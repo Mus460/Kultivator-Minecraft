@@ -1,0 +1,42 @@
+{
+  "_catatan": "Kebiasaan #32 pekerja_keras (DESIGN 42.4.12)",
+  "nomor": 32,
+  "siapa": {
+    "umur": [
+      18,
+      200
+    ],
+    "bekerja": true,
+    "tahap": [
+      "dewasa"
+    ]
+  },
+  "sesi": [
+    {
+      "jam": [
+        5,
+        6.5
+      ],
+      "syarat": [
+        "bekerja"
+      ],
+      "tujuan": [
+        "@kerja"
+      ],
+      "klip": "@kerja"
+    },
+    {
+      "jam": [
+        19,
+        21
+      ],
+      "syarat": [
+        "bekerja"
+      ],
+      "tujuan": [
+        "@kerja"
+      ],
+      "klip": "@kerja"
+    }
+  ]
+}

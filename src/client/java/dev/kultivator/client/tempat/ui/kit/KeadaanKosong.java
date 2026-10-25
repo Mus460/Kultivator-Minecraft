@@ -26,14 +26,14 @@ public final class KeadaanKosong {
 		int h = y1 - y0;
 		Component teks = kosong.ada(LembarKunci.TEKS) ? kosong.teks(LembarKunci.TEKS) : cadangan != null ? cadangan : TeksTempat.k("kosong.bawaan");
 		float lebar = Math.min(x1 - x0 - 16, 220);
-		// a short box (GUI scale 4) drops the illustration first, then writes smaller; lines never leave the box
+		// a short box (GUI scale 4) drops the illustration first; lines never leave the box (43.0.5: always 1.0)
 		boolean gambarAda = h >= 64;
 		float iy = y0 + (gambarAda ? Math.max(6, h * 0.18F) : 4.0F);
 		if (gambarAda) {
 			ilustrasi(l, gambar, cx, iy + 14.0F);
 		}
 		float ty = gambarAda ? iy + 34.0F : iy;
-		float ukuran = h < 40 ? 0.75F : 1.0F;
+		float ukuran = 1.0F;
 		java.util.List<net.minecraft.util.FormattedCharSequence> lines = l.font.split(teks, Math.max(10, Math.round(lebar / ukuran)));
 		int muat = Math.max(1, (int) ((y1 - ty) / (9.0F * ukuran)));
 		int n = Math.min(lines.size(), muat);
@@ -78,8 +78,9 @@ public final class KeadaanKosong {
 				Brush.line(l.g, cx + 18, cy - 5, cx + 19, cy - 7, 0.8F, ink);
 				Brush.line(l.g, cx + 22, cy - 5, cx + 21.5F, cy - 7, 0.8F, ink);
 				Brush.line(l.g, cx + 11, cy + 5, cx + 7, cy + 7, 1.2F, ink);
-				Brush.text(l.g, l.font, Component.literal("z"), cx + 23, cy - 12, ink, 0.6F, false);
-				Brush.text(l.g, l.font, Component.literal("z"), cx + 26, cy - 16, ink, 0.75F, false);
+				// two little "z" drawn as strokes (no text below 1.0, 43.0.5)
+				zet(l, cx + 23, cy - 12, 3.0F, ink);
+				zet(l, cx + 27, cy - 17, 4.0F, ink);
 			}
 			case GULUNGAN -> {
 				l.g.fill(Math.round(cx - 14), Math.round(cy - 9), Math.round(cx + 14), Math.round(cy + 9), soft);
@@ -97,5 +98,12 @@ public final class KeadaanKosong {
 	}
 
 	private KeadaanKosong() {
+	}
+
+	/** A "z" of size {@code u} drawn with three strokes from its top-left corner. */
+	private static void zet(Lukis l, float x, float y, float u, int warna) {
+		Brush.line(l.g, x, y, x + u, y, 0.8F, warna);
+		Brush.line(l.g, x + u, y, x, y + u, 0.8F, warna);
+		Brush.line(l.g, x, y + u, x + u, y + u, 0.8F, warna);
 	}
 }

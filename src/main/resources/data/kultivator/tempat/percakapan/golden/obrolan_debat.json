@@ -1,0 +1,143 @@
+{
+  "id": "obrolan_debat",
+  "jenis": "realisasi",
+  "_catatan": "NPC-NPC DEBAT: accusation, rebuttal, threat, a third party separates, storming off.",
+  "benih_dunia": 42,
+  "masukan": {
+    "niat": "TUDUH",
+    "pembicara": 610,
+    "hari": 120,
+    "now": 2880000,
+    "cuaca": "cerah",
+    "musim": "semi",
+    "situasi": {
+      "jam": "pagi",
+      "cuaca": "cerah",
+      "musim": "semi",
+      "kelompok": "pekerja",
+      "watak": "ramah",
+      "kebiasaan": [],
+      "sifat": {
+        "H": -20,
+        "E": 10,
+        "X": 30,
+        "A": -50,
+        "C": 0,
+        "O": 0
+      },
+      "wajah": "netral",
+      "tempat": "kota_besar"
+    },
+    "pendengar": null,
+    "kesan": "kenal",
+    "tahu_nama": false,
+    "register": "kasar",
+    "dialek": "iblis",
+    "label": "marah",
+    "intensitas": "bukan_main",
+    "nilai": {
+      "lawan": {
+        "orang": {
+          "nama": "Lao Wu",
+          "kelamin": "l",
+          "tahap": "dewasa"
+        }
+      }
+    },
+    "topik": "debat"
+  },
+  "langkah": [
+    {
+      "ubah": {},
+      "harap": {
+        "k": "kultivator.cakap.debat.tuduh.2",
+        "a": [
+          {
+            "t": "Lao Wu"
+          }
+        ]
+      },
+      "aturan": "debat.tuduh",
+      "gestur": "marah_tunjuk",
+      "seru": null,
+      "tik": null,
+      "id_id": "Timbanganmu curang, Lao Wu! Sekati-mu cuma tiga perempat!",
+      "en_us": "Your scales cheat, Lao Wu! Your catty is only three quarters!"
+    },
+    {
+      "ubah": {
+        "niat": "BANTAH",
+        "pembicara": 611
+      },
+      "harap": {
+        "k": "kultivator.cakap.debat.bantah.0.kasar",
+        "a": [
+          {
+            "t": "Lao Wu"
+          }
+        ]
+      },
+      "aturan": "debat.bantah",
+      "gestur": "berdebat",
+      "seru": null,
+      "tik": null,
+      "id_id": "Tutup mulutmu! Buktikan dulu, baru bicara!",
+      "en_us": "Shut your mouth! Prove it first, then talk!"
+    },
+    {
+      "ubah": {
+        "niat": "ESKALASI",
+        "topik": "debat"
+      },
+      "harap": {
+        "k": "kultivator.cakap.debat.ancam.1",
+        "a": [
+          {
+            "t": "Lao Wu"
+          }
+        ]
+      },
+      "aturan": "debat.ancam",
+      "gestur": "ancam",
+      "seru": "kota42.seru.cih",
+      "tik": null,
+      "id_id": "Awas kau, Lao Wu! Tunggu saja malam ini!",
+      "en_us": "Watch yourself, Lao Wu! Just wait till tonight!"
+    },
+    {
+      "ubah": {
+        "niat": "LERAI",
+        "pembicara": 612
+      },
+      "harap": {
+        "k": "kultivator.cakap.debat.lerai.3.iblis",
+        "a": []
+      },
+      "aturan": "debat.lerai",
+      "gestur": "lerai",
+      "seru": null,
+      "tik": null,
+      "id_id": "Kalau mau saling bunuh, ke arena. Di sana ada yang bayar.",
+      "en_us": "If you want to kill each other, go to the arena. Someone pays there."
+    },
+    {
+      "ubah": {
+        "niat": "PERGI_MARAH"
+      },
+      "harap": {
+        "k": "kultivator.cakap.debat.pergi.2.iblis",
+        "a": [
+          {
+            "t": "Lao Wu"
+          }
+        ]
+      },
+      "aturan": "debat.pergi",
+      "gestur": "marah_hentak",
+      "seru": null,
+      "tik": null,
+      "id_id": "Ingat wajahku, Lao Wu. Kau akan melihatnya lagi. Dalam gelap.",
+      "en_us": "Remember my face, Lao Wu. You'll see it again. In the dark."
+    }
+  ]
+}

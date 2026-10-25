@@ -1,0 +1,2545 @@
+{
+  "_dibuat": "tools/gen_kota_hidup_cakap.py dari tools/kota_cakap_sumber (jangan disunting tangan)",
+  "kelompok": "sapa",
+  "isi": [
+    {
+      "aturan": "sapa.subuh",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "jam": [
+          "subuh"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.subuh.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kampung",
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "sapa.subuh.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "sapa.subuh.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "gunung"
+          ]
+        },
+        {
+          "kunci": "sapa.subuh.3",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "varian": [
+            "air"
+          ]
+        },
+        {
+          "kunci": "sapa.subuh.4",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "lambai"
+    },
+    {
+      "aturan": "sapa.pagi",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "jam": [
+          "pagi"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.pagi.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "pelabuhan",
+            "oasis",
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "sapa.pagi.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kampung",
+            "ibukota"
+          ]
+        },
+        {
+          "kunci": "sapa.pagi.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1
+        },
+        {
+          "kunci": "sapa.pagi.3",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1
+        },
+        {
+          "kunci": "sapa.pagi.4",
+          "slot": [],
+          "bobot": 2
+        },
+        {
+          "kunci": "sapa.pagi.5",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "air"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "lambai"
+    },
+    {
+      "aturan": "sapa.siang",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "jam": [
+          "siang"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.siang.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "sapa.siang.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kasar",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "sapa.siang.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kuno",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "sapa.siang.3",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "sapa.siang.4",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "air",
+            "pelabuhan"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "lambai"
+    },
+    {
+      "aturan": "sapa.sore",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "jam": [
+          "sore"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.sore.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kuno",
+            "air"
+          ]
+        },
+        {
+          "kunci": "sapa.sore.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kasar",
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "sapa.sore.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "sapa.sore.3",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kuno",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "sapa.sore.4",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "varian": [
+            "gunung"
+          ]
+        },
+        {
+          "kunci": "sapa.sore.5",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "lambai"
+    },
+    {
+      "aturan": "sapa.malam",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "jam": [
+          "malam"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.malam.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "sapa.malam.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kuno",
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "sapa.malam.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "air"
+          ]
+        },
+        {
+          "kunci": "sapa.malam.3",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kasar",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "sapa.malam.4",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "kasar",
+            "pelabuhan"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "lambai"
+    },
+    {
+      "aturan": "sapa.larut",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "jam": [
+          "larut"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.larut.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kuno",
+            "kampung",
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "sapa.larut.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kasar",
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "sapa.larut.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "air"
+          ]
+        },
+        {
+          "kunci": "sapa.larut.3",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "varian": [
+            "iblis",
+            "kuno"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "lambai"
+    },
+    {
+      "aturan": "sapa.hujan",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "cuaca": [
+          "hujan"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.hujan.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "sapa.hujan.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "sapa.hujan.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "sapa.hujan.3",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kasar",
+            "air"
+          ]
+        },
+        {
+          "kunci": "sapa.hujan.4",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "lambai"
+    },
+    {
+      "aturan": "sapa.badai",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "cuaca": [
+          "badai"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.badai.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "sapa.badai.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "sapa.badai.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "gunung",
+            "pelabuhan"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "lambai"
+    },
+    {
+      "aturan": "sapa.salju",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "cuaca": [
+          "salju"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.salju.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kasar",
+            "gunung"
+          ]
+        },
+        {
+          "kunci": "sapa.salju.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "sapa.salju.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "sapa.salju.3",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "pelabuhan"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "hangat_tangan"
+    },
+    {
+      "aturan": "sapa.kabut_qi",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "cuaca": [
+          "kabut_qi"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.kabut_qi.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "sapa.kabut_qi.1",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "gunung"
+          ]
+        },
+        {
+          "kunci": "sapa.kabut_qi.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kampung",
+            "kuno"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "lihat_sekeliling"
+    },
+    {
+      "aturan": "sapa.gerhana",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "cuaca": [
+          "gerhana",
+          "meteor"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.gerhana.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "sapa.gerhana.1",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "sapa.gerhana.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "air"
+          ]
+        },
+        {
+          "kunci": "sapa.gerhana.3",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "kaget"
+    },
+    {
+      "aturan": "sapa.gembira",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "label_emosi": [
+          "gembira",
+          "puas",
+          "kagum"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.gembira.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "sapa.gembira.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "sapa.gembira.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "sapa.gembira.3",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "sapa.gembira.4",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "air"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "tertawa"
+    },
+    {
+      "aturan": "sapa.sedih",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "label_emosi": [
+          "sedih"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.sedih.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "sapa.sedih.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "air"
+          ]
+        },
+        {
+          "kunci": "sapa.sedih.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "sapa.sedih.3",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "menangis"
+    },
+    {
+      "aturan": "sapa.marah",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "label_emosi": [
+          "marah"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.marah.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "sapa.marah.1",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "sapa.marah.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "sapa.marah.3",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "marah_hentak"
+    },
+    {
+      "aturan": "sapa.cemas",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "label_emosi": [
+          "cemas"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.cemas.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kasar",
+            "air"
+          ]
+        },
+        {
+          "kunci": "sapa.cemas.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "sapa.cemas.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1
+        },
+        {
+          "kunci": "sapa.cemas.3",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kampung"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "lihat_sekeliling"
+    },
+    {
+      "aturan": "sapa.jemu",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "label_emosi": [
+          "jemu"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.jemu.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "sapa.jemu.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "sapa.jemu.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "sapa.jemu.3",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "pelabuhan"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "menguap_peregangan"
+    },
+    {
+      "aturan": "sapa.mabuk",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "wajah": [
+          "mabuk"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.mabuk.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "sapa.mabuk.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "sapa.mabuk.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "sapa.mabuk.3",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "p"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "jalan_mabuk",
+      "seru": "mabuk"
+    },
+    {
+      "aturan": "sapa.sakit",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "wajah": [
+          "sakit"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.sakit.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "sapa.sakit.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "sapa.sakit.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "gunung"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "batuk"
+    },
+    {
+      "aturan": "sapa.asing",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "kesan": [
+          "asing"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.asing.0",
+          "slot": [
+            "$sebutan",
+            "$tempat"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "sapa.asing.1",
+          "slot": [
+            "$tempat",
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kasar",
+            "kampung",
+            "ibukota",
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "sapa.asing.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "sapa.asing.3",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kuno",
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "sapa.asing.4",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "varian": [
+            "kasar"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        },
+        "$tempat": {
+          "tipe": "tempat",
+          "dari": "konteks.tempat"
+        }
+      },
+      "gestur": "hormat"
+    },
+    {
+      "aturan": "sapa.kenal",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "kesan": [
+          "kenal"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.kenal.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "sapa.kenal.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "pelabuhan",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "sapa.kenal.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "sapa.kenal.3",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "air"
+          ]
+        },
+        {
+          "kunci": "sapa.kenal.4",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "lambai"
+    },
+    {
+      "aturan": "sapa.akrab",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "kesan": [
+          "akrab"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.akrab.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "varian": [
+            "kasar",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "sapa.akrab.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "sapa.akrab.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "air"
+          ]
+        },
+        {
+          "kunci": "sapa.akrab.3",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kasar",
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "sapa.akrab.4",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kampung"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "tepuk_bahu"
+    },
+    {
+      "aturan": "sapa.sahabat",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "kesan": [
+          "sahabat"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.sahabat.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "varian": [
+            "kasar",
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "sapa.sahabat.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "sapa.sahabat.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "sapa.sahabat.3",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "sapa.sahabat.4",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "p",
+            "kuno"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "peluk"
+    },
+    {
+      "aturan": "sapa.musuh",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "kesan": [
+          "musuh"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.musuh.0",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "kasar",
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "sapa.musuh.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "sapa.musuh.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kampung",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "sapa.musuh.3",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "sapa.musuh.4",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "sikap_lipat_tangan"
+    },
+    {
+      "aturan": "sapa.tahu_nama",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "tahu_nama": true,
+        "kesan": [
+          "kenal",
+          "akrab",
+          "sahabat"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.tahu_nama.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "sapa.tahu_nama.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "sapa.tahu_nama.2",
+          "slot": [
+            "$sebutan",
+            "$tempat"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kampung"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        },
+        "$tempat": {
+          "tipe": "tempat",
+          "dari": "konteks.tempat"
+        }
+      },
+      "gestur": "lambai"
+    },
+    {
+      "aturan": "sapa.pedagang",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "kelompok": [
+          "pedagang"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.pedagang.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "pelabuhan",
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "sapa.pedagang.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "sapa.pedagang.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "sapa.pedagang.3",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "sapa.pedagang.4",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "sapa.pedagang.5",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "seru_dagang"
+    },
+    {
+      "aturan": "sapa.pedagang.hujan",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "kelompok": [
+          "pedagang"
+        ],
+        "cuaca": [
+          "hujan"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.pedagang.hujan.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "sapa.pedagang.hujan.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "sapa.pedagang.hujan.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "seru_dagang"
+    },
+    {
+      "aturan": "sapa.pekerja",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "kelompok": [
+          "pekerja"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.pekerja.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "sapa.pekerja.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "sapa.pekerja.2",
+          "slot": [
+            "$sebutan",
+            "$kerja"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "sapa.pekerja.3",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "sapa.pekerja.4",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        },
+        "$kerja": {
+          "tipe": "pekerjaan",
+          "dari": "pembicara"
+        }
+      },
+      "gestur": "seka_keringat"
+    },
+    {
+      "aturan": "sapa.pekerja.pagi",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "kelompok": [
+          "pekerja"
+        ],
+        "jam": [
+          "pagi"
+        ],
+        "label_emosi": [
+          "gembira",
+          "puas",
+          "netral"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.pekerja.pagi.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "sapa.pekerja.pagi.1",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "sapa.pekerja.pagi.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "lambai"
+    },
+    {
+      "aturan": "sapa.penjaga",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "kelompok": [
+          "penjaga"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.penjaga.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "sapa.penjaga.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "sapa.penjaga.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "sapa.penjaga.3",
+          "slot": [
+            "$tempat"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "sapa.penjaga.4",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        },
+        "$tempat": {
+          "tipe": "tempat",
+          "dari": "konteks.tempat"
+        }
+      },
+      "gestur": "sikap_tombak"
+    },
+    {
+      "aturan": "sapa.anak",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "kelompok": [
+          "anak"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.anak.0",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "sapa.anak.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "sapa.anak.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "sapa.anak.3",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "sapa.anak.4",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "sapa.anak.5",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "air"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "lari_lambai"
+    },
+    {
+      "aturan": "sapa.tetua",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "kelompok": [
+          "tetua"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.tetua.0",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "sapa.tetua.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "sapa.tetua.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "sapa.tetua.3",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "sapa.tetua.4",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "sikap_tua",
+      "seru": "tetua_hmm"
+    },
+    {
+      "aturan": "sapa.kultivator",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "kelompok": [
+          "kultivator"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.kultivator.0",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "kuno",
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "sapa.kultivator.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kuno",
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "sapa.kultivator.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "sapa.kultivator.3",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "hormat"
+    },
+    {
+      "aturan": "sapa.kultivator.senior",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "ranah_selisih": ">=3"
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.kultivator.senior.0",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "sapa.kultivator.senior.1",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "sapa.kultivator.senior.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "sapa.kultivator.senior.3",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kampung"
+          ]
+        }
+      ],
+      "slot": {},
+      "gestur": "hormat_dalam"
+    },
+    {
+      "aturan": "sapa.cendekia",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "kelompok": [
+          "cendekia"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.cendekia.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "sapa.cendekia.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "sapa.cendekia.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "sapa.cendekia.3",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "hormat"
+    },
+    {
+      "aturan": "sapa.rahib",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "kelompok": [
+          "rahib"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.rahib.0",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "sapa.rahib.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "sapa.rahib.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "sapa.rahib.3",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "sikap_doa"
+    },
+    {
+      "aturan": "sapa.pejabat",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "kelompok": [
+          "pejabat"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.pejabat.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "varian": [
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "sapa.pejabat.1",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kasar",
+            "ibukota"
+          ]
+        },
+        {
+          "kunci": "sapa.pejabat.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "sapa.pejabat.3",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "sikap_tangan_belakang"
+    },
+    {
+      "aturan": "sapa.khusus",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "kelompok": [
+          "khusus"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.khusus.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "sapa.khusus.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "sapa.khusus.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "lambai"
+    },
+    {
+      "aturan": "sapa.dialek.iblis",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "dialek": [
+          "iblis"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.dialek.iblis.0",
+          "slot": [],
+          "bobot": 2
+        },
+        {
+          "kunci": "sapa.dialek.iblis.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "sapa.dialek.iblis.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "sapa.dialek.iblis.3",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "sikap_berkacak"
+    },
+    {
+      "aturan": "sapa.dialek.gunung",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "dialek": [
+          "gunung"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.dialek.gunung.0",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "sapa.dialek.gunung.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "sapa.dialek.gunung.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "sikap_doa"
+    },
+    {
+      "aturan": "sapa.dialek.pelabuhan",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "dialek": [
+          "pelabuhan"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.dialek.pelabuhan.0",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "sapa.dialek.pelabuhan.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "sapa.dialek.pelabuhan.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "lambai"
+    },
+    {
+      "aturan": "sapa.dialek.oasis",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "dialek": [
+          "oasis"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.dialek.oasis.0",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "sapa.dialek.oasis.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "sapa.dialek.oasis.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "hormat"
+    },
+    {
+      "aturan": "sapa.dialek.air",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "dialek": [
+          "air"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.dialek.air.0",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "sapa.dialek.air.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "sapa.dialek.air.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "lambai"
+    }
+  ]
+}

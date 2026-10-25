@@ -223,7 +223,7 @@ final class TanamanRenderer {
 		}
 		Minecraft minecraft = Minecraft.getInstance();
 		ClientLevel level = minecraft.level;
-		if (level == null || minecraft.gui.screen() instanceof KebunScreen) {
+		if (level == null || KebunScreen.ditampilkan()) {
 			return;
 		}
 		try {

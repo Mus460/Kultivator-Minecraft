@@ -1,0 +1,101 @@
+{
+  "pemberi": "peran:tetua_sekte",
+  "tempat": "gabung_sekte",
+  "tahap": [
+    {
+      "id": "pagi",
+      "tujuan": [
+        "gabung_titik arena",
+        "jam 5 10"
+      ],
+      "akibat_masuk": [
+        "gabung.cerita air_kayu pagi kakak corak"
+      ],
+      "akibat": [
+        "gabung.sikap kakak 5",
+        "gabung.pk 5"
+      ],
+      "batas_hari": 2,
+      "gagal_ke": "dapur",
+      "arah": "sekte/kompleks"
+    },
+    {
+      "id": "dapur",
+      "tujuan": [
+        "gabung pilih:air_kayu"
+      ],
+      "akibat_masuk": [
+        "gabung.cerita air_kayu dapur saingan",
+        "gabung.pilihan air_kayu dapur balas mengalah"
+      ],
+      "cabang": [
+        {
+          "syarat": [
+            "bendera gabung.air_kayu.balas"
+          ],
+          "ke": "leitai"
+        }
+      ],
+      "ke": "mengalah",
+      "batas_hari": 3,
+      "gagal_ke": "mengalah"
+    },
+    {
+      "id": "leitai",
+      "tujuan": [
+        "gabung tanding:saingan"
+      ],
+      "akibat_masuk": [
+        "gabung.cerita air_kayu leitai saingan",
+        "gabung.tanding saingan"
+      ],
+      "cabang": [
+        {
+          "syarat": [
+            "bendera gabung.tanding.saingan.menang"
+          ],
+          "ke": "menang"
+        }
+      ],
+      "ke": "kalah",
+      "batas_hari": 2,
+      "gagal_ke": "kalah"
+    },
+    {
+      "id": "menang",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "gabung.cerita air_kayu menang kakak",
+        "gabung.sikap saingan -10",
+        "gabung.pk 30"
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "kalah",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "gabung.cerita air_kayu kalah kakak",
+        "gabung.sikap kakak 5",
+        "gabung.pk 10"
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "mengalah",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "gabung.cerita air_kayu mengalah kakak",
+        "gabung.sikap kakak 10",
+        "gabung.pk 10"
+      ],
+      "ke": "selesai"
+    }
+  ]
+}

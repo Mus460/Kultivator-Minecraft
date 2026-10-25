@@ -1,0 +1,14 @@
+{
+  "kultivator.gui43.hal.diri.jalan": "Jalan",
+  "kultivator.gui43.hal.panduan.kitab": "Kitab",
+  "kultivator.gui43.sub.kitab.jalan_kultivasi": "Jalan Kultivasi",
+  "kultivator.gui43.sub.kitab.bab": "Bab Panduan",
+  "kultivator.gui43.m17.buku.1": "Langkah Pertama · Bab 1-5",
+  "kultivator.gui43.m17.buku.2": "Jalan Dunia · Bab 6-10",
+  "kultivator.gui43.m17.buku.3": "Jalan Abadi · Bab 11-15",
+  "kultivator.gui43.m17.langkah.belum": "Selesaikan keempat langkah bab ini dulu.",
+  "kultivator.gui43.m17.bab.ringkas": "Bab %s sekarang · %s/%s langkah",
+  "kultivator.gui43.m17.ensiklopedia.cari": "Cari topik...",
+  "kultivator.gui43.m17.ensiklopedia.hasil": "%s topik cocok",
+  "kultivator.gui43.m17.ensiklopedia.kosong": "Tidak ada topik yang cocok. Coba kata lain, atau kosongkan pencarian (×)."
+}

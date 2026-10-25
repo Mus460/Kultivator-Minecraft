@@ -78,7 +78,7 @@ final class NatalSendiri {
 	/** Free at home: no order pause, not Patuh, idle or resting in the planner, not fighting, duelling or breaking through. */
 	private static boolean bebas(DiscipleEntity murid) {
 		DiscipleData data = murid.data();
-		if (murid.getTarget() != null || data.breakingThrough() || DuelRules.inDuel(murid) || murid.isReleasing()) {
+		if (murid.getTarget() != null || data.breakingThrough() || DuelRules.inDuel(murid) || murid.isReleasing() || murid.mode().follows()) {
 			return false;
 		}
 		if (MandiriApi.kebijakan(murid).mode() == ModeMandiri.PATUH || MandiriApi.bebasSampai(data) > murid.level().getGameTime()) {

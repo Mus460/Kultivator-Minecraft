@@ -10,6 +10,7 @@ import dev.kultivator.disciple.path.DisciplePaths;
 import dev.kultivator.fx.Fx;
 import dev.kultivator.sect.build.api.Bahan;
 import dev.kultivator.sect.build.api.EngineApi;
+import dev.kultivator.sect.build.api.SectTemplates;
 import dev.kultivator.sect.event.Duties;
 import dev.kultivator.sect.hall.Halls;
 import dev.kultivator.sect.hall.SectRanks;
@@ -132,7 +133,7 @@ public final class GatherExpeditions {
 
 	/** Parties allowed at once: {@code 1 + floor((S - 1) / 3)}. */
 	public static int maxParties(UUID owner) {
-		int template = EngineApi.get().template(owner);
+		int template = SectTemplates.rank(EngineApi.get().template(owner));
 		return 1 + Math.max(0, template - 1) / 3;
 	}
 

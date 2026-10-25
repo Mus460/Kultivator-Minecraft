@@ -36,6 +36,13 @@ public final class LangitUi {
 	}
 
 	private static void handle(ServerPlayer player, LangitUiPayloads.Minta minta) {
+		if (!LangitConfig.on()) {
+			// Off: only the answer that the module is off, no action runs.
+			CompoundTag off = new CompoundTag();
+			off.putBoolean("aktif", false);
+			sendData(player, off);
+			return;
+		}
 		MinecraftServer server = player.level().getServer();
 		UUID owner = ownerFor(player);
 		switch (minta.action()) {

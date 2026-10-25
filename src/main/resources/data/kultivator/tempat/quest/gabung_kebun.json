@@ -1,0 +1,152 @@
+{
+  "pemberi": "peran:tetua_sekte",
+  "tempat": "gabung_sekte",
+  "tahap": [
+    {
+      "id": "hilang",
+      "tujuan": [
+        "gabung_titik tetua"
+      ],
+      "akibat_masuk": [
+        "gabung.cerita kebun hilang obat corak"
+      ],
+      "akibat": [
+        "gabung.sikap obat 3"
+      ],
+      "batas_hari": 3,
+      "gagal_ke": "jejak",
+      "arah": "sekte/kompleks"
+    },
+    {
+      "id": "jejak",
+      "tujuan": [
+        "gabung_titik gerbang",
+        "jam 20 4"
+      ],
+      "akibat_masuk": [
+        "gabung.cerita kebun jejak kakak"
+      ],
+      "cabang": [
+        {
+          "syarat": [
+            "gabung.musuh",
+            "acak 50"
+          ],
+          "ke": "mata_mata"
+        }
+      ],
+      "ke": "saingan",
+      "batas_hari": 3,
+      "gagal_ke": "saingan",
+      "arah": "sekte/kompleks"
+    },
+    {
+      "id": "saingan",
+      "tujuan": [
+        "gabung pilih:kebun"
+      ],
+      "akibat_masuk": [
+        "gabung.cerita kebun saingan saingan",
+        "gabung.pilihan kebun saingan lapor peras lindungi"
+      ],
+      "cabang": [
+        {
+          "syarat": [
+            "bendera gabung.kebun.lapor"
+          ],
+          "ke": "lapor_saingan"
+        },
+        {
+          "syarat": [
+            "bendera gabung.kebun.peras"
+          ],
+          "ke": "peras"
+        }
+      ],
+      "ke": "lindungi",
+      "batas_hari": 3,
+      "gagal_ke": "lindungi"
+    },
+    {
+      "id": "mata_mata",
+      "tujuan": [
+        "gabung pilih:kebun"
+      ],
+      "akibat_masuk": [
+        "gabung.cerita kebun mata_mata",
+        "gabung.pilihan kebun mata_mata lapor peras lindungi"
+      ],
+      "cabang": [
+        {
+          "syarat": [
+            "bendera gabung.kebun.lapor"
+          ],
+          "ke": "lapor_mata"
+        },
+        {
+          "syarat": [
+            "bendera gabung.kebun.peras"
+          ],
+          "ke": "peras"
+        }
+      ],
+      "ke": "lindungi",
+      "batas_hari": 3,
+      "gagal_ke": "lindungi"
+    },
+    {
+      "id": "lapor_saingan",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "gabung.cerita kebun lapor_saingan hukum",
+        "gabung.sikap hukum 10",
+        "gabung.sikap saingan -15",
+        "gabung.pk 40"
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "lapor_mata",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "gabung.cerita kebun lapor_mata hukum",
+        "gabung.sikap hukum 10",
+        "gabung.standing 3",
+        "gabung.standing_musuh -5",
+        "gabung.pk 60"
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "peras",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "gabung.cerita kebun peras",
+        "gabung.infami 3",
+        "beri_nb_pita 15",
+        "gabung.sikap saingan -5"
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "lindungi",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "gabung.cerita kebun lindungi kakak",
+        "gabung.pelanggaran 5",
+        "gabung.sikap kakak 10",
+        "gabung.ikatan 5",
+        "gabung.pk 20"
+      ],
+      "ke": "selesai"
+    }
+  ]
+}

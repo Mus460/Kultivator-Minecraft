@@ -1,0 +1,112 @@
+{
+  "id": "tagih_utang",
+  "jenis": "realisasi",
+  "_catatan": "Asking the player to repay 120 NB, then the debt-memory flashback. (PERMINTAAN_NPC/uang: TAGIH is not an intent in niat.json)",
+  "benih_dunia": 42,
+  "masukan": {
+    "niat": "PERMINTAAN_NPC",
+    "pembicara": 501,
+    "hari": 120,
+    "now": 2880000,
+    "cuaca": "cerah",
+    "musim": "semi",
+    "situasi": {
+      "jam": "pagi",
+      "cuaca": "cerah",
+      "musim": "semi",
+      "kelompok": "pedagang",
+      "watak": "ramah",
+      "kebiasaan": [],
+      "sifat": {
+        "H": 10,
+        "E": 0,
+        "X": 20,
+        "A": 30,
+        "C": 10,
+        "O": 0
+      },
+      "wajah": "netral",
+      "tempat": "kota_besar"
+    },
+    "pendengar": {
+      "nama": "Han",
+      "kelamin": "l",
+      "tahap": "dewasa",
+      "pemain": true
+    },
+    "kesan": "kenal",
+    "tahu_nama": false,
+    "register": "biasa",
+    "dialek": "pelabuhan",
+    "nilai": {
+      "konteks.jumlah": 120,
+      "konteks.batas": 119
+    },
+    "topik": "uang"
+  },
+  "langkah": [
+    {
+      "ubah": {},
+      "harap": {
+        "k": "kultivator.cakap.tagih.1.pelabuhan",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.kakak.pelabuhan",
+            "a": []
+          },
+          {
+            "k": "kultivator.kota.nb",
+            "a": [
+              {
+                "t": "120"
+              }
+            ]
+          }
+        ]
+      },
+      "aturan": "tagih",
+      "gestur": "marah_tunjuk",
+      "seru": null,
+      "tik": null,
+      "id_id": "Kapalku butuh layar baru, Bung. %s NB, hari ini.",
+      "en_us": "My boat needs a new sail, mate. %s SV, today."
+    },
+    {
+      "ubah": {
+        "niat": "KILAS_BALIK",
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pedagang",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar",
+          "kenangan": [
+            "UTANG_MANGKIR"
+          ]
+        },
+        "topik": "kilas.utang_pemain"
+      },
+      "harap": {
+        "k": "kultivator.cakap.kilas.utang.2",
+        "a": []
+      },
+      "aturan": "kilas.utang",
+      "gestur": "hitung_koin",
+      "seru": null,
+      "tik": null,
+      "id_id": "Kalau belum bisa semua, separuh dulu juga boleh.",
+      "en_us": "If you can't pay it all, half for now will do."
+    }
+  ]
+}

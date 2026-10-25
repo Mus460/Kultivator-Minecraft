@@ -1,0 +1,78 @@
+{
+  "_catatan": "Kebiasaan #1 pemabuk (DESIGN 42.4.12); ilham: Li Bai, Liu Ling",
+  "nomor": 1,
+  "siapa": {
+    "umur": [
+      18,
+      200
+    ],
+    "bukan": [
+      "rahib"
+    ],
+    "tahap": [
+      "dewasa",
+      "tua"
+    ]
+  },
+  "bobot": 0.8,
+  "sesi": [
+    {
+      "jam": [
+        19,
+        23
+      ],
+      "peluang": 0.85,
+      "tujuan": [
+        "@kedai",
+        "kursi",
+        "obrol"
+      ],
+      "klip": "kota42:minum_arak",
+      "kanan": "kota42:cawan_arak",
+      "ganti": [
+        {
+          "klip": "kota42:minum_arak"
+        },
+        {
+          "klip": "kota42:minum_arak"
+        },
+        {
+          "klip": "kota42:nyanyi_mabuk"
+        },
+        {
+          "klip": "tertawa"
+        }
+      ],
+      "ganti_menit": 9
+    },
+    {
+      "jam": [
+        23,
+        5
+      ],
+      "butuh": 0,
+      "peluang": 0.1,
+      "kegiatan": "kb_pemabuk_tidur",
+      "tujuan": [
+        "kursi",
+        "obrol",
+        "@jalan:3"
+      ],
+      "klip": "kota42:tidur_bangku",
+      "jalan": "kota42:jalan_mabuk"
+    },
+    {
+      "jam": [
+        23,
+        0.75
+      ],
+      "butuh": 0,
+      "kegiatan": "kb_pemabuk_pulang",
+      "tujuan": [
+        "@rumah"
+      ],
+      "jalan": "kota42:jalan_mabuk",
+      "klip": "kota42:jalan_mabuk"
+    }
+  ]
+}

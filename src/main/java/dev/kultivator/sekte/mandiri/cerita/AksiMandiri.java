@@ -124,8 +124,15 @@ public final class AksiMandiri {
 			case "dorong" -> {
 				JalanHidup jalan = JalanHidup.byId(aksi.arg());
 				if (jalan != null && jalan.pilihanAwal()) {
+					JalanHidup sebelum = MandiriApi.jalan(body.data());
 					MandiriApi.dorongJalan(body, jalan);
-					jawab(player, "dorong.ok", ChatFormatting.GRAY, body.getName(), Component.translatable(jalan.kunciNama()));
+					String key = sebelum == JalanHidup.IBLIS ? "dorong.iblis"
+							: jalan == sebelum ? "dorong.cabut" : MandiriApi.jalan(body.data()) == jalan ? "dorong.ganti" : "dorong.ok";
+					ChatFormatting tone = "dorong.ganti".equals(key) ? ChatFormatting.GREEN : "dorong.iblis".equals(key) ? ChatFormatting.YELLOW
+							: ChatFormatting.GRAY;
+					// In chat, not the action bar: the answer to a deliberate choice must not be missed.
+					player.sendSystemMessage(Component.translatable(K + key, body.getName(), Component.translatable(jalan.kunciNama()))
+							.withStyle(tone));
 				}
 			}
 			case "bebaskan" -> {

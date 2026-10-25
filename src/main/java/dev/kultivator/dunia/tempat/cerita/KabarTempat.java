@@ -147,6 +147,7 @@ public final class KabarTempat {
 		if (!CeritaConfig.jalan()) {
 			return;
 		}
+		dev.kultivator.dunia.kota42.cakap.GosipWarga.dariKabar(level, situs, pemicu, isian);    // 42.5.4: one source
 		List<Templat> pool = new ArrayList<>();
 		int total = 0;
 		for (Templat t : CeritaReload.kabar().values()) {

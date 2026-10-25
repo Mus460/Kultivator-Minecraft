@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:sekte/gabung_pangkat_luar",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "kultivator.gabung.adv.turnamen.desc"
+    },
+    "icon": {
+      "id": "minecraft:golden_sword"
+    },
+    "title": {
+      "translate": "kultivator.gabung.adv.turnamen.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

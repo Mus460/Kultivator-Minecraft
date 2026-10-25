@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:sekte/gabung_tugas",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "kultivator.gabung.adv.misi_10.desc"
+    },
+    "icon": {
+      "id": "minecraft:map"
+    },
+    "title": {
+      "translate": "kultivator.gabung.adv.misi_10.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

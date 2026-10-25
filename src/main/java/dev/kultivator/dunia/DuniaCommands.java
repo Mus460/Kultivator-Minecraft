@@ -125,7 +125,14 @@ public final class DuniaCommands {
 			"penampilan galeri peran [halaman]", "penampilan galeri murid", "penampilan galeri jalan", "penampilan galeri usia <peran>",
 			"penampilan galeri dao", "penampilan galeri fisik", "penampilan acak [n]", "penampilan klip <id> [radius]", "penampilan klip semua",
 			"penampilan klip kelompok <kelompok>", "penampilan jalan", "penampilan wajah", "penampilan pegas", "penampilan murid <ubah>",
-			"penampilan pratinjau_benih <benih> <rupa>", "penampilan hapus");
+			"penampilan pratinjau_benih <benih> <rupa>", "penampilan hapus",
+			// DESIGN 41.13.3 (Gabung Sekte, 41A; the whole list is group "gabung_sekte" of /kultivasi uji)
+			"gabung", "gabung daftar", "gabung sebaran [preset]", "gabung tp <sekte> [titik]", "gabung ujian <sekte> [tahap 1|2|3] [corak <id>]",
+			"gabung terima <sekte> <pangkat>", "gabung reset [semua]",
+			// DESIGN 42.14.3 (Kota yang Hidup, 42A; the whole list is group "kota_hidup" of /kultivasi uji)
+			"kota_hidup", "kota_hidup cek", "kota_hidup warga daftar [situs]", "kota_hidup cakap info <npc>", "kota_hidup sebaran peta",
+			"kota_hidup ekonomi harga [kategori]", "kota_hidup acara musim <musim>", "kota_hidup tumbuh kavling [daftar]",
+			"kota_hidup kompat periksa [radius]", "kota_hidup anggaran", "kota_hidup reset [bagian] [situs]");
 
 	private static final SuggestionProvider<CommandSourceStack> STRUCTURES = (ctx, builder) -> {
 		Registry<Structure> registry = ctx.getSource().getServer().registryAccess().lookupOrThrow(Registries.STRUCTURE);

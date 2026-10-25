@@ -42,6 +42,14 @@ public final class SekteIds {
 	 */
 	public static final String MANDIRI = "mandiri";
 
+	/**
+	 * Gabung Sekte (DESIGN 41, package {@code sekte.gabung}): joining the NPC sects. Config section {@code gabungSekte}
+	 * (its own switch {@code aktif}), test tree {@code uji gabung}, player tree {@code /kultivasi gabung}, lang prefix
+	 * {@code kultivator.gabung.}. Like {@link #MANDIRI} deliberately not in {@link #MODULES} (that array fixes the DESIGN 36
+	 * epic beat ranges and {@code SekteApi.liveModules}).
+	 */
+	public static final String GABUNG = "gabung";
+
 	// ================================================================== saved data keys
 
 	/**

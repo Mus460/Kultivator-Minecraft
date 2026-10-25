@@ -184,6 +184,7 @@ public final class Kepribadian {
 			return InteractionResult.PASS;
 		});
 		registerBus();
+		KepergianMurid.init();
 		ServerTickEvents.END_SERVER_TICK.register(Kepribadian::serverTick);
 		ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
 			KepergianMurid.clear();
@@ -813,7 +814,7 @@ public final class Kepribadian {
 		}
 		Halls.HallView hall = Halls.hallOf(player.getUUID());
 		Vec3 stele = hall == null ? null : Vec3.atBottomCenterOf(hall.pos());
-		if (hall == null || !player.level().dimension().equals(hall.dim()) || player.position().distanceToSqr(stele) > STELE_REACH * STELE_REACH
+		if (hall == null || !hall.active() || !player.level().dimension().equals(hall.dim()) || player.position().distanceToSqr(stele) > STELE_REACH * STELE_REACH
 				|| e.position().distanceToSqr(stele) > (STELE_REACH + 4.0D) * (STELE_REACH + 4.0D)) {
 			Msg.chat(player, Component.translatable("kultivator.sekte.kepribadian.maaf.aula").withStyle(ChatFormatting.YELLOW));
 			return;

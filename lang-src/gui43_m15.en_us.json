@@ -1,0 +1,23 @@
+{
+  "kultivator.gui43.hal.dunia.dagang": "Trade",
+  "kultivator.gui43.sub.dagang.pasar": "Market",
+  "kultivator.gui43.sub.dagang.harga": "Prices",
+  "kultivator.gui43.sub.dagang.laba": "Profit",
+  "kultivator.gui43.sub.dagang.kontrak": "Contracts",
+  "kultivator.gui43.m15.nama_baik": "Good Name %s",
+  "kultivator.gui43.m15.pilih_barang": "Pick an item in the list first.",
+  "kultivator.gui43.m15.beli": "Buy (%s NB)",
+  "kultivator.gui43.m15.beli_asal": "Buy (%s Origin Stones)",
+  "kultivator.gui43.m15.jual_habis": "The merchant buys nothing more from you today.",
+  "kultivator.gui43.m15.lelang.ke_juru": "Bid and consign only in front of the Auctioneer.",
+  "kultivator.gui43.m15.lelang.memimpin": "Your bid is leading.",
+  "kultivator.gui43.m15.misi.nama_baik": "+5 Good Name",
+  "kultivator.gui43.m15.misi.habis": "Today's missions are used up.",
+  "kultivator.gui43.m15.misi.batal_yakin": "Cancel the running mission? Its reward is lost.",
+  "kultivator.gui43.m15.titah.ke_utusan": "Orders are taken from and reported to the Jade Emperor's Envoy.",
+  "kultivator.gui43.m15.temu.beri": "Exchange Knowledge: %s",
+  "kultivator.gui43.m15.temu.tak_punya": "You do not carry that.",
+  "kultivator.gui43.m15.temu.sudah_tanding": "You have already crossed blades once.",
+  "kultivator.gui43.m15.temu.tak_mau": "Only a friendly wanderer comes along, from Golden Core up.",
+  "kultivator.gui43.m15.temu.tip_pamit": "Part ways with this wanderer."
+}

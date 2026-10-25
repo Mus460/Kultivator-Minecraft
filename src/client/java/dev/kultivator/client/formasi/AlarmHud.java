@@ -1,6 +1,7 @@
 package dev.kultivator.client.formasi;
 
 import dev.kultivator.client.EffectQuality;
+import dev.kultivator.client.codex.CodexHud;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Palette;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement;
@@ -19,8 +20,8 @@ import java.util.List;
 /**
  * Formation HUD (DESIGN 24.7.4, 24.4.7, 24.4.10): the {@code AlarmPing} arrows at the screen edge pointing at the
  * intruders of an alarm for 8 s (copper for an approach, red for a breach, violet for a stranger, gold for an elite or a
- * boss, with the count), and the trip channel ring at the bottom centre while we channel a transport node. Hidden with
- * F1; drawn under the chat.
+ * boss, with the count), and the trip channel ring around the crosshair ({@link CodexHud#cincin}, DESIGN 43.9) while we
+ * channel a transport node. Hidden with F1; drawn under the chat.
  */
 public final class AlarmHud implements HudElement {
 
@@ -100,17 +101,14 @@ public final class AlarmHud implements HudElement {
 				float ay = cy + sy * scale;
 				arrow(g, ax, ay, sx, sy, color);
 				Component label = Component.literal("⚠ " + ping.count());
-				Brush.centered(g, minecraft.font, label, ax - sx * 14.0F, ay - sy * 14.0F - 3.0F, color, 0.75F, true);
+				Brush.centered(g, minecraft.font, label, ax - sx * 14.0F, ay - sy * 14.0F - 4.0F, color, 1.0F, true);
 				row++;
 			}
 		}
 		if (channelUntil > now && channelLength > 0.0F) {
 			float progress = Math.min(1.0F, channelDone / channelLength + (now - channelSeen) / 50.0F / channelLength);
-			float cx = width / 2.0F;
-			float cy = height - 62.0F;
-			Brush.ring(g, cx, cy, 9.0F, 10.5F, Palette.argb(0x60, 0x1A1030));
-			Brush.arc(g, cx, cy, 8.5F, 11.0F, 0.0F, progress, Palette.opaque(0xD8C8FF));
-			Brush.disc(g, cx, cy, 2.0F + 2.0F * progress, Palette.argb(0xC0, 0xFFFFFF));
+			// the one crosshair ring (DESIGN 43.9)
+			CodexHud.cincin(g, width / 2.0F, height / 2.0F, progress, 0xD8C8FF, null);
 		}
 	}
 

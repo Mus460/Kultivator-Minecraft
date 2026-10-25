@@ -2,12 +2,15 @@ package dev.kultivator.client.guide;
 
 import dev.kultivator.client.ClientCultivation;
 import dev.kultivator.client.Keys;
+import dev.kultivator.client.hub.HubNav;
+import dev.kultivator.client.hub.HubPages;
+import dev.kultivator.client.hub.Tujuan;
+import dev.kultivator.client.hub.Urutan;
 import dev.kultivator.network.Payloads;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
@@ -19,13 +22,14 @@ import java.util.BitSet;
 
 /**
  * Client side of the Kitab Panduan (the in-game guide): the last {@code GuideSync} (done steps, manual ticks, the
- * current chapter), the "Kitab Panduan" key, the requests to the server ({@code GuideAction} "open" and "tick <id>")
- * and the "Bab selesai" toast. The chapters and steps themselves are shared static data ({@link GuideBook}).
+ * current chapter), the registration of Panduan › Kitab ({@link GuideScreen}, DESIGN 43.5), the requests to the server
+ * ({@code GuideAction} "open" and "tick <id>") and the "Bab selesai" toast. The chapters and steps themselves are shared
+ * static data ({@link GuideBook}). The guide key (J) is read by {@code Keys} and opens Panduan › Kitab (43.10.3).
  * <p>
  * A quiet background sync is asked for a few seconds after joining (and every five minutes as a safety net; the server
  * also pushes a sync whenever the progress changes), so the guide tracker's "Panduan: Bab N" line and the chapter toast
  * stay current without opening the book. The server never sets the open flag in an answer to a GuideAction; the client
- * ignores it for such background requests anyway, so the screen never pops up by itself.
+ * ignores it for such background requests anyway, so the book never pops up by itself.
  */
 public final class GuideClient {
 
@@ -38,7 +42,6 @@ public final class GuideClient {
 	private static final int REFRESH = 6000;
 	/** How long the answer to a background request may take before an open flag counts again. */
 	private static final long BACKGROUND_MILLIS = 4000L;
-	private static final SystemToast.SystemToastId TOAST = new SystemToast.SystemToastId(6000L);
 
 	private static BitSet done = new BitSet();
 	private static BitSet manual = new BitSet();
@@ -50,6 +53,7 @@ public final class GuideClient {
 
 	public static void init() {
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.GuideSync.TYPE, (payload, context) -> onSync(payload));
+		HubPages.daftar(HubNav.PANDUAN, Urutan.ID_KITAB, Urutan.KITAB, GuideScreen::new);
 		ClientTickEvents.END_CLIENT_TICK.register(GuideClient::tick);
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> clear());
 	}
@@ -171,21 +175,20 @@ public final class GuideClient {
 		}
 		boolean background = Util.getMillis() < backgroundUntil;
 		backgroundUntil = 0L;
-		if (GuidePayloads.open(payload) && !background && minecraft.player != null && !(minecraft.gui.screen() instanceof GuideScreen)) {
-			minecraft.gui.setScreen(new GuideScreen(null));
+		if (GuidePayloads.open(payload) && !background && minecraft.player != null && !GuideScreen.terbuka) {
+			open(null);
 		}
 	}
 
 	/**
-	 * Opens the book. {@code parent} is shown again when the book closes. The screen asks the server for a fresh sync
-	 * itself on its first {@code init}, so no request is sent here.
+	 * Opens Panduan › Kitab › Bab in the Gulungan Utama (43.4.4). {@code parent} is ignored: Esc steps back inside the
+	 * Gulungan. The page asks the server for a fresh sync itself when it shows, so no request is sent here.
 	 */
 	public static void open(@Nullable Screen parent) {
-		Minecraft minecraft = Minecraft.getInstance();
-		minecraft.gui.setScreen(new GuideScreen(parent));
+		HubNav.buka(Tujuan.of(HubNav.PANDUAN, Urutan.ID_KITAB).sub(GuideScreen.SUB_BAB));
 	}
 
-	/** Asks for a fresh sync while the book is open (the screen calls this when it opens). */
+	/** Asks for a fresh sync while the book is shown (the page calls this when it shows). */
 	static void requestSync() {
 		send(Payloads.GuideAction.OPEN);
 	}
@@ -215,17 +218,12 @@ public final class GuideClient {
 
 	private static void tick(Minecraft minecraft) {
 		boolean inWorld = minecraft.player != null && Keys.connected();
-		while (Keys.GUIDE.consumeClick()) {
-			if (inWorld && minecraft.gui.screen() == null) {
-				open(null);
-			}
-		}
 		if (!inWorld || !ClientCultivation.received()) {
 			return;
 		}
 		if (--refreshIn <= 0) {
 			refreshIn = REFRESH;
-			if (!(minecraft.gui.screen() instanceof GuideScreen) && connected()) {
+			if (!GuideScreen.terbuka && connected()) {
 				backgroundUntil = Util.getMillis() + BACKGROUND_MILLIS;
 				send(Payloads.GuideAction.OPEN);
 			}
@@ -233,8 +231,9 @@ public final class GuideClient {
 	}
 
 	private static void chapterToast(Minecraft minecraft, int chapter) {
-		SystemToast.addOrUpdate(minecraft.gui.toastManager(), TOAST, Component.translatable("kultivator.guide_client.toast.title"),
-				Component.translatable("kultivator.guide_client.toast.body", chapter + 1, GuideBook.chapter(chapter).title()));
+		dev.kultivator.client.hud.Kabar.kirim(Component.translatable("kultivator.guide_client.toast.title"),
+				Component.translatable("kultivator.guide_client.toast.body", chapter + 1, GuideBook.chapter(chapter).title()),
+				dev.kultivator.client.hud.Kabar.glyph(dev.kultivator.client.screen.ui.Glyphs.JALAN), false);
 		minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.AMETHYST_BLOCK_CHIME, 1.2F, 0.8F));
 	}
 

@@ -1,0 +1,31 @@
+{
+  "_catatan": "Kebiasaan #24 penyapu_jalan (DESIGN 42.4.12)",
+  "nomor": 24,
+  "siapa": {
+    "umur": [
+      14,
+      200
+    ],
+    "tahap": [
+      "dewasa",
+      "tua"
+    ]
+  },
+  "sesi": [
+    {
+      "jam": [
+        5,
+        6
+      ],
+      "peluang": 0.9,
+      "syarat": [
+        "tidak_hujan"
+      ],
+      "tujuan": [
+        "@rumah"
+      ],
+      "klip": "sapu",
+      "kanan": "sapu"
+    }
+  ]
+}

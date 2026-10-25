@@ -1,27 +1,31 @@
 package dev.kultivator.client.tempa;
 
-import com.mojang.blaze3d.platform.InputConstants;
 import dev.kultivator.client.screen.ui.Brush;
+import dev.kultivator.client.screen.ui.DaftarGulir;
+import dev.kultivator.client.screen.ui.Fokus;
 import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.client.screen.ui.JadeCoin;
-import dev.kultivator.client.screen.ui.JadeTablet;
+import dev.kultivator.client.screen.ui.KeyHints;
+import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.ScrollFrame;
+import dev.kultivator.client.screen.ui.SegelKonfirmasi;
 import dev.kultivator.client.screen.ui.SlipTooltip;
+import dev.kultivator.client.screen.ui.TabBar;
 import dev.kultivator.client.screen.ui.TalismanButton;
-import dev.kultivator.client.screen.ui.UiSound;
-import dev.kultivator.client.screen.ui.Widget;
 import dev.kultivator.tempa.ArtifactItem;
 import dev.kultivator.tempa.ForgeMenu;
 import dev.kultivator.tempa.Forging;
 import dev.kultivator.tempa.Heat;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Util;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
@@ -29,102 +33,86 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BooleanSupplier;
 
 /**
- * The Earthfire Forge screen (DESIGN 25.5.10), a jade scroll of 270 x 214 with four vertical tablets: Tempa Baru · Tempa
- * Ulang · Roh · Cincin. The material slots sit on the left, an anvil with the heat gauge and the progress ring in the
- * middle, and the preview card (result grade and what limits it, sub-quality odds, the chance and its parts, qi, time) on
- * the right; the card's lines come from the server's plan. Buttons use vanilla's menu-button packet.
+ * The Earthfire Forge screen (DESIGN 25.5.10, 43.8.5), one of the two container screens that stay outside the Gulungan
+ * because of their slots, drawn with the same kit: a jade scroll of 270 x 214 (the slot layout is the menu's) with the
+ * {@link TabBar} rail of four tablets on its left (Tempa Baru · Tempa Ulang · Roh · Cincin; locked while a job runs), the
+ * material slots on the left, an anvil with the heat gauge and the progress ring in the middle, and the preview card
+ * (lines from the server's plan, text 1.0 in a {@link DaftarGulir}) on the right. Talismans use vanilla's menu-button
+ * packet; Runtuhkan Ruang asks a medium {@link SegelKonfirmasi}; the "?" seal opens the tab's Ensiklopedia topic. The
+ * natal treasure's summary lives in Diri › Pusaka only; the Roh tab carries the actions.
  */
 public class ForgeScreen extends AbstractContainerScreen<ForgeMenu> {
 
-	private static final int TABLET_W = 20;
+	private static final String K = "kultivator.gui43.tempa.";
+	private static final int RAIL_W = 22;
 	private static final int CARD_X = 150;
 	private static final int CARD_Y = 20;
 	private static final int CARD_W = 112;
-	private static final int CARD_H = 100;
+	private static final int CARD_H = 106;
 	private static final int ANVIL_X = 108;
 	private static final int ANVIL_Y = 58;
+	/** The two button columns under the grid and the anvil, and their two rows. */
+	private static final int COL_L = 8;
+	private static final int COL_L_W = 64;
+	private static final int COL_C = 76;
+	private static final int COL_C_W = 70;
+	private static final int ROW_A = 92;
+	private static final int ROW_B = 107;
+	private static final int BTN_H = 13;
 	private static final int[] TAB_ICONS = {Glyphs.BUILD, Glyphs.SEAL, Glyphs.TALENT, Glyphs.RING};
 	private static final String[] TAB_KEYS = {"new", "refine", "spirit", "ring"};
+	private static final String[] TOPICS = {"tempa", "tempa", "roh_senjata", "cincin"};
+	private static final String[] SPIRIT = {"feed", "seed", "soul", "purify"};
+	private static final int[] SPIRIT_IDS = {ForgeMenu.BTN_FEED, ForgeMenu.BTN_SEED, ForgeMenu.BTN_SOUL, ForgeMenu.BTN_PURIFY};
 
-	private record Entry(Widget widget, BooleanSupplier visible) {
+	private record Row(FormattedCharSequence text, int color) {
 	}
 
-	private final List<JadeTablet> tablets = new ArrayList<>();
-	private final List<Entry> entries = new ArrayList<>();
-	private @Nullable Widget pressed;
+	private final Fokus fokus = new Fokus(this::pesan);
+	private final TabBar rail = new TabBar();
+	private final DaftarGulir kartu = new DaftarGulir();
+	private final KeyHints.HelpSeal seal = new KeyHints.HelpSeal(0.0F, 0.0F, 13, () -> TOPICS[tab()]);
+	private final JadeCoin natal;
+	private final TalismanButton bentuk;
+	private @Nullable Lukis frame;
+	private @Nullable CompoundTag rowsOf;
+	private List<Row> rows = List.of();
+	private @Nullable Component pesan;
+	private long pesanSampai;
 	private int localTab;
-	private long lastFrame;
 
 	public ForgeScreen(ForgeMenu menu, Inventory inventory, Component title) {
 		super(menu, inventory, title, ForgeMenu.WIDTH, ForgeMenu.HEIGHT);
 		this.localTab = menu.tab();
+		this.natal = new JadeCoin(0, 0, COL_L_W, BTN_H, () -> Component.translatable("kultivator.tempa.btn.natal"), menu::natalTarget);
+		natal.tooltip(() -> List.of(Component.translatable("kultivator.tempa.btn.natal"), Component.translatable("kultivator.tempa.btn.natal.tip")))
+				.onPress(() -> click(ForgeMenu.BTN_NATAL));
+		// The Kuali's embryo form: one cycling talisman instead of four coins (click forward, right click back).
+		this.bentuk = new TalismanButton(0, 0, COL_L_W, BTN_H, () -> Component.translatable("kultivator.tempa.form." + ArtifactItem.FORMS.get(form())))
+				.siklus(() -> click(ForgeMenu.BTN_KUALI_FORM + Math.floorMod(form() + 1, 4)), () -> click(ForgeMenu.BTN_KUALI_FORM + Math.floorMod(form() - 1, 4)));
+		bentuk.tooltip(() -> List.of(Component.translatable(K + "bentuk", Component.translatable("kultivator.tempa.form." + ArtifactItem.FORMS.get(form()))),
+				Component.translatable(K + "bentuk.tip")));
 	}
 
 	@Override
 	protected void init() {
 		super.init();
-		this.leftPos = (this.width - this.imageWidth + TABLET_W) / 2;
+		this.leftPos = (this.width - this.imageWidth + RAIL_W) / 2;
 		this.topPos = (this.height - this.imageHeight) / 2;
-		lastFrame = Util.getMillis();
-		tablets.clear();
-		entries.clear();
-		for (int i = 0; i < 4; i++) {
-			int index = i;
-			JadeTablet tablet = new JadeTablet(leftPos - TABLET_W + 1, topPos + 14 + i * 46, TABLET_W, 42, TAB_ICONS[i],
-					() -> Component.translatable("kultivator.tempa.tab." + TAB_KEYS[index] + ".short"), () -> tab() == index);
-			tablet.onPress(() -> {
-				localTab = index;
-				click(index);
-			});
-			tablet.tooltip(() -> List.of(Component.translatable("kultivator.tempa.tab." + TAB_KEYS[index])));
-			tablets.add(tablet);
-		}
-		int x = leftPos;
-		int y = topPos;
-		// The start talisman (every tab but Roh) and the cancel talisman while a job runs.
-		add(new TalismanButton(x + 74, y + 104, 68, 14, () -> Component.translatable(startKey())).urgentWhen(() -> forge().getBooleanOr("ok", false))
-				.enabledWhen(() -> forge().getBooleanOr("ok", false)).onPress(() -> click(ForgeMenu.BTN_START)),
-				() -> tab() != ForgeMenu.TAB_SPIRIT && !menu.running());
-		add(new TalismanButton(x + 74, y + 104, 68, 14, () -> Component.translatable("kultivator.tempa.btn.cancel"))
-				.onPress(() -> click(ForgeMenu.BTN_CANCEL)), menu::running);
-		// Tempa Baru: the assistant (or the Kuali's form when a Kuali lies in the slots).
-		add(new TalismanButton(x + 8, y + 92, 60, 12, () -> Component.translatable("kultivator.tempa.btn.assist"))
-				.tooltip(() -> List.of(Component.translatable("kultivator.tempa.btn.assist.tip"))).onPress(() -> click(ForgeMenu.BTN_ASSIST)),
-				() -> (tab() == ForgeMenu.TAB_NEW || tab() == ForgeMenu.TAB_REFINE) && !kuali());
-		add(new TalismanButton(x + 8, y + 106, 60, 12, () -> Component.translatable("kultivator.tempa.btn.release"))
-				.onPress(() -> click(ForgeMenu.BTN_RELEASE)), () -> tab() == ForgeMenu.TAB_NEW && !kuali());
-		for (int i = 0; i < 4; i++) {
-			int form = i;
-			add(new JadeCoin(x + 8 + (i % 2) * 31, y + 92 + (i / 2) * 14, 30, 12,
-					() -> Component.translatable("kultivator.tempa.form." + ArtifactItem.FORMS.get(form)), () -> forge().getIntOr("form", 0) == form)
-					.onPress(() -> click(ForgeMenu.BTN_KUALI_FORM + form)), () -> tab() == ForgeMenu.TAB_NEW && kuali());
-		}
-		// Tempa Ulang: refine the natal treasure in place.
-		add(new JadeCoin(x + 8, y + 106, 62, 12, () -> Component.translatable("kultivator.tempa.btn.natal"), menu::natalTarget)
-				.tooltip(() -> List.of(Component.translatable("kultivator.tempa.btn.natal.tip"))).onPress(() -> click(ForgeMenu.BTN_NATAL)),
-				() -> tab() == ForgeMenu.TAB_REFINE);
-		// Roh: the four spirit actions.
-		String[] spirit = {"feed", "seed", "soul", "purify"};
-		int[] spiritIds = {ForgeMenu.BTN_FEED, ForgeMenu.BTN_SEED, ForgeMenu.BTN_SOUL, ForgeMenu.BTN_PURIFY};
-		for (int i = 0; i < 4; i++) {
-			int index = i;
-			add(new TalismanButton(x + (i < 2 ? 8 : 74), y + 92 + (i % 2) * 15, i < 2 ? 62 : 68, 13,
-					() -> Component.translatable("kultivator.tempa.btn." + spirit[index]))
-					.tooltip(() -> List.of(Component.translatable("kultivator.tempa.btn." + spirit[index] + ".tip")))
-					.enabledWhen(() -> forge().getBooleanOr("natal_bound", false)).onPress(() -> click(spiritIds[index])),
-					() -> tab() == ForgeMenu.TAB_SPIRIT);
-		}
-		// Cincin: Runtuhkan Ruang.
-		add(new TalismanButton(x + 8, y + 100, 62, 14, () -> Component.translatable("kultivator.tempa.btn.collapse"))
-				.tooltip(() -> List.of(Component.translatable("kultivator.tempa.btn.collapse.tip", Forging.COLLAPSE_STONES)))
-				.onPress(() -> click(ForgeMenu.BTN_COLLAPSE)), () -> tab() == ForgeMenu.TAB_RING && !menu.running());
+		natal.x = leftPos + COL_L;
+		natal.y = topPos + ROW_B;
+		bentuk.x = leftPos + COL_L;
+		bentuk.y = topPos + ROW_A;
+		seal.moveTo(leftPos + imageWidth - 13.0F, topPos + 13.0F);
 	}
 
-	private void add(Widget widget, BooleanSupplier visible) {
-		entries.add(new Entry(widget, visible));
+	/** Replaced by another screen without closing (the "?" seal opens the Gulungan): the server closes the menu too. */
+	@Override
+	public void removed() {
+		super.removed();
+		TempaClient.tutupDiServer(menu);
 	}
 
 	private int tab() {
@@ -133,6 +121,10 @@ public class ForgeScreen extends AbstractContainerScreen<ForgeMenu> {
 
 	private static CompoundTag forge() {
 		return TempaClient.forge();
+	}
+
+	private int form() {
+		return Math.floorMod(forge().getIntOr("form", 0), 4);
 	}
 
 	private boolean kuali() {
@@ -153,29 +145,38 @@ public class ForgeScreen extends AbstractContainerScreen<ForgeMenu> {
 		}
 	}
 
+	/** A refusal (a locked tab, a disabled talisman): shown in place of the heading for 3 s. */
+	private void pesan(Component alasan) {
+		pesan = alasan;
+		pesanSampai = Util.getMillis() + 3000L;
+	}
+
 	// ================================================================== drawing
 
 	@Override
 	public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float a) {
 		super.extractBackground(g, mouseX, mouseY, a);
-		long now = Util.getMillis();
-		float seconds = Math.max(0.0F, Math.min(0.1F, (now - lastFrame) / 1000.0F));
-		lastFrame = now;
+		SlipTooltip.mulaiBingkai();
 		int x0 = leftPos;
 		int y0 = topPos;
 		int x1 = leftPos + imageWidth;
 		int y1 = topPos + imageHeight;
-		for (JadeTablet tablet : tablets) {
-			tablet.render(g, font, mouseX, mouseY, seconds);
-		}
+		Lukis l = fokus.mulai(g, font, mouseX, mouseY, 1.0F, Palette.Gaya.KERTAS, x0, y0, x1, y1);
+		frame = l;
+		drawRail(l);
 		ScrollFrame.paper(g, x0, x1, y0, y1, y0, y1);
 		ScrollFrame.rod(g, x0, x1, y0);
 		ScrollFrame.rod(g, x0, x1, y1);
-		Component heading = Brush.bold(Component.translatable("kultivator.tempa.forge.title", title,
-				Component.translatable("kultivator.tempa.tab." + TAB_KEYS[tab()])));
-		Brush.fitCentered(g, font, heading, (x0 + x1) / 2.0F, y0 + 8.0F, imageWidth - 30.0F, Palette.INK, 0.9F, 0.55F, false);
-		Brush.text(g, font, Component.translatable("kultivator.tempa.forge.materials"), x0 + ForgeMenu.GRID_X, y0 + ForgeMenu.GRID_Y - 9.0F,
-				Palette.SEAL_DARK, 0.65F, false);
+		if (pesan != null && Util.getMillis() < pesanSampai) {
+			Brush.fitCentered(g, font, pesan, (x0 + x1) / 2.0F, y0 + 8.0F, imageWidth - 44.0F, Palette.DANGER, 1.0F, 1.0F, false);
+		} else {
+			Component heading = Brush.bold(Component.translatable("kultivator.tempa.forge.title", title,
+					Component.translatable("kultivator.tempa.tab." + TAB_KEYS[tab()])));
+			Brush.fitCentered(g, font, heading, (x0 + x1) / 2.0F, y0 + 6.0F, imageWidth - 44.0F, Palette.INK, 1.5F, 1.0F, false);
+		}
+		l.widget("bantuan", seal);
+		Brush.text(g, font, Component.translatable("kultivator.tempa.forge.materials"), x0 + ForgeMenu.GRID_X, y0 + ForgeMenu.GRID_Y - 10.0F,
+				Palette.SEAL_DARK, 1.0F, false);
 		for (Slot slot : menu.slots) {
 			int sx = x0 + slot.x - 1;
 			int sy = y0 + slot.y - 1;
@@ -186,17 +187,30 @@ public class ForgeScreen extends AbstractContainerScreen<ForgeMenu> {
 				g.fill(sx + 1, sy + 1, sx + 17, sy + 17, 0x30B3281D);
 			}
 		}
-		drawAnvil(g, now);
-		drawCard(g);
-		for (Entry entry : entries) {
-			if (entry.visible().getAsBoolean()) {
-				entry.widget().render(g, font, mouseX, mouseY, seconds);
-			}
+		drawAnvil(l);
+		drawCard(l);
+		drawButtons(l);
+	}
+
+	/** The rail of four tablets left of the paper; while a job runs only its own tab stays open. */
+	private void drawRail(Lukis l) {
+		List<TabBar.Tab> tabs = new ArrayList<>(4);
+		Component busy = menu.running() ? Component.translatable(K + "sibuk") : null;
+		for (int i = 0; i < 4; i++) {
+			TabBar.Tab t = TabBar.Tab.of(String.valueOf(i), Component.translatable("kultivator.tempa.tab." + TAB_KEYS[i]), TAB_ICONS[i]);
+			tabs.add(i == tab() ? t : t.terkunci(busy));
 		}
+		rail.setTabs(tabs);
+		int top = topPos + 14;
+		rail.gambar(l, "tab", leftPos - RAIL_W + 1, top, leftPos + 1, top + 4 * 36 + 4, true, TabBar.Rupa.TABLET, false, String.valueOf(tab()), id -> {
+			localTab = Integer.parseInt(id);
+			click(localTab);
+		});
 	}
 
 	/** The anvil over its fire, the heat gauge on its right and the progress ring around it. */
-	private void drawAnvil(GuiGraphicsExtractor g, long now) {
+	private void drawAnvil(Lukis l) {
+		GuiGraphicsExtractor g = l.g;
 		float cx = leftPos + ANVIL_X;
 		float cy = topPos + ANVIL_Y;
 		int heat = menu.heat();
@@ -208,7 +222,7 @@ public class ForgeScreen extends AbstractContainerScreen<ForgeMenu> {
 			Brush.arc(g, cx, cy, 24.0F, 26.5F, 0.0F, Math.max(0.01F, menu.progress()), color);
 		}
 		// Flames under the anvil.
-		float t = (now % 100000L) / 1000.0F;
+		float t = (l.kini % 100000L) / 1000.0F;
 		for (int i = 0; i < 5; i++) {
 			float fx = cx - 10.0F + i * 5.0F;
 			float h = 5.0F + 3.0F * (float) Math.sin(t * 6.0F + i * 1.7F);
@@ -229,24 +243,29 @@ public class ForgeScreen extends AbstractContainerScreen<ForgeMenu> {
 		// Heat gauge.
 		int gx = leftPos + 138;
 		int gTop = topPos + 26;
-		int gBottom = topPos + 92;
+		int gBottom = topPos + 86;
 		g.fill(gx, gTop, gx + 5, gBottom, Palette.argb(0x60, Palette.INK));
 		int filled = Math.round((gBottom - gTop - 2) * (heat + 1) / 6.0F);
 		g.fillGradient(gx + 1, gBottom - 1 - filled, gx + 4, gBottom - 1, fire, Palette.mix(fire, 0xFF401000, 0.5F));
 		Brush.frame(g, gx, gTop, gx + 5, gBottom, Palette.GOLD_DARK);
 		Component heatLine = Component.translatable("kultivator.tempa.forge.heat", Heat.name(heat), ArtifactItem.gradeName(heat));
 		if (tab() != ForgeMenu.TAB_SPIRIT) {
-			Brush.fitCentered(g, font, heatLine, cx, topPos + 92.0F, 66.0F, Palette.INK, 0.6F, 0.42F, false);
+			// The fire's name at 1.0; the cap it puts on the grade is the tooltip of the gauge and the name.
+			l.tengah(Heat.name(heat), cx, topPos + 88.0F, COL_C_W, Palette.INK);
+			if (l.di(leftPos + COL_C, topPos + 87, gx + 6, topPos + 97) || l.di(gx - 1, gTop, gx + 6, gBottom)) {
+				l.tip(List.of(heatLine));
+			}
 		}
 		if (menu.running()) {
 			Component state = Component.translatable(menu.paused() ? "kultivator.tempa.forge.paused" : "kultivator.tempa.forge.working",
 					Math.round(menu.progress() * 100.0F));
-			Brush.fitCentered(g, font, state, cx, topPos + 20.0F, 66.0F, menu.paused() ? Palette.DANGER : Palette.JADE_DARK, 0.6F, 0.42F, false);
+			l.tengah(state, cx, topPos + 20.0F, COL_C_W, menu.paused() ? Palette.DANGER : Palette.JADE_DARK);
 		}
 	}
 
-	/** The preview card: the plan's title, lines and problem, as the server computed them. */
-	private void drawCard(GuiGraphicsExtractor g) {
+	/** The preview card: the plan's title, then its lines and problem (as the server computed them) in a scrolling list. */
+	private void drawCard(Lukis l) {
+		GuiGraphicsExtractor g = l.g;
 		int x0 = leftPos + CARD_X;
 		int y0 = topPos + CARD_Y;
 		int x1 = x0 + CARD_W;
@@ -255,56 +274,146 @@ public class ForgeScreen extends AbstractContainerScreen<ForgeMenu> {
 		Brush.frame(g, x0, y0, x1, y1, Palette.argb(0xC0, Palette.GOLD));
 		CompoundTag card = forge();
 		if (card.isEmpty()) {
-			Brush.wrap(g, font, Component.translatable("kultivator.tempa.preview.wait"), x0 + 4.0F, y0 + 4.0F, CARD_W - 8.0F, Palette.INK_SOFT, 0.6F, false);
+			l.bungkus(Component.translatable("kultivator.tempa.preview.wait"), x0 + 4.0F, y0 + 4.0F, CARD_W - 8.0F, Palette.INK_SOFT);
 			return;
 		}
-		Component cardTitle = Brush.bold(Forging.component(card.getCompoundOrEmpty("title")));
-		Brush.rect(g, x0 + 3.0F, y0 + 4.0F, x0 + 6.0F, y0 + 7.0F, Palette.SEAL);
-		Brush.fit(g, font, cardTitle, x0 + 8.0F, y0 + 3.0F, CARD_W - 12.0F, Palette.SEAL_DARK, 0.7F, 0.45F, false);
-		float y = y0 + 12.0F;
-		float scale = 0.55F;
+		Brush.rect(g, x0 + 3.0F, y0 + 5.0F, x0 + 6.0F, y0 + 8.0F, Palette.SEAL);
+		l.teks(Brush.bold(Forging.component(card.getCompoundOrEmpty("title"))), x0 + 8.0F, y0 + 3.0F, CARD_W - 11.0F, Palette.SEAL_DARK);
+		Brush.rect(g, x0 + 3.0F, y0 + 13.0F, x1 - 3.0F, y0 + 13.5F, Palette.argb(0x80, Palette.GOLD));
+		List<Row> list = rows(card);
+		kartu.gambar(l, "kartu", x0 + 3, y0 + 15, x1 - 2, y1 - 2, list.size(), 10,
+				(ll, i, rx0, ry0, rx1, ry1, sorot, pilih) -> Brush.text(ll.g, font, list.get(i).text(), rx0 + 1.0F, ry0 + 1.0F, list.get(i).color(), 1.0F, false),
+				null, null);
+	}
+
+	/** The card's lines wrapped at 1.0 (rebuilt only when a new card arrives); the problem last, in red. */
+	private List<Row> rows(CompoundTag card) {
+		if (card == rowsOf) {
+			return rows;
+		}
+		int width = CARD_W - 16;
+		List<Row> out = new ArrayList<>();
 		ListTag lines = card.getListOrEmpty("lines");
 		for (Tag entry : lines) {
-			if (!(entry instanceof CompoundTag line)) {
-				continue;
+			if (entry instanceof CompoundTag line) {
+				int color = Palette.opaque(line.getIntOr("c", 0x1B2521));
+				for (FormattedCharSequence part : font.split(Forging.component(line), width)) {
+					out.add(new Row(part, color));
+				}
 			}
-			if (y > y1 - 14.0F) {
-				break;
-			}
-			int color = Palette.opaque(line.getIntOr("c", 0x1B2521));
-			y += Brush.wrap(g, font, Forging.component(line), x0 + 4.0F, y, CARD_W - 8.0F, color, scale, false) + 1.0F;
 		}
 		CompoundTag problem = card.getCompoundOrEmpty("problem");
 		if (!problem.isEmpty()) {
-			float h = Brush.wrapHeight(font, Forging.component(problem), CARD_W - 8.0F, scale);
-			Brush.wrap(g, font, Forging.component(problem), x0 + 4.0F, y1 - 3.0F - h, CARD_W - 8.0F, Palette.DANGER, scale, false);
+			for (FormattedCharSequence part : font.split(Forging.component(problem), width)) {
+				out.add(new Row(part, Palette.DANGER));
+			}
+		}
+		kartu.mulaiUlang(Util.getMillis());
+		rowsOf = card;
+		rows = out;
+		return out;
+	}
+
+	/** The reason the start talisman is dim: the plan's problem, else "put materials in". */
+	private Component startReason() {
+		CompoundTag problem = forge().getCompoundOrEmpty("problem");
+		return problem.isEmpty() ? Component.translatable("kultivator.tempa.preview.wait") : Forging.component(problem);
+	}
+
+	private void drawButtons(Lukis l) {
+		int x = leftPos;
+		int y = topPos;
+		int tab = tab();
+		boolean running = menu.running();
+		if (running) {
+			talisman(l, "batal", x + COL_C, y + 104, COL_C_W, 16, Component.translatable("kultivator.tempa.btn.cancel"), null, true, null,
+					() -> click(ForgeMenu.BTN_CANCEL), false);
+		} else if (tab != ForgeMenu.TAB_SPIRIT) {
+			boolean ok = forge().getBooleanOr("ok", false);
+			talisman(l, "mulai", x + COL_C, y + 104, COL_C_W, 16, Component.translatable(startKey()), null, ok, ok ? null : startReason(),
+					() -> click(ForgeMenu.BTN_START), ok);
+		}
+		switch (tab) {
+			case ForgeMenu.TAB_NEW -> {
+				if (kuali()) {
+					l.widget("bentuk", bentuk);
+				} else {
+					assist(l);
+					talisman(l, "lepas", x + COL_L, y + ROW_B, COL_L_W, BTN_H, Component.translatable("kultivator.tempa.btn.release"), null, true, null,
+							() -> click(ForgeMenu.BTN_RELEASE), false);
+				}
+			}
+			case ForgeMenu.TAB_REFINE -> {
+				if (!kuali()) {
+					assist(l);
+				}
+				l.widget("natal", natal);
+			}
+			case ForgeMenu.TAB_SPIRIT -> {
+				boolean bound = forge().getBooleanOr("natal_bound", false);
+				Component why = bound ? null : Component.translatable(K + "tanpa_natal");
+				for (int i = 0; i < 4; i++) {
+					int index = i;
+					talisman(l, "roh" + i, x + (i < 2 ? COL_L : COL_C), y + (i % 2 == 0 ? ROW_A : ROW_B), i < 2 ? COL_L_W : COL_C_W, BTN_H,
+							Component.translatable("kultivator.tempa.btn." + SPIRIT[i]), Component.translatable("kultivator.tempa.btn." + SPIRIT[i] + ".tip"),
+							bound, why, () -> click(SPIRIT_IDS[index]), false);
+				}
+			}
+			case ForgeMenu.TAB_RING -> {
+				if (!running) {
+					Component tip = Component.translatable("kultivator.tempa.btn.collapse.tip", Forging.COLLAPSE_STONES);
+					talisman(l, "runtuh", x + COL_L, y + ROW_B, COL_L_W, BTN_H, Component.translatable("kultivator.tempa.btn.collapse"), tip, true, null,
+							() -> fokus.konfirmasi(SegelKonfirmasi.Tingkat.SEDANG, Component.translatable(K + "runtuh.tanya", Forging.COLLAPSE_STONES),
+									() -> click(ForgeMenu.BTN_COLLAPSE)), false);
+				}
+			}
+			default -> {
+			}
+		}
+	}
+
+	private void assist(Lukis l) {
+		talisman(l, "asisten", leftPos + COL_L, topPos + ROW_A, COL_L_W, BTN_H, Component.translatable("kultivator.tempa.btn.assist"),
+				Component.translatable("kultivator.tempa.btn.assist.tip"), true, null, () -> click(ForgeMenu.BTN_ASSIST), false);
+	}
+
+	/** An immediate talisman whose tooltip is its whole name (it may be cut at 1.0), its explanation and its reason. */
+	private static void talisman(Lukis l, String kunci, int x, int y, int w, int h, Component label, @Nullable Component tip, boolean aktif,
+			@Nullable Component alasan, Runnable aksi, boolean mendesak) {
+		if (TalismanButton.gambar(l, kunci, x, y, w, h, label, aktif, alasan, aksi, mendesak, false)) {
+			List<Component> lines = new ArrayList<>(3);
+			lines.add(label);
+			if (tip != null) {
+				lines.add(tip);
+			}
+			if (!aktif && alasan != null) {
+				lines.add(alasan.copy().withColor(0xFFFF8A7A));
+			}
+			l.tip(lines);
 		}
 	}
 
 	@Override
 	protected void extractLabels(GuiGraphicsExtractor g, int xm, int ym) {
-		Brush.text(g, font, playerInventoryTitle, ForgeMenu.INV_X, ForgeMenu.INV_Y - 9.0F, Palette.INK_SOFT, 0.65F, false);
+		Brush.text(g, font, playerInventoryTitle, ForgeMenu.INV_X, ForgeMenu.INV_Y - 10.0F, Palette.INK_SOFT, 1.0F, false);
 	}
 
 	@Override
 	public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float a) {
 		super.extractRenderState(g, mouseX, mouseY, a);
-		if (menu.getCarried().isEmpty() && (hoveredSlot == null || !hoveredSlot.hasItem())) {
-			List<Component> tip = null;
-			for (JadeTablet tablet : tablets) {
-				if (tablet.contains(mouseX, mouseY)) {
-					tip = tablet.tooltipLines();
-				}
-			}
-			for (Entry entry : entries) {
-				if (entry.visible().getAsBoolean() && entry.widget().contains(mouseX, mouseY)) {
-					tip = entry.widget().tooltipLines();
-				}
-			}
-			if (tip != null && !tip.isEmpty()) {
-				g.nextStratum();
-				SlipTooltip.draw(g, font, tip, mouseX, mouseY, width, height);
-			}
+		Lukis l = frame;
+		frame = null;
+		if (l == null) {
+			return;
+		}
+		// The confirm lies over the slots and items; the kit's tooltip only where no item tooltip shows.
+		g.nextStratum();
+		fokus.selesai(l, mouseX, mouseY);
+		if (fokus.segel().terbuka() || menu.getCarried().isEmpty() && (hoveredSlot == null || !hoveredSlot.hasItem())) {
+			g.nextStratum();
+			SlipTooltip.gambarAntrean(g, font, mouseX, mouseY, width, height);
+		} else {
+			SlipTooltip.mulaiBingkai();
 		}
 	}
 
@@ -312,39 +421,43 @@ public class ForgeScreen extends AbstractContainerScreen<ForgeMenu> {
 
 	@Override
 	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-		if (event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
-			for (JadeTablet tablet : tablets) {
-				if (tablet.contains(event.x(), event.y())) {
-					if (!menu.running()) {
-						tablet.press();
-						pressed = tablet;
-					}
-					return true;
-				}
-			}
-			for (int i = entries.size() - 1; i >= 0; i--) {
-				Entry entry = entries.get(i);
-				if (entry.visible().getAsBoolean() && entry.widget().contains(event.x(), event.y())) {
-					entry.widget().press();
-					pressed = entry.widget();
-					return true;
-				}
-			}
+		if (fokus.klik(event.x(), event.y(), event.button())) {
+			return true;
 		}
+		fokus.set(null);
 		return super.mouseClicked(event, doubleClick);
 	}
 
 	@Override
 	public boolean mouseReleased(MouseButtonEvent event) {
-		if (pressed != null) {
-			Widget widget = pressed;
-			pressed = null;
-			if (widget instanceof JadeTablet) {
-				UiSound.tab();
-			}
-			widget.release(event.x(), event.y());
+		if (fokus.lepas(event.x(), event.y())) {
 			return true;
 		}
 		return super.mouseReleased(event);
+	}
+
+	@Override
+	public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
+		if (fokus.seret(event.x(), event.y(), dx)) {
+			return true;
+		}
+		return super.mouseDragged(event, dx, dy);
+	}
+
+	@Override
+	public boolean mouseScrolled(double x, double y, double scrollX, double scrollY) {
+		if (fokus.gulir(x, y, scrollY)) {
+			return true;
+		}
+		return super.mouseScrolled(x, y, scrollX, scrollY);
+	}
+
+	@Override
+	public boolean keyPressed(KeyEvent event) {
+		// The confirm takes every key (Esc cancels it); Tab / Enter / arrows walk the talismans and the rail.
+		if (fokus.tombol(event)) {
+			return true;
+		}
+		return super.keyPressed(event);
 	}
 }

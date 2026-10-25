@@ -17,6 +17,7 @@ public final class LabelHarga {
 	 * (-1 = do not compare). Returns the drawn width.
 	 */
 	public static int gambar(Lukis l, long harga, long uang, float x, float y, boolean kanan, float ukuran, boolean pendek) {
+		ukuran = Math.max(1.0F, ukuran); // 43.0.5: no text below 1.0
 		boolean kurang = uang >= 0L && harga > uang;
 		Component angka = Component.literal(pendek ? TeksTempat.singkat(harga) : TeksTempat.angka(harga));
 		int ikon = Math.round(10 * ukuran);
@@ -44,6 +45,7 @@ public final class LabelHarga {
 
 	/** A signed PK amount with the tally icon (ledgers). */
 	public static int pk(Lukis l, long pk, float x, float y, boolean kanan, float ukuran, int warna) {
+		ukuran = Math.max(1.0F, ukuran);
 		Component angka = Component.literal(TeksTempat.bertanda(pk));
 		int ikon = Math.round(10 * ukuran);
 		int lebar = ikon + 2 + Math.round(l.font.width(angka) * ukuran);
@@ -55,6 +57,7 @@ public final class LabelHarga {
 
 	/** A signed NB amount with the coin icon (ledgers): green up, red down. */
 	public static int nbBertanda(Lukis l, long nb, float x, float y, boolean kanan, float ukuran) {
+		ukuran = Math.max(1.0F, ukuran);
 		int naik = l.gaya.gelap() ? 0xFF9AE0B0 : 0xFF2E7A4E;
 		int turun = l.gaya.gelap() ? 0xFFFF8A7A : TempatWarna.BAHAYA;
 		Component angka = Component.literal(TeksTempat.bertanda(nb));

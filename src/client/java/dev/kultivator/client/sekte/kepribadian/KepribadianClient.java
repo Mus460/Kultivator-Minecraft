@@ -1,13 +1,10 @@
 package dev.kultivator.client.sekte.kepribadian;
 
-import dev.kultivator.client.disciple.DiscipleScreen;
 import dev.kultivator.client.epic.SekteScenes;
-import dev.kultivator.client.hub.HubCards;
-import dev.kultivator.client.hub.HubNav;
-import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.client.sekte.SektePoses;
 import dev.kultivator.sekte.SekteIds;
 import dev.kultivator.sekte.kepribadian.KepribadianPayloads;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.util.Mth;
@@ -16,10 +13,10 @@ import java.util.List;
 
 /**
  * Module P on the client (DESIGN 36.2.1, 36.4): the payload receivers, the thought bubbles ({@link GelembungPikiran}),
- * the Hati tab of the disciple scroll ({@link HatiTab}, registered first so it is the eighth tablet), the poses of
- * activities 19 ({@code ACT_SULK}: arms crossed, head turned away, a foot tapping) and 22 ({@code ACT_LEAVING}: a cloth
- * bundle on a stick over the shoulder, looking back once), the hub card "Suasana Hati Murid" (section MURID) and the
- * scene recipes of beats 100-102 (a rebel's challenge, a rebel who submits, a disciple who left).
+ * the poses of activities 19 ({@code ACT_SULK}: arms crossed, head turned away, a foot tapping) and 22 ({@code ACT_LEAVING}:
+ * a cloth bundle on a stick over the shoulder, looking back once), the mood list of Murid › Daftar › suasana
+ * ({@link SuasanaScreen}, DESIGN 43.5) and the scene recipes of beats 100-102 (a rebel's challenge, a rebel who submits, a
+ * disciple who left). The Hati sub of Murid › Murid ({@code HatiTab}) is mounted by the Murid page.
  */
 public final class KepribadianClient {
 
@@ -33,10 +30,10 @@ public final class KepribadianClient {
 		ClientPlayNetworking.registerGlobalReceiver(KepribadianPayloads.Suasana.TYPE, (payload, context) -> GelembungPikiran.onMoods(payload));
 		ClientPlayNetworking.registerGlobalReceiver(KepribadianPayloads.Letup.TYPE, (payload, context) -> GelembungPikiran.onPop(payload));
 		ClientPlayNetworking.registerGlobalReceiver(KepribadianPayloads.Daftar.TYPE, (payload, context) -> SuasanaScreen.onList(payload));
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> SuasanaScreen.bersih());
 		GelembungPikiran.init();
-		DiscipleScreen.addExtraTab(Glyphs.RING, HatiTab::new);
+		// 43: the Hati sub is built by the Murid page (M03); the mood list is the sub Murid › Daftar › suasana (M04).
 		registerPoses();
-		HubCards.register(HubNav.MURID, "sekte_kepribadian_suasana", Glyphs.RING, null, SuasanaScreen::open);
 		registerScenes();
 	}
 

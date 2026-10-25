@@ -138,6 +138,24 @@
     {
       "element": {
         "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/rumah_toko_3",
+        "processors": "kultivator:kota/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/rumah_toko_4",
+        "processors": "kultivator:kota/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
         "location": "kultivator:kota/hias_kios",
         "processors": "kultivator:kota/utuh",
         "projection": "rigid"
@@ -203,6 +221,69 @@
         "element_type": "minecraft:single_pool_element",
         "location": "kultivator:kota/hias_pohon",
         "processors": "kultivator:kota/utuh",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/hias_kandang",
+        "processors": "kultivator:kota/utuh",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/kavling_kecil",
+        "processors": "kultivator:kota/utuh",
+        "projection": "rigid"
+      },
+      "weight": 2
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/kavling_kecil_2",
+        "processors": "kultivator:kota/utuh",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/kavling_besar",
+        "processors": "kultivator:kota/utuh",
+        "projection": "rigid"
+      },
+      "weight": 2
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/kavling_besar_2",
+        "processors": "kultivator:kota/utuh",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/kedai_arak",
+        "processors": "kultivator:kota/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/gudang",
+        "processors": "kultivator:kota/lapuk",
         "projection": "rigid"
       },
       "weight": 1

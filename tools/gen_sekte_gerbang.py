@@ -25,7 +25,12 @@ Facts this file relies on (checked in reference/mcsrc, 26.3, and in tools/gen_du
 
 Anchors (kind "sektenpc/<what>", DESIGN 34.4.1 marker entity) read by AnggotaSekte: "gerbang" (one, at the gate; marks
 the gate born and greets visitors), "murid" (member spots, data slot 0-5, panji = carries the sect banner), "ketua" (the
-sect master's throne).
+sect master's throne). DESIGN 41.11.2 adds the titik of joining a sect (read through TitikGabung, protect 0, Rotation =
+the way a body put there faces): "ujian_bawah" (foot of the gate stair, start of the Tangga Ujian), "ujian_atas" (the
+last gate of the climb), "loket" (where the registrar stands behind the registration desk, facing the applicants),
+"bilik_0", "bilik_1" (data slot 0-1: the two spare cells of the gate with a bed, a chest, a mat and a lamp; dwellings
+of members whose sect has no compound) and "altar" (the oath mat before the master's throne, for a sect without a
+compound).
 
 Run: python tools/gen_sekte_gerbang.py [--plan]   (prints validate_all(); --plan prints a floor plan of each size)
 Sumber: the mountain gates of the Seven Great Sects of Yue (A Record of a Mortal's Journey); the paifang gate, the
@@ -190,6 +195,58 @@ def anchors(p, gate, members, master, band):
     p.anchor(master[0], master[1], master[2], "sektenpc/ketua")
 
 
+# ------------------------------------------------------------------------------------------------- DESIGN 41 titik
+YAW = {"south": 0.0, "west": 90.0, "north": 180.0, "east": 270.0}
+FACES = {"north": (0, -1), "south": (0, 1), "east": (1, 0), "west": (-1, 0)}
+
+
+def titik41(p, x, y, z, what, facing="north", **data):
+    """A DESIGN 41.11.2 gate titik: anchor sektenpc/<what> without a protection radius of its own (the gate is a site);
+    the anchor faces `facing` (Rotation), so a body put there looks the right way."""
+    d = {"protect": nbt.Int(0)}
+    d.update(data)
+    p.entity(x, y, z, {"id": "kultivator:dunia_anchor", "kind": "sektenpc/" + what, "data": d,
+                       "Rotation": [nbt.Float(YAW[facing]), nbt.Float(0.0)]})
+
+
+def meja_loket(p, cells, y, face):
+    """The registration desk over `cells`: a counter of top trapdoors, the register (a lectern facing the applicants) in
+    the middle and a barrel with an ink candle at the first cell; the registrar stands behind it (opposite of `face`)."""
+    mid = len(cells) // 2
+    for i, (cx, cz) in enumerate(cells):
+        if i == mid:
+            p.put(cx, y, cz, "minecraft:lectern", {"facing": face, "has_book": "false", "powered": "false"})
+        elif i == 0:
+            p.put(cx, y, cz, "minecraft:barrel", {"facing": "up", "open": "false"})
+            p.put(cx, y + 1, cz, "minecraft:white_candle", {"candles": "2", "lit": "true", "waterlogged": "false"})
+        else:
+            p.put(cx, y, cz, "window", {"facing": face, "half": "top", "open": "false", "powered": "false",
+                                        "waterlogged": "false"})
+
+
+def tempat_tidur(p, x, y, z, facing, color="minecraft:red_bed"):
+    """A bed whose head is at (x, z) and whose foot lies away from `facing`."""
+    dx, dz = FACES[facing]
+    p.put(x, y, z, color, {"facing": facing, "part": "head", "occupied": "false"})
+    p.put(x - dx, y, z - dz, color, {"facing": facing, "part": "foot", "occupied": "false"})
+
+
+def bilik(p, x0, z0, x1, z1, y, slot, bed_at, bed_facing, chest_at, chest_facing):
+    """Furnishes a spare cell (DESIGN 41.6.6 Bilik): bed, chest, a mat in the free middle; anchor sektenpc/bilik_<slot>."""
+    tempat_tidur(p, bed_at[0], y, bed_at[1], bed_facing)
+    p.put(chest_at[0], y, chest_at[1], "minecraft:chest", {"facing": chest_facing, "type": "single", "waterlogged": "false"})
+    cx, cz = (x0 + x1 + 1) // 2, (z0 + z1 + 1) // 2
+    if p.get(cx, y, cz) in (None, "minecraft:air"):
+        p.put(cx, y, cz, "carpet")
+    titik41(p, cx + 0.5, y, cz + 0.5, "bilik_%d" % slot, "south", slot=nbt.Int(slot))
+
+
+def lilin_tegak(p, x, y, z):
+    """A candle stand (a fence post with three lit candles)."""
+    p.put(x, y, z, "fence")
+    p.put(x, y + 1, z, "minecraft:white_candle", {"candles": "3", "lit": "true", "waterlogged": "false"})
+
+
 # ------------------------------------------------------------------------------------------------- kecil (tier 1-3)
 def build_kecil():
     sx, sy, sz = 25, 20, 33
@@ -217,8 +274,35 @@ def build_kecil():
     for x in (8, 16):
         p.lantern(x, y + 6, 7)
     p.put(12, y + 1, 3, "minecraft:lectern", {"facing": "south", "has_book": "false", "powered": "false"})
-    p.put(5, y + 1, 3, "minecraft:bookshelf")
-    p.put(19, y + 1, 3, "minecraft:bookshelf")
+    # DESIGN 41: two cells in the back corners of the hall behind plank partitions with a lattice top (bilik 0-1), the
+    # registration desk in the front right, the oath mat with two candle stands in the aisle before the throne
+    for side, (px, ix0, ix1) in enumerate(((8, 5, 7), (16, 17, 19))):
+        for z in range(3, 7):
+            for dy in (1, 2):
+                p.put(px, y + dy, z, "wall")
+            p.put(px, y + 3, z, "window", {"facing": "east" if side == 0 else "west", "half": "bottom", "open": "true",
+                                           "powered": "false", "waterlogged": "false"})
+        door_x = (ix0 + ix1) // 2
+        for x in range(ix0, ix1 + 1):
+            if x == door_x:
+                for half, dy in (("lower", 1), ("upper", 2)):
+                    p.put(x, y + dy, 6, "minecraft:spruce_door", {"facing": "south", "half": half, "hinge": "left",
+                                                                  "open": "false", "powered": "false"})
+            else:
+                p.put(x, y + 1, 6, "wall")
+                p.put(x, y + 2, 6, "wall")
+            p.put(x, y + 3, 6, "trim", {"axis": "x"})
+        shelf_x, bed_x = (ix1, ix0) if side == 0 else (ix0, ix1)
+        p.put(shelf_x, y + 1, 3, "minecraft:bookshelf")
+        bilik(p, ix0, 3, ix1, 5, y + 1, side, (bed_x, 3), "north", (shelf_x, 5), "west" if side == 0 else "east")
+        p.lantern(door_x, y + 4, 4)
+    meja_loket(p, [(x, 9) for x in range(15, 19)], y + 1, "south")
+    titik41(p, 16.5, y + 1.0, 8.5, "loket", "south")
+    lilin_tegak(p, 11, y + 1, 7)
+    lilin_tegak(p, 13, y + 1, 7)
+    titik41(p, 12.5, y + 1.0, 7.5, "altar", "north")
+    titik41(p, 12.5, 1.0, 32.5, "ujian_bawah", "north")
+    titik41(p, 12.5, y + 1.0, 26.5, "ujian_atas", "north")
     anchors(p, (12.5, y + 1.0, 23.5), [(6.5, y + 1.0, 22.5), (18.5, y + 1.0, 22.5), (9.5, y + 1.0, 15.5), (15.5, y + 1.0, 15.5)],
             (12.5, y + 1.0, 5.5), 0)
     p.weather(0.06)
@@ -244,9 +328,16 @@ def build_sedang():
     censer(p, 18, y + 1, 19)
     cherry(p, 3, y + 1, 35, 5)
     cherry(p, 33, y + 1, 35, 5)
-    # side pavilions facing the courtyard
+    # side pavilions facing the courtyard: the two spare cells of the gate (DESIGN 41 bilik 0-1)
     hall(p, 1, 17, 7, 25, y + 1, 4, door_side="east", windows=3)
     hall(p, 29, 17, 35, 25, y + 1, 4, door_side="west", windows=3)
+    bilik(p, 2, 18, 6, 24, y + 1, 0, (2, 18), "north", (6, 18), "south")
+    bilik(p, 30, 18, 34, 24, y + 1, 1, (34, 18), "north", (30, 18), "south")
+    for x in (2, 34):
+        p.put(x, y + 1, 24, "minecraft:barrel", {"facing": "up", "open": "false"})
+        p.put(x, y + 2, 24, "minecraft:flower_pot")
+    p.lantern(4, y + 4, 21)
+    p.lantern(32, y + 4, 21)
     # main hall with a double eave
     top = hall(p, 7, 2, 29, 14, y + 1, 6, tiers=2)
     aisle(p, 18, y + 1, 5, 13)
@@ -260,6 +351,14 @@ def build_sedang():
         p.put(x, y + 1, 3, "minecraft:bookshelf")
     for x in (9, 27):
         p.put(x, y + 3, 14 + 1, "banner", {"facing": "south"})
+    # DESIGN 41: registration desk in the front right of the hall (before the east pillars), oath mat in the aisle
+    meja_loket(p, [(x, 12) for x in range(22, 25)], y + 1, "south")
+    titik41(p, 23.5, y + 1.0, 11.5, "loket", "south")
+    lilin_tegak(p, 17, y + 1, 8)
+    lilin_tegak(p, 19, y + 1, 8)
+    titik41(p, 18.5, y + 1.0, 8.5, "altar", "north")
+    titik41(p, 18.5, 1.0, 44.5, "ujian_bawah", "north")
+    titik41(p, 18.5, y + 1.0, 38.5, "ujian_atas", "north")
     anchors(p, (18.5, y + 1.0, 36.5),
             [(12.5, y + 1.0, 35.5), (24.5, y + 1.0, 35.5), (4.5, y + 1.0, 27.5), (32.5, y + 1.0, 27.5), (15.5, y + 1.0, 18.5),
              (21.5, y + 1.0, 18.5)],
@@ -310,6 +409,18 @@ def build_besar():
     for x0 in (1, 40):
         hall(p, x0, 29, x0 + 5, 34, mid + 1, 4, tiers=3, door_side="south", windows=0)
     p.put(3, mid + 4, 31, "minecraft:bell", {"attachment": "ceiling", "facing": "north", "powered": "false"})
+    # DESIGN 41: the bell and drum towers keep the two spare cells (bilik 0-1); the west side hall is the registration
+    # hall (a desk along it, the registrar behind it facing the court door)
+    bilik(p, 2, 30, 5, 33, mid + 1, 0, (2, 30), "north", (5, 30), "south")
+    bilik(p, 41, 30, 44, 33, mid + 1, 1, (44, 30), "north", (41, 30), "south")
+    meja_loket(p, [(5, z) for z in range(21, 26)], mid + 1, "east")
+    for z in (20, 26):
+        p.put(2, mid + 1, z, "minecraft:bookshelf")
+        p.put(2, mid + 2, z, "minecraft:bookshelf")
+    p.put(3, mid + 1, 23, "minecraft:spruce_stairs", {"facing": "west", "half": "bottom", "shape": "straight",
+                                                      "waterlogged": "false"})
+    p.lantern(5, mid + 5, 23)
+    titik41(p, 4.5, mid + 1.0, 23.5, "loket", "east")
     # the great hall: double eave, inner pillars, the throne under gold
     top = hall(p, 8, 1, 38, 12, high + 1, 7, tiers=2, windows=4)
     aisle(p, 23, high + 1, 4, 11)
@@ -324,6 +435,11 @@ def build_besar():
         p.put(x, high + 2, 2, "minecraft:bookshelf")
     for x in (10, 36):
         p.put(x, high + 4, 13, "banner", {"facing": "south"})
+    lilin_tegak(p, 22, high + 1, 7)
+    lilin_tegak(p, 24, high + 1, 7)
+    titik41(p, 23.5, high + 1.0, 7.5, "altar", "north")
+    titik41(p, 23.5, 1.0, 47.5, "ujian_bawah", "north")
+    titik41(p, 23.5, high + 1.0, 13.5, "ujian_atas", "north")
     anchors(p, (23.5, low + 1.0, 39.5),
             [(12.5, low + 1.0, 38.5), (34.5, low + 1.0, 38.5), (10.5, mid + 1.0, 29.5), (36.5, mid + 1.0, 29.5), (17.5, mid + 1.0, 19.5),
              (29.5, mid + 1.0, 19.5)],

@@ -16,6 +16,7 @@ import dev.kultivator.sect.build.api.EngineApi;
 import dev.kultivator.sect.build.api.SectTemplates;
 import dev.kultivator.sect.build.api.SiteView;
 import dev.kultivator.sect.build.blueprint.Glaze;
+import dev.kultivator.sect.build.engine.Classifier;
 import dev.kultivator.sect.hall.Halls;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
@@ -31,6 +32,10 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.Container;
+import net.minecraft.world.RandomizableContainer;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
@@ -171,7 +176,7 @@ public final class Ceremonies implements BuildListener {
 			if (near(master, site)) {
 				Msg.actionBar(master, Component.translatable("kultivator.sectbuild.component.done", component.name()).withStyle(ChatFormatting.GOLD));
 			}
-			boolean glazed = site != null && (site.glaze() != Glaze.TINTA || site.template() >= 5);
+			boolean glazed = site != null && (site.glaze() != Glaze.TINTA || SectTemplates.rank(site.template()) >= 5);
 			if (glazed && component.kind().contains("pagoda") && !site.test() && ownComponent(owner, component.id())) {
 				Advancements.grant(master, "glazed_pagoda");
 			}
@@ -216,7 +221,41 @@ public final class Ceremonies implements BuildListener {
 		line.append(button("kultivator.sectbuild.button.skip", "/kultivasi aula bangun lewati " + component.id()));
 		line.append(Component.literal(" "));
 		line.append(button("kultivator.sectbuild.button.finish_blocked", "/kultivasi aula bangun tanpa-terhalang " + component.id()));
+		appendBlockedCells(line, level, sample);
 		Msg.chat(master, line);
+	}
+
+	/** Names the first blocked cells (block, position, why), so the player can find them; a hint for player-made ones. */
+	private static void appendBlockedCells(MutableComponent line, @Nullable ServerLevel level, @Nullable List<BlockPos> sample) {
+		if (level == null || sample == null) {
+			return;
+		}
+		boolean playerMade = false;
+		for (int k = 0; k < Math.min(3, sample.size()); k++) {
+			BlockPos cell = sample.get(k);
+			if (!level.isLoaded(cell)) {
+				continue;
+			}
+			BlockState state = level.getBlockState(cell);
+			BlockEntity entity = level.getBlockEntity(cell);
+			String why;
+			if (Classifier.protectedBlock(level, cell, state)) {
+				why = "protected";
+			} else if (entity instanceof RandomizableContainer loot && loot.getLootTable() != null
+					|| entity instanceof Container container && !container.isEmpty()) {
+				why = "container";
+			} else {
+				why = "player";
+				playerMade = true;
+			}
+			line.append(Component.literal("\n"));
+			line.append(Component.translatable("kultivator.sectbuild.blocked.cell", state.getBlock().getName(), cell.getX(), cell.getY(), cell.getZ(),
+					Component.translatable("kultivator.sectbuild.blocked.why." + why)).withStyle(ChatFormatting.GRAY));
+		}
+		if (playerMade) {
+			line.append(Component.literal("\n"));
+			line.append(Component.translatable("kultivator.sectbuild.blocked.hint").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
+		}
 	}
 
 	@Override
@@ -300,15 +339,16 @@ public final class Ceremonies implements BuildListener {
 				}
 				if (complete) {
 					Advancements.grant(master, "sect_complete");
-					if (template >= 5) {
+					// rank(): sky templates are numbered 11-19.
+					if (SectTemplates.rank(template) >= 5) {
 						Advancements.grant(master, "grand_sect_complete");
 					}
-					if (template >= 9) {
+					if (SectTemplates.rank(template) >= 9) {
 						Advancements.grant(master, "heavenly_court");
 					}
 				}
 			}
-			if (complete && template >= 5 && server != null && FlowData.award(owner, "grand_line:" + template)) {
+			if (complete && SectTemplates.rank(template) >= 5 && server != null && FlowData.award(owner, "grand_line:" + template)) {
 				Msg.broadcast(server, Component.translatable("kultivator.sectbuild.grand_line", sectName, SectTemplates.name(template))
 						.withStyle(ChatFormatting.GOLD));
 			}

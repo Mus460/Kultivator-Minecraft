@@ -81,7 +81,8 @@ public final class HidupCommands {
 				.then(Commands.literal("prop").then(Commands.argument("prop", StringArgumentType.word())
 						.executes(ctx -> prop(ctx, StringArgumentType.getString(ctx, "prop")))))
 				.then(Commands.literal("impostor").executes(HidupCommands::impostor))
-				.then(Commands.literal("audit").executes(HidupCommands::audit))
+				.then(Commands.literal("audit").executes(HidupCommands::audit)
+						.then(Commands.literal("warga").executes(HidupCommands::auditWarga)))
 				.then(Commands.literal("saksi").executes(HidupCommands::saksi))
 				.then(Commands.literal("bahaya").executes(HidupCommands::bahaya))
 				.then(Commands.literal("keadaan").then(Commands.argument("keadaan", StringArgumentType.word())
@@ -100,6 +101,43 @@ public final class HidupCommands {
 							return b.buildFuture();
 						})
 						.executes(ctx -> cuaca(ctx, StringArgumentType.getString(ctx, "cuaca")))));
+	}
+
+	/** One line about the stored person behind a resident body (42A: name, age, mood, family), or null when none. */
+	@FunctionalInterface
+	public interface PenjelasWarga {
+		@Nullable Component jelaskan(KultivatorNpc npc);
+	}
+
+	private static @Nullable PenjelasWarga penjelas;
+
+	/** Sets the {@code audit warga} line maker (one owner, 42A); null clears it. */
+	public static void setPenjelasWarga(@Nullable PenjelasWarga value) {
+		penjelas = value;
+	}
+
+	/** {@code uji hidup audit warga}: every resident body within 32 blocks with its stored person (42.4.14). */
+	private static int auditWarga(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+		ServerPlayer player = ctx.getSource().getPlayerOrException();
+		List<KultivatorNpc> bodies = player.level().getEntitiesOfClass(KultivatorNpc.class, player.getBoundingBox().inflate(32.0D),
+				n -> n.isAlive() && TubuhPenduduk.adalah(n));
+		bodies.sort(java.util.Comparator.comparingDouble(n -> n.distanceToSqr(player)));
+		ok(ctx, "kultivator.hidup.audit_warga.judul", bodies.size());
+		PenjelasWarga p = penjelas;
+		int shown = 0;
+		for (KultivatorNpc npc : bodies) {
+			if (shown++ >= 24) {
+				break;
+			}
+			Component line = p == null ? null : p.jelaskan(npc);
+			if (line == null) {
+				Penduduk who = TubuhPenduduk.penduduk(npc);
+				ok(ctx, "kultivator.hidup.audit_warga.tanpa", npc.plate(), who == null ? "?" : Integer.toString(who.id()));
+			} else {
+				ctx.getSource().sendSuccess(() -> line, false);
+			}
+		}
+		return Math.max(1, bodies.size());
 	}
 
 	private static void ok(CommandContext<CommandSourceStack> ctx, String key, Object... args) {
@@ -187,7 +225,7 @@ public final class HidupCommands {
 				Component.translatableWithFallback(next.kunciLang(), next.kunci()), TubuhPenduduk.keadaan(npc));
 		int state = h.keadaanDari(p.id());
 		if (state != PendudukData.SEHAT) {
-			ok(ctx, "kultivator.hidup.uji.keadaan_jadwal", Component.translatable("kultivator.hidup.keadaan_nama." + KEADAAN[state]));
+			ok(ctx, "kultivator.hidup.uji.keadaan_jadwal", Component.translatable("kultivator.hidup.keadaan_nama." + (state >= 0 && state < NAMA_KEADAAN.length ? NAMA_KEADAAN[state] : "sehat")));
 		}
 		return 1;
 	}
@@ -477,6 +515,8 @@ public final class HidupCommands {
 
 	/** Life state names in {@link PendudukData} order (SEHAT, PULIH, DUKA, DATANG). */
 	private static final String[] KEADAAN = {"sehat", "pulih", "duka", "datang"};
+	/** Every life state name in {@link PendudukData} order, the four of 42 included (SAKIT, MABUK, PENGANTIN, BERKABUNG). */
+	private static final String[] NAMA_KEADAAN = {"sehat", "pulih", "duka", "datang", "sakit", "mabuk", "pengantin", "berkabung"};
 
 	/**
 	 * {@code uji hidup keadaan <sehat|pulih|duka|datang>}: gives the nearest resident body a life state now (saved like a

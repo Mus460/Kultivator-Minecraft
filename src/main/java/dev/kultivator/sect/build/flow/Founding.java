@@ -155,10 +155,11 @@ public final class Founding {
 			return SectTemplates.rank(template) > config.sectBuildMaxTemplate
 					? Component.translatable("kultivator.sectbuild.template.too_large", config.sectBuildMaxTemplate) : LangitRancang.blocker(player, template);
 		}
-		if (template > config.sectBuildMaxTemplate) {
+		if (SectTemplates.rank(template) > config.sectBuildMaxTemplate) {
 			return Component.translatable("kultivator.sectbuild.template.too_large", config.sectBuildMaxTemplate);
 		}
-		if (config.sectTemplateRealmGate && Cultivators.get(player).realm().ordinal() < template - 1) {
+		// Sky upgrades (11-19) use their own realm gate in Upgrade.blocker.
+		if (!SectTemplates.isSky(template) && config.sectTemplateRealmGate && Cultivators.get(player).realm().ordinal() < template - 1) {
 			return Component.translatable("kultivator.sectbuild.template.realm_gate", SectTemplates.name(template),
 					Component.translatable("kultivator.sectbuild.realm_hint." + template));
 		}
@@ -364,13 +365,19 @@ public final class Founding {
 				FlowData.setFrozenScanCap(self, frozen);
 			}
 			// Sekte Langit: the offering is taken first (all or nothing) and given back if the engine refuses.
-			boolean offering = pending.sky && pending.mode == Mode.FOUND && !LangitSesaji.held(self);
+			boolean offering = pending.sky && pending.mode == Mode.FOUND && LangitSesaji.heldSky(self) != pending.template;
+			// A redesign to another size pays its own offering; the old one goes back only once the engine accepted.
+			CompoundTag old = offering ? LangitSesaji.detach(self) : new CompoundTag();
 			if (offering && !LangitSesaji.take(player, pending.template)) {
+				LangitSesaji.restore(self, old);
 				return false;
 			}
 			error = engine.confirm(player, pending.ticket);
-			if (error != null && offering) {
+			if (offering && error != null) {
 				LangitSesaji.refund(player);
+				LangitSesaji.restore(self, old);
+			} else if (offering && !old.isEmpty()) {
+				LangitSesaji.giveBack(player, old);
 			}
 		}
 		if (error != null) {
@@ -435,6 +442,12 @@ public final class Founding {
 			return;
 		}
 		FlowData.closeHistory(owner);
+		if ("upgrade".equals(FlowData.guaranteeKind(owner))) {
+			// The released upgrade never builds: its "hold the old tier" guarantee would otherwise stay forever.
+			FlowData.clearGuarantee(owner);
+		}
+		// An untouched sky design's offering goes back with it (no-op when none is held).
+		LangitSesaji.refund(player);
 		Builders.releaseAll(owner);
 		Halls.refreshBuildings(owner);
 		Msg.chat(player, Component.translatable("kultivator.sectbuild.change.done").withStyle(ChatFormatting.AQUA));

@@ -305,7 +305,7 @@ final class PaviliunCommands {
 			}
 			default -> {
 				PaviliunData.putLong(owner, PaviliunData.INCENSE_DAY, Ingatan.today(server) - 1L);
-				Upacara.incense(player, ItemStack.EMPTY);
+				Upacara.incense(player, new ItemStack(Dupa.DUPA)); // incense() shrinks it: never the shared EMPTY
 			}
 		}
 		ctx.getSource().sendSuccess(() -> Component.translatable("kultivator.sekte.paviliun.cmd.rite", kind), false);

@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:tempat/kota42_kavling",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.tempat.kota42_jalan_namaku.description"
+    },
+    "icon": {
+      "id": "minecraft:oak_sign"
+    },
+    "title": {
+      "translate": "advancement.kultivator.tempat.kota42_jalan_namaku.title"
+    },
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

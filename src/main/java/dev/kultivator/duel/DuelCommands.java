@@ -15,7 +15,9 @@ import dev.kultivator.duel.session.DuelRecords;
 import dev.kultivator.duel.session.DuelRuleSet;
 import dev.kultivator.duel.session.DuelSession;
 import dev.kultivator.duel.session.DuelSessions;
+import dev.kultivator.network.Payloads;
 import dev.kultivator.util.Msg;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -39,7 +41,7 @@ import java.util.Locale;
  * The player commands of the sword duel (DESIGN 35.8.4): {@code /kultivasi duel tantang [entitas] [bebas|handicap|tekan]},
  * {@code terima [id]}, {@code tolak [id]}, {@code tarik}, {@code menyerah}, {@code tunda}, {@code hormat},
  * {@code catatan [pemain]}, {@code layar}, {@code murid <murid1> <murid2>}. Without a target, {@code tantang} takes
- * the entity the player looks at; the full challenge screen is in Hub › Dunia › Duel Pedang.
+ * the entity the player looks at; the full challenge page is Gulungan › Dunia › Duel (DESIGN 43.5).
  */
 final class DuelCommands {
 
@@ -204,8 +206,13 @@ final class DuelCommands {
 		return 1;
 	}
 
+	/** Opens Gulungan › Dunia › Duel (43.14 S1); the chat line stays for a client without the mod. */
 	private static int screen(ServerPlayer player) {
-		Msg.chat(player, Component.translatable("kultivator.duel.cmd.screen").withColor(0xE8D9A8));
+		if (ServerPlayNetworking.canSend(player, Payloads.OpenScreen.TYPE)) {
+			ServerPlayNetworking.send(player, new Payloads.OpenScreen(Payloads.OpenScreen.DUNIA, Payloads.OpenScreen.DUNIA_DUEL));
+		} else {
+			Msg.chat(player, Component.translatable("kultivator.duel.cmd.screen").withColor(0xE8D9A8));
+		}
 		return 1;
 	}
 

@@ -4,6 +4,8 @@ import dev.kultivator.dunia.kota.Harga;
 import dev.kultivator.dunia.kota.KultivatorNpc;
 import dev.kultivator.dunia.kota.NilaiBatu;
 import dev.kultivator.dunia.kota.NpcRole;
+import dev.kultivator.dunia.kota42.api.Kategori;
+import dev.kultivator.dunia.kota42.ekonomi.HargaKota;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import dev.kultivator.dunia.tempat.ui.TempatLayar;
 import dev.kultivator.duel.clash.WeaponClass;
@@ -73,7 +75,11 @@ public final class TokoSenjata {
 		long hari = Barang.hari(level.getServer());
 		RandomSource random = RandomSource.create(situs * 0x2545F4914F6CDD1DL + hari * 1_000_003L);
 		List<Barisan> list = new ArrayList<>();
-		double faktor = 1.0D - diskon;
+		// one HargaKota.faktor per price (42.6.3): weapons SENJATA, armour ZIRAH, robes KAIN
+		double dasar = 1.0D - diskon;
+		double faktor = dasar * HargaKota.faktor(level.getServer(), situs, Kategori.SENJATA);
+		double faktorZirah = dasar * HargaKota.faktor(level.getServer(), situs, Kategori.ZIRAH);
+		double faktorKain = dasar * HargaKota.faktor(level.getServer(), situs, Kategori.KAIN);
 		int[][] stokMutu = {{2, 4}, {1, 3}, {1, 2}, {0, 1}};
 		for (SenjataKota.Bentuk bentuk : SenjataKota.Bentuk.values()) {
 			for (SenjataKota.Mutu mutu : SenjataKota.Mutu.values()) {
@@ -98,17 +104,17 @@ public final class TokoSenjata {
 					() -> Forging.buatStok(level, ArtifactItem.PEDANG, g, RandomSource.create(seed), "Gilda Pandai Pusaka"), harga, 1,
 					Math.max(0, g + 1), langka, g));
 		}
-		list.add(zirah("z.rantai", () -> new ItemStack(Items.CHAINMAIL_CHESTPLATE), 40L, 1, faktor, 1 + random.nextInt(2)));
-		list.add(zirah("z.besi", () -> new ItemStack(Items.IRON_CHESTPLATE), 60L, 1, faktor, 1 + random.nextInt(2)));
-		list.add(zirah("z.intan_helm", () -> new ItemStack(Items.DIAMOND_HELMET), 180L, 3, faktor, random.nextInt(2)));
-		list.add(zirah("z.intan_dada", () -> new ItemStack(Items.DIAMOND_CHESTPLATE), 180L, 3, faktor, random.nextInt(2)));
-		list.add(zirah("z.intan_celana", () -> new ItemStack(Items.DIAMOND_LEGGINGS), 180L, 3, faktor, random.nextInt(2)));
-		list.add(zirah("z.intan_sepatu", () -> new ItemStack(Items.DIAMOND_BOOTS), 180L, 3, faktor, random.nextInt(2)));
+		list.add(zirah("z.rantai", () -> new ItemStack(Items.CHAINMAIL_CHESTPLATE), 40L, 1, faktorZirah, 1 + random.nextInt(2)));
+		list.add(zirah("z.besi", () -> new ItemStack(Items.IRON_CHESTPLATE), 60L, 1, faktorZirah, 1 + random.nextInt(2)));
+		list.add(zirah("z.intan_helm", () -> new ItemStack(Items.DIAMOND_HELMET), 180L, 3, faktorZirah, random.nextInt(2)));
+		list.add(zirah("z.intan_dada", () -> new ItemStack(Items.DIAMOND_CHESTPLATE), 180L, 3, faktorZirah, random.nextInt(2)));
+		list.add(zirah("z.intan_celana", () -> new ItemStack(Items.DIAMOND_LEGGINGS), 180L, 3, faktorZirah, random.nextInt(2)));
+		list.add(zirah("z.intan_sepatu", () -> new ItemStack(Items.DIAMOND_BOOTS), 180L, 3, faktorZirah, random.nextInt(2)));
 		String[] warna = {"merah", "biru", "hijau", "emas"};
 		List<Item> jubah = EkonomiItems.jubah();
 		for (int i = 0; i < 4; i++) {
 			Item item = jubah.get(i);
-			list.add(zirah("z.jubah_" + warna[i], () -> new ItemStack(item), 30L, 0, faktor, 3));
+			list.add(zirah("z.jubah_" + warna[i], () -> new ItemStack(item), 30L, 0, faktorKain, 3));
 		}
 		return list;
 	}
@@ -352,6 +358,9 @@ public final class TokoSenjata {
 		}
 		sold.putInt(found.id, sold.getIntOr(found.id, 0) + count);
 		EkonomiData.get(level.getServer()).touch();
+		Kategori kategori = !LembarKunci.TokoSenjata.TAB_ZIRAH.equals(found.tab) ? Kategori.SENJATA
+				: found.id.startsWith("z.jubah") ? Kategori.KAIN : Kategori.ZIRAH;
+		HargaKota.catatBeli(level.getServer(), situs, kategori, count);
 		long hari = Barang.hari(level.getServer());
 		Component name = Component.empty();
 		for (int i = 0; i < count; i++) {

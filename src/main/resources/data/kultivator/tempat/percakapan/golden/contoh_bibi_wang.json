@@ -1,0 +1,234 @@
+{
+  "id": "contoh_bibi_wang",
+  "jenis": "realisasi",
+  "_catatan": "42.5A.10: Bibi Wang (penakut + gosip_sumur, cemas, ibukota) to Han: flashback to the promise, the pickpocket news, the rice price, then the goodbye.",
+  "benih_dunia": 42,
+  "masukan": {
+    "niat": "KILAS_BALIK",
+    "pembicara": 7,
+    "hari": 120,
+    "now": 2880000,
+    "cuaca": "cerah",
+    "musim": "semi",
+    "situasi": {
+      "jam": "pagi",
+      "cuaca": "cerah",
+      "musim": "semi",
+      "kelompok": "pekerja",
+      "watak": "penakut",
+      "kebiasaan": [
+        "gosip_sumur"
+      ],
+      "sifat": {
+        "H": 10,
+        "E": 60,
+        "X": -15,
+        "A": 10,
+        "C": 0,
+        "O": -10
+      },
+      "wajah": "netral",
+      "tempat": "kota_besar",
+      "kenangan": [
+        "DIBANTU"
+      ]
+    },
+    "pendengar": {
+      "nama": "Han",
+      "kelamin": "l",
+      "tahap": "dewasa",
+      "pemain": true
+    },
+    "kesan": "akrab",
+    "tahu_nama": true,
+    "register": "sopan",
+    "dialek": "ibukota",
+    "kelamin": "p",
+    "tahap": "dewasa",
+    "peran": "warga",
+    "label": "cemas",
+    "intensitas": "agak",
+    "arousal": 0.2,
+    "tik": [
+      "tahu_kan"
+    ],
+    "nilai": {
+      "janji": {
+        "t": "obat untuk ibu mertuaku"
+      },
+      "batas": 119,
+      "fakta.hariKejadian": 118
+    }
+  },
+  "langkah": [
+    {
+      "ubah": {},
+      "harap": {
+        "k": "kultivator.cakap.kilas.dibantu.0",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.sebutan_nama",
+            "a": [
+              {
+                "k": "kultivator.cakap.lex.tuan.ibukota",
+                "a": []
+              },
+              {
+                "t": "Han"
+              }
+            ]
+          }
+        ]
+      },
+      "aturan": "kilas.dibantu",
+      "gestur": "hormat",
+      "seru": null,
+      "tik": null,
+      "id_id": "Tuanku Han yang dulu membantuku, kan? Aku masih ingat. Terima kasih sekali lagi.",
+      "en_us": "You're the one who helped me before, aren't you, My Lord Han? I still remember. Thank you again."
+    },
+    {
+      "ubah": {
+        "niat": "BERI_KABAR",
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "penakut",
+          "kebiasaan": [
+            "gosip_sumur"
+          ],
+          "sifat": {
+            "H": 10,
+            "E": 60,
+            "X": -15,
+            "A": 10,
+            "C": 0,
+            "O": -10
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar",
+          "kenangan": [
+            "DIBANTU"
+          ],
+          "fakta": "COPET_TERTANGKAP"
+        },
+        "topik": "kejahatan",
+        "nilai": {
+          "fakta.subjek": {
+            "orang": {
+              "nama": "Han",
+              "kelamin": "l",
+              "tahap": "dewasa",
+              "pemain": true
+            }
+          },
+          "fakta.objek": {
+            "t": "pasar"
+          },
+          "fakta.hariKejadian": 118
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.kabar.copet.1.ibukota",
+        "a": [
+          {
+            "t": "pasar"
+          },
+          {
+            "k": "kultivator.cakap.seru.kaget.6",
+            "a": []
+          },
+          {
+            "t": ""
+          }
+        ]
+      },
+      "aturan": "kabar.copet",
+      "gestur": "tunjuk",
+      "seru": null,
+      "tik": null,
+      "id_id": "Penjaga istana pun memuji pasar. Copet di  kini mendekam di penjara.",
+      "en_us": "Even the palace guard praised pasar. The thief from  now sits in jail."
+    },
+    {
+      "ubah": {
+        "niat": "BERI_KABAR",
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "penakut",
+          "kebiasaan": [
+            "gosip_sumur"
+          ],
+          "sifat": {
+            "H": 10,
+            "E": 60,
+            "X": -15,
+            "A": 10,
+            "C": 0,
+            "O": -10
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar",
+          "kenangan": [
+            "DIBANTU"
+          ],
+          "fakta": "HARGA_NAIK"
+        },
+        "nilai": {
+          "fakta.objek": {
+            "t": "beras"
+          },
+          "fakta.nilai": 15,
+          "fakta.hariKejadian": 113,
+          "konteks.arah": "selatan"
+        },
+        "topik": "harga"
+      },
+      "harap": {
+        "k": "kultivator.cakap.kabar.harga_naik.0",
+        "a": [
+          {
+            "t": "beras"
+          },
+          {
+            "k": "kultivator.cakap.lex.minggu_lalu.ibukota",
+            "a": []
+          },
+          {
+            "k": "kultivator.cakap.frag.sebab_harga.4.ibukota",
+            "a": []
+          },
+          {
+            "t": ""
+          }
+        ]
+      },
+      "aturan": "kabar.harga_naik",
+      "gestur": "geleng",
+      "seru": "kota42.seru.aduh_p",
+      "tik": null,
+      "id_id": "beras naik lagi sejak pekan lalu. Bea gerbang ibu kota dinaikkan menteri. ",
+      "en_us": "beras went up again last week. The minister raised the capital's gate duty. "
+    },
+    {
+      "ubah": {
+        "niat": "TUTUP"
+      },
+      "harap": {
+        "k": "kultivator.cakap.tutup.akrab.1.p",
+        "a": []
+      },
+      "aturan": "tutup.akrab",
+      "gestur": "tepuk_bahu",
+      "seru": null,
+      "tik": null,
+      "id_id": "Hati-hati, ya. Kalau sakit, cepat ke sini, kubuatkan jamu.",
+      "en_us": "Take care. If you fall ill, come quick; I'll brew you tonic."
+    }
+  ]
+}

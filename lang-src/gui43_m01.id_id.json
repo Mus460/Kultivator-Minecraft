@@ -1,0 +1,18 @@
+{
+  "kultivator.gui43.hal.diri.harta": "Harta",
+  "kultivator.gui43.sub.harta.titik": "Gua Pribadi",
+  "kultivator.gui43.sub.harta.gua": "Gua Sekte",
+  "kultivator.gui43.sub.harta.pilih": "Pilih Gua",
+  "kultivator.gui43.sub.harta.kolam": "Kolam Roh",
+  "kultivator.gui43.sub.harta.lapak": "Lapak",
+  "kultivator.gui43.m01.harta.tetapkan": "Tetapkan di sini",
+  "kultivator.gui43.m01.harta.pindah": "Pindahkan ke sini",
+  "kultivator.gui43.m01.harta.tetapkan.tip": "Duduklah bermeditasi di kursi formasi qi di dalam formasi pelindung yang aktif, lalu tekan ini. Kursi itu menjadi Gua Kediaman-mu.",
+  "kultivator.gui43.m01.harta.hapus": "Hapus gua",
+  "kultivator.gui43.m01.harta.hapus.tip": "Melepaskan Gua Kediaman-mu. Bonusnya berhenti sampai kamu menetapkan gua baru.",
+  "kultivator.gui43.m01.harta.hapus.yakin": "Hapus Gua Kediaman-mu? Bonus gua berhenti sampai kamu menetapkan yang baru.",
+  "kultivator.gui43.m01.harta.cara": "Bermeditasilah di kursi formasi qi di dalam formasi pelindung yang aktif, lalu tekan \"Tetapkan di sini\" (atau /kultivasi gua tetapkan). Dalam 6 blok dari kursi itu urat qi terkuras separuh, pencerahan lebih sering datang, dan Mode Kehancuran tidak pernah memahat dalam 16 blok.",
+  "kultivator.gui43.m01.pusaka.cincin": "Buka Cincin",
+  "kultivator.gui43.m01.pusaka.cincin.tip": "Membuka cincin penyimpanan terikat tertinggi di tasmu. Esc membawamu kembali ke halaman ini.",
+  "kultivator.gui43.m01.dao.sumpah": "Bersumpah pada %s? Sumpah Dao berlaku seumur hidup dan tidak bisa ditarik kembali."
+}

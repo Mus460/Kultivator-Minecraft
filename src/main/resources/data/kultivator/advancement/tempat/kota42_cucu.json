@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:tempat/kota42_generasi",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.tempat.kota42_cucu.description"
+    },
+    "icon": {
+      "id": "minecraft:cake"
+    },
+    "title": {
+      "translate": "advancement.kultivator.tempat.kota42_cucu.title"
+    },
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

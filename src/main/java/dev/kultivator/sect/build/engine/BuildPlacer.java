@@ -469,7 +469,8 @@ public final class BuildPlacer {
 			return Result.SKIPPED_OWN;
 		}
 		BlockState state = level.getBlockState(pos);
-		if (expected != null && state != expected || !Classifier.ownStill(level, pos, state)) {
+		// Same block is enough: fences/panes reconnect, doors open, campfires light.
+		if (expected != null && state.getBlock() != expected.getBlock() || !Classifier.ownStill(level, pos, state)) {
 			return Result.SKIPPED_OWN;
 		}
 		BlockState after = replacement == null ? Blocks.AIR.defaultBlockState() : replacement;
@@ -480,7 +481,8 @@ public final class BuildPlacer {
 		if (guard.inTheWay(level, pos, after)) {
 			return Result.DEFERRED;
 		}
-		refundPlaced(site, state, "dismantle");
+		// The planned state's cost: a player-doubled slab or added candle is not paid out.
+		refundPlaced(site, expected != null ? expected : state, "dismantle");
 		level.setBlock(pos, after, after.isAir() ? REMOVE_FLAGS : PLACE_FLAGS);
 		index.setPlaced(level, pos, site.owner, false);
 		return Result.PLACED;

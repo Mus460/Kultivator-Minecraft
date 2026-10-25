@@ -1,0 +1,169 @@
+{
+  "id": "niat_pendek",
+  "jenis": "realisasi",
+  "_catatan": "Short intents: thanks, apology, refusal, request for help, question, a child's dream.",
+  "benih_dunia": 42,
+  "masukan": {
+    "niat": "TERIMA_KASIH",
+    "pembicara": 506,
+    "hari": 120,
+    "now": 2880000,
+    "cuaca": "cerah",
+    "musim": "semi",
+    "situasi": {
+      "jam": "pagi",
+      "cuaca": "cerah",
+      "musim": "semi",
+      "kelompok": "pekerja",
+      "watak": "ramah",
+      "kebiasaan": [],
+      "sifat": {
+        "H": 10,
+        "E": 0,
+        "X": 20,
+        "A": 30,
+        "C": 10,
+        "O": 0
+      },
+      "wajah": "netral",
+      "tempat": "kota_besar"
+    },
+    "pendengar": {
+      "nama": "Han",
+      "kelamin": "l",
+      "tahap": "dewasa",
+      "pemain": true
+    },
+    "kesan": "kenal",
+    "tahu_nama": false,
+    "register": "sopan",
+    "dialek": "air",
+    "kelamin": "p",
+    "nilai": {
+      "konteks.barang_murah": "minecraft:carrot",
+      "konteks.barang_mahal": "minecraft:honey_bottle"
+    }
+  },
+  "langkah": [
+    {
+      "ubah": {},
+      "harap": {
+        "k": "kultivator.cakap.terima_kasih.puji.0.air",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.tuan.air",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "terima_kasih.puji",
+      "gestur": "hormat",
+      "seru": "kota42.seru.terima_kasih_p",
+      "tik": null,
+      "id_id": "Aduh, Kakak... pipiku jadi panas... terima kasih...",
+      "en_us": "Oh, dear... my cheeks are burning... thank you..."
+    },
+    {
+      "ubah": {
+        "niat": "MAAF"
+      },
+      "harap": {
+        "k": "kultivator.cakap.maaf.1.p",
+        "a": []
+      },
+      "aturan": "maaf",
+      "gestur": "sikap_tunduk",
+      "seru": "kota42.seru.maaf_p",
+      "tik": null,
+      "id_id": "Maafkan aku, ya. Tadi aku capek sekali.",
+      "en_us": "Forgive me. I was so tired earlier."
+    },
+    {
+      "ubah": {
+        "niat": "TOLAK"
+      },
+      "harap": {
+        "k": "kultivator.cakap.tolak.2",
+        "a": []
+      },
+      "aturan": "tolak",
+      "gestur": "geleng",
+      "seru": null,
+      "tik": null,
+      "id_id": "Itu di luar kemampuanku. Coba tanya orang lain.",
+      "en_us": "That's beyond me. Try someone else."
+    },
+    {
+      "ubah": {
+        "niat": "MINTA_TOLONG"
+      },
+      "harap": {
+        "t": ""
+      },
+      "aturan": null,
+      "gestur": null,
+      "seru": null,
+      "tik": null,
+      "id_id": "",
+      "en_us": ""
+    },
+    {
+      "ubah": {
+        "niat": "TANYA"
+      },
+      "harap": {
+        "k": "kultivator.cakap.dagang.tanya_harga.2",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.tuan.air",
+            "a": []
+          },
+          {
+            "k": "item.minecraft.honey_bottle",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "dagang.tanya_harga",
+      "gestur": "bicara_tangan",
+      "seru": null,
+      "tik": null,
+      "id_id": "Menurut Kakak, harga item.minecraft.honey_bottle akan turun sebelum musim berganti?",
+      "en_us": "Do you think item.minecraft.honey_bottle will drop before the season turns, Dear Sir?"
+    },
+    {
+      "ubah": {
+        "niat": "CITA",
+        "tahap": "anak",
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar",
+          "tahap": "anak"
+        }
+      },
+      "harap": {
+        "t": ""
+      },
+      "aturan": null,
+      "gestur": null,
+      "seru": null,
+      "tik": null,
+      "id_id": "",
+      "en_us": ""
+    }
+  ]
+}

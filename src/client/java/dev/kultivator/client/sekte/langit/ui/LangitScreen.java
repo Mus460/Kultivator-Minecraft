@@ -1,325 +1,197 @@
 package dev.kultivator.client.sekte.langit.ui;
 
-import com.mojang.blaze3d.platform.InputConstants;
 import dev.kultivator.client.hub.HubNav;
+import dev.kultivator.client.hub.Tujuan;
+import dev.kultivator.client.hub.Urutan;
+import dev.kultivator.client.screen.Page;
 import dev.kultivator.client.screen.ui.Brush;
-import dev.kultivator.client.screen.ui.KeyHints;
+import dev.kultivator.client.screen.ui.Glyphs;
+import dev.kultivator.client.screen.ui.InkField;
+import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
-import dev.kultivator.client.screen.ui.UiSound;
+import dev.kultivator.client.screen.ui.PemilihOrang;
+import dev.kultivator.client.screen.ui.TalismanButton;
 import dev.kultivator.client.sekte.langit.LangitClient;
+import dev.kultivator.client.sekte.wilayah.GulirIsi;
 import dev.kultivator.sect.build.api.SectTemplates;
-import dev.kultivator.sect.hall.Halls;
 import dev.kultivator.sekte.langit.main.LangitUiPayloads;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**
- * "Sekte Langit", the sky-sect screen (DESIGN 37.7.9, module 37G): a scroll over a dusk sky with drifting cloud banks.
- * Left, a living diorama of the hall's island drawn from the synced numbers (the inverted cone, the terraces, the
- * satellites and jade bridges of its template, the pagoda that grows with the tier, the mist falls from tier 4, the net
- * pillars from tier 5, the crystals and the Gate of the Nine Heavens at tier 9, the tether pillar while tethered, the
- * cloud sea below) with the nine tier seals and the island's numbers. Right, three tabs: <b>Peristiwa</b> (the sky's state,
- * the days until the next cloud pirates, envoy, guests and lantern festival, the Heaven Court order with its progress
- * and its "lay the stones" seal), <b>Kronik</b> (the hall's sky chronicle) and <b>Tetangga Langit</b> (the NPC sky sects
- * with their stance). Footer seals: Feri, Gerbang, Undang (a name box), Rancang (the build tablet), Pemandangan (37V's
- * sky view settings) and the "?" seal. All numbers come from the server ({@code LangitUi}); refreshed every 3 s. Fits a
- * 320 × 190 GUI (GUI scale 4 on 1366 × 768).
+ * Sekte › Wilayah › Langit (DESIGN 37.7.9, 43.5, 43.12.1: was the "Sekte Langit" screen of module 37G). A living diorama of
+ * the hall's island drawn from the synced numbers (the inverted cone, the satellites and jade bridges of its template, the
+ * pagoda that grows with the tier, the mist falls from tier 4, the net pillars from tier 5, the crystals and the Gate of
+ * the Nine Heavens at tier 9, the tether pillar while tethered, the cloud sea below) with the nine tier seals and the
+ * island's numbers; beside it (below it in a narrow box) one scroll with stacked headings (43.0.4, no tabs): the sky's
+ * state, the event clock, the Heaven Court order with its "lay the stones" talisman and the NPC sky sects (the sky
+ * chronicle is a source of Sekte › Ikhtisar › Catatan, 43.11 G37). Foot talismans: Feri, Gerbang, Undang, Rancang (Sekte › Bangun) and Pemandangan (Pengaturan › Tampilan, the
+ * switches of {@code LangitClientConfig.rows()}). Undang (R30) picks an online player from the kit's people picker, with a
+ * name field for anyone else. All numbers come from the server ({@code LangitUi}, kept by {@link LangitUiClient}), asked
+ * for when shown and every 3 s while shown. Text 1.0.
  */
-public class LangitScreen extends Screen {
+public class LangitScreen extends Page {
 
 	private static final String K = "kultivator.sekte_langit.layar.";
-	private static final int TAB_EVENTS = 0;
-	private static final int TAB_CHRONICLE = 1;
-	private static final int TAB_NEIGHBOURS = 2;
-	private static final int SKY_TOP = 0xFF101C36;
-	private static final int SKY_BOTTOM = 0xFF5B4A78;
-	private static final int DUSK = 0xFFE59A6A;
+	private static final String M = "kultivator.gui43.m10.langit.";
+	private static final String P = "kultivator.gui43.p5.";
+	private static final int KAKI = 16;
+	private static final long SEGAR_MS = 3000L;
 
-	private static @Nullable LangitScreen open;
+	private static @Nullable LangitScreen tampil;
 
-	private @Nullable CompoundTag data;
+	private final GulirIsi gulir = new GulirIsi();
+	private final PemilihOrang pemain = new PemilihOrang(1);
+	private final InkField nama = new InkField(0, 0, 80, 14, 16, this::undangNama);
 	private final long openedAt = Util.getMillis();
 	private long askedAt;
-	private int tab = TAB_EVENTS;
-	private float scroll;
-	private float contentH;
-	private int x0;
-	private int y0;
-	private int x1;
-	private int y1;
-	private int split;
-	private int bodyTop;
-	private int bodyBottom;
-	private @Nullable EditBox inviteBox;
-	private final List<Seal> seals = new ArrayList<>();
-	private final KeyHints.SealCorner help = new KeyHints.SealCorner("sekte_langit");
-	/** The "lay the stones" seal inside the events tab (screen coordinates, -1 when not drawn). */
-	private float depositX0 = -1.0F;
-	private float depositX1;
-	private float depositY0;
-	private float depositY1;
-
-	/** One footer seal. */
-	private static final class Seal {
-		final Component label;
-		final Component tip;
-		final int color;
-		final Runnable action;
-		boolean enabled = true;
-		int ax;
-		int ay;
-		int bx;
-		int by;
-
-		Seal(Component label, Component tip, int color, Runnable action) {
-			this.label = label;
-			this.tip = tip;
-			this.color = color;
-			this.action = action;
-		}
-
-		boolean over(double mx, double my) {
-			return mx >= ax && mx <= bx && my >= ay && my <= by;
-		}
-	}
+	private boolean undang;
 
 	public LangitScreen() {
-		super(Component.translatable(K + "judul"));
+		nama.hint(Component.translatable(K + "undang_nama").withStyle(ChatFormatting.DARK_GRAY));
 	}
 
-	static void ask(int action, String arg) {
-		ClientPlayNetworking.send(new LangitUiPayloads.Minta(action, arg));
+	/** True while this page is on screen. */
+	static boolean ditampilkan() {
+		return tampil != null;
 	}
 
-	static void onData(CompoundTag tag) {
-		LangitScreen screen = open;
-		if (screen != null) {
-			screen.data = tag.copy();
-			screen.rebuildSeals();
-		}
+	// ================================================================== identity and life
+
+	@Override
+	public Component title() {
+		CompoundTag d = LangitUiClient.data();
+		return d != null && d.contains("nama") ? Component.translatable(K + "judul_aula", d.getStringOr("nama", "")) : Component.translatable(K + "judul");
 	}
 
 	@Override
-	protected void init() {
-		open = this;
-		int w = Math.min(460, width - 12);
-		int h = Math.min(282, height - 8);
-		x0 = (width - w) / 2;
-		x1 = x0 + w;
-		y0 = (height - h) / 2;
-		y1 = y0 + h;
-		split = x0 + Math.round(w * 0.43F);
-		bodyTop = y0 + 36;
-		bodyBottom = y1 - 26;
-		help.place(x1 - 10.0F, y0 + 11.0F);
-		String draft = inviteBox != null ? inviteBox.getValue() : "";
-		boolean typing = inviteBox != null && inviteBox.isFocused();
-		inviteBox = new EditBox(font, split + 8, y1 - 40, Math.max(60, Math.min(120, x1 - split - 70)), 12, Component.translatable(K + "undang_nama"));
-		inviteBox.setMaxLength(16);
-		inviteBox.setHint(Component.translatable(K + "undang_nama").withStyle(ChatFormatting.DARK_GRAY));
-		inviteBox.setValue(draft);
-		inviteBox.visible = typing;
-		addRenderableWidget(inviteBox);
-		if (typing) {
-			setFocused(inviteBox);
-		}
-		rebuildSeals();
-		askedAt = Util.getMillis();
-		ask(LangitUiPayloads.Minta.ASK, "");
+	public Component shortName() {
+		return Component.translatable(K + "judul");
 	}
 
 	@Override
-	public void removed() {
-		if (open == this) {
-			open = null;
+	public int glyph() {
+		return Glyphs.BUILD;
+	}
+
+	@Override
+	public String helpTopic() {
+		return "sekte_langit";
+	}
+
+	@Override
+	protected void build() {
+	}
+
+	@Override
+	public void onShow(@Nullable CompoundTag fokus) {
+		tampil = this;
+		minta();
+		super.onShow(fokus);
+	}
+
+	@Override
+	public void onHide() {
+		if (tampil == this) {
+			tampil = null;
 		}
-		super.removed();
+		tutupUndang();
 	}
 
 	@Override
 	public void tick() {
-		if (Util.getMillis() - askedAt > 3000L) {
-			askedAt = Util.getMillis();
-			ask(LangitUiPayloads.Minta.ASK, "");
+		if (Util.getMillis() - askedAt > SEGAR_MS) {
+			minta();
 		}
 	}
 
-	// ================================================================== seals (footer buttons)
-
-	private void rebuildSeals() {
-		seals.clear();
-		CompoundTag d = data;
-		boolean sky = d != null && d.getBooleanOr("langit", false);
-		boolean owner = d != null && d.getBooleanOr("pemilik", false);
-		boolean hall = d != null && d.getBooleanOr("aula", false);
-		CompoundTag island = d == null ? new CompoundTag() : d.getCompoundOrEmpty("pulau");
-		boolean standing = sky && !island.getBooleanOr("tertambat", true);
-		boolean closed = island.getBooleanOr("tertutup", false);
-		Seal ferry = new Seal(Component.translatable(K + "feri"), Component.translatable(K + "feri.tip"), Palette.JADE,
-				() -> ask(LangitUiPayloads.Minta.FERI, ""));
-		ferry.enabled = standing;
-		Seal gate = new Seal(Component.translatable(closed ? K + "gerbang_buka" : K + "gerbang_tutup"), Component.translatable(K + "gerbang.tip"),
-				closed ? Palette.JADE : Palette.SEAL, () -> ask(LangitUiPayloads.Minta.GERBANG, ""));
-		gate.enabled = sky && owner;
-		Seal invite = new Seal(Component.translatable(K + "undang"), Component.translatable(K + "undang.tip"), Palette.GOLD_DARK, this::toggleInvite);
-		invite.enabled = sky && owner;
-		Seal design = new Seal(Component.translatable(K + "rancang"), Component.translatable(K + "rancang.tip"), Palette.ROD_LIGHT,
-				() -> HubNav.openHall(Halls.PAGE_BANGUN));
-		design.enabled = hall && owner;
-		Seal views = new Seal(Component.translatable(K + "pemandangan"), Component.translatable(K + "pemandangan.tip"), 0xFF4B6FA8,
-				() -> LangitClient.openSettings(this));
-		seals.add(ferry);
-		seals.add(gate);
-		seals.add(invite);
-		seals.add(design);
-		seals.add(views);
-		layoutSeals();
+	private void minta() {
+		askedAt = Util.getMillis();
+		LangitUiClient.minta(LangitUiPayloads.Minta.ASK, "");
 	}
 
-	private void layoutSeals() {
-		int n = seals.size();
-		int room = x1 - x0 - 20;
-		int each = Math.min(70, (room - (n - 1) * 4) / n);
-		int ax = x0 + 10;
-		int ay = y1 - 20;
-		for (Seal seal : seals) {
-			seal.ax = ax;
-			seal.ay = ay;
-			seal.bx = ax + each;
-			seal.by = ay + 13;
-			ax += each + 4;
-		}
+	@Override
+	public boolean rinci() {
+		return undang;
 	}
 
-	private void toggleInvite() {
-		if (inviteBox == null) {
-			return;
+	@Override
+	public boolean mundur() {
+		if (undang) {
+			tutupUndang();
+			return true;
 		}
-		if (inviteBox.visible && !inviteBox.getValue().isBlank()) {
-			ask(LangitUiPayloads.Minta.UNDANG, inviteBox.getValue().strip());
-			inviteBox.setValue("");
-			inviteBox.visible = false;
-			inviteBox.setFocused(false);
-			setFocused(null);
-			return;
-		}
-		inviteBox.visible = !inviteBox.visible;
-		if (inviteBox.visible) {
-			setFocused(inviteBox);
-			inviteBox.setFocused(true);
-		} else {
-			inviteBox.setFocused(false);
-			setFocused(null);
-		}
+		return false;
+	}
+
+	@Override
+	protected void drawBehind(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
 	}
 
 	// ================================================================== drawing
 
 	@Override
-	public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float a) {
+	protected void lukis(Lukis l) {
 		long now = Util.getMillis();
-		g.fillGradient(0, 0, width, height, SKY_TOP, SKY_BOTTOM);
-		// a dusk glow on the horizon and the first stars
-		g.fillGradient(0, height * 2 / 3, width, height, Palette.argb(0x00, DUSK), Palette.argb(0x70, DUSK));
-		for (int i = 0; i < 28; i++) {
-			float sx = (i * 97 % 1000) / 1000.0F * width;
-			float sy = (i * 61 % 1000) / 1000.0F * height * 0.55F;
-			float tw = 0.5F + 0.5F * (float) Math.sin(now / 600.0D + i * 1.7D);
-			Brush.dot(g, sx, sy, 0.6F + 0.4F * tw, Palette.argb((int) (0x50 + 0x70 * tw), 0xFFF4D8));
+		CompoundTag d = LangitUiClient.data();
+		if (d == null) {
+			int dots = (int) ((now - openedAt) / 300L % 4L);
+			l.tengah(Component.translatable(K + "memuat").append(".".repeat(dots)), x + w / 2.0F, y + h / 2.0F - 4.0F, w - 8, l.gaya.teksLemah);
+			return;
 		}
-		// three drifting cloud banks at the bottom
-		for (int layer = 0; layer < 3; layer++) {
-			float speed = 0.004F + layer * 0.003F;
-			float y = height - 18.0F - layer * 14.0F;
-			int alpha = 0x70 - layer * 0x18;
-			for (int i = 0; i < 9; i++) {
-				float cx = ((i * 71.0F + now * speed) % (width + 80.0F)) - 40.0F;
-				Brush.disc(g, cx, y + (i % 2) * 4.0F, 16.0F + (i % 3) * 5.0F, Palette.argb(alpha, layer == 0 ? 0xF0F4FF : 0xD8DDF0));
-			}
+		int bawah = y + h - KAKI - 2;
+		int cy = y;
+		if (!d.getBooleanOr("aktif", true)) {
+			cy += Math.round(l.bungkus(Component.translatable(K + "mati"), x + 2, cy, w - 4, Palette.DANGER)) + 2;
+		}
+		if (w >= 300) {
+			// two columns: the island stays, the right column scrolls
+			int split = x + Mth.clamp(Math.round(w * 0.42F), 130, 210);
+			pulau(l, d, x + 2, cy, split - 6, bawah, now, Math.min(110, Math.round((bawah - cy) * 0.55F)));
+			l.g.fill(split - 2, cy, split - 1, bawah, Palette.argb(0x60, Palette.JADE_DARK));
+			int ry = gulir.mulai(l, split + 4, cy, x + w - 5, bawah);
+			ry = isi(l, d, split + 4, ry, x + w - 7, now);
+			gulir.selesai(l, ry);
+		} else {
+			int ry = gulir.mulai(l, x, cy, x + w - 5, bawah);
+			ry = pulau(l, d, x + 2, ry, x + w - 7, Integer.MAX_VALUE, now, 80) + 6;
+			ry = isi(l, d, x + 2, ry, x + w - 7, now);
+			gulir.selesai(l, ry);
+		}
+		kaki(l, d);
+		if (undang) {
+			undang(l, d);
 		}
 	}
 
-	@Override
-	public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float a) {
-		super.extractRenderState(g, mouseX, mouseY, a);
-		long now = Util.getMillis();
-		// the scroll: shadow, paper, rods, frame
-		g.fill(x0 + 3, y0 + 4, x1 + 3, y1 + 4, 0x60000000);
-		g.fillGradient(x0, y0, x1, y1, Palette.PAPER_TOP, Palette.PAPER_BOTTOM);
-		g.fillGradient(x0 - 4, y0 - 3, x1 + 4, y0 + 3, Palette.ROD_LIGHT, Palette.ROD_DARK);
-		g.fillGradient(x0 - 4, y1 - 3, x1 + 4, y1 + 3, Palette.ROD_LIGHT, Palette.ROD_DARK);
-		Brush.frame(g, x0, y0, x1, y1, Palette.JADE_DARK);
-		CompoundTag d = data;
-		Component title = this.title;
-		if (d != null && d.contains("nama")) {
-			title = Component.translatable(K + "judul_aula", d.getStringOr("nama", ""));
-		}
-		Brush.disc(g, x0 + 16.0F, y0 + 12.0F, 8.0F, Palette.argb(0xFF, 0x3E6FB0));
-		Brush.centered(g, font, Component.literal("天"), x0 + 16.0F, y0 + 8.0F, 0xFFF4FAFF, 1.0F, false);
-		Brush.fit(g, font, Brush.bold(title), x0 + 28.0F, y0 + 7.0F, x1 - x0 - 60.0F, Palette.INK, 1.05F, 0.6F, false);
-		Brush.rect(g, x0 + 10.0F, y0 + 21.0F, x1 - 10.0F, y0 + 22.0F, Palette.argb(0x90, Palette.JADE_DARK));
-		if (d == null) {
-			int dots = (int) ((now - openedAt) / 300L % 4L);
-			Brush.fitCentered(g, font, Component.translatable(K + "memuat").append(".".repeat(dots)), (x0 + x1) / 2.0F, (y0 + y1) / 2.0F, 200.0F,
-					Palette.INK_SOFT, 0.9F, 0.6F, false);
-			drawSeals(g, mouseX, mouseY);
-			help.render(g, font, mouseX, mouseY, width, height);
-			return;
-		}
-		if (!d.getBooleanOr("aktif", true)) {
-			Brush.fitCentered(g, font, Component.translatable(K + "mati"), (x0 + x1) / 2.0F, y0 + 26.0F, x1 - x0 - 20.0F, Palette.DANGER, 0.7F,
-					0.5F, false);
-		}
-		drawIsland(g, d, now);
-		Brush.rect(g, split, y0 + 26.0F, split + 0.8F, bodyBottom, Palette.argb(0x60, Palette.JADE_DARK));
-		drawTabs(g, mouseX, mouseY);
-		g.enableScissor(split + 4, bodyTop, x1 - 6, bodyBottom);
-		float top = bodyTop + 2.0F - scroll;
-		float end = switch (tab) {
-			case TAB_CHRONICLE -> chronicle(g, d, split + 8.0F, top, x1 - 12.0F);
-			case TAB_NEIGHBOURS -> neighbours(g, d, split + 8.0F, top, x1 - 12.0F);
-			default -> events(g, d, split + 8.0F, top, x1 - 12.0F, now, mouseX, mouseY);
-		};
-		g.disableScissor();
-		contentH = end + scroll - bodyTop;
-		float max = Math.max(0.0F, contentH - (bodyBottom - bodyTop));
-		scroll = Mth.clamp(scroll, 0.0F, max);
-		if (max > 0.0F) {
-			float t = scroll / max;
-			float barH = Math.max(10.0F, (bodyBottom - bodyTop) * (bodyBottom - bodyTop) / Math.max(1.0F, contentH));
-			float by = bodyTop + t * (bodyBottom - bodyTop - barH);
-			Brush.rect(g, x1 - 6.0F, by, x1 - 4.0F, by + barH, Palette.argb(0x90, Palette.JADE_DARK));
-		}
-		drawSeals(g, mouseX, mouseY);
-		if (inviteBox != null && inviteBox.visible) {
-			Brush.text(g, font, Component.translatable(K + "undang_label"), split + 8.0F, y1 - 49.0F, Palette.INK_SOFT, 0.6F, false);
-		}
-		help.render(g, font, mouseX, mouseY, width, height);
+	/**
+	 * The stacked right column (or the rest of the narrow scroll): events and neighbours. The sky chronicle is in
+	 * Sekte › Ikhtisar › Catatan (a source of the one Kronik, registered by {@link LangitUiClient}).
+	 */
+	private int isi(Lukis l, CompoundTag d, int left, int y, int right, long now) {
+		y = peristiwa(l, d, left, y, right, now) + 6;
+		return tetangga(l, d, left, y, right);
 	}
 
 	// ------------------------------------------------------------------ the island diorama
 
-	private void drawIsland(GuiGraphicsExtractor g, CompoundTag d, long now) {
-		float left = x0 + 10.0F;
-		float right = split - 6.0F;
-		float top = y0 + 26.0F;
-		float dioBottom = top + (bodyBottom - top) * 0.58F;
+	/** The diorama ({@code tinggi} high), the tier seals and the island's numbers; returns the y below them. */
+	private int pulau(Lukis l, CompoundTag d, int left, int top, int right, int batas, long now, int tinggi) {
+		float dioBottom = top + tinggi;
 		float cx = (left + right) / 2.0F;
 		float wide = right - left;
 		boolean sky = d.getBooleanOr("langit", false);
@@ -328,8 +200,10 @@ public class LangitScreen extends Screen {
 		int tier = sky ? island.getIntOr("tingkat", 0) : 0;
 		boolean tethered = island.getBooleanOr("tertambat", false);
 		int n = Mth.clamp(template - 10, 1, 9);
+		GuiGraphicsExtractor g = l.g;
 		// the window: dusk sky, sun, cloud sea
-		g.fillGradient((int) left, (int) top, (int) right, (int) dioBottom, 0xFF1C2D52, 0xFFD8936A);
+		g.fillGradient(left, top, right, Math.round(dioBottom), 0xFF1C2D52, 0xFFD8936A);
+		l.klip(left, top, right, Math.round(dioBottom));
 		Brush.halo(g, right - 22.0F, dioBottom - 18.0F, 7.0F, 8.0F, 0xFFD27A, 0.8F);
 		Brush.disc(g, right - 22.0F, dioBottom - 18.0F, 6.0F, 0xFFFFE2A0);
 		float sea = dioBottom - 10.0F;
@@ -411,38 +285,49 @@ public class LangitScreen extends Screen {
 			}
 		}
 		if (!sky) {
-			Brush.fitCentered(g, font, Component.translatable(K + "belum_pulau"), cx, top + 4.0F, wide - 8.0F, 0xFFF4FAFF, 0.62F, 0.45F, true);
+			l.tengah(Component.translatable(K + "belum_pulau"), cx, top + 4.0F, wide - 8.0F, 0xFFF4FAFF);
 		}
+		l.lepasKlip();
 		// the nine tier seals
-		float sealY = dioBottom + 5.0F;
-		float step = Math.min(13.0F, wide / 9.0F);
+		int sealY = Math.round(dioBottom) + 4;
+		float step = Math.min(14.0F, wide / 9.0F);
 		float sx0 = cx - step * 4.0F;
 		for (int i = 1; i <= 9; i++) {
 			boolean done = i <= tier;
 			float scx = sx0 + (i - 1) * step;
-			Brush.disc(g, scx, sealY + 4.0F, step * 0.38F, done ? Palette.SEAL : Palette.argb(0x60, Palette.INK_FAINT));
-			Brush.centered(g, font, Component.literal(String.valueOf(i)), scx, sealY + 1.2F, done ? 0xFFFFF4E0 : Palette.INK_FAINT, 0.55F, false);
+			Brush.disc(g, scx, sealY + 5.0F, step * 0.42F, done ? Palette.SEAL : Palette.argb(0x60, Palette.INK_FAINT));
+			l.tengah(Component.literal(String.valueOf(i)), scx, sealY + 1, step, done ? 0xFFFFF4E0 : l.gaya.teksSamar);
 		}
 		// the island's numbers
-		float y = sealY + 12.0F;
-		float room = wide;
+		int y = sealY + 14;
+		int room = right - left;
 		if (sky) {
-			y += stat(g, Component.translatable(K + "templat", SectTemplates.name(template)), left, y, room, Palette.INK, 0.62F);
-			y += stat(g, Component.translatable(K + "tingkat", tier), left, y, room, Palette.INK_SOFT, 0.58F);
-			y += stat(g, Component.translatable(K + "ketinggian", island.getIntOr("yP", 0), island.getIntOr("dasar", 0)), left, y, room, Palette.INK_SOFT,
-					0.58F);
-			y += stat(g, Component.translatable(tethered ? K + "tertambat" : K + "berdiri"), left, y, room, tethered ? Palette.WARN : Palette.JADE_DARK,
-					0.58F);
-			y += stat(g, Component.translatable(K + "faktor", String.format(java.util.Locale.ROOT, "%.3f", island.getDoubleOr("faktor", 1.0D))), left, y,
-					room, Palette.QI, 0.58F);
+			y = baris(l, Component.translatable(K + "templat", SectTemplates.name(template)), left, y, room, l.gaya.teks, batas);
+			y = baris(l, Component.translatable(K + "tingkat", tier), left, y, room, l.gaya.teksLemah, batas);
+			y = baris(l, Component.translatable(K + "ketinggian", island.getIntOr("yP", 0), island.getIntOr("dasar", 0)), left, y, room, l.gaya.teksLemah,
+					batas);
+			y = baris(l, Component.translatable(tethered ? K + "tertambat" : K + "berdiri"), left, y, room, tethered ? Palette.WARN : Palette.JADE_DARK,
+					batas);
+			y = baris(l, Component.translatable(K + "faktor", String.format(java.util.Locale.ROOT, "%.3f", island.getDoubleOr("faktor", 1.0D))), left, y,
+					room, Palette.QI, batas);
 		} else {
-			Brush.wrap(g, font, Component.translatable(d.getBooleanOr("aula", false) ? K + "jalan_a" : K + "jalan_b"), left, y, room, Palette.INK_SOFT,
-					0.56F, false);
+			y += Math.round(l.bungkus(Component.translatable(d.getBooleanOr("aula", false) ? K + "jalan_a" : K + "jalan_b"), left, y, room,
+					l.gaya.teksLemah, Math.max(9, batas - y)));
 		}
+		return y;
+	}
+
+	/** One line of the island's numbers while it fits above {@code batas} (the fixed left column). */
+	private static int baris(Lukis l, Component text, int x, int y, int room, int color, int batas) {
+		if (y + 9 > batas) {
+			return y;
+		}
+		l.teks(text, x, y, room, color);
+		return y + 10;
 	}
 
 	/** An inverted cone with a grass top: {@code r} half width, {@code depth} below the plaza. */
-	private void cone(GuiGraphicsExtractor g, float cx, float top, float r, float depth, int alpha) {
+	private static void cone(GuiGraphicsExtractor g, float cx, float top, float r, float depth, int alpha) {
 		int rows = 7;
 		for (int i = 0; i < rows; i++) {
 			float t0 = i / (float) rows;
@@ -455,138 +340,95 @@ public class LangitScreen extends Screen {
 		Brush.rect(g, cx - r * 0.55F, top - 2.2F, cx + r * 0.55F, top - 1.4F, Palette.argb(alpha, 0xEDEBE4));
 	}
 
-	private float stat(GuiGraphicsExtractor g, Component text, float x, float y, float room, int color, float scale) {
-		Brush.fit(g, font, text, x, y, room, color, scale, scale * 0.7F, false);
-		return 8.5F * scale / 0.6F;
+	// ------------------------------------------------------------------ the stacked sections
+
+	private int teks(Lukis l, Component text, int x, int y, int room, int color) {
+		return y + Math.round(l.bungkus(text, x, y, room, color)) + 1;
 	}
 
-	// ------------------------------------------------------------------ tabs
-
-	private void drawTabs(GuiGraphicsExtractor g, int mouseX, int mouseY) {
-		String[] keys = {"tab.peristiwa", "tab.kronik", "tab.tetangga"};
-		float left = split + 8.0F;
-		float each = (x1 - 12.0F - left) / keys.length;
-		for (int i = 0; i < keys.length; i++) {
-			float ax = left + i * each;
-			boolean selected = i == tab;
-			boolean hover = mouseX >= ax && mouseX <= ax + each - 3 && mouseY >= y0 + 24 && mouseY <= y0 + 34;
-			int color = selected ? Palette.JADE : hover ? Palette.JADE_LIGHT : Palette.argb(0x90, Palette.JADE_DULL);
-			Brush.chamfer(g, (int) ax, y0 + 24, (int) (ax + each - 3), y0 + 34, 2, color);
-			Brush.fitCentered(g, font, Brush.bold(Component.translatable(K + keys[i])), ax + (each - 3) / 2.0F, y0 + 26.5F, each - 8.0F,
-					selected ? 0xFFFFF8E8 : Palette.INK, 0.6F, 0.4F, false);
-		}
-	}
-
-	private int tabAt(double mx, double my) {
-		float left = split + 8.0F;
-		float each = (x1 - 12.0F - left) / 3.0F;
-		if (my < y0 + 24 || my > y0 + 34 || mx < left || mx > x1 - 12) {
-			return -1;
-		}
-		return Mth.clamp((int) ((mx - left) / each), 0, 2);
-	}
-
-	private float heading(GuiGraphicsExtractor g, Component text, float x, float y, float room) {
-		Brush.rect(g, x, y + 2.0F, x + 2.5F, y + 5.5F, Palette.SEAL);
-		Brush.fit(g, font, Brush.bold(text), x + 5.0F, y, room - 5.0F, Palette.JADE_DARK, 0.7F, 0.45F, false);
-		return 10.0F;
-	}
-
-	private float line(GuiGraphicsExtractor g, Component text, float x, float y, float room, int color, float scale) {
-		return Brush.wrap(g, font, text, x, y, room, color, scale, false) + 1.5F;
-	}
-
-	/** The events tab: the sky's state, the event clock, the Heaven Court order. Returns the y below it. */
-	private float events(GuiGraphicsExtractor g, CompoundTag d, float left, float top, float right, long now, int mouseX, int mouseY) {
-		float room = right - left;
-		float y = top;
-		depositX0 = -1.0F;
+	/** The sky's state, the event clock, the Heaven Court order. Returns the y below it. */
+	private int peristiwa(Lukis l, CompoundTag d, int left, int top, int right, long now) {
+		int room = right - left;
+		int y = top;
 		boolean sky = d.getBooleanOr("langit", false);
 		if (!sky) {
-			y += heading(g, Component.translatable(K + "cara"), left, y, room);
-			y += line(g, Component.translatable(K + "cara.1"), left, y, room, Palette.INK, 0.58F);
-			y += line(g, Component.translatable(K + "cara.2"), left, y, room, Palette.INK, 0.58F);
-			y += line(g, Component.translatable(K + "cara.3"), left, y, room, Palette.INK, 0.58F);
-			y += line(g, Component.translatable(K + "cara.4"), left, y, room, Palette.INK_SOFT, 0.56F);
-			return y;
+			y += l.kepala(Component.translatable(K + "cara"), left, y, right);
+			y = teks(l, Component.translatable(K + "cara.1"), left, y, room, l.gaya.teks);
+			y = teks(l, Component.translatable(K + "cara.2"), left, y, room, l.gaya.teks);
+			y = teks(l, Component.translatable(K + "cara.3"), left, y, room, l.gaya.teks);
+			return teks(l, Component.translatable(K + "cara.4"), left, y, room, l.gaya.teksLemah);
 		}
 		CompoundTag island = d.getCompoundOrEmpty("pulau");
 		CompoundTag ev = d.getCompoundOrEmpty("peristiwa");
-		y += heading(g, Component.translatable(K + "keadaan"), left, y, room);
-		y += flag(g, Component.translatable(K + "formasi_agung"), island.getBooleanOr("formasi", false), left, y, room);
-		y += flag(g, Component.translatable(K + "jaring_awan"), island.getBooleanOr("jaring", false), left, y, room);
-		y += flag(g, Component.translatable(K + "gerbang_terbuka"), !island.getBooleanOr("tertutup", false), left, y, room);
-		y += flag(g, Component.translatable(K + "tangga_awan"), island.getBooleanOr("tangga", false), left, y, room);
+		y += l.kepala(Component.translatable(K + "keadaan"), left, y, right);
+		y = tanda(l, Component.translatable(K + "formasi_agung"), island.getBooleanOr("formasi", false), left, y, room);
+		y = tanda(l, Component.translatable(K + "jaring_awan"), island.getBooleanOr("jaring", false), left, y, room);
+		y = tanda(l, Component.translatable(K + "gerbang_terbuka"), !island.getBooleanOr("tertutup", false), left, y, room);
+		y = tanda(l, Component.translatable(K + "tangga_awan"), island.getBooleanOr("tangga", false), left, y, room);
 		long acknowledged = ev.getLongOr("diakui", -1L);
 		if (acknowledged >= 0L) {
 			float pulse = 0.5F + 0.5F * (float) Math.sin(now / 400.0D);
-			y += line(g, Component.translatable(K + "diakui", acknowledged), left, y, room, Palette.mix(Palette.GOLD_DARK, Palette.GOLD, pulse), 0.62F);
+			y = teks(l, Component.translatable(K + "diakui", acknowledged), left, y, room, Palette.mix(Palette.GOLD_DARK, Palette.GOLD, pulse));
 		}
-		y += 3.0F;
-		y += heading(g, Component.translatable(K + "jadwal"), left, y, room);
+		y += 4;
+		y += l.kepala(Component.translatable(K + "jadwal"), left, y, right);
 		if (ev.getBooleanOr("bajak_kini", false) || ev.getBooleanOr("serbu_kini", false)) {
 			float pulse = 0.5F + 0.5F * (float) Math.sin(now / 200.0D);
-			y += line(g, Component.translatable(ev.getBooleanOr("bajak_kini", false) ? K + "bajak_kini" : K + "serbu_kini"), left, y, room,
-					Palette.mix(Palette.SEAL_DARK, Palette.SEAL_GLOW, pulse), 0.62F);
+			y = teks(l, Component.translatable(ev.getBooleanOr("bajak_kini", false) ? K + "bajak_kini" : K + "serbu_kini"), left, y, room,
+					Palette.mix(Palette.SEAL_DARK, Palette.SEAL_GLOW, pulse));
 		}
-		y += when(g, "bajak", ev, island.getIntOr("tingkat", 0) >= 3, left, y, room);
-		y += when(g, "utusan", ev, ev.getBooleanOr("utusan_layak", false), left, y, room);
-		y += when(g, "tamu", ev, true, left, y, room);
+		y = kapan(l, "bajak", ev, island.getIntOr("tingkat", 0) >= 3, left, y, room);
+		y = kapan(l, "utusan", ev, ev.getBooleanOr("utusan_layak", false), left, y, room);
+		y = kapan(l, "tamu", ev, true, left, y, room);
 		if (ev.getBooleanOr("pesta_kini", false)) {
-			y += line(g, Component.translatable(K + "pesta_kini"), left, y, room, Palette.GOLD_DARK, 0.6F);
+			y = teks(l, Component.translatable(K + "pesta_kini"), left, y, room, Palette.GOLD_DARK);
 		} else {
-			y += when(g, "pesta", ev, true, left, y, room);
+			y = kapan(l, "pesta", ev, true, left, y, room);
 		}
 		String pending = ev.getStringOr("tunda", "");
 		if (!pending.isEmpty()) {
-			y += line(g, Component.translatable(K + "tunda", Component.translatable(K + "jenis." + pending)), left, y, room, Palette.INK_FAINT, 0.55F);
+			y = teks(l, Component.translatable(K + "tunda", Component.translatable(K + "jenis." + pending)), left, y, room, l.gaya.teksSamar);
 		}
 		int refusals = ev.getIntOr("tolak", 0);
 		if (refusals > 0) {
-			y += line(g, Component.translatable(K + "tolak", refusals), left, y, room, refusals >= 3 ? Palette.DANGER : Palette.INK_SOFT, 0.55F);
+			y = teks(l, Component.translatable(K + "tolak", refusals), left, y, room, refusals >= 3 ? Palette.DANGER : l.gaya.teksLemah);
 		}
-		y += 3.0F;
-		y += heading(g, Component.translatable(K + "perintah"), left, y, room);
+		y += 4;
+		y += l.kepala(Component.translatable(K + "perintah"), left, y, right);
 		CompoundTag order = d.getCompoundOrEmpty("perintah");
 		if (order.getIntOr("status", 0) != 1) {
-			y += line(g, Component.translatable(K + "perintah.kosong"), left, y, room, Palette.INK_FAINT, 0.58F);
-			return y;
+			return teks(l, Component.translatable(K + "perintah.kosong"), left, y, room, l.gaya.teksSamar);
 		}
 		int kills = order.getIntOr("kills", 0);
 		int need = Math.max(1, order.getIntOr("perlu", 12));
-		y += line(g, Component.translatable(K + "perintah.isi", need, order.getLongOr("sisa", 0L)), left, y, room, Palette.INK, 0.58F);
+		y = teks(l, Component.translatable(K + "perintah.isi", need, order.getLongOr("sisa", 0L)), left, y, room, l.gaya.teks);
+		Component hitung = Component.literal(kills + " / " + need);
 		float bar = Mth.clamp(kills / (float) need, 0.0F, 1.0F);
-		Brush.rect(g, left, y + 1.0F, right, y + 5.0F, Palette.argb(0x50, Palette.INK_FAINT));
-		Brush.rect(g, left, y + 1.0F, left + (right - left) * bar, y + 5.0F, Palette.GOLD);
-		Brush.text(g, font, Component.literal(kills + " / " + need), right - 30.0F, y - 0.5F, Palette.INK, 0.55F, false);
-		y += 8.0F;
+		int barRight = right - font.width(hitung) - 4;
+		Brush.rect(l.g, left, y + 3.0F, barRight, y + 7.0F, Palette.argb(0x50, Palette.INK_FAINT));
+		Brush.rect(l.g, left, y + 3.0F, left + (barRight - left) * bar, y + 7.0F, Palette.GOLD);
+		l.kanan(hitung, right, y, l.gaya.teks);
+		y += 12;
 		if (d.getBooleanOr("pemilik", false)) {
-			depositX0 = left;
-			depositX1 = Math.min(right, left + 120.0F);
-			depositY0 = y;
-			depositY1 = y + 12.0F;
-			boolean hover = mouseX >= depositX0 && mouseX <= depositX1 && mouseY >= depositY0 && mouseY <= depositY1 && mouseY >= bodyTop
-					&& mouseY <= bodyBottom;
-			Brush.chamfer(g, (int) depositX0, (int) depositY0, (int) depositX1, (int) depositY1, 2, hover ? Palette.GOLD : Palette.GOLD_DARK);
-			Brush.fitCentered(g, font, Brush.bold(Component.translatable(K + "setor")), (depositX0 + depositX1) / 2.0F, depositY0 + 2.5F,
-					depositX1 - depositX0 - 6.0F, 0xFFFFF8E8, 0.6F, 0.4F, false);
-			y += 15.0F;
+			TalismanButton.gambar(l, "setor", left, y, Math.min(room, 140), 14, Component.translatable(K + "setor"), true, null,
+					() -> LangitUiClient.minta(LangitUiPayloads.Minta.SETOR, ""));
+			y += 17;
 		}
 		return y;
 	}
 
-	private float flag(GuiGraphicsExtractor g, Component text, boolean on, float x, float y, float room) {
-		Brush.disc(g, x + 3.0F, y + 3.0F, 2.5F, on ? Palette.JADE : Palette.argb(0x70, Palette.INK_FAINT));
-		Brush.fit(g, font, text, x + 9.0F, y, room - 9.0F, on ? Palette.INK : Palette.INK_FAINT, 0.58F, 0.42F, false);
-		return 8.5F;
+	private int tanda(Lukis l, Component text, boolean on, int x, int y, int room) {
+		Brush.disc(l.g, x + 3.0F, y + 4.0F, 2.5F, on ? Palette.JADE : Palette.argb(0x70, Palette.INK_FAINT));
+		l.teks(text, x + 9, y, room - 9, on ? l.gaya.teks : l.gaya.teksSamar);
+		return y + 10;
 	}
 
-	private float when(GuiGraphicsExtractor g, String what, CompoundTag ev, boolean possible, float x, float y, float room) {
+	private int kapan(Lukis l, String what, CompoundTag ev, boolean possible, int x, int y, int room) {
 		Component text;
-		int color = Palette.INK_SOFT;
+		int color = l.gaya.teksLemah;
 		if (!possible) {
 			text = Component.translatable(K + "jadwal." + what + ".belum");
-			color = Palette.INK_FAINT;
+			color = l.gaya.teksSamar;
 		} else if (!ev.contains(what)) {
 			text = Component.translatable(K + "jadwal." + what + ".nanti");
 		} else {
@@ -596,180 +438,176 @@ public class LangitScreen extends Screen {
 				color = Palette.SEAL_DARK;
 			}
 		}
-		return line(g, text, x, y, room, color, 0.58F);
+		return teks(l, text, x, y, room, color);
 	}
 
-	/** The chronicle tab: newest first, with the day. */
-	private float chronicle(GuiGraphicsExtractor g, CompoundTag d, float left, float top, float right) {
-		float room = right - left;
-		float y = top;
-		y += heading(g, Component.translatable(K + "kronik"), left, y, room);
-		ListTag list = d.getListOrEmpty("kronik");
-		if (list.isEmpty()) {
-			return y + line(g, Component.translatable(K + "kronik.kosong"), left, y, room, Palette.INK_FAINT, 0.58F);
-		}
-		long today = d.getLongOr("hari", 0L);
-		for (Tag tag : list) {
-			if (!(tag instanceof CompoundTag entry)) {
-				continue;
-			}
-			long ago = today - entry.getLongOr("day", today);
-			Component when = ago <= 0L ? Component.translatable(K + "hari_ini") : Component.translatable(K + "hari_lalu", ago);
-			Component text = entry.read("text", ComponentSerialization.CODEC).orElse(Component.empty());
-			Brush.text(g, font, when, left, y, Palette.GOLD_DARK, 0.52F, false);
-			y += 6.0F;
-			y += line(g, text, left + 4.0F, y, room - 4.0F, Palette.INK, 0.56F) + 1.5F;
-		}
-		return y;
-	}
-
-	/** The neighbours tab: the NPC sky sects with tier, stance and standing. */
-	private float neighbours(GuiGraphicsExtractor g, CompoundTag d, float left, float top, float right) {
-		float room = right - left;
-		float y = top;
-		y += heading(g, Component.translatable(K + "tetangga"), left, y, room);
+	/**
+	 * The NPC sky sects: only a count and a link. Their cards (tier, stance, standing, distance, diplomacy) live in the one
+	 * sect list, Sekte › Luar › Sekte Dunia, marked with the sky icon (43.12.1, G36).
+	 */
+	private int tetangga(Lukis l, CompoundTag d, int left, int top, int right) {
+		int room = right - left;
+		int y = top + l.kepala(Component.translatable(K + "tetangga"), left, top, right);
 		ListTag list = d.getListOrEmpty("sekte");
 		if (list.isEmpty()) {
-			return y + line(g, Component.translatable(K + "tetangga.kosong"), left, y, room, Palette.INK_FAINT, 0.58F);
+			return teks(l, Component.translatable(K + "tetangga.kosong"), left, y, room, l.gaya.teksSamar);
 		}
+		int kenal = 0;
 		for (Tag tag : list) {
-			if (!(tag instanceof CompoundTag s)) {
-				continue;
-			}
-			boolean met = s.getBooleanOr("kenal", false);
-			Component name = met ? s.read("nama", ComponentSerialization.CODEC).orElse(Component.literal("?"))
-					: Component.translatable(K + "tetangga.belum_kenal");
-			String stance = s.getStringOr("sikap", "netral");
-			int color = switch (stance) {
-				case "sekutu" -> Palette.JADE_DARK;
-				case "ramah" -> Palette.JADE;
-				case "dingin" -> Palette.WARN;
-				case "bermusuhan", "perang" -> Palette.DANGER;
-				default -> Palette.INK_SOFT;
-			};
-			Brush.chamfer(g, (int) left, (int) y, (int) right, (int) (y + 26.0F), 2, Palette.argb(0x30, color));
-			Brush.disc(g, left + 8.0F, y + 9.0F, 5.0F, Palette.argb(0xFF, 0x3E6FB0));
-			Brush.centered(g, font, Component.literal("雲"), left + 8.0F, y + 6.0F, 0xFFF4FAFF, 0.6F, false);
-			Brush.fit(g, font, Brush.bold(name), left + 16.0F, y + 2.0F, room - 20.0F, Palette.INK, 0.62F, 0.42F, false);
-			Brush.fit(g, font, Component.translatable(K + "tetangga.baris", s.getIntOr("tier", 1),
-					Component.translatable("kultivator.sekte.sikap." + stance)), left + 16.0F, y + 10.0F, room - 20.0F, color, 0.55F, 0.4F, false);
-			int standing = s.getIntOr("standing", 0);
-			float mid = left + 16.0F + (room - 24.0F) / 2.0F;
-			float half = (room - 24.0F) / 2.0F;
-			Brush.rect(g, left + 16.0F, y + 19.0F, right - 8.0F, y + 21.0F, Palette.argb(0x40, Palette.INK_FAINT));
-			float to = mid + half * Mth.clamp(standing / 100.0F, -1.0F, 1.0F);
-			Brush.rect(g, Math.min(mid, to), y + 19.0F, Math.max(mid, to), y + 21.0F, color);
-			Brush.rect(g, mid - 0.3F, y + 18.0F, mid + 0.3F, y + 22.0F, Palette.INK_SOFT);
-			y += 29.0F;
-			if (met && s.contains("pos")) {
-				int[] pos = s.getIntArray("pos").orElse(new int[0]);
-				if (pos.length >= 2) {
-					y += line(g, Component.translatable(K + "tetangga.letak", pos[0], pos[1]), left + 4.0F, y - 2.0F, room - 4.0F, Palette.INK_FAINT, 0.5F);
-				}
+			if (tag instanceof CompoundTag s && s.getBooleanOr("kenal", false)) {
+				kenal++;
 			}
 		}
-		return y;
+		y = teks(l, Component.translatable(P + "tetangga_ringkas", list.size(), kenal), left, y, room, l.gaya.teksLemah) + 2;
+		TalismanButton.gambar(l, "tetangga", left, y, Math.min(room, 150), 14, Component.translatable(P + "ke_sekte_dunia"), true, null,
+				() -> dev.kultivator.client.sekte.diplomasi.LuarPage.bukaSekte(""));
+		return y + 16;
 	}
 
-	private void drawSeals(GuiGraphicsExtractor g, int mouseX, int mouseY) {
-		Seal hovered = null;
-		for (Seal seal : seals) {
-			boolean hover = seal.over(mouseX, mouseY);
-			int color = !seal.enabled ? Palette.LOCKED : hover ? Palette.mix(seal.color, 0xFFFFFFFF, 0.25F) : seal.color;
-			Brush.chamfer(g, seal.ax, seal.ay, seal.bx, seal.by, 2, color);
-			Brush.fitCentered(g, font, Brush.bold(seal.label), (seal.ax + seal.bx) / 2.0F, seal.ay + 3.0F, seal.bx - seal.ax - 4.0F,
-					seal.enabled ? 0xFFFFF8E8 : Palette.LOCKED_PAPER, 0.6F, 0.38F, false);
-			if (hover) {
-				hovered = seal;
+	// ------------------------------------------------------------------ the foot talismans
+
+	private void kaki(Lukis l, CompoundTag d) {
+		boolean sky = d.getBooleanOr("langit", false);
+		boolean owner = d.getBooleanOr("pemilik", false);
+		boolean hall = d.getBooleanOr("aula", false);
+		CompoundTag island = d.getCompoundOrEmpty("pulau");
+		boolean standing = sky && !island.getBooleanOr("tertambat", true);
+		boolean closed = island.getBooleanOr("tertutup", false);
+		Component bukanLangit = Component.translatable(M + "bukan_langit");
+		Component bukanPemilik = Component.translatable(M + "bukan_pemilik");
+		int n = 5;
+		int gap = 4;
+		int each = (w - (n - 1) * gap) / n;
+		int by = y + h - KAKI + 1;
+		int bx = x;
+		seal(l, "feri", bx, by, each, K + "feri", K + "feri.tip", standing, sky ? Component.translatable(M + "tertambat") : bukanLangit,
+				() -> LangitUiClient.minta(LangitUiPayloads.Minta.FERI, ""));
+		bx += each + gap;
+		seal(l, "gerbang", bx, by, each, closed ? K + "gerbang_buka" : K + "gerbang_tutup", K + "gerbang.tip", sky && owner,
+				sky ? bukanPemilik : bukanLangit, () -> LangitUiClient.minta(LangitUiPayloads.Minta.GERBANG, ""));
+		bx += each + gap;
+		seal(l, "undang", bx, by, each, K + "undang", K + "undang.tip", sky && owner, sky ? bukanPemilik : bukanLangit, this::bukaUndang);
+		bx += each + gap;
+		seal(l, "rancang", bx, by, each, K + "rancang", K + "rancang.tip", hall && owner, Component.translatable(M + "tanpa_aula"),
+				() -> tuju(Tujuan.of(HubNav.SEKTE, Urutan.ID_BANGUN)));
+		bx += each + gap;
+		seal(l, "pemandangan", bx, by, x + w - bx, K + "pemandangan", K + "pemandangan.tip", true, null, LangitClient::openSettings);
+	}
+
+	private void seal(Lukis l, String kunci, int x0, int y0, int lebar, String label, String tip, boolean aktif, @Nullable Component alasan,
+			Runnable aksi) {
+		Component nama = Component.translatable(label);
+		if (TalismanButton.gambar(l, kunci, x0, y0, lebar, 14, nama, aktif, aktif ? null : alasan, aksi)) {
+			l.tip(List.of(nama.copy().withStyle(ChatFormatting.GOLD), Component.translatable(tip)));
+		}
+	}
+
+	// ------------------------------------------------------------------ Undang (R30)
+
+	private void bukaUndang() {
+		undang = true;
+		nama.setText("");
+		nama.setFocused(false);
+		pemain.terpilih().clear();
+	}
+
+	private void tutupUndang() {
+		undang = false;
+		nama.setFocused(false);
+	}
+
+	/** The online players but this one, by name. */
+	private List<PemilihOrang.Orang> pemainDaring() {
+		List<PemilihOrang.Orang> out = new ArrayList<>();
+		ClientPacketListener connection = minecraft.getConnection();
+		String diri = minecraft.player == null ? "" : minecraft.player.getName().getString();
+		if (connection == null) {
+			return out;
+		}
+		for (PlayerInfo info : connection.getOnlinePlayers()) {
+			String n = info.getProfile().name();
+			if (n != null && !n.isEmpty() && !n.equals(diri)) {
+				out.add(PemilihOrang.Orang.of(n, Component.literal(n), Palette.QI));
 			}
 		}
-		if (hovered != null) {
-			g.setComponentTooltipForNextFrame(font, List.of(hovered.label.copy().withStyle(ChatFormatting.GOLD), hovered.tip), mouseX, mouseY);
+		out.sort(Comparator.comparing(o -> o.id().toLowerCase(java.util.Locale.ROOT)));
+		return out;
+	}
+
+	/** The pop-up card: the online players, a name field for anyone else, Undang and Batal. */
+	private void undang(Lukis l, CompoundTag d) {
+		l.g.fill(l.kx0, l.ky0, l.kx1, l.ky1, 0x90101418);
+		l.zona("undang#luar", l.kx0, l.ky0, l.kx1, l.ky1, this::tutupUndang, true, null, false);
+		int cw = Math.min(300, l.kx1 - l.kx0 - 16);
+		int ch = Math.min(210, l.ky1 - l.ky0 - 12);
+		int cx0 = (l.kx0 + l.kx1 - cw) / 2;
+		int cy0 = (l.ky0 + l.ky1 - ch) / 2;
+		int cx1 = cx0 + cw;
+		int cy1 = cy0 + ch;
+		l.g.fill(cx0 + 3, cy0 + 3, cx1 + 3, cy1 + 3, 0x60000000);
+		l.g.fillGradient(cx0, cy0, cx1, cy1, Palette.PAPER_TOP, Palette.PAPER_BOTTOM);
+		Brush.frame(l.g, cx0, cy0, cx1, cy1, Palette.GOLD);
+		l.zona("undang#kartu", cx0, cy0, cx1, cy1, null, true, null, false);
+		Palette.Gaya lama = l.gaya;
+		l.gaya = Palette.Gaya.KERTAS;
+		int cy = cy0 + 5 + l.kepala(Component.translatable(K + "undang"), cx0 + 6, cy0 + 5, cx1 - 26);
+		TalismanButton.gambar(l, "undang:tutup", cx1 - 22, cy0 + 3, 16, 12, Component.literal("×"), true, null, this::tutupUndang);
+		// the name field (anyone, also players out of sight) and the invite talisman
+		l.samar(Component.translatable(K + "undang_label"), cx0 + 6, cy, cw - 12);
+		cy += 10;
+		List<PemilihOrang.Orang> semua = pemainDaring();
+		String pilih = pemain.pilihan(semua).isEmpty() ? "" : pemain.pilihan(semua).get(0).id();
+		String sasaran = !nama.text().isBlank() ? nama.text().strip() : pilih;
+		int tombolW = Math.max(56, font.width(Component.translatable(M + "undang_kirim")) + 20);
+		nama.x = cx0 + 6;
+		nama.y = cy;
+		nama.w = cw - 12 - tombolW - 4;
+		nama.h = 14;
+		l.widget("undang:nama", nama);
+		TalismanButton.gambar(l, "undang:kirim", cx1 - 6 - tombolW, cy, tombolW, 14, Component.translatable(M + "undang_kirim"), !sasaran.isEmpty(),
+				Component.translatable(M + "undang_kosong"), () -> kirimUndang(sasaran), true, false);
+		cy += 18;
+		l.samar(Component.translatable(M + "daring"), cx0 + 6, cy, cw - 12);
+		cy += 10;
+		pemain.gambar(l, "undang:daftar", semua, cx0 + 6, cy, cx1 - 6, cy1 - 6);
+		l.gaya = lama;
+	}
+
+	private void undangNama(String text) {
+		if (text != null && !text.isBlank()) {
+			kirimUndang(text.strip());
 		}
+	}
+
+	private void kirimUndang(String sasaran) {
+		if (sasaran.isEmpty()) {
+			return;
+		}
+		// the server only takes player names (LangitUi: [A-Za-z0-9_]{1,16}); say so instead of failing silently
+		if (!sasaran.matches("[A-Za-z0-9_]{1,16}")) {
+			pesan(Component.translatable(M + "undang_salah", sasaran), Palette.DANGER);
+			return;
+		}
+		LangitUiClient.minta(LangitUiPayloads.Minta.UNDANG, sasaran);
+		pesan(Component.translatable(M + "undang_terkirim", sasaran), Palette.JADE_DARK);
+		tutupUndang();
 	}
 
 	// ================================================================== input
 
 	@Override
-	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-		double mx = event.x();
-		double my = event.y();
-		if (inviteBox != null && inviteBox.visible && inviteBox.isFocused() && !inviteBox.isMouseOver(mx, my)) {
-			inviteBox.setFocused(false);
-			setFocused(null);
-		}
-		if (event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
-			if (help.click(mx, my)) {
-				return true;
-			}
-			int clickedTab = tabAt(mx, my);
-			if (clickedTab >= 0 && clickedTab != tab) {
-				tab = clickedTab;
-				scroll = 0.0F;
-				UiSound.tab();
-				return true;
-			}
-			if (depositX0 >= 0.0F && mx >= depositX0 && mx <= depositX1 && my >= depositY0 && my <= depositY1 && my >= bodyTop && my <= bodyBottom) {
-				UiSound.press();
-				ask(LangitUiPayloads.Minta.SETOR, "");
-				return true;
-			}
-			for (Seal seal : seals) {
-				if (seal.over(mx, my)) {
-					if (seal.enabled) {
-						UiSound.press();
-						seal.action.run();
-					} else {
-						UiSound.denied();
-					}
-					return true;
-				}
-			}
-		}
-		return super.mouseClicked(event, doubleClick);
-	}
-
-	@Override
-	public boolean mouseReleased(MouseButtonEvent event) {
-		if (help.release(event.x(), event.y())) {
+	public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+		if (super.mouseScrolled(mouseX, mouseY, scrollX, scrollY)) {
 			return true;
 		}
-		return super.mouseReleased(event);
-	}
-
-	@Override
-	public boolean mouseScrolled(double x, double y, double scrollX, double scrollY) {
-		if (x > split && y >= bodyTop && y <= bodyBottom) {
-			scroll -= (float) scrollY * 12.0F;
-			return true;
-		}
-		return super.mouseScrolled(x, y, scrollX, scrollY);
+		return !undang && gulir.roda(mouseX, mouseY, scrollY);
 	}
 
 	@Override
 	public boolean keyPressed(KeyEvent event) {
-		if (inviteBox != null && inviteBox.visible && inviteBox.isFocused()) {
-			if (event.isConfirmation()) {
-				toggleInvite();
-				return true;
-			}
-			if (event.isEscape()) {
-				inviteBox.visible = false;
-				inviteBox.setFocused(false);
-				setFocused(null);
-				return true;
-			}
-			return super.keyPressed(event);
-		}
-		if (event.isEscape()) {
-			onClose();
+		if (super.keyPressed(event)) {
 			return true;
 		}
-		return super.keyPressed(event);
-	}
-
-	@Override
-	public boolean isPauseScreen() {
-		return false;
+		return !undang && gulir.tombol(event);
 	}
 }

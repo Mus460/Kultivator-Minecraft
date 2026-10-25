@@ -227,7 +227,8 @@ public final class SeteruPayloads {
 			sects.add(s);
 		}
 		sheet.put("sekte", sects);
-		String focus = fokusSekte == null || fokusSekte.isEmpty() ? (d.sects().isEmpty() ? "" : d.sects().get(0)) : fokusSekte;
+		// a client-sent id that names no known sect falls back too: Roster.anggota would create and save an entry for it
+		String focus = fokusSekte == null || !d.sects().contains(fokusSekte) ? (d.sects().isEmpty() ? "" : d.sects().get(0)) : fokusSekte;
 		sheet.putString("fokus", focus);
 		ListTag roster = new ListTag();
 		if (!focus.isEmpty()) {

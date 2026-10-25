@@ -1,0 +1,38 @@
+{
+  "_catatan": "Kebiasaan #20 teman_kucing (DESIGN 42.4.12); ilham: Lu You",
+  "nomor": 20,
+  "siapa": {
+    "umur": [
+      10,
+      200
+    ],
+    "tahap": [
+      "dewasa",
+      "tua"
+    ]
+  },
+  "sesi": [
+    {
+      "jam": [
+        16,
+        17.5
+      ],
+      "peluang": 0.8,
+      "tujuan": [
+        "kucing_tidur",
+        "@rumah",
+        "obrol"
+      ],
+      "klip": "kota42:beri_makan_kucing",
+      "ganti": [
+        {
+          "klip": "kota42:beri_makan_kucing"
+        },
+        {
+          "klip": "kota42:main_kucing"
+        }
+      ],
+      "ganti_menit": 8
+    }
+  ]
+}

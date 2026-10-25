@@ -1,0 +1,111 @@
+{
+  "id": "obrolan_curhat",
+  "jenis": "realisasi",
+  "_catatan": "NPC-NPC CURHAT: a sad complaint about the late husband, comfort.",
+  "benih_dunia": 42,
+  "masukan": {
+    "niat": "KELUH",
+    "pembicara": 650,
+    "hari": 120,
+    "now": 2880000,
+    "cuaca": "cerah",
+    "musim": "semi",
+    "situasi": {
+      "jam": "pagi",
+      "cuaca": "cerah",
+      "musim": "semi",
+      "kelompok": "pekerja",
+      "watak": "ramah",
+      "kebiasaan": [],
+      "sifat": {
+        "H": 10,
+        "E": 0,
+        "X": 20,
+        "A": 30,
+        "C": 10,
+        "O": 0
+      },
+      "wajah": "netral",
+      "tempat": "kota_besar"
+    },
+    "pendengar": null,
+    "kesan": "kenal",
+    "tahu_nama": false,
+    "register": "biasa",
+    "dialek": "kampung",
+    "kelamin": "p",
+    "label": "sedih",
+    "intensitas": "sangat",
+    "nilai": {
+      "lawan": {
+        "orang": {
+          "nama": "Ah Ling",
+          "kelamin": "p",
+          "tahap": "dewasa"
+        }
+      },
+      "konteks.almarhum": {
+        "orang": {
+          "nama": "Almarhum Chen",
+          "kelamin": "l",
+          "tahap": "dewasa"
+        }
+      }
+    }
+  },
+  "langkah": [
+    {
+      "ubah": {},
+      "harap": {
+        "k": "kultivator.cakap.keluh.kejahatan.2",
+        "a": []
+      },
+      "aturan": "keluh.kejahatan",
+      "gestur": "geleng",
+      "seru": null,
+      "tik": null,
+      "id_id": "Penjaga datang setelah malingnya pergi. Selalu begitu.",
+      "en_us": "The guards arrive after the thief has gone. Always."
+    },
+    {
+      "ubah": {
+        "niat": "HIBUR",
+        "pembicara": 651,
+        "label": "netral"
+      },
+      "harap": {
+        "k": "kultivator.cakap.curhat.hibur.2",
+        "a": [
+          {
+            "t": "Ah Ling"
+          }
+        ]
+      },
+      "aturan": "curhat.hibur",
+      "gestur": "tepuk_bahu",
+      "seru": null,
+      "tik": null,
+      "id_id": "Anak muda memang begitu. Dulu kita juga keras kepala, ingat?",
+      "en_us": "Young ones are like that. We were stubborn too, remember?"
+    },
+    {
+      "ubah": {
+        "niat": "KELUH"
+      },
+      "harap": {
+        "k": "kultivator.cakap.curhat.keluh.3",
+        "a": [
+          {
+            "t": "Ah Ling"
+          }
+        ]
+      },
+      "aturan": "curhat.keluh",
+      "gestur": "menangis",
+      "seru": "kota42.seru.aduh_p",
+      "tik": null,
+      "id_id": "Pelanggan sepi, sewa lapak naik. Mungkin aku harus pulang kampung saja.",
+      "en_us": "Customers are few, the stall rent's up. Maybe I should just go back home."
+    }
+  ]
+}

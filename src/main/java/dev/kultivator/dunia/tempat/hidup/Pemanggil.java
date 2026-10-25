@@ -159,7 +159,8 @@ public final class Pemanggil {
 		// one place per tick, each at most once per cycle
 		for (Iterator<TempatHuni> it = AKTIF.values().iterator(); it.hasNext(); ) {
 			TempatHuni huni = it.next();
-			long last = SIKLUS_T.getOrDefault(huni.situsId, Long.MIN_VALUE);
+			// never cycled = MIN_VALUE / 2: now - Long.MIN_VALUE overflows to a negative number and the place would never cycle
+			long last = SIKLUS_T.getOrDefault(huni.situsId, Long.MIN_VALUE / 2);
 			if (now - last < SIKLUS) {
 				continue;
 			}
@@ -213,10 +214,65 @@ public final class Pemanggil {
 		return Math.sqrt(dx * dx + dz * dz);
 	}
 
-	// ================================================================== one cycle of one place
+	// ================================================================== body pickers (DESIGN 42.4A.2; none registered = as built)
 
-	private record Calon(Penduduk p, Kegiatan k, TempatHuni.Tujuan tujuan, double jarak) {
+	/**
+	 * One resident that may get a body this cycle: its activity, goal and the distance from the goal to the nearest player
+	 * (at most {@link #PANGGIL}).
+	 */
+	public record Calon(Penduduk p, Kegiatan k, TempatHuni.Tujuan tujuan, double jarak) {
 	}
+
+	/**
+	 * Decides who gets the bodies and the far-crowd figures of a place (42S {@code PemilihTubuh}: shares per zone by the
+	 * largest remainder, then nearest within the zone). The caller still applies every limit after the order:
+	 * {@link #BARU_PER_SIKLUS}, the place cap, {@code tubuhGlobal}, {@code perPemain}, overload and danger; workplace
+	 * keepers ({@link NpcRole#stationary}) pass the caps, and the first capped non-keeper ends the cycle, so keep the keepers
+	 * first.
+	 */
+	public interface PemilihTubuh {
+		/**
+		 * @param calon    the candidates (any order; do not modify)
+		 * @param anggaran bodies the caps leave for non-keepers this cycle
+		 * @return the candidates in the order bodies are made (may drop some), or null to leave it to the next picker and
+		 *         finally the built-in order (keepers first, then nearest)
+		 */
+		@Nullable List<Calon> pilih(TempatHuni huni, List<Calon> calon, int anggaran);
+
+		/**
+		 * The far-crowd figures sent to {@code player} when there are more than {@code maks} ({@code impostorMaks}).
+		 *
+		 * @return at most {@code maks} entries, or null for the built-in nearest-first cut
+		 */
+		default @Nullable List<PendudukSnapshot.Entri> pilihJauh(TempatHuni huni, ServerPlayer player, List<PendudukSnapshot.Entri> entri, int maks) {
+			return null;
+		}
+	}
+
+	private static final List<PemilihTubuh> PEMILIH = new ArrayList<>();
+
+	/**
+	 * Dresses a new resident body before it enters the world (42A: the stored person's name plate, visible age, sex and
+	 * face; DESIGN 42.4.14). Called after {@code setup}, before {@code addFreshEntity}.
+	 */
+	@FunctionalInterface
+	public interface PenghiasTubuh {
+		void hias(ServerLevel level, TempatHuni huni, KultivatorNpc npc, Penduduk p, long now);
+	}
+
+	private static @Nullable PenghiasTubuh penghias;
+
+	/** Sets the body decorator (one owner, 42A); null clears it. */
+	public static void setPenghias(@Nullable PenghiasTubuh value) {
+		penghias = value;
+	}
+
+	/** Registers a body picker; pickers are asked in order of registration. Call once at init. */
+	public static synchronized void addPemilihTubuh(PemilihTubuh pemilih) {
+		PEMILIH.add(pemilih);
+	}
+
+	// ================================================================== one cycle of one place
 
 	private static void siklus(ServerLevel level, TempatHuni huni, long now) {
 		huni.segarkan(level, now, false);
@@ -384,11 +440,25 @@ public final class Pemanggil {
 		boolean berat = DuniaBudget.overloaded(level.getServer());
 		HidupConfig cfg = HidupConfig.get();
 		int cap = cfg.tubuhUntuk(huni.jenis);
-		// workplace keepers (stationary roles: cook, healer, smith, innkeeper, banker...) first and outside the caps, so a
-		// village's healer or a compound's alchemist is never crowded out by strollers; the rest by distance, capped
-		calon.sort(Comparator.comparing((Calon c) -> !c.p().peran().stationary).thenComparingDouble(Calon::jarak));
+		List<Calon> urutan = null;
+		if (!PEMILIH.isEmpty()) {
+			int anggaran = Math.max(0, Math.min(BARU_PER_SIKLUS, cap - huni.tubuh.size()));
+			List<Calon> lihat = List.copyOf(calon);
+			for (PemilihTubuh each : PEMILIH) {
+				urutan = each.pilih(huni, lihat, anggaran);
+				if (urutan != null) {
+					break;
+				}
+			}
+		}
+		if (urutan == null) {
+			// workplace keepers (stationary roles: cook, healer, smith, innkeeper, banker...) first and outside the caps, so a
+			// village's healer or a compound's alchemist is never crowded out by strollers; the rest by distance, capped
+			calon.sort(Comparator.comparing((Calon c) -> !c.p().peran().stationary).thenComparingDouble(Calon::jarak));
+			urutan = calon;
+		}
 		int dibuat = 0;
-		for (Calon c : calon) {
+		for (Calon c : urutan) {
 			boolean staf = c.p().peran().stationary;
 			if (dibuat >= BARU_PER_SIKLUS || !staf && (berat || huni.tubuh.size() >= cap || !DuniaBudget.mayAdd(level, BUDGET))) {
 				return;
@@ -476,6 +546,10 @@ public final class Pemanggil {
 		if (role.kelompok == NpcRole.Kelompok.PENJAGA) {
 			npc.setFightsMonsters(true);
 		}
+		PenghiasTubuh hias = penghias;
+		if (hias != null) {
+			hias.hias(level, huni, npc, p, now);
+		}
 		if (!level.addFreshEntity(npc)) {
 			return null;
 		}
@@ -539,7 +613,18 @@ public final class Pemanggil {
 		HidupConfig cfg = HidupConfig.get();
 		for (ServerPlayer player : dekat) {
 			List<PendudukSnapshot.Entri> list = jauh.getOrDefault(player, List.of());
+			List<PendudukSnapshot.Entri> dipilih = null;
 			if (list.size() > cfg.impostorMaks) {
+				for (PemilihTubuh each : PEMILIH) {
+					dipilih = each.pilihJauh(huni, player, List.copyOf(list), cfg.impostorMaks);
+					if (dipilih != null) {
+						break;
+					}
+				}
+			}
+			if (dipilih != null) {
+				list = dipilih.size() > cfg.impostorMaks ? dipilih.subList(0, cfg.impostorMaks) : dipilih;
+			} else if (list.size() > cfg.impostorMaks) {
 				// nearest first: the far edge thins out
 				Vec3 at = player.position();
 				List<PendudukSnapshot.Entri> sorted = new ArrayList<>(list);

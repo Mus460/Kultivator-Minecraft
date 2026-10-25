@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.BooleanSupplier;
+import java.util.function.IntConsumer;
 import java.util.function.Supplier;
 
 /**
@@ -25,6 +26,10 @@ public abstract class Widget {
 	protected @Nullable Runnable action;
 	protected BooleanSupplier enabled = () -> true;
 	protected @Nullable Supplier<List<Component>> tooltip;
+	/** Why the control is disabled right now (tooltip line and footer message, DESIGN 43.7). */
+	protected @Nullable Supplier<Component> alasan;
+	/** A right click (cycle backwards, DESIGN 43.7); null = right clicks do nothing. */
+	protected @Nullable Runnable kanan;
 
 	protected Widget(int x, int y, int w, int h) {
 		this.x = x;
@@ -48,6 +53,28 @@ public abstract class Widget {
 		return this;
 	}
 
+	/** The reason shown while the control is disabled (tooltip and the Gulungan footer when it is clicked). */
+	public Widget alasanWhen(Supplier<Component> alasan) {
+		this.alasan = alasan;
+		return this;
+	}
+
+	/** What a right click does (null: nothing). */
+	public Widget onRightPress(@Nullable Runnable kanan) {
+		this.kanan = kanan;
+		return this;
+	}
+
+	/** The disabled reason right now (null while enabled or when none is given). */
+	public @Nullable Component alasan() {
+		return alasan == null || isEnabled() ? null : alasan.get();
+	}
+
+	/** The right-click action (null: none). */
+	public @Nullable Runnable kanan() {
+		return kanan;
+	}
+
 	public boolean isEnabled() {
 		return enabled.getAsBoolean();
 	}
@@ -58,7 +85,14 @@ public abstract class Widget {
 
 	/** Tooltip lines right now (empty when none). */
 	public List<Component> tooltipLines() {
-		return tooltip == null ? List.of() : tooltip.get();
+		List<Component> lines = tooltip == null ? List.of() : tooltip.get();
+		Component why = alasan();
+		if (why == null) {
+			return lines;
+		}
+		List<Component> all = new java.util.ArrayList<>(lines);
+		all.add(why.copy().withColor(0xFFFF8A7A));
+		return all;
 	}
 
 	/** Draws the control; {@code seconds} is the frame time for its animations. */
@@ -73,6 +107,21 @@ public abstract class Widget {
 	/** Mouse button went down on the control. */
 	public void press() {
 		pressed = true;
+	}
+
+	/** Mouse button went down at ({@code x}, {@code y}) on the control (sliders read the position; the default presses). */
+	public void pressAt(double x, double y) {
+		press();
+	}
+
+	/** The mouse moved while the press started here; true when the control used it (a slider handle). */
+	public boolean dragTo(double x, double y) {
+		return false;
+	}
+
+	/** What ←/→ do while the control has focus (null: nothing). */
+	public @Nullable IntConsumer geser() {
+		return null;
 	}
 
 	/** Mouse button released: runs the action when still over the control. True when it acted. */

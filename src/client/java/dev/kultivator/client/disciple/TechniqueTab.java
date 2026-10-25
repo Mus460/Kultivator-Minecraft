@@ -7,6 +7,8 @@ import dev.kultivator.client.codex.CodexGrid;
 import dev.kultivator.client.codex.SpecInfo;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Glyphs;
+import dev.kultivator.client.screen.ui.KeadaanKosong;
+import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.SealCard;
 import dev.kultivator.client.screen.ui.TalismanButton;
@@ -20,6 +22,8 @@ import dev.kultivator.network.Actions;
 import dev.kultivator.util.Msg;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -38,13 +42,17 @@ import java.util.Map;
  * with the "Ajarkan" talisman and the "Siapkan" combat slots ({@code 3 + realm/2 + stars/9}, at most 10): click a
  * socket to put the picked learned art in it, right click empties it. Teaching costs the master a share of max qi by
  * grade; the server checks everything again. A 9-star title's Dewa offer ({@code dewa_pending}) lists its arts here too:
- * the talisman then reads "Pahami" and the pick is free.
+ * the talisman then reads "Pahami" and the pick is free. Keyboard (43.0.7): Tab reaches the grid (arrows, PgUp/PgDn,
+ * Home/End pick a card, Enter teaches) and every socket (Enter fills it, Delete/Backspace empties it).
  */
-final class TechniqueTab extends DiscipleTab {
+final class TechniqueTab extends MuridSub {
 
 	private static final int HEADER = 13;
 	private static final int BUTTON_H = 16;
-	private static final int SOCKET = 12;
+	/** A combat socket: 16 x 16, the kit's smallest click box or more (43.0.6); they wrap to a second row when narrow. */
+	private static final int SOCKET = 16;
+	private static final String KISI = "kisi";
+	private static final String SOKET = "soket.";
 	private static final CodexFilters FILTERS = new CodexFilters("teach");
 
 	private final CodexGrid grid = new CodexGrid();
@@ -61,7 +69,6 @@ final class TechniqueTab extends DiscipleTab {
 	private int gridH;
 	private int detailX;
 	private int detailW;
-	private int slotsY;
 
 	private final CodexFilters.View view = new CodexFilters.View() {
 		@Override
@@ -86,8 +93,19 @@ final class TechniqueTab extends DiscipleTab {
 		}
 	};
 
-	TechniqueTab(DiscipleScreen screen) {
-		super(screen);
+	TechniqueTab(MuridPage murid) {
+		super(murid);
+	}
+
+	/** Its own scroll when the box is shorter (GUI scale 4): the detail column, the sockets and the talisman at 1.0. */
+	@Override
+	public int tinggiMin() {
+		return 184;
+	}
+
+	@Override
+	public String helpTopic() {
+		return "teknik";
 	}
 
 	@Override
@@ -261,14 +279,13 @@ final class TechniqueTab extends DiscipleTab {
 				return;
 			}
 			if (offered()) {
-				screen.send(Actions.TECHNIQUE, "dlearn:" + selected.id());
+				send(Actions.TECHNIQUE, "dlearn:" + selected.id());
 			} else {
-				screen.send(Actions.DISCIPLE_TEACH, selected.id());
+				send(Actions.DISCIPLE_TEACH, selected.id());
 			}
 		});
 		teach.tooltip(this::teachTip);
 		add(teach);
-		slotsY = y + h - BUTTON_H - 6 - SOCKET - 9;
 	}
 
 	private void refresh() {
@@ -389,22 +406,126 @@ final class TechniqueTab extends DiscipleTab {
 		return -1;
 	}
 
+	/** Sockets per row in the detail box. */
+	private int perRow() {
+		return Math.max(1, (detailW - 10) / (SOCKET + 2));
+	}
+
+	/** The top of the socket rows for {@code count} sockets (above the talisman). */
+	private int slotsTop(int count) {
+		int rows = (count + perRow() - 1) / perRow();
+		return y + h - BUTTON_H - 6 - rows * (SOCKET + 2);
+	}
+
+	private int socketX(int i) {
+		return detailX + 5 + (i % perRow()) * (SOCKET + 2);
+	}
+
+	private int socketY(int i, int count) {
+		return slotsTop(count) + (i / perRow()) * (SOCKET + 2);
+	}
+
 	private int socketAt(double mouseX, double mouseY) {
 		int count = slotCount();
 		for (int i = 0; i < count; i++) {
-			int sx = detailX + 5 + i * (SOCKET + 2);
-			if (mouseX >= sx && mouseX < sx + SOCKET && mouseY >= slotsY && mouseY < slotsY + SOCKET) {
+			int sx = socketX(i);
+			int sy = socketY(i, count);
+			if (mouseX >= sx && mouseX < sx + SOCKET && mouseY >= sy && mouseY < sy + SOCKET) {
 				return i;
 			}
 		}
 		return -1;
 	}
 
+	/** Puts the picked learned art in socket {@code i} (a click, Enter on a focused socket). */
+	private void fill(int i) {
+		if (selected != null && entries.containsKey(selected.id()) && entries.get(selected.id()).learned()) {
+			UiSound.press();
+			send(Actions.TECHNIQUE, "dslot:" + i + ":" + selected.id());
+		} else {
+			UiSound.denied();
+			pesan(Component.translatable("kultivator.codex.teach.slot.tip"), Palette.INK_SOFT);
+		}
+	}
+
+	private void empty(int i) {
+		UiSound.toggle(false);
+		send(Actions.TECHNIQUE, "dslot:" + i + ":-");
+	}
+
+	private void teachSelected() {
+		if (selected == null || !(offered() || canTeach())) {
+			UiSound.denied();
+			return;
+		}
+		UiSound.press();
+		send(offered() ? Actions.TECHNIQUE : Actions.DISCIPLE_TEACH, offered() ? "dlearn:" + selected.id() : selected.id());
+	}
+
+	// ================================================================== the Tab ring
+
+	@Override
+	protected void lukis(Lukis l) {
+		if (entries.isEmpty()) {
+			KeadaanKosong.gambar(l, KeadaanKosong.Gambar.NAMPAN, Component.translatable("kultivator.discipleui.tech.none"), null, null, gridX, gridY,
+					gridX + gridW, y + h);
+		} else {
+			Lukis.Zona kisi = l.zona(KISI, gridX, gridY, gridX + gridW, gridY + gridH, null, true, null, true);
+			if (kisi != null) {
+				kisi.geser = arah -> pickWith(arah > 0 ? InputConstants.KEY_RIGHT : InputConstants.KEY_LEFT);
+			}
+			int[] box = grid.kotakTerpilih();
+			if (box != null) {
+				l.fokusCincin(KISI, box[0], box[1], box[2], box[3]);
+			}
+		}
+		int count = slotCount();
+		for (int i = 0; i < count; i++) {
+			int sx = socketX(i);
+			int sy = socketY(i, count);
+			int index = i;
+			Lukis.Zona z = l.zona(SOKET + i, sx, sy, sx + SOCKET, sy + SOCKET, () -> fill(index), true, null, true);
+			if (z != null) {
+				z.kanan = () -> empty(index);
+			}
+			l.fokusCincin(SOKET + i, sx, sy, sx + SOCKET, sy + SOCKET);
+		}
+	}
+
+	private void pickWith(int key) {
+		if (grid.tombol(key)) {
+			selected = grid.selected();
+			UiSound.tab();
+		}
+	}
+
+	@Override
+	public boolean keyPressed(KeyEvent event) {
+		int key = event.key();
+		String focused = fokusRing.kunci();
+		if (!fokusRing.mauTombol() && focused != null && focused.startsWith(SOKET)
+				&& (key == InputConstants.KEY_DELETE || key == InputConstants.KEY_BACKSPACE)) {
+			empty(Integer.parseInt(focused.substring(SOKET.length())));
+			return true;
+		}
+		if (!fokusRing.mauTombol() && KISI.equals(focused) && event.isSelection()) {
+			// Enter / Space on the grid: teach (or take the Dewa offer of) the picked card
+			teachSelected();
+			return true;
+		}
+		if (!fokusRing.mauTombol() && KISI.equals(focused) && (event.isUp() || event.isDown() || key == InputConstants.KEY_PAGEUP
+				|| key == InputConstants.KEY_PAGEDOWN || key == InputConstants.KEY_HOME || key == InputConstants.KEY_END)) {
+			pickWith(key);
+			return true;
+		}
+		return super.keyPressed(event);
+	}
+
 	// ================================================================== drawing
 
 	@Override
 	protected void drawBehind(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
-		heading(g, Component.translatable("kultivator.discipleui.tech.heading"), x + 2.0F, y, gridW * 0.6F, 0.8F);
+		heading(g, Component.translatable("kultivator.discipleui.tech.heading"), x + 2.0F, y, gridW * 0.6F, 1.0F);
 		int learned = 0;
 		for (TeachCard.Entry entry : entries.values()) {
 			if (entry.learned()) {
@@ -412,22 +533,17 @@ final class TechniqueTab extends DiscipleTab {
 			}
 		}
 		Component count = Component.translatable("kultivator.discipleui.tech.count", learned, entries.size());
-		float countScale = Brush.fitScale(font, count, gridW * 0.38F, 0.7F, 0.45F);
-		float countW = Math.min(gridW * 0.38F, font.width(count) * countScale);
-		Brush.fit(g, font, count, x + gridW - countW, y + 1.0F, gridW * 0.38F, Palette.INK_SOFT, 0.7F, 0.45F, false);
+		float countW = Math.min(gridW * 0.38F, font.width(count));
+		Brush.fit(g, font, count, x + gridW - countW, y + 1.0F, gridW * 0.38F, Palette.INK_SOFT, 1.0F, 1.0F, false);
 		String[] slots = slots();
 		grid.render(g, font, mouseX, mouseY, seconds, spec -> TeachCard.look(entries.get(spec.id()), slotOf(spec.id(), slots), spec == selected));
-		if (entries.isEmpty()) {
-			Brush.wrap(g, font, Component.translatable("kultivator.discipleui.tech.none"), gridX + 4.0F, gridY + 8.0F, gridW - 8.0F, Palette.INK_SOFT,
-					0.75F, false);
-		}
 		TechniqueSpec hovered = grid.hovered();
 		if (hovered != null) {
 			List<Component> tip = new ArrayList<>();
 			tip.add(hovered.displayName());
 			tip.add(SpecInfo.sourceLine(hovered));
 			tip.add(statusLine(hovered));
-			screen.showTooltip(tip);
+			tooltip(tip);
 		}
 		drawDetail(g, slots, mouseX, mouseY);
 	}
@@ -442,50 +558,55 @@ final class TechniqueTab extends DiscipleTab {
 		float room = detailW - 10.0F;
 		float ty = y0 + 5.0F;
 		if (selected == null) {
-			Brush.wrap(g, font, Component.translatable("kultivator.discipleui.tech.select"), tx, ty, room, Palette.INK_SOFT, 0.7F, false);
+			Brush.wrap(g, font, Component.translatable("kultivator.discipleui.tech.select"), tx, ty, room, Palette.INK_SOFT, 1.0F, false);
 			return;
 		}
 		TechniqueSpec spec = selected;
 		int tone = SpecInfo.ink(spec);
 		Glyphs.spec(g, spec, tx + 5.0F, ty + 5.0F, 9.0F, tone);
-		Brush.fit(g, font, Brush.bold(spec.displayName()), tx + 13.0F, ty + 1.0F, room - 13.0F, tone, 0.85F, 0.5F, false);
+		Brush.fit(g, font, Brush.bold(spec.displayName()), tx + 13.0F, ty + 1.0F, room - 13.0F, tone, 1.0F, 1.0F, false);
 		ty += 12.0F;
 		Component kind = Component.translatable("kultivator.codex.tip.grade_type", SpecInfo.gradeName(spec), spec.type().displayName());
-		Brush.fit(g, font, Component.empty().append(SpecInfo.daoName(spec)).append(" · ").append(kind), tx, ty, room, Palette.INK_SOFT, 0.6F, 0.4F,
+		Brush.fit(g, font, Component.empty().append(SpecInfo.daoName(spec)).append(" · ").append(kind), tx, ty, room, Palette.INK_SOFT, 1.0F, 1.0F,
 				false);
-		ty += 7.0F;
-		ty += Brush.wrap(g, font, SpecInfo.sourceLine(spec), tx, ty, room, Palette.INK_FAINT, 0.55F, false) + 1.0F;
+		ty += 10.0F;
+		// the source line: one line cut with "…" (full text in the card's tooltip)
+		Brush.fit(g, font, SpecInfo.sourceLine(spec), tx, ty, room, Palette.INK_FAINT, 1.0F, 1.0F, false);
+		ty += 10.0F;
 		TeachCard.Entry entry = entries.get(spec.id());
 		double qiCost = entry != null && entry.qiCost() >= 0.0D ? entry.qiCost() : spec.qi() * 0.6D;
 		int cooldown = entry != null && entry.cooldown() >= 0 ? entry.cooldown() : spec.cooldownTicks();
 		Component cost = Component.translatable("kultivator.discipleui.tech.cost_cd", Msg.number(Math.ceil(qiCost)), SealCard.seconds(cooldown));
-		Brush.fit(g, font, cost, tx, ty, room, Palette.onPaper(Palette.QI), 0.6F, 0.4F, false);
-		ty += 8.0F;
+		Brush.fit(g, font, cost, tx, ty, room, Palette.onPaper(Palette.QI), 1.0F, 1.0F, false);
+		ty += 10.0F;
 		Brush.rect(g, tx, ty, x1 - 5.0F, ty + 0.6F, Palette.argb(0x90, Palette.GOLD));
 		ty += 3.0F;
-		ty += Brush.wrap(g, font, statusLine(spec), tx, ty, room, Palette.INK, 0.6F, false) + 2.0F;
-		float descBottom = slotsY - 10.0F;
+		int slotsY = slotsTop(slots.length);
+		float descBottom = slotsY - 12.0F;
+		g.enableScissor(x0 + 1, Math.round(ty), x1 - 1, Math.max(Math.round(ty), Math.round(descBottom)));
+		ty += Brush.wrap(g, font, statusLine(spec), tx, ty, room, Palette.INK, 1.0F, false) + 2.0F;
 		if (descBottom - ty > 8.0F) {
-			g.enableScissor(x0 + 1, Math.round(ty), x1 - 1, Math.round(descBottom));
-			Brush.wrap(g, font, spec.description(), tx, ty, room, Palette.INK_SOFT, 0.55F, false);
-			g.disableScissor();
+			Brush.wrap(g, font, spec.description(), tx, ty, room, Palette.INK_SOFT, 1.0F, false);
 		}
+		g.disableScissor();
 		// "Siapkan": the combat slots.
-		Brush.fit(g, font, Component.translatable("kultivator.codex.teach.slots", slots.length), tx, slotsY - 8.0F, room, Palette.SEAL_DARK, 0.55F, 0.4F,
+		Brush.fit(g, font, Component.translatable("kultivator.codex.teach.slots", slots.length), tx, slotsY - 11.0F, room, Palette.SEAL_DARK, 1.0F, 1.0F,
 				false);
 		int over = socketAt(mouseX, mouseY);
+		int size = SOCKET;
 		for (int i = 0; i < slots.length; i++) {
-			int sx = detailX + 5 + i * (SOCKET + 2);
-			g.fill(sx, slotsY, sx + SOCKET, slotsY + SOCKET, i == over ? 0xFFF7DFA0 : Palette.TALISMAN);
-			Brush.frame(g, sx, slotsY, sx + SOCKET, slotsY + SOCKET, Palette.TALISMAN_EDGE);
+			int sx = socketX(i);
+			int sy = socketY(i, slots.length);
+			g.fill(sx, sy, sx + size, sy + size, i == over ? 0xFFF7DFA0 : Palette.TALISMAN);
+			Brush.frame(g, sx, sy, sx + size, sy + size, Palette.TALISMAN_EDGE);
 			TechniqueSpec there = slots[i].isEmpty() ? null : TechniqueRegistry.byId(slots[i]);
 			if (there != null) {
-				Glyphs.spec(g, there, sx + SOCKET / 2.0F, slotsY + SOCKET / 2.0F, SOCKET * 0.62F, SpecInfo.ink(there));
+				Glyphs.spec(g, there, sx + size / 2.0F, sy + size / 2.0F, size * 0.62F, SpecInfo.ink(there));
 			}
 		}
 		if (over >= 0) {
 			TechniqueSpec there = slots[over].isEmpty() ? null : TechniqueRegistry.byId(slots[over]);
-			screen.showTooltip(List.of(Component.translatable("kultivator.codex.teach.slot", over + 1),
+			tooltip(List.of(Component.translatable("kultivator.codex.teach.slot", over + 1),
 					there == null ? Component.translatable("kultivator.codex.ring.empty").withStyle(ChatFormatting.GRAY) : there.displayName(),
 					Component.translatable("kultivator.codex.teach.slot.tip").withStyle(ChatFormatting.DARK_GRAY)));
 		}
@@ -494,35 +615,34 @@ final class TechniqueTab extends DiscipleTab {
 	// ================================================================== input
 
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button) {
+	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+		double mouseX = event.x();
+		double mouseY = event.y();
+		int button = event.button();
 		int socket = socketAt(mouseX, mouseY);
 		if (socket >= 0) {
+			fokusRing.set(SOKET + socket);
 			if (button == InputConstants.MOUSE_BUTTON_RIGHT) {
-				UiSound.toggle(false);
-				screen.send(Actions.TECHNIQUE, "dslot:" + socket + ":-");
-			} else if (selected != null && entries.containsKey(selected.id()) && entries.get(selected.id()).learned()) {
-				UiSound.press();
-				screen.send(Actions.TECHNIQUE, "dslot:" + socket + ":" + selected.id());
+				empty(socket);
 			} else {
-				UiSound.denied();
+				fill(socket);
 			}
 			return true;
 		}
-		if (super.mouseClicked(mouseX, mouseY, button)) {
-			return true;
-		}
+		// a card first: the grid's zone would otherwise teach on a plain click
 		TechniqueSpec spec = grid.at(mouseX, mouseY);
 		if (spec != null && button == InputConstants.MOUSE_BUTTON_LEFT) {
 			UiSound.press();
 			selected = spec;
 			grid.select(spec);
+			fokusRing.set(KISI);
 			return true;
 		}
-		return false;
+		return super.mouseClicked(event, doubleClick);
 	}
 
 	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-		return grid.scrolled(mouseX, mouseY, amount);
+	public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double amount) {
+		return grid.scrolled(mouseX, mouseY, amount) || super.mouseScrolled(mouseX, mouseY, scrollX, amount);
 	}
 }

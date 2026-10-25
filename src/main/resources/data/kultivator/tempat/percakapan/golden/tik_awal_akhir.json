@@ -1,0 +1,158 @@
+{
+  "id": "tik_awal_akhir",
+  "jenis": "realisasi",
+  "_catatan": "Tics forced on (chance 1): an outgoing trader owns haiya + untung_rugi, never the same twice in a row.",
+  "benih_dunia": 42,
+  "masukan": {
+    "niat": "SAPA",
+    "pembicara": 700,
+    "hari": 120,
+    "now": 2880000,
+    "cuaca": "cerah",
+    "musim": "semi",
+    "situasi": {
+      "jam": "pagi",
+      "cuaca": "cerah",
+      "musim": "semi",
+      "kelompok": "pedagang",
+      "watak": "ramah",
+      "kebiasaan": [],
+      "sifat": {
+        "H": 0,
+        "E": 0,
+        "X": 50,
+        "A": 20,
+        "C": 0,
+        "O": 0
+      },
+      "wajah": "netral",
+      "tempat": "kota_besar"
+    },
+    "pendengar": {
+      "nama": "Han",
+      "kelamin": "l",
+      "tahap": "dewasa",
+      "pemain": true
+    },
+    "kesan": "kenal",
+    "tahu_nama": false,
+    "register": "sopan",
+    "dialek": "ibukota",
+    "tik": [
+      "haiya",
+      "untung_rugi"
+    ],
+    "tik_peluang": 1.0
+  },
+  "langkah": [
+    {
+      "ubah": {},
+      "harap": {
+        "k": "kultivator.cakap.bungkus.sisip",
+        "a": [
+          {
+            "k": "kultivator.cakap.sapa.pedagang.0",
+            "a": [
+              {
+                "k": "kultivator.cakap.lex.tuan.ibukota",
+                "a": []
+              }
+            ]
+          },
+          {
+            "k": "kultivator.cakap.tik.untung_rugi",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "sapa.pedagang",
+      "gestur": "seru_dagang",
+      "seru": null,
+      "tik": "untung_rugi",
+      "id_id": "Silakan, silakan, Tuanku! Lihat-lihat dulu, tidak beli juga tidak apa. ...untung-rugi, untung-rugi.",
+      "en_us": "Come, come, My Lord! Have a look; no need to buy. ...profit and loss, profit and loss."
+    },
+    {
+      "ubah": {
+        "tik_terakhir": "haiya"
+      },
+      "harap": {
+        "k": "kultivator.cakap.bungkus.sisip",
+        "a": [
+          {
+            "k": "kultivator.cakap.sapa.pedagang.3",
+            "a": [
+              {
+                "k": "kultivator.cakap.lex.tuan.ibukota",
+                "a": []
+              }
+            ]
+          },
+          {
+            "k": "kultivator.cakap.tik.untung_rugi",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "sapa.pedagang",
+      "gestur": "seru_dagang",
+      "seru": null,
+      "tik": "untung_rugi",
+      "id_id": "Tuanku! Penglarisan hari ini, kuberi harga teman. ...untung-rugi, untung-rugi.",
+      "en_us": "My Lord! First sale of the day; a friend's price for you. ...profit and loss, profit and loss."
+    },
+    {
+      "ubah": {
+        "tik_terakhir": "untung_rugi"
+      },
+      "harap": {
+        "k": "kultivator.cakap.bungkus.awal",
+        "a": [
+          {
+            "k": "kultivator.cakap.tik.haiya",
+            "a": []
+          },
+          {
+            "k": "kultivator.cakap.sapa.pedagang.4",
+            "a": [
+              {
+                "k": "kultivator.cakap.lex.tuan.ibukota",
+                "a": []
+              }
+            ]
+          }
+        ]
+      },
+      "aturan": "sapa.pedagang",
+      "gestur": "seru_dagang",
+      "seru": null,
+      "tik": "haiya",
+      "id_id": "Haiya! Mari mampir, Tuanku. Mata Tuanku jeli, pasti tahu barang bagus.",
+      "en_us": "Aiyah! Do stop by, My Lord. You've a keen eye; you know good goods."
+    },
+    {
+      "ubah": {
+        "niat": "BASA_BASI"
+      },
+      "harap": {
+        "k": "kultivator.cakap.bungkus.awal",
+        "a": [
+          {
+            "k": "kultivator.cakap.tik.haiya",
+            "a": []
+          },
+          {
+            "k": "kultivator.cakap.basa.cuaca.cerah.0",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "basa.cuaca.cerah",
+      "gestur": "tatap_langit",
+      "seru": null,
+      "tik": "haiya",
+      "id_id": "Haiya! Langit bersih sekali hari ini. Pertanda baik, kata orang.",
+      "en_us": "Aiyah! Such a clear sky today. A good omen, they say."
+    }
+  ]
+}

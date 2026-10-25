@@ -482,8 +482,8 @@ def main():
         folder = os.path.join(DATA, sub)
         if os.path.isdir(folder):
             for fn in os.listdir(folder):
-                # tema_* belong to the 38TK theme generators, mandiri* to 39's gen_mandiri_lang.py: never ours to delete
-                if fn.endswith('.json') and not fn.startswith(('tema_', 'mandiri')):
+                # tema_* belong to the 38TK theme generators, mandiri* to 39's gen_mandiri_lang.py: gabung* to 41, kota42* to 42: never ours to delete
+                if fn.endswith('.json') and not fn.startswith(('tema_', 'mandiri', 'gabung', 'kota42')):
                     os.remove(os.path.join(folder, fn))
     for did, obj in dialogs.items():
         write_json(os.path.join(DATA, 'dialog', did + '.json'), obj)

@@ -17,6 +17,11 @@ Checks (each prints ERROR lines; exit code 1 when any error, unless --soft):
      parsed from the Java enum), satellites 380451/380452; every themed structure is in #kultivator:kota_tema.
   7. Tags (38.D.1, 38.R.1, owner 38W): every inhabited 38 set present is in #kultivator:tempat_berpenghuni and every
      cared-for 38 structure in #kultivator:tempat_dirawat (directly, through a tag, or as an optional entry).
+  8. Titik of DESIGN 41.11.2 (owner 41W-G): every kompleks/<what> anchor names a known compound spot (38.C.3.3 or the
+     41 list, cross-checked against TitikGabung.java); every compound district holds its 41 titik exactly once (the
+     Iblis court two altar_sumpah, one marked aliran=iblis); every sect gate template (structure/sekte/gerbang_*) holds
+     sektenpc/ujian_bawah, ujian_atas, loket, bilik_0, bilik_1 and altar exactly once. A compound lot may carry up to
+     tempat_lib.maks_jangkar("kompleks_sekte") anchors and a compound district up to 32.
 Templates are read with tools/nbt.py; only the repo is read, nothing is written.
 """
 import gzip
@@ -27,6 +32,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import nbt  # noqa: E402
 import tempat_lib as tl  # noqa: E402
+import kota_hidup_kit  # noqa: E402,F401  (registers the DESIGN 42 titik types and kavling as a box titik)
 
 REPO = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 RES = os.path.join(REPO, "src", "main", "resources")
@@ -35,28 +41,30 @@ PACKS = os.path.join(RES, "resourcepacks")
 
 # Structure folders that belong to DESIGN 38 (structure/<folder>/**) and their gzip budget in bytes (38.C.10).
 FOLDERS = {
-    "kota_besar": 3_000_000,
+    "kota_besar": 3_600_000,     # 42.12.1: 3.0 -> 3.6 MB (night district, kantor_rekrut, gudang_kota, kavling, makam)
     "kompleks_sekte": 1_200_000,
-    "kampung": 1_500_000,
+    "kampung": 1_800_000,        # 42.12.1: 1.5 -> 1.8 MB (kavling, makam desa, kandang)
     "gua": 760_000,     # 38.C.10: gua + situs share 1 MB (D-GU: gua near the old 700 KB, situs uses ~128 KB)
     "situs": 240_000,
     "jalan": 200_000,
     "pos": 600_000,         # 38W: 0.4 MB in 38.C.10; the 40 x 40 inns with rooms and the caravanserai need 0.43 MB,
                             # D-W's extra stelae, shrines, fortified bandit camp, the pond rest post (singgah_b, 90 KB)
                             # and interior dressing bring it to about 0.55 MB (jar size only, no runtime cost)
-    "kota_tema": 6_200_000,  # F2: 5 themes x TEMA_BUDGET 1.2 MB + satellites 0.2 MB (38.T budgets cannot fit 5.5 MB)
+    "kota_tumbuh": 2_400_000,    # 42.12.1 / 42.9.4: ~110 growth plans x 5 cumulative stages (read by the server only)
+    "kota_tema": 7_200_000,  # 42.12.1: 6.2 -> 7.2 MB (jalan_malam, kavling, makam, kantor_rekrut). F2: 5 themes x TEMA_BUDGET 1.2 MB + satellites 0.2 MB (38.T budgets cannot fit 5.5 MB)
 }
-TEMA_BUDGET = 1_200_000          # per theme folder kota_tema/<tema>
+TEMA_BUDGET = 1_400_000          # per theme folder kota_tema/<tema> (42.12.1: +0.2 MB per theme)
 # 38.C.10 / 38.T.2.4: (points per template, anchors per district or start) by structure folder.
 BATAS = {
     "kota_besar": (96, 40),
-    "kompleks_sekte": (64, 24),
+    "kompleks_sekte": (64, 32),   # 41.11.2: + the 41 titik (a small court with a sky pier reaches 24 + 4)
     "kampung": (32, 12),
     "gua": (24, 16),
     "situs": (24, 16),
     "jalan": (0, 0),
     "pos": (48, 6),       # 24 in 38.C.10; an inn lot has a bed point per guest bed and table seats (38W, <= 39)
     "kota_tema": (96, 24),
+    "kota_tumbuh": (96, 0),     # growth stages carry titik (stage 5 interior) but never anchors
 }
 # Inhabited set folders (tempat_berpenghuni) and cared-for structure folders (tempat_dirawat, 38.R.1).
 BERPENGHUNI = ("kota_besar", "kampung", "kompleks_sekte", "kota_tema")
@@ -122,8 +130,8 @@ def check_template(tid, path, root):
         err("%s: size %s exceeds %dx%d" % (where, size, tl.LOT, tl.LOT))
     ents = root.get("entities", [])
     anchors = [e for e in ents if (e.get("nbt") or {}).get("id") == "kultivator:dunia_anchor"]
-    if len(anchors) > tl.MAKS_JANGKAR:
-        err("%s: %d anchors > %d" % (where, len(anchors), tl.MAKS_JANGKAR))
+    if len(anchors) > tl.maks_jangkar(tid):
+        err("%s: %d anchors > %d" % (where, len(anchors), tl.maks_jangkar(tid)))
     pts = root.get("kultivator_titik", [])
     if len(pts) > tl.MAKS_TITIK:
         err("%s: %d titik > %d" % (where, len(pts), tl.MAKS_TITIK))
@@ -405,6 +413,109 @@ def check_tags(sets, structures):
                 err("structure %s missing from #kultivator:tempat_dirawat" % sid)
 
 
+# ---------------------------------------------------------------------------------------------- DESIGN 41 titik
+TITIK_GABUNG_JAVA = os.path.join(REPO, "src", "main", "java", "dev", "kultivator", "sekte", "gabung", "dunia",
+                                 "TitikGabung.java")
+KOMPLEKS_38 = ("situs", "gerbang", "aula", "arena", "pasar", "dalam", "puncak", "tetua", "dermaga_awan")
+T41_PAVILIUN = ("jasa", "jasa_meja", "papan_misi", "pesanan")
+T41_AULA = ("altar_sumpah", "hukum")
+T41_LAPANGAN = ("ujian_corak", "kandang", "lorong") + tuple("pilar_%d" % i for i in range(5))
+T41_KEBUN = ("kerja:sumur", "kerja:tong")
+T41_GUA = tuple("kediaman_%d" % i for i in range(6)) + ("gua_renungan",)
+T41_DALAM = tuple("kediaman_dalam_%d" % i for i in range(4))
+T41_PUNCAK = ("kediaman_puncak_0", "kediaman_puncak_1")
+T41_TANGGA = ("ujian_bawah", "ujian_atas")
+T41_SEMUA = T41_PAVILIUN + T41_AULA + T41_LAPANGAN + T41_KEBUN + T41_GUA + T41_DALAM + T41_PUNCAK + T41_TANGGA + ("ujian_darah",)
+GERBANG_41 = ("ujian_bawah", "ujian_atas", "loket", "bilik_0", "bilik_1", "altar")
+
+
+def wajib41(aliran, distrik):
+    """The 41 titik a compound district of `aliran` must hold exactly once (41.11.2)."""
+    if distrik.startswith("halaman"):
+        need = T41_PAVILIUN + T41_AULA + T41_LAPANGAN
+        if aliran == "lurus":
+            need += T41_KEBUN
+        if distrik.startswith("halaman_kecil"):
+            need += T41_PUNCAK
+        return need
+    if distrik == "dalam":
+        return T41_GUA + T41_DALAM + T41_TANGGA + (("ujian_darah",) if aliran == "iblis" else ())
+    if distrik.startswith("puncak_sedang"):
+        return T41_PUNCAK + T41_GUA + T41_TANGGA
+    if distrik.startswith("puncak"):
+        return T41_PUNCAK
+    return ()
+
+
+def _anchors(root):
+    return [(e.get("nbt") or {}) for e in root.get("entities", []) if (e.get("nbt") or {}).get("id") == "kultivator:dunia_anchor"]
+
+
+def check_titik41(structures, pools, templates):
+    if os.path.exists(TITIK_GABUNG_JAVA):
+        with open(TITIK_GABUNG_JAVA, encoding="utf-8") as f:
+            java = f.read()
+        for name in T41_SEMUA:
+            lit = name if not name[-1].isdigit() else name.rstrip("0123456789")
+            if '"%s"' % lit not in java:
+                err("TitikGabung.java has no titik %r (41.11.2 list of tools/cek_tempat.py)" % lit)
+        for name in GERBANG_41:
+            lit = name if not name[-1].isdigit() else name.rstrip("0123456789")
+            if '"%s"' % lit not in java and 'GERBANG + "%s"' % lit not in java:
+                err("TitikGabung.java has no gate titik %r" % lit)
+    else:
+        warn("TitikGabung.java missing: 41 titik names not cross-checked")
+    known = set(KOMPLEKS_38) | set(T41_SEMUA)
+    for tid, (path, root) in sorted(templates.items()):
+        if not tid.startswith("kultivator:kompleks_sekte/"):
+            continue
+        for a in _anchors(root):
+            kind = str(a.get("kind", ""))
+            if kind.startswith("kompleks/") and kind.split("/", 1)[1] not in known:
+                err("%s: unknown compound titik %s" % (rel(path), kind))
+    for sid, (path, s_) in sorted(structures.items()):
+        if not sid.startswith("kultivator:kompleks_sekte/") or s_.get("type") != "kultivator:tata_letak":
+            continue
+        aliran, distrik = sid.split("/", 1)[1].split("_", 1)
+        count = {}
+        marked = 0
+        for lot in s_.get("lot", []):
+            tids = pool_templates(pools, lot.get("pool", "")) or []
+            for t in tids[:1]:
+                if t not in templates:
+                    continue
+                for a in _anchors(templates[t][1]):
+                    kind = str(a.get("kind", ""))
+                    if not kind.startswith("kompleks/"):
+                        continue
+                    what = kind.split("/", 1)[1]
+                    count[what] = count.get(what, 0) + 1
+                    if what == "altar_sumpah" and str((a.get("data") or {}).get("aliran", "")) == "iblis":
+                        marked += 1
+        for what in wajib41(aliran, distrik):
+            n = count.get(what, 0)
+            want = 2 if (what == "altar_sumpah" and aliran == "iblis") else 1
+            if n != want:
+                err("%s: 41 titik %s %d times (want %d)" % (rel(path), what, n, want))
+        if aliran == "iblis" and distrik.startswith("halaman") and marked != 1:
+            err("%s: the Iblis court needs one altar_sumpah marked aliran=iblis (has %d)" % (rel(path), marked))
+        for what, n in count.items():
+            if what in T41_SEMUA and n > 1 and not (what == "altar_sumpah" and aliran == "iblis"):
+                err("%s: 41 titik %s appears %d times" % (rel(path), what, n))
+    gdir = os.path.join(DATA, "structure", "sekte")
+    for size in ("kecil", "sedang", "besar"):
+        gp = os.path.join(gdir, "gerbang_%s.nbt" % size)
+        if not os.path.exists(gp):
+            err("%s missing" % rel(gp))
+            continue
+        _, root = nbt.read_file(gp)
+        kinds = [str(a.get("kind", "")) for a in _anchors(root)]
+        for what in GERBANG_41:
+            n = kinds.count("sektenpc/" + what)
+            if n != 1:
+                err("%s: gate titik sektenpc/%s %d times (want 1)" % (rel(gp), what, n))
+
+
 # ------------------------------------------------------------------------------------------------------- budgets
 def gz_size(path):
     return os.path.getsize(path)
@@ -468,6 +579,7 @@ def main(argv):
             err("%s: salt %s outside the 38 ranges" % (rel(path), salt))
     check_tema(sets, structures)
     check_tags(sets, structures)
+    check_titik41(structures, pools, templates)
     per = check_budgets(templates)
     for w in sorted(set(warnings)):
         print("warning:", w)

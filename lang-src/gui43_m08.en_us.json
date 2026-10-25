@@ -1,0 +1,20 @@
+{
+  "kultivator.gui43.hal.sekte.kas": "Treasury & Shop",
+  "kultivator.gui43.sub.kas.kas": "Treasury",
+  "kultivator.gui43.sub.kas.toko_pk": "PK Shop",
+  "kultivator.gui43.sub.kas.rak": "Scripture Rack",
+  "kultivator.gui43.sub.kas.makam": "Tombs",
+  "kultivator.gui43.sub.kas.kafilah": "Caravans",
+  "kultivator.gui43.m08.v.kantor": "Mission Office",
+  "kultivator.gui43.m08.v.hari_ini": "Today",
+  "kultivator.gui43.m08.v.minggu": "7 Days",
+  "kultivator.gui43.m08.v.sumber": "Sources",
+  "kultivator.gui43.m08.v.politik": "Treasury Politics",
+  "kultivator.gui43.m08.v.mandiri": "Independent Purse",
+  "kultivator.gui43.m08.sumber.aulaku": "My Hall",
+  "kultivator.gui43.m08.sumber.perguruanku": "My Sect",
+  "kultivator.gui43.m08.toko_aula": "Hall PK Shop",
+  "kultivator.gui43.m08.tanpa_aula": "You have no sect hall yet. Raise a hall at a sect stele to open the Mission Office and the Hall PK Shop.",
+  "kultivator.gui43.m08.rak.ambil.tanya": "Take %s back from the Scripture Rack?",
+  "kultivator.gui43.m08.makam.abadikan.tanya": "Enshrine %s on the altar for %s PK?"
+}

@@ -1,0 +1,20 @@
+{
+  "kultivator.gui43.hal.teknik.kodeks": "Codex",
+  "kultivator.gui43.hal.teknik.cincin_segel": "Seal Ring",
+  "kultivator.gui43.hal.teknik.kehancuran": "Destruction",
+  "kultivator.gui43.sub.kehancuran.diri": "Self",
+  "kultivator.gui43.sub.kehancuran.murid": "Disciples",
+  "kultivator.gui43.m02.urut": "Sort: %s",
+  "kultivator.gui43.m02.keadaan": "State",
+  "kultivator.gui43.m02.strip": "Selected: %s · Power %s · Best mastery: %s",
+  "kultivator.gui43.m02.luring": "Not connected to a server.",
+  "kultivator.gui43.m02.pasang.tip": "Go to the Seal Ring carrying this card; click a socket to set it.",
+  "kultivator.gui43.m02.bawa": "Click a socket for %s (Esc cancels)",
+  "kultivator.gui43.m02.kosongkan.tanya": "Clear the Seal Ring? All twelve sockets are emptied.",
+  "kultivator.gui43.m02.kosongkan.tip": "Takes every seal out of the twelve sockets (asks first).",
+  "kultivator.gui43.m02.pulihkan.kosong": "Nothing can be restored right now.",
+  "kultivator.gui43.m02.baca_saja": "A sect mate's hall: view only.",
+  "kultivator.gui43.m02.kunci.server": "The server has Destruction Mode turned off.",
+  "kultivator.gui43.m02.kunci.aula": "Needs a Sect Hall of your own.",
+  "kultivator.gui43.m02.memuat": "Loading hall details…"
+}

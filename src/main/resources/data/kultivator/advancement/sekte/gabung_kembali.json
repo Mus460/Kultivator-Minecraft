@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:sekte/gabung_pamit",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "kultivator.gabung.adv.kembali.desc"
+    },
+    "icon": {
+      "id": "minecraft:recovery_compass"
+    },
+    "title": {
+      "translate": "kultivator.gabung.adv.kembali.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

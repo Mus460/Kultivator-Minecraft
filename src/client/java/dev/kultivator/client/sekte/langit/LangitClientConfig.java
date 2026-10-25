@@ -4,6 +4,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import dev.kultivator.Kultivator;
+import dev.kultivator.client.duel.ui.DuelSettings;
+import dev.kultivator.client.screen.ui.Brush;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.chat.Component;
 
@@ -11,14 +13,15 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * The client switches of the sky-sect visuals (DESIGN 37.7.9, module 37V), in their own file
  * {@code config/kultivator-langit-client.json} so the main client file is never rewritten by this module. Every switch
  * defaults on; each only hides a layer on this client (the server never knows). {@link #TOGGLES} lists them in display
- * order with their lang keys ({@code kultivator.sekte_langit.visual.<id>} and {@code .<id>.tip}) for the sky-sect screen
- * (37G {@code LangitScreen}) or {@link LangitVisualScreen}.
+ * order with their lang keys ({@code kultivator.sekte_langit.visual.<id>} and {@code .<id>.tip}); {@link #rows()} gives
+ * them to Pengaturan › Tampilan &amp; Efek (DESIGN 43.10.1; the old settings screen is {@code LangitVisualScreen.java.deactivation}).
  */
 public final class LangitClientConfig {
 
@@ -69,6 +72,21 @@ public final class LangitClientConfig {
 
 	public static void flip(Toggle toggle) {
 		set(toggle, !on(toggle));
+	}
+
+	/**
+	 * The rows of these switches for Pengaturan › Tampilan &amp; Efek (DESIGN 43.10.1, pattern of {@code DuelSettings.rows}):
+	 * a heading "Langit Sekte" and one jade coin per switch with its explanation as tooltip. Shown with or without a sky
+	 * hall; the JSON file stays {@code kultivator-langit-client.json}.
+	 */
+	public static List<DuelSettings.Row> rows() {
+		List<DuelSettings.Row> rows = new ArrayList<>();
+		rows.add(new DuelSettings.Row(true, false, () -> Component.translatable("kultivator.gui43.m10.langit.pengaturan"), null, List::of, () -> false));
+		for (Toggle toggle : TOGGLES) {
+			rows.add(new DuelSettings.Row(false, false, toggle::label, () -> flip(toggle), () -> List.of(Brush.bold(toggle.label()), toggle.tip()),
+					() -> on(toggle)));
+		}
+		return rows;
 	}
 
 	public static void load() {

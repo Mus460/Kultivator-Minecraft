@@ -3,7 +3,6 @@ package dev.kultivator.client.formasi;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.formasi.stack.Stacking;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -12,9 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The Medan panel (DESIGN 24.7.1): the player's current {@code FormationField} at the moment the scroll was opened, one
+ * The Medan sub of Sekte › Formasi (DESIGN 24.7.1): the player's current {@code FormationField} at the moment the scroll was opened, one
  * line per active term with its cap ("Kultivasi ×1,26 · Sekte · batas ×2,6", "Petir ×0,77 · lantai formasi 0,70",
- * "Lapisan 6/6", "Teman sekte ×1,15"). Neutral terms are left out.
+ * "Lapisan 6/6", "Teman sekte ×1,15"). Neutral terms are left out. Text is 1.0 (43.0.5).
  */
 final class FieldPanel {
 
@@ -22,34 +21,33 @@ final class FieldPanel {
 	}
 
 	static void draw(FormasiPage page, GuiGraphicsExtractor g, int x, int y, int w, int h, int mouseX, int mouseY) {
-		Font font = page.font();
 		CompoundTag f = page.f().getCompoundOrEmpty("field");
 		List<Line> lines = lines(f);
 		meditation(page.f().getCompoundOrEmpty("med"), lines);
-		page.title(g, Component.translatable("kultivator.formasiui.field.title"), x + 2.0F, y + 1.0F, w - 6.0F, 0.7F);
-		float top = y + 13.0F;
-		float view = h - 13.0F;
+		page.title(g, Component.translatable("kultivator.formasiui.field.title"), x + 2.0F, y + 1.0F, w - 6.0F, 1.0F);
+		float top = y + 15.0F;
+		float view = h - 15.0F;
 		float rowH = 12.0F;
-		float content = Math.max(1, lines.size()) * rowH + 24.0F;
+		Component note = Component.translatable("kultivator.formasiui.field.note");
+		float noteH = page.font().split(note, Math.max(10, w - 10)).size() * 9.0F + 6.0F;
+		float content = Math.max(1, lines.size()) * rowH + noteH;
 		float offset = page.clampScroll(2, content, view);
+		page.scrollArea(x, Math.round(top), x + w, Math.round(top + view));
+		page.klip(x, Math.round(top), x + w, Math.round(top + view));
 		float cursor = top - offset;
 		if (lines.isEmpty()) {
-			Brush.wrap(g, font, Component.translatable("kultivator.formasiui.field.none"), x + 4.0F, cursor + 2.0F, w - 10.0F, Palette.INK_SOFT, 0.62F, false);
-			cursor += rowH * 2.0F;
+			cursor += page.wrap(Component.translatable("kultivator.formasiui.field.none"), x + 4.0F, cursor + 2.0F, w - 10.0F, Palette.INK_SOFT) + 4.0F;
 		}
 		for (Line line : lines) {
 			if (cursor + rowH >= top && cursor <= top + view) {
 				Brush.rect(g, x + 3.0F, cursor + 3.0F, x + 6.0F, cursor + 6.0F, line.color());
-				Brush.fit(g, font, line.text(), x + 9.0F, cursor + 1.0F, w - 16.0F, Palette.INK, 0.62F, 0.4F, false);
-				if (cursor >= top - 2.0F && cursor + rowH <= top + view + 2.0F) {
-					page.hit(x, cursor, x + w - 4.0F, cursor + rowH, null, List.of(line.text(), line.tip()));
-				}
+				page.line(line.text(), x + 9.0F, cursor + 1.0F, w - 16.0F, Palette.INK);
+				page.hit(x, cursor, x + w - 4.0F, cursor + rowH, null, List.of(line.text(), line.tip()));
 			}
 			cursor += rowH;
 		}
-		if (cursor + 20.0F >= top && cursor <= top + view) {
-			Brush.wrap(g, font, Component.translatable("kultivator.formasiui.field.note"), x + 4.0F, cursor + 4.0F, w - 10.0F, Palette.INK_FAINT, 0.5F, false);
-		}
+		page.wrap(note, x + 4.0F, cursor + 4.0F, w - 10.0F, Palette.INK_FAINT);
+		page.lepasKlip();
 		FormasiPage.bead(g, x + w, Math.round(top), Math.round(top + view), offset, Math.max(0.0F, content - view));
 	}
 

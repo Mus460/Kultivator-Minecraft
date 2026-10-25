@@ -1,0 +1,43 @@
+{
+  "_catatan": "Kebiasaan #26 pecinta_teh (DESIGN 42.4.12)",
+  "nomor": 26,
+  "siapa": {
+    "umur": [
+      18,
+      200
+    ],
+    "tahap": [
+      "dewasa",
+      "tua"
+    ]
+  },
+  "bobot": 1.2,
+  "sesi": [
+    {
+      "jam": [
+        15,
+        17
+      ],
+      "peluang": 0.8,
+      "tujuan": [
+        "@kedai",
+        "kursi"
+      ],
+      "klip": "minum_teh",
+      "kanan": "cangkir",
+      "ganti": [
+        {
+          "klip": "minum_teh"
+        },
+        {
+          "klip": "bicara_tangan",
+          "kanan": ""
+        },
+        {
+          "klip": "minum_teh"
+        }
+      ],
+      "ganti_menit": 7
+    }
+  ]
+}

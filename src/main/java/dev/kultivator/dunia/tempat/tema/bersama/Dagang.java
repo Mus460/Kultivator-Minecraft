@@ -4,6 +4,7 @@ import dev.kultivator.dunia.DuniaSites;
 import dev.kultivator.dunia.kota.KotaData;
 import dev.kultivator.dunia.kota.NilaiBatu;
 import dev.kultivator.dunia.kota.Towns;
+import dev.kultivator.dunia.kota42.ekonomi.HargaKota;
 import dev.kultivator.dunia.tempat.cerita.CeritaApi;
 import dev.kultivator.dunia.tempat.ekonomi.Barang;
 import dev.kultivator.dunia.tempat.tema.KotaTemaData;
@@ -44,6 +45,7 @@ import java.util.Locale;
  * n = units of that good sold by all players to that town in the last 24 world hours (one unit recovers per world
  * hour). Demand drifts +-0.05 every 7 world days (hash) and by events ({@link #geserPermintaan}). Goods bought in the
  * same town within 3 days sell back for at most {@code 0.5 x dasar} (38.M.5).</li>
+ * <li>Both prices carry the town's event x war multiplier {@code HargaKota.faktorDagang} (42.6.3) once.</li>
  * <li><b>Cap</b>: profit (sale minus cost basis) per player per world week {@code batasLabaMingguan x (band + 1)}; past
  * it, trade goods sell for {@code 0.5 x dasar} until the next week.</li>
  * <li><b>Smuggling</b>: {@code minyak_bayangan} is bought only by fences ({@link Opsi#penadah}); Infami +2 per sale.
@@ -391,7 +393,8 @@ public final class Dagang {
 		if (pasar < 0 || pasar != TemaInti.kolom(barang.asal())) {
 			return -1L;
 		}
-		double price = barang.dasar() * (1.0D - Barang.diskon(player, situsId, false));
+		// trade goods keep their own demand and saturation; the town only adds events x war (HargaKota.faktorDagang, 42.6.3)
+		double price = barang.dasar() * (1.0D - Barang.diskon(player, situsId, false)) * HargaKota.faktorDagang(server, situsId);
 		if (diskonKafilah(server, situsId, barang.id())) {
 			price *= 1.0D - DISKON_KAFILAH;
 		}
@@ -461,7 +464,7 @@ public final class Dagang {
 		if (demand <= 0.0D) {
 			return 0.0D;
 		}
-		double price = barang.dasar() * demand * jenuhDari(jenuhUnit(server, situsId, barang.id()) + sudah);
+		double price = barang.dasar() * demand * jenuhDari(jenuhUnit(server, situsId, barang.id()) + sudah) * HargaKota.faktorDagang(server, situsId);
 		if (lewatBatas(player) || beliSini(player, situsId, barang.id()) > sudah) {
 			price = Math.min(price, barang.dasar() * JUAL_RENDAH);
 		}

@@ -1,0 +1,110 @@
+{
+  "id": "sapa_register_sopan",
+  "jenis": "realisasi",
+  "_catatan": "SAPA in register sopan: address forms (Tuan/Nona, Kakak, Kawan, Senior/Leluhur).",
+  "benih_dunia": 42,
+  "masukan": {
+    "niat": "SAPA",
+    "pembicara": 200,
+    "hari": 120,
+    "now": 2880000,
+    "cuaca": "cerah",
+    "musim": "semi",
+    "situasi": {
+      "jam": "pagi",
+      "cuaca": "cerah",
+      "musim": "semi",
+      "kelompok": "pekerja",
+      "watak": "ramah",
+      "kebiasaan": [],
+      "sifat": {
+        "H": 10,
+        "E": 0,
+        "X": 20,
+        "A": 30,
+        "C": 10,
+        "O": 0
+      },
+      "wajah": "netral",
+      "tempat": "kota_besar"
+    },
+    "pendengar": {
+      "nama": "Han",
+      "kelamin": "l",
+      "tahap": "dewasa",
+      "pemain": true
+    },
+    "kesan": "kenal",
+    "tahu_nama": false,
+    "register": "sopan",
+    "dialek": "kampung"
+  },
+  "langkah": [
+    {
+      "ubah": {},
+      "harap": {
+        "k": "kultivator.cakap.sapa.kenal.1.kampung",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.tuan.kampung",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "sapa.kenal",
+      "gestur": "lambai",
+      "seru": null,
+      "tik": null,
+      "id_id": "Lho, Pak! Sehat, Nak?",
+      "en_us": "Well, Mister! Keeping well, child?"
+    },
+    {
+      "ubah": {
+        "pendengar": {
+          "nama": "Mei",
+          "kelamin": "p",
+          "tahap": "dewasa",
+          "pemain": true
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.pekerja.4",
+        "a": []
+      },
+      "aturan": "sapa.pekerja",
+      "gestur": "seka_keringat",
+      "seru": null,
+      "tik": null,
+      "id_id": "Salam! Jangan berdiri di situ, nanti kena serbuk kayu.",
+      "en_us": "Greetings! Don't stand there; you'll get sawdust on you."
+    },
+    {
+      "ubah": {
+        "tahu_nama": true
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.pagi.2",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.sebutan_nama",
+            "a": [
+              {
+                "k": "kultivator.cakap.lex.tuan.kampung",
+                "a": []
+              },
+              {
+                "t": "Han"
+              }
+            ]
+          }
+        ]
+      },
+      "aturan": "sapa.pagi",
+      "gestur": "lambai",
+      "seru": null,
+      "tik": null,
+      "id_id": "Pagi yang cerah, Pak Han. Semoga harimu lancar.",
+      "en_us": "A bright morning, Mister Han. May your day go smoothly."
+    }
+  ]
+}

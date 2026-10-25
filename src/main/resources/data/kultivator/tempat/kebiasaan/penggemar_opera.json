@@ -1,0 +1,44 @@
+{
+  "_catatan": "Kebiasaan #27 penggemar_opera (DESIGN 42.4.12); ilham: piyingxi",
+  "nomor": 27,
+  "siapa": {
+    "umur": [
+      12,
+      200
+    ],
+    "tahap": [
+      "dewasa",
+      "tua"
+    ]
+  },
+  "sesi": [
+    {
+      "jam": [
+        20,
+        22
+      ],
+      "peluang": 0.5,
+      "tujuan": [
+        "penonton",
+        "panggung",
+        "@kedai"
+      ],
+      "klip": "memandang",
+      "ganti": [
+        {
+          "klip": "memandang"
+        },
+        {
+          "klip": "memandang"
+        },
+        {
+          "klip": "tepuk_tangan"
+        },
+        {
+          "klip": "tertawa"
+        }
+      ],
+      "ganti_menit": 6
+    }
+  ]
+}

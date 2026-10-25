@@ -1,10 +1,17 @@
 package dev.kultivator.client.screen;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
 import dev.kultivator.client.EffectQuality;
 import dev.kultivator.client.Keys;
 import dev.kultivator.client.aura.AuraSettings;
 import dev.kultivator.client.epic.EpicSettings;
+import dev.kultivator.client.hub.HubNav;
+import dev.kultivator.client.hub.Tujuan;
+import dev.kultivator.client.hub.Urutan;
 import dev.kultivator.client.screen.ui.Palette;
+import dev.kultivator.client.screen.ui.SegelKonfirmasi;
+import dev.kultivator.client.sekte.gabung.fx.GabungFxClient;
 import dev.kultivator.client.sosok.SosokDetail;
 import dev.kultivator.client.voice.VoiceSettings;
 import dev.kultivator.data.CultivationData;
@@ -13,28 +20,29 @@ import dev.kultivator.network.Actions;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.options.controls.KeyBindsScreen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
 /**
- * The group table of the hub's Pengaturan section (DESIGN 33.5): which row lives in which of the five groups, and the
- * row builders. Every stored setting keeps its key, default and setter; only where it is shown changes. Every row of
- * the old single column appears exactly once (23.17.5): Tampilan & Efek (the quality column is drawn by
- * {@link SettingsPage}; cosmetics, aura, techniques, impact and world), Kamera & Film (the film rows of
- * {@link EpicSettings#rows()} and the Film Titah rows), Suara (cinematic music, aura hum, the voice rows), HUD (HUD,
- * cooldown ping, danger alert, guide tracker) and Kontrol (hold G, release = cast, the live key list, "Ubah tombol…",
- * Hardcore). An {@code EpicSettings} row whose key is not in a group table falls into Tampilan & Efek.
+ * The group table of the Pengaturan pages (DESIGN 33.5, 43.10): which row lives in which of the five groups (one page
+ * each, {@link SettingsPage}), and the row builders. Every stored setting keeps its key, default and setter; only where
+ * it is shown changes. Every row appears exactly once (23.17.5): Tampilan & Efek (the quality column is drawn by
+ * {@link SettingsPage}; cosmetics, aura, gait, Gabung Sekte, Kota yang Hidup, techniques, impact and world, Langit Sekte),
+ * Kamera & Film (the film rows of {@link EpicSettings#rows()} and the Film Titah rows), Suara (cinematic music, aura hum,
+ * street music, the voice rows), HUD (HUD, cooldown ping, danger alert, guide tracker) and Kontrol (hold G, release =
+ * cast, Hardcore, duel input; the live key list rebound in place, "Semua tombol Minecraft…"). The sword-duel rows join
+ * their groups. An {@code EpicSettings} row whose key is not in a group table falls into Tampilan & Efek.
  */
 final class SettingsRows {
 
@@ -53,19 +61,32 @@ final class SettingsRows {
 
 	/**
 	 * One item of a group. {@code label} is the heading, control or line text; {@code value} is the right-hand text of a
-	 * line (a key name); {@code color} its ink; {@code on} lights a coin; {@code asking} pulses a coin (Hardcore).
+	 * line (a key name); {@code color} its ink; {@code on} lights a coin; {@code asking} is no longer read (confirmations
+	 * are {@code SegelKonfirmasi}, 43.7) and stays false.
 	 */
 	record Item(Type type, Supplier<Component> label, @Nullable Supplier<Component> value, @Nullable Runnable action,
 				Supplier<List<Component>> tooltip, BooleanSupplier on, BooleanSupplier enabled, BooleanSupplier asking, IntSupplier color) {
 	}
 
 	private static final String P = "kultivator.pengaturan.";
+	private static final String M = "kultivator.gui43.m18.";
 	private static final String C = "kultivator.codex.settings.";
 	private static final String G = "kultivator.goals.settings.";
 	private static final String AURA = "kultivator.aura.setting.";
 	private static final String SOSOK = "kultivator.sosok.setelan.";
+	/** Lang prefix of the Kota yang Hidup rows (fragment {@code kota_hidup_panduan}, 42V-B). */
+	private static final String KOTA42 = "kultivator.kota42.setelan.";
+	/**
+	 * The client switches of Kota yang Hidup (DESIGN 42.14.1, all default on), stored in {@code kultivator-client.json}:
+	 * town lanterns, kitchen smoke, banners, firecrackers, pigeon flocks, shadow-puppet silhouettes, soot marks. The fx
+	 * of 42V-F read them with {@link #kota42}.
+	 */
+	public static final List<String> KOTA42_SAKLAR = List.of("kota42.lentera", "kota42.asap", "kota42.panji", "kota42.petasan",
+			"kota42.merpati", "kota42.wayang", "kota42.jelaga");
+	/** The street music volume in percent (100/75/50/25/0, Suara group), read with {@link #kota42Melodi}. */
+	public static final String KOTA42_MELODI = "kota42.melodi";
+	private static final int[] MELODI_LANGKAH = {100, 75, 50, 25, 0};
 	private static final String KEY_PREFIX = "key.kultivator.";
-	private static final long CONFIRM_MILLIS = 3000L;
 	private static final int[] FLAGS = {CultivationData.COSMETIC_AURA, CultivationData.COSMETIC_ROBE, CultivationData.COSMETIC_BACK_SWORD,
 			CultivationData.COSMETIC_EYES, CultivationData.COSMETIC_DAO_CIRCLE};
 	private static final String[] PARTS = {"aura", "robe", "back_sword", "eyes", "dao_circle"};
@@ -77,14 +98,20 @@ final class SettingsRows {
 	private static final List<String> TAMPILAN_ORDER = List.of(EpicSettings.WORLD_FX, EpicSettings.IMPACT_POWER, EpicSettings.GEOMETRY,
 			EpicSettings.SKY, EpicSettings.VFX);
 
-	private final Screen hub;
-	private long hardcoreAskUntil;
+	private final SettingsPage page;
+	/** The key of each key line of the last {@link #group} call (Kontrol). */
+	private final Map<Item, KeyMapping> keyLines = new IdentityHashMap<>();
 
-	SettingsRows(Screen hub) {
-		this.hub = hub;
+	SettingsRows(SettingsPage page) {
+		this.page = page;
 	}
 
-	/** The group's name (the hub's sub-coin). */
+	/** The mapping a key line ({@link Type#LINE}) stands for. */
+	@Nullable KeyMapping keyOf(Item line) {
+		return keyLines.get(line);
+	}
+
+	/** The group's name (the title of its Pengaturan page). */
 	static Component groupName(int group) {
 		return Component.translatable(P + "group." + GROUP_IDS[clamp(group)]);
 	}
@@ -96,6 +123,7 @@ final class SettingsRows {
 	/** The items of {@code group}, in order (Tampilan & Efek: the right column only). */
 	List<Item> group(int group) {
 		List<Item> items = new ArrayList<>();
+		keyLines.clear();
 		switch (clamp(group)) {
 			case TAMPILAN -> tampilan(items);
 			case FILM -> film(items);
@@ -105,6 +133,9 @@ final class SettingsRows {
 		}
 		if (clamp(group) != KONTROL) {
 			duel(items, clamp(group));
+		}
+		if (clamp(group) == TAMPILAN) {
+			rows(items, dev.kultivator.client.sekte.langit.LangitClientConfig.rows());
 		}
 		return items;
 	}
@@ -144,6 +175,23 @@ final class SettingsRows {
 		items.add(cycle(() -> Component.translatable(SOSOK + "jalan_kuat", SosokDetail.jalanKuatPersen()), SosokDetail::putarJalanKuat,
 				() -> List.of(Component.translatable(SOSOK + "jalan_kuat", SosokDetail.jalanKuatPersen()),
 						Component.translatable(SOSOK + "jalan_kuat.tip").withStyle(ChatFormatting.GRAY))));
+		// Gabung Sekte (DESIGN 41.13.1, client group): the member robe over armour, the sect class visuals, the illusion
+		// stair of the entrance test, the rank line above member names. Stored in kultivator-client.json, default on.
+		items.add(heading(GabungFxClient.LANG_SETELAN + "judul"));
+		for (int i = 0; i < GabungFxClient.SAKLAR.size(); i++) {
+			String key = GabungFxClient.SAKLAR.get(i);
+			String label = GabungFxClient.LANG_SETELAN + GabungFxClient.SAKLAR_LANG.get(i);
+			items.add(coin(() -> Component.translatable(label), () -> GabungFxClient.saklar(key), on -> GabungFxClient.setSaklar(key, on),
+					() -> List.of(Component.translatable(label), Component.translatable(label + ".tip").withStyle(ChatFormatting.GRAY))));
+		}
+		// Kota yang Hidup (DESIGN 42.14.1, client group): the town's lanterns, smoke, banners, firecrackers, pigeons, shadow
+		// puppets and soot. Stored in kultivator-client.json, default on.
+		items.add(heading(KOTA42 + "judul"));
+		for (String key : KOTA42_SAKLAR) {
+			String label = KOTA42 + key.substring("kota42.".length());
+			items.add(coin(() -> Component.translatable(label), () -> kota42(key), on -> EffectQuality.put(key, new JsonPrimitive(on)),
+					() -> List.of(Component.translatable(label), Component.translatable(label + ".tip").withStyle(ChatFormatting.GRAY))));
+		}
 		// Techniques and effects (DESIGN 22.12.9; hold G and release = cast live in Kontrol).
 		items.add(heading(C + "techniques"));
 		items.add(cycle(() -> Component.translatable(C + "shake", Component.translatable(C + "shake." + EffectQuality.shake().id())),
@@ -191,6 +239,9 @@ final class SettingsRows {
 		}
 		items.add(coin(() -> Component.translatable(AURA + "hum"), AuraSettings::hum, AuraSettings::setHum,
 				() -> List.of(Component.translatable(AURA + "hum"), Component.translatable(AURA + "hum.tip").withStyle(ChatFormatting.GRAY))));
+		// Kota yang Hidup (42.14.1): street music of musicians, weddings and troupes, 100/75/50/25 % or off.
+		items.add(cycle(SettingsRows::melodiLabel, SettingsRows::putarMelodi,
+				() -> List.of(melodiLabel(), Component.translatable(KOTA42 + "melodi.tip").withStyle(ChatFormatting.GRAY))));
 		List<VoiceSettings.Row> voices = VoiceSettings.rows();
 		if (!voices.isEmpty()) {
 			items.add(heading(VoiceSettings.heading()));
@@ -218,13 +269,25 @@ final class SettingsRows {
 		items.add(heading(P + "heading.cast"));
 		items.add(codexCoin("wheel_hold", EffectQuality::wheelHold, EffectQuality::setWheelHold));
 		items.add(codexCoin("release_cast", EffectQuality::releaseCast, EffectQuality::setReleaseCast));
-		items.add(new Item(Type.BUTTON, () -> Component.translatable(P + "rebind"), null, this::openKeyBinds,
-				() -> List.of(Component.translatable(P + "rebind"), Component.translatable(P + "rebind.tip").withStyle(ChatFormatting.GRAY)),
-				SettingsRows::no, SettingsRows::yes, SettingsRows::no, SettingsRows::ink));
+		// Hardcore breakthroughs: switching on is a medium seal (hold 1.5 s), switching off a light one (43.7).
+		items.add(heading(P + "heading.game"));
+		items.add(new Item(Type.COIN, () -> Component.translatable("kultivator.screen.settings.hardcore"), null, this::askHardcore,
+				() -> List.of(Component.translatable("kultivator.screen.settings.hardcore"),
+						Component.translatable("kultivator.screen.settings.hardcore.tip"),
+						Component.translatable(Page.data().hardcore() ? "kultivator.screen.settings.hardcore.is_on" : "kultivator.screen.settings.hardcore.is_off")
+								.withStyle(Page.data().hardcore() ? ChatFormatting.RED : ChatFormatting.GRAY),
+						Component.translatable(M + "hardcore.how").withStyle(ChatFormatting.DARK_GRAY)),
+				() -> Page.data().hardcore(), Keys::connected, SettingsRows::no, SettingsRows::ink));
+		// Duel Pedang (DESIGN 35.8.3): input mode, parry outside duels, lock-on, PAL animations.
+		duel(items, KONTROL);
+		// The live list of every Kultivator key (the only key list, DESIGN 33.6 R2), rebound in place (43.10.2).
+		items.add(new Item(Type.BREAK, Component::empty, null, null, List::of, SettingsRows::no, SettingsRows::yes, SettingsRows::no,
+				SettingsRows::ink));
+		items.add(heading(P + "heading.keys"));
+		items.add(note(() -> Component.translatable(M + "keys.petunjuk")));
 		List<KeyMapping> keys = kultivatorKeys();
 		// The G / quick-actions note (DESIGN 33.4.1), only while a Kultivator key really shares the quick-actions key.
-		Minecraft minecraft = Minecraft.getInstance();
-		KeyMapping quick = minecraft.options.keyQuickActions;
+		KeyMapping quick = Minecraft.getInstance().options.keyQuickActions;
 		KeyMapping sharing = null;
 		boolean otherClash = false;
 		for (KeyMapping key : keys) {
@@ -239,41 +302,32 @@ final class SettingsRows {
 			items.add(note(() -> Component.translatable(P + "quick_actions", keyName, Component.translatable(quick.getName()))));
 		}
 		if (otherClash) {
-			items.add(note(() -> Component.translatable(P + "clash_note")));
+			items.add(note(() -> Component.translatable(M + "clash_note")));
 		}
-		// Hardcore breakthroughs: a second click within 3 s confirms (as before).
-		items.add(heading(P + "heading.game"));
-		items.add(new Item(Type.COIN, () -> Component.translatable(asking() ? "kultivator.screen.settings.hardcore.confirm" : "kultivator.screen.settings.hardcore"),
-				null, () -> {
-					if (asking()) {
-						Page.send(Actions.SET_HARDCORE, Page.data().hardcore() ? 0 : 1, "");
-						hardcoreAskUntil = 0L;
-					} else {
-						hardcoreAskUntil = Util.getMillis() + CONFIRM_MILLIS;
-					}
-				},
-				() -> List.of(Component.translatable("kultivator.screen.settings.hardcore"),
-						Component.translatable("kultivator.screen.settings.hardcore.tip"),
-						Component.translatable(Page.data().hardcore() ? "kultivator.screen.settings.hardcore.is_on" : "kultivator.screen.settings.hardcore.is_off")
-								.withStyle(Page.data().hardcore() ? ChatFormatting.RED : ChatFormatting.GRAY),
-						Component.translatable("kultivator.screen.settings.hardcore.how").withStyle(ChatFormatting.DARK_GRAY)),
-				() -> Page.data().hardcore(), Keys::connected, this::asking, SettingsRows::ink));
-		// Duel Pedang (DESIGN 35.8.3): input mode, parry outside duels, lock-on, PAL animations.
-		duel(items, KONTROL);
-		// The live list of every Kultivator key (the only key list, DESIGN 33.6 R2), in the second column.
-		items.add(new Item(Type.BREAK, Component::empty, null, null, List::of, SettingsRows::no, SettingsRows::yes, SettingsRows::no,
-				SettingsRows::ink));
-		items.add(heading(P + "heading.keys"));
 		for (KeyMapping key : keys) {
-			items.add(new Item(Type.LINE, () -> Component.translatable(key.getName()), () -> keyText(key), null, () -> keyTooltip(key),
-					SettingsRows::no, SettingsRows::yes, SettingsRows::no, () -> keyColor(key)));
+			Item line = new Item(Type.LINE, () -> Component.translatable(key.getName()), () -> keyValue(key), null, () -> keyTooltip(key),
+					SettingsRows::no, SettingsRows::yes, SettingsRows::no, () -> keyColor(key));
+			keyLines.put(line, key);
+			items.add(line);
 		}
+		// vanilla's own keys stay on vanilla's screen (43.0.3: the one vanilla screen besides chat)
+		items.add(new Item(Type.BUTTON, () -> Component.translatable(M + "vanilla"), null, SettingsRows::openKeyBinds,
+				() -> List.of(Component.translatable(M + "vanilla"), Component.translatable(M + "vanilla.tip").withStyle(ChatFormatting.GRAY)),
+				SettingsRows::no, SettingsRows::yes, SettingsRows::no, SettingsRows::ink));
+	}
+
+	/** The Hardcore coin: asks over the page, then tells the server. */
+	private void askHardcore() {
+		boolean on = Page.data().hardcore();
+		page.konfirmasi(on ? SegelKonfirmasi.Tingkat.RINGAN : SegelKonfirmasi.Tingkat.SEDANG,
+				Component.translatable(on ? M + "hardcore.mati" : M + "hardcore.nyala"),
+				() -> Page.send(Actions.SET_HARDCORE, on ? 0 : 1, ""));
 	}
 
 	// ================================================================ keys
 
 	/** Every mapping of this mod ({@code key.kultivator.*}, the {@code Keys} and {@code SkipKey} ones), in registration order. */
-	private static List<KeyMapping> kultivatorKeys() {
+	static List<KeyMapping> kultivatorKeys() {
 		List<KeyMapping> keys = new ArrayList<>();
 		for (KeyMapping key : Minecraft.getInstance().options.keyMappings) {
 			if (key.getName().startsWith(KEY_PREFIX)) {
@@ -284,7 +338,7 @@ final class SettingsRows {
 	}
 
 	/** The other mappings (not F3 debug combos, not itself) bound to the same key. */
-	private static List<KeyMapping> clashes(KeyMapping key) {
+	static List<KeyMapping> clashes(KeyMapping key) {
 		List<KeyMapping> others = new ArrayList<>();
 		if (key.isUnbound()) {
 			return others;
@@ -301,14 +355,20 @@ final class SettingsRows {
 		return key.isUnbound() ? Component.translatable(P + "key.unbound") : key.getTranslatedKeyMessage();
 	}
 
-	private static int keyColor(KeyMapping key) {
+	/** The binding as shown on the key line: "G", or "G · juga <other mapping>" on a clash. */
+	static Component keyValue(KeyMapping key) {
+		List<KeyMapping> others = clashes(key);
+		return others.isEmpty() ? keyText(key) : Component.translatable(M + "key.bentrok", keyText(key), Component.translatable(others.get(0).getName()));
+	}
+
+	static int keyColor(KeyMapping key) {
 		if (key.isUnbound()) {
 			return Palette.INK_FAINT;
 		}
-		return clashes(key).isEmpty() ? Palette.JADE_DARK : Palette.WARN;
+		return clashes(key).isEmpty() ? Palette.JADE_DARK : Palette.DANGER;
 	}
 
-	private static List<Component> keyTooltip(KeyMapping key) {
+	static List<Component> keyTooltip(KeyMapping key) {
 		List<Component> lines = new ArrayList<>();
 		lines.add(Component.translatable(key.getName()));
 		lines.add(keyText(key).copy().withStyle(ChatFormatting.GOLD));
@@ -322,23 +382,68 @@ final class SettingsRows {
 				names.add(Component.translatable(other.getName()));
 			}
 			lines.add(Component.translatable(P + "key.clash", net.minecraft.network.chat.ComponentUtils.formatList(names, Component.literal(", ")))
-					.withStyle(ChatFormatting.YELLOW));
+					.withStyle(ChatFormatting.RED));
 		}
-		lines.add(Component.translatable(P + "key.change").withStyle(ChatFormatting.DARK_GRAY));
+		lines.add(Component.translatable(M + "key.ubah").withStyle(ChatFormatting.DARK_GRAY));
 		return lines;
 	}
 
-	/** "Ubah tombol…": vanilla's key binds screen; closing it comes back to the hub (on the Kontrol group). */
-	private void openKeyBinds() {
+	/** "Semua tombol Minecraft…": vanilla's key binds screen over a new Gulungan on Pengaturan › Kontrol (Done/Esc return there). */
+	private static void openKeyBinds() {
 		Minecraft minecraft = Minecraft.getInstance();
-		minecraft.gui.setScreen(new KeyBindsScreen(hub, minecraft.options));
+		minecraft.gui.setScreen(new KeyBindsScreen(CultivationScreen.buka(Tujuan.of(HubNav.PENGATURAN, Urutan.ID_KONTROL)), minecraft.options));
+	}
+
+	// ================================================================ Kota yang Hidup switches (42.14.1)
+
+	/** A Kota yang Hidup client switch ({@link #KOTA42_SAKLAR}); default on, also when the file holds something else. */
+	public static boolean kota42(String key) {
+		JsonElement e = EffectQuality.get(key);
+		try {
+			return e == null || !e.isJsonPrimitive() || e.getAsBoolean();
+		} catch (RuntimeException ignored) {
+			return true;
+		}
+	}
+
+	/** The street music volume 0-100 (default 100). */
+	public static int kota42Melodi() {
+		JsonElement e = EffectQuality.get(KOTA42_MELODI);
+		try {
+			return e == null || !e.isJsonPrimitive() ? 100 : Math.max(0, Math.min(100, e.getAsInt()));
+		} catch (RuntimeException ignored) {
+			return 100;
+		}
+	}
+
+	private static Component melodiLabel() {
+		int v = kota42Melodi();
+		return Component.translatable(KOTA42 + "melodi", v <= 0 ? Component.translatable(KOTA42 + "melodi.mati") : Component.literal(v + " %"));
+	}
+
+	/** Next step of 100 > 75 > 50 > 25 > off > 100; a value between steps moves to the next lower step. */
+	private static void putarMelodi() {
+		int v = kota42Melodi();
+		int next = MELODI_LANGKAH[0];
+		for (int i = 0; i < MELODI_LANGKAH.length; i++) {
+			if (v >= MELODI_LANGKAH[i]) {
+				next = v == MELODI_LANGKAH[i] ? MELODI_LANGKAH[(i + 1) % MELODI_LANGKAH.length] : MELODI_LANGKAH[i];
+				break;
+			}
+		}
+		EffectQuality.put(KOTA42_MELODI, new JsonPrimitive(next));
 	}
 
 	// ================================================================ builders
 
 	/** The sword-duel rows of {@code group} (DESIGN 35.8.3, {@code client.duel.ui.DuelSettings}). */
 	private static void duel(List<Item> items, int group) {
-		for (dev.kultivator.client.duel.ui.DuelSettings.Row row : dev.kultivator.client.duel.ui.DuelSettings.rows(group)) {
+		rows(items, dev.kultivator.client.duel.ui.DuelSettings.rows(group));
+	}
+
+	/** Rows in the {@code DuelSettings.Row} shape (duel, Langit Sekte) as setting items. */
+	private static void rows(List<Item> items, List<dev.kultivator.client.duel.ui.DuelSettings.Row> rows) {
+		for (dev.kultivator.client.duel.ui.DuelSettings.Row row : rows) {
 			if (row.heading()) {
 				items.add(new Item(Type.HEADING, row.label(), null, null, List::of, SettingsRows::no, SettingsRows::yes, SettingsRows::no,
 						SettingsRows::ink));
@@ -430,10 +535,6 @@ final class SettingsRows {
 			lines.add(Component.translatable("kultivator.aura.realm." + realm + ".source").withStyle(ChatFormatting.DARK_GRAY));
 		}
 		return lines;
-	}
-
-	private boolean asking() {
-		return Util.getMillis() < hardcoreAskUntil;
 	}
 
 	private static boolean yes() {

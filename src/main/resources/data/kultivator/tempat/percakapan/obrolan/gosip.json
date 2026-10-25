@@ -1,0 +1,147 @@
+{
+  "_catatan": "GOSIP 42.5A.9: sapa > umpan > (sambung) > kabar (bumbu H) > kaget/ragu/koreksi > komentar. 42K-C.",
+  "jenis": "gosip",
+  "syarat": {
+    "hubungan_min": "kenal",
+    "fakta_menonjol": true
+  },
+  "mulai": {
+    "dasar": 0.3,
+    "X": 300,
+    "hubungan": 400
+  },
+  "jeda_tick": [
+    40,
+    80
+  ],
+  "langkah": [
+    {
+      "id": "sapa",
+      "oleh": "A",
+      "niat": "SAPA",
+      "lanjut": [
+        "umpan"
+      ]
+    },
+    {
+      "id": "umpan",
+      "oleh": "A",
+      "niat": "UMPAN_GOSIP",
+      "lanjut": [
+        "sambung",
+        "kabar"
+      ]
+    },
+    {
+      "id": "sambung",
+      "oleh": "B",
+      "niat": "SAMBUNG_RASA",
+      "lanjut": [
+        "kabar"
+      ]
+    },
+    {
+      "id": "kabar",
+      "oleh": "A",
+      "niat": "BERI_KABAR",
+      "fakta": "menonjol",
+      "bumbu": true,
+      "lanjut": [
+        "kaget",
+        "ragu",
+        "koreksi"
+      ]
+    },
+    {
+      "id": "kaget",
+      "oleh": "B",
+      "niat": "KAGET",
+      "fakta": "menonjol",
+      "syarat": {
+        "saksi": false
+      },
+      "lanjut": [
+        "komentar",
+        "tambah"
+      ]
+    },
+    {
+      "id": "ragu",
+      "oleh": "B",
+      "niat": "RAGU",
+      "fakta": "menonjol",
+      "syarat": {
+        "saksi": false
+      },
+      "lanjut": [
+        "yakinkan",
+        "komentar"
+      ]
+    },
+    {
+      "id": "koreksi",
+      "oleh": "B",
+      "niat": "KOREKSI",
+      "fakta": "menonjol",
+      "syarat": {
+        "saksi": true
+      },
+      "lanjut": [
+        "terima"
+      ]
+    },
+    {
+      "id": "tambah",
+      "oleh": "A",
+      "niat": "BERI_KABAR",
+      "fakta": "menonjol",
+      "bumbu": true,
+      "syarat": {
+        "ronde_maks": 1,
+        "sifat": {
+          "H": "<20"
+        }
+      },
+      "lanjut": [
+        "komentar"
+      ]
+    },
+    {
+      "id": "yakinkan",
+      "oleh": "A",
+      "niat": "BERI_KABAR",
+      "fakta": "menonjol",
+      "syarat": {
+        "ronde_maks": 1
+      },
+      "lanjut": [
+        "komentar"
+      ]
+    },
+    {
+      "id": "terima",
+      "oleh": "A",
+      "niat": "KOMENTAR",
+      "fakta": "menonjol"
+    },
+    {
+      "id": "komentar",
+      "oleh": "B",
+      "niat": "KOMENTAR",
+      "fakta": "menonjol",
+      "lanjut": [
+        "tutup"
+      ]
+    },
+    {
+      "id": "tutup",
+      "oleh": "A",
+      "niat": "SAMBUNG_RASA"
+    }
+  ],
+  "efek": {
+    "fakta_pindah": true,
+    "kesan_subjek": 3,
+    "catatan": true
+  }
+}

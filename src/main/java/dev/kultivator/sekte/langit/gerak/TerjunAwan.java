@@ -170,7 +170,8 @@ public final class TerjunAwan {
 				player.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, GLIDE_TICKS, 0, false, false, true));
 			}
 			player.resetFallDistance();
-			if (now % 20L == 0L) {
+			// The server tick gates this loop (every 5): game time may never land on a multiple of 20 here.
+			if (server.getTickCount() % 20 == 0) {
 				Vec3 at = player.position();
 				LangitGerak.fx(level, LangitIds.FX_TANGKAP, BlockPos.containing(at.add(0.0D, 1.0D, 0.0D)), BlockPos.containing(at));
 			}

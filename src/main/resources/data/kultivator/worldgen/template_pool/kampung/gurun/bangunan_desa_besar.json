@@ -30,6 +30,24 @@
     {
       "element": {
         "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kampung/gurun/kavling_besar",
+        "processors": "kultivator:kampung/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 4
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kampung/gurun/kavling_kecil",
+        "processors": "kultivator:kampung/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 5
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
         "location": "kultivator:kampung/gurun/kincir_air",
         "processors": "kultivator:kampung/lapuk",
         "projection": "rigid"

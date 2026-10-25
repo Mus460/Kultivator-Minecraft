@@ -7,6 +7,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,6 +42,14 @@ public final class PendudukData extends SavedData {
 	public static final int DUKA = 2;
 	/** A newcomer's first day in the dead resident's place: unpacks, looks around, introduces itself. */
 	public static final int DATANG = 3;
+	/** 42 (DESIGN 42.4.14, {@code WargaApi.keadaan}): health below 30, rests at home, coughs on the porch, the healer comes. */
+	public static final int SAKIT = 4;
+	/** 42: the night drinker after 21:00 (habit {@code pemabuk}): sings at the tavern, staggers home. */
+	public static final int MABUK = 5;
+	/** 42: the wedding day and the day after: the newlyweds stroll with a red flower, beaming. */
+	public static final int PENGANTIN = 6;
+	/** 42: days 2-7 after a household death: works on in white, walks slowly, incense at dusk, no market calls. */
+	public static final int BERKABUNG = 7;
 	public static final long MASA_PULIH = 24000L;
 	public static final long MASA_DUKA = 2L * 24000L;
 	public static final long MASA_DATANG = 24000L;
@@ -48,6 +57,58 @@ public final class PendudukData extends SavedData {
 	private static final String DUKA_KEY = "_duka";
 
 	private final Map<Long, CompoundTag> places = new HashMap<>();
+
+	// ================================================================== seam (DESIGN 42.4.14; none set = this class as built)
+
+	/** A {@link Penerus} answer meaning "not mine, use the built-in record". */
+	public static final int LANJUT = -1;
+
+	/**
+	 * Where 42A routes the questions this class answers once the town's people are unified into {@code WargaData}
+	 * ({@code WargaApi.terapkan/keadaan}, {@code Ingatan}). Every method may decline ({@code null} / {@link #LANJUT}); a
+	 * declined question is answered from this class's own record. {@code luka} and {@code tanda} always stay here.
+	 */
+	public interface Penerus {
+		/** The resident as it is now, or null. */
+		default @Nullable Penduduk terapkan(long situs, Penduduk p) {
+			return null;
+		}
+
+		/** 1 away (no body, no data position), 0 present, or {@link #LANJUT}. */
+		default int absen(long situs, int id, long now) {
+			return LANJUT;
+		}
+
+		/** The life state ({@link #SEHAT}, {@link #PULIH}, {@link #DUKA}, {@link #DATANG} or a 42 state), or {@link #LANJUT}. */
+		default int keadaan(long situs, int id, int rumahTangga, long now) {
+			return LANJUT;
+		}
+
+		/** One more meeting with {@code player}: the new count, or {@link #LANJUT}. */
+		default int kenal(long situs, int id, UUID player) {
+			return LANJUT;
+		}
+
+		/** How many times {@code player} met the resident, or {@link #LANJUT}. */
+		default int kenalan(long situs, int id, UUID player) {
+			return LANJUT;
+		}
+
+		/**
+		 * The resident's body was killed at game time {@code now}: true when the seam recorded the death itself (42: the
+		 * stored person dies, the slot falls free for a successor), false to keep the built-in "newcomer in three days".
+		 */
+		default boolean mati(long situs, int id, int rumahTangga, long now) {
+			return false;
+		}
+	}
+
+	private static @Nullable Penerus penerus;
+
+	/** Sets the seam (one owner, 42A); null restores the built-in answers. */
+	public static void setPenerus(@Nullable Penerus value) {
+		penerus = value;
+	}
 
 	public PendudukData() {
 	}
@@ -73,6 +134,11 @@ public final class PendudukData extends SavedData {
 
 	/** The resident as it is now: a newcomer's look and seed after a death, unchanged otherwise. */
 	public Penduduk terapkan(long situs, Penduduk p) {
+		Penerus seam = penerus;
+		Penduduk routed = seam == null ? null : seam.terapkan(situs, p);
+		if (routed != null) {
+			return routed;
+		}
 		int gen = lihat(situs, p.id()).getIntOr("gen", 0);
 		if (gen == 0) {
 			return p;
@@ -84,6 +150,11 @@ public final class PendudukData extends SavedData {
 
 	/** True while the resident is away: wounded, or dead and not yet replaced. Replaces the dead when their time came. */
 	public boolean absen(long situs, int id, long now) {
+		Penerus seam = penerus;
+		int routed = seam == null ? LANJUT : seam.absen(situs, id, now);
+		if (routed != LANJUT) {
+			return routed != 0;
+		}
 		CompoundTag t = lihat(situs, id);
 		if (t.isEmpty()) {
 			return false;
@@ -120,6 +191,10 @@ public final class PendudukData extends SavedData {
 
 	/** The resident of household {@code rumahTangga} died at {@code now}: its housemates mourn (0 = lived alone). */
 	public void mati(long situs, int id, int rumahTangga, long now) {
+		Penerus seam = penerus;
+		if (seam != null && seam.mati(situs, id, rumahTangga, now)) {
+			return;
+		}
 		orang(situs, id).putLong("mati", now);
 		if (rumahTangga > 0) {
 			CompoundTag place = places.computeIfAbsent(situs, key -> new CompoundTag());
@@ -135,6 +210,11 @@ public final class PendudukData extends SavedData {
 	 * {@link #PULIH}, {@link #DUKA} or {@link #SEHAT}. Read once per place cycle by {@link Pemanggil}.
 	 */
 	public int keadaan(long situs, int id, int rumahTangga, long now) {
+		Penerus seam = penerus;
+		int routed = seam == null ? LANJUT : seam.keadaan(situs, id, rumahTangga, now);
+		if (routed != LANJUT) {
+			return routed;
+		}
 		CompoundTag place = places.get(situs);
 		if (place == null) {
 			return SEHAT;
@@ -187,6 +267,11 @@ public final class PendudukData extends SavedData {
 
 	/** One more meeting with {@code player}; returns the new count (capped at 99). */
 	public int kenal(long situs, int id, UUID player) {
+		Penerus seam = penerus;
+		int routed = seam == null ? LANJUT : seam.kenal(situs, id, player);
+		if (routed != LANJUT) {
+			return routed;
+		}
 		CompoundTag t = orang(situs, id);
 		CompoundTag kenal = t.getCompoundOrEmpty("kenal");
 		int n = Math.min(99, kenal.getIntOr(player.toString(), 0) + 1);
@@ -198,6 +283,11 @@ public final class PendudukData extends SavedData {
 
 	/** How many times {@code player} met the resident. */
 	public int kenalan(long situs, int id, UUID player) {
+		Penerus seam = penerus;
+		int routed = seam == null ? LANJUT : seam.kenalan(situs, id, player);
+		if (routed != LANJUT) {
+			return routed;
+		}
 		return lihat(situs, id).getCompoundOrEmpty("kenal").getIntOr(player.toString(), 0);
 	}
 

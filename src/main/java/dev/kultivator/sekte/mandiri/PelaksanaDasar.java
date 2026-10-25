@@ -191,7 +191,9 @@ public final class PelaksanaDasar {
 		public void selesai(DiscipleEntity murid, Konteks konteks, boolean batal) {
 			String asal = MandiriApi.bagian(murid.data()).getCompoundOrEmpty(MandiriIds.K_KEGIATAN).getStringOr(MandiriIds.KG_MODE_ASAL, "");
 			DiscipleEntity.Mode mode = DiscipleEntity.Mode.byId(asal);
-			if (murid.mode() == DiscipleEntity.Mode.GUARD_HALL && mode != null && mode != DiscipleEntity.Mode.GUARD_HALL) {
+			// A running order pause means the master set GUARD_HALL himself during the watch: keep his order.
+			if (murid.mode() == DiscipleEntity.Mode.GUARD_HALL && mode != null && mode != DiscipleEntity.Mode.GUARD_HALL
+					&& MandiriApi.bebasSampai(murid.data()) <= murid.level().getGameTime()) {
 				MandiriApi.setModeSendiri(murid, mode);
 			}
 		}

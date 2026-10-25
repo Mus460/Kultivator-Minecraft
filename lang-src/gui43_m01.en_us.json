@@ -1,0 +1,18 @@
+{
+  "kultivator.gui43.hal.diri.harta": "Holdings",
+  "kultivator.gui43.sub.harta.titik": "Own Abode",
+  "kultivator.gui43.sub.harta.gua": "Sect Cave",
+  "kultivator.gui43.sub.harta.pilih": "Choose Cave",
+  "kultivator.gui43.sub.harta.kolam": "Spirit Pool",
+  "kultivator.gui43.sub.harta.lapak": "Stall",
+  "kultivator.gui43.m01.harta.tetapkan": "Set it here",
+  "kultivator.gui43.m01.harta.pindah": "Move it here",
+  "kultivator.gui43.m01.harta.tetapkan.tip": "Sit in meditation on the seat of a qi formation inside an active protective formation, then press this. That seat becomes your Cave Abode.",
+  "kultivator.gui43.m01.harta.hapus": "Remove abode",
+  "kultivator.gui43.m01.harta.hapus.tip": "Gives up your Cave Abode. Its bonus stops until you set a new one.",
+  "kultivator.gui43.m01.harta.hapus.yakin": "Remove your Cave Abode? Its bonus stops until you set a new one.",
+  "kultivator.gui43.m01.harta.cara": "Meditate on the seat of a qi formation inside an active protective formation, then press \"Set it here\" (or /cultivate gua tetapkan). Within 6 blocks of that seat qi veins drain at half speed, enlightenment comes more often, and Destruction Mode never carves within 16 blocks.",
+  "kultivator.gui43.m01.pusaka.cincin": "Open Ring",
+  "kultivator.gui43.m01.pusaka.cincin.tip": "Opens the highest bound storage ring in your bag. Esc brings you back to this page.",
+  "kultivator.gui43.m01.dao.sumpah": "Swear by %s? A Dao oath lasts a lifetime and cannot be taken back."
+}

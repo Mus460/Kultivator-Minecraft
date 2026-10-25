@@ -1,0 +1,323 @@
+# kabar_warga: corpus of the conversation engine (42K-C, DESIGN 42.5A.8). Source format: gen_kota_hidup_cakap.py.
+# BERI_KABAR about townsfolk (predicates of golongan "warga" and OPINI). {$subjek}/{$objek} = warga of the fact.
+@kelompok kabar_warga
+
+== kabar.nikah
+niat: BERI_KABAR
+topik: keluarga
+syarat: fakta=NIKAH
+lanjut: acara keluarga
+gestur: tertawa
+$subjek: tipe=nama_warga dari=fakta.subjek
+$objek: tipe=nama_warga dari=fakta.objek
+$waktu_lalu: tipe=waktu_lalu dari=fakta.hariKejadian
+$senang: aturan=seru.senang opsional=0.5
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] {$subjek} dan {$objek} menikah {$waktu_lalu}! Pestanya tiga hari, aku sampai kenyang seminggu. || {$subjek} and {$objek} married {$waktu_lalu}! Three days of feasting; I'm still full.
+  ~ kasar: {$subjek} menikah dengan {$objek}. Semoga awet. Taruhan berapa lama? || {$subjek} married {$objek}. Hope it lasts. Wager how long?
+  ~ kuno: Benang merah telah mengikat {$subjek} dan {$objek}. Langit merestui. || The red thread has bound {$subjek} and {$objek}. Heaven approves.
+  ~ kampung: {$subjek} sama {$objek} sudah kawin {$waktu_lalu}. Sekampung datang, kerbau dua ekor disembelih. || {$subjek} and {$objek} wed {$waktu_lalu}. The whole village came; two buffalo slaughtered.
+- [2] Akhirnya {$subjek} berani melamar {$objek}. Sudah tiga musim mereka saling melirik. {$senang} || {$subjek} finally dared propose to {$objek}. Three seasons of side glances. {$senang}
+  ~ air: Mereka menikah di atas perahu berhias lentera, Kakak... {$subjek} dan {$objek}... indah sekali... || They wed on a lantern-decked boat, dear... {$subjek} and {$objek}... so lovely...
+  ~ pelabuhan: {$subjek} dan {$objek} menikah di dermaga, Bung. Semua kapal membunyikan terompet. || {$subjek} and {$objek} wed on the dock, mate. Every ship sounded its horn.
+- Kau datang ke pernikahan {$subjek}? Arak dari {$objek} keluarga enak sekali. || Did you go to {$subjek}'s wedding? The wine from {$objek}'s family was excellent.
+  ~ oasis: Pernikahan {$subjek} dan {$objek} dirayakan di tepi mata air. Para penari gurun menari sampai subuh. || {$subjek} and {$objek}'s wedding was held by the spring. Desert dancers danced till dawn.
+- Ibu {$subjek} menangis bahagia sepanjang upacara. Katanya {$objek} menantu idaman. || {$subjek}'s mother wept with joy all ceremony. Says {$objek} is the perfect in-law.
+- [sopan] Kabar bahagia, {$sebutan}: {$subjek} telah menikah dengan {$objek}. Mungkin {$sebutan} berkenan memberi selamat. || Happy news, {$sebutan}: {$subjek} has married {$objek}. Perhaps you'd care to congratulate them.
+
+== kabar.tunangan
+niat: BERI_KABAR
+topik: keluarga
+syarat: fakta=BERTUNANGAN
+lanjut: asmara acara
+gestur: bisik
+$subjek: tipe=nama_warga dari=fakta.subjek
+$objek: tipe=nama_warga dari=fakta.objek
+- [3] {$subjek} sudah bertunangan dengan {$objek}! Mak Comblang sendiri yang mengatur. || {$subjek} is engaged to {$objek}! The matchmaker arranged it herself.
+  ~ kasar: {$subjek} tunangan sama {$objek}. Mau taruhan siapa yang mundur duluan? || {$subjek} got engaged to {$objek}. Wager who backs out first?
+  ~ kuno: Kedua keluarga telah bertukar tanda: {$subjek} dan {$objek} kini terikat janji. || The two families exchanged tokens: {$subjek} and {$objek} are now betrothed.
+- [2] Hadiah lamaran dari keluarga {$subjek} sampai dua gerobak. {$objek} beruntung. || The betrothal gifts from {$subjek}'s family filled two carts. {$objek} is lucky.
+  ~ ibukota: Lamaran keluarga {$subjek} kepada {$objek} dihadiri pejabat distrik. Megah sekali. || {$subjek}'s family's proposal to {$objek} was attended by district officials. Very grand.
+  ~ kampung: Keluarga {$subjek} bawa ayam, beras, kain ke rumah {$objek}. Sudah resmi itu. || {$subjek}'s family brought chickens, rice and cloth to {$objek}'s house. It's official.
+- Tanggal pernikahan {$subjek} dan {$objek} sudah dihitung ahli nujum. Katanya hari baik. || The astrologer has reckoned {$subjek} and {$objek}'s wedding day. A lucky date, he says.
+- Dulu {$subjek} bilang tidak mau menikah. Sekarang lihat, bertunangan dengan {$objek}. Hehe. || {$subjek} once swore never to marry. Now look, engaged to {$objek}. Hehe.
+
+== kabar.hamil
+niat: BERI_KABAR
+topik: keluarga
+syarat: fakta=HAMIL
+lanjut: keluarga
+gestur: bisik
+$subjek: tipe=nama_warga dari=fakta.subjek
+$doa: aturan=frag.doa opsional=0.4
+- [2] Sst, {$subjek} sedang mengandung! Jangan bilang dulu, belum diumumkan. || Shh, {$subjek} is expecting! Don't tell yet; it isn't announced.
+  ~ kasar: {$subjek} hamil. Satu mulut lagi untuk diberi makan. || {$subjek}'s pregnant. One more mouth to feed.
+  ~ kuno: Ada kehidupan baru tumbuh dalam rahim {$subjek}. Semoga lahir dengan akar roh yang baik. || A new life grows within {$subjek}. May it be born with good spirit roots.
+- [2] {$subjek} ngidam buah persik di musim dingin. Suaminya sampai keliling tiga pasar. || {$subjek} craves peaches in winter. Her husband went round three markets.
+  ~ air: {$subjek} sedang hamil, Kakak... setiap pagi dia minum air teratai, katanya baik untuk bayi... || {$subjek} is with child, dear... drinks lotus water each morning, says it's good for the baby...
+  ~ kampung: {$subjek} lagi isi. Mertuanya sudah sibuk jahit popok dari sekarang. || {$subjek}'s expecting. Her mother-in-law is already sewing nappies.
+- Dukun beranak bilang anak {$subjek} pasti laki-laki. Tapi dia bilang begitu ke semua orang. || The midwife says {$subjek}'s child will surely be a boy. But she says that to everyone.
+- Semoga persalinan {$subjek} lancar. {$doa} || May {$subjek}'s delivery go smoothly. {$doa}
+
+== kabar.lahir
+niat: BERI_KABAR
+topik: keluarga
+syarat: fakta=LAHIR
+lanjut: keluarga acara
+gestur: tertawa
+$subjek: tipe=nama_warga dari=fakta.subjek
+$waktu_lalu: tipe=waktu_lalu dari=fakta.hariKejadian
+$objek: tipe=nama_warga dari=fakta.objek
+$senang: aturan=seru.senang opsional=0.5
+- [3] Bayi {$subjek} sudah lahir {$waktu_lalu}! Namanya {$objek}. Tangisnya keras, pasti jadi pendekar. || {$subjek}'s baby was born {$waktu_lalu}! Named {$objek}. Such a loud cry, surely a future warrior.
+  ~ kasar: Anak {$subjek} lahir. {$objek} namanya. Berisik sekali tiap malam. || {$subjek}'s kid was born. {$objek}, it's called. Noisy every night.
+  ~ kuno: Keluarga {$subjek} dikaruniai seorang anak, {$objek}. Kelahirannya disertai angin yang harum. || {$subjek}'s family is blessed with a child, {$objek}. Its birth came with a fragrant breeze.
+  ~ kampung: Anak {$subjek} sudah brojol {$waktu_lalu}. Namanya {$objek}. Sehat, montok! || {$subjek}'s little one popped out {$waktu_lalu}. Named {$objek}. Healthy and chubby!
+- [2] {$subjek} membagi telur merah ke seluruh gang. Anaknya, {$objek}, sehat sekali. {$senang} || {$subjek} handed red eggs down the whole lane. The child, {$objek}, is very healthy. {$senang}
+  ~ pelabuhan: {$subjek} punya anak, Bung! Namanya {$objek}. Seluruh kru ditraktir minum. || {$subjek} has a little one, mate! Named {$objek}. The whole crew got free drinks.
+  ~ p: {$subjek} melahirkan {$objek} {$waktu_lalu}. Aku membantu merebus air semalaman. || {$subjek} gave birth to {$objek} {$waktu_lalu}. I helped boil water all night.
+- Upacara sebulan untuk {$objek} anak {$subjek} sebentar lagi. Kau diundang juga, pasti. || The one-month feast for {$subjek}'s child {$objek} is soon. You'll surely be invited.
+- Nenek {$objek} bilang cucunya akan memilih kuas di upacara setahun. Jadi cendekiawan, katanya. || {$objek}'s grandmother says the child will pick the brush at the first birthday. A scholar, she says.
+
+== kabar.sakit
+niat: BERI_KABAR
+topik: kesehatan
+syarat: fakta=SAKIT
+lanjut: kesehatan keluarga
+gestur: geleng
+$subjek: tipe=nama_warga dari=fakta.subjek
+$waktu_lalu: tipe=waktu_lalu dari=fakta.hariKejadian
+$keluh: aturan=seru.keluh opsional=0.5
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] {$subjek} jatuh sakit {$waktu_lalu}. Demamnya tinggi, tabib sudah dua kali datang. {$keluh} || {$subjek} fell ill {$waktu_lalu}. High fever; the physician has come twice. {$keluh}
+  ~ kasar: {$subjek} sakit. Makanya jangan minum air sumur mentah. || {$subjek}'s sick. Told them not to drink raw well water.
+  ~ kuno: Qi {$subjek} sedang kacau, tubuhnya lemah. Semoga segera pulih. || {$subjek}'s Qi is in disarray and the body weak. May they recover soon.
+  ~ kampung: {$subjek} meriang sejak {$waktu_lalu}. Sudah dikerokin, belum juga baikan. || {$subjek}'s been feverish since {$waktu_lalu}. Scraped with a coin, still no better.
+- [2] Kasihan {$subjek}, batuknya tidak berhenti. Kalau {$sebutan} punya pil penyembuh... || Poor {$subjek}, the cough won't stop. If you have a healing pill, {$sebutan}...
+  ~ gunung: Para biksu mendoakan {$subjek} setiap pagi. Batuknya belum reda. Amitaba. || The monks pray for {$subjek} every morning. The cough hasn't eased. Amitabha.
+  ~ oasis: {$subjek} kena demam pasir. Air dari mata air suci mungkin bisa menolong, Saudara. || {$subjek} has sand fever. Water from the holy spring might help, friend.
+- Toko {$subjek} tutup sejak dia sakit. Pelanggannya pindah ke tempat lain. || {$subjek}'s shop has been shut since the illness. The customers went elsewhere.
+- Aku mau mengantar bubur ke rumah {$subjek} nanti. Semoga dia mau makan. || I'm taking porridge to {$subjek}'s house later. Hope they'll eat.
+
+== kabar.wafat
+niat: BERI_KABAR
+topik: duka
+syarat: fakta=WAFAT
+lanjut: duka keluarga
+gestur: menangis
+$subjek: tipe=nama_warga dari=fakta.subjek
+$waktu_lalu: tipe=waktu_lalu dari=fakta.hariKejadian
+$keluh: aturan=seru.keluh opsional=0.5
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] {$subjek} sudah tiada {$waktu_lalu}. Aku masih tidak percaya. Kemarin masih menyapaku. || {$subjek} passed {$waktu_lalu}. I still can't believe it. Only yesterday they greeted me.
+  ~ kasar: {$subjek} mati. Begitulah. Semua orang juga nanti. || {$subjek} died. That's that. Everyone will, someday.
+  ~ kuno: {$subjek} telah kembali ke langit dan bumi. Semoga rohnya tenang di alam baka. || {$subjek} has returned to heaven and earth. May the soul rest in the netherworld.
+  ~ kampung: {$subjek} sudah meninggal {$waktu_lalu}. Sekampung melayat. Orangnya baik sekali dulu. || {$subjek} passed {$waktu_lalu}. The whole village mourned. Such a kind soul.
+- [2] Pemakaman {$subjek} besok di bukit timur. Bawa uang kertas kalau mau ikut. {$keluh} || {$subjek}'s funeral is tomorrow on the east hill. Bring spirit money if you'll come. {$keluh}
+  ~ pelabuhan: Laut mengambil {$subjek}, Bung. Perahunya kembali kosong {$waktu_lalu}. || The sea took {$subjek}, mate. The boat came back empty {$waktu_lalu}.
+  ~ iblis: {$subjek} mati. Di kota ini orang mati lebih cepat dari utangnya lunas. || {$subjek}'s dead. In this city folk die faster than their debts are paid.
+- Keluarga {$subjek} memakai kain putih. Kalau lewat rumahnya, pelankan suara. || {$subjek}'s family wears white. Lower your voice when you pass the house.
+- Sumur jadi sepi sejak {$subjek} tiada. Dia yang paling banyak bercerita di sana. || The well's gone quiet since {$subjek} passed. They told the most stories there.
+- [sopan] Mohon maaf membawa kabar duka, {$sebutan}. {$subjek} telah berpulang {$waktu_lalu}. || Forgive me for bearing grief, {$sebutan}. {$subjek} passed away {$waktu_lalu}.
+
+== kabar.pindah
+niat: BERI_KABAR
+topik: tetangga
+syarat: fakta=PINDAH
+lanjut: tetangga kota
+gestur: tunjuk
+$subjek: tipe=nama_warga dari=fakta.subjek
+$tempat_fakta: tipe=tempat dari=fakta.objek
+$waktu_lalu: tipe=waktu_lalu dari=fakta.hariKejadian
+$doa: aturan=frag.doa opsional=0.4
+- [3] {$subjek} pindah ke {$tempat_fakta} {$waktu_lalu}. Rumahnya sekarang kosong. || {$subjek} moved to {$tempat_fakta} {$waktu_lalu}. The house stands empty now.
+  ~ kasar: {$subjek} pergi ke {$tempat_fakta}. Bagus, sumur jadi tidak antre. || {$subjek} left for {$tempat_fakta}. Good, no more queue at the well.
+  ~ kuno: {$subjek} telah berangkat menuju {$tempat_fakta}. Jalan setiap orang memang berbeda. || {$subjek} has set out for {$tempat_fakta}. Each person's road is different.
+- [2] Kau tahu {$subjek} pindah ke {$tempat_fakta}? Katanya di sana lebih banyak kerja. || Did you know {$subjek} moved to {$tempat_fakta}? Says there's more work there.
+  ~ kampung: {$subjek} merantau ke {$tempat_fakta}. Anak kampung kalau sudah besar, pergi semua. || {$subjek} went off to {$tempat_fakta}. Village kids grow up and all leave.
+  ~ pelabuhan: {$subjek} naik kapal ke {$tempat_fakta}, Bung. Tidak bilang apa-apa ke siapa pun. || {$subjek} took ship for {$tempat_fakta}, mate. Didn't tell anyone a thing.
+- Sebelum pindah, {$subjek} menitipkan kucingnya padaku. Sekarang kucing itu tidur di kursiku. || Before moving, {$subjek} left me their cat. Now the cat sleeps on my chair.
+- Semoga {$subjek} betah di {$tempat_fakta}. {$doa} || I hope {$subjek} settles well in {$tempat_fakta}. {$doa}
+
+== kabar.utang
+niat: BERI_KABAR
+topik: uang
+syarat: fakta=BERUTANG
+lanjut: uang tetangga
+gestur: bisik
+$subjek: tipe=nama_warga dari=fakta.subjek
+$harga: tipe=harga dari=fakta.nilai
+$objek: tipe=nama_warga dari=fakta.objek
+$katanya: aturan=frag.katanya
+$ragu: aturan=seru.ragu opsional=0.5
+- [3] Sst... {$subjek} berutang {$harga} pada {$objek}. Sudah lewat bulan, belum dibayar. || Shh... {$subjek} owes {$objek} {$harga}. A month past due, still unpaid.
+  ~ kasar: {$subjek} itu tukang utang. {$harga} ke {$objek}! Mau bayar pakai apa? || {$subjek}'s a debtor. {$harga} to {$objek}! Paying with what?
+  ~ kuno: Ada utang {$harga} antara {$subjek} dan {$objek}. Utang yang tidak dibayar menjadi karma. || There is a debt of {$harga} between {$subjek} and {$objek}. Unpaid debt becomes karma.
+- [2] Jangan bilang siapa-siapa, ya. {$objek} menagih {$subjek} di depan rumahnya. Malu sekali. || Don't tell anyone. {$objek} dunned {$subjek} right outside the house. So shameful.
+  ~ iblis: Rentenir {$objek} memberi {$subjek} waktu tiga hari. Setelah itu... jari. Begitulah aturan sini. || The lender {$objek} gave {$subjek} three days. After that... fingers. Such are the rules here.
+  ~ kampung: {$subjek} ngutang ke {$objek} buat bibit. Panennya gagal, jadi belum bisa bayar. || {$subjek} borrowed from {$objek} for seed. The harvest failed, so no repayment yet.
+- {$subjek} menghindari jalan pasar sejak berutang pada {$objek}. Lewat gang belakang terus. || {$subjek} avoids the market road since owing {$objek}. Always takes the back lane.
+- {$katanya} utang {$subjek} pada {$objek} sudah {$harga}. Bunganya saja sudah menggunung. {$ragu} || {$katanya} {$subjek}'s debt to {$objek} is {$harga} now. The interest alone is a mountain. {$ragu}
+
+== kabar.suka
+niat: BERI_KABAR
+topik: asmara
+syarat: fakta=SUKA
+lanjut: asmara
+gestur: bisik
+$subjek: tipe=nama_warga dari=fakta.subjek
+$objek: tipe=nama_warga dari=fakta.objek
+$penutup_kecil: aturan=frag.penutup_kecil opsional=0.4
+- [3] Hihi, rahasia ya: {$subjek} suka pada {$objek}. Kelihatan dari caranya menatap. || Hehe, a secret: {$subjek} is sweet on {$objek}. You can tell by the looks.
+  ~ kasar: {$subjek} naksir {$objek}. Semua orang tahu kecuali {$objek} sendiri. || {$subjek} fancies {$objek}. Everybody knows except {$objek}.
+  ~ kuno: Hati {$subjek} telah tertambat pada {$objek}. Tinggal menunggu benang merah bergerak. || {$subjek}'s heart is moored to {$objek}. Now we wait for the red thread to move.
+- [2] {$subjek} selalu lewat depan rumah {$objek}, padahal jalannya memutar. Hmm, hmm. || {$subjek} always passes {$objek}'s house, though it's out of the way. Hmm, hmm.
+  ~ air: {$subjek} sering menyanyi di perahu dekat jendela {$objek}, Kakak... lagunya sedih-sedih manis... || {$subjek} often sings in a boat by {$objek}'s window, dear... bittersweet songs...
+  ~ kampung: {$subjek} rajin bantuin {$objek} di sawah. Mana ada orang rajin tanpa sebab? || {$subjek} keeps helping {$objek} in the paddies. Who's that diligent without a reason?
+- {$subjek} membeli jepit rambut di pasar, lalu bingung cara memberikannya pada {$objek}. Lucu sekali. || {$subjek} bought a hairpin at market, then fretted how to give it to {$objek}. So sweet.
+- Jangan bilang {$objek}, ya. Biar {$subjek} sendiri yang berani bicara. {$penutup_kecil} || Don't tell {$objek}. Let {$subjek} find the courage to speak. {$penutup_kecil}
+
+== kabar.benci
+niat: BERI_KABAR
+topik: tetangga
+syarat: fakta=BENCI
+lanjut: tetangga
+gestur: bisik
+$subjek: tipe=nama_warga dari=fakta.subjek
+$objek: tipe=nama_warga dari=fakta.objek
+$ragu: aturan=seru.ragu opsional=0.5
+- [3] {$subjek} dan {$objek} tidak saling bicara lagi. Kalau berpapasan, buang muka. || {$subjek} and {$objek} don't speak any more. If they pass, they look away.
+  ~ kasar: {$subjek} benci setengah mati sama {$objek}. Jangan sebut nama itu di depannya. || {$subjek} hates {$objek} to death. Don't say that name in front of them.
+  ~ kuno: Ada dendam antara {$subjek} dan {$objek}. Simpul seperti itu sulit diurai. || There is enmity between {$subjek} and {$objek}. Such a knot is hard to untie.
+- [2] Semua gara-gara pagar. {$objek} menggeser pagar satu jengkal, dan {$subjek} tidak pernah memaafkan. || All over a fence. {$objek} moved it one hand-span and {$subjek} never forgave.
+  ~ kampung: Gara-gara kambing {$objek} makan sayur {$subjek}. Sejak itu musuhan. || All because {$objek}'s goat ate {$subjek}'s greens. Enemies ever since.
+  ~ ibukota: Perseteruan {$subjek} dan {$objek} soal kedudukan sudah sampai ke telinga hakim. || The feud of {$subjek} and {$objek} over a post has reached the magistrate's ears.
+- Kalau mengundang {$subjek}, jangan undang {$objek}. Bisa pecah piring. || If you invite {$subjek}, don't invite {$objek}. Plates will fly.
+- {$subjek} bilang {$objek} membawa sial. Aku sih tidak percaya hal begitu. {$ragu} || {$subjek} says {$objek} brings bad luck. I don't believe such things. {$ragu}
+
+== kabar.berkelahi
+niat: BERI_KABAR
+topik: tetangga
+syarat: fakta=BERKELAHI
+lanjut: kejahatan tetangga
+gestur: berdebat
+$subjek: tipe=nama_warga dari=fakta.subjek
+$objek: tipe=nama_warga dari=fakta.objek
+$waktu_lalu: tipe=waktu_lalu dari=fakta.hariKejadian
+$kaget: aturan=seru.kaget opsional=0.5
+$barang_murah: tipe=barang dari=konteks.barang_murah
+- [3] {$subjek} dan {$objek} baku hantam di depan kedai {$waktu_lalu}! Meja pecah dua. || {$subjek} and {$objek} came to blows outside the eatery {$waktu_lalu}! A table split in two.
+  ~ kasar: {$subjek} meninju {$objek}. Pantas. Mulut {$objek} memang minta ditinju. || {$subjek} punched {$objek}. Fair. {$objek}'s mouth was asking for it.
+  ~ kuno: Dua orang fana beradu tinju seperti ayam jago. {$subjek} dan {$objek}, sungguh memalukan. || Two mortals brawling like gamecocks. {$subjek} and {$objek}, truly shameful.
+- [2] Penjaga harus memisahkan {$subjek} dan {$objek}. Mata {$objek} sampai biru. {$kaget} || The guards had to separate {$subjek} and {$objek}. {$objek} got a black eye. {$kaget}
+  ~ pelabuhan: {$subjek} dan {$objek} berkelahi di dermaga, Bung. Dua-duanya jatuh ke laut. Dingin kepala jadinya. || {$subjek} and {$objek} fought on the dock, mate. Both fell in the sea. Cooled their heads.
+  ~ iblis: Perkelahian {$subjek} lawan {$objek}? Itu bukan perkelahian. Tidak ada yang mati. || {$subjek} versus {$objek}? That's no fight. Nobody died.
+- Katanya mereka bertengkar soal harga {$barang_murah}. Sepele sekali, tapi begitulah orang. || They say they quarrelled over the price of {$barang_murah}. So petty, but that's people.
+- Keluarga {$subjek} masih marah-marah sejak perkelahian dengan {$objek}. || {$subjek}'s family is still fuming since the fight with {$objek}.
+  ~ p: Ibu {$subjek} menjewer anaknya pulang setelah berkelahi dengan {$objek}. Hihi. || {$subjek}'s mother dragged them home by the ear after the fight with {$objek}. Hehe.
+
+== kabar.mabuk
+niat: BERI_KABAR
+topik: tetangga
+syarat: fakta=MABUK
+lanjut: tetangga
+gestur: tertawa
+$subjek: tipe=nama_warga dari=fakta.subjek
+$waktu_lalu: tipe=waktu_lalu dari=fakta.hariKejadian
+$keluh: aturan=seru.keluh opsional=0.5
+- [3] {$subjek} mabuk berat {$waktu_lalu}. Menyanyi di atas atap sampai subuh! || {$subjek} got roaring drunk {$waktu_lalu}. Sang on the rooftop till dawn!
+  ~ kasar: {$subjek} mabuk lagi. Pemabuk tetap pemabuk. || {$subjek}'s drunk again. A sot is a sot.
+  ~ kuno: Arak menenggelamkan akal {$subjek} {$waktu_lalu}. Kendali diri adalah dasar jalan. || Wine drowned {$subjek}'s wits {$waktu_lalu}. Self-control is the root of the path.
+- [2] {$subjek} tidur di kandang babi semalaman. Babinya sampai pindah. Hahaha! || {$subjek} slept in the pigsty all night. Even the pig moved out. Hahaha!
+  ~ pelabuhan: {$subjek} mabuk lalu memeluk tiang layar, Bung. Bilang itu kekasihnya. || {$subjek} got drunk and hugged the mast, mate. Called it their sweetheart.
+  ~ kampung: {$subjek} mabuk tuak, pulang salah rumah. Masuk ke rumah Pak Lurah. Ramai sekali. || {$subjek} got drunk on palm wine and went into the wrong house. The headman's! What a fuss.
+- Pemilik kedai menahan sandal {$subjek} sebagai jaminan. Utang araknya belum dibayar. || The tavern keeper kept {$subjek}'s sandals as surety. The wine bill is unpaid.
+- Sudah kubilang jangan minum dengan {$subjek}. Dia tidak tahu kapan berhenti. {$keluh} || I told you not to drink with {$subjek}. They don't know when to stop. {$keluh}
+
+== kabar.judi
+niat: BERI_KABAR
+topik: uang
+syarat: fakta=KALAH_JUDI
+lanjut: uang
+gestur: geleng
+$subjek: tipe=nama_warga dari=fakta.subjek
+$harga: tipe=harga dari=fakta.nilai
+$waktu_lalu: tipe=waktu_lalu dari=fakta.hariKejadian
+$keluh: aturan=seru.keluh opsional=0.5
+- [2] {$subjek} kalah {$harga} di meja dadu {$waktu_lalu}. Keluarganya belum tahu. Sst. || {$subjek} lost {$harga} at the dice table {$waktu_lalu}. The family doesn't know yet. Shh.
+  ~ kasar: {$subjek} kalah judi lagi. Bodoh. Dadu itu sudah diberi pemberat semua. || {$subjek} lost at gambling again. Idiot. Every one of those dice is weighted.
+  ~ kuno: Nafsu berjudi menggerogoti {$subjek}. {$harga} lenyap dalam semalam. || The gambling hunger gnaws at {$subjek}. {$harga} vanished in one night.
+- {$subjek} menjual cangkulnya untuk berjudi. Besok bagaimana dia bekerja? {$keluh} || {$subjek} sold the hoe to gamble. How will they work tomorrow? {$keluh}
+  ~ iblis: {$subjek} kalah {$harga} di sarang judi. Bandar tersenyum. Bandar selalu tersenyum. || {$subjek} lost {$harga} in the gambling den. The house smiled. The house always smiles.
+  ~ pelabuhan: Upah tiga bulan melaut, Bung, habis di meja dadu oleh {$subjek}. || Three months' sea wages, mate, gone at the dice by {$subjek}.
+- Katanya {$subjek} bersumpah tidak akan berjudi lagi. Itu sumpahnya yang kesepuluh. || They say {$subjek} swore off gambling. That's the tenth oath.
+
+== kabar.direkrut
+niat: BERI_KABAR
+topik: sekte
+syarat: fakta=DIREKRUT
+lanjut: sekte keluarga
+gestur: kagum
+$subjek: tipe=nama_warga dari=fakta.subjek
+$sekte_fakta: tipe=tempat dari=fakta.objek
+$waktu_lalu: tipe=waktu_lalu dari=fakta.hariKejadian
+- [3] Anak {$subjek} diterima di {$sekte_fakta}! Akar rohnya bagus, kata penguji. || {$subjek}'s child was accepted by {$sekte_fakta}! Good spirit roots, the examiner said.
+  ~ kasar: {$subjek} masuk {$sekte_fakta}. Sebentar lagi pasti lupa kampung sendiri. || {$subjek} joined {$sekte_fakta}. Soon they'll forget their own home.
+  ~ kuno: {$subjek} telah menapaki gerbang {$sekte_fakta}. Semoga Dao-nya panjang. || {$subjek} has stepped through the gate of {$sekte_fakta}. May their Dao be long.
+- [2] {$subjek} berangkat ke {$sekte_fakta} {$waktu_lalu}. Ibunya menangis, bapaknya membanggakan ke semua orang. || {$subjek} left for {$sekte_fakta} {$waktu_lalu}. The mother wept; the father boasted to everyone.
+  ~ kampung: Anak kampung kita masuk {$sekte_fakta}! {$subjek}! Bayangkan, dari sawah ke sekte. || A child of our village joined {$sekte_fakta}! {$subjek}! Imagine, from paddy to sect.
+  ~ gunung: {$subjek} meninggalkan biara dan masuk {$sekte_fakta}. Para biksu melepasnya dengan doa. || {$subjek} left the monastery for {$sekte_fakta}. The monks sent them off with prayers.
+- Sejak {$subjek} masuk {$sekte_fakta}, keluarganya tidak perlu bayar pajak tanah lagi. Untung. || Since {$subjek} joined {$sekte_fakta}, the family no longer pays land tax. Lucky.
+- Aku juga mau anakku dites akarnya. Siapa tahu seperti {$subjek} masuk {$sekte_fakta}. || I want my child's roots tested too. Who knows, maybe into {$sekte_fakta} like {$subjek}.
+
+== kabar.laris
+niat: BERI_KABAR
+topik: dagang
+syarat: fakta=USAHA_LARIS
+lanjut: dagang harga
+gestur: tunjuk
+$tempat_fakta: tipe=tempat dari=fakta.objek
+$subjek: tipe=nama_warga dari=fakta.subjek
+- [3] {$tempat_fakta} milik {$subjek} laris sekali sekarang. Antreannya sampai ke sudut jalan. || {$subjek}'s {$tempat_fakta} is booming. The queue reaches the street corner.
+  ~ kasar: {$subjek} kaya mendadak. {$tempat_fakta}-nya laris. Sekarang jalannya seperti pejabat. || {$subjek} got rich overnight. The {$tempat_fakta} is booming. Walks like an official now.
+  ~ kuno: Rezeki mengalir ke {$tempat_fakta} milik {$subjek}. Kerja keras berbuah manis. || Fortune flows into {$subjek}'s {$tempat_fakta}. Hard work bears sweet fruit.
+- [2] Coba mampir ke {$tempat_fakta} {$subjek}. Semua orang bilang yang terbaik di kota. || Try {$subjek}'s {$tempat_fakta}. Everyone says it's the best in town.
+  ~ pelabuhan: {$tempat_fakta} {$subjek} penuh pelaut tiap malam, Bung. Ramai seperti pelabuhan musim angin. || {$subjek}'s {$tempat_fakta} is full of sailors every night, mate. Busy as a monsoon port.
+  ~ oasis: Kafilah-kafilah berhenti di {$tempat_fakta} milik {$subjek}. Laris seperti air dingin di siang bolong. || Caravans stop at {$subjek}'s {$tempat_fakta}. Selling like cold water at noon.
+- {$subjek} sampai mengambil dua pegawai baru. {$tempat_fakta}-nya kewalahan. || {$subjek} even took on two new hands. The {$tempat_fakta} is swamped.
+
+== kabar.bangkrut
+niat: BERI_KABAR
+topik: dagang
+syarat: fakta=USAHA_BANGKRUT
+lanjut: uang dagang
+gestur: geleng
+$tempat_fakta: tipe=tempat dari=fakta.objek
+$subjek: tipe=nama_warga dari=fakta.subjek
+$waktu_lalu: tipe=waktu_lalu dari=fakta.hariKejadian
+$keluh: aturan=seru.keluh opsional=0.5
+$katanya: aturan=frag.katanya
+$ragu: aturan=seru.ragu opsional=0.5
+- [3] {$tempat_fakta} milik {$subjek} tutup {$waktu_lalu}. Bangkrut, kasihan sekali. {$keluh} || {$subjek}'s {$tempat_fakta} closed {$waktu_lalu}. Bankrupt; such a pity. {$keluh}
+  ~ kasar: {$subjek} bangkrut. Dagang tanpa otak memang begitu akhirnya. || {$subjek} went bust. That's how trading without brains ends.
+  ~ kuno: Roda nasib berputar. {$tempat_fakta} {$subjek} kini sunyi. || The wheel of fate turns. {$subjek}'s {$tempat_fakta} is silent now.
+- [2] {$subjek} menjual perabot {$tempat_fakta}-nya murah-murah. Kalau butuh meja, sekarang saatnya. || {$subjek} is selling the {$tempat_fakta}'s furniture cheap. If you need a table, now's the time.
+  ~ iblis: {$tempat_fakta} {$subjek} diambil alih penagih. Di kota ini, jatuh sekali berarti jatuh selamanya. || {$subjek}'s {$tempat_fakta} was seized by collectors. In this city, fall once and you fall for good.
+  ~ kampung: Warung {$subjek} tutup. Padahal nasi gorengnya enak. Pembelinya pada utang semua, sih. || {$subjek}'s stall shut. Lovely fried rice, too. Everyone bought on credit, that's why.
+- {$katanya} {$subjek} terlilit utang sampai {$tempat_fakta} harus dijual. {$ragu} || {$katanya} {$subjek} got so deep in debt the {$tempat_fakta} had to be sold. {$ragu}
+- Semoga {$subjek} bisa bangkit lagi. Orangnya ulet, kok. || I hope {$subjek} rises again. They're tough, after all.
+
+== kabar.opini
+niat: BERI_KABAR
+topik: opini
+syarat: fakta=OPINI
+lanjut: kota pejabat
+gestur: bicara_tangan
+$subjek: tipe=nama_warga dari=fakta.subjek
+- [2] Menurut {$subjek}, kota ini dulu lebih baik. Aku tidak tahu harus setuju atau tidak. || {$subjek} reckons this town used to be better. I don't know whether to agree.
+  ~ kasar: {$subjek} bilang semua pejabat korup. Yah, dia tidak salah. || {$subjek} says every official is crooked. Well, not wrong.
+  ~ kuno: {$subjek} berpendapat bahwa langit sedang menguji kota ini. Pandangan yang patut direnungkan. || {$subjek} holds that heaven is testing this town. A view worth pondering.
+- {$subjek} yakin pajak gerbang terlalu tinggi. Setiap ada yang lewat, dia mengomel lagi. || {$subjek} is sure the gate tax is too high. Grumbles again every time someone passes.
+  ~ ibukota: {$subjek} menulis surat ke kantor menteri tentang pajak. Belum ada jawaban. || {$subjek} wrote to the minister's office about taxes. No answer yet.
+- Kata {$subjek}, sekte pelindung kota tidak pernah benar-benar peduli. Ada yang setuju, ada yang marah. || {$subjek} says the town's protector sect never truly cares. Some agree, some are furious.
+- {$subjek} bilang anak muda sekarang malas. Padahal dulu dia juga begitu, kata ibunya. || {$subjek} says young folk are lazy now. Though their mother says they were the same.

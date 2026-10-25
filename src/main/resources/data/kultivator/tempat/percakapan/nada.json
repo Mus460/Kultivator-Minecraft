@@ -1,0 +1,146 @@
+{
+  "_catatan": "Enam nada 42.5A.7 (42K disetel): p = logistik(b0 + sum w*x); efek berhasil/gagal (kunci CakapData).",
+  "ulang": 0.7,
+  "nada": [
+    {
+      "id": "sopan",
+      "syarat": {},
+      "b0": 1.5,
+      "w": {
+        "A": 0.01,
+        "C": 0.01,
+        "kesan": 0.02,
+        "nama_baik": 0.01
+      },
+      "berhasil": {
+        "kesan": 2,
+        "info": true
+      },
+      "gagal": {
+        "kesabaran": -5,
+        "isyarat": "sibuk"
+      }
+    },
+    {
+      "id": "akrab",
+      "syarat": {
+        "kesan_min": 20
+      },
+      "b0": -0.5,
+      "w": {
+        "kesan": 0.04,
+        "X": 0.01,
+        "A": 0.01,
+        "sebaya": 0.5
+      },
+      "berhasil": {
+        "kesan": 4,
+        "rahasia": true,
+        "harga": -0.03
+      },
+      "gagal": {
+        "kesan": -3,
+        "isyarat": "sok_akrab"
+      }
+    },
+    {
+      "id": "merayu",
+      "syarat": {
+        "dewasa": true,
+        "lajang_atau_H_maks": -30
+      },
+      "b0": -1.5,
+      "w": {
+        "O": 0.01,
+        "X": 0.01,
+        "P": 0.02,
+        "kesan": 0.03,
+        "ranah": 0.2
+      },
+      "berhasil": {
+        "kesan": 6,
+        "emosi": "dirayu_diterima",
+        "harga": -0.05,
+        "fakta": "MERAYU",
+        "gosip": true
+      },
+      "gagal": {
+        "kesan": -8,
+        "emosi": "dirayu_ditolak",
+        "gosip": true,
+        "fakta": "MERAYU",
+        "isyarat": "risih"
+      }
+    },
+    {
+      "id": "mengancam",
+      "syarat": {},
+      "b0": -1.0,
+      "w": {
+        "ranah": 0.6,
+        "infami": 0.02,
+        "E": 0.015,
+        "D": -0.02,
+        "saksi": -0.3
+      },
+      "berhasil": {
+        "info": true,
+        "harga": -0.2,
+        "emosi": "diancam_kuat",
+        "fakta": "MENGANCAM"
+      },
+      "gagal": {
+        "kesan": -20,
+        "emosi": "dihina",
+        "fakta": "MENGANCAM",
+        "hukum": 3,
+        "isyarat": "marah"
+      }
+    },
+    {
+      "id": "menyuap",
+      "syarat": {
+        "nb_min": 2
+      },
+      "b0": -0.5,
+      "w": {
+        "H": -0.03,
+        "serakah": 1.0,
+        "miskin": 0.8
+      },
+      "berhasil": {
+        "rahasia": true,
+        "info": true,
+        "harga": -0.05
+      },
+      "gagal": {
+        "kesan": -5,
+        "fakta": "MENYUAP",
+        "gosip": true,
+        "infami": 2,
+        "isyarat": "tersinggung"
+      }
+    },
+    {
+      "id": "bercanda",
+      "syarat": {},
+      "b0": -0.3,
+      "w": {
+        "X": 0.01,
+        "O": 0.01,
+        "P": 0.02,
+        "kesan": 0.02
+      },
+      "berhasil": {
+        "kesan": 3,
+        "kesabaran": 10,
+        "emosi": "canda_berhasil"
+      },
+      "gagal": {
+        "kesan": -2,
+        "emosi": "canda_gagal",
+        "isyarat": "tidak_lucu"
+      }
+    }
+  ]
+}

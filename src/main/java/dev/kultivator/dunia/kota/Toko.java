@@ -1,6 +1,9 @@
 package dev.kultivator.dunia.kota;
 
 import dev.kultivator.data.Cultivators;
+import dev.kultivator.dunia.kota42.api.Kategori;
+import dev.kultivator.dunia.kota42.ekonomi.HargaKota;
+import dev.kultivator.dunia.tempat.ekonomi.Barang;
 import dev.kultivator.harta.BeastCores;
 import dev.kultivator.harta.SpiritHerbs;
 import dev.kultivator.harta.SpiritStones;
@@ -28,8 +31,9 @@ import java.util.List;
  * The shops of the Paviliun Pil and Paviliun Pusaka (DESIGN 34.5.1): stock seeded by (the merchant's anchor, the
  * in-game day, the buyer's realm band), 6-9 offers of existing items in the band ±1, price = base × 0.9-1.3 ×
  * {@code kota.priceScale} × the Nama Baik discount (10 % at 50+). A shop buys its own kind of goods back at 0.35-0.40 ×
- * base (never more than half of any sell price), at most 16 stacks per player per day. Each offer has 1-4 pieces a day,
- * shared by everyone in the town.
+ * base (never more than half of any sell price), at most 16 stacks per player per day. Both sides carry one
+ * {@code HargaKota.faktor} of the item's category (42.6.3; the buy-back also the player's market flooding). Each offer
+ * has 1-4 pieces a day, shared by everyone in the town.
  */
 final class Toko {
 
@@ -72,7 +76,9 @@ final class Toko {
 				continue;
 			}
 			double factor = 0.9D + random.nextDouble() * 0.4D;
-			long price = Math.max(1L, Math.round(Harga.priceOf(ware, stack) * factor * Kota.config().priceScale * discount));
+			// one HargaKota.faktor per price (42.6.3)
+			double town = HargaKota.faktor(player, npc, Kategori.dari(stack));
+			long price = Math.max(1L, Math.round(Harga.priceOf(ware, stack) * factor * Kota.config().priceScale * discount * town));
 			int stock = 1 + random.nextInt(4);
 			int left = Math.max(0, stock - sold.getIntOr(Integer.toString(i), 0));
 			offers.add(new Offer(i, ware, stack, price, left));
@@ -127,7 +133,11 @@ final class Toko {
 		long day = Kota.day(player.level().getServer());
 		RandomSource random = RandomSource.create(npc.anchorSite() ^ day * 31L);
 		double factor = 0.35D + random.nextDouble() * 0.05D;
-		return Math.max(0L, (long) Math.floor(Harga.value(stack) * factor * Kota.config().priceScale));
+		// the town factor with the player's market flooding (42.6.3), never above half of the lowest sell price
+		Kategori kategori = Kategori.dari(stack);
+		double cap = 0.5D * 0.9D * HargaKota.faktor(player, npc, kategori);
+		double town = Math.min(factor * HargaKota.faktorJual(player, npc, kategori), cap);
+		return Math.max(0L, (long) Math.floor(Harga.value(stack) * town * Kota.config().priceScale));
 	}
 
 	// ================================================================== actions
@@ -170,8 +180,10 @@ final class Toko {
 		long day = Kota.day(player.level().getServer());
 		CompoundTag sold = soldTag(player, npc, day);
 		sold.putInt(Integer.toString(index), sold.getIntOr(Integer.toString(index), 0) + 1);
+		HargaKota.catatBeli(player.level().getServer(), HargaKota.situs(player, npc), Kategori.dari(offer.stack()), 1);
 		KotaData.get(player.level().getServer()).touch();
-		ItemStack stack = offer.stack().copy();
+		// bought in a town shop: no shop or stall buys it back for 3 days (38.M.5, 42.0 rule)
+		ItemStack stack = Barang.tandaiAsal(offer.stack().copy(), Barang.hari(player.level().getServer()));
 		Component name = stack.getHoverName();
 		if (!player.getInventory().add(stack) && !stack.isEmpty()) {
 			Kota.drop(player, stack);
@@ -194,6 +206,10 @@ final class Toko {
 					.withStyle(ChatFormatting.RED));
 			return true;
 		}
+		if (Barang.baruDibeli(stack, Barang.hari(player.level().getServer()))) {
+			Msg.actionBar(player, Component.translatable("kultivator.tempat_ekonomi.asal_toko", Barang.ASAL_HARI).withStyle(ChatFormatting.RED));
+			return true;
+		}
 		long day = Kota.day(player.level().getServer());
 		KotaData data = KotaData.get(player.level().getServer());
 		if (data.dailyCount(player.getUUID(), day, SALES) >= SALES_PER_DAY) {
@@ -208,9 +224,11 @@ final class Toko {
 		int count = stack.getCount();
 		Component name = stack.getHoverName();
 		long total = each * count;
+		Kategori kategori = Kategori.dari(stack);
 		stack.shrink(count);
 		NilaiBatu.give(player, total);
 		data.addDaily(player.getUUID(), day, SALES, 1);
+		HargaKota.catatJual(player.level().getServer(), HargaKota.situs(player, npc), kategori, count);
 		player.level().playSound(null, npc.getX(), npc.getY(), npc.getZ(), SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.NEUTRAL, 0.5F, 0.8F);
 		Msg.actionBar(player, Component.translatable("kultivator.kota.toko.dijual", count, name, NilaiBatu.text(total)).withStyle(ChatFormatting.GREEN));
 		return true;

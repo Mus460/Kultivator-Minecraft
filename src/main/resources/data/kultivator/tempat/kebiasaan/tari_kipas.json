@@ -1,0 +1,71 @@
+{
+  "_catatan": "Kebiasaan #23 tari_kipas (DESIGN 42.4.12); ilham: yangge",
+  "nomor": 23,
+  "siapa": {
+    "umur": [
+      30,
+      200
+    ],
+    "kelamin": "wanita",
+    "tahap": [
+      "dewasa",
+      "tua"
+    ]
+  },
+  "sesi": [
+    {
+      "jam": [
+        6,
+        7
+      ],
+      "peluang": 0.75,
+      "syarat": [
+        "tidak_hujan"
+      ],
+      "tujuan": [
+        "panggung",
+        "obrol",
+        "@jalan:4"
+      ],
+      "klip": "kota42:tari_yangge",
+      "kanan": "kipas_lipat",
+      "ragam": [
+        {
+          "varian": 0,
+          "kanan": "kipas_lipat"
+        },
+        {
+          "varian": 1,
+          "kanan": "kota42:selendang"
+        }
+      ]
+    },
+    {
+      "jam": [
+        19,
+        20
+      ],
+      "peluang": 0.6,
+      "syarat": [
+        "tidak_hujan"
+      ],
+      "tujuan": [
+        "panggung",
+        "obrol",
+        "@jalan:4"
+      ],
+      "klip": "kota42:tari_yangge",
+      "kanan": "kipas_lipat",
+      "ragam": [
+        {
+          "varian": 0,
+          "kanan": "kipas_lipat"
+        },
+        {
+          "varian": 1,
+          "kanan": "kota42:selendang"
+        }
+      ]
+    }
+  ]
+}

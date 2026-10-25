@@ -1,0 +1,51 @@
+{
+  "_catatan": "Kebiasaan #31 pemalas (DESIGN 42.4.12)",
+  "nomor": 31,
+  "siapa": {
+    "umur": [
+      18,
+      200
+    ],
+    "tahap": [
+      "dewasa"
+    ]
+  },
+  "bobot": 0.8,
+  "sesi": [
+    {
+      "jam": [
+        5,
+        7.5
+      ],
+      "tujuan": [
+        "@kasur"
+      ],
+      "dalam": true,
+      "klip": "tidur"
+    },
+    {
+      "jam": [
+        7.5,
+        8.5
+      ],
+      "kegiatan": "kb_pemalas_bangun",
+      "tujuan": [
+        "@rumah"
+      ],
+      "klip": "kota42:menguap"
+    },
+    {
+      "jam": [
+        13,
+        14
+      ],
+      "peluang": 0.5,
+      "kegiatan": "kb_pemalas_siang",
+      "tujuan": [
+        "kursi",
+        "obrol"
+      ],
+      "klip": "tidur_duduk"
+    }
+  ]
+}

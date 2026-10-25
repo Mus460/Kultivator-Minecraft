@@ -1,0 +1,185 @@
+{
+  "id": "basa_basi_jam",
+  "jenis": "realisasi",
+  "_catatan": "Small talk by hour of the day.",
+  "benih_dunia": 42,
+  "masukan": {
+    "niat": "BASA_BASI",
+    "pembicara": 302,
+    "hari": 120,
+    "now": 2880000,
+    "cuaca": "cerah",
+    "musim": "semi",
+    "situasi": {
+      "jam": "pagi",
+      "cuaca": "cerah",
+      "musim": "semi",
+      "kelompok": "pekerja",
+      "watak": "ramah",
+      "kebiasaan": [],
+      "sifat": {
+        "H": 10,
+        "E": 0,
+        "X": 20,
+        "A": 30,
+        "C": 10,
+        "O": 0
+      },
+      "wajah": "netral",
+      "tempat": "kota_besar"
+    },
+    "pendengar": {
+      "nama": "Han",
+      "kelamin": "l",
+      "tahap": "dewasa",
+      "pemain": true
+    },
+    "kesan": "kenal",
+    "tahu_nama": false,
+    "register": "biasa",
+    "dialek": "pelabuhan",
+    "nilai": {
+      "konteks.tempat": {
+        "t": "Pelabuhan Mutiara"
+      },
+      "konteks.distrik": {
+        "t": "Dermaga Timur"
+      }
+    }
+  },
+  "langkah": [
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "tema_pelabuhan"
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.makanan.basa.0.pelabuhan",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.kakak.pelabuhan",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "makanan.basa",
+      "gestur": "makan",
+      "seru": null,
+      "tik": null,
+      "id_id": "Ikan bakar baru diangkat, Bung! Bau asapnya sampai ke kapal!",
+      "en_us": "Grilled fish just off the fire, mate! You can smell it from the ships!"
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "siang",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "tema_pelabuhan"
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.basa.musim.semi.1",
+        "a": []
+      },
+      "aturan": "basa.musim.semi",
+      "gestur": "bicara_tangan",
+      "seru": null,
+      "tik": null,
+      "id_id": "Musim semi, semua orang jadi rajin. Sawah, kebun, bahkan kucing di atap.",
+      "en_us": "In spring everyone turns diligent. Paddies, gardens, even the cats on the roofs."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "sore",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "tema_pelabuhan"
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.basa.musim.semi.4",
+        "a": []
+      },
+      "aturan": "basa.musim.semi",
+      "gestur": "bicara_tangan",
+      "seru": null,
+      "tik": null,
+      "id_id": "Burung walet kembali ke atap kami tahun ini. Pertanda rumah tangga rukun.",
+      "en_us": "The swallows came back to our eaves this year. A sign of a harmonious household."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "malam",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "tema_pelabuhan"
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.basa.cuaca.cerah.3.pelabuhan",
+        "a": []
+      },
+      "aturan": "basa.cuaca.cerah",
+      "gestur": "tatap_langit",
+      "seru": null,
+      "tik": null,
+      "id_id": "Cerah begini kapal dagang berdatangan, Bung. Dermaga bakal sesak.",
+      "en_us": "Clear like this the merchantmen come in, mate. The dock will be packed."
+    }
+  ]
+}

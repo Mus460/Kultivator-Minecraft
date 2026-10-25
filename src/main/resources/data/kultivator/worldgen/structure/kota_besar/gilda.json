@@ -63,7 +63,7 @@
     {
       "dx": -24,
       "dz": 24,
-      "pool": "kultivator:kota_besar/gilda/asrama_gilda",
+      "pool": "kultivator:kota_besar/gilda/kantor_rekrut",
       "putar": 0
     },
     {
@@ -82,6 +82,12 @@
       "dx": 24,
       "dz": 24,
       "pool": "kultivator:kota_besar/gilda/rumah_makan_bakmi",
+      "putar": 0
+    },
+    {
+      "dx": -118,
+      "dz": 8,
+      "pool": "kultivator:kota_besar/gilda/bukit_makam",
       "putar": 0
     }
   ],

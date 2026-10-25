@@ -2,6 +2,7 @@ package dev.kultivator.client.mixin;
 
 import dev.kultivator.client.anim.PoseApplier;
 import dev.kultivator.client.render.MeditationPose;
+import dev.kultivator.client.sekte.gabung.gerak.GabungPoses;
 import dev.kultivator.client.sosok.gerak.GerakApplier;
 import dev.kultivator.client.sosok.gerak.Langkah;
 import net.minecraft.client.model.player.PlayerModel;
@@ -16,7 +17,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * trousers, jacket and hat are child parts, so they follow; armour, robe, cape and ears models are PlayerModels too and
  * pose the same way). Then the Gerak system's own channels of DESIGN 40.5.1-40.5.2 (head roll, hip sway, shoulder raise,
  * walk profile, gaze and breath offsets; nothing for a render state without Gerak data). Last, the player walk of {@code Langkah}
- * (players and mannequins only; it yields to every pose above, Player Animation Library and EMF models).
+ * (players and mannequins only; it yields to every pose above, Player Animation Library and EMF models). Then a player's
+ * Gabung Sekte ceremony clip (DESIGN 41.11.6: oath, leave, expulsion, reflection, succession; only while the server poses
+ * that player, yielding to the meditation seat and cast poses).
  * First-person hands reset their arm and are moved by FirstPersonHandsMixin instead.
  */
 @Mixin(PlayerModel.class)
@@ -28,5 +31,6 @@ public abstract class PlayerModelMixin {
 		PoseApplier.apply((PlayerModel) (Object) this, state);
 		GerakApplier.apply((PlayerModel) (Object) this, state);
 		Langkah.pemain((PlayerModel) (Object) this, state);
+		GabungPoses.pemain((PlayerModel) (Object) this, state);
 	}
 }

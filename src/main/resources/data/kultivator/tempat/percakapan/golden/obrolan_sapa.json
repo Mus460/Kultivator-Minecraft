@@ -1,0 +1,103 @@
+{
+  "id": "obrolan_sapa",
+  "jenis": "realisasi",
+  "_catatan": "NPC-NPC SAPA between neighbours (listener is a warga, not a player), then small talk.",
+  "benih_dunia": 42,
+  "masukan": {
+    "niat": "SAPA",
+    "pembicara": 670,
+    "hari": 120,
+    "now": 2880000,
+    "cuaca": "cerah",
+    "musim": "semi",
+    "situasi": {
+      "jam": "pagi",
+      "cuaca": "cerah",
+      "musim": "semi",
+      "kelompok": "pekerja",
+      "watak": "ramah",
+      "kebiasaan": [],
+      "sifat": {
+        "H": 10,
+        "E": 0,
+        "X": 20,
+        "A": 30,
+        "C": 10,
+        "O": 0
+      },
+      "wajah": "netral",
+      "tempat": "kota_besar"
+    },
+    "pendengar": {
+      "nama": "Lao Wu",
+      "kelamin": "l",
+      "tahap": "tua",
+      "pemain": false
+    },
+    "kesan": "akrab",
+    "tahu_nama": false,
+    "register": "biasa",
+    "dialek": "kampung",
+    "nilai": {
+      "konteks.tempat": {
+        "t": "Desa Bambu"
+      }
+    }
+  },
+  "langkah": [
+    {
+      "ubah": {},
+      "harap": {
+        "k": "kultivator.cakap.sapa.obrol.ajar.2",
+        "a": []
+      },
+      "aturan": "sapa.obrol.ajar",
+      "gestur": "hormat",
+      "seru": null,
+      "tik": null,
+      "id_id": "Guru, kemarin aku berlatih sampai malam! Lihat, tanganku lecet.",
+      "en_us": "Master, I practised till night yesterday! Look, my hands are blistered."
+    },
+    {
+      "ubah": {
+        "niat": "BASA_BASI"
+      },
+      "harap": {
+        "k": "kultivator.cakap.kerja.pekerja.0.kampung",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.bapak.kampung",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "kerja.pekerja",
+      "gestur": "seka_keringat",
+      "seru": null,
+      "tik": null,
+      "id_id": "Habis nyangkul dari subuh, Nak. Pinggang rasanya mau copot.",
+      "en_us": "Been hoeing since dawn, child. My hips feel ready to fall off."
+    },
+    {
+      "ubah": {
+        "tahap": "remaja",
+        "pembicara": 671
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.pekerja.0",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.kakek.kampung",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "sapa.pekerja",
+      "gestur": "seka_keringat",
+      "seru": null,
+      "tik": null,
+      "id_id": "Oh, Mbah. Maaf, tanganku kotor. Salam!",
+      "en_us": "Oh, Gramps. Sorry, my hands are dirty. Greetings!"
+    }
+  ]
+}

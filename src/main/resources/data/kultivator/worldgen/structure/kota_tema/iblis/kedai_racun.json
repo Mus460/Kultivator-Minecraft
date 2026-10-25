@@ -65,6 +65,12 @@
       "dz": 47,
       "pool": "kultivator:kota_tema/iblis/tembok/sudut",
       "putar": 2
+    },
+    {
+      "dx": -48,
+      "dz": 60,
+      "pool": "kultivator:kota_tema/iblis/hidup42/kantor_rekrut",
+      "putar": 0
     }
   ],
   "gaya": [

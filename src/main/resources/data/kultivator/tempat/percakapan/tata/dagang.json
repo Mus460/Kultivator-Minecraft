@@ -1,0 +1,537 @@
+{
+  "_dibuat": "tools/gen_kota_hidup_cakap.py dari tools/kota_cakap_sumber (jangan disunting tangan)",
+  "kelompok": "dagang",
+  "isi": [
+    {
+      "aturan": "dagang.tawarkan",
+      "niat": "TAWARAN",
+      "topik": "dagang",
+      "syarat": {
+        "kelompok": [
+          "pedagang"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "dagang.tawarkan.0",
+          "slot": [
+            "$barang",
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "pelabuhan",
+            "oasis",
+            "air",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "dagang.tawarkan.1",
+          "slot": [
+            "$sebutan",
+            "$barang",
+            "$harga"
+          ],
+          "bobot": 2,
+          "varian": [
+            "ibukota",
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "dagang.tawarkan.2",
+          "slot": [
+            "$sebutan",
+            "$barang",
+            "$harga"
+          ],
+          "bobot": 2,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "dagang.tawarkan.3",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "dagang.tawarkan.4",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "dagang.tawarkan.5",
+          "slot": [
+            "$barang"
+          ],
+          "bobot": 1
+        },
+        {
+          "kunci": "dagang.tawarkan.6",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$barang": {
+          "tipe": "barang",
+          "dari": "konteks.barang"
+        },
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        },
+        "$harga": {
+          "tipe": "harga",
+          "dari": "konteks.harga"
+        }
+      },
+      "gestur": "seru_dagang"
+    },
+    {
+      "aturan": "dagang.tawar_pembeli",
+      "niat": "TAWAR",
+      "topik": "dagang",
+      "syarat": {
+        "kelompok": [
+          "pekerja",
+          "pedagang",
+          "tetua",
+          "anak",
+          "penjaga"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "dagang.tawar_pembeli.0",
+          "slot": [
+            "$harga",
+            "$harga_tawar"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "oasis",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "dagang.tawar_pembeli.1",
+          "slot": [
+            "$harga_tawar"
+          ],
+          "bobot": 2,
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "dagang.tawar_pembeli.2",
+          "slot": [
+            "$harga_tawar"
+          ],
+          "bobot": 1,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "dagang.tawar_pembeli.3",
+          "slot": [
+            "$harga_tawar"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "dagang.tawar_pembeli.4",
+          "slot": [
+            "$harga_tawar"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$harga": {
+          "tipe": "harga",
+          "dari": "konteks.harga"
+        },
+        "$harga_tawar": {
+          "tipe": "harga",
+          "dari": "konteks.harga_tawar"
+        }
+      },
+      "gestur": "tawar"
+    },
+    {
+      "aturan": "dagang.tawar_penjual",
+      "niat": "TAWAR_BALIK",
+      "topik": "dagang",
+      "syarat": {
+        "kelompok": [
+          "pedagang"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "dagang.tawar_penjual.0",
+          "slot": [
+            "$harga_tawar",
+            "$harga",
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "dagang.tawar_penjual.1",
+          "slot": [
+            "$harga"
+          ],
+          "bobot": 2,
+          "varian": [
+            "p",
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "dagang.tawar_penjual.2",
+          "slot": [
+            "$harga"
+          ],
+          "bobot": 1,
+          "varian": [
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "dagang.tawar_penjual.3",
+          "slot": [
+            "$harga"
+          ],
+          "bobot": 1
+        },
+        {
+          "kunci": "dagang.tawar_penjual.4",
+          "slot": [
+            "$harga"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$harga_tawar": {
+          "tipe": "harga",
+          "dari": "konteks.harga_tawar"
+        },
+        "$harga": {
+          "tipe": "harga",
+          "dari": "konteks.harga"
+        },
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "hitung_koin"
+    },
+    {
+      "aturan": "dagang.sepakat",
+      "niat": "SEPAKAT",
+      "topik": "dagang",
+      "bingkai": [
+        {
+          "kunci": "dagang.sepakat.0",
+          "slot": [
+            "$harga",
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "pelabuhan",
+            "oasis",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "dagang.sepakat.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "p",
+            "air"
+          ]
+        },
+        {
+          "kunci": "dagang.sepakat.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1
+        },
+        {
+          "kunci": "dagang.sepakat.3",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "dagang.sepakat.4",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$harga": {
+          "tipe": "harga",
+          "dari": "konteks.harga"
+        },
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "angguk",
+      "seru": "terima_kasih"
+    },
+    {
+      "aturan": "dagang.batal",
+      "niat": "BATAL",
+      "topik": "dagang",
+      "bingkai": [
+        {
+          "kunci": "dagang.batal.0",
+          "slot": [],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "pelabuhan",
+            "oasis",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "dagang.batal.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "dagang.batal.2",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "dagang.batal.3",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "iblis"
+          ]
+        }
+      ],
+      "slot": {},
+      "gestur": "geleng"
+    },
+    {
+      "aturan": "dagang.cerita.laris",
+      "niat": "BERI_KABAR",
+      "topik": "dagang",
+      "syarat": {
+        "kelompok": [
+          "pedagang"
+        ],
+        "label_emosi": [
+          "gembira",
+          "puas",
+          "lega"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "dagang.cerita.laris.0",
+          "slot": [
+            "$barang",
+            "$senang"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "dagang.cerita.laris.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "dagang.cerita.laris.2",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "dagang.cerita.laris.3",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$barang": {
+          "tipe": "barang",
+          "dari": "konteks.barang"
+        },
+        "$senang": {
+          "aturan": "seru.senang",
+          "opsional": 0.5
+        }
+      },
+      "gestur": "hitung_koin"
+    },
+    {
+      "aturan": "dagang.cerita.sepi",
+      "niat": "KELUH",
+      "topik": "dagang",
+      "syarat": {
+        "kelompok": [
+          "pedagang"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "dagang.cerita.sepi.0",
+          "slot": [
+            "$keluh"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "pelabuhan",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "dagang.cerita.sepi.1",
+          "slot": [
+            "$barang"
+          ],
+          "bobot": 2,
+          "varian": [
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "dagang.cerita.sepi.2",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "dagang.cerita.sepi.3",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "iblis"
+          ]
+        }
+      ],
+      "slot": {
+        "$keluh": {
+          "aturan": "seru.keluh",
+          "opsional": 0.5
+        },
+        "$barang": {
+          "tipe": "barang",
+          "dari": "konteks.barang"
+        }
+      },
+      "gestur": "geleng",
+      "seru": "aduh"
+    },
+    {
+      "aturan": "dagang.tanya_harga",
+      "niat": "TANYA",
+      "topik": "harga",
+      "bingkai": [
+        {
+          "kunci": "dagang.tanya_harga.0",
+          "slot": [
+            "$sebutan",
+            "$barang_murah"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "dagang.tanya_harga.1",
+          "slot": [
+            "$sebutan",
+            "$barang_mahal"
+          ],
+          "bobot": 2,
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "dagang.tanya_harga.2",
+          "slot": [
+            "$sebutan",
+            "$barang_mahal"
+          ],
+          "bobot": 1
+        },
+        {
+          "kunci": "dagang.tanya_harga.3",
+          "slot": [
+            "$barang_murah"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        },
+        "$barang_murah": {
+          "tipe": "barang",
+          "dari": "konteks.barang_murah"
+        },
+        "$barang_mahal": {
+          "tipe": "barang",
+          "dari": "konteks.barang_mahal",
+          "fitur": [
+            "jamak"
+          ]
+        }
+      },
+      "gestur": "bicara_tangan"
+    }
+  ]
+}

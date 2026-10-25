@@ -16,6 +16,7 @@ import dev.kultivator.dunia.tempat.ui.TempatLayar;
 import dev.kultivator.util.Sibuk;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * The capital's calendar (DESIGN 38.B.6). World day {@code d = overworld clock / 24000}; at most one great event a day per
@@ -78,6 +80,26 @@ public final class KotaBesarKalender {
 	}
 
 	private static final Map<String, Acara> ACARA = new LinkedHashMap<>();
+
+	/**
+	 * A source of extra rows for the capital's calendar list (DESIGN 42.7: 42D's {@code KalenderKota} adds the troupes,
+	 * festivals and ceremonies of the town): rows with {@link LembarKunci#NAMA}, {@link LembarKunci#HARI} and
+	 * {@link LembarKunci#CATATAN}, for {@code hari} days from {@code day}.
+	 */
+	@FunctionalInterface
+	public interface SumberJadwal {
+		void isi(MinecraftServer server, long town, long day, int hari, List<CompoundTag> out);
+	}
+
+	private static final List<SumberJadwal> SUMBER_JADWAL = new CopyOnWriteArrayList<>();
+
+	/** Registers a source of extra calendar rows (42D). */
+	public static void addSumberJadwal(SumberJadwal sumber) {
+		if (sumber != null) {
+			SUMBER_JADWAL.add(sumber);
+		}
+	}
+
 	static void init() {
 		daftar(new AcaraPertahanan());
 		daftar(new TurnamenAgung());
@@ -464,6 +486,29 @@ public final class KotaBesarKalender {
 				LembarKunci.teks(row, LembarKunci.NAMA, Component.translatable("kultivator.kota_besar.acara." + LembarKunci.Acara.ACARA_PERTEMUAN_SEKTE));
 				row.putInt(LembarKunci.HARI, (int) d);
 				LembarKunci.teks(row, LembarKunci.CATATAN, Component.translatable("kultivator.kota_besar.acara.jam", jam(6000L), jam(9000L)));
+				list.add(row);
+			}
+		}
+		if (!SUMBER_JADWAL.isEmpty()) {
+			List<CompoundTag> rows = new ArrayList<>();
+			for (Tag each : list) {
+				if (each instanceof CompoundTag row) {
+					rows.add(row);
+				}
+			}
+			for (SumberJadwal sumber : SUMBER_JADWAL) {
+				try {
+					sumber.isi(server, town, day, 14, rows);
+				} catch (RuntimeException ignored) {
+					// a broken source never breaks the calendar
+				}
+			}
+			rows.sort(java.util.Comparator.comparingInt(row -> row.getIntOr(LembarKunci.HARI, 0)));
+			list = new ListTag();
+			for (CompoundTag row : rows) {
+				if (list.size() >= 24) {
+					break;
+				}
 				list.add(row);
 			}
 		}

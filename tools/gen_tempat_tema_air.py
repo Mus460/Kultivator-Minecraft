@@ -46,6 +46,7 @@ import nbt as nbtmod  # noqa: E402
 import structgen  # noqa: E402
 import tempat_lib as tl  # noqa: E402
 import kota_besar_kit as K  # noqa: E402
+import tema_hidup_kit as thk  # noqa: E402  (DESIGN 42 lots outside the wall, 42W-T)
 import hias_tema as H  # noqa: E402
 
 F = "kota_tema/air"
@@ -2657,12 +2658,59 @@ def build_dermaga_perahu():
                     kode_dalam={"h0": "B", "h1": "B", "v0": "B", "v1": "B"}, utuh=("rumah_perahu_naga",))
 
 
+# ===================================================================================================== DESIGN 42 (42W-T)
+# 42.12.1 row tema: the night street, the recruitment office (2 booths), 10 kavling of gaya "air", the island
+# cemetery in its moat (pulau makam) and the Ghost Market / rentable stall points, all on free lots OUTSIDE the low wall
+# inside the keep-out zone of their district (tools/tema_hidup_kit.py; off the 48-grid, no side code). White plaster,
+# dark tile gables with stepped horse-head walls (matou), dark timber - the Jiangnan style of the town.
+GAYA42 = {
+    "tema": "air", "pal": PAL, "pondasi": "minecraft:stone",
+    "tanah": ["minecraft:grass_block", "minecraft:grass_block", "minecraft:moss_block", "minecraft:grass_block",
+              "minecraft:coarse_dirt", "minecraft:grass_block"],
+    "jalan": ["minecraft:polished_andesite", "minecraft:andesite", "minecraft:polished_andesite", "minecraft:tuff",
+              "minecraft:stone_bricks"],
+    "alas": "minecraft:stone_bricks", "alas_tangga": "minecraft:stone_brick_stairs",
+    "lantai": ["minecraft:dark_oak_planks", "minecraft:spruce_planks"],
+    "dinding": ["minecraft:white_terracotta", "minecraft:calcite", "minecraft:white_terracotta"],
+    "tiang": "minecraft:dark_oak_log", "balok": "minecraft:stripped_dark_oak_log",
+    "jendela": "minecraft:dark_oak_trapdoor", "pintu": "minecraft:dark_oak_door", "plafon": "minecraft:dark_oak_planks",
+    "atap": "pelana", "atap_tangga": "minecraft:deepslate_tile_stairs", "atap_slab": "minecraft:deepslate_tile_slab",
+    "atap_penuh": "minecraft:deepslate_tiles", "parapet": "minecraft:stone_brick_wall", "kubah": "minecraft:calcite",
+    "matou": True,
+    "kain": ("minecraft:blue_wool", "minecraft:white_wool"), "warna": "light_blue", "lampu": "minecraft:lantern",
+    "pohon": "cherry", "kavling": "air", "makam": ("pulau", "pulau"),
+    "rencana": (("rumah_toko", "kedai_teh", "rumah_besar", "bengkel", "gudang", "sekolah", "kedai_arak"),
+                ("rumah_kecil", "taman", "kuil_kecil", "rumah_kecil", "menara_jaga")),
+    "bilik_warna": ("light_blue", "white"),
+}
+# (district, dx, dz, lot): south band west of the Pintu Air (night street, kavling), east of it (office, kavling);
+# the island cemetery west of the Hunian Kanal wall (clear of the west land gate at city z -24)
+LOT42 = (("hunian_kanal", -48, 58, "hidup42/kavling_barat"), ("hunian_kanal", 0, 58, "hidup42/jalan_malam"),
+         ("dermaga_perahu", -48, 58, "hidup42/kantor_rekrut"), ("dermaga_perahu", 0, 58, "hidup42/kavling_timur"),
+         ("hunian_kanal", -108, -16, "hidup42/makam"))
+
+
+def lot42_buat(dry=False):
+    """Writes the DESIGN 42 lots and registers them (lapak_sewa 0-4, pasar_hantu 0-3, nisan 0-31)."""
+    out = [thk.lot_jalan_malam(F, GAYA42, lapak0=0, hantu0=0),
+           thk.lot_kantor_rekrut(F, GAYA42, lapak0=2),
+           thk.lot_kavling(F, GAYA42, "hidup42/kavling_barat", 0),
+           thk.lot_kavling(F, GAYA42, "hidup42/kavling_timur", 1, hantu=3),
+           thk.lot_makam(F, GAYA42, nisan0=0, hantu0=1)]
+    if not dry:
+        for distrik, dx, dz, name in LOT42:
+            daftar_lot(distrik, dx, dz, name, ["%s%s/%s" % (NS, F, name)])
+    return out
+
+
 def main(argv):
     only = [a for a in argv if not a.startswith("-")]
     builders = {n: globals()["build_" + n] for n in ORDER if "build_" + n in globals()}
     for name in ORDER:
         if (not only or name in only) and name in builders:
             builders[name]()
+    if not only:
+        lot42_buat()
     write_processors()
     write_pools()
     write_structures()

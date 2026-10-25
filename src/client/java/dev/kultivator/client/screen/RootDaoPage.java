@@ -3,7 +3,9 @@ package dev.kultivator.client.screen;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Eased;
 import dev.kultivator.client.screen.ui.Glyphs;
+import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
+import dev.kultivator.client.screen.ui.SegelKonfirmasi;
 import dev.kultivator.client.screen.ui.UiSound;
 import dev.kultivator.cultivation.SpiritRoots;
 import dev.kultivator.data.CultivationData;
@@ -27,22 +29,20 @@ import java.util.Locale;
  * Root and Dao: on the left the five-element pentagram (Fire, Earth, Metal, Water, Wood around the circle of
  * generation, the star of overcoming inside) with the four mutant elements beneath it, lit by the player's root, and
  * the root's grade; on the right the Bagua octagon of the eight Daos around a turning yin-yang. A trigram is read on
- * hover and chosen with a click that must be repeated within 3 s to swear by that Dao.
+ * hover; a click (or Tab to it and Enter) asks to swear by that Dao with the medium confirm seal (DESIGN 43.5, 43.7
+ * {@code SegelKonfirmasi.SEDANG}: hold 1.5 s). All text is drawn at 1.0 (43.0.5).
  */
 final class RootDaoPage extends Page {
 
 	/** Clockwise from the top, so neighbours generate each other and the star lines overcome. */
 	private static final Element[] WU_XING = {Element.FIRE, Element.EARTH, Element.METAL, Element.WATER, Element.WOOD};
 	private static final Element[] MUTANTS = {Element.LIGHTNING, Element.ICE, Element.WIND, Element.SPACE};
-	private static final long CONFIRM_MILLIS = 3000L;
 	private static final int YANG = 0xFFF3EEDC;
 	private static final int YIN = 0xFF1B2521;
 
 	private final Eased[] tileGlow = new Eased[8];
 	private final Eased comprehension = new Eased(4.0F);
 	private int hoveredTile = -1;
-	private int pendingTile = -1;
-	private long pendingUntil;
 	private long swornAt;
 
 	private int half;
@@ -67,12 +67,12 @@ final class RootDaoPage extends Page {
 	}
 
 	@Override
-	Component title() {
+	public Component title() {
 		return Component.translatable("kultivator.screen.tab.root_dao");
 	}
 
 	@Override
-	Component shortName() {
+	public Component shortName() {
 		return Component.translatable("kultivator.screen.tab.root_dao.short");
 	}
 
@@ -81,17 +81,18 @@ final class RootDaoPage extends Page {
 		half = (w - 6) / 2;
 		float header = 13.0F;
 		// Left: pentagram, mutant row, grade line.
-		float availStar = h - header - 20.0F - 16.0F;
-		float byHeight = (availStar - 16.0F) / 2.17F;
-		float byWidth = (half / 2.0F - 15.0F) / 1.13F;
+		// Vertical budget at text 1.0: top label 10, star, bottom labels 11, mutant row + labels, grade line 10.
+		float byHeight = (h - header - 46.0F) / 2.39F;
+		float byWidth = (half / 2.0F - 18.0F) / 1.13F;
 		starR = Math.max(16.0F, Math.min(byHeight, byWidth));
 		nodeR = Math.max(4.5F, Math.min(9.0F, starR * 0.18F));
-		float used = 1.81F * starR + 2.0F * nodeR + 16.0F + 20.0F + 16.0F;
+		float mutantSize = Math.max(3.5F, nodeR * 0.62F);
+		float used = 10.0F + nodeR + 1.81F * starR + nodeR + 11.0F + 2.0F * mutantSize + 13.0F + 10.0F;
 		float top = y + header + Math.max(0.0F, (h - header - used) / 2.0F);
 		starX = x + half / 2.0F;
-		starY = top + 8.0F + nodeR + starR;
-		mutantY = starY + 0.81F * starR + nodeR + 8.0F + 9.0F;
-		gradeY = Math.min(y + h - 15.0F, mutantY + 14.0F);
+		starY = top + 10.0F + nodeR + starR;
+		mutantY = starY + 0.81F * starR + nodeR + 11.0F + mutantSize + 2.0F;
+		gradeY = Math.min(y + h - 10.0F, mutantY + mutantSize + 13.0F);
 
 		// The Uji Akar talisman lives only on Status now (DESIGN 33.6 R6); the grade line says where while untested.
 
@@ -100,7 +101,7 @@ final class RootDaoPage extends Page {
 		int rw = w - half - 6;
 		float caption = 22.0F;
 		float diameter = Math.max(60.0F, Math.min(rw - 4.0F, h - header - caption - 2.0F));
-		tileH = Math.max(9.0F, Math.min(16.0F, diameter * 0.13F));
+		tileH = Math.max(12.0F, Math.min(16.0F, diameter * 0.13F));
 		baguaR = diameter / 2.0F - tileH / 2.0F - 1.0F;
 		tileW = 2.0F * baguaR * (float) Math.tan(Math.PI / 8.0D) * 0.88F;
 		baguaX = rx + rw / 2.0F;
@@ -113,13 +114,6 @@ final class RootDaoPage extends Page {
 		return "roots";
 	}
 
-	@Override
-	void onData() {
-		if (data().dao() != null) {
-			pendingTile = -1;
-		}
-	}
-
 	private static boolean eligible(CultivationData data) {
 		return data.dao() == null && data.realm().atLeast(Realm.GOLDEN_CORE);
 	}
@@ -130,11 +124,8 @@ final class RootDaoPage extends Page {
 	protected void drawBehind(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
 		CultivationData data = data();
 		long now = Util.getMillis();
-		if (pendingTile >= 0 && now > pendingUntil) {
-			pendingTile = -1;
-		}
-		heading(g, Component.translatable("kultivator.screen.root.header"), x + 2.0F, y, half - 4.0F, 0.85F);
-		heading(g, Component.translatable("kultivator.screen.dao.header"), x + half + 8.0F, y, w - half - 10.0F, 0.85F);
+		heading(g, Component.translatable("kultivator.screen.root.header"), x + 2.0F, y, half - 4.0F, 1.0F);
+		heading(g, Component.translatable("kultivator.screen.dao.header"), x + half + 8.0F, y, w - half - 10.0F, 1.0F);
 		drawPentagram(g, data, mouseX, mouseY, now);
 		g.nextStratum();
 		drawBagua(g, data, mouseX, mouseY, seconds, now);
@@ -166,12 +157,15 @@ final class RootDaoPage extends Page {
 			RootGrade grade = data.rootGrade();
 			Brush.disc(g, starX, starY, seal + 1.0F, Palette.GOLD_DARK);
 			Brush.band(g, starX, starY, seal, -seal, seal, Palette.lighten(Palette.opaque(grade.color()), 0.2F), Palette.darken(Palette.opaque(grade.color()), 0.25F));
+			// The multiplier is also on the grade line; inside the seal only when it fits at 1.0.
 			Component multiplier = Component.literal("×" + trim(grade.multiplier()));
-			Brush.fitCentered(g, font, multiplier, starX, starY - 2.5F, seal * 1.8F, Palette.INK, 0.6F, 0.4F, false);
+			if (font.width(multiplier) <= seal * 2.0F) {
+				Brush.centered(g, font, multiplier, starX, starY - 4.0F, Palette.INK, 1.0F, false);
+			}
 		} else {
 			Brush.disc(g, starX, starY, seal + 1.0F, Palette.PAPER_DEEP);
 			Brush.disc(g, starX, starY, seal, Palette.PAPER_SHADE);
-			Brush.centered(g, font, Brush.bold(Component.literal("?")), starX, starY - 3.5F, Palette.INK_SOFT, 0.9F, false);
+			Brush.centered(g, font, Brush.bold(Component.literal("?")), starX, starY - 4.0F, Palette.INK_SOFT, 1.0F, false);
 		}
 
 		Element hovered = null;
@@ -179,21 +173,21 @@ final class RootDaoPage extends Page {
 			Element element = WU_XING[i];
 			boolean lit = (mask & element.bit()) != 0;
 			drawNode(g, element, px[i], py[i], nodeR, lit, pulse, false);
-			float labelY = i == 0 ? py[i] - nodeR - 7.5F : py[i] + nodeR + 2.0F;
-			Brush.fitCentered(g, font, element.displayName(), px[i], labelY, 40.0F, lit ? Palette.onPaper(element.color()) : Palette.INK_FAINT, 0.6F, 0.45F, false);
+			float labelY = i == 0 ? py[i] - nodeR - 10.0F : py[i] + nodeR + 2.0F;
+			Brush.fitCentered(g, font, element.displayName(), px[i], labelY, 44.0F, lit ? Palette.onPaper(element.color()) : Palette.INK_FAINT, 1.0F, 1.0F, false);
 			if (near(mouseX, mouseY, px[i], py[i], nodeR + 2.0F)) {
 				hovered = element;
 			}
 		}
-		float spacing = Math.min(28.0F, (half - 10.0F) / 4.0F);
+		float spacing = Math.min(36.0F, (half - 6.0F) / 4.0F);
 		float mutantSize = Math.max(3.5F, nodeR * 0.62F);
 		for (int i = 0; i < MUTANTS.length; i++) {
 			Element element = MUTANTS[i];
 			float mx = starX + (i - 1.5F) * spacing;
 			boolean lit = (mask & element.bit()) != 0;
 			drawNode(g, element, mx, mutantY, mutantSize, lit, pulse, true);
-			Brush.fitCentered(g, font, element.displayName(), mx, mutantY + mutantSize + 2.5F, spacing - 2.0F,
-					lit ? Palette.onPaper(element.color()) : Palette.INK_FAINT, 0.5F, 0.4F, false);
+			Brush.fitCentered(g, font, element.displayName(), mx, mutantY + mutantSize + 2.0F, spacing - 1.0F,
+					lit ? Palette.onPaper(element.color()) : Palette.INK_FAINT, 1.0F, 1.0F, false);
 			if (near(mouseX, mouseY, mx, mutantY, mutantSize + 2.0F)) {
 				hovered = element;
 			}
@@ -205,9 +199,9 @@ final class RootDaoPage extends Page {
 				: untested ? Component.translatable("kultivator.uxpages.root.test_on_status")
 				: Component.translatable("kultivator.screen.root.untested");
 		int color = known ? Palette.onPaper(data.rootGrade().color()) : untested ? Palette.SEAL_DARK : Palette.INK_FAINT;
-		Brush.fitCentered(g, font, grade, starX, gradeY, half - 8.0F, color, 0.85F, 0.6F, false);
+		Brush.fitCentered(g, font, grade, starX, gradeY, half - 8.0F, color, 1.0F, 1.0F, false);
 		if (hovered != null) {
-			screen.showTooltip(elementTip(data, hovered));
+			tooltip(elementTip(data, hovered));
 		}
 	}
 
@@ -315,9 +309,6 @@ final class RootDaoPage extends Page {
 			if (isChosen) {
 				Brush.rect(g, -hw - 3.0F, -hh - 3.0F, hw + 3.0F, hh + 3.0F, Palette.argb(Math.round(60 + 60 * pulse), Palette.GOLD_LIGHT));
 			}
-			if (i == pendingTile) {
-				Brush.rect(g, -hw - 3.0F, -hh - 3.0F, hw + 3.0F, hh + 3.0F, Palette.argb(Math.round(70 + 110 * pulse), Palette.SEAL_GLOW));
-			}
 			Brush.rect(g, -hw + 0.8F, -hh + 1.2F, hw + 0.8F, hh + 1.2F, 0x40000000);
 			Brush.rect(g, -hw, -hh, hw, hh, isChosen ? Palette.GOLD : Palette.darken(fill, 0.35F));
 			Brush.rect(g, -hw + 1.0F, -hh + 1.0F, hw - 1.0F, hh - 1.0F, fill);
@@ -335,9 +326,6 @@ final class RootDaoPage extends Page {
 			line1 = Component.translatable("kultivator.screen.dao.chosen", chosen.displayName(), Math.round(data.comprehension(chosen)));
 			color1 = Palette.onPaper(chosen.color());
 			line2 = Dao.comprehensionName(data.comprehension(chosen));
-		} else if (pendingTile >= 0) {
-			line1 = Component.translatable("kultivator.screen.dao.confirm", Glyphs.BAGUA[pendingTile].displayName());
-			color1 = Palette.mix(Palette.SEAL, Palette.SEAL_GLOW, pulse);
 		} else if (now - swornAt < 4000L) {
 			line1 = Component.translatable("kultivator.screen.dao.sworn");
 			color1 = Palette.GOLD_DARK;
@@ -352,17 +340,17 @@ final class RootDaoPage extends Page {
 			line2 = Glyphs.BAGUA[hoveredTile].displayName();
 		}
 		float cx = baguaX;
-		Brush.fitCentered(g, font, line1, cx, captionY, captionRoom, color1, 0.8F, 0.5F, false);
+		Brush.fitCentered(g, font, line1, cx, captionY, captionRoom, color1, 1.0F, 1.0F, false);
 		if (line2 != null) {
 			int color2 = hoveredTile >= 0 && chosen == null ? Palette.onPaper(Glyphs.BAGUA[hoveredTile].color()) : Palette.INK_SOFT;
-			Brush.fitCentered(g, font, line2, cx, captionY + 9.0F, captionRoom, color2, 0.7F, 0.45F, false);
+			Brush.fitCentered(g, font, line2, cx, captionY + 10.0F, captionRoom, color2, 1.0F, 1.0F, false);
 		}
 		if (hoveredTile >= 0) {
-			screen.showTooltip(daoTip(data, Glyphs.BAGUA[hoveredTile], hoveredTile));
+			tooltip(daoTip(data, Glyphs.BAGUA[hoveredTile]));
 		}
 	}
 
-	private List<Component> daoTip(CultivationData data, Dao dao, int tile) {
+	private List<Component> daoTip(CultivationData data, Dao dao) {
 		List<Component> lines = new ArrayList<>();
 		lines.add(dao.displayName().copy().withColor(dao.color()));
 		lines.add(Component.translatable("kultivator.screen.trigram." + dao.id()).withStyle(ChatFormatting.GRAY));
@@ -392,8 +380,6 @@ final class RootDaoPage extends Page {
 			lines.add(Component.translatable("kultivator.screen.dao.other").withStyle(ChatFormatting.DARK_GRAY));
 		} else if (!data.realm().atLeast(Realm.GOLDEN_CORE)) {
 			lines.add(Component.translatable("kultivator.screen.dao.locked").withStyle(ChatFormatting.RED));
-		} else if (tile == pendingTile) {
-			lines.add(Component.translatable("kultivator.screen.dao.confirm_tip").withStyle(ChatFormatting.RED));
 		} else {
 			lines.add(Component.translatable("kultivator.screen.dao.click").withStyle(ChatFormatting.YELLOW));
 		}
@@ -480,29 +466,49 @@ final class RootDaoPage extends Page {
 		return (int) Math.round(angle / (Math.PI / 4.0D)) % 8;
 	}
 
+	/** The eight tiles as focus zones (Tab + Enter swears like a click); a locked tile tells why. */
+	@Override
+	protected void lukis(Lukis l) {
+		CultivationData data = data();
+		boolean open = eligible(data);
+		Component why = data.dao() != null ? Component.translatable("kultivator.screen.dao.other")
+				: Component.translatable("kultivator.screen.dao.locked");
+		int r = Math.round(Math.max(tileH, 12.0F) * 0.7F);
+		for (int i = 0; i < 8; i++) {
+			double angle = i * Math.PI / 4.0D;
+			int tx = Math.round(baguaX + (float) Math.sin(angle) * baguaR);
+			int ty = Math.round(baguaY - (float) Math.cos(angle) * baguaR);
+			final int tile = i;
+			l.zona("dao" + i, tx - r, ty - r, tx + r, ty + r, () -> swear(tile), open, open ? null : why, true);
+			l.fokusCincin("dao" + i, tx - r, ty - r, tx + r, ty + r);
+		}
+	}
+
+	/** A click on a tile outside its focus zone (the corners of the turned tile). */
 	@Override
 	protected boolean clickedElsewhere(double mouseX, double mouseY) {
 		int tile = tileAt(mouseX, mouseY);
 		if (tile < 0) {
 			return false;
 		}
-		CultivationData data = data();
-		if (!eligible(data)) {
-			UiSound.denied();
-			return true;
-		}
-		long now = Util.getMillis();
-		if (tile == pendingTile && now <= pendingUntil) {
-			send(Actions.CHOOSE_DAO, Glyphs.BAGUA[tile].ordinal(), "");
-			UiSound.press();
-			pendingTile = -1;
-			swornAt = now;
-		} else {
-			pendingTile = tile;
-			pendingUntil = now + CONFIRM_MILLIS;
-			UiSound.ask();
-		}
+		swear(tile);
 		return true;
+	}
+
+	/** Asks to swear by the Dao of {@code tile} (medium seal: hold 1.5 s); the oath lasts a lifetime. */
+	private void swear(int tile) {
+		if (!eligible(data())) {
+			UiSound.denied();
+			return;
+		}
+		Dao dao = Glyphs.BAGUA[tile];
+		UiSound.ask();
+		konfirmasi(SegelKonfirmasi.Tingkat.SEDANG, Component.translatable("kultivator.gui43.m01.dao.sumpah",
+				dao.displayName().copy().withColor(dao.color())), () -> {
+			send(Actions.CHOOSE_DAO, dao.ordinal(), "");
+			UiSound.press();
+			swornAt = Util.getMillis();
+		});
 	}
 
 	private static boolean near(double mouseX, double mouseY, float cx, float cy, float r) {

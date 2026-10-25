@@ -3,6 +3,7 @@ package dev.kultivator.client.dunia.tempat.tema.fx;
 import dev.kultivator.client.EffectQuality;
 import dev.kultivator.client.epic.EpicBudget;
 import dev.kultivator.client.epic.film.FilmDirector;
+import dev.kultivator.client.fx.spec.ScreenFlash;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Palette;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement;
@@ -19,7 +20,8 @@ import org.jetbrains.annotations.Nullable;
  * packs), hidden with F1 and while a film plays:
  * <ul>
  * <li>the sandstorm tint {@code #C8A060} with a denser vignette and, outdoors, gusting grain lines blowing across the
- * screen in the wind's sense (on Minimal this overlay is the whole storm); thin under a roof;</li>
+ * screen in the wind's sense (on Minimal this overlay is the whole storm); thin under a roof; the edges through the one
+ * edge painter {@link ScreenFlash#tepi} (DESIGN 43.9);</li>
  * <li>a faint white veil in the mountain mist;</li>
  * <li>the festival banner (four seconds, gold rules, title and subtitle from {@code kultivator.tempat_tema_fx.acara.*});</li>
  * <li>small captions: the player's own lantern wish (only he sees it), the commissioner of the niche-12 mural he stands
@@ -81,18 +83,8 @@ final class TemaHud implements HudElement {
 		float base = (minimal ? 0.42F : 0.22F) * k * roof;
 		int rgb = BadaiPasirFx.WARNA;
 		g.fill(0, 0, w, h, Palette.argb(Math.round(base * 255.0F), rgb));
-		// vignette: the edges choke first
-		int band = Math.max(16, Math.min(w, h) / 3);
-		int edge = Palette.argb(Math.round(Math.min(0.5F, base * 1.3F) * 255.0F), 0xA87840);
-		int clear = Palette.argb(0, 0xA87840);
-		g.fillGradient(0, 0, w, band, edge, clear);
-		g.fillGradient(0, h - band, w, h, clear, edge);
-		for (int i = 0; i < band; i += 3) {
-			float f = 1.0F - i / (float) band;
-			int c = Palette.argb(Math.round(Math.min(0.5F, base * 1.3F) * 255.0F * f * f), 0xA87840);
-			g.fill(i, 0, i + 3, h, c);
-			g.fill(w - i - 3, 0, w - i, h, c);
-		}
+		// vignette: the edges choke first (the one edge painter, DESIGN 43.9)
+		ScreenFlash.tepi(0xA87840, Math.min(0.5F, base * 1.3F));
 		if (BadaiPasirFx.bawahAtap() || EffectQuality.reduceMotion()) {
 			return;
 		}
@@ -118,11 +110,7 @@ final class TemaHud implements HudElement {
 			return;
 		}
 		g.fill(0, 0, w, h, Palette.argb(Math.round(0.07F * k * 255.0F), 0xF2F6FA));
-		int band = Math.max(16, h / 4);
-		int edge = Palette.argb(Math.round(0.16F * k * 255.0F), 0xF2F6FA);
-		int clear = Palette.argb(0, 0xF2F6FA);
-		g.fillGradient(0, h - band, w, h, clear, edge);
-		g.fillGradient(0, 0, w, band / 2, edge, clear);
+		ScreenFlash.tepi(0xF2F6FA, 0.16F * k, ScreenFlash.ATAS | ScreenFlash.BAWAH);
 	}
 
 	private static void teks(GuiGraphicsExtractor g, Minecraft minecraft, int w, int h, long now, float pt) {
@@ -141,10 +129,10 @@ final class TemaHud implements HudElement {
 				float half = Math.min(w * 0.3F, 150.0F) * (0.6F + 0.4F * a);
 				int gold = Palette.argb(Math.round(a * 200.0F), 0xE8C070);
 				Brush.rect(g, w / 2.0F - half, y - 6.0F, w / 2.0F + half, y - 5.0F, gold);
-				Brush.centered(g, minecraft.font, judul, w / 2.0F, y, Palette.argb(Math.round(a * 255.0F), 0xFFF0D0), 1.3F, true);
+				Brush.centered(g, minecraft.font, judul, w / 2.0F, y, Palette.argb(Math.round(a * 255.0F), 0xFFF0D0), 1.5F, true);
 				float y2 = y + 16.0F;
 				if (sub != null) {
-					Brush.centered(g, minecraft.font, sub, w / 2.0F, y2, Palette.argb(Math.round(a * 220.0F), 0xD8C8A8), 0.8F, true);
+					Brush.centered(g, minecraft.font, sub, w / 2.0F, y2, Palette.argb(Math.round(a * 220.0F), 0xD8C8A8), 1.0F, true);
 					y2 += 11.0F;
 				}
 				Brush.rect(g, w / 2.0F - half, y2, w / 2.0F + half, y2 + 1.0F, gold);
@@ -158,17 +146,17 @@ final class TemaHud implements HudElement {
 			} else {
 				float a = Math.min(1.0F, age / 10.0F) * Math.min(1.0F, (HARAPAN_TICK - age) / 20.0F);
 				Brush.centered(g, minecraft.font, Component.translatable(K + "hud.harapan", harapan), w / 2.0F, cy,
-						Palette.argb(Math.round(a * 235.0F), 0xFFD890), 0.85F, true);
+						Palette.argb(Math.round(a * 235.0F), 0xFFD890), 1.0F, true);
 				cy -= 11.0F;
 			}
 		}
 		String mural = MuralBillboard.caption();
 		if (mural != null) {
-			Brush.centered(g, minecraft.font, Component.translatable(K + "hud.mural", mural), w / 2.0F, cy, Palette.argb(0xC8, 0xE8C890), 0.8F, true);
+			Brush.centered(g, minecraft.font, Component.translatable(K + "hud.mural", mural), w / 2.0F, cy, Palette.argb(0xC8, 0xE8C890), 1.0F, true);
 			cy -= 11.0F;
 		}
 		if (CahayaBudhaFx.dilihat()) {
-			Brush.centered(g, minecraft.font, Component.translatable(K + "hud.budha"), w / 2.0F, cy, Palette.argb(0xB4, 0xF0E8FF), 0.8F, true);
+			Brush.centered(g, minecraft.font, Component.translatable(K + "hud.budha"), w / 2.0F, cy, Palette.argb(0xB4, 0xF0E8FF), 1.0F, true);
 		}
 	}
 }

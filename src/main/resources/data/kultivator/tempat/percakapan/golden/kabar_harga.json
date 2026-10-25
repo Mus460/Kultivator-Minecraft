@@ -1,0 +1,203 @@
+{
+  "id": "kabar_harga",
+  "jenis": "realisasi",
+  "_catatan": "News of prices: rice up 15 %, salt down, with item, day and percent slots.",
+  "benih_dunia": 42,
+  "masukan": {
+    "niat": "BERI_KABAR",
+    "pembicara": 400,
+    "hari": 120,
+    "now": 2880000,
+    "cuaca": "cerah",
+    "musim": "semi",
+    "situasi": {
+      "jam": "pagi",
+      "cuaca": "cerah",
+      "musim": "semi",
+      "kelompok": "pedagang",
+      "watak": "ramah",
+      "kebiasaan": [],
+      "sifat": {
+        "H": 10,
+        "E": 0,
+        "X": 20,
+        "A": 30,
+        "C": 10,
+        "O": 0
+      },
+      "wajah": "netral",
+      "tempat": "kota_besar"
+    },
+    "pendengar": {
+      "nama": "Han",
+      "kelamin": "l",
+      "tahap": "dewasa",
+      "pemain": true
+    },
+    "kesan": "kenal",
+    "tahu_nama": false,
+    "register": "sopan",
+    "dialek": "ibukota",
+    "label": "jemu"
+  },
+  "langkah": [
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pedagang",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar",
+          "fakta": "HARGA_NAIK"
+        },
+        "nilai": {
+          "fakta.objek": {
+            "t": "beras"
+          },
+          "fakta.nilai": 15,
+          "fakta.hariKejadian": 113
+        },
+        "topik": "harga"
+      },
+      "harap": {
+        "k": "kultivator.cakap.kabar.harga_naik.2",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.tuan.ibukota",
+            "a": []
+          },
+          {
+            "t": "beras"
+          },
+          {
+            "t": ""
+          }
+        ]
+      },
+      "aturan": "kabar.harga_naik",
+      "gestur": "geleng",
+      "seru": "kota42.seru.aduh_l",
+      "tik": null,
+      "id_id": "Mohon maaf, Tuanku, harga beras sedang tinggi. ",
+      "en_us": "My apologies, My Lord, beras is dear right now. "
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pedagang",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar",
+          "fakta": "HARGA_TURUN"
+        },
+        "nilai": {
+          "fakta.objek": {
+            "t": "garam"
+          },
+          "fakta.nilai": 8,
+          "fakta.hariKejadian": 119
+        },
+        "topik": "harga"
+      },
+      "harap": {
+        "k": "kultivator.cakap.kabar.harga_turun.1",
+        "a": [
+          {
+            "t": "garam"
+          }
+        ]
+      },
+      "aturan": "kabar.harga_turun",
+      "gestur": "tertawa",
+      "seru": null,
+      "tik": null,
+      "id_id": "Kafilah besar datang membawa garam. Harganya jatuh, pedagang lama menangis.",
+      "en_us": "A big caravan came with garam. Prices crashed; the old merchants weep."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pedagang",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar",
+          "fakta": "HARGA_NAIK"
+        },
+        "nilai": {
+          "fakta.objek": "minecraft:wheat",
+          "fakta.nilai": 25,
+          "fakta.hariKejadian": 100
+        },
+        "topik": "harga",
+        "register": "kasar",
+        "dialek": "iblis"
+      },
+      "harap": {
+        "k": "kultivator.cakap.kabar.harga_naik.0.kasar",
+        "a": [
+          {
+            "k": "item.minecraft.wheat",
+            "a": []
+          },
+          {
+            "k": "kultivator.cakap.lex.minggu_lalu_n",
+            "a": [
+              {
+                "k": "kultivator.cakap.lex.angka.2",
+                "a": []
+              }
+            ]
+          },
+          {
+            "t": ""
+          },
+          {
+            "t": ""
+          }
+        ]
+      },
+      "aturan": "kabar.harga_naik",
+      "gestur": "geleng",
+      "seru": "kota42.seru.aduh_l",
+      "tik": null,
+      "id_id": "item.minecraft.wheat naik lagi. Pedagang rakus semua.",
+      "en_us": "item.minecraft.wheat up again. Greedy merchants, the lot."
+    }
+  ]
+}

@@ -30,6 +30,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import structgen  # noqa: E402
 import tempat_lib as tl  # noqa: E402
 import kota_besar_kit as K  # noqa: E402
+import kota_hidup_kit as khk  # noqa: E402
 from kota_besar_kit import LY, FACE, OPP  # noqa: E402
 
 F = "kota_besar"
@@ -77,6 +78,7 @@ def daftar_bebas(distrik, dx, dz, pool, putar, utuh=True):
 def simpan_kanvas(k, distrik, names, utuh=(), tinggi_min=24):
     """Cuts a district canvas into its lots, saves them and registers them. names[(i, j)] = lot name."""
     full = {ij: "%s/%s" % (distrik, n) for ij, n in names.items() if n}
+    hidup42(k, distrik, names, jalan=distrik not in ("kumuh", "luar"))
     lots = K.potong(k, full, tinggi_min=tinggi_min)
     for ij, lot in lots.items():
         lot.simpan()
@@ -588,6 +590,7 @@ def build_pusat():
     yamen(k, *o(2, 1))
     taman_kota(k, *o(0, 2))
     kantor_pos(k, *o(2, 2))
+    spanduk_jalan(k, 63, 80, (12, 30, 118, 132), "fu,shou", 2)
     names = {(0, 0): "menara_genderang", (1, 0): "jalan_raya_utara", (2, 0): "menara_lonceng",
              (0, 1): "alun_penerimaan", (1, 1): "alun_agung", (2, 1): "yamen",
              (0, 2): "taman_kota", (1, 2): "jalan_raya_selatan", (2, 2): "kantor_pos"}
@@ -816,6 +819,7 @@ def yamen(k, x0, z0, y=LY):
                                                     "waterlogged": "false"})
     k.stairs(ix1 - 1, f + 2, cz, "wood_stairs", "east")
     k.titik("kursi", ix1 - 1, f + 2, cz, "west", {"peran": "HAKIM"})
+    khk.sidang(k, ix1 - 1, f + 2, cz + 1, "west")       # DESIGN 42.6.6: the hearing seat beside the judge
     for z in range(cz - 3, cz + 4):
         k.put(ix1 + 1, f + 5, z, "red" if abs(z - cz) == 3 else "gold" if abs(z - cz) <= 1 else "wood")
     K.candle(k, ix1 - 3, f + 3, cz - 2, 2, "red")
@@ -1630,6 +1634,8 @@ def build_cendekia():
     K.tempel(k, siheyuan(tl._seed("cendekia/rumah_a"), 42, 42, tree="pine"), 3, 99, 0)
     taman_tinta(k, *o(1, 2))
     K.tempel(k, siheyuan(tl._seed("cendekia/rumah_b"), 42, 42, tree="cherry"), 99, 99, 0)
+    jual(k, "siheyuan", "besar", (0, 96, 47, 143))
+    jual(k, "siheyuan", "besar", (96, 96, 143, 143))
     names = {(0, 0): "perpustakaan_a", (1, 0): "perpustakaan_b", (2, 0): "menara_pengamat", (0, 1): "kuil_langit_a",
              (1, 1): "kuil_langit_b", (2, 1): "sekolah", (0, 2): "rumah_cendekia_a", (1, 2): "taman_tinta",
              (2, 2): "rumah_cendekia_b"}
@@ -1929,6 +1935,7 @@ def build_awan():
     penginapan_awak(k, *o(0, 2))
     bengkel_kapal(k, *o(1, 2))
     K.tempel(k, rumah_susun(tl._seed("awan/rumah"), 26, 22), 99, 110, 0)
+    jual(k, "rumah_susun", "sedang", (96, 96, 143, 143))
     names = {(0, 0): "kantor_pelabuhan", (1, 0): "dermaga_a", (2, 0): "dermaga_b", (0, 1): "gudang_a",
              (1, 1): "stasiun_teleport", (2, 1): "gudang_b", (0, 2): "penginapan_awak", (1, 2): "bengkel_kapal",
              (2, 2): "rumah_awan"}
@@ -2283,12 +2290,13 @@ def build_gilda():
     gilda_tempa(k)
     gilda_kultivator(k)
     balai_tabib(k, *o(0, 2))
-    K.tempel(k, rumah_susun(tl._seed("gilda/asrama"), 28, 22), 58, 110, 0)
+    kantor_gilda(k, *o(1, 2))
     rumah_makan(k, *o(2, 2), name="bakmi")
     names = {(0, 0): "gilda_alkemis_a", (1, 0): "gilda_alkemis_b", (2, 0): "gilda_tempa_a", (0, 1): "gilda_kultivator_a",
-             (1, 1): "gilda_kultivator_b", (2, 1): "gilda_tempa_b", (0, 2): "balai_tabib", (1, 2): "asrama_gilda",
+             (1, 1): "gilda_kultivator_b", (2, 1): "gilda_tempa_b", (0, 2): "balai_tabib", (1, 2): "kantor_rekrut",
              (2, 2): "rumah_makan_bakmi"}
     simpan_kanvas(k, "gilda", names)
+    bukit_makam()
 
 
 def gilda_alkemis(k, y=LY):
@@ -2583,6 +2591,9 @@ def build_pasar():
     kios_pil(k, *o(0, 2))
     lapak_sekte(k, *o(1, 2))
     pasar_malam(k, *o(2, 2))
+    jual(k, "rumah_toko", "toko", (0, 96, 47, 143))
+    for (i, j), rencana in (((0, 2), ("rumah_kecil", "taman")), ((1, 1), ("kuil_kecil",)), ((2, 1), ("rumah_kecil",))):
+        kavling_lot(k, i, j, rencana, "ibukota_pasar", len(rencana))
     names = {(0, 0): "rumah_uang", (1, 0): "lelang_agung_a", (2, 0): "lelang_agung_b", (0, 1): "rumah_judi_batu",
              (1, 1): "pasar_binatang", (2, 1): "toko_senjata", (0, 2): "kios_pil", (1, 2): "lapak_sekte",
              (2, 2): "pasar_malam"}
@@ -2914,6 +2925,7 @@ def lot_sendiri(name, draw, h=48):
     v = K.Kanvas(tl.LOT, h, tl.LOT, seed=tl._seed(F + "/" + name))
     K.street_grid(v, nx=1, nz=1)
     draw(v)
+    hidup42(v, "lot", {(0, 0): name}, jalan=False)
     lots = K.potong(v, {(0, 0): name}, nx=1, nz=1)
     lots[(0, 0)].simpan()
     return tid(name)
@@ -3040,6 +3052,7 @@ def sumur_umum(k, cx, cz, y=LY, r=3):
     k.slab(cx - r, y + 1, cz + r - 1, "kerb_slab")
     k.titik("obrol", cx + 1, y + 1, cz + r, "north")
     k.titik("kerja:sapu", cx - 1, y + 1, cz + r, "north")
+    khk.titik42(k, "sumur", cx, y + 1, cz + 2, "north")
 
 
 def rumah_varian_a(v):
@@ -3117,10 +3130,15 @@ def build_hunian_barat():
     bengkel_tukang(k, *o(0, 1))
     alun_hunian(k, *o(1, 1))
     rumah_makan_kecil(k, *o(1, 2))
+    kavling_lot(k, 0, 1, ("rumah_kecil", "menara_jaga"), "ibukota_hunian_barat", 2)
     names = {(0, 1): "bengkel", (1, 1): "alun_hunian", (1, 2): "rumah_makan_kecil"}
     simpan_kanvas(k, "hunian_barat", names)
-    for ij in ((0, 0), (1, 0), (2, 0), (2, 1), (0, 2), (2, 2)):
+    for ij in ((0, 0), (1, 0), (2, 0)):
         daftar_pool("hunian_barat", ij[0], ij[1], "hunian/rumah", rumah)
+    # DESIGN 42.9.4 / 42.12.1: three fixed lots with kavling (4 + 3 + 3) and two houses for sale
+    for ij, (suffix, fn) in (((2, 1), ("g", rumah_varian_g)), ((0, 2), ("h", rumah_varian_h)),
+                             ((2, 2), ("i", rumah_varian_i))):
+        daftar_pool("hunian_barat", ij[0], ij[1], "hunian/rumah_" + suffix, [lot_sendiri("hunian/rumah_" + suffix, fn)])
 
 
 def bengkel_tukang(k, x0, z0, y=LY):
@@ -3356,6 +3374,8 @@ def build_gerbang():
     kedai_teh_agung(k, *o(2, 1))
     jalan_lentera(k, *o(0, 2), sisi=0)
     jalan_lentera(k, *o(2, 2), sisi=1)
+    kavling_lot(k, 0, 0, ("taman",), "ibukota_gerbang", 1)
+    spanduk_jalan(k, 63, 80, (20, 34, 116, 130), "fu,chun", 2)
     names = {(0, 0): "penginapan_awan_singgah", (1, 0): "jalan_raya_gerbang_utara", (2, 0): "penginapan_bulan_perak",
              (0, 1): "rumah_makan_teratai", (1, 1): "jalan_raya_gerbang", (2, 1): "kedai_teh_agung",
              (0, 2): "jalan_lentera_barat", (1, 2): "alun_gerbang", (2, 2): "jalan_lentera_timur"}
@@ -4385,16 +4405,23 @@ def build_kumuh():
     k = kanvas("kumuh", h=40)
     km_ground(k, 0, 0, 143, 143)
     km_road(k, 0, 143)
-    for (i, j), seed in (((0, 0), 1), ((1, 0), 2), ((2, 0), 3), ((1, 2), 4), ((2, 2), 5)):
+    for (i, j), seed in (((1, 0), 2), ((2, 0), 3), ((2, 2), 5)):
         x0, z0 = o(i, j)
         gubuk_blok(k, x0 + 1, z0 + 1, x0 + 46, z0 + (39 if (i, j) == (1, 0) else 46), tl._seed("kumuh/blok_%d" % seed))
     kuil_tikus(k, *o(1, 0))
     pasar_loak(k, *o(0, 1))
     sarang_tikus(k, *o(1, 1))
     warung_jalan(k, *o(2, 1))
-    dapur_umum(k, *o(0, 2))
-    names = {(0, 0): "gubuk_a", (1, 0): "gubuk_b", (2, 0): "gubuk_c", (0, 1): "pasar_loak", (1, 1): "sarang_tikus",
-             (2, 1): "warung_jalan", (0, 2): "dapur_umum", (1, 2): "gubuk_d", (2, 2): "gubuk_e"}
+    dapur_umum(k, *o(1, 2))
+    # DESIGN 42.9.6: the night district on both sides of the junk market, right outside the east gate wall
+    malam_utara(k, *o(0, 0))
+    malam_selatan(k, *o(0, 2))
+    kavling_lot(k, 1, 1, ("rumah_kecil",), "ibukota_kumuh", 1)
+    x0, z0 = o(2, 0)
+    jual(k, "gubuk", "kecil", (x0, z0, x0 + 47, z0 + 47), 0)
+    jual(k, "gubuk", "kecil", (x0, z0, x0 + 47, z0 + 47), 3)
+    names = {(0, 0): "malam_utara", (1, 0): "gubuk_b", (2, 0): "gubuk_c", (0, 1): "pasar_loak", (1, 1): "sarang_tikus",
+             (2, 1): "warung_jalan", (0, 2): "malam_selatan", (1, 2): "dapur_umum", (2, 2): "gubuk_e"}
     simpan_kanvas(k, "kumuh", names, tinggi_min=20)
 
 
@@ -4419,10 +4446,27 @@ def kuil_tikus(k, x0, z0, y=LY):
 def pasar_loak(k, x0, z0, y=LY):
     """The junk market at the east gate (gubuk + road lot (0,1)): stalls of scrap and second-hand goods on both sides
     of the road, the slum carpenter's open shed (kotabesar/tukang, 38PR), shack rows north and south."""
-    gubuk_blok(k, x0 + 1, z0 + 1, x0 + 46, z0 + 14, tl._seed("kumuh/loak_n"))
-    gubuk_blok(k, x0 + 18, z0 + 33, x0 + 46, z0 + 46, tl._seed("kumuh/loak_s"))
+    gubuk_blok(k, x0 + 1, z0 + 1, x0 + 22, z0 + 14, tl._seed("kumuh/loak_n"))
+    gubuk_blok(k, x0 + 28, z0 + 1, x0 + 46, z0 + 14, tl._seed("kumuh/loak_ne"))
+    gubuk_blok(k, x0 + 34, z0 + 33, x0 + 46, z0 + 46, tl._seed("kumuh/loak_s"))
+    # DESIGN 42.9.6: alleys from the road to the two night lanes (malam_utara north, malam_selatan south)
+    for x in range(x0 + 23, x0 + 28):
+        for z in range(z0, KM_ROAD[0]):
+            k.put(x, y, z, "minecraft:dirt_path" if (x + z) % 4 else "minecraft:packed_mud")
+    for x in range(x0 + 26, x0 + 33):
+        for z in range(KM_ROAD[1] + 1, z0 + 48):
+            k.put(x, y, z, "minecraft:dirt_path" if (x + z) % 4 else "minecraft:packed_mud")
+    for x in range(x0 + 18, x0 + 26):
+        for z in range(z0 + 33, z0 + 47):
+            k.put(x, y, z, "minecraft:coarse_dirt" if (x * 3 + z) % 4 else "minecraft:gravel")
     km_road(k, x0, x0 + 47)
+    for x in (x0 + 23, x0 + 27):
+        khk.tiang_lentera(k, x, y, KM_ROAD[0] - 1, "north", 4, "merah")
+    for x in (x0 + 26, x0 + 32):
+        khk.tiang_lentera(k, x, y, KM_ROAD[1] + 1, "south", 4, "merah")
     for i, sx in enumerate(range(x0 + 6, x0 + 42, 7)):
+        if x0 + 21 <= sx <= x0 + 34:
+            continue
         for (zz, f) in ((KM_ROAD[0] - 2, "south"), (KM_ROAD[1] + 2, "north")):
             gx, gz = K.stall(k, sx, zz, f, w=3, cloth=("minecraft:brown_wool", "minecraft:gray_wool"),
                              goods=(JUNK[i % len(JUNK)], JUNK[(i + 3) % len(JUNK)]))
@@ -4702,6 +4746,11 @@ def build_luar():
     kios_jalan(k, *o(2, 1))
     ladang(k, *o(0, 2))
     kebun_dewa_jalan(k, *o(2, 2))
+    spanduk_jalan(k, 63, 80, (10, 26, 120), "chun", 1)
+    # DESIGN 42.12.1: six kavling outside the Great South Gate (new settlers along the Imperial Road)
+    for (i, j), rencana in (((2, 1), ("rumah_toko", "rumah_kecil", "rumah_kecil")), ((1, 1), ("rumah_kecil", "kuil_kecil")),
+                            ((1, 0), ("rumah_kecil",))):
+        kavling_lot(k, i, j, rencana, "ibukota_luar", len(rencana))
     names = {(0, 0): "kandang_kuda", (1, 0): "jalan_kafilah_utara", (2, 0): "pos_kafilah", (0, 1): "perkemahan",
              (1, 1): "jalan_kafilah", (2, 1): "kios_jalan", (0, 2): "ladang", (1, 2): "jalan_kafilah_selatan",
              (2, 2): "kebun_dewa_jalan"}
@@ -5034,6 +5083,701 @@ def kebun_dewa_jalan(k, x0, z0, y=LY):
 
 
 # ===================================================================================================== JSON
+# ===================================================================================================== DESIGN 42 (42W-B)
+# 42.12.1 row 1: the Kantor Rekrutmen and the Gudang Kota (gilda), the night district on the pasar-kumuh border, the
+# Bukit Makam Barat outside the west wall, 24 kavling (6 outside the south wall), 8 houses for sale and the 42 life
+# points of every district (kota_hidup_kit). Every lot keeps <= 96 points (BATAS); the dressing pass hidup42() only adds
+# points (and chimney stacks) where a lot still has room.
+BILIK_WARNA = ("red", "blue", "green", "purple")       # the four sect booths of the recruitment office
+SIA = (None, "minecraft:air", "minecraft:cave_air")
+
+
+def _udara(k, x, y, z):
+    return k.get(x, y, z) in SIA
+
+
+def _terbuka(k, x, z, tinggi=10):
+    """Open street cell: a floor block on the lot floor row and open sky above it (not inside a hall)."""
+    return not _udara(k, x, LY, z) and all(_udara(k, x, yy, z) for yy in range(LY + 1, LY + 1 + tinggi))
+
+
+def _lantai(k, x0, f, z0, x1, z1, a="minecraft:spruce_planks", b="minecraft:stripped_spruce_wood", tiap=4):
+    """A plank floor with a log-band every `tiap` rows."""
+    for x in range(x0, x1 + 1):
+        for z in range(z0, z1 + 1):
+            k.put(x, f, z, b if (z - z0) % tiap == 0 else a, {"axis": "x"} if (z - z0) % tiap == 0 else None)
+
+
+def kantor_rekrut(k, x0, z0, y=LY):
+    """Kantor Rekrutmen Sekte (42.8.1, 42.12.1; 24 x 18, two storeys) on lot (1,2) of the guild district: a red-pillared
+    hall on a low podium entered from the north street under two sect banner poles. Ground floor: the clerk's desk and
+    record shelves by the door, the notice board of open sect places, two rows of waiting benches either side of a red
+    runner, and at the back four booths (bilik 0-3) between dark plank partitions, each with a desk, the recruiter's stool
+    (`rekrut` data bilik), the candidate's stool, a records chest, a hanging lantern and the booth sect's colour banner.
+    Upper floor: the recruits' dormitory (18 beds with chests, a long table, a wash corner) over a straight stair."""
+    bx0, bz0, bx1, bz1 = x0 + 10, z0 + 4, x0 + 33, z0 + 21
+    f = K.podium(k, bx0, bz0, bx1, bz1, y, 1, steps=("north",), step_w=5)
+    ix0, iz0, ix1, iz1 = K.hall(k, bx0, bz0, bx1, bz1, f, 5, door_sides=("north",), door_w=3, windows=4, lamps=False)
+    _lantai(k, ix0, f, iz0, ix1, iz1, "minecraft:dark_oak_planks", "minecraft:stripped_dark_oak_wood")
+    f2 = f + 5
+    K.upper_floor(k, ix0, iz0, ix1, iz1, f2, hole=(ix0, iz0 + 2, ix0, iz0 + 5))
+    K.stair_flight(k, ix0, f + 1, iz0 + 2, "south", 5, width=1)
+    cx = (bx0 + bx1) // 2
+    # entrance: runner, clerk desk with the archive behind it, notice board, pots
+    for z in range(iz0, iz1 - 3):
+        k.put(cx, f + 1, z, "minecraft:red_carpet")
+    K.counter(k, cx + 5, cx + 9, iz0 + 3, f, "north")
+    k.titik("kerja:konter", cx + 7, f + 1, iz0 + 4, "north", {"peran": "JURU_TULIS"})
+    khk.titik42(k, "pajangan:gulungan", cx + 6, f + 2, iz0 + 3, "north")
+    for z in range(iz0 + 1, iz0 + 6):
+        for dy in (1, 2, 3):
+            k.put(ix1, f + dy, z, "minecraft:chiseled_bookshelf" if (z + dy) % 3 == 0 else "minecraft:bookshelf",
+                  {"facing": "west", "slot_0_occupied": "false", "slot_1_occupied": "false", "slot_2_occupied": "false",
+                   "slot_3_occupied": "false", "slot_4_occupied": "false", "slot_5_occupied": "false"}
+                  if (z + dy) % 3 == 0 else None)
+    K.notice_board(k, cx - 4, iz0, "south", y=f, w=4)
+    for x in (ix0 + 2, cx + 3):
+        K.pot(k, x, f + 1, iz0, "minecraft:potted_bamboo")
+    # waiting benches either side of the runner, facing the booths
+    for z in (iz0 + 7, iz0 + 9):
+        for start in (cx - 2, cx + 7):
+            K.bench(k, start, z, "south", y=f, n=4)
+            for dx in (0, -2):
+                k.titik("kursi", start + dx, f + 1, z, "south", {"antre": "rekrut"})
+    # the four booths
+    zb = iz1 - 3
+    for i in range(5):
+        px = ix0 + 1 + 5 * i
+        for z in range(zb, iz1 + 1):
+            for dy in (1, 2, 3):
+                k.put(px, f + dy, z, "minecraft:dark_oak_planks" if z > zb else "minecraft:stripped_dark_oak_log",
+                      None if z > zb else {"axis": "y"})
+        k.put(px, f + 4, zb, "minecraft:dark_oak_slab", {"type": "bottom", "waterlogged": "false"})
+    for i in range(4):
+        bc = ix0 + 3 + 5 * i
+        K.counter(k, bc - 1, bc + 1, iz1 - 2, f, "north")
+        K.chair(k, bc, f + 1, iz1 - 1, "north")
+        khk.rekrut(k, bc, f + 1, iz1 - 1, "north", bilik=i)
+        K.chair(k, bc, f + 1, zb, "south")
+        k.titik("kursi", bc, f + 1, zb, "south", {"bilik": i})
+        K.chest(k, bc - 1, f + 1, iz1, None, "north")
+        K.barrel(k, bc + 1, f + 1, iz1, "north")
+        k.put(bc + 1, f + 2, iz1, "minecraft:candle", {"candles": "2", "lit": "false", "waterlogged": "false"})
+        K.wall_banner(k, bc, f + 3, iz1, "north", BILIK_WARNA[i])
+        K.lit(k, bc, f + 5, iz1 - 2, chain=1)
+        khk.titik42(k, "pajangan:gulungan", bc, f + 2, iz1 - 2, "north")
+    for x, z in ((cx - 6, iz0 + 4), (cx + 6, iz0 + 8), (cx - 6, iz0 + 10)):
+        K.lit(k, x, f + 5, z, chain=1)
+    # dormitory
+    jx0, jz0, jx1, jz1 = K.hall(k, bx0, bz0, bx1, bz1, f2, 4, door_sides=(), windows=4, lamps=False)
+    for z in range(iz0 + 2, iz0 + 6):
+        k.put(ix0 + 1, f2 + 1, z, "wood_fence")
+    for n, x in enumerate(range(jx0 + 3, jx1, 2)):
+        K.bed(k, x, f2 + 1, jz0, "north", "minecraft:white_bed")
+        K.bed(k, x, f2 + 1, jz1, "south", "minecraft:white_bed")
+        k.titik("kasur", x, f2 + 1, jz0, "south")
+        k.titik("kasur", x, f2 + 1, jz1, "north")
+        if x + 1 < jx1:
+            K.chest(k, x + 1, f2 + 1, jz0, None, "south")
+            K.barrel(k, x + 1, f2 + 1, jz1, "north")
+            if n % 3 == 0:
+                k.titik("peti_milik", x + 1, f2 + 1, jz0 + 1, "north")
+    for x in range(jx0 + 5, jx1 - 3):
+        K.table(k, x, f2 + 1, (jz0 + jz1) // 2, "minecraft:white_carpet" if x % 2 else "")
+    K.bench(k, jx1 - 4, (jz0 + jz1) // 2 - 1, "south", y=f2, n=jx1 - jx0 - 8)
+    K.bench(k, jx0 + 5, (jz0 + jz1) // 2 + 1, "north", y=f2, n=jx1 - jx0 - 8)
+    k.titik("meja_makan", (jx0 + jx1) // 2, f2 + 1, (jz0 + jz1) // 2 - 1, "south")
+    for x in range(jx0 + 6, jx1 - 4, 4):
+        k.titik("kursi", x, f2 + 1, (jz0 + jz1) // 2 + 1, "north")
+    k.put(jx1, f2 + 1, (jz0 + jz1) // 2, "minecraft:water_cauldron", {"level": "3"})
+    K.barrel(k, jx1, f2 + 1, (jz0 + jz1) // 2 + 1, "west")
+    for x in range(jx0 + 4, jx1, 6):
+        for z in (jz0 + 3, jz1 - 3):
+            K.lit(k, x, f2 + 4, z, chain=0)
+    K.roof_over(k, bx0, bz0, bx1, bz1, f2 + 5, kind="hip", tiers=1, overhang=1, tile=True)
+    # forecourt: sect banner poles by the steps, the street-name post
+    for x in (cx - 5, cx + 5):
+        khk.panji(k, x, y, bz0 - 1, "north", "panji", None, tiang=6)
+    khk.nama_jalan(k, x0 + 4, y, z0 + 3, "north")
+    k.titik("pintu", cx, f + 1, bz0 - 1, "north")
+    k.kotak("bangunan", bx0, y, bz0, bx1, f2 + 13, bz1, "north", nama="kantor_rekrut")
+    # east court: the well and a xiangqi table under a tree for the waiting candidates
+    for x in range(x0 + 35, x0 + 45):
+        for z in range(z0 + 3, z0 + 23):
+            k.put(x, y, z, "paving" if (x + z) % 5 else "paving_alt")
+    khk.sumur(k, x0 + 40, y, z0 + 8, "west")
+    khk.catur(k, x0 + 40, y, z0 + 15, "south")
+    K.bench(k, x0 + 37, z0 + 21, "north", n=3)
+    # west strip: squatters waiting their turn, potted pines
+    khk.jongkok(k, x0 + 6, y, z0 + 13, "east", 2)
+    K.potted_pine(k, x0 + 5, y + 1, z0 + 5)
+    K.potted_pine(k, x0 + 5, y + 1, z0 + 19)
+
+
+def gudang_kota(k, x0, z0, y=LY):
+    """Gudang Kota (42.6.5, 42.12.1; 24 x 19, gilda): the rentable city warehouse behind the recruitment office - a
+    stone-footed timber hall with a gable tile roof and a wide east door, inside the gudang kit (racks of crates and
+    barrels, sacks, the scale, the keeper's `gudang` point and the granary `lumbung`); the loading yard east of it with a
+    hitching rail and trough, stacked goods, hay and the granary queue head at the door."""
+    gx0, gz0, gx1, gz1 = x0 + 4, z0 + 25, x0 + 27, z0 + 43
+    a = K.aula(k, gx0, gz0, gx1, gz1, h=6, podium_h=1, teras=0, roof="gable", along="x", door_sides=("east",), door_w=3,
+               tile=True)
+    ix0, iz0, ix1, iz1 = a["inner"]
+    gf = a["f"]
+    _lantai(k, ix0, gf, iz0, ix1, iz1, "minecraft:spruce_planks", "minecraft:stripped_spruce_wood", 5)
+    khk.interior_gudang(k, ix0, gf, iz0, ix1 - ix0 + 1, iz1 - iz0 + 1, 5, "east", titik_maks=8)
+    for x in range(x0 + 29, x0 + 45):
+        for z in range(z0 + 24, z0 + 45):
+            k.put(x, y, z, "minecraft:packed_mud" if (x * 5 + z * 3) % 7 else "minecraft:coarse_dirt")
+    khk.tambat(k, x0 + 39, y, z0 + 28, "south")
+    K.crates(k, x0 + 30, z0 + 40, x0 + 34, z0 + 43, y + 1, h=3)
+    for x in (x0 + 42, x0 + 43):
+        for z in range(z0 + 37, z0 + 42):
+            for dy in (1, 2):
+                if (x + z + dy) % 4:
+                    k.put(x, y + dy, z, "minecraft:hay_block", {"axis": "y"})
+    khk.lumbung(k, x0 + 31, y + 1, (gz0 + gz1) // 2, "west")
+    k.put(x0 + 36, y + 1, z0 + 33, "minecraft:spruce_trapdoor", {"facing": "north", "half": "top", "open": "false",
+                                                                  "powered": "false", "waterlogged": "false"})
+    k.put(x0 + 36, y + 1, z0 + 34, "minecraft:spruce_fence")
+    k.titik("kerja:rak", x0 + 34, y + 1, z0 + 37, "north", {"alat": "angkut"})
+    k.titik("pintu", gx1 + 2, y + 1, (gz0 + gz1) // 2, "east")
+    k.kotak("bangunan", gx0, y, gz0, gx1, gf + 14, gz1, "east", nama="gudang_kota")
+
+
+def kantor_gilda(k, x0, z0, y=LY):
+    kantor_rekrut(k, x0, z0, y)
+    gudang_kota(k, x0, z0, y)
+
+
+# ----------------------------------------------------------------------------------------------- night district
+def _jalan_malam_lantai(k, x0, z0, x1, z1, y=LY, sumbu="x"):
+    """The trodden lane of the night district: packed mud with mud-brick patches and plank boardwalks on both edges."""
+    for x in range(x0, x1 + 1):
+        for z in range(z0, z1 + 1):
+            tepi = z in (z0, z1) if sumbu == "x" else x in (x0, x1)
+            h = (x * 31 + z * 17) % 9
+            k.put(x, y, z, "minecraft:spruce_planks" if tepi else "minecraft:mud_bricks" if h == 0 else
+                  "minecraft:packed_mud" if h < 6 else "minecraft:dirt_path")
+            for yy in range(y + 1, y + 6):
+                if not tepi:
+                    k.put(x, yy, z, "minecraft:air")
+
+
+def kedai_arak_besar(k, x0, z0, y=LY):
+    """Kedai Arak Besar 'Persik Mabuk' (42.9.6; 24 x 20, two storeys) at the head of the north night lane: a dark timber
+    wine house on a low plinth, the door on the lane under the 'jiu' flag. Ground floor = the kedai_arak kit (barrel
+    wall, bar, jars, long tables, the dice corner) with a stair in a side bay to the upper floor: four private rooms
+    (low table, floor cushions, a wine jar and a lamp each) off a corridor, an open gallery with low tables round the
+    fan dancer's little stage, and a balcony over the lane hung with red paper lanterns."""
+    bx0, bz0, bx1, bz1 = x0 + 2, z0 + 1, x0 + 25, z0 + 20
+    f = K.podium(k, bx0, bz0, bx1, bz1, y, 1, steps=("south",), step_w=3)
+    ix0, iz0, ix1, iz1 = K.hall(k, bx0, bz0, bx1, bz1, f, 5, door_sides=("south",), door_w=3, windows=4,
+                                wall_role="minecraft:spruce_planks", pillar_role="minecraft:stripped_dark_oak_log",
+                                lamps=False)
+    cx = (bx0 + bx1) // 2
+    _lantai(k, ix0, f, iz0, ix1, iz1)
+    # the stair bay (east): a partition and a straight flight north to the gallery floor
+    for z in range(iz0, iz1 + 1):
+        for dy in (1, 2, 3, 4):
+            if not (iz1 - 3 <= z <= iz1 - 1 and dy <= 2):
+                k.put(ix1 - 3, f + dy, z, "minecraft:spruce_planks")
+    f2 = f + 5
+    K.upper_floor(k, ix0, iz0, ix1, iz1, f2, hole=(ix1, iz0 + 9, ix1, iz0 + 12))
+    K.stair_flight(k, ix1, f + 1, iz0 + 13, "north", 5, width=1)
+    K.crates(k, ix1 - 2, iz0, ix1, iz0 + 2, f + 1, h=2)
+    k.put(ix1 - 1, f + 1, iz1 - 1, "minecraft:decorated_pot", {"facing": "south", "cracked": "false", "waterlogged": "false"})
+    khk.interior_kedai_arak(k, ix0, f, iz0, ix1 - 3 - ix0, iz1 - iz0 + 1, 4, "south", pintu=cx, titik_maks=14)
+    # upper floor: balcony strip (front two rows) left open, the rest walled
+    jx0, jz0, jx1, jz1 = K.hall(k, bx0, bz0, bx1, bz1 - 2, f2, 4, door_sides=("south",), door_w=3, windows=4,
+                                wall_role="minecraft:spruce_planks", pillar_role="minecraft:stripped_dark_oak_log",
+                                lamps=False)
+    for z in range(iz0 + 9, iz0 + 13):
+        k.put(ix1 - 1, f2 + 1, z, "minecraft:spruce_fence")
+    # four private rooms on the north side
+    wall_z = jz0 + 6
+    for x in range(jx0, jx1 + 1):
+        for dy in (1, 2, 3):
+            k.put(x, f2 + dy, wall_z, "minecraft:spruce_planks" if dy < 3 else "minecraft:stripped_spruce_log",
+                  None if dy < 3 else {"axis": "x"})
+    for i in range(5):
+        px = jx0 + 5 * i
+        if px > jx1 - 2:
+            break
+        for z in range(jz0, wall_z):
+            for dy in (1, 2, 3):
+                k.put(px, f2 + dy, z, "minecraft:spruce_planks")
+    for i in range(4):
+        rc = jx0 + 2 + 5 * i
+        if rc + 1 >= jx1 - 1:
+            break
+        K.door(k, rc, f2 + 1, wall_z, "south", "left", "minecraft:spruce_door")
+        K.low_table(k, rc, f2 + 1, jz0 + 3)
+        for dx in (-1, 1):
+            k.put(rc + dx, f2 + 1, jz0 + 3, "minecraft:red_carpet")
+        k.titik("kursi_lantai", rc - 1, f2 + 1, jz0 + 3, "east")
+        k.put(rc + 1, f2 + 1, jz0 + 1, "minecraft:decorated_pot", {"facing": "south", "cracked": "false",
+                                                                     "waterlogged": "false"})
+        K.lit(k, rc, f2 + 4, jz0 + 3, chain=0)
+    # gallery: the dancer's stage and low tables
+    khk.panggung(k, jx0 + 1, f2 + 1, jz1 - 2, jx0 + 5, jz1, "north", tinggi=3, acara="penari_kipas")
+    for x in range(jx0 + 1, jx0 + 6):
+        for z in range(jz1 - 2, jz1 + 1):
+            k.put(x, f2 + 1, z, "minecraft:red_carpet" if (x + z) % 2 else "minecraft:yellow_carpet")
+    for tx in (jx0 + 3, jx0 + 7, cx + 5):
+        K.low_table(k, tx, f2 + 1, wall_z + 3)
+        k.titik("kursi_lantai", tx, f2 + 1, wall_z + 2, "south")
+    for x in range(jx0 + 2, jx1 - 1, 5):
+        K.lit(k, x, f2 + 4, wall_z + 3, chain=0, role="lamp")
+    # balcony over the lane: rail, lanterns on strings
+    for x in range(bx0, bx1 + 1):
+        k.put(x, f2 + 1, bz1, "minecraft:spruce_fence")
+    for x in range(bx0 + 3, bx1 - 1, 7):
+        khk.lentera_gantung(k, x, f2 + 3, bz1, "south", "merah", kait=False)
+    K.roof_over(k, bx0, bz0, bx1, bz1 - 2, f2 + 5, kind="hip", tiers=1, overhang=1, tile=True)
+    k.titik("pintu", cx, f + 1, bz1 + 1, "south")
+    k.kotak("bangunan", bx0, y, bz0, bx1, f2 + 12, bz1, "south", nama="kedai_arak_besar")
+
+
+def rumah_judi_malam(k, x0, z0, y=LY):
+    """Rumah Judi 'Tiga Dadu' (42.9.6; 19 x 18) across the north night lane: a red-lacquered plastered hall with a green
+    felt interior from the rumah_judi kit (four dice tables with the dealers' meja_dadu spots, stools, the cashier's
+    counter behind iron bars, lanterns), red lanterns under the eaves, the moneylender's bench outside."""
+    bx0, bz0, bx1, bz1 = x0 + 4, z0 + 28, x0 + 22, z0 + 45
+    f = K.podium(k, bx0, bz0, bx1, bz1, y, 1, steps=("north",), step_w=3)
+    ix0, iz0, ix1, iz1 = K.hall(k, bx0, bz0, bx1, bz1, f, 5, door_sides=("north",), door_w=3, windows=4, lamps=False)
+    cx = (bx0 + bx1) // 2
+    _lantai(k, ix0, f, iz0, ix1, iz1, "minecraft:dark_oak_planks", "minecraft:stripped_dark_oak_wood")
+    khk.interior_rumah_judi(k, ix0, f, iz0, ix1 - ix0 + 1, iz1 - iz0 + 1, 4, "north", pintu=cx, titik_maks=16)
+    K.roof_over(k, bx0, bz0, bx1, bz1, f + 6, kind="hip", tiers=1, overhang=1, tile=True)
+    K.bench(k, bx1 + 2, bz0 + 4, "west", n=3)
+    k.titik("obrol", bx1 + 2, y + 1, bz0 + 3, "west", {"peran": "RENTENIR"})
+    k.titik("pintu", cx, f + 1, bz0 - 1, "north")
+    k.kotak("bangunan", bx0, y, bz0, bx1, f + 13, bz1, "north", nama="rumah_judi")
+
+
+def malam_utara(k, x0, z0, y=LY):
+    """Lot kumuh (0,0), the north half of the night district (42.9.6) just outside the east gate wall: the night lane
+    from the wall to the shacks with lantern posts, cross-street lanterns and wine flags, the big wine house north of it,
+    the gambling house south of it, an alley down to the junk market, shacks east, two Ghost Market corners."""
+    _jalan_malam_lantai(k, x0 + 2, z0 + 21, x0 + 47, z0 + 27)
+    for x in range(x0 + 23, x0 + 28):
+        for z in range(z0 + 28, z0 + 48):
+            k.put(x, y, z, "minecraft:dirt_path" if (x + z) % 4 else "minecraft:packed_mud")
+    gubuk_blok(k, x0 + 28, z0 + 1, x0 + 46, z0 + 19, tl._seed("kumuh/malam_utara_n"))
+    kedai_arak_besar(k, x0, z0, y)
+    rumah_judi_malam(k, x0, z0, y)
+    for x in range(x0 + 29, x0 + 46):
+        for z in range(z0 + 29, z0 + 47):
+            k.put(x, y, z, "minecraft:coarse_dirt" if (x * 7 + z * 3) % 5 else "minecraft:podzol",
+                  None if (x * 7 + z * 3) % 5 else {"snowy": "false"})
+    K.crates(k, x0 + 30, z0 + 30, x0 + 33, z0 + 32, y + 1, h=2)
+    K.tree(k, x0 + 40, y + 1, z0 + 38, "willow")
+    khk.jalan_malam(k, x0 + 2, z0 + 21, x0 + 47, z0 + 27, y, sumbu="x", tiang_setiap=4, lentera_maks=10, kursi_maks=2)
+    khk.pasar_hantu(k, 0, x0 + 45, y + 1, z0 + 24, "west", "gang_buntu")
+    khk.pasar_hantu(k, 1, x0 + 36, y + 1, z0 + 44, "north", "gudang_kosong")
+    khk.jongkok(k, x0 + 34, y, z0 + 36, "south", 2)
+
+
+def teater_bayang(k, x0, z0, y=LY):
+    """Teater Bayang 'Lentera Kulit' (42.9.6; 24 x 23) on the south night lane: a tall dark hall with no windows. At
+    the west end the puppeteers' stage two blocks high behind a red-and-gold proscenium whose opening is the
+    `panggung` box where the layar_bayang screen entity stands (lit from behind by lanterns), the musicians' corner
+    with gong and drum, the ticket counter by the east door, ten benches in two blocks either side of the aisle (the
+    back four on a riser) with `penonton` points."""
+    tx0, tz0, tx1, tz1 = x0 + 2, z0 + 4, x0 + 25, z0 + 26
+    f = K.podium(k, tx0, tz0, tx1, tz1, y, 1, steps=("east",), step_w=3)
+    ix0, iz0, ix1, iz1 = K.hall(k, tx0, tz0, tx1, tz1, f, 8, door_sides=("east",), door_w=3, windows=0, lamps=False)
+    cz = (tz0 + tz1) // 2
+    _lantai(k, ix0, f, iz0, ix1, iz1, "minecraft:dark_oak_planks", "minecraft:stripped_dark_oak_wood", 5)
+    # the stage (x ix0..ix0+6) two high, steps at the south end
+    sx1 = ix0 + 6
+    for x in range(ix0, sx1 + 1):
+        for z in range(iz0, iz1 + 1):
+            k.put(x, f + 1, z, "minecraft:dark_oak_planks")
+            k.put(x, f + 2, z, "minecraft:spruce_planks")
+    for z in (iz1 - 1, iz1):
+        k.stairs(sx1 + 1, f + 1, z, "minecraft:dark_oak_stairs", "west")
+        k.stairs(sx1, f + 2, z, "minecraft:dark_oak_stairs", "west")
+    # proscenium at x = sx1: red posts, gold-trimmed lintel, red drapes; the opening is the screen
+    for z in (cz - 5, cz + 5):
+        for dy in range(3, 9):
+            k.put(sx1, f + dy, z, "red")
+    for z in range(cz - 5, cz + 6):
+        k.put(sx1, f + 8, z, "minecraft:gold_block" if z in (cz - 5, cz, cz + 5) else "red")
+        k.put(sx1, f + 7, z, "minecraft:red_wool" if abs(z - cz) >= 3 else "minecraft:air")
+    for z in (cz - 4, cz + 4):
+        for dy in (3, 4, 5, 6):
+            k.put(sx1, f + dy, z, "minecraft:red_wool")
+    khk.panggung(k, sx1 - 2, f + 3, cz - 3, sx1, cz + 3, "east", tinggi=4, acara="wayang")
+    # backlight lamps for the puppeteers and their stools
+    for z in (cz - 3, cz, cz + 3):
+        k.put(ix0 + 1, f + 3, z, "minecraft:spruce_fence")
+        k.put(ix0 + 1, f + 4, z, "minecraft:lantern", {"hanging": "false", "waterlogged": "false"})
+    for z in (cz - 2, cz + 2):
+        K.chair(k, ix0 + 3, f + 3, z, "east")
+    k.put(ix0, f + 3, iz0, "minecraft:chest", {"facing": "east", "type": "single", "waterlogged": "false"})
+    # musicians' corner on the stage's north end: gong (bell), drum, stools
+    k.put(ix0 + 4, f + 3, iz0 + 1, "minecraft:bell", {"attachment": "floor", "facing": "east", "powered": "false"})
+    K.drum(k, ix0 + 4, f + 2, iz0 + 3, "east")
+    k.titik("kursi", ix0 + 5, f + 3, iz0 + 1, "east", {"peran": "PEMUSIK"})
+    k.titik("kursi", ix0 + 5, f + 3, iz0 + 3, "east", {"peran": "PEMUSIK"})
+    # audience: two blocks of benches, the back rows raised
+    for n, x in enumerate(range(sx1 + 3, ix1 - 3, 2)):
+        tinggi = f + (1 if n >= 3 else 0)
+        if n >= 3:
+            for z in list(range(iz0 + 1, cz - 1)) + list(range(cz + 2, iz1)):
+                for xx in (x, x + 1):
+                    if xx < ix1:
+                        k.put(xx, tinggi, z, "minecraft:dark_oak_planks")
+        K.bench(k, x, cz - 2, "west", y=tinggi, n=cz - 2 - iz0)
+        K.bench(k, x, iz1 - 1, "west", y=tinggi, n=iz1 - cz - 2)
+        k.titik("penonton", x, tinggi + 1, cz - 3, "west")
+        k.titik("penonton", x, tinggi + 1, cz + 3, "west")
+    # ticket counter by the door, dim lamps
+    K.counter(k, ix1 - 2, ix1, iz0 + 2, f, "south")
+    k.titik("kerja:konter", ix1 - 1, f + 1, iz0 + 1, "south", {"peran": "PENJUAL_TIKET"})
+    for z in (iz0 + 3, iz1 - 3):
+        for x in (ix0 + 10, ix1 - 3):
+            K.lit(k, x, f + 8, z, chain=2)
+    for z in range(iz0 + 2, iz1 - 1, 4):
+        K.wall_banner(k, ix1, f + 4, z, "west", "black")
+    K.roof_over(k, tx0, tz0, tx1, tz1, f + 9, kind="hip", tiers=2, overhang=1, tile=True)
+    k.titik("pintu", tx1 + 2, y + 1, cz, "east")
+    k.kotak("bangunan", tx0, y, tz0, tx1, f + 20, tz1, "east", nama="teater_bayang")
+
+
+def rumah_teh_malam(k, x0, z0, y=LY):
+    """Rumah Teh Malam 'Bulan Pucat' (42.9.6; 18 x 16) on the south night lane: a quiet plastered tea house open late,
+    the kedai_teh kit inside (round tables, the storyteller's little stage, the teapot rack), a forecourt with stone
+    lanterns, a lantern string and a bench under a willow between it and the lane."""
+    hx0, hz0, hx1, hz1 = x0 + 4, z0 + 30, x0 + 21, z0 + 45
+    f = K.podium(k, hx0, hz0, hx1, hz1, y, 1, steps=("east",), step_w=3)
+    ix0, iz0, ix1, iz1 = K.hall(k, hx0, hz0, hx1, hz1, f, 5, door_sides=("east",), door_w=3, windows=4, lamps=False)
+    cz = (hz0 + hz1) // 2
+    _lantai(k, ix0, f, iz0, ix1, iz1)
+    khk.interior_kedai_teh(k, ix0, f, iz0, ix1 - ix0 + 1, iz1 - iz0 + 1, 4, "east", pintu=cz, titik_maks=14)
+    K.roof_over(k, hx0, hz0, hx1, hz1, f + 6, kind="hip", tiers=1, overhang=1, tile=True)
+    for x in range(hx1 + 1, x0 + 26):
+        for z in range(hz0, hz1 + 1):
+            k.put(x, y, z, "paving" if abs(z - cz) <= 1 else "minecraft:moss_block")
+    for z in (hz0 + 1, hz1 - 1):
+        K.stone_lantern(k, hx1 + 3, y + 1, z)
+    K.tree(k, x0 + 24, y + 1, hz1 - 2, "willow")
+    K.bench(k, x0 + 24, hz0 + 3, "west", n=2)
+    k.titik("obrol", x0 + 24, y + 1, hz0 + 2, "west")
+    k.titik("pintu", hx1 + 2, y + 1, cz, "east")
+    k.kotak("bangunan", hx0, y, hz0, hx1, f + 13, hz1, "east", nama="rumah_teh_malam")
+
+
+def malam_selatan(k, x0, z0, y=LY):
+    """Lot kumuh (0,2), the south half of the night district: the lane coming down from the junk market alley, the
+    shadow theatre west of it, the night tea house, shacks east, a banner pair over the lane mouth and the Ghost
+    Market's dead end at the south."""
+    _jalan_malam_lantai(k, x0 + 26, z0, x0 + 32, z0 + 47, sumbu="z")
+    gubuk_blok(k, x0 + 34, z0 + 1, x0 + 46, z0 + 46, tl._seed("kumuh/malam_selatan_e"))
+    teater_bayang(k, x0, z0, y)
+    rumah_teh_malam(k, x0, z0, y)
+    for x in range(x0 + 2, x0 + 22):
+        for z in (z0 + 27, z0 + 28, z0 + 46, z0 + 47):
+            k.put(x, y, z, "ground", {"snowy": "false"})
+    khk.jalan_malam(k, x0 + 26, z0, x0 + 32, z0 + 47, y, sumbu="z", tiang_setiap=4, lentera_maks=10, kursi_maks=2)
+    khk.spanduk(k, x0 + 26, z0 + 3, x0 + 32, z0 + 3, y, tinggi=6, pasangan="malam", glif="jiu")
+    khk.pasar_hantu(k, 2, x0 + 29, y + 1, z0 + 46, "north", "gang_buntu")
+    khk.pasar_hantu(k, 3, x0 + 31, y + 1, z0 + 44, "west", "gang_buntu")
+
+
+# ----------------------------------------------------------------------------------------------- Bukit Makam Barat
+MAKAM_DX, MAKAM_DZ = -118, 8          # free lot of district gilda: west of the west-gate wall, south of the west road
+
+
+def bukit_makam():
+    """Bukit Makam Barat (42.4.6, 42.7.7, 42.12.1; 34 x 48 free lot of the guild district outside the west wall, inside
+    the 8-chunk reach of its start): the path from the west road along the north edge, the cemetery 32 x 32 on seven
+    rising terraces with 48 graves (nisan_0..47, khk.makam 'bukit'), the gate and the paper-money burner at the entrance,
+    a mourners' pavilion with benches, cypress-like pines along the back, and the Ghost Market's cemetery corner."""
+    lot = tl.Lot(F, "gilda/bukit_makam", tinggi=26, lebar=34, dalam=48, palet=K.PAL)
+    y = LY
+    for x in range(34):
+        for z in range(48):
+            h = (x * 13 + z * 7) % 10
+            lot.put(x, y, z, "minecraft:grass_block" if h < 7 else "minecraft:coarse_dirt" if h < 9 else "minecraft:podzol",
+                    {"snowy": "false"} if h < 7 or h == 9 else None)
+    for x in range(34):
+        for z in range(0, 4):
+            lot.put(x, y, z, "minecraft:dirt_path" if (x + z) % 5 else "minecraft:coarse_dirt")
+    for z in range(4, 8):
+        for x in (16, 17, 18):
+            lot.put(x, y, z, "minecraft:dirt_path")
+    khk.makam(lot, 1, y, 8, 32, 32, "north", 48, mulai=0, gaya="bukit", bertingkat=True, gapura=True, pembakar=True)
+    # mourners' pavilion west of the gate: four posts, a tile roof, benches
+    px0, pz0 = 3, 3
+    for x in range(px0, px0 + 6):
+        for z in range(pz0, pz0 + 4):
+            lot.put(x, y, z, "minecraft:polished_andesite")
+            if x in (px0, px0 + 5) and z in (pz0, pz0 + 3):
+                for dy in range(1, 4):
+                    lot.put(x, y + dy, z, "red")
+    K.gable(lot, px0, y + 4, pz0, px0 + 5, pz0 + 3, along="x", overhang=1, pearl=False, role="tile_stairs",
+            slab_role="tile_slab", full_role="tile")
+    K.bench(lot, px0 + 4, pz0 + 1, "south", n=4)
+    lot.titik("obrol", px0 + 2, y + 1, pz0 + 1, "south")
+    lot.titik("kursi", px0 + 4, y + 1, pz0 + 1, "south")
+    for x in range(3, 31, 5):
+        K.tree(lot, x, y + 1, 44, "pine")
+    khk.pasar_hantu(lot, 4, 26, y + 1, 2, "west", "dekat_makam")
+    khk.tiang_lentera(lot, 21, y, 4, "north", 4, "putih")
+    khk.tiang_lentera(lot, 13, y, 4, "north", 4, "putih")
+    lot.titik("jalan", 33, y + 1, 1, "west", {"urut": 0, "jalur": "makam"})
+    lot.titik("jalan", 17, y + 1, 2, "south", {"urut": 1, "jalur": "makam"})
+    lot.titik("jalan", 17, y + 1, 7, "south", {"urut": 2, "jalur": "makam"})
+    lot.kotak("bangunan", 1, y, 8, 32, y + 14, 39, "north", nama="bukit_makam")
+    khk.sambung(lot)
+    lot.simpan()
+    daftar_bebas("gilda", MAKAM_DX, MAKAM_DZ, "gilda/bukit_makam", 0)
+
+
+# ----------------------------------------------------------------------------------------------- kavling, houses for sale
+def _hadap_jalan(x0, z0, x1, z1):
+    """Facing toward the nearest edge of the rectangle (the lot's edge street)."""
+    def f(x, z):
+        d = {"west": x - x0, "east": x1 - x, "north": z - z0, "south": z1 - z}
+        return min(d, key=lambda s: (d[s], s))
+    return f
+
+
+def spanduk_jalan(k, xa, xb, zs, glif, maks=2):
+    """Banner pairs over a north-south avenue (42.9.3): poles on the two kerbs xa / xb at the first free z of zs."""
+    n = 0
+    for z in zs:
+        if n >= maks:
+            break
+        if all(_terbuka(k, x, zz) for x in (xa, xb) for zz in (z - 1, z, z + 1)):
+            khk.spanduk(k, xa, z, xb, z, LY, tinggi=7, pasangan="jalan_%d" % n, glif=glif)
+            n += 1
+    return n
+
+
+def kavling_lot(k, i, j, rencana, gaya, maks, ox=0, oz=0):
+    """Kavling on free flat ground inside lot (i, j) of canvas k (the 3-block edge street and a 1-block margin kept)."""
+    x0, z0 = ox + i * tl.LOT, oz + j * tl.LOT
+    return khk.kavling_di(k, x0 + 4, z0 + 4, x0 + 43, z0 + 43, LY, rencana, gaya,
+                          _hadap_jalan(x0, z0, x0 + 47, z0 + 47), maks=maks)
+
+
+def jual(k, nama, ukuran, kotak, ambil=0):
+    """Marks the `ambil`-th house (bangunan box named `nama` whose corner lies in kotak = (x0, z0, x1, z1)) for sale
+    (42.6.1): the dijual point on a free standing cell inside the box, as near its door (pintu point) as possible."""
+    boxes = [t for t in k.titik_list if t["jenis"] == "bangunan" and t.get("data", {}).get("nama") == nama
+             and kotak[0] <= t["pos"][0] <= kotak[2] and kotak[1] <= t["pos"][2] <= kotak[3]]
+    if len(boxes) <= ambil:
+        raise ValueError("jual: no house %s #%d in %s" % (nama, ambil, kotak))
+    t = boxes[ambil]
+    bx, by, bz = t["pos"]
+    dx, dz = int(t["data"]["dx"]), int(t["data"]["dz"])
+    doors = [p for p in k.titik_list if p["jenis"] == "pintu" and bx - 1 <= p["pos"][0] <= bx + dx + 1
+             and bz - 1 <= p["pos"][2] <= bz + dz + 1]
+    tx, tz = (doors[0]["pos"][0], doors[0]["pos"][2]) if doors else (bx + dx // 2, bz + dz // 2)
+    pts = {(p["pos"][0], p["pos"][1], p["pos"][2]) for p in k.titik_list}
+    best = None
+    for x in range(bx + 1, bx + dx):
+        for z in range(bz + 1, bz + dz):
+            for yy in range(by + 1, by + 4):
+                if (x, yy, z) in pts or not (_udara(k, x, yy, z) and _udara(k, x, yy + 1, z)) or _udara(k, x, yy - 1, z):
+                    continue
+                key = (abs(x - tx) + abs(z - tz), yy, x, z)
+                if best is None or key < best[0]:
+                    best = (key, x, yy, z)
+                break
+    if best is None:
+        raise ValueError("jual: no free cell in house %s" % nama)
+    _, x, yy, z = best
+    f = ("east" if tx > x else "west") if abs(tx - x) >= abs(tz - z) else ("south" if tz > z else "north")
+    return khk.dijual(k, x, yy, z, f, rumah=nama, ukuran=ukuran)
+
+
+def rumah_varian_g(v):
+    """A small family house (for sale) with four kavling on the rest of the lot (42.9.4): two big plots on the east,
+    two small ones south of the house."""
+    K.tempel(v, rumah_kecil(tl._seed("hunian/rumah_g1"), 20, 20, roof_tile=True, crop="minecraft:potatoes"), 3, 3, 0)
+    jual(v, "rumah_kecil", "kecil", (0, 0, 47, 47))
+    khk.kavling_di(v, 4, 4, 43, 43, LY, ("rumah_besar", "rumah_toko", "rumah_kecil", "kuil_kecil"), "ibukota_hunian_barat",
+                   _hadap_jalan(0, 0, 47, 47), maks=4)
+
+
+def rumah_varian_h(v):
+    """A shophouse (for sale) on the east, a big and two small kavling north-west, a neighbourhood well."""
+    K.tempel(v, rumah_toko(tl._seed("hunian/rumah_h1"), 20, 24, goods=("minecraft:decorated_pot", "minecraft:melon")),
+             24, 21, 0)
+    jual(v, "rumah_toko", "toko", (0, 0, 47, 47))
+    sumur_umum(v, 12, 34)
+    K.tree(v, 4, LY + 1, 42, "cherry")
+    khk.kavling_di(v, 4, 4, 43, 43, LY, ("rumah_toko", "rumah_kecil", "taman"), "ibukota_hunian_barat",
+                   _hadap_jalan(0, 0, 47, 47), maks=3)
+
+
+def rumah_varian_i(v):
+    """A long tenement on the north half, three kavling on the south half."""
+    K.tempel(v, rumah_susun(tl._seed("hunian/rumah_i1"), 42, 20), 3, 3, 0)
+    khk.kavling_di(v, 4, 4, 43, 43, LY, ("rumah_besar", "rumah_kecil", "rumah_kecil"), "ibukota_hunian_barat",
+                   _hadap_jalan(0, 0, 47, 47), maks=3)
+
+
+# ----------------------------------------------------------------------------------------------- 42 life points pass
+RONDA = {"cendekia": 0, "istana": 2, "awan": 4, "pasar": 6, "arena": 8, "gerbang": 10, "hunian_barat": 12, "gilda": 14}
+PASAR_PAGI = [0]
+LAPAK_SEWA = [0]
+LENTERA_LOT = {"pusat": 6, "gerbang": 6, "pasar": 6, "istana": 4, "cendekia": 4, "awan": 4, "gilda": 4, "arena": 4,
+               "hunian_barat": 3, "kumuh": 3, "luar": 2}
+KEBIASAAN = {   # district -> {(i, j): [(jenis, n), ...]} on free ground (42.4.12, 42.7.5)
+    "pusat": {(0, 2): [("catur", 2), ("gantung_sangkar", 2)], (0, 1): [("jongkok", 1)], (1, 1): [("gantung_sangkar", 1)]},
+    "hunian_barat": {(1, 1): [("catur", 2), ("gantung_sangkar", 1), ("jongkok", 1)], (0, 1): [("jongkok", 1),
+                                                                                           ("kandang", 1)]},
+    "cendekia": {(1, 2): [("catur", 2), ("gantung_sangkar", 2)], (0, 2): [("catur", 1)]},
+    "istana": {(0, 0): [("gantung_sangkar", 2), ("catur", 1)]},
+    "awan": {(2, 2): [("catur", 1), ("gantung_sangkar", 1)]},
+    "gilda": {(0, 2): [("jongkok", 1)]},
+    "gerbang": {(1, 2): [("jongkok", 1), ("catur", 1), ("tambat", 2)]},
+    "pasar": {(1, 1): [("jongkok", 1)], (2, 2): [("jongkok", 1)]},
+    "kumuh": {(1, 1): [("jongkok", 1)], (2, 1): [("jongkok", 1)]},
+    "luar": {(0, 1): [("catur", 1), ("jongkok", 1)], (2, 2): [("gantung_sangkar", 2), ("kandang", 1)], (0, 2): [("gantung_sangkar", 1),
+             ("kandang", 1)], (0, 0): [("tambat", 2)], (2, 0): [("tambat", 2)]},
+}
+
+
+PAJANG = {      # district -> {(i, j): pajangan kinds} drawn on counter / table tops of the old shops (42.9.1)
+    "gilda": {(0, 0): ("botol_pil", "herba"), (1, 0): ("herba",), (2, 0): ("pedang",), (2, 1): ("pedang",),
+              (0, 2): ("herba", "botol_pil"), (2, 2): ("mangkuk", "mi")},
+    "pasar": {(0, 0): ("dacing",), (0, 2): ("botol_pil", "jimat"), (2, 1): ("pedang",), (1, 2): ("gulungan", "jimat"),
+              (2, 2): ("lentera_kertas", "bunga"), (1, 1): ("keranjang",)},
+    "gerbang": {(0, 1): ("mangkuk", "mi"), (2, 1): ("teko",), (0, 2): ("lentera_kertas", "bakpao"),
+                (2, 2): ("bakpao", "lentera_kertas"), (0, 0): ("teko",), (2, 0): ("teko", "mangkuk")},
+    "hunian_barat": {(1, 2): ("mangkuk", "mi"), (0, 1): ("papan",)},
+    "kumuh": {(0, 1): ("keranjang", "kain"), (2, 1): ("mangkuk",), (1, 1): ("dacing",), (1, 2): ("mangkuk",)},
+    "cendekia": {(0, 0): ("gulungan",), (1, 0): ("gulungan",), (2, 1): ("gulungan",)},
+    "awan": {(0, 1): ("dacing",), (2, 1): ("dacing",), (0, 0): ("gulungan",), (0, 2): ("teko",)},
+    "luar": {(2, 1): ("keranjang", "bakpao"), (2, 0): ("dacing",)},
+    "pusat": {(2, 1): ("gulungan",), (2, 2): ("gulungan",)},
+    "lot": {(0, 0): ("keranjang", "teko")},
+}
+
+
+def pajang(k, x0, z0, x1, z1, jenis, maks=2, jarak=3):
+    """Display props (42.9.1 pajangan:<jenis>) on counter and table tops inside x0..x1 x z0..z1: the air cell over a
+    closed top-half trapdoor or a pressure plate at standing height, no point there yet, `jarak` apart."""
+    pts = {tuple(t["pos"]) for t in k.titik_list}
+    kand = []
+    for (x, yy, z), cell in k.cells.items():
+        if not (x0 <= x <= x1 and z0 <= z <= z1 and LY + 1 <= yy <= LY + 12):
+            continue
+        bid, props = cell[0]
+        top = bid.endswith("pressure_plate") or (bid.endswith("_trapdoor") and ("half", "top") in props
+                                                  and ("open", "false") in props)
+        if top and _udara(k, x, yy + 1, z) and (x, yy + 1, z) not in pts and not _udara(k, x, yy - 1, z):
+            kand.append((tl._seed("pajang/%d/%d/%d" % (x, yy, z)), x, yy + 1, z))
+    kand.sort()
+    out, dipilih = [], []
+    for _h, x, yy, z in kand:
+        if len(out) >= maks:
+            break
+        if all(max(abs(x - a), abs(z - b)) >= jarak for a, b in dipilih):
+            out.append(khk.titik42(k, "pajangan:" + jenis[len(out) % len(jenis)], x, yy, z, "south"))
+            dipilih.append((x, z))
+    return out
+
+
+def _titik_lot(k, x0, z0):
+    return sum(1 for t in k.titik_list if x0 <= t["pos"][0] < x0 + tl.LOT and z0 <= t["pos"][2] < z0 + tl.LOT)
+
+
+def hidup42(k, distrik, names, ox=0, oz=0, jalan=True):
+    """The 42 life points of one district canvas (42.12.1 titik table), lot by lot, never beyond 96 points per lot:
+    habit spots (KEBIASAAN), fishing on pond banks, chimneys over kitchens, paper lanterns under the eaves, a napping
+    cat on a roof; with street grids a street-name post and night-watch stops at the crossings (ronda, one route round
+    the city), morning-market tent spots and rentable stalls in the market district."""
+    sisa = {}
+    for (i, j), n in names.items():
+        if n:
+            sisa[(i, j)] = tl.MAKS_TITIK - 2 - _titik_lot(k, ox + i * tl.LOT, oz + j * tl.LOT)
+
+    def boleh(ij, n):
+        return sisa.get(ij, 0) >= n
+
+    def pakai(ij, n):
+        sisa[ij] = sisa.get(ij, 0) - n
+
+    for (i, j), daftar in sorted(KEBIASAAN.get(distrik, {}).items()):
+        if (i, j) not in sisa:
+            continue
+        x0, z0 = ox + i * tl.LOT, oz + j * tl.LOT
+        for jenis, n in daftar:
+            per = {"catur": 3, "gantung_sangkar": 1, "jongkok": 2, "sumur": 2, "tambat": 1, "kandang": 1}[jenis]
+            for _ in range(n):
+                if boleh((i, j), per):
+                    if khk.kebiasaan(k, x0 + 4, z0 + 4, x0 + 43, z0 + 43, LY, jenis, 1):
+                        pakai((i, j), per)
+    for (i, j), jenis in sorted(PAJANG.get(distrik, {}).items()):
+        if (i, j) in sisa and boleh((i, j), 3):
+            x0, z0 = ox + i * tl.LOT, oz + j * tl.LOT
+            pakai((i, j), len(pajang(k, x0 + 1, z0 + 1, x0 + 46, z0 + 46, jenis, maks=3)))
+    for (i, j) in sorted(sisa):
+        x0, z0 = ox + i * tl.LOT, oz + j * tl.LOT
+        if boleh((i, j), 2):
+            pakai((i, j), len(khk.pancing_kolam(k, x0 + 3, z0 + 3, x0 + 44, z0 + 44, LY, maks=1)))
+        if boleh((i, j), 2):
+            pakai((i, j), len(khk.cerobong_dapur(k, x0 + 1, z0 + 1, x0 + 46, z0 + 46, LY, maks=2)))
+        m = min(LENTERA_LOT.get(distrik, 3), max(0, sisa[(i, j)] - 2))
+        if m:
+            pakai((i, j), len(khk.lentera_atap(k, x0 + 1, z0 + 1, x0 + 46, z0 + 46, LY, maks=m, jarak=5,
+                                                salt=i * 3 + j)))
+        if boleh((i, j), 1) and (i + j) % 2 == 0:      # about 40 roof cats in the capital (42.12.1 table)
+            pakai((i, j), len(khk.kucing_atap(k, x0 + 1, z0 + 1, x0 + 46, z0 + 46, LY, maks=1, salt=i * 3 + j)))
+    if jalan:
+        # crossings of the street grid: (cx, cz) = lot corner; the 6-wide streets run cx-3..cx+2. The street-name
+        # post stands on the crossing's north-east street corner (lot (ci, cj - 1)), clear of the lamp posts
+        for ci in (1, 2):
+            for cj in (1, 2):
+                cx, cz = ox + ci * tl.LOT, oz + cj * tl.LOT
+                px, pz = cx + 2, cz - 3
+                if (ci, cj - 1) in sisa and boleh((ci, cj - 1), 1) and _terbuka(k, px, pz) and not _udara(k, px, LY, pz):
+                    khk.nama_jalan(k, px, LY, pz, "north")
+                    pakai((ci, cj - 1), 1)
+        if distrik in RONDA:
+            pts = []
+            for (ci, cj) in ((1, 1), (2, 2), (2, 1), (1, 2)):
+                if len(pts) >= 2:
+                    break
+                cx, cz = ox + ci * tl.LOT, oz + cj * tl.LOT
+                for (px, pz) in ((cx - 1, cz - 1), (cx, cz), (cx - 1, cz - 8), (cx - 8, cz - 1), (cx, cz + 8),
+                                 (cx + 8, cz)):
+                    if _terbuka(k, px, pz):
+                        pts.append((px, LY + 1, pz))
+                        break
+            khk.ronda(k, pts, mulai=RONDA[distrik], rute="tembok")
+    if distrik == "pasar":
+        # morning-market tents on the inner streets (3 x 3 free), rentable stalls on free ground by the streets
+        for ci, cj in ((1, 0), (2, 0), (1, 1), (2, 1), (1, 2), (2, 2), (0, 1), (0, 2)):
+            for (x, z, f) in ((ox + ci * tl.LOT - 1, oz + cj * tl.LOT + 14, "east"),
+                              (ox + ci * tl.LOT - 1, oz + cj * tl.LOT + 34, "west"),
+                              (ox + ci * tl.LOT + 14, oz + cj * tl.LOT - 1, "south"),
+                              (ox + ci * tl.LOT + 34, oz + cj * tl.LOT - 1, "north")):
+                if PASAR_PAGI[0] >= 12:
+                    break
+                if all(_terbuka(k, x + a, z + b) for a in (-1, 0, 1) for b in (-1, 0, 1)):
+                    khk.pasar_pagi(k, PASAR_PAGI[0], x, LY + 1, z, f)
+                    PASAR_PAGI[0] += 1
+        for (i, j) in sorted(sisa):
+            x0, z0 = ox + i * tl.LOT, oz + j * tl.LOT
+            hadap = _hadap_jalan(x0, z0, x0 + 47, z0 + 47)
+            for fx, fz in khk.cari_lahan(k, x0 + 4, z0 + 4, x0 + 43, z0 + 43, LY, 5, 4, maks=2, jarak=1):
+                if LAPAK_SEWA[0] >= 12 or not boleh((i, j), 1):
+                    break
+                f = hadap(fx + 2, fz + 1)
+                khk.lapak_sewa(k, LAPAK_SEWA[0], fx + 2, LY, fz + 1, f)
+                LAPAK_SEWA[0] += 1
+                pakai((i, j), 1)
+
+
 BIOMES_TANAH = [
     "plains", "sunflower_plains", "snowy_plains", "desert", "swamp", "mangrove_swamp", "forest", "flower_forest",
     "birch_forest", "dappled_forest", "dark_forest", "pale_garden", "old_growth_birch_forest", "old_growth_pine_taiga",

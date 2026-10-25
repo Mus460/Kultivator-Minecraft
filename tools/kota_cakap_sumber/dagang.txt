@@ -1,0 +1,157 @@
+# dagang: corpus of the conversation engine (42K-C, DESIGN 42.5A.8). Source format: gen_kota_hidup_cakap.py.
+# Trade talk (42.5A.9 DAGANG and player bargaining 42.5A.7): TAWARAN (seller offers), TAWAR (buyer), TAWAR_BALIK (seller's
+# counter), SEPAKAT, BATAL; BERI_KABAR / KELUH on topik dagang (the speaker's own trade); TANYA on topik harga.
+# {$barang} {$harga} {$harga_tawar} = konteks.barang / konteks.harga / konteks.harga_tawar (frames without them still work).
+@kelompok dagang
+
+== dagang.tawarkan
+niat: TAWARAN
+topik: dagang
+syarat: kelompok=pedagang
+gestur: seru_dagang
+$barang: tipe=barang dari=konteks.barang
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+$harga: tipe=harga dari=konteks.harga
+- [3] Mari, mari! {$barang} segar, baru datang pagi ini! || Come, come! Fresh {$barang}, just in this morning!
+  ~ kasar: {$barang}. Mau beli atau cuma lihat? || {$barang}. Buying or just looking?
+  ~ kuno: Silakan dilihat, {$sebutan}. {$barang} terbaik di seluruh kota fana ini. || Please look, {$sebutan}. The finest {$barang} in all this mortal town.
+  ~ pelabuhan: {$barang} langsung dari kapal, Bung! Masih bau laut! || {$barang} straight off the ship, mate! Still smells of the sea!
+  ~ oasis: {$barang} dari seberang gurun, Saudara. Lima puluh hari perjalanan unta! || {$barang} from beyond the desert, friend. Fifty days by camel!
+  ~ air: {$barang}, Kakak... dari perahu ke tanganmu... segar sekali... || {$barang}, dear... from boat to your hand... so fresh...
+  ~ kampung: {$barang} hasil kebun sendiri, Nak. Tidak pakai racun hama. || {$barang} from my own garden, child. No pest poison.
+- [2] {$sebutan}, lihat {$barang} ini. Cuma {$harga}. Murah, kan? || {$sebutan}, look at this {$barang}. Only {$harga}. Cheap, eh?
+  ~ ibukota: {$barang} kualitas istana, {$sebutan}. Hanya {$harga}. Para pejabat membeli di sini. || Palace-grade {$barang}, {$sebutan}. Only {$harga}. Officials buy here.
+  ~ iblis: {$barang}. {$harga}. Tidak tanya asal-usulnya, aku tidak bohong. || {$barang}. {$harga}. You don't ask where it's from, I don't lie.
+- [2] Untuk {$sebutan}, khusus hari ini, {$barang} {$harga} saja. Jangan bilang yang lain, ya. || For you, {$sebutan}, today only, {$barang} for just {$harga}. Don't tell the others.
+  ~ kasar: Hari ini {$harga}. Besok lebih mahal. Terserah. || {$harga} today. Dearer tomorrow. Up to you.
+- Pembeli pertama hari ini! Pembuka rezeki, kuberi harga bagus. || First customer today! Fortune's opener; I'll give you a good price.
+  ~ p: Pembeli pertama! Wah, pertanda baik. Ayo, pilih yang mana? || First customer! Oh, a good sign. Come, which one?
+- Coba pegang. Rasakan sendiri bedanya dengan barang pasar sebelah. || Feel it. Tell the difference from the next market's goods yourself.
+- {$barang} tinggal sedikit. Kafilah berikutnya masih lama. || Only a little {$barang} left. The next caravan's a long way off.
+- Lihat-lihat dulu juga boleh. Lihat itu gratis, beli baru bayar. Hehe. || Looking's fine too. Looking's free; buying you pay. Hehe.
+
+== dagang.tawar_pembeli
+niat: TAWAR
+topik: dagang
+syarat: kelompok=pekerja,pedagang,tetua,anak,penjaga
+gestur: tawar
+$harga: tipe=harga dari=konteks.harga
+$harga_tawar: tipe=harga dari=konteks.harga_tawar
+- [3] {$harga}? Mahal sekali! {$harga_tawar} saja, ya? || {$harga}? Too dear! Just {$harga_tawar}, all right?
+  ~ kasar: {$harga}? Kau mau merampok? {$harga_tawar}, tidak lebih. || {$harga}? Are you robbing me? {$harga_tawar}, no more.
+  ~ kuno: Harga {$harga} terlalu tinggi untuk barang semacam ini. {$harga_tawar} lebih pantas. || {$harga} is too high for goods of this kind. {$harga_tawar} is more fitting.
+  ~ oasis: {$harga}? Demi mata air! Di bazar sebelah cuma {$harga_tawar}, Saudara! || {$harga}? By the spring! The next bazaar has it for {$harga_tawar}, friend!
+  ~ kampung: Aduh, {$harga} kemahalan, Pak. {$harga_tawar} ya, buat langganan. || Oh, {$harga}'s too much, sir. {$harga_tawar}, for a regular.
+- [2] Kemarin di pasar timur cuma {$harga_tawar}. Kok di sini lebih mahal? || Yesterday at the east market it was only {$harga_tawar}. Why dearer here?
+  ~ pelabuhan: Di dermaga sebelah {$harga_tawar}, Bung. Jangan kira aku baru turun kapal. || At the next dock it's {$harga_tawar}, mate. Don't think I just stepped off a boat.
+- Aku beli dua kalau {$harga_tawar}. Bagaimana? || I'll take two at {$harga_tawar}. How's that?
+  ~ p: Aku beli dua kalau {$harga_tawar}. Untuk anak-anakku. Kasihanilah. || I'll take two at {$harga_tawar}. For my children. Have pity.
+- Lihat, ada cacatnya di sini. {$harga_tawar} saja. || Look, there's a flaw here. {$harga_tawar} at most.
+  ~ kasar: Ini cacat. {$harga_tawar}. Ambil atau aku pergi. || It's flawed. {$harga_tawar}. Take it or I walk.
+- Aku langganan sejak ayahmu masih berdagang di sini, lho. {$harga_tawar}, demi kenangan. || I've been buying since your father traded here, you know. {$harga_tawar}, for old times.
+
+== dagang.tawar_penjual
+niat: TAWAR_BALIK
+topik: dagang
+syarat: kelompok=pedagang
+gestur: hitung_koin
+$harga_tawar: tipe=harga dari=konteks.harga_tawar
+$harga: tipe=harga dari=konteks.harga
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] {$harga_tawar}? Aduh, aku rugi! {$harga}, itu sudah harga teman. || {$harga_tawar}? Oh, I'd lose money! {$harga}, that's a friend's price already.
+  ~ kasar: {$harga_tawar}? Pergi sana. {$harga} atau tidak sama sekali. || {$harga_tawar}? Get away. {$harga} or nothing.
+  ~ kuno: Hamba hanya mencari sesuap nasi, {$sebutan}. {$harga} adalah batas hamba. || This humble one only seeks a bowl of rice, {$sebutan}. {$harga} is my limit.
+  ~ iblis: {$harga_tawar}? Lucu. Orang terakhir yang menawar segitu tidak pulang utuh. {$harga}. || {$harga_tawar}? Funny. The last one who offered that didn't go home whole. {$harga}.
+- [2] Aku harus memberi makan lima mulut. {$harga}, tidak bisa kurang. || I've five mouths to feed. {$harga}, can't go lower.
+  ~ p: Anakku tiga, suami sakit. {$harga}, kasihanilah aku juga. || Three children, a sick husband. {$harga}; have pity on me too.
+  ~ pelabuhan: Ongkos kapal mahal, Bung! {$harga}, sudah dipotong untung. || Shipping's dear, mate! {$harga}, profit's already cut.
+- Baiklah, baiklah. Kita bertemu di tengah. {$harga}. || Fine, fine. Let's meet in the middle. {$harga}.
+  ~ oasis: Demi persahabatan, Saudara. {$harga}. Ini kurugikan diriku sendiri. || For friendship's sake, friend. {$harga}. I'm hurting myself here.
+- Kau pandai menawar. {$harga}, tapi jangan bilang siapa-siapa. || You bargain well. {$harga}, but tell no one.
+- Barang begini di ibu kota dua kali lipat harganya. {$harga} sudah murah sekali. || Goods like these cost double in the capital. {$harga} is very cheap already.
+
+== dagang.sepakat
+niat: SEPAKAT
+topik: dagang
+gestur: angguk
+seru: terima_kasih
+$harga: tipe=harga dari=konteks.harga
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Baik, sepakat! {$harga}. Semoga rezekimu lancar! || Done, agreed! {$harga}. May your fortune flow!
+  ~ kasar: Ya sudah. Bayar. || Fine. Pay up.
+  ~ kuno: Kesepakatan tercapai. Semoga barang ini bermanfaat bagi jalanmu, {$sebutan}. || Agreement is reached. May these goods serve your path, {$sebutan}.
+  ~ pelabuhan: Jabat tangan, Bung! Kesepakatan pelaut tidak bisa ditarik! || Shake on it, mate! A sailor's deal can't be taken back!
+  ~ oasis: Demi mata air, sepakat! Semoga kafilahmu selamat, Saudara. || By the spring, agreed! May your caravan be safe, friend.
+  ~ kampung: Jadi, ya! Terima kasih, Nak. Lain kali mampir lagi. || Deal! Thank you, child. Drop by again.
+- [2] Terima kasih! Kubungkus yang rapi, ya. || Thank you! I'll wrap it neatly.
+  ~ p: Terima kasih! Kuberi bonus sedikit, untuk langganan baru. || Thank you! A little extra, for a new regular.
+  ~ air: Terima kasih, Kakak... semoga senang dengan barangnya... || Thank you, dear... I hope you like it...
+- Pembeli seperti {$sebutan} membuat hariku cerah. || Customers like you brighten my day, {$sebutan}.
+- Pas, pas! Langit menyaksikan, jual-beli kita bersih. || Done, done! Heaven witnesses, our trade is clean.
+- Kembaliannya pas. Hati-hati di jalan. || Exact change. Safe journey.
+
+== dagang.batal
+niat: BATAL
+topik: dagang
+gestur: geleng
+- [3] Tidak jadi, deh. Terlalu mahal untukku. || Never mind, then. Too dear for me.
+  ~ kasar: Lupakan. Penipu. || Forget it. Cheat.
+  ~ kuno: Mungkin jodoh kita bukan di barang ini. Lain kali saja. || Perhaps our fate does not lie with these goods. Another time.
+  ~ pelabuhan: Tidak jadi, Bung. Kucari di kapal lain. || No deal, mate. I'll try another boat.
+  ~ oasis: Tidak jadi, Saudara. Bazar ini luas. || No deal, friend. This bazaar is large.
+  ~ kampung: Wis, nggak jadi. Nanti kubikin sendiri. || Fine, not buying. I'll make it myself.
+- [2] Ya sudah, kalau tidak bisa kurang. Aku lihat-lihat dulu di tempat lain. || Well, if it can't go lower. I'll look elsewhere first.
+  ~ p: Ya sudah. Mungkin suamiku bisa membuatnya sendiri. || Oh well. Perhaps my husband can make one himself.
+- Hmph. Rugi sendiri kau, aku pelanggan setia. || Hmph. Your loss; I'm a loyal customer.
+- Nanti aku kembali kalau harganya turun. || I'll come back when the price drops.
+  ~ iblis: Nanti aku kembali. Dengan teman-temanku. || I'll be back. With my friends.
+
+== dagang.cerita.laris
+niat: BERI_KABAR
+topik: dagang
+syarat: kelompok=pedagang label_emosi=gembira,puas,lega
+gestur: hitung_koin
+$barang: tipe=barang dari=konteks.barang
+$senang: aturan=seru.senang opsional=0.5
+- [3] Dagangan hari ini laris! {$barang} habis sebelum tengah hari. {$senang} || Trade's brisk today! The {$barang} sold out before noon. {$senang}
+  ~ kasar: Laris. Akhirnya bisa bayar sewa. || Selling well. Can finally pay the rent.
+  ~ kuno: Rezeki hari ini melimpah. Langit memperhatikan orang yang tekun. || Fortune overflows today. Heaven watches the diligent.
+  ~ pelabuhan: Seluruh muatan habis, Bung! Malam ini aku traktir! || Whole cargo's gone, mate! Drinks on me tonight!
+- [2] Pelanggan baru datang terus sejak festival. Aku sampai minta anakku membantu. || New customers keep coming since the festival. I've had to get my child to help.
+  ~ p: Pelanggan baru datang terus. Aku sampai lupa menyisir rambut. Hihi. || New customers keep coming. I even forgot to comb my hair. Hehe.
+- Kalau terus begini, aku bisa membuka lapak kedua. || If this keeps up, I could open a second stall.
+- Untung tahun ini lebih baik dari tahun lalu. Leluhur pasti memberkati. || Profit's better than last year. The ancestors must be blessing us.
+
+== dagang.cerita.sepi
+niat: KELUH
+topik: dagang
+syarat: kelompok=pedagang
+gestur: geleng
+seru: aduh
+$keluh: aturan=seru.keluh opsional=0.5
+$barang: tipe=barang dari=konteks.barang
+- [3] Sepi sekali hari ini. Baru dua pembeli sejak pagi. {$keluh} || So quiet today. Only two buyers since morning. {$keluh}
+  ~ kasar: Sepi. Lalat pun malas mampir. || Dead. Even the flies won't stop by.
+  ~ kuno: Pasar sedang lesu. Bahkan batu roh pun tidur di kantong orang. || The market is sluggish. Even spirit stones sleep in people's purses.
+  ~ pelabuhan: Kapal tidak datang, pembeli tidak datang, Bung. Aku cuma memandangi laut. || No ships, no buyers, mate. I just stare at the sea.
+  ~ kampung: Sepi, Nak. Orang kampung lagi pada ke sawah semua. || Quiet, child. The village is all out in the paddies.
+- [2] {$barang} tidak laku. Mungkin aku salah memilih dagangan musim ini. || The {$barang} won't sell. Maybe I chose wrong this season.
+  ~ oasis: Kafilah lewat tanpa berhenti, Saudara. {$barang}-ku menunggu di bawah terik. || Caravans pass without stopping, friend. My {$barang} waits under the blazing sun.
+- Pajak lapak naik, pembeli turun. Bagaimana orang kecil bisa hidup? || Stall tax up, buyers down. How are small folk to live?
+- Kalau begini terus, aku harus pinjam ke rentenir. Jangan sampai. || If this goes on, I'll have to borrow from the lender. Heaven forbid.
+  ~ iblis: Sepi. Di kota ini sepi berarti ada yang lebih besar memakan pasar. || Quiet. In this city quiet means something bigger is eating the market.
+
+== dagang.tanya_harga
+niat: TANYA
+topik: harga
+gestur: bicara_tangan
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+$barang_murah: tipe=barang dari=konteks.barang_murah
+$barang_mahal: tipe=barang dari=konteks.barang_mahal fitur=jamak
+- [3] {$sebutan} tahu harga {$barang_murah} di kota lain? Di sini makin tidak masuk akal. || Do you know the price of {$barang_murah} in other towns, {$sebutan}? Here it's getting absurd.
+  ~ kasar: Berapa harga {$barang_murah} di tempatmu? Jangan bohong. || What's {$barang_murah} cost where you're from? Don't lie.
+  ~ kuno: Bolehkah aku bertanya, {$sebutan}, berapa harga {$barang_murah} di negeri yang {$sebutan} lewati? || May I ask, {$sebutan}, what {$barang_murah} costs in the lands you've passed?
+- [2] Mau beli apa hari ini, {$sebutan}? Kalau mencari {$barang_mahal}, mahal sekarang. || What are you buying today, {$sebutan}? If it's {$barang_mahal}, it's dear now.
+  ~ pelabuhan: Cari apa, Bung? {$barang_mahal} lagi mahal, kapal belum datang. || Looking for what, mate? {$barang_mahal} is dear; the ship's not in.
+- Menurut {$sebutan}, harga {$barang_mahal} akan turun sebelum musim berganti? || Do you think {$barang_mahal} will drop before the season turns, {$sebutan}?
+- {$barang_murah} sedang murah. Sudah beli belum? Simpan untuk musim dingin. || {$barang_murah} is cheap now. Bought any? Store some for winter.

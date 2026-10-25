@@ -1,0 +1,161 @@
+{
+  "_doc": "DESIGN 42.4A.6 spontaneous turns (42S-R): taken on 12 % of trips (kotaWarga.belokanPeluang) when an attraction of titik kind 'titik' lies <= 24 blocks of the route; depan = stand in front of the stall; untuk semua/dewasa/anak; kebiasaan = habits that triple the weight.",
+  "belokan": [
+    {
+      "id": "jajan_tanghulu",
+      "kunci": "rg_belok_jajan",
+      "titik": "lapak",
+      "depan": true,
+      "klip": "kota42_makan_tanghulu",
+      "kanan": "kota42_tanghulu",
+      "dur": [
+        6,
+        12
+      ],
+      "bobot": 1.4,
+      "untuk": "semua"
+    },
+    {
+      "id": "jajan_bakpao",
+      "kunci": "rg_belok_bakpao",
+      "titik": "lapak",
+      "depan": true,
+      "klip": "makan",
+      "kanan": "kota42_kantong_kue",
+      "dur": [
+        6,
+        12
+      ],
+      "bobot": 1.2,
+      "untuk": "dewasa"
+    },
+    {
+      "id": "elus_kucing",
+      "kunci": "rg_belok_kucing",
+      "titik": "kucing_tidur",
+      "klip": "kota42_elus_hewan",
+      "dur": [
+        5,
+        10
+      ],
+      "bobot": 1.0,
+      "untuk": "semua",
+      "kebiasaan": [
+        "teman_kucing"
+      ]
+    },
+    {
+      "id": "tonton_pengamen",
+      "kunci": "rg_belok_tonton",
+      "titik": "penonton",
+      "klip": "kota42_kagum",
+      "dur": [
+        8,
+        15
+      ],
+      "bobot": 1.0,
+      "untuk": "semua",
+      "kerumunan": true,
+      "kebiasaan": [
+        "penggemar_opera"
+      ]
+    },
+    {
+      "id": "sapa_sahabat",
+      "kunci": "obrol",
+      "titik": "obrol",
+      "klip": "bicara_tangan",
+      "dur": [
+        6,
+        12
+      ],
+      "bobot": 1.1,
+      "untuk": "semua",
+      "sahabat": true
+    },
+    {
+      "id": "baca_papan",
+      "kunci": "rg_belok_papan",
+      "titik": "nama_jalan",
+      "klip": "memandang",
+      "dur": [
+        4,
+        8
+      ],
+      "bobot": 0.7,
+      "untuk": "dewasa"
+    },
+    {
+      "id": "beri_pengemis",
+      "kunci": "rg_belok_sedekah",
+      "titik": "kursi_lantai",
+      "klip": "kota42_beri_koin",
+      "kanan": "kantong_uang",
+      "dur": [
+        4,
+        8
+      ],
+      "bobot": 0.5,
+      "untuk": "dewasa",
+      "kebiasaan": [
+        "dermawan"
+      ],
+      "syarat_kebiasaan": false
+    },
+    {
+      "id": "longok_toko",
+      "kunci": "rg_belok_longok",
+      "titik": "lapak",
+      "depan": true,
+      "klip": "lihat_barang",
+      "dur": [
+        5,
+        10
+      ],
+      "bobot": 0.8,
+      "untuk": "dewasa",
+      "kebiasaan": [
+        "pesolek"
+      ]
+    },
+    {
+      "id": "duduk_bangku",
+      "kunci": "rg_belok_duduk",
+      "titik": "kursi",
+      "klip": "duduk_kursi",
+      "dur": [
+        6,
+        12
+      ],
+      "bobot": 0.9,
+      "untuk": "semua"
+    },
+    {
+      "id": "air_sumur",
+      "kunci": "rg_belok_air",
+      "titik": "sumur_timba",
+      "klip": "main_lompat",
+      "dur": [
+        5,
+        10
+      ],
+      "bobot": 1.2,
+      "untuk": "anak",
+      "musim": [
+        "panas"
+      ]
+    },
+    {
+      "id": "beri_pakan_burung",
+      "kunci": "rg_belok_pakan",
+      "titik": "pandang",
+      "klip": "lempar_pakan",
+      "dur": [
+        5,
+        10
+      ],
+      "bobot": 0.6,
+      "untuk": "dewasa"
+    }
+  ]
+}

@@ -2,6 +2,9 @@ package dev.kultivator.client.codex;
 
 import dev.kultivator.client.ClientCultivation;
 import dev.kultivator.client.EffectQuality;
+import dev.kultivator.client.QiHud;
+import dev.kultivator.client.epic.EpicDirector;
+import dev.kultivator.client.hud.Kabar;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.client.screen.ui.Palette;
@@ -18,43 +21,46 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * The codex parts of the HUD (DESIGN 22.12.8; the seal tile, Perisai Qi, lasting arcs and the KEHANCURAN tag are drawn by
- * {@code QiHud}): the Roda Segel, the four quick seal tiles, the charge bar under the crosshair ("Tekan lagi = lepas"
- * from 50%), the emptying channel ring (flashing when it is about to break), stage pips with the window timer, the
- * ultimate lockout ("Pamungkas 12s"), the 1.2 s carousel of the previous and next seals, and jade seal toasts ("Jurus
- * baru", "Pencerahan Jurus", mastery level-ups with a chime, "Gerbang Dewa terbuka"). F1 hides all of it.
+ * The seal parts of the HUD (DESIGN 22.12.8, 43.9; the orb, Perisai Qi, lasting arcs and vital lines are {@code QiHud}):
+ * the Roda Segel, the four quick seal tiles, the selected seal tile (glyph, grade ribbon, cooldown sweep, mastery beads,
+ * qi cost, charge pips, the red Kehancuran frame; G32: the only seal tile), the charge bar under the crosshair ("Tekan
+ * lagi = lepas" from 50%), the emptying channel ring (flashing when it is about to break), stage pips with the window
+ * timer, the ultimate lockout ("Pamungkas 12s") and the 1.2 s carousel of the previous and next seals. Seal notices
+ * ("Jurus baru", "Pencerahan Jurus", mastery level-ups with a chime, "Gerbang Dewa terbuka") go to {@link Kabar}.
+ * <p>
+ * {@link #cincin} is the one painter of a progress ring around the crosshair (G30): the channel ring here, the formation
+ * trip ({@code AlarmHud}), the capital's teleport ({@code KotaBesarHud}), the dragon contest ({@code NagaHud}) and the
+ * sky-treasure claim ({@code LangitHud}) all call it. F1 hides all of it.
  */
 public final class CodexHud implements HudElement {
 
 	private static final long TOAST_MILLIS = 3500L;
 	private static final long CAROUSEL_MILLIS = 1200L;
 	private static final long HINT_MILLIS = 1600L;
+	private static final long KILAT_MILLIS = 700L;
+	/** Inner radius of the crosshair ring; the band is {@link #CINCIN_TEBAL} thick. */
+	public static final float CINCIN_R = 11.0F;
+	public static final float CINCIN_TEBAL = 2.5F;
 
-	private record Toast(Component title, Component text, @Nullable TechniqueSpec spec, long[] start) {
-	}
-
-	private static final Deque<Toast> TOASTS = new ArrayDeque<>();
 	private static @Nullable TechniqueSpec carouselPrevious;
 	private static @Nullable TechniqueSpec carouselCurrent;
 	private static @Nullable TechniqueSpec carouselNext;
 	private static long carouselAt;
 	private static @Nullable Component hint;
 	private static long hintAt;
+	private static long kilatSampai;
 
 	private static long seenVersion = -1L;
 	private static @Nullable Set<String> known;
@@ -63,16 +69,21 @@ public final class CodexHud implements HudElement {
 
 	// ================================================================== events
 
-	/** A jade toast with a title line and the art's glyph. */
+	/** A seal notice with a title line and the art's glyph. */
 	public static void toast(Component text, @Nullable TechniqueSpec spec) {
 		toast(Component.translatable("kultivator.codex.toast.title"), text, spec);
 	}
 
 	public static void toast(Component title, Component text, @Nullable TechniqueSpec spec) {
-		if (TOASTS.size() >= 5) {
-			TOASTS.pollFirst();
-		}
-		TOASTS.addLast(new Toast(title, text, spec, new long[]{0L}));
+		Kabar.kirim(Kabar.kartu(title, text).ikon(spec != null ? specIkon(spec) : Kabar.glyph(Glyphs.CODEX)).lama(TOAST_MILLIS));
+	}
+
+	private static Kabar.Ikon specIkon(TechniqueSpec spec) {
+		return (g, cx, cy) -> {
+			Brush.rect(g, cx - 8.0F, cy - 8.0F, cx + 8.0F, cy + 8.0F, Palette.SEAL);
+			Brush.frame(g, Math.round(cx - 7.0F), Math.round(cy - 7.0F), Math.round(cx + 7.0F), Math.round(cy + 7.0F), Palette.argb(0xB0, Palette.TALISMAN));
+			Glyphs.spec(g, spec, cx, cy, 11.0F, Palette.TALISMAN);
+		};
 	}
 
 	/** A short line above the hotbar (an empty quick seal...). */
@@ -87,6 +98,11 @@ public final class CodexHud implements HudElement {
 		carouselCurrent = current;
 		carouselNext = next;
 		carouselAt = Util.getMillis();
+	}
+
+	/** The cooldown ping (DESIGN 19.3.15): a short gold flash over the selected seal tile ({@code QiHud} rings it). */
+	public static void kilatUbin() {
+		kilatSampai = Util.getMillis() + KILAT_MILLIS;
 	}
 
 	/** Compares the new snapshot with the last one: newly learned arts, mastery level-ups, the Dewa gate. */
@@ -153,12 +169,32 @@ public final class CodexHud implements HudElement {
 
 	/** Forgets everything (disconnect). */
 	static void reset() {
-		TOASTS.clear();
 		known = null;
 		LEVELS.clear();
 		seenVersion = -1L;
 		carouselCurrent = null;
 		hint = null;
+		kilatSampai = 0L;
+	}
+
+	// ================================================================== the crosshair ring
+
+	/** The crosshair ring at the standard radius: a dark track, {@code isi} (0..1) filled clockwise in {@code rgb}, an optional label. */
+	public static void cincin(GuiGraphicsExtractor g, float cx, float cy, float isi, int rgb, @Nullable Component label) {
+		cincin(g, cx, cy, CINCIN_R, isi, rgb, label);
+	}
+
+	/** The same ring at radius {@code r} (the dragon contest draws its arcs on a wide one). */
+	public static void cincin(GuiGraphicsExtractor g, float cx, float cy, float r, float isi, int rgb, @Nullable Component label) {
+		int color = (rgb >>> 24) == 0 ? Palette.opaque(rgb) : rgb;
+		Brush.arc(g, cx, cy, r, r + CINCIN_TEBAL, 0.0F, 1.0F, Palette.argb(0x60, 0x101418));
+		float share = Math.max(0.0F, Math.min(1.0F, isi));
+		if (share > 0.0F) {
+			Brush.arc(g, cx, cy, r, r + CINCIN_TEBAL, 0.0F, share, color);
+		}
+		if (label != null) {
+			Brush.centered(g, Minecraft.getInstance().font, label, cx, cy + r + CINCIN_TEBAL + 3.0F, color, 1.0F, true);
+		}
 	}
 
 	// ================================================================== drawing
@@ -182,42 +218,131 @@ public final class CodexHud implements HudElement {
 		if (!chat && QuickSeals.shown()) {
 			QuickSeals.draw(g, font, 40, height - 47);
 		}
+		if (!chat && !EpicDirector.recordHide()) {
+			sealTile(g, font, minecraft, ClientCultivation.data(), width, height, partial);
+		}
 		if (!SealWheel.isOpen()) {
 			flows(g, font, width / 2.0F, height / 2.0F);
 		}
 		long lockout = TeknikSession.lockoutLeft();
 		if (lockout > 0L && !chat) {
 			Component text = Component.translatable("kultivator.codex.hud.lockout", (lockout + 19L) / 20L);
-			Brush.centered(g, font, text, width / 2.0F, height - 62.0F, 0xFFFF9A6A, 0.7F, true);
+			Brush.centered(g, font, text, width / 2.0F, height - 62.0F, 0xFFFF9A6A, 1.0F, true);
 		}
 		if (carouselCurrent != null && now - carouselAt < CAROUSEL_MILLIS && !chat) {
-			carousel(g, font, width / 2.0F, height - 78.0F, now);
+			carousel(g, font, width / 2.0F, height - 84.0F, now);
 		}
 		if (hint != null && now - hintAt < HINT_MILLIS) {
 			float alpha = Math.min(1.0F, (HINT_MILLIS - (now - hintAt)) / 300.0F);
-			Brush.centered(g, font, hint, width / 2.0F, height - 70.0F, Palette.fade(0xFFF7DC7E, alpha), 0.7F, true);
+			Brush.centered(g, font, hint, width / 2.0F, height - 72.0F, Palette.fade(0xFFF7DC7E, alpha), 1.0F, true);
 		}
-		toasts(g, font, width, now);
+	}
+
+	/** The selected seal tile at x 40, under the quick seals, where {@code QiHud} keeps room for it. */
+	private static void sealTile(GuiGraphicsExtractor g, Font font, Minecraft minecraft, CultivationData data, int width, int height, float partial) {
+		int limit = QiHud.limit(minecraft, width);
+		if (!QiHud.sealTile(data, limit)) {
+			return;
+		}
+		int x = 40;
+		int y = height - 33;
+		TechniqueSpec spec = data.selectedId().isEmpty() ? null : TechniqueRegistry.byId(data.selectedId());
+		if (spec != null) {
+			drawSeal(g, font, data, spec, x, y, partial);
+		} else {
+			// Mode Kehancuran on with no seal chosen: the red seal alone
+			kehancuranFrame(g, x, y, 18);
+			Brush.rect(g, x, y, x + 18, y + 18, Palette.SEAL_DARK);
+			Brush.centered(g, font, Component.literal("毁"), x + 9.5F, y + 5.0F, 0xFFFFE0D0, 1.0F, false);
+		}
+	}
+
+	/**
+	 * The selected spec as a seal tile (DESIGN 22.12.8): glyph, grade ribbon, cooldown sweep and seconds, four mastery
+	 * beads, the qi cost after mastery and the realm gap under it, charge pips above it, and a pulsing red frame while Mode
+	 * Kehancuran is on.
+	 */
+	private static void drawSeal(GuiGraphicsExtractor g, Font font, CultivationData data, TechniqueSpec spec, int x, int y, float partialTick) {
+		int size = 18;
+		int qi = SpecInfo.qi(data, spec);
+		boolean affordable = data.qi() + 1.0E-6D >= qi;
+		if (TeknikSession.breakerOn()) {
+			kehancuranFrame(g, x, y, size);
+		}
+		g.fill(x - 1, y - 1, x + size + 1, y + size + 1, 0xA0101824);
+		int paper = affordable ? Palette.TALISMAN : Palette.grey(Palette.TALISMAN, 0.6F);
+		g.fill(x, y, x + size, y + size, paper);
+		long left = SpecInfo.cooldownLeft(spec);
+		int total = SpecInfo.cooldown(data, spec);
+		if (left > 0L && total > 0) {
+			float fraction = Math.min(1.0F, Math.max(0.0F, (left - partialTick) / total));
+			g.enableScissor(x, y, x + size, y + size);
+			Brush.pie(g, x + size / 2.0F, y + size / 2.0F, size * 0.75F, 1.0F - fraction, 1.0F, Palette.mix(paper, 0xFF1A2230, 0.6F));
+			g.disableScissor();
+		}
+		int seal = affordable ? Palette.SEAL : 0xFF6A6A6A;
+		Brush.frame(g, x, y, x + size, y + size, seal);
+		Brush.frame(g, x + 1, y + 1, x + size - 1, y + size - 1, Palette.argb(0x70, seal));
+		int ribbon = SpecInfo.ribbon(spec.grade());
+		for (int i = 0; i < 5; i++) {
+			g.fill(x + size - 5 + i, y + i, x + size, y + i + 1, ribbon);
+		}
+		int ink = SpecInfo.ink(spec);
+		Glyphs.spec(g, spec, x + size / 2.0F, y + size / 2.0F - 1.0F, 10.0F, left > 0L ? Palette.fade(ink, 0.55F) : ink);
+		int mastery = data.knows(spec.id()) ? SpecInfo.mastery(data, spec) : 0;
+		for (int i = 0; i < 4; i++) {
+			Brush.dot(g, x + size / 2.0F + (i - 1.5F) * 2.6F, y + size - 2.2F, 0.7F, i < mastery ? Palette.GOLD : Palette.argb(0x60, 0x3A2D12));
+		}
+		if (left > 0L) {
+			Component secs = Component.literal(String.valueOf((left + 19L) / 20L));
+			Brush.centered(g, font, secs, x + size / 2.0F, y + size / 2.0F - 4.0F, 0xFFFFFFFF, 1.0F, true);
+		}
+		long flash = kilatSampai - Util.getMillis();
+		if (flash > 0L) {
+			int alpha = Math.round(160 * flash / (float) KILAT_MILLIS);
+			g.fill(x - 1, y - 1, x + size + 1, y + size + 1, Palette.argb(alpha, 0xFFE07A));
+		}
+		Component cost = Component.literal(SpecInfo.compact(qi));
+		Brush.centered(g, font, cost, x + size / 2.0F, y + size + 2.0F, affordable ? Palette.QI_LIGHT : 0xFFFF7A6A, 1.0F, true);
+		CompoundTag charges = TeknikSession.charges(spec.id());
+		if (charges != null) {
+			int max = Math.max(1, Math.min(8, charges.getIntOr("max", 1)));
+			int have = Math.max(0, Math.min(max, charges.getIntOr("n", max)));
+			for (int i = 0; i < max; i++) {
+				Brush.dot(g, x + size / 2.0F + (i - (max - 1) / 2.0F) * 3.0F, y - 2.5F, 0.9F, i < have ? Palette.QI_LIGHT : Palette.argb(0x70, 0x3A4A5A));
+			}
+		}
+	}
+
+	/** Mode Kehancuran on and allowed: a pulsing red double frame around the tile. */
+	private static void kehancuranFrame(GuiGraphicsExtractor g, int x, int y, int size) {
+		float pulse = 0.6F + 0.4F * (float) Math.sin(Util.getMillis() / 250.0D);
+		int red = Palette.mix(0xFFB3281D, 0xFFFF5B3A, pulse);
+		Brush.frame(g, x - 3, y - 3, x + size + 3, y + size + 3, red);
+		Brush.frame(g, x - 2, y - 2, x + size + 2, y + size + 2, Palette.argb(Math.round(0x90 * pulse), 0xFF5B3A));
 	}
 
 	/** Charge bar, channel ring and stage pips around the crosshair. */
 	private static void flows(GuiGraphicsExtractor g, Font font, float cx, float cy) {
 		long time = ClientCultivation.serverGameTime();
-		TeknikSession.Flow charge = TeknikSession.charge();
-		if (charge != null) {
-			float share = Math.max(0.0F, Math.min(1.0F, (time - charge.start()) / (float) Math.max(1L, charge.end() - charge.start())));
-			float bw = 40.0F;
-			Brush.rect(g, cx - bw / 2.0F - 1.0F, cy + 9.0F, cx + bw / 2.0F + 1.0F, cy + 13.0F, 0xA0101824);
-			Brush.rect(g, cx - bw / 2.0F, cy + 10.0F, cx - bw / 2.0F + bw * share, cy + 12.0F, share >= 0.5F ? Palette.GOLD_LIGHT : Palette.GOLD);
-			if (share >= 0.5F) {
-				Brush.centered(g, font, Component.translatable("kultivator.codex.hud.release"), cx, cy + 15.0F, Palette.GOLD_LIGHT, 0.55F, true);
-			}
-		}
 		TeknikSession.Flow channel = TeknikSession.channel();
 		if (channel != null) {
 			float left = Math.max(0.0F, Math.min(1.0F, (channel.end() - time) / (float) Math.max(1L, channel.end() - channel.start())));
 			boolean flash = channel.warn() && Util.getMillis() / 150L % 2L == 0L;
-			Brush.arc(g, cx, cy, 8.0F, 9.5F, 0.0F, left, flash ? 0xFFFF4A3A : Palette.QI_LIGHT);
+			cincin(g, cx, cy, left, flash ? 0xFFFF4A3A : Palette.QI_LIGHT, null);
+		}
+		// under the ring: the charge bar, then the stage pips
+		float below = cy + CINCIN_R + CINCIN_TEBAL + 3.0F;
+		TeknikSession.Flow charge = TeknikSession.charge();
+		if (charge != null) {
+			float share = Math.max(0.0F, Math.min(1.0F, (time - charge.start()) / (float) Math.max(1L, charge.end() - charge.start())));
+			float bw = 40.0F;
+			Brush.rect(g, cx - bw / 2.0F - 1.0F, below, cx + bw / 2.0F + 1.0F, below + 4.0F, 0xA0101824);
+			Brush.rect(g, cx - bw / 2.0F, below + 1.0F, cx - bw / 2.0F + bw * share, below + 3.0F, share >= 0.5F ? Palette.GOLD_LIGHT : Palette.GOLD);
+			if (share >= 0.5F) {
+				Brush.centered(g, font, Component.translatable("kultivator.codex.hud.release"), cx, below + 6.0F, Palette.GOLD_LIGHT, 1.0F, true);
+			}
+			below += 16.0F;
 		}
 		TeknikSession.Flow stages = TeknikSession.stages();
 		if (stages != null && stages.count() > 1) {
@@ -225,15 +350,14 @@ public final class CodexHud implements HudElement {
 			float total = stages.count() * 6.0F;
 			for (int i = 0; i < stages.count(); i++) {
 				float px = cx - total / 2.0F + i * 6.0F + 3.0F;
-				Brush.dot(g, px, cy + 20.0F, 1.6F, i < stages.stage() ? Palette.GOLD_LIGHT : Palette.argb(0x80, Palette.GOLD_DARK));
+				Brush.dot(g, px, below + 2.0F, 1.6F, i < stages.stage() ? Palette.GOLD_LIGHT : Palette.argb(0x80, Palette.GOLD_DARK));
 			}
-			Brush.rect(g, cx - total / 2.0F, cy + 23.5F, cx - total / 2.0F + total * left, cy + 24.5F, Palette.GOLD);
+			Brush.rect(g, cx - total / 2.0F, below + 5.5F, cx - total / 2.0F + total * left, below + 6.5F, Palette.GOLD);
 		}
 	}
 
 	private static void carousel(GuiGraphicsExtractor g, Font font, float cx, float y, long now) {
 		float alpha = Math.min(1.0F, (CAROUSEL_MILLIS - (now - carouselAt)) / 250.0F);
-		CultivationData data = ClientCultivation.data();
 		TechniqueSpec[] specs = {carouselPrevious, carouselCurrent, carouselNext};
 		for (int i = 0; i < 3; i++) {
 			TechniqueSpec spec = specs[i];
@@ -251,49 +375,7 @@ public final class CodexHud implements HudElement {
 			Glyphs.spec(g, spec, x, y, size * 0.6F, Palette.fade(SpecInfo.ink(spec), fade));
 		}
 		if (carouselCurrent != null) {
-			Brush.centered(g, font, CodexNames.name(carouselCurrent), cx, y + 10.0F, Palette.fade(0xFFF7DC7E, alpha), 0.6F, true);
-		}
-	}
-
-	private static void toasts(GuiGraphicsExtractor g, Font font, int width, long now) {
-		if (TOASTS.isEmpty()) {
-			return;
-		}
-		List<Toast> shown = new ArrayList<>();
-		int index = 0;
-		for (Toast toast : TOASTS) {
-			if (index++ >= 3) {
-				break;
-			}
-			if (toast.start()[0] == 0L) {
-				toast.start()[0] = now;
-			}
-			shown.add(toast);
-		}
-		float y = 6.0F;
-		for (Toast toast : shown) {
-			long age = now - toast.start()[0];
-			float slide = Math.min(1.0F, age / 200.0F) * Math.min(1.0F, (TOAST_MILLIS - age) / 250.0F);
-			float w = 150.0F;
-			float x = width - (w + 6.0F) * Math.max(0.0F, slide);
-			int x0 = Math.round(x);
-			int y0 = Math.round(y);
-			g.fill(x0 + 2, y0 + 2, x0 + Math.round(w) + 2, y0 + 26, 0x50000000);
-			g.fill(x0, y0, x0 + Math.round(w), y0 + 24, 0xF2112A23);
-			Brush.frame(g, x0, y0, x0 + Math.round(w), y0 + 24, Palette.GOLD);
-			g.fill(x0 + 3, y0 + 3, x0 + 21, y0 + 21, Palette.SEAL);
-			Brush.frame(g, x0 + 4, y0 + 4, x0 + 20, y0 + 20, Palette.argb(0xB0, Palette.TALISMAN));
-			if (toast.spec() != null) {
-				Glyphs.spec(g, toast.spec(), x0 + 12.0F, y0 + 12.0F, 11.0F, Palette.TALISMAN);
-			} else {
-				Glyphs.tab(g, Glyphs.CODEX, x0 + 12.0F, y0 + 12.0F, 11.0F, Palette.TALISMAN);
-			}
-			Brush.fit(g, font, toast.title(), x0 + 25.0F, y0 + 4.0F, w - 29.0F, Palette.GOLD_LIGHT, 0.6F, 0.45F, false);
-			Brush.fit(g, font, toast.text(), x0 + 25.0F, y0 + 13.0F, w - 29.0F, Palette.JADE_PALE, 0.65F, 0.45F, false);
-			y += 27.0F;
-		}
-		while (!TOASTS.isEmpty() && TOASTS.peekFirst().start()[0] != 0L && now - TOASTS.peekFirst().start()[0] >= TOAST_MILLIS) {
-			TOASTS.pollFirst();
+			Brush.centered(g, font, CodexNames.name(carouselCurrent), cx, y + 10.0F, Palette.fade(0xFFF7DC7E, alpha), 1.0F, true);
 		}
 	}
 }

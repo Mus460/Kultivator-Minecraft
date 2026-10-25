@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:sekte/gabung_tetua",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "kultivator.gabung.adv.ketua.desc"
+    },
+    "icon": {
+      "id": "minecraft:beacon"
+    },
+    "title": {
+      "translate": "kultivator.gabung.adv.ketua.title"
+    },
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

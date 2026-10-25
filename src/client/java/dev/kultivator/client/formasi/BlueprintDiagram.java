@@ -24,13 +24,13 @@ import java.util.TreeMap;
  * The mini pattern diagram of the bamboo slip (DESIGN 24.7.1): one ink-grid slice per layer, drawn from the pattern
  * data (3-4 px per cell, no image assets), north up; each cell takes the map colour of its canonical block, the eye is a
  * gold seal and the heart block is ringed in red. Below it the legend: swatch, item icon, label and count, the bill of
- * materials. Nothing is cached between frames except the layer list of the last spec.
+ * materials (text 1.0, 43.0.5). Nothing is cached between frames except the layer list of the last spec.
  */
 final class BlueprintDiagram {
 
 	private static final int GAP = 6;
-	private static final int LABEL_H = 7;
-	private static final int LEGEND_ROW = 10;
+	private static final int LABEL_H = 10;
+	private static final int LEGEND_ROW = 11;
 
 	private static @Nullable FormationSpec cachedSpec;
 	private static int cachedRot = -1;
@@ -89,8 +89,10 @@ final class BlueprintDiagram {
 				continue;
 			}
 			int dy = layer.getKey();
-			Component label = Component.translatable("kultivator.formasiui.diagram.layer", dy > 0 ? "+" + dy : Integer.toString(dy));
-			Brush.fit(g, font, label, sx, sy, side, Palette.INK_SOFT, 0.45F, 0.3F, false);
+			String label = dy > 0 ? "+" + dy : Integer.toString(dy);
+			// The slice may be narrower than "Lapisan +1" at 1.0 (43.0.5): the number is written, the word is the tooltip.
+			Brush.fit(g, font, Component.literal(label), sx, sy, Math.max(side, 12), Palette.INK_SOFT, 1.0F, 1.0F, false);
+			page.hit(sx, sy, sx + Math.max(side, 12), sy + LABEL_H - 1, null, List.of(Component.translatable("kultivator.formasiui.diagram.layer", label)));
 			float gx = sx;
 			float gy = sy + LABEL_H;
 			// Paper and ink grid.
@@ -163,8 +165,8 @@ final class BlueprintDiagram {
 			if (ry + LEGEND_ROW < clipTop || ry > clipBottom) {
 				continue;
 			}
-			Brush.rect(g, rx, ry + 2.0F, rx + 5.0F, ry + 7.0F, colors.get(i));
-			Brush.frame(g, Math.round(rx), Math.round(ry + 2.0F), Math.round(rx + 5.0F), Math.round(ry + 7.0F), Palette.argb(0x80, Palette.INK));
+			Brush.rect(g, rx, ry + 3.0F, rx + 5.0F, ry + 8.0F, colors.get(i));
+			Brush.frame(g, Math.round(rx), Math.round(ry + 3.0F), Math.round(rx + 5.0F), Math.round(ry + 8.0F), Palette.argb(0x80, Palette.INK));
 			ItemStack stack = icons.get(i);
 			if (!stack.isEmpty()) {
 				g.pose().pushMatrix();
@@ -174,7 +176,7 @@ final class BlueprintDiagram {
 				g.pose().popMatrix();
 			}
 			Component text = Component.translatable("kultivator.formasiui.diagram.count", rows.get(i).getKey(), rows.get(i).getValue());
-			Brush.fit(g, font, text, rx + 17.0F, ry + 1.5F, colW - 18.0F, Palette.INK, 0.55F, 0.35F, false);
+			page.line(text, rx + 17.0F, ry + 1.0F, colW - 18.0F, Palette.INK);
 		}
 		return (float) Math.ceil(rows.size() / (double) columns) * LEGEND_ROW;
 	}

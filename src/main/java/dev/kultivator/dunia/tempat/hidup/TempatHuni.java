@@ -2,6 +2,7 @@ package dev.kultivator.dunia.tempat.hidup;
 
 import dev.kultivator.dunia.kota.KultivatorNpc;
 import dev.kultivator.dunia.kota.NpcRole;
+import dev.kultivator.dunia.kota42.api.KotaGerakId;
 import dev.kultivator.dunia.tempat.TempatApi;
 import dev.kultivator.dunia.tempat.TempatInfo;
 import dev.kultivator.dunia.tempat.Titik;
@@ -23,6 +24,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
+import java.util.function.BiPredicate;
+import java.util.function.Function;
 
 /**
  * One inhabited place while a player is near it (DESIGN 38.N.1): its residents, its life points by type (read from the
@@ -42,6 +45,54 @@ public final class TempatHuni {
 	/** Titik refresh period while the place is active (ticks). */
 	private static final long SEGAR = 400L;
 
+	// ================================================================== hooks (DESIGN 42.4.14, 42.4A.2; none registered = 38NL as built)
+
+	/**
+	 * Picks the goal of a resident going somewhere that is not its own spot (bed, home, own work titik, a scene): stalls,
+	 * taverns, strolls, chat corners, temples, any shared titik type (42S {@code Penyeimbang}: weighted by zone capacity,
+	 * reservations, overflow). Use {@link #titik}, {@link #terkunci}, {@link #dipesan} and {@link #pesan}.
+	 */
+	@FunctionalInterface
+	public interface Penyeimbang {
+		/**
+		 * @param kunciUntuk true for a body (a titik locked by another body must be skipped), false for a data position
+		 * @return the goal, or null to leave the choice to the next balancer and finally the built-in pick
+		 */
+		@Nullable Tujuan pilih(TempatHuni huni, ServerLevel level, Penduduk p, Kegiatan k, int jam, boolean kunciUntuk);
+	}
+
+	private static final List<Function<TempatHuni, List<Penduduk>>> SUMBER_PENDUDUK = new ArrayList<>();
+	private static final List<Function<TempatHuni, List<Titik>>> SUMBER_TITIK = new ArrayList<>();
+	private static final List<BiPredicate<TempatHuni, BlockPos>> PENOLAK_TITIK = new ArrayList<>();
+	private static final List<Penyeimbang> PENYEIMBANG = new ArrayList<>();
+
+	/**
+	 * Extra resident slots of a place (42A {@code PendudukTambahan}: newcomers, apprentices, born children). Asked when the
+	 * place becomes active and every 10 s after; ids must be at least {@link #jumlahAsli()} and unique (others are
+	 * dropped). Extras own no generated bed, house or work titik slot; their goals come from the schedule as usual.
+	 */
+	public static synchronized void addSumberPenduduk(Function<TempatHuni, List<Penduduk>> sumber) {
+		SUMBER_PENDUDUK.add(sumber);
+	}
+
+	/** Extra life points of a place (42F: the titik of finished kavling buildings), merged into every titik refresh. */
+	public static synchronized void addSumberTitik(Function<TempatHuni, List<Titik>> sumber) {
+		SUMBER_TITIK.add(sumber);
+	}
+
+	/**
+	 * A titik veto (42C: titik inside a player's house or shop are never used by residents), applied at every titik refresh;
+	 * call {@link #ubahTitik()} when the answer for a place changes.
+	 */
+	public static synchronized void addPenolakTitik(BiPredicate<TempatHuni, BlockPos> penolak) {
+		PENOLAK_TITIK.add(penolak);
+	}
+
+	/** A goal balancer (42S), asked in order of registration before the built-in pick ({@link Penyeimbang}). */
+	public static synchronized void addPenyeimbang(Penyeimbang penyeimbang) {
+		PENYEIMBANG.add(penyeimbang);
+	}
+
 	public final long situsId;
 	public final String jenis;
 	public final BoundingBox kotak;
@@ -54,7 +105,8 @@ public final class TempatHuni {
 
 	private final Map<String, List<Titik>> titik = new HashMap<>();
 	private int titikN;
-	private long titikT = Long.MIN_VALUE;
+	/** Last titik refresh; "never" is MIN_VALUE / 2 because {@code now - Long.MIN_VALUE} overflows to a negative number. */
+	private long titikT = Long.MIN_VALUE / 2;
 	/** Seats of the taverns, tea houses and eating houses (near a tea kettle, or a stove with four seats or more). */
 	private List<Titik> kursiKedai = List.of();
 	private final Map<Integer, Titik> kasurMilik = new HashMap<>();
@@ -65,6 +117,13 @@ public final class TempatHuni {
 	final Map<Integer, KultivatorNpc> tubuh = new LinkedHashMap<>();
 	/** Locked titik: block pos -> resident id. */
 	private final Map<Long, Integer> kunci = new HashMap<>();
+	/** Reserved titik (42S, for residents with or without a body): block pos -> holder and expiry; memory only. */
+	private final Map<Long, Pesanan> pesanan = new HashMap<>();
+	/** Extra residents of {@link #addSumberPenduduk} by id. */
+	private final Map<Integer, Penduduk> tambahan = new HashMap<>();
+
+	private record Pesanan(int id, long sampai) {
+	}
 
 	/** Weather and sky of the place, refreshed by {@link Pemanggil} every cycle. */
 	Jadwal.Cuaca cuaca = Jadwal.Cuaca.CERAH;
@@ -75,7 +134,7 @@ public final class TempatHuni {
 	/** The night drum (22:00) sounded: the night market closes early until this game time (38.N.4 butir 12). */
 	long tutupSampai;
 	/** The temple bell last rang here (game time; the town bows toward it, 38.N.4 butir 12). */
-	long loncengT = Long.MIN_VALUE;
+	long loncengT = Long.MIN_VALUE / 2;
 
 	/** Life states that are not {@link PendudukData#SEHAT} (resident id -> state), refreshed every {@link Pemanggil} cycle. */
 	final Map<Integer, Integer> keadaan = new HashMap<>();
@@ -111,17 +170,43 @@ public final class TempatHuni {
 		return penduduk;
 	}
 
-	/** Re-applies the saved changes (newcomers) to the generated residents. */
+	/** Re-applies the saved changes (newcomers) to the generated residents, then adds the extra slots of the sources. */
 	void terapkan(PendudukData data) {
 		List<Penduduk> now = new ArrayList<>(asli.size());
 		for (Penduduk p : asli) {
 			now.add(data.terapkan(situsId, p));
 		}
+		tambahan.clear();
+		for (Function<TempatHuni, List<Penduduk>> sumber : SUMBER_PENDUDUK) {
+			List<Penduduk> extra = sumber.apply(this);
+			if (extra == null) {
+				continue;
+			}
+			for (Penduduk p : extra) {
+				if (p != null && p.id() >= asli.size() && !tambahan.containsKey(p.id())) {
+					tambahan.put(p.id(), p);
+					now.add(p);
+				}
+			}
+		}
 		penduduk = List.copyOf(now);
 	}
 
 	public @Nullable Penduduk orang(int id) {
-		return id >= 0 && id < penduduk.size() ? penduduk.get(id) : null;
+		if (id >= 0 && id < penduduk.size() && penduduk.get(id).id() == id) {
+			return penduduk.get(id);
+		}
+		return tambahan.get(id);
+	}
+
+	/** The number of generated residents (ids {@code 0..n-1}); extra slots of {@link #addSumberPenduduk} start here. */
+	public int jumlahAsli() {
+		return asli.size();
+	}
+
+	/** Weather and sky of the place this cycle (read only). */
+	public Jadwal.Cuaca cuaca() {
+		return cuaca;
 	}
 
 	/** The number of titik read so far. */
@@ -149,7 +234,18 @@ public final class TempatHuni {
 			return;
 		}
 		titikT = now;
+		pesanan.values().removeIf(r -> r.sampai() <= now);
 		List<Titik> all = TempatApi.titik(level, situsId, "");
+		if (!SUMBER_TITIK.isEmpty() || !PENOLAK_TITIK.isEmpty()) {
+			all = new ArrayList<>(all);
+			for (Function<TempatHuni, List<Titik>> sumber : SUMBER_TITIK) {
+				List<Titik> extra = sumber.apply(this);
+				if (extra != null) {
+					all.addAll(extra);
+				}
+			}
+			all.removeIf(this::ditolak);
+		}
 		if (all.size() == titikN && !paksa) {
 			return;
 		}
@@ -179,6 +275,22 @@ public final class TempatHuni {
 			}
 			kerjaMilik.put(e.getKey(), owners);
 		}
+	}
+
+	/** True when a registered veto keeps residents off titik {@code t}. */
+	private boolean ditolak(Titik t) {
+		for (BiPredicate<TempatHuni, BlockPos> penolak : PENOLAK_TITIK) {
+			if (penolak.test(this, t.pos())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/** The titik sources or vetoes changed for this place: the next cycle re-reads every titik. */
+	public void ubahTitik() {
+		titikT = Long.MIN_VALUE / 2;
+		titikN = -1;
 	}
 
 	/** Seat titik within 10 blocks of a tea kettle, or of a stove that has at least four seats round it (not a home kitchen). */
@@ -395,6 +507,14 @@ public final class TempatHuni {
 		if (Kegiatan.RUMAH.equals(to)) {
 			return new Tujuan(rumahPos(p), Direction.SOUTH, "rumah", rumah(p) != null);
 		}
+		if (!PENYEIMBANG.isEmpty() && !(Kegiatan.KERJA.equals(to) && kerja(p) != null)) {
+			for (Penyeimbang each : PENYEIMBANG) {
+				Tujuan t = each.pilih(this, level, p, k, jam, kunciUntuk);
+				if (t != null) {
+					return t;
+				}
+			}
+		}
 		if (Kegiatan.KEDAI.equals(to)) {
 			if (!kursiKedai.isEmpty()) {
 				return pilih(level, p, kursiKedai, jam, kunciUntuk);
@@ -517,7 +637,7 @@ public final class TempatHuni {
 		for (int i = 0; i < near.size(); i++) {
 			Titik t = near.get((start + i) % near.size());
 			Integer owner = kunci.get(t.pos().asLong());
-			if (!kunciUntuk || owner == null || owner == p.id()) {
+			if (!kunciUntuk || (owner == null || owner == p.id()) && !dipesan(t.pos(), p.id(), aktifT)) {
 				return new Tujuan(t.pos(), t.hadap(), t.jenis(), true);
 			}
 		}
@@ -600,6 +720,13 @@ public final class TempatHuni {
 			acara = null;
 		}
 		Kegiatan k = Jadwal.kegiatan(p, jenis, waktu, cuaca, acara);
+		if (acara == null && Jadwal.adaPenimpa() && p.peran().kelompok != NpcRole.Kelompok.KHUSUS && p.peran() != NpcRole.TAWANAN) {
+			// ceremonies, habits, the daily plan (42): final, past ramai and the life-state bending (Jadwal.PenimpaJadwal)
+			Kegiatan timpa = Jadwal.timpa(this, p, waktu, Jadwal.saat(p, jenis, waktu).jam(), now);
+			if (timpa != null) {
+				return timpa;
+			}
+		}
 		if (acara == null && keadaan.getOrDefault(p.id(), PendudukData.SEHAT) == PendudukData.SEHAT && !p.tamu()) {
 			// markets, taverns and streets full of people living their day (Jadwal.ramai)
 			Kegiatan ramai = Jadwal.ramai(p, Jadwal.saat(p, jenis, waktu), k, cuaca, adaPasar(), adaKedai());
@@ -617,11 +744,17 @@ public final class TempatHuni {
 		// mourners keep to their grief through any event; the hurt still come to watch a scene; a newcomer joins events
 		boolean tonton = acara != null && acara.startsWith("tonton:");
 		boolean ikut = switch (state) {
-			case PendudukData.DUKA -> true;
+			case PendudukData.DUKA, PendudukData.SAKIT, PendudukData.BERKABUNG -> true;
 			case PendudukData.PULIH -> !tonton;
 			default -> acara == null;
 		};
 		return ikut ? hidupnya(p, k, state, Jadwal.saat(p, jenis, waktu)) : k;
+	}
+
+	/** The live body of resident {@code id} in this place, or null (42 {@code WargaApi.mitraJalan}). */
+	public @Nullable KultivatorNpc tubuhDari(int id) {
+		KultivatorNpc body = tubuh.get(id);
+		return body == null || body.isRemoved() ? null : body;
 	}
 
 	/** The life state of resident {@code id} ({@link PendudukData#SEHAT} when nothing special). */
@@ -668,6 +801,38 @@ public final class TempatHuni {
 				}
 				boolean tangis = Math.floorMod(p.benih() >>> 21, 3L) == 0L || p.peran().anak();
 				yield new Kegiatan("berkabung", Kegiatan.RUMAH, tangis ? GerakId.MENANGIS : GerakId.SIKAP_DOA, 0, 0, 0, 0, GerakId.JALAN_TUA, false);
+			}
+			case PendudukData.SAKIT -> {
+				// in bed most of the day; a better hour on the porch, coughing; meals slowly
+				if (pokok(k)) {
+					yield k.berjalan(GerakId.JALAN_TUA);
+				}
+				if (h >= 10 && h < 16 && (h + (int) (p.benih() & 3L)) % 4 == 0) {
+					yield new Kegiatan("sakit", "kursi", KotaGerakId.BATUK, 0, 0, 0, 0, GerakId.JALAN_TUA, false);
+				}
+				yield Kegiatan.dalam("sakit");
+			}
+			case PendudukData.MABUK -> {
+				// the night drinker sings at the tavern, then staggers home
+				if (pokok(k) || k.dalam()) {
+					yield k.berjalan(KotaGerakId.JALAN_MABUK);
+				}
+				yield new Kegiatan("mabuk", Kegiatan.KEDAI, KotaGerakId.NYANYI_MABUK, 0, 0, 0, 0, KotaGerakId.JALAN_MABUK, false);
+			}
+			case PendudukData.PENGANTIN -> {
+				// no work on the wedding days: a stroll through the streets with a red flower, an evening at home
+				if (pokok(k) || h < 8 || h >= 19) {
+					yield k;
+				}
+				yield new Kegiatan("pengantin", Kegiatan.JALAN + (int) (s.hari() + (p.benih() & 7L)), GerakId.MEMANDANG, 0,
+						KotaGerakId.PROP_BUNGA, 0, 0, GerakId.JALAN_SANTAI, false);
+			}
+			case PendudukData.BERKABUNG -> {
+				// back at work in white, slow steps; incense at the altar at dusk
+				if (h == 18) {
+					yield new Kegiatan("berkabung", "dupa", GerakId.SUJUD_DUPA, 0, PropId.DUPA, 0, 0, GerakId.JALAN_TUA, false);
+				}
+				yield k.berjalan(GerakId.JALAN_TUA);
 			}
 			case PendudukData.DATANG -> {
 				if (pokok(k) || h < 6 || h >= 18) {
@@ -904,6 +1069,39 @@ public final class TempatHuni {
 	/** Releases every lock of resident {@code id}. */
 	void lepas(int id) {
 		kunci.values().removeIf(owner -> owner == id);
+	}
+
+	/** True when a body other than resident {@code id} holds {@code pos} now. */
+	public boolean terkunci(BlockPos pos, int id) {
+		Integer owner = kunci.get(pos.asLong());
+		return owner != null && owner != id;
+	}
+
+	/**
+	 * Reserves {@code pos} for resident {@code id} until game time {@code sampai} (42.4A.2: the activity's length plus a world
+	 * minute), replacing the resident's earlier reservation. False when another resident holds it unexpired.
+	 */
+	public boolean pesan(BlockPos pos, int id, long sampai, long now) {
+		if (dipesan(pos, id, now)) {
+			return false;
+		}
+		batalPesan(id);
+		pesanan.put(pos.asLong(), new Pesanan(id, sampai));
+		return true;
+	}
+
+	/** True when another resident than {@code id} holds an unexpired reservation of {@code pos}. */
+	public boolean dipesan(BlockPos pos, int id, long now) {
+		if (pesanan.isEmpty()) {
+			return false;
+		}
+		Pesanan r = pesanan.get(pos.asLong());
+		return r != null && r.id() != id && r.sampai() > now;
+	}
+
+	/** Drops the reservations of resident {@code id}. */
+	public void batalPesan(int id) {
+		pesanan.values().removeIf(r -> r.id() == id);
 	}
 
 	/** Bodies alive now (commands, snapshot). */

@@ -1,0 +1,29 @@
+{
+  "pembicara": [
+    "peran:tetua_sekte"
+  ],
+  "prioritas": 95,
+  "syarat": [
+    "gabung.tamu_jalan"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "310",
+      "pilihan": [
+        {
+          "akibat": [
+            "gabung.tamu duel"
+          ]
+        },
+        {
+          "akibat": [
+            "gabung.tamu karya"
+          ]
+        },
+        {}
+      ]
+    }
+  ]
+}

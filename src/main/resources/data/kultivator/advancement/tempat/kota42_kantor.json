@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:tempat/kota42_sapa",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.tempat.kota42_kantor.description"
+    },
+    "icon": {
+      "id": "minecraft:blue_banner"
+    },
+    "title": {
+      "translate": "advancement.kultivator.tempat.kota42_kantor.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

@@ -35,7 +35,9 @@ import java.util.UUID;
  * The bamboo slip (DESIGN 24.7.1): the detail view of one core, or of one Kitab entry. Name, grade stars, family and the
  * Sumber line; the mini pattern diagram with its bill; in core mode the state and reason, the Daya bar with its upkeep
  * breakdown, the P breakdown, live numbers, the keepers with their order coins and the controls; in Kitab mode the
- * numbers at the current hall level, the lock reason and the hologram talismans. Scrolls with the wheel (key 100).
+ * numbers at the current hall level, the lock reason and the hologram talismans. Scrolls with the wheel (key 100). It is
+ * the detail view of Sekte › Formasi: the host's back control and Esc close it (43.6 {@code rinci}). Text is 1.0 (43.0.5);
+ * a hologram closes the Gulungan so it can be seen, with an action-bar line (43.13 R32).
  */
 final class FormationSlip {
 
@@ -55,7 +57,7 @@ final class FormationSlip {
 			assigning = false;
 			lastContent = 0.0F;
 		}
-		// Bamboo backing and the close talisman.
+		// Bamboo backing.
 		g.fill(x, y, x + w, y + h, Palette.argb(0xE8, Palette.BAMBOO));
 		for (int sx = x + 14; sx < x + w; sx += 14) {
 			g.fill(sx, y, sx + 1, y + h, Palette.argb(0x40, Palette.BAMBOO_KNOT));
@@ -68,26 +70,26 @@ final class FormationSlip {
 		float cw = w - PAD * 2 - 3.0F;
 		float cursor = y + PAD - offset;
 		float start = cursor;
+		page.scrollArea(x, y, x + w, y + h);
 		if (spec == null) {
-			Brush.wrap(g, font, Component.translatable("kultivator.formasiui.unknown_spec", core == null ? "?" : core.getStringOr("spec", "?")), cx,
-					cursor + 14.0F, cw, Palette.DANGER, 0.62F, false);
+			page.wrap(Component.translatable("kultivator.formasiui.unknown_spec", core == null ? "?" : core.getStringOr("spec", "?")), cx,
+					cursor + 4.0F, cw, Palette.DANGER);
 			lastContent = 40.0F;
-			back(page, g, x, y, w, mouseX, mouseY);
 			return;
 		}
 		// ---- header
 		int familyColor = Palette.opaque(spec.family().color());
 		if (visible(cursor, 12.0F, top, bottom)) {
-			Brush.fit(g, font, Brush.bold(spec.name()), cx, cursor, cw - 52.0F, Palette.onPaper(familyColor & 0xFFFFFF), 0.8F, 0.5F, false);
+			page.line(Brush.bold(spec.name()), cx, cursor, cw, Palette.onPaper(familyColor & 0xFFFFFF));
 		}
 		cursor += 11.0F;
 		if (visible(cursor, 9.0F, top, bottom)) {
 			MutableComponent stars = Component.literal("★".repeat(Math.max(1, spec.grade().number())));
 			Component line = Component.translatable("kultivator.formasiui.slip.line", stars, spec.grade().label(), spec.family().label(),
 					Component.translatable(spec.scope() == Scope.TERRITORY ? "kultivator.formasiui.slip.scope.territory" : "kultivator.formasiui.slip.scope.core"));
-			Brush.fit(g, font, line, cx, cursor, cw, Palette.onPaper(spec.grade().color() & 0xFFFFFF), 0.55F, 0.35F, false);
+			page.line(line, cx, cursor, cw, Palette.onPaper(spec.grade().color() & 0xFFFFFF));
 		}
-		cursor += 8.0F;
+		cursor += 11.0F;
 		Component source = spec.source();
 		String sourceText = source.getString();
 		boolean inspired = sourceText.contains("Terinspirasi") || sourceText.contains("Inspired");
@@ -114,13 +116,6 @@ final class FormationSlip {
 		}
 		lastContent = cursor - start + PAD * 2.0F;
 		FormasiPage.bead(g, x + w, y, y + h, offset, Math.max(0.0F, lastContent - h));
-		back(page, g, x, y, w, mouseX, mouseY);
-	}
-
-	/** The close talisman, drawn last so it stays on top of scrolled content. */
-	private static void back(FormasiPage page, GuiGraphicsExtractor g, int x, int y, int w, int mouseX, int mouseY) {
-		page.talisman(g, x + w - 50.0F, y + 2.0F, 46.0F, 11.0F, Component.translatable("kultivator.formasiui.slip.back"), true, page::closeSlip, mouseX,
-				mouseY, null);
 	}
 
 	// ================================================================== core mode
@@ -144,7 +139,7 @@ final class FormationSlip {
 			if (core.getBooleanOr("uji", false)) {
 				line.append(" · ").append(Component.translatable("kultivator.formasiui.tag.test"));
 			}
-			Brush.fit(g, font, Brush.bold(line), cx + 15.0F, cursor + 1.5F, cw - 15.0F, Palette.INK, 0.62F, 0.4F, false);
+			page.line(Brush.bold(line), cx + 15.0F, cursor + 1.0F, cw - 15.0F, Palette.INK);
 		}
 		cursor += 12.0F;
 		Component why = FormasiPage.text(core, "why");
@@ -158,12 +153,11 @@ final class FormationSlip {
 		// Daya bar and upkeep breakdown.
 		long daya = core.getLongOr("daya", 0L);
 		long cap = Math.max(1L, core.getLongOr("cap", 1L));
-		if (visible(cursor, 14.0F, top, bottom)) {
-			Brush.fit(g, font, Component.translatable("kultivator.formasiui.slip.daya", FormasiPage.daya(daya), FormasiPage.daya(cap)), cx, cursor, cw,
-					Palette.INK, 0.58F, 0.4F, false);
-			FormasiPage.bar(g, cx, cursor + 7.0F, cw, 4.0F, daya / (float) cap, Palette.QI);
+		if (visible(cursor, 15.0F, top, bottom)) {
+			page.line(Component.translatable("kultivator.formasiui.slip.daya", FormasiPage.daya(daya), FormasiPage.daya(cap)), cx, cursor, cw, Palette.INK);
+			FormasiPage.bar(g, cx, cursor + 10.0F, cw, 4.0F, daya / (float) cap, Palette.QI);
 		}
-		cursor += 13.0F;
+		cursor += 17.0F;
 		Component upkeep = Component.translatable("kultivator.formasiui.slip.upkeep", FormasiPage.hours(core.getDoubleOr("hrs", 0.0D)),
 				FormasiPage.decimal(spec.upkeep()), FormasiPage.decimal(core.getDoubleOr("vein", 1.0D)), FormasiPage.decimal(core.getDoubleOr("keepf", 1.0D)),
 				FormasiPage.decimal(core.getDoubleOr("upk", 0.0D)));
@@ -179,35 +173,35 @@ final class FormationSlip {
 				Palette.INK, 0.52F, top, bottom) + 4.0F;
 		// Controls.
 		float half = (cw - 3.0F) / 2.0F;
-		if (visible(cursor, 12.0F, top, bottom)) {
+		if (visible(cursor, 14.0F, top, bottom)) {
 			boolean on = core.getBooleanOr("on", true);
-			page.coin(g, cx, cursor, half, 10.0F, Component.translatable(on ? "kultivator.formasiui.slip.on" : "kultivator.formasiui.slip.off"), on, edit,
+			page.coin(g, cx, cursor, half, 14.0F, Component.translatable(on ? "kultivator.formasiui.slip.on" : "kultivator.formasiui.slip.off"), on, edit,
 					() -> page.send("toggle:" + id), mouseX, mouseY, List.of(Component.translatable("kultivator.formasiui.slip.toggle.tip")));
 			boolean draw = core.getBooleanOr("draw", true);
-			page.coin(g, cx + half + 3.0F, cursor, half, 10.0F, Component.translatable("kultivator.formasiui.slip.draw"), draw, edit,
+			page.coin(g, cx + half + 3.0F, cursor, half, 14.0F, Component.translatable("kultivator.formasiui.slip.draw"), draw, edit,
 					() -> page.send("draw:" + id + ":" + (draw ? 0 : 1)), mouseX, mouseY, List.of(Component.translatable("kultivator.formasiui.slip.draw.tip")));
 		}
-		cursor += 13.0F;
+		cursor += 17.0F;
 		BlockPos eye = new BlockPos(core.getIntOr("x", 0), core.getIntOr("y", 0), core.getIntOr("z", 0));
-		if (visible(cursor, 12.0F, top, bottom)) {
-			page.talisman(g, cx, cursor, half, 11.0F, Component.translatable("kultivator.formasiui.slip.fill"), edit, () -> page.send("fill:" + id), mouseX,
+		if (visible(cursor, 14.0F, top, bottom)) {
+			page.talisman(g, cx, cursor, half, 14.0F, Component.translatable("kultivator.formasiui.slip.fill"), edit, () -> page.send("fill:" + id), mouseX,
 					mouseY, List.of(Component.translatable("kultivator.formasiui.slip.fill.tip")));
-			page.talisman(g, cx + half + 3.0F, cursor, half, 11.0F, Component.translatable("kultivator.formasiui.slip.mark"), true,
+			page.talisman(g, cx + half + 3.0F, cursor, half, 14.0F, Component.translatable("kultivator.formasiui.slip.mark"), true,
 					() -> page.send("mark:" + id), mouseX, mouseY, List.of(Component.translatable("kultivator.formasiui.slip.mark.tip")));
 		}
-		cursor += 14.0F;
-		if (visible(cursor, 12.0F, top, bottom)) {
+		cursor += 17.0F;
+		if (visible(cursor, 14.0F, top, bottom)) {
 			int coreRot = core.getIntOr("rot", 0);
-			page.talisman(g, cx, cursor, half, 11.0F, Component.translatable("kultivator.formasiui.slip.view"), true, () -> hologram(spec, eye, coreRot),
+			page.talisman(g, cx, cursor, half, 14.0F, Component.translatable("kultivator.formasiui.slip.view"), true, () -> hologram(spec, eye, coreRot),
 					mouseX, mouseY, List.of(Component.translatable("kultivator.formasiui.slip.view.tip")));
 			if (state == 1) {
-				page.talisman(g, cx + half + 3.0F, cursor, half, 11.0F, Component.translatable("kultivator.formasiui.slip.view_missing"), true, () -> {
+				page.talisman(g, cx + half + 3.0F, cursor, half, 14.0F, Component.translatable("kultivator.formasiui.slip.view_missing"), true, () -> {
 					page.send("mark:" + id);
 					hologram(spec, eye, coreRot);
 				}, mouseX, mouseY, List.of(Component.translatable("kultivator.formasiui.slip.view_missing.tip")));
 			}
 		}
-		cursor += 15.0F;
+		cursor += 18.0F;
 		return keepers(page, g, font, spec, core, eye, cx, cursor, cw, mouseX, mouseY, top, bottom);
 	}
 
@@ -218,10 +212,10 @@ final class FormationSlip {
 		ListTag keep = core.getListOrEmpty("keep");
 		int max = spec.grade().maxKeepers();
 		cursor = rule(g, cx, cursor, cw, top, bottom);
-		if (visible(cursor, 9.0F, top, bottom)) {
-			page.title(g, Component.translatable("kultivator.formasiui.slip.keepers", keep.size(), max), cx, cursor, cw, 0.62F);
+		if (visible(cursor, 12.0F, top, bottom)) {
+			page.title(g, Component.translatable("kultivator.formasiui.slip.keepers", keep.size(), max), cx, cursor, cw, 1.0F);
 		}
-		cursor += 11.0F;
+		cursor += 14.0F;
 		for (Tag tag : keep) {
 			if (!(tag instanceof CompoundTag entry)) {
 				continue;
@@ -231,33 +225,33 @@ final class FormationSlip {
 			if (order == null) {
 				order = KeeperOrder.JAGA;
 			}
-			if (visible(cursor, 12.0F, top, bottom)) {
+			if (visible(cursor, 20.0F, top, bottom)) {
 				boolean loaded = entry.contains("n");
-				Brush.disc(g, cx + 5.0F, cursor + 5.5F, 4.5F, loaded ? Palette.JADE : Palette.JADE_DULL);
+				Brush.disc(g, cx + 6.0F, cursor + 9.0F, 5.5F, loaded ? Palette.JADE : Palette.JADE_DULL);
 				Brush.centered(g, font, Component.literal(loaded ? entry.getStringOr("n", "?").substring(0, Math.min(1, entry.getStringOr("n", "?").length())) : "?"),
-						cx + 5.0F, cursor + 3.0F, 0xFFFFF4D6, 0.55F, false);
+						cx + 6.0F, cursor + 5.0F, 0xFFFFF4D6, 1.0F, false);
 				Component name = loaded ? Component.literal(entry.getStringOr("n", "?")) : Component.translatable("kultivator.formasiui.slip.keeper_away");
 				Component realm = loaded ? Realm.byOrdinal(entry.getIntOr("realm", 0)).displayName() : Component.empty();
-				Brush.fit(g, font, name, cx + 12.0F, cursor, cw * 0.45F, Palette.INK, 0.55F, 0.35F, false);
-				Brush.fit(g, font, realm, cx + 12.0F, cursor + 6.0F, cw * 0.45F, Palette.INK_FAINT, 0.42F, 0.3F, false);
+				page.line(name, cx + 14.0F, cursor, cw * 0.5F - 16.0F, Palette.INK);
+				page.line(realm, cx + 14.0F, cursor + 10.0F, cw * 0.5F - 16.0F, Palette.INK_SOFT);
 				float bx = cx + cw * 0.5F;
 				float bw = (cw * 0.5F - 3.0F) / 2.0F;
 				KeeperOrder next = order.next();
 				if (soul != null) {
-					page.coin(g, bx, cursor, bw, 10.0F, order.label(), true, edit, () -> page.send("order:" + id + ":" + soul + ":" + next.id()), mouseX, mouseY,
-							List.of(Component.translatable("kultivator.formasiui.slip.order.tip", order.label(), next.label())));
-					page.talisman(g, bx + bw + 3.0F, cursor, bw, 10.0F, Component.translatable("kultivator.formasiui.slip.release"), edit,
+					page.coin(g, bx, cursor + 3.0F, bw, 14.0F, order.label(), true, edit, () -> page.send("order:" + id + ":" + soul + ":" + next.id()), mouseX,
+							mouseY, List.of(Component.translatable("kultivator.formasiui.slip.order.tip", order.label(), next.label())));
+					page.talisman(g, bx + bw + 3.0F, cursor + 3.0F, bw, 14.0F, Component.translatable("kultivator.formasiui.slip.release"), edit,
 							() -> page.send("release:" + id + ":" + soul), mouseX, mouseY, null);
 				}
 			}
-			cursor += 13.0F;
+			cursor += 22.0F;
 		}
 		if (keep.size() < max && edit) {
-			if (visible(cursor, 12.0F, top, bottom)) {
-				page.talisman(g, cx, cursor, Math.min(90.0F, cw), 11.0F, Component.translatable("kultivator.formasiui.slip.assign"), true,
+			if (visible(cursor, 14.0F, top, bottom)) {
+				page.talisman(g, cx, cursor, Math.min(120.0F, cw), 14.0F, Component.translatable("kultivator.formasiui.slip.assign"), true,
 						() -> assigning = !assigning, mouseX, mouseY, List.of(Component.translatable("kultivator.formasiui.slip.assign.tip")));
 			}
-			cursor += 14.0F;
+			cursor += 17.0F;
 			if (assigning) {
 				cursor += drawWrap(g, font, Component.translatable("kultivator.formasiui.slip.assign.hint"), cx, cursor, cw, Palette.INK_SOFT, 0.5F, top,
 						bottom) + 2.0F;
@@ -267,17 +261,17 @@ final class FormationSlip {
 							bottom) + 2.0F;
 				}
 				for (DiscipleEntity disciple : near) {
-					if (visible(cursor, 11.0F, top, bottom)) {
+					if (visible(cursor, 14.0F, top, bottom)) {
 						int entityId = disciple.getId();
 						double distance = Math.sqrt(disciple.distanceToSqr(eye.getX() + 0.5D, eye.getY() + 0.5D, eye.getZ() + 0.5D));
 						Component label = Component.translatable("kultivator.formasiui.slip.assign.row", disciple.getName(),
 								Realm.byOrdinal(Math.max(0, disciple.syncedRealm())).displayName(), Math.round(distance));
-						page.talisman(g, cx + 6.0F, cursor, cw - 6.0F, 10.0F, label, true, () -> {
+						page.talisman(g, cx + 6.0F, cursor, cw - 6.0F, 14.0F, label, true, () -> {
 							page.send("keeper:" + id + ":" + entityId + ":" + KeeperOrder.JAGA.id());
 							assigning = false;
 						}, mouseX, mouseY, null);
 					}
-					cursor += 12.0F;
+					cursor += 16.0F;
 				}
 			}
 		}
@@ -334,33 +328,33 @@ final class FormationSlip {
 		}
 		float half = (cw - 3.0F) / 2.0F;
 		LocalPlayer player = Minecraft.getInstance().player;
-		if (visible(cursor, 12.0F, top, bottom) && player != null) {
+		if (visible(cursor, 14.0F, top, bottom) && player != null) {
 			ListTag anchors = page.f().getListOrEmpty("anchors");
 			// No built Titik Formasi (no sect template has one yet): the "Di Titik Formasi" talisman is hidden, the
 			// hologram talisman takes the whole row and its tooltip says why.
 			List<Component> frontTip = anchors.isEmpty()
 					? List.of(Component.translatable("kultivator.formasiui.slip.front.tip"), Component.translatable("kultivator.sect_fix_feat.anchor.none"))
 					: List.of(Component.translatable("kultivator.formasiui.slip.front.tip"));
-			page.talisman(g, cx, cursor, anchors.isEmpty() ? cw : half, 11.0F, Component.translatable("kultivator.formasiui.slip.front"), true,
+			page.talisman(g, cx, cursor, anchors.isEmpty() ? cw : half, 14.0F, Component.translatable("kultivator.formasiui.slip.front"), true,
 					() -> hologram(spec, PatternHologram.inFront(player), PatternHologram.facingRotation(player)), mouseX, mouseY, frontTip);
 			if (!anchors.isEmpty()) {
 				Component anchorLabel = Component.translatable("kultivator.formasiui.slip.anchor_n", anchorIndex % anchors.size() + 1, anchors.size());
-				page.talisman(g, cx + half + 3.0F, cursor, half, 11.0F, anchorLabel, true, () -> {
+				page.talisman(g, cx + half + 3.0F, cursor, half, 14.0F, anchorLabel, true, () -> {
 					CompoundTag anchor = anchors.getCompoundOrEmpty(anchorIndex % anchors.size());
 					anchorIndex++;
 					hologram(spec, new BlockPos(anchor.getIntOr("x", 0), anchor.getIntOr("y", 0), anchor.getIntOr("z", 0)), -1);
 				}, mouseX, mouseY, List.of(Component.translatable("kultivator.formasiui.slip.anchor.tip")));
 			}
 		}
-		cursor += 14.0F;
+		cursor += 17.0F;
 		BlockPos looked = lookedEye();
 		if (looked != null && page.canEdit()) {
-			if (visible(cursor, 12.0F, top, bottom)) {
-				page.talisman(g, cx, cursor, cw, 11.0F, Component.translatable("kultivator.formasiui.slip.target"), lock == null,
+			if (visible(cursor, 14.0F, top, bottom)) {
+				page.talisman(g, cx, cursor, cw, 14.0F, Component.translatable("kultivator.formasiui.slip.target"), lock == null,
 						() -> page.send("target:" + looked.getX() + ":" + looked.getY() + ":" + looked.getZ() + ":" + spec.id()), mouseX, mouseY,
 						List.of(Component.translatable("kultivator.formasiui.slip.target.tip")));
 			}
-			cursor += 14.0F;
+			cursor += 17.0F;
 		}
 		return cursor;
 	}
@@ -420,22 +414,22 @@ final class FormationSlip {
 		return line;
 	}
 
-	/** Shows the hologram and closes the scroll so it can be seen. */
+	/** Shows the hologram and closes the Gulungan so it can be seen (on purpose, 43.13 R32; the action bar says why). */
 	private static void hologram(FormationSpec spec, BlockPos anchor, int rot) {
 		PatternHologram.show(spec, anchor, rot, PatternHologram.DEFAULT_MINUTES);
-		Minecraft.getInstance().gui.setScreen(null);
+		FormasiPage.closeToWorld(Component.translatable("kultivator.gui43.m07.hologram", spec.name()));
 	}
 
 	private static boolean visible(float y, float height, float top, float bottom) {
 		return y + height >= top && y <= bottom;
 	}
 
-	/** Wrapped text drawn only when on screen; returns its height either way. */
+	/** Wrapped text at 1.0 (43.0.5; {@code scale} is ignored) drawn only when on screen; returns its height either way. */
 	private static float drawWrap(GuiGraphicsExtractor g, Font font, Component text, float x, float y, float width, int color, float scale, float top,
 			float bottom) {
-		float height = Brush.wrapHeight(font, text, width, scale);
+		float height = Brush.wrapHeight(font, text, width, 1.0F);
 		if (visible(y, height, top, bottom)) {
-			Brush.wrap(g, font, text, x, y, width, color, scale, false);
+			Brush.wrap(g, font, text, x, y, width, color, 1.0F, false);
 		}
 		return height;
 	}

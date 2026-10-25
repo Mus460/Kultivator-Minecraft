@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:sekte/gabung_pangkat_inti",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "kultivator.gabung.adv.pewaris.desc"
+    },
+    "icon": {
+      "id": "minecraft:golden_helmet"
+    },
+    "title": {
+      "translate": "kultivator.gabung.adv.pewaris.title"
+    },
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

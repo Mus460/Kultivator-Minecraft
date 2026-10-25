@@ -1,0 +1,58 @@
+{
+  "pemberi": "peran:tetua_sekte",
+  "tempat": "gabung_sekte",
+  "tahap": [
+    {
+      "id": "wasiat",
+      "tujuan": [
+        "gabung_titik puncak"
+      ],
+      "akibat_masuk": [
+        "gabung.cerita jubah_mangkuk wasiat ketua"
+      ],
+      "arah": "sekte/kompleks"
+    },
+    {
+      "id": "ujian",
+      "tujuan": [
+        "gabung tanding:ketua"
+      ],
+      "akibat_masuk": [
+        "gabung.cerita jubah_mangkuk ujian ketua",
+        "gabung.tanding ketua"
+      ],
+      "cabang": [
+        {
+          "syarat": [
+            "bendera gabung.tanding.ketua.menang"
+          ],
+          "ke": "serah"
+        }
+      ],
+      "ke": "renung"
+    },
+    {
+      "id": "renung",
+      "tujuan": [
+        "tunggu 3"
+      ],
+      "akibat": [
+        "gabung.cerita jubah_mangkuk renung ketua"
+      ],
+      "ke": "ujian"
+    },
+    {
+      "id": "serah",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "gabung.cerita jubah_mangkuk serah ketua corak",
+        "bendera gabung.jubah_mangkuk.restu",
+        "gabung.sikap ketua 20",
+        "gabung.pk 300"
+      ],
+      "ke": "selesai"
+    }
+  ]
+}

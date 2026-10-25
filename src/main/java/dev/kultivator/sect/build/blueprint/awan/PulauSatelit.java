@@ -363,11 +363,10 @@ public final class PulauSatelit implements Part {
 		sink.phase(Phase.FRAME);
 		for (int row = 0; grave < n; row++) {
 			int fz = 1 + row * 3;
+			int half = (perRow + 1) / 2;
 			for (int i = 0; i < perRow && grave < n; i++) {
-				int fx = -(perRow - 1) + 2 * i;
-				if (Math.abs(fx) <= 1) {
-					fx += fx <= 0 ? -2 : 2;
-				}
+				// Two apart on both sides of the walk, one grave per cell.
+				int fx = i < half ? -2 * (half - i) : 2 * (i - half + 1);
 				int x = f.x(fx, fz);
 				int z = f.z(fx, fz);
 				// The tombstone faces the front, the mound lies behind it.

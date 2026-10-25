@@ -1,9 +1,6 @@
 package dev.kultivator.client.sekte.seragam;
 
 import dev.kultivator.Kultivator;
-import dev.kultivator.client.hub.HubCards;
-import dev.kultivator.client.hub.HubNav;
-import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.sekte.SekteContent;
 import dev.kultivator.sekte.SekteIds;
 import dev.kultivator.sekte.seragam.SeragamPayloads;
@@ -15,19 +12,24 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Util;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Module S on the client (DESIGN 36.2.8, 36.4): the payload receivers, the banner and decal pass
- * ({@code LevelRenderEvents.COLLECT_SUBMITS}), the owner cache of the robe layer, the designer and the hub card
- * Sekte › "Lambang &amp; Seragam". One line in {@code SekteContentClient}. Client code reads only module S's own
+ * ({@code LevelRenderEvents.COLLECT_SUBMITS}), the owner cache of the robe layer and the design for the designer in
+ * Sekte › Ikhtisar › Identitas ({@link LambangPanel}, DESIGN 43.5). One line in {@code SekteContentClient}. Client code reads only module S's own
  * payloads and the shared {@code sekte.api} records.
  */
 public final class SeragamClient {
 
-	private static final long HUB_WINDOW_MS = 4000L;
+	private static final long ASK_WINDOW_MS = 4000L;
+	/** The sub id of Sekte › Ikhtisar where the designer lives. */
+	public static final String SUB_IDENTITAS = "identitas";
 	private static boolean initialised;
 	private static long ticks;
-	private static long hubAskedAt = Long.MIN_VALUE / 2;
+	private static long askedAt = Long.MIN_VALUE / 2;
+	private static @Nullable SeragamPayloads.LambangOpen terakhir;
+	private static long versiBuka;
 	private static long lastWarn;
 
 	public static void init() {
@@ -59,34 +61,57 @@ public final class SeragamClient {
 		});
 		LevelRenderEvents.COLLECT_SUBMITS.register(BenderaRenderer::collect);
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> clearAll());
-		// Hub › Sekte › "Lambang & Seragam": the server answers with the design and opens the designer
-		HubCards.register(HubNav.SEKTE, "sekte_seragam_lambang", Glyphs.SEAL, null, () -> {
-			hubAskedAt = Util.getMillis();
-			ClientPlayNetworking.send(new SeragamPayloads.LambangRequest(0));
-		});
 	}
 
+	/**
+	 * Asks the server for the design of our hall (it answers with {@code LambangOpen}); false when module S is off on the
+	 * server (nothing would ever answer). Called by Sekte › Ikhtisar › Identitas while shown.
+	 */
+	public static boolean minta() {
+		if (!initialised || !ClientPlayNetworking.canSend(SeragamPayloads.LambangRequest.TYPE)) {
+			return false;
+		}
+		askedAt = Util.getMillis();
+		ClientPlayNetworking.send(new SeragamPayloads.LambangRequest(0));
+		return true;
+	}
+
+	/** A save was sent: its answering {@code LambangOpen} only refreshes the page. */
+	static void tandaiDiminta() {
+		askedAt = Util.getMillis();
+	}
+
+	/** The last {@code LambangOpen} (key, free changes, cost, pool, flags), or null before the first. */
+	public static @Nullable SeragamPayloads.LambangOpen terakhir() {
+		return terakhir;
+	}
+
+	/** Grows with every {@code LambangOpen}. */
+	public static long versiBuka() {
+		return versiBuka;
+	}
+
+	/**
+	 * A design arrived: the Identitas page picks it up; one nobody asked for ({@code /kultivasi perguruan lambang}) opens
+	 * the Gulungan on Sekte › Ikhtisar › Identitas (43.4.4: no screen of its own any more).
+	 */
 	private static void open(SeragamPayloads.LambangOpen payload) {
 		Minecraft mc = Minecraft.getInstance();
 		if (mc.player == null) {
 			return;
 		}
-		if (mc.gui.screen() instanceof LambangDesignerScreen designer && designer.key().equals(payload.key())) {
-			designer.refresh(payload.freeLeft(), payload.cost(), payload.pool());
-			return;
-		}
-		boolean fromHub = Util.getMillis() - hubAskedAt < HUB_WINDOW_MS;
-		hubAskedAt = Long.MIN_VALUE / 2;
-		LambangDesignerScreen screen = new LambangDesignerScreen(fromHub ? null : mc.gui.screen(), payload.key(), payload.freeLeft(), payload.cost(),
-				payload.pool(), payload.flags());
-		if (fromHub) {
-			HubNav.openChild(screen, HubNav.SEKTE);
-		} else {
-			mc.gui.setScreen(screen);
+		terakhir = payload;
+		versiBuka++;
+		boolean asked = Util.getMillis() - askedAt < ASK_WINDOW_MS;
+		askedAt = Long.MIN_VALUE / 2;
+		if (!asked) {
+			dev.kultivator.client.hall.IkhtisarPage.buka(SUB_IDENTITAS);
 		}
 	}
 
 	private static void clearAll() {
+		terakhir = null;
+		versiBuka++;
 		LambangCache.clear();
 		SeragamOwners.clear();
 		BenderaRenderer.clear();

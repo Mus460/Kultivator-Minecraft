@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:sekte/gabung_ketua",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "kultivator.gabung.adv.serap.desc"
+    },
+    "icon": {
+      "id": "minecraft:lodestone"
+    },
+    "title": {
+      "translate": "kultivator.gabung.adv.serap.title"
+    },
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

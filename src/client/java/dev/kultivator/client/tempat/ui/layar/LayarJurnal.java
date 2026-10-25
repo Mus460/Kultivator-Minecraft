@@ -20,8 +20,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.Util;
 
 /**
- * {@code jurnal} (DESIGN 38.U.3.9, 38.S.1): Catatan Perjalanan, from the hub card (reads only; tracking and marking are
- * read ops). "Aktif": the open quests by place with stage dots and deadline rings, the tracked one sealed, detail with
+ * {@code jurnal} (DESIGN 38.U.3.9, 38.S.1): Catatan Perjalanan, the page Dunia › Perjalanan of the Gulungan Utama (43.5,
+ * M12; read only from there, tracking and marking are read ops; {@code /kultivasi jurnal} opens it as a context). Text at
+ * 1.0 (43.0.5). "Aktif": the open quests by place with stage dots and deadline rings, the tracked one sealed, detail with
  * "Lacak" (the compass needle) and "Tandai". "Selesai": finished quests with the branch taken. "Alur": the capital's
  * storyline chapter by chapter; chapters not yet open stay sealed.
  */
@@ -71,17 +72,17 @@ public final class LayarJurnal extends LayarTempatDasar {
 		}
 		String lacak = lembar.s(Jurnal.LACAK);
 		Kotak[] k = bagi(x0, y0, x1, y1);
-		daftarAktif.gambar(l, "aktif", k[0].x0(), k[0].y0(), k[0].x1(), k[0].y1(), rows.size(), 26, (lk, i, rx0, ry0, rx1, ry1, sorot, pilih) -> {
+		daftarAktif.gambar(l, "aktif", k[0].x0(), k[0].y0(), k[0].x1(), k[0].y1(), rows.size(), 28, (lk, i, rx0, ry0, rx1, ry1, sorot, pilih) -> {
 			Lembar e = rows.get(i);
 			boolean dilacak = e.id().equals(lacak);
 			PanelTempat.kartu(lk.g, gaya, rx0, ry0, rx1, ry1, sorot ? 1.0F : 0.0F, pilih);
 			IkonTempat.gambar(lk.g, dilacak ? IkonTempat.KOMPAS : IkonTempat.SURAT, rx0 + 3, ry0 + 4, 14, 0xFFFFFFFF);
-			lk.teks(Brush.bold(e.teks(LembarKunci.NAMA)), rx0 + 21, ry0 + 2, rx1 - rx0 - 40, dilacak ? gaya.aksen : gaya.teks, 0.85F);
-			lk.keterangan(e.teks(LembarKunci.TEMPAT), rx0 + 21, ry0 + 12, rx1 - rx0 - 40, gaya.teksSamar);
+			lk.teks(Brush.bold(e.teks(LembarKunci.NAMA)), rx0 + 21, ry0 + 2, rx1 - rx0 - 40, dilacak ? gaya.aksen : gaya.teks);
+			lk.teks(e.teks(LembarKunci.TEMPAT), rx0 + 21, ry0 + 12, rx1 - rx0 - 40, gaya.teksSamar);
 			int tahap = e.i(LembarKunci.TAHAP, 0);
 			int total = Math.max(1, e.i(LembarKunci.TAHAP_TOTAL, 1));
 			for (int s = 0; s < total && s < 10; s++) {
-				Brush.disc(lk.g, rx0 + 23 + s * 5, ry0 + 22, 1.6F, s < tahap ? TempatWarna.OK : Palette.argb(0x60, 0x000000));
+				Brush.disc(lk.g, rx0 + 23 + s * 5, ry0 + 24, 1.6F, s < tahap ? TempatWarna.OK : Palette.argb(0x60, 0x000000));
 			}
 			if (e.ada(LembarKunci.SISA_TICK)) {
 				CincinWaktu.gambar(lk, rx1 - 10, ry0 + 13, 7.0F, e.l(LembarKunci.SISA_TICK, 0L), 0L, diterima, CincinWaktu.TANPA);
@@ -99,13 +100,15 @@ public final class LayarJurnal extends LayarTempatDasar {
 		int y = d.y0() + 4;
 		l.teks(Brush.bold(e.teks(LembarKunci.NAMA)), dx0, y, dx1 - dx0, gaya.aksen);
 		y += 11;
-		l.keterangan(TeksTempat.k("jurnal.tahap", e.i(LembarKunci.TAHAP, 0), Math.max(1, e.i(LembarKunci.TAHAP_TOTAL, 1)), e.teks(LembarKunci.TEMPAT)), dx0,
+		l.teks(TeksTempat.k("jurnal.tahap", e.i(LembarKunci.TAHAP, 0), Math.max(1, e.i(LembarKunci.TAHAP_TOTAL, 1)), e.teks(LembarKunci.TEMPAT)), dx0,
 				y, dx1 - dx0, gaya.teksSamar);
 		y += 11;
+		// the big deadline ring only on a tall detail (GUI scale 4 stacks list over a low detail: the row's small ring stays)
+		boolean cincin = e.ada(LembarKunci.SISA_TICK) && d.h() >= 90;
 		// the quest text stops above the deadline ring and the buttons (full text as tooltip when cut)
-		int teksBawah = d.y1() - (e.ada(LembarKunci.SISA_TICK) ? 58 : 23);
-		l.bungkus(e.teks(LembarKunci.TEKS), dx0, y, dx1 - dx0, gaya.teks, 0.85F, teksBawah - y);
-		if (e.ada(LembarKunci.SISA_TICK)) {
+		int teksBawah = d.y1() - (cincin ? 58 : 23);
+		l.bungkus(e.teks(LembarKunci.TEKS), dx0, y, dx1 - dx0, gaya.teks, 1.0F, teksBawah - y);
+		if (cincin) {
 			CincinWaktu.gambar(l, dx0 + 8, d.y1() - 46, 8.0F, e.l(LembarKunci.SISA_TICK, 0L), 0L, diterima, CincinWaktu.KANAN);
 		}
 		boolean dilacak = e.id().equals(lacak);
@@ -134,10 +137,10 @@ public final class LayarJurnal extends LayarTempatDasar {
 			Lembar e = rows.get(i);
 			PanelTempat.kartu(lk.g, gaya, rx0, ry0, rx1, ry1, sorot ? 1.0F : 0.0F, pilih);
 			IkonTempat.gambar(lk.g, IkonTempat.CENTANG, rx0 + 3, ry0 + 5, 14, 0xFFFFFFFF);
-			lk.teks(Brush.bold(e.teks(LembarKunci.NAMA)), rx0 + 21, ry0 + 2, rx1 - rx0 - 70, gaya.teks, 0.85F);
-			lk.kanan(TeksTempat.k("jurnal.hari", e.i(LembarKunci.HARI, 0)), rx1 - 4, ry0 + 3, gaya.teksSamar, 0.7F);
+			lk.teks(Brush.bold(e.teks(LembarKunci.NAMA)), rx0 + 21, ry0 + 2, rx1 - rx0 - 70, gaya.teks);
+			lk.kanan(TeksTempat.k("jurnal.hari", e.i(LembarKunci.HARI, 0)), rx1 - 4, ry0 + 2, gaya.teksSamar, 1.0F);
 			Component hasil = e.teksAtau(Jurnal.HASIL);
-			lk.keterangan(hasil != null ? TeksTempat.k("jurnal.hasil", e.teks(LembarKunci.TEMPAT), hasil) : e.teks(LembarKunci.TEMPAT), rx0 + 21, ry0 + 13,
+			lk.teks(hasil != null ? TeksTempat.k("jurnal.hasil", e.teks(LembarKunci.TEMPAT), hasil) : e.teks(LembarKunci.TEMPAT), rx0 + 21, ry0 + 13,
 					rx1 - rx0 - 26, gaya.teksLemah);
 		}, null, null);
 	}
@@ -156,11 +159,11 @@ public final class LayarJurnal extends LayarTempatDasar {
 			Brush.disc(lk.g, rx0 + 12, ry0 + 12, 9.0F, buka ? TempatWarna.SEGEL : 0xFF8D928E);
 			Brush.centered(lk.g, font, Component.literal(Integer.toString(e.i(Jurnal.BAB, i + 1))), rx0 + 12, ry0 + 8, 0xFFFFF0E0, 1.0F, false);
 			if (!buka) {
-				lk.teks(TeksTempat.k("jurnal.bab_tersegel"), rx0 + 26, ry0 + 8, rx1 - rx0 - 30, TempatWarna.terkunci(gaya.teks), 0.9F);
+				lk.teks(TeksTempat.k("jurnal.bab_tersegel"), rx0 + 26, ry0 + 8, rx1 - rx0 - 30, TempatWarna.terkunci(gaya.teks));
 				return;
 			}
-			lk.teks(Brush.bold(e.teks(LembarKunci.JUDUL)), rx0 + 26, ry0 + 3, rx1 - rx0 - 30, gaya.teks, 0.9F);
-			lk.bungkus(e.teks(Jurnal.RINGKASAN), rx0 + 26, ry0 + 14, rx1 - rx0 - 30, gaya.teksLemah, 0.7F, ry1 - ry0 - 15);
+			lk.teks(Brush.bold(e.teks(LembarKunci.JUDUL)), rx0 + 26, ry0 + 3, rx1 - rx0 - 30, gaya.teks);
+			lk.bungkus(e.teks(Jurnal.RINGKASAN), rx0 + 26, ry0 + 14, rx1 - rx0 - 30, gaya.teksLemah, 1.0F, ry1 - ry0 - 15);
 		}, null, null);
 	}
 }

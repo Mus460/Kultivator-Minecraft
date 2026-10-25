@@ -34,6 +34,7 @@ import structgen  # noqa: E402
 import tempat_lib as tl  # noqa: E402
 import kota_besar_kit as K  # noqa: E402
 import hias_tema as H  # noqa: E402
+import tema_hidup_kit as thk  # noqa: E402  (DESIGN 42 lots outside the wall, 42W-T)
 from kota_besar_kit import FACE, OPP  # noqa: E402
 
 F = "kota_tema/pelabuhan"
@@ -2093,6 +2094,49 @@ def d_hunian_saudagar():
             (1, 1): ("J", "T", "T", "J")})
 
 
+# ===================================================================================================== DESIGN 42 (42W-T)
+# 42.12.1 row tema: the night street, the recruitment office (2 booths), 10 kavling of gaya "pelabuhan", the sea-cliff
+# cemetery (tebing makam laut) and the Ghost Market / rentable stall points, all on free lots OUTSIDE the wall inside the
+# keep-out zone of the district that registers them (tools/tema_hidup_kit.py; off the 48-grid, no side code).
+GAYA42 = {
+    "tema": "pelabuhan", "pal": PAL, "pondasi": "minecraft:dirt",
+    "tanah": ["minecraft:grass_block", "minecraft:grass_block", "minecraft:coarse_dirt", "minecraft:grass_block",
+              "minecraft:rooted_dirt", "minecraft:grass_block"],
+    "jalan": ["minecraft:stone_bricks", "minecraft:polished_andesite", "minecraft:stone_bricks",
+              "minecraft:cracked_stone_bricks", "minecraft:polished_andesite"],
+    "alas": "minecraft:polished_diorite", "alas_tangga": "minecraft:polished_diorite_stairs",
+    "lantai": ["minecraft:acacia_planks", "minecraft:jungle_planks"],
+    "dinding": ["minecraft:bricks", "minecraft:bricks", "minecraft:bricks", "minecraft:white_terracotta"],
+    "tiang": "minecraft:stripped_acacia_log", "balok": "minecraft:polished_diorite",
+    "jendela": "minecraft:acacia_trapdoor", "pintu": "minecraft:acacia_door", "plafon": "minecraft:acacia_planks",
+    "atap": "pelana", "atap_tangga": "minecraft:polished_granite_stairs", "atap_slab": "minecraft:polished_granite_slab",
+    "atap_penuh": "minecraft:polished_granite", "parapet": "minecraft:brick_wall", "kubah": "minecraft:cut_sandstone",
+    "kain": ("minecraft:white_wool", "minecraft:light_blue_wool"), "warna": "blue", "lampu": "minecraft:lantern",
+    "pohon": "oak", "kavling": "pelabuhan", "makam": ("laut", "tebing"),
+    "rencana": (("rumah_toko", "gudang", "kedai_teh", "rumah_besar", "kedai_arak", "bengkel", "sekolah"),
+                ("rumah_kecil", "menara_jaga", "kuil_kecil", "taman", "rumah_kecil")),
+    "bilik_warna": ("blue", "red"),
+}
+# (district, dx, dz, lot): south band west of the Land Gate (night street, kavling), east of it (office, kavling);
+# the cemetery on the shore west of the Kota Awak wall
+LOT42 = (("kuil_laut", -48, 62, "hidup42/kavling_barat"), ("kuil_laut", 0, 62, "hidup42/jalan_malam"),
+         ("hunian_saudagar", -48, 62, "hidup42/kantor_rekrut"), ("hunian_saudagar", 0, 62, "hidup42/kavling_timur"),
+         ("kota_awak", -112, -24, "hidup42/makam"))
+
+
+def lot42_buat(dry=False):
+    """Writes the DESIGN 42 lots and registers them (lapak_sewa 0-4, pasar_hantu 0-3, nisan 0-31)."""
+    out = [thk.lot_jalan_malam(F, GAYA42, lapak0=0, hantu0=0),
+           thk.lot_kantor_rekrut(F, GAYA42, lapak0=2),
+           thk.lot_kavling(F, GAYA42, "hidup42/kavling_barat", 0),
+           thk.lot_kavling(F, GAYA42, "hidup42/kavling_timur", 1, hantu=3),
+           thk.lot_makam(F, GAYA42, nisan0=0, hantu0=1)]
+    if not dry:
+        for distrik, dx, dz, name in LOT42:
+            daftar_bebas(distrik, dx, dz, name, 0)
+    return out
+
+
 # ===================================================================================================== JSON
 def tulis_json():
     states = tl.semua_state()
@@ -2123,6 +2167,7 @@ def main():
     d_gerbang_darat()
     d_hunian_saudagar()
     build_walls()
+    lot42_buat()
     tulis_json()
     tl.cek_semua()
     n = sum(len(v) for v in LOTS.values())

@@ -309,6 +309,10 @@ public final class Perencana {
 	/** Orders, Patuh, raids, another module's activity, a breakthrough or a duel interrupt the planner (39.7.2). */
 	private static boolean harusBatal(DiscipleEntity murid, CompoundTag rec, Kegiatan k) {
 		long now = murid.level().getGameTime();
+		if (PelaksanaDasar.ACARA_TEBUS.equals(rec.getStringOr(MandiriIds.KG_ACARA, ""))) {
+			// The master's own ritual: the order pause, FOLLOW and Patuh do not end it; it checks the master itself.
+			return murid.data().breakingThrough();
+		}
 		if (MandiriApi.bebasSampai(murid.data()) > now || murid.mode().follows()) {
 			return true;
 		}
@@ -848,20 +852,17 @@ public final class Perencana {
 		if (list.isEmpty()) {
 			return;
 		}
-		ServerLevel level = (ServerLevel) list.get(0).level();
-		if (Irama.jam(level) != Irama.JAM_SALAM || Irama.menit(level) > 20) {
+		Halls.HallView hall = Halls.hallOf(owner);
+		ServerLevel level = hall == null ? null : srv.getLevel(hall.dim());
+		if (level == null || Irama.jam(level) != Irama.JAM_SALAM || Irama.menit(level) > 20) {
 			return;
 		}
 		long today = Irama.hari(level);
 		Long done = SALAM.get(owner);
-		if (done != null && done == today) {
+		if (done != null && done == today || Irama.serbuan(owner)) {
 			return;
 		}
 		SALAM.put(owner, today);
-		Halls.HallView hall = Halls.hallOf(owner);
-		if (hall == null || !hall.dim().equals(level.dimension()) || Irama.serbuan(owner)) {
-			return;
-		}
 		BlockPos base = SectBuild.anchor(owner, "main_hall");
 		if (base == null) {
 			base = hall.pos();

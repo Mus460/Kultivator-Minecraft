@@ -1,0 +1,574 @@
+{
+  "_dibuat": "tools/gen_kota_hidup_cakap.py dari tools/kota_cakap_sumber (jangan disunting tangan)",
+  "kelompok": "tutup",
+  "isi": [
+    {
+      "aturan": "tutup.sabar_habis",
+      "niat": "TUTUP",
+      "topik": "sabar_habis",
+      "bingkai": [
+        {
+          "kunci": "tutup.sabar_habis.0",
+          "slot": [
+            "$sebutan",
+            "$alasan_pergi"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "pelabuhan",
+            "oasis",
+            "air",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "tutup.sabar_habis.1",
+          "slot": [
+            "$alasan_pergi",
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "varian": [
+            "iblis",
+            "gunung"
+          ]
+        },
+        {
+          "kunci": "tutup.sabar_habis.2",
+          "slot": [
+            "$alasan_pergi"
+          ],
+          "bobot": 2
+        },
+        {
+          "kunci": "tutup.sabar_habis.3",
+          "slot": [
+            "$alasan_pergi",
+            "$doa",
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "ibukota"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        },
+        "$alasan_pergi": {
+          "aturan": "frag.alasan_pergi"
+        },
+        "$doa": {
+          "aturan": "frag.doa",
+          "opsional": 0.4
+        }
+      },
+      "gestur": "pamit_lambai"
+    },
+    {
+      "aturan": "tutup.malam",
+      "niat": "TUTUP",
+      "topik": "sabar_habis",
+      "syarat": {
+        "jam": [
+          "malam",
+          "larut"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "tutup.malam.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "tutup.malam.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "varian": [
+            "pelabuhan",
+            "air"
+          ]
+        },
+        {
+          "kunci": "tutup.malam.2",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "tutup.malam.3",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "menguap_peregangan"
+    },
+    {
+      "aturan": "tutup.akrab",
+      "niat": "TUTUP",
+      "topik": "pamit",
+      "syarat": {
+        "kesan": [
+          "akrab",
+          "sahabat"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "tutup.akrab.0",
+          "slot": [],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "tutup.akrab.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "p",
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "tutup.akrab.2",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "tutup.akrab.3",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {},
+      "gestur": "tepuk_bahu"
+    },
+    {
+      "aturan": "tutup.dingin",
+      "niat": "TUTUP",
+      "topik": "sabar_habis",
+      "syarat": {
+        "kesan": [
+          "musuh"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "tutup.dingin.0",
+          "slot": [],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "tutup.dingin.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "tutup.dingin.2",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "tutup.dingin.3",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {},
+      "gestur": "sikap_lipat_tangan"
+    },
+    {
+      "aturan": "tutup.pamit_balas",
+      "niat": "TUTUP",
+      "topik": "pamit",
+      "bingkai": [
+        {
+          "kunci": "tutup.pamit_balas.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "pelabuhan",
+            "oasis",
+            "air",
+            "kampung",
+            "iblis",
+            "gunung",
+            "ibukota"
+          ]
+        },
+        {
+          "kunci": "tutup.pamit_balas.1",
+          "slot": [
+            "$sebutan",
+            "$doa"
+          ],
+          "bobot": 2
+        },
+        {
+          "kunci": "tutup.pamit_balas.2",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "tutup.pamit_balas.3",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        },
+        "$doa": {
+          "aturan": "frag.doa",
+          "opsional": 0.4
+        }
+      },
+      "gestur": "lambai"
+    },
+    {
+      "aturan": "potong.bahaya",
+      "niat": "POTONG",
+      "bingkai": [
+        {
+          "kunci": "potong.bahaya.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "pelabuhan",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "potong.bahaya.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "air"
+          ]
+        },
+        {
+          "kunci": "potong.bahaya.2",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "potong.bahaya.3",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "lari_takut",
+      "seru": "takut"
+    },
+    {
+      "aturan": "potong.pelanggan",
+      "niat": "POTONG",
+      "syarat": {
+        "kelompok": [
+          "pedagang",
+          "pekerja"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "potong.pelanggan.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "potong.pelanggan.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "potong.pelanggan.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "seru_dagang"
+    },
+    {
+      "aturan": "potong.gong",
+      "niat": "POTONG",
+      "bingkai": [
+        {
+          "kunci": "potong.gong.0",
+          "slot": [],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "potong.gong.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "gunung",
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "potong.gong.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {},
+      "gestur": "lihat_sekeliling"
+    },
+    {
+      "aturan": "potong.dipanggil",
+      "niat": "POTONG",
+      "bingkai": [
+        {
+          "kunci": "potong.dipanggil.0",
+          "slot": [
+            "$pasangan",
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "l",
+            "p"
+          ]
+        },
+        {
+          "kunci": "potong.dipanggil.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "potong.dipanggil.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$pasangan": {
+          "tipe": "nama_warga",
+          "dari": "konteks.pasangan"
+        },
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "lihat_sekeliling"
+    },
+    {
+      "aturan": "potong.anak",
+      "niat": "POTONG",
+      "syarat": {
+        "tahap": [
+          "dewasa",
+          "tua"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "potong.anak.0",
+          "slot": [
+            "$anak"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "potong.anak.1",
+          "slot": [
+            "$anak"
+          ],
+          "bobot": 2,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "potong.anak.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$anak": {
+          "tipe": "nama_warga",
+          "dari": "konteks.anak"
+        }
+      },
+      "gestur": "lari_lambai"
+    },
+    {
+      "aturan": "potong.sibuk",
+      "niat": "POTONG",
+      "syarat": {
+        "kelompok": [
+          "penjaga",
+          "pejabat",
+          "pekerja"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "potong.sibuk.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "potong.sibuk.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "varian": [
+            "ibukota"
+          ]
+        },
+        {
+          "kunci": "potong.sibuk.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "berdiri_jaga"
+    },
+    {
+      "aturan": "kembali",
+      "niat": "KEMBALI",
+      "bingkai": [
+        {
+          "kunci": "kembali.0",
+          "slot": [],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "pelabuhan",
+            "air",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "kembali.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "varian": [
+            "ibukota"
+          ]
+        },
+        {
+          "kunci": "kembali.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "kembali.3",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "bicara_tangan"
+    }
+  ]
+}

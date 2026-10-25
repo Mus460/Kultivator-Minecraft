@@ -1,10 +1,10 @@
 package dev.kultivator.client.sekte.paviliun;
 
 import dev.kultivator.client.screen.ui.Brush;
+import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.TalismanButton;
 import dev.kultivator.client.screen.ui.UiSound;
-import dev.kultivator.client.screen.ui.Widget;
 import dev.kultivator.sekte.paviliun.PaviliunPayloads;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
@@ -21,79 +21,231 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The Rak Kitab page of {@link PaviliunScreen} (DESIGN 36.2.5): three shelves of nine places (27, the most a hall of
- * level 7-9 holds); each book a spine in its grade's ribbon colour with gilt bands (a jade slip as a bundle of pale green
- * bamboo strips), the free places in faint outline, the places the hall's level has not opened yet hatched with the level
- * that opens them. Hover a spine for its arts; click it to choose it: its arts, grades and the giver fill the right
- * column with "Ambil kembali". Below sit the readers (name, art, progress bar, minutes left) and "Setor kitab di tangan".
+ * The painter of the Rak Kitab sub (DESIGN 36.2.5, 43.5 Sekte › Kas &amp; Toko › rak). Top row: the shelf tally and "Setor
+ * kitab di tangan". Then three shelves of nine places (27, the most a hall of level 7-9 holds); each book a spine in its
+ * grade's ribbon colour with gilt bands (a jade slip as a bundle of pale green bamboo strips), the free places in faint
+ * outline, the places the hall's level has not opened yet hatched. A spine is a focusable zone: hover for its arts, click
+ * (or Enter) to choose it; the chosen book's arts, grades and giver fill the side column (below the shelves when narrow)
+ * with "Ambil kembali" behind a light confirm. Below sit the readers with their progress and minutes left. Text is 1.0.
  */
 final class RakScreen {
 
 	private static final int PER_SHELF = 9;
 	private static final int SHELVES = 3;
+	private static final int SPINE_H = 22;
+	private static final int BTN_H = 14;
+	private static final String[] GLYPHS = {"經", "訣", "典", "錄", "法", "書", "譜", "卷"};
+	private static final String U = "kultivator.sekte.paviliun.ui.";
 
-	static void build(PaviliunScreen s) {
-		CompoundTag v = s.rak;
+	/** Paints the Rak Kitab from {@code y} between {@code x0} and {@code x1}; returns the y under the content. */
+	static int lukis(PaviliunScreen s, Lukis l, int x0, int y, int x1) {
+		CompoundTag v = s.lembar();
+		Font font = s.font();
 		int capacity = v.getIntOr("capacity", 0);
+		int level = v.getIntOr("level", 0);
 		ListTag books = v.getListOrEmpty("books");
-		float shelfW = shelfWidth(s);
-		float slotW = shelfW / PER_SHELF;
-		int spineH = spineHeight(s);
-		for (int i = 0; i < SHELVES * PER_SHELF; i++) {
-			int shelf = i / PER_SHELF;
-			int x = Math.round(s.left + 4 + (i % PER_SHELF) * slotW + 1);
-			int y = s.contentTop() + 4 + shelf * (spineH + 8);
-			CompoundTag book = i < books.size() && books.get(i) instanceof CompoundTag b ? b : null;
-			if (book == null) {
-				continue;
-			}
-			int id = book.getIntOr("id", -1);
-			s.widgets.add(new Spine(x, y, Math.max(4, Math.round(slotW) - 2), spineH, book, () -> s.selectedBook == id).onPress(() -> {
-				s.selectedBook = s.selectedBook == id ? -1 : id;
-				s.confirmWithdraw = false;
-				s.rebuild();
-			}).tooltip(() -> tooltip(book)));
-		}
-		float colX = s.left + 8 + shelfW;
-		int colW = Math.round(s.right - colX);
-		CompoundTag chosen = chosen(s);
-		if (chosen != null) {
-			int id = chosen.getIntOr("id", -1);
-			s.widgets.add(new TalismanButton(Math.round(colX), s.contentTop() + 78, Math.min(colW, 110), 12,
-					() -> Component.translatable(s.confirmWithdraw ? "kultivator.sekte.paviliun.ui.withdraw.sure" : "kultivator.sekte.paviliun.ui.withdraw"))
-					.urgentWhen(() -> s.confirmWithdraw)
-					.onPress(() -> {
-						if (s.confirmWithdraw) {
-							s.selectedBook = -1;
-							PaviliunClient.send(PaviliunPayloads.OP_WITHDRAW, Integer.toString(id));
-						} else {
-							s.confirmWithdraw = true;
-							UiSound.ask();
-						}
-					})
-					.tooltip(() -> List.of(Component.translatable("kultivator.sekte.paviliun.ui.withdraw.tip").withStyle(ChatFormatting.GRAY))));
-		}
+		int w = x1 - x0;
+
+		// top row: tally on the left, the deposit talisman on the right
 		boolean hand = v.contains("hand");
 		boolean room = books.size() < capacity;
 		Component handName = v.read("hand", ComponentSerialization.CODEC).orElse(Component.empty());
-		s.widgets.add(new TalismanButton(s.left + 4, s.bottom - 13, Math.min(150, s.right - s.left - 70), 13,
-				() -> hand ? Component.translatable("kultivator.sekte.paviliun.ui.deposit", handName) : Component.translatable("kultivator.sekte.paviliun.ui.deposit.none"))
-				.urgentWhen(() -> hand && room)
-				.enabledWhen(() -> hand && room)
-				.onPress(() -> PaviliunClient.send(PaviliunPayloads.OP_DEPOSIT, ""))
-				.tooltip(() -> List.of(Component.translatable("kultivator.sekte.paviliun.ui.deposit.tip").withStyle(ChatFormatting.GRAY))));
+		Component setor = hand ? Component.translatable(U + "deposit", handName) : Component.translatable(U + "deposit.none");
+		int bw = Math.min(w / 2, TalismanButton.lebar(font, setor, 70, 170));
+		Component alasan = !hand ? Component.translatable(U + "deposit.none") : !room ? Component.translatable(U + "shelf", books.size(), capacity, level) : null;
+		TalismanButton.gambar(l, "rak:setor", x1 - bw, y, bw, BTN_H, setor, hand && room, alasan, () -> PaviliunClient.send(PaviliunPayloads.OP_DEPOSIT, ""),
+				hand && room, false);
+		if (l.di(x1 - bw, y, x1, y + BTN_H)) {
+			l.tip(Component.translatable(U + "deposit.tip").withStyle(ChatFormatting.GRAY));
+		}
+		l.teks(Component.translatable(U + "shelf", books.size(), capacity, level), x0, y + 3, w - bw - 6, l.gaya.teksLemah);
+		y += BTN_H + 4;
+
+		// the bookcase (left; full width when narrow) and the side column
+		boolean lebar = w >= 300;
+		float shelfW = lebar ? w * 0.58F : w;
+		float slotW = shelfW / PER_SHELF;
+		int caseTop = y;
+		int caseBottom = caseTop + 4 + SHELVES * (SPINE_H + 8);
+		shelves(l, x0, caseTop, shelfW, slotW, capacity, books.size());
+		for (int i = 0; i < books.size() && i < SHELVES * PER_SHELF; i++) {
+			if (!(books.get(i) instanceof CompoundTag book)) {
+				continue;
+			}
+			int bx = Math.round(x0 + (i % PER_SHELF) * slotW + 1);
+			int by = caseTop + 4 + (i / PER_SHELF) * (SPINE_H + 8);
+			int sw = Math.max(4, Math.round(slotW) - 2);
+			spine(s, l, book, bx, by, sw);
+		}
+		int under = caseBottom + 3;
+		if (capacity < SHELVES * PER_SHELF) {
+			int need = capacity < PER_SHELF * 2 ? 4 : 7;
+			l.samar(Component.translatable(U + "locked", need), x0, under, shelfW);
+			under += 10;
+		}
+
+		int colX = lebar ? Math.round(x0 + shelfW + 8) : x0;
+		int colY = lebar ? caseTop : under + 2;
+		int colEnd = side(s, l, v, colX, colY, x1);
+		y = Math.max(under, colEnd) + 4;
+
+		// readers
+		ListTag readers = v.getListOrEmpty("readers");
+		y += l.kepala(Component.translatable(U + "readers", readers.size(), v.getIntOr("readers_max", 4)), x0, y, x1);
+		if (readers.isEmpty()) {
+			l.samar(Component.translatable(U + "readers.none"), x0 + 2, y, w - 4);
+			return y + 10;
+		}
+		int cols = lebar ? 2 : 1;
+		float colW = (w - (cols - 1) * 8) / (float) cols;
+		for (int i = 0; i < readers.size(); i++) {
+			if (!(readers.get(i) instanceof CompoundTag r)) {
+				continue;
+			}
+			float cx = x0 + (i % cols) * (colW + 8);
+			int cy = y + (i / cols) * 22;
+			int rgb = r.getIntOr("rgb", 0x5FE3C0);
+			Component name = r.read("name", ComponentSerialization.CODEC).orElse(Component.literal("?"));
+			Component spec = r.read("spec", ComponentSerialization.CODEC).orElse(Component.literal("…"));
+			l.teks(Component.translatable(U + "reader", name, spec), cx, cy, colW, l.gaya.teks);
+			float progress = r.getFloatOr("progress", 0.0F);
+			int eta = r.getIntOr("eta", 0);
+			Component sisa = Component.translatable(U + "eta", Math.round(progress * 100.0F), Math.max(1, (eta + 59) / 60));
+			int sisaW = Math.min(Math.round(colW / 2), font.width(sisa));
+			PaviliunScreen.bar(l.g, cx, cy + 12, colW - sisaW - 4, 3, progress, rgb);
+			l.teks(sisa, cx + colW - sisaW, cy + 10, sisaW, l.gaya.teksSamar);
+		}
+		return y + ((readers.size() + cols - 1) / cols) * 22;
 	}
 
-	private static float shelfWidth(PaviliunScreen s) {
-		return (s.right - s.left - 8) * 0.58F;
+	/** The dark lacquer case, the planks, the empty and the locked places. */
+	private static void shelves(Lukis l, int x0, int caseTop, float shelfW, float slotW, int capacity, int count) {
+		GuiGraphicsExtractor g = l.g;
+		float sx = x0;
+		int caseBottom = caseTop + 4 + SHELVES * (SPINE_H + 8);
+		Brush.rect(g, sx, caseTop - 2, sx + shelfW, caseBottom + 1, Palette.argb(0xFF, 0x3A1E10));
+		Brush.rect(g, sx + 2, caseTop, sx + shelfW - 2, caseBottom - 1, Palette.argb(0xFF, 0x22120A));
+		for (int shelf = 0; shelf < SHELVES; shelf++) {
+			float py = caseTop + 4 + shelf * (SPINE_H + 8) + SPINE_H;
+			Brush.rect(g, sx, py, sx + shelfW, py + 3, Palette.argb(0xFF, 0x7E4A27));
+			Brush.rect(g, sx, py + 3, sx + shelfW, py + 4, Palette.argb(0xFF, 0x45230F));
+		}
+		for (int i = count; i < SHELVES * PER_SHELF; i++) {
+			int shelf = i / PER_SHELF;
+			float px = sx + (i % PER_SHELF) * slotW + 1;
+			float py = caseTop + 4 + shelf * (SPINE_H + 8);
+			if (i < capacity) {
+				Brush.frame(g, Math.round(px), Math.round(py + 3), Math.round(px + slotW - 2), Math.round(py + SPINE_H), Palette.argb(0x50, Palette.PAPER_SHADE));
+			} else {
+				for (int k = 0; k < SPINE_H; k += 3) {
+					Brush.rect(g, px, py + k, px + slotW - 2, py + k + 1, Palette.argb(0x30, Palette.LOCKED));
+				}
+			}
+		}
 	}
 
-	private static int spineHeight(PaviliunScreen s) {
-		return Math.max(18, Math.min(28, (s.bottom - 70 - s.contentTop()) / SHELVES - 8));
+	/** One book on the shelf: a focusable zone that chooses it. */
+	private static void spine(PaviliunScreen s, Lukis l, CompoundTag book, int x, int y, int w) {
+		int id = book.getIntOr("id", -1);
+		boolean on = s.selectedBook == id;
+		boolean over = l.di(x, y, x + w, y + SPINE_H);
+		String kunci = "rak:buku" + id;
+		l.zona(kunci, x, y, x + w, y + SPINE_H, () -> {
+			UiSound.press();
+			s.selectedBook = s.selectedBook == id ? -1 : id;
+		}, true, null, true);
+		ListTag specs = book.getListOrEmpty("specs");
+		int rgb = specs.isEmpty() || !(specs.get(0) instanceof CompoundTag first) ? 0xC8962E : first.getIntOr("rgb", 0xC8962E);
+		boolean slip = "giok".equals(book.getStringOr("kind", "buku"));
+		GuiGraphicsExtractor g = l.g;
+		int lift = on ? 3 : over ? 2 : 0;
+		int by = y - lift + 2;
+		int r = x + w;
+		int b = y + SPINE_H;
+		if (slip) {
+			// a bundle of bamboo strips tied with red cord
+			for (int k = x; k < r; k += 2) {
+				g.fill(k, by + 2, Math.min(r, k + 2), b, (k - x) % 4 == 0 ? Palette.argb(0xFF, 0xA8D8A0) : Palette.argb(0xFF, 0x86B97E));
+			}
+			g.fill(x, by + SPINE_H / 3, r, by + SPINE_H / 3 + 1, Palette.argb(0xFF, 0xB3281D));
+			g.fill(x, by + 2 * SPINE_H / 3, r, by + 2 * SPINE_H / 3 + 1, Palette.argb(0xFF, 0xB3281D));
+		} else {
+			int base = 0xFF000000 | rgb;
+			g.fillGradient(x, by, r, b, Palette.lighten(base, 0.12F), Palette.darken(base, 0.35F));
+			g.fill(x, by + 2, r, by + 3, Palette.argb(0xE0, Palette.GOLD_LIGHT));
+			g.fill(x, b - 4, r, b - 3, Palette.argb(0xE0, Palette.GOLD_LIGHT));
+			g.fill(x, by, x + 1, b, Palette.argb(0x60, 0x000000));
+			// the title label: a paper slip with one character, written at 1.0 only when the slip is wide enough (43.0.5)
+			Font font = s.font();
+			Component c = Component.literal(GLYPHS[Math.floorMod(id * 7, GLYPHS.length)]);
+			int lx0 = x + Math.max(1, (w - font.width(c) - 2) / 2);
+			int lx1 = r - Math.max(1, (w - font.width(c) - 2) / 2);
+			int ly0 = by + 5;
+			int ly1 = Math.min(b - 5, ly0 + 11);
+			g.fill(lx0, ly0, lx1, ly1, Palette.argb(0xFF, 0xEFE3C2));
+			if (lx1 - lx0 >= font.width(c)) {
+				g.text(font, c, (lx0 + lx1 - font.width(c)) / 2, ly0 + 2, 0xFF1B2521, false);
+			}
+		}
+		if (on || over) {
+			Brush.frame(g, x - 1, by - 1, r + 1, b + 1, on ? Palette.SEAL : Palette.argb(0xC0, Palette.GOLD));
+		}
+		if (on) {
+			float pulse = 0.5F + 0.5F * (float) Math.sin(Util.getMillis() / 220.0D);
+			Brush.rect(g, x, by - 3, r, by - 2, Palette.argb(Math.round(120 + 100 * pulse), Palette.SEAL_GLOW));
+		}
+		l.fokusCincin(kunci, x, y, r, b);
+		if (over) {
+			l.tip(tooltip(book));
+		}
 	}
 
-	private static @Nullable CompoundTag chosen(PaviliunScreen s) {
-		for (Tag tag : s.rak.getListOrEmpty("books")) {
+	/** The side column: the chosen book with "Ambil kembali", else the pavilion's tally. Returns the y under it. */
+	private static int side(PaviliunScreen s, Lukis l, CompoundTag v, int x0, int y, int x1) {
+		int w = x1 - x0;
+		CompoundTag chosen = chosen(s, v);
+		if (chosen == null) {
+			y += l.kepala(Component.translatable(U + "pavilion"), x0, y, x1);
+			boolean library = v.getBooleanOr("library", false);
+			y += Math.round(l.bungkus(Component.translatable(library ? U + "pavilion.open" : U + "pavilion.none"), x0, y, w,
+					library ? Palette.JADE_DARK : Palette.WARN)) + 2;
+			y += Math.round(l.bungkus(Component.translatable(U + "pavilion.rule", v.getIntOr("readers_max", 4)), x0, y, w, l.gaya.teksLemah)) + 2;
+			l.teks(Component.translatable(U + "learned", v.getIntOr("learned", 0)), x0, y, w, l.gaya.teks);
+			return y + 10;
+		}
+		Component name = chosen.read("name", ComponentSerialization.CODEC).orElse(Component.literal("?"));
+		y += l.kepala(name, x0, y, x1);
+		int n = 0;
+		for (Tag t : chosen.getListOrEmpty("specs")) {
+			if (!(t instanceof CompoundTag spec) || n >= 5) {
+				continue;
+			}
+			int rgb = spec.getIntOr("rgb", 0xC8962E);
+			Component grade = spec.read("grade_name", ComponentSerialization.CODEC).orElse(Component.empty());
+			int gw = Math.min(w / 2, s.font().width(grade));
+			Brush.dot(l.g, x0 + 3, y + 4.0F, 1.8F, Palette.argb(0xFF, rgb));
+			l.teks(spec.read("name", ComponentSerialization.CODEC).orElse(Component.literal("?")), x0 + 8, y, w - gw - 12, l.gaya.teks);
+			l.teks(grade, x1 - gw, y, gw, Palette.argb(0xFF, Palette.darken(0xFF000000 | rgb, 0.3F)));
+			y += 10;
+			n++;
+		}
+		l.samar(Component.translatable(U + "book.by", chosen.getStringOr("by", "?"), chosen.getLongOr("day", 0L)), x0, y + 1, w);
+		y += 12;
+		int id = chosen.getIntOr("id", -1);
+		Component ambil = Component.translatable(U + "withdraw");
+		TalismanButton.gambar(l, "rak:ambil", x0, y, Math.min(w, TalismanButton.lebar(s.font(), ambil, 70, 140)), BTN_H, ambil, true, null,
+				() -> s.tanya(Component.translatable("kultivator.gui43.m08.rak.ambil.tanya", name), () -> {
+					s.selectedBook = -1;
+					PaviliunClient.send(PaviliunPayloads.OP_WITHDRAW, Integer.toString(id));
+				}));
+		if (l.di(x0, y, x0 + Math.min(w, 140), y + BTN_H)) {
+			l.tip(Component.translatable(U + "withdraw.tip").withStyle(ChatFormatting.GRAY));
+		}
+		return y + BTN_H;
+	}
+
+	private static @Nullable CompoundTag chosen(PaviliunScreen s, CompoundTag v) {
+		for (Tag tag : v.getListOrEmpty("books")) {
 			if (tag instanceof CompoundTag b && b.getIntOr("id", -1) == s.selectedBook) {
 				return b;
 			}
@@ -111,186 +263,8 @@ final class RakScreen {
 				lines.add(Component.literal(" · ").append(name).append(Component.literal("  ")).append(grade.copy().withColor(spec.getIntOr("rgb", 0xFFFFFF))));
 			}
 		}
-		lines.add(Component.translatable("kultivator.sekte.paviliun.ui.book.by", book.getStringOr("by", "?"), book.getLongOr("day", 0L))
-				.withStyle(ChatFormatting.DARK_GRAY));
+		lines.add(Component.translatable(U + "book.by", book.getStringOr("by", "?"), book.getLongOr("day", 0L)).withStyle(ChatFormatting.DARK_GRAY));
 		return lines;
-	}
-
-	// ================================================================== drawing
-
-	static void draw(PaviliunScreen s, GuiGraphicsExtractor g, int mouseX, int mouseY) {
-		CompoundTag v = s.rak;
-		Font font = s.font();
-		int capacity = v.getIntOr("capacity", 0);
-		int level = v.getIntOr("level", 0);
-		ListTag books = v.getListOrEmpty("books");
-		float shelfW = shelfWidth(s);
-		float slotW = shelfW / PER_SHELF;
-		int spineH = spineHeight(s);
-		float sx = s.left + 4;
-		// the bookcase: dark lacquer back, three planks, carved posts
-		float caseTop = s.contentTop();
-		float caseBottom = caseTop + 4 + SHELVES * (spineH + 8);
-		Brush.rect(g, sx - 3, caseTop - 2, sx + shelfW + 3, caseBottom + 1, Palette.argb(0xFF, 0x3A1E10));
-		Brush.rect(g, sx - 1, caseTop, sx + shelfW + 1, caseBottom - 1, Palette.argb(0xFF, 0x22120A));
-		for (int shelf = 0; shelf < SHELVES; shelf++) {
-			float py = caseTop + 4 + shelf * (spineH + 8) + spineH;
-			Brush.rect(g, sx - 3, py, sx + shelfW + 3, py + 3, Palette.argb(0xFF, 0x7E4A27));
-			Brush.rect(g, sx - 3, py + 3, sx + shelfW + 3, py + 4, Palette.argb(0xFF, 0x45230F));
-		}
-		for (int i = books.size(); i < SHELVES * PER_SHELF; i++) {
-			int shelf = i / PER_SHELF;
-			float x = sx + (i % PER_SHELF) * slotW + 1;
-			float y = caseTop + 4 + shelf * (spineH + 8);
-			if (i < capacity) {
-				Brush.frame(g, Math.round(x), Math.round(y + 3), Math.round(x + slotW - 2), Math.round(y + spineH), Palette.argb(0x50, Palette.PAPER_SHADE));
-			} else {
-				// a place the hall has not opened yet: hatched
-				for (int k = 0; k < spineH; k += 3) {
-					Brush.rect(g, x, y + k, x + slotW - 2, y + k + 1, Palette.argb(0x30, Palette.LOCKED));
-				}
-			}
-		}
-		if (capacity < SHELVES * PER_SHELF) {
-			int need = capacity < PER_SHELF * 2 ? 4 : 7;
-			Brush.fit(g, font, Component.translatable("kultivator.sekte.paviliun.ui.locked", need), sx, caseBottom + 3, shelfW, Palette.INK_FAINT,
-					0.55F, 0.4F, false);
-		}
-		Brush.fit(g, font, Component.translatable("kultivator.sekte.paviliun.ui.shelf", books.size(), capacity, level), sx, caseBottom + 11, shelfW,
-				Palette.INK_SOFT, 0.6F, 0.42F, false);
-
-		// right column: the chosen book, else the pavilion's tally
-		float colX = s.left + 8 + shelfW;
-		float colW = s.right - colX;
-		float y = s.contentTop();
-		CompoundTag chosen = chosen(s);
-		if (chosen != null) {
-			y = s.heading(g, chosen.read("name", ComponentSerialization.CODEC).orElse(Component.literal("?")), colX, y, colW);
-			int n = 0;
-			for (Tag t : chosen.getListOrEmpty("specs")) {
-				if (!(t instanceof CompoundTag spec) || n >= 5) {
-					continue;
-				}
-				int rgb = spec.getIntOr("rgb", 0xC8962E);
-				Brush.dot(g, colX + 3, y + 3.5F, 1.8F, Palette.argb(0xFF, rgb));
-				Brush.fit(g, font, spec.read("name", ComponentSerialization.CODEC).orElse(Component.literal("?")), colX + 8, y, colW * 0.62F, Palette.INK, 0.62F,
-						0.42F, false);
-				Brush.fit(g, font, spec.read("grade_name", ComponentSerialization.CODEC).orElse(Component.empty()), colX + 8 + colW * 0.62F, y, colW * 0.36F,
-						Palette.argb(0xFF, Palette.darken(0xFF000000 | rgb, 0.3F)), 0.55F, 0.4F, false);
-				y += 9;
-				n++;
-			}
-			Brush.fit(g, font, Component.translatable("kultivator.sekte.paviliun.ui.book.by", chosen.getStringOr("by", "?"), chosen.getLongOr("day", 0L)),
-					colX, y + 2, colW, Palette.INK_FAINT, 0.52F, 0.4F, false);
-		} else {
-			y = s.heading(g, Component.translatable("kultivator.sekte.paviliun.ui.pavilion"), colX, y, colW);
-			Component state = v.getBooleanOr("library", false) ? Component.translatable("kultivator.sekte.paviliun.ui.pavilion.open")
-					: Component.translatable("kultivator.sekte.paviliun.ui.pavilion.none");
-			y += Brush.wrap(g, font, state, colX, y, colW, v.getBooleanOr("library", false) ? Palette.JADE_DARK : Palette.WARN, 0.58F, false) + 3;
-			y += Brush.wrap(g, font, Component.translatable("kultivator.sekte.paviliun.ui.pavilion.rule", v.getIntOr("readers_max", 4)), colX, y, colW,
-					Palette.INK_SOFT, 0.55F, false) + 3;
-			Brush.fit(g, font, Component.translatable("kultivator.sekte.paviliun.ui.learned", v.getIntOr("learned", 0)), colX, y, colW, Palette.INK,
-					0.6F, 0.42F, false);
-		}
-
-		// readers
-		float ry = Math.max(caseBottom + 22, s.contentTop() + 96);
-		float rw = s.right - s.left - 8;
-		ListTag readers = v.getListOrEmpty("readers");
-		ry = s.heading(g, Component.translatable("kultivator.sekte.paviliun.ui.readers", readers.size(), v.getIntOr("readers_max", 4)), s.left + 4, ry, rw);
-		if (readers.isEmpty()) {
-			Brush.fit(g, font, Component.translatable("kultivator.sekte.paviliun.ui.readers.none"), s.left + 6, ry, rw - 4, Palette.INK_FAINT, 0.58F, 0.42F,
-					false);
-			return;
-		}
-		float half = rw / 2.0F - 4;
-		for (int i = 0; i < readers.size() && i < 4; i++) {
-			if (!(readers.get(i) instanceof CompoundTag r)) {
-				continue;
-			}
-			float cx = s.left + 4 + (i % 2) * (half + 8);
-			float cy = ry + (i / 2) * 17;
-			if (cy > s.bottom - 30) {
-				break;
-			}
-			int rgb = r.getIntOr("rgb", 0x5FE3C0);
-			Component name = r.read("name", ComponentSerialization.CODEC).orElse(Component.literal("?"));
-			Component spec = r.read("spec", ComponentSerialization.CODEC).orElse(Component.literal("…"));
-			Brush.fit(g, font, Component.translatable("kultivator.sekte.paviliun.ui.reader", name, spec), cx, cy, half, Palette.INK, 0.58F, 0.4F, false);
-			float progress = r.getFloatOr("progress", 0.0F);
-			s.bar(g, cx, cy + 8, half * 0.7F, 3, progress, rgb);
-			int eta = r.getIntOr("eta", 0);
-			Brush.fit(g, font, Component.translatable("kultivator.sekte.paviliun.ui.eta", Math.round(progress * 100.0F), Math.max(1, (eta + 59) / 60)),
-					cx + half * 0.7F + 3, cy + 6.5F, half * 0.3F - 3, Palette.INK_SOFT, 0.5F, 0.36F, false);
-		}
-	}
-
-	/** One book on the shelf. */
-	private static final class Spine extends Widget {
-		private final CompoundTag book;
-		private final java.util.function.BooleanSupplier chosen;
-		private final int rgb;
-		private final boolean slip;
-		private final String glyph;
-
-		Spine(int x, int y, int w, int h, CompoundTag book, java.util.function.BooleanSupplier chosen) {
-			super(x, y, w, h);
-			this.book = book;
-			this.chosen = chosen;
-			ListTag specs = book.getListOrEmpty("specs");
-			this.rgb = specs.isEmpty() || !(specs.get(0) instanceof CompoundTag first) ? 0xC8962E : first.getIntOr("rgb", 0xC8962E);
-			this.slip = "giok".equals(book.getStringOr("kind", "buku"));
-			int id = book.getIntOr("id", 0);
-			this.glyph = GLYPHS[Math.floorMod(id * 7, GLYPHS.length)];
-		}
-
-		private static final String[] GLYPHS = {"經", "訣", "典", "錄", "法", "書", "譜", "卷"};
-
-		@Override
-		protected void draw(GuiGraphicsExtractor g, Font font, boolean over, float seconds) {
-			boolean on = chosen.getAsBoolean();
-			int lift = on ? 3 : Math.round(hover.get() * 2.0F);
-			int bx = x;
-			int by = y - lift + 2;
-			int r = x + w;
-			int b = y + h;
-			if (slip) {
-				// a bundle of bamboo strips tied with red cord
-				for (int k = bx; k < r; k += 2) {
-					g.fill(k, by + 2, Math.min(r, k + 2) - 0, b, (k - bx) % 4 == 0 ? Palette.argb(0xFF, 0xA8D8A0) : Palette.argb(0xFF, 0x86B97E));
-				}
-				g.fill(bx, by + h / 3, r, by + h / 3 + 1, Palette.argb(0xFF, 0xB3281D));
-				g.fill(bx, by + 2 * h / 3, r, by + 2 * h / 3 + 1, Palette.argb(0xFF, 0xB3281D));
-			} else {
-				int base = 0xFF000000 | rgb;
-				g.fillGradient(bx, by, r, b, Palette.lighten(base, 0.12F), Palette.darken(base, 0.35F));
-				g.fill(bx, by + 2, r, by + 3, Palette.argb(0xE0, Palette.GOLD_LIGHT));
-				g.fill(bx, b - 4, r, b - 3, Palette.argb(0xE0, Palette.GOLD_LIGHT));
-				g.fill(bx, by, bx + 1, b, Palette.argb(0x60, 0x000000));
-				// the title label: a paper slip with one character
-				int lx0 = bx + Math.max(1, w / 4);
-				int lx1 = r - Math.max(1, w / 4);
-				int ly0 = by + 6;
-				int ly1 = Math.min(b - 6, ly0 + Math.max(8, h / 2));
-				g.fill(lx0, ly0, lx1, ly1, Palette.argb(0xFF, 0xEFE3C2));
-				if (lx1 - lx0 >= 5) {
-					Component c = Component.literal(glyph);
-					float sc = Math.min(0.75F, (lx1 - lx0) / 9.0F);
-					g.pose().pushMatrix();
-					g.pose().translate((lx0 + lx1) / 2.0F - font.width(c) * sc / 2.0F, ly0 + 1);
-					g.pose().scale(sc, sc);
-					g.text(font, c, 0, 0, 0xFF1B2521, false);
-					g.pose().popMatrix();
-				}
-			}
-			if (on || over) {
-				Brush.frame(g, bx - 1, by - 1, r + 1, b + 1, on ? Palette.SEAL : Palette.argb(0xC0, Palette.GOLD));
-			}
-			if (on) {
-				float pulse = 0.5F + 0.5F * (float) Math.sin(Util.getMillis() / 220.0D);
-				Brush.rect(g, bx, by - 3, r, by - 2, Palette.argb(Math.round(120 + 100 * pulse), Palette.SEAL_GLOW));
-			}
-		}
 	}
 
 	private RakScreen() {

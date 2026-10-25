@@ -1,0 +1,61 @@
+{
+  "nama": "kultivator.kota42.perkara.t.ayam_hilang.nama",
+  "teks": "kultivator.kota42.perkara.t.ayam_hilang.teks",
+  "penggugat": {
+    "klaim": "kultivator.kota42.perkara.t.ayam_hilang.klaim_a",
+    "peran": [
+      "petani"
+    ]
+  },
+  "tergugat": {
+    "klaim": "kultivator.kota42.perkara.t.ayam_hilang.klaim_b"
+  },
+  "benar": "acak",
+  "saksi": 2,
+  "kesaksian": {
+    "penggugat": [
+      "kultivator.kota42.perkara.t.ayam_hilang.saksi_a1",
+      "kultivator.kota42.perkara.t.ayam_hilang.saksi_a2"
+    ],
+    "tergugat": [
+      "kultivator.kota42.perkara.t.ayam_hilang.saksi_b1",
+      "kultivator.kota42.perkara.t.ayam_hilang.saksi_b2"
+    ]
+  },
+  "dusta": "kultivator.kota42.perkara.t.ayam_hilang.dusta",
+  "bukti": [
+    {
+      "jenis": "barang",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.ayam_hilang.bukti1_a",
+        "tergugat": "kultivator.kota42.perkara.t.ayam_hilang.bukti1_b"
+      },
+      "barang": "minecraft:feather"
+    },
+    {
+      "jenis": "gosip",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.ayam_hilang.bukti2_a",
+        "tergugat": "kultivator.kota42.perkara.t.ayam_hilang.bukti2_b"
+      }
+    }
+  ],
+  "putusan": [
+    {
+      "untuk": "penggugat",
+      "teks": "kultivator.kota42.perkara.t.ayam_hilang.putusan1",
+      "akibat": "kultivator.kota42.perkara.t.ayam_hilang.putusan1_akibat"
+    },
+    {
+      "untuk": "tergugat",
+      "teks": "kultivator.kota42.perkara.t.ayam_hilang.putusan2",
+      "akibat": "kultivator.kota42.perkara.t.ayam_hilang.putusan2_akibat"
+    },
+    {
+      "untuk": "damai",
+      "teks": "kultivator.kota42.perkara.t.ayam_hilang.putusan3",
+      "akibat": "kultivator.kota42.perkara.t.ayam_hilang.putusan3_akibat"
+    }
+  ],
+  "suap": 0.35
+}

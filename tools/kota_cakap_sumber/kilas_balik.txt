@@ -1,0 +1,344 @@
+# kilas_balik: corpus of the conversation engine (42K-C, DESIGN 42.5A.8). Source format: gen_kota_hidup_cakap.py.
+# Flashbacks and obligations (42.5A.6): KILAS_BALIK by memory (topik kilas.kenangan + syarat kenangan) and by cause
+# (topik kilas.janji_tempo|janji_lewat|utang_pemain|utang_warga|kabar_pemain|lama), PERMINTAAN_NPC (debt demand, favour),
+# TERIMA_KASIH, MAAF, TOLAK (topik minta).
+# {$apa} = what was promised (42K isian "apa", a lex word rendered by the tempat type); {$jumlah} / {$batas} from _slot.
+@kelompok kilas_balik
+
+== kilas.diselamatkan
+niat: KILAS_BALIK
+topik: kilas.kenangan
+syarat: kenangan=DISELAMATKAN
+gestur: hormat_dalam
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Setiap lihat api tungku aku ingat {$sebutan}. Kalau bukan karena {$sebutan}, rumah kami sudah jadi abu. || Every time I see the stove fire I think of you, {$sebutan}. If not for you, our house would be ash.
+  ~ kasar: Kau yang menyelamatkanku dulu. Aku tidak lupa. Itu saja. || You saved me back then. I don't forget. That's all.
+  ~ kuno: Budi penyelamatan {$sebutan} tidak akan hamba lupakan sampai akhir hayat. || This one will not forget your rescue, {$sebutan}, until life's end.
+  ~ kampung: {$sebutan} yang menolongku waktu itu! Sekampung masih cerita, Nak. || You're the one who saved me back then, {$sebutan}! The village still talks of it, child.
+  ~ pelabuhan: Kau yang menarikku dari laut, Bung! Nyawaku utang padamu! || You hauled me out of the sea, mate! I owe you my life!
+- [2] Tuan yang menyelamatkanku! Aku masih bermimpi tentang hari itu. Terima kasih, sungguh. || My rescuer! I still dream of that day. Thank you, truly.
+  ~ p: Penyelamatku! Anak-anakku masih punya ibu karena {$sebutan}. || My rescuer! My children still have a mother because of you, {$sebutan}.
+  ~ l: Penyelamatku! Anak-anakku masih punya ayah karena {$sebutan}. || My rescuer! My children still have a father because of you, {$sebutan}.
+- Aku menyalakan dupa untuk {$sebutan} setiap bulan purnama. Semoga umurmu panjang. || I light incense for you every full moon, {$sebutan}. May you live long.
+- Kalau {$sebutan} butuh apa pun, apa pun, bilang saja. Nyawaku sudah {$sebutan} selamatkan. || If you need anything, anything at all, {$sebutan}, just say. You saved my life.
+
+== kilas.dibantu
+niat: KILAS_BALIK
+topik: kilas.kenangan
+syarat: kenangan=DIBANTU
+gestur: hormat
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] {$sebutan} yang dulu membantuku, kan? Aku masih ingat. Terima kasih sekali lagi. || You're the one who helped me before, aren't you, {$sebutan}? I still remember. Thank you again.
+  ~ kasar: Kau yang bantu aku waktu itu. Ya. Terima kasih. Jangan dibesar-besarkan. || You helped me that time. Yes. Thanks. Don't make a fuss.
+  ~ kuno: Bantuan {$sebutan} dahulu masih hamba ingat. Utang budi ini akan hamba balas. || This one still recalls your help, {$sebutan}. This debt of kindness will be repaid.
+  ~ kampung: Lho, {$sebutan}! Yang dulu bantu aku angkat karung, kan? Mampir dulu, Nak! || Oh, {$sebutan}! The one who helped me lift the sacks, right? Come in, child!
+- [2] Berkat {$sebutan}, urusanku waktu itu beres. Mampir, kuberi teh. || Thanks to you, {$sebutan}, my trouble back then was sorted. Come, have tea.
+  ~ air: Berkat Kakak, waktu itu semuanya selesai... aku masih berterima kasih... || Thanks to you, dear, it all worked out back then... I'm still grateful...
+- Aku sudah cerita ke semua orang tentang kebaikan {$sebutan}. || I've told everyone of your kindness, {$sebutan}.
+- Kalau lewat lagi, mampir. Aku masih berutang budi. || If you pass again, drop in. I still owe you.
+
+== kilas.hadiah
+niat: KILAS_BALIK
+topik: kilas.kenangan
+syarat: kenangan=DIBERI_HADIAH
+gestur: tertawa
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Hadiah dari {$sebutan} waktu itu masih kusimpan baik-baik. || I still keep the gift you gave me, {$sebutan}.
+  ~ kasar: Hadiahmu dulu... masih kupakai. Jangan tersenyum begitu. || Your gift back then... I still use it. Don't smile like that.
+  ~ kuno: Pemberian {$sebutan} kusimpan di altar rumah. Benda berharga dari orang berharga. || Your gift sits on my house altar, {$sebutan}. A precious thing from a precious person.
+  ~ p: Lihat, jepit yang {$sebutan} berikan. Kupakai setiap hari pasar. || Look, the pin you gave me, {$sebutan}. I wear it every market day.
+- [2] Anakku masih bermain dengan hadiah dari {$sebutan}. Dia bilang itu jimat keberuntungan. || My child still plays with your gift, {$sebutan}. Calls it a lucky charm.
+  ~ kampung: Anakku masih main sama hadiah dari {$sebutan}. Ditaruh di bawah bantal kalau tidur. || My little one still plays with your gift, {$sebutan}. Keeps it under the pillow at night.
+- Tidak usah membawa apa-apa lagi. Kunjunganmu saja sudah cukup. Hehe. || No need to bring anything again. Your visit's enough. Hehe.
+
+== kilas.nikah
+niat: KILAS_BALIK
+topik: kilas.kenangan
+syarat: kenangan=HADIR_NIKAH
+gestur: tertawa
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+$pasangan: tipe=nama_warga dari=konteks.pasangan
+- [3] {$sebutan} datang ke pernikahanku dulu. {$pasangan} masih membicarakannya. || You came to my wedding, {$sebutan}. {$pasangan} still talks about it.
+  ~ kasar: Kau datang ke pernikahanku. Makan banyak sekali, seingatku. Hehe. || You came to my wedding. Ate a lot, as I recall. Heh.
+  ~ kuno: Kehadiran {$sebutan} di hari pernikahan kami membawa berkah. Rumah tangga kami damai. || Your presence at our wedding brought blessings, {$sebutan}. Our household is at peace.
+- [2] Ingat pernikahanku? Kau yang paling keras bersorak waktu kami bersembah. || Remember my wedding? You cheered loudest when we bowed.
+  ~ air: Ingat waktu kami menikah di perahu, Kakak? Kakak menyalakan lentera untuk kami... || Remember when we wed on the boat, dear? You lit a lantern for us...
+- Rumah tangga kami baik-baik saja. Terima kasih atas doamu waktu itu. || Our household is fine. Thank you for your blessing back then.
+
+== kilas.makam
+niat: KILAS_BALIK
+topik: kilas.kenangan
+syarat: kenangan=HADIR_MAKAM
+gestur: sikap_doa
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+$almarhum: tipe=nama_warga dari=konteks.almarhum
+- [3] {$sebutan} datang ke pemakaman {$almarhum}. Aku tidak akan lupa itu. || You came to {$almarhum}'s funeral, {$sebutan}. I'll never forget it.
+  ~ kasar: Kau datang waktu {$almarhum} dikubur. Tidak banyak yang datang. Aku ingat. || You came when {$almarhum} was buried. Few did. I remember.
+  ~ kuno: Penghormatan {$sebutan} kepada {$almarhum} menenangkan roh keluarga kami. || Your respects to {$almarhum} eased our family's spirits, {$sebutan}.
+- [2] Waktu kami berduka, {$sebutan} berdiri di samping kami. Itu sangat berarti. || When we grieved, you stood beside us, {$sebutan}. It meant so much.
+  ~ p: Waktu aku menangis di makam {$almarhum}, {$sebutan} memberiku sapu tangan. Masih kusimpan. || When I wept at {$almarhum}'s grave you gave me a handkerchief, {$sebutan}. I still have it.
+- Qingming nanti, maukah ikut menyapu makam {$almarhum}? Dia pasti senang. || At Qingming, will you help sweep {$almarhum}'s grave? They'd be glad.
+
+== kilas.anak_direkrut
+niat: KILAS_BALIK
+topik: kilas.kenangan
+syarat: kenangan=ANAK_DIREKRUT
+gestur: hormat_dalam
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+$lama: tipe=waktu_lalu dari=konteks.terakhir_jumpa
+- [3] Anakku sekarang di sektemu, {$sebutan}. Bagaimana kabarnya? Dia makan cukup? || My child is in your sect now, {$sebutan}. How are they? Eating enough?
+  ~ kasar: Anakku di sektemu. Kalau dia disakiti, aku datang sendiri. Ingat. || My kid's in your sect. If anyone hurts them, I'll come myself. Remember.
+  ~ kuno: Anak hamba kini murid sekte {$sebutan}. Mohon bimbinglah dia dengan keras dan adil. || This one's child is now your sect's disciple, {$sebutan}. Guide them firmly and fairly.
+  ~ kampung: Anakku di sekte {$sebutan}, kan? Titip, ya, Nak. Dia suka lupa pakai baju hangat. || My little one's in your sect, right, {$sebutan}? Look after them. They forget their warm coat.
+- [2] Surat dari anakku datang {$lama}. Katanya sekte {$sebutan} baik sekali. || A letter from my child came {$lama}. Says your sect is very good, {$sebutan}.
+  ~ p: Aku menjahitkan baju untuk anakku di sekte {$sebutan}. Tolong titipkan, ya? || I sewed clothes for my child in your sect, {$sebutan}. Would you take them?
+- Sejak anakku masuk sektemu, tetangga jadi lebih hormat padaku. Hehe. || Since my child joined your sect, the neighbours respect me more. Hehe.
+
+== kilas.dipukul
+niat: KILAS_BALIK
+topik: kilas.kenangan
+syarat: kenangan=DIPUKUL
+gestur: sikap_lipat_tangan
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Kau. Aku ingat pukulanmu. Masih sakit kalau hujan. || You. I remember your blow. Still aches when it rains.
+  ~ kasar: Berani juga kau datang lagi, setelah memukulku. || You've got nerve showing up, after hitting me.
+  ~ kuno: Bekas tanganmu masih membekas, {$sebutan}. Dendam memang belum hamba lepaskan. || Your hand's mark still lingers, {$sebutan}. This one has not yet let go of the grudge.
+  ~ iblis: Kau memukulku dulu. Aku menyimpan hitungan. Suatu hari, kita impas. || You struck me once. I keep count. One day we'll be even.
+- [2] Jangan dekat-dekat. Terakhir kali kau di sini, aku jatuh tersungkur. || Don't come close. Last time you were here I ended up face-down.
+  ~ p: Anakku masih takut padamu sejak kau memukulku di depan dia. || My child still fears you since you struck me in front of them.
+- Aku sudah memaafkan... hampir. Jangan diulang. || I've forgiven... nearly. Don't repeat it.
+
+== kilas.dicuri
+niat: KILAS_BALIK
+topik: kilas.kenangan
+syarat: kenangan=DICURI
+gestur: marah_tunjuk
+- [3] Barangku hilang waktu kau lewat dulu. Aku belum lupa. || My things went missing when you passed by before. I haven't forgotten.
+  ~ kasar: Maling. Kembalikan barangku dulu, baru bicara. || Thief. Return my things first, then talk.
+  ~ kuno: Ada barang yang lenyap dari tanganku, dan bayanganmu ada di sana. Jelaskan. || Something vanished from my hands, and your shadow was there. Explain.
+- [2] Kau berutang padaku, tahu? Barang yang kau ambil itu warisan ibuku. || You owe me, you know. The thing you took was my mother's heirloom.
+  ~ kampung: Barangku yang hilang itu, Nak... aku tahu siapa yang ambil. Balikin, ya. || Those things I lost, child... I know who took them. Give them back.
+- Sejak hari itu aku mengunci lapak dua kali. || Since that day I lock my stall twice.
+
+== kilas.rumah_rusak
+niat: KILAS_BALIK
+topik: kilas.kenangan
+syarat: kenangan=RUMAH_RUSAK
+gestur: marah_hentak
+- [3] Atapku masih bocor sejak pertarunganmu di sini. Siapa yang mau memperbaiki? || My roof still leaks since your fight here. Who's going to fix it?
+  ~ kasar: Rumahku hancur gara-gara kau. Bayar. || My house got wrecked because of you. Pay.
+  ~ kuno: Pertarungan para kultivator selalu meninggalkan reruntuhan bagi kami orang fana. || Cultivators' battles always leave ruins for us mortals.
+- [2] Tukang sudah datang memperbaiki dinding kami. Tapi aku masih ingat siapa yang merusaknya. || The builders came to fix our wall. But I remember who broke it.
+  ~ p: Pot bungaku pecah semua waktu itu. Bunga dari almarhum ibuku. || My flower pots all broke that day. Flowers from my late mother.
+- Kalau mau bertarung lagi, lakukan di luar tembok kota, ya. || If you must fight again, do it outside the town walls.
+
+== kilas.utang_lunas
+niat: KILAS_BALIK
+topik: kilas.kenangan
+syarat: kenangan=UTANG_LUNAS
+gestur: angguk
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] {$sebutan} membayar utang tepat waktu dulu. Orang jujur itu langka. || You paid your debt on time, {$sebutan}. Honest folk are rare.
+  ~ kasar: Utangmu lunas. Bagus. Kau boleh pinjam lagi. Sedikit. || Your debt's paid. Good. You may borrow again. A little.
+  ~ kuno: Kejujuran {$sebutan} dalam utang-piutang menunjukkan hati yang lurus. || Your honesty in debts shows an upright heart, {$sebutan}.
+- [2] Kalau butuh pinjaman lagi, datang padaku saja. Kau bisa dipercaya. || If you need a loan again, come to me. You can be trusted.
+  ~ iblis: Kau membayar. Di kota ini itu membuatmu hampir seperti saudara. Hampir. || You paid. In this city that makes you almost family. Almost.
+- Ayahku selalu bilang, lihat orang dari caranya membayar utang. Kau lulus. || My father always said, judge a person by how they pay debts. You passed.
+
+== kilas.utang_mangkir
+niat: KILAS_BALIK
+topik: kilas.kenangan
+syarat: kenangan=UTANG_MANGKIR
+gestur: marah_tunjuk
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Utangmu dulu belum kau bayar. Jangan pura-pura lupa. || You never paid your old debt. Don't pretend you forgot.
+  ~ kasar: Hei, tukang kabur! Mana uangku? || Hey, runaway! Where's my money?
+  ~ kuno: Utang yang dibiarkan menjadi karma yang berbunga, {$sebutan}. || A debt left alone becomes karma that blossoms, {$sebutan}.
+  ~ iblis: Kau lupa utangmu. Aku tidak. Penagihku juga tidak. || You forgot your debt. I didn't. Neither did my collectors.
+- [2] Aku sudah menunggu terlalu lama. Kapan kau bayar? || I've waited too long. When will you pay?
+  ~ kampung: Utangmu masih kucatat di dinding dapur, Nak. Sudah berdebu. || Your debt's still chalked on my kitchen wall, child. Gathering dust.
+- Tidak ada yang mau meminjamimu lagi di pasar ini. Kau tahu kenapa. || No one in this market will lend to you again. You know why.
+
+== kilas.cerita_ortu
+niat: KILAS_BALIK
+topik: kilas.kenangan
+syarat: kenangan=CERITA_ORANG_TUA
+gestur: cerita
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Ibuku dulu cerita tentang {$sebutan}. Katanya orang baik. Ternyata benar. || My mother used to tell me about you, {$sebutan}. Said you were good. Seems she was right.
+  ~ kasar: Ayahku bilang kau bermasalah. Aku belum memutuskan. || My father said you're trouble. I haven't decided yet.
+  ~ kuno: Leluhurku menyebut nama {$sebutan} dalam cerita mereka. Kini aku melihatnya sendiri. || My elders spoke your name in their tales, {$sebutan}. Now I see you myself.
+- [2] Kakekku masih menceritakan hari {$sebutan} datang ke kota ini. Aku masih kecil waktu itu. || My grandfather still tells of the day you came to this town, {$sebutan}. I was small then.
+  ~ kampung: Simbah sering cerita soal {$sebutan}, Nak. Katanya dulu bantu bangun jembatan. || Granny often talks of you, {$sebutan}. Says you helped build the bridge.
+- Waktu kecil aku pikir {$sebutan} itu dongeng. Ternyata nyata! || As a child I thought you were a legend, {$sebutan}. Turns out you're real!
+
+== kilas.janji_tempo
+niat: KILAS_BALIK
+topik: kilas.janji_tempo
+gestur: bicara_tangan
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+$batas: tipe=waktu_depan dari=konteks.batas
+$apa: tipe=tempat dari=konteks.apa
+- [3] Oh, {$sebutan}... {$batas} batas janjimu soal {$apa}, ya? Bukan menagih, hanya mengingatkan. || Oh, {$sebutan}... {$batas} is the deadline for your promise about {$apa}, isn't it? Not pressing, just reminding.
+  ~ kasar: Janjimu soal {$apa}. Batasnya {$batas}. Jangan lupa. || Your promise about {$apa}. Due {$batas}. Don't forget.
+  ~ kuno: Janji {$sebutan} tentang {$apa} jatuh tempo {$batas}. Hamba percaya pada kata {$sebutan}. || Your promise about {$apa} falls due {$batas}, {$sebutan}. This one trusts your word.
+  ~ air: Kakak... {$apa} itu... {$batas}, ya...? Aku menunggu... || Dear... the {$apa}... it's {$batas}, isn't it...? I'm waiting...
+- [2] Ingat {$apa} yang {$sebutan} janjikan? Aku sudah bilang ke keluargaku. Mereka menunggu. || Remember the {$apa} you promised, {$sebutan}? I've told my family. They're waiting.
+  ~ p: Aduh, maaf mengungkit... {$apa} itu, {$sebutan}. Ibu mertuaku sudah bertanya-tanya. || Oh, sorry to bring it up... the {$apa}, {$sebutan}. My mother-in-law keeps asking.
+- Aku tidak sabar menunggu {$apa}. {$batas}, kan? || I can't wait for the {$apa}. {$batas}, right?
+
+== kilas.janji_lewat
+niat: KILAS_BALIK
+topik: kilas.janji_lewat
+gestur: geleng
+seru: aduh
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+$apa: tipe=tempat dari=konteks.apa
+$keluh: aturan=seru.keluh opsional=0.5
+- [3] {$sebutan}... kau bilang mau membawa {$apa}. Batasnya sudah lewat. {$keluh} || {$sebutan}... you said you'd bring the {$apa}. The deadline's passed. {$keluh}
+  ~ kasar: Mana {$apa}-nya? Janji tinggal janji. || Where's the {$apa}? A promise is just a promise.
+  ~ kuno: Janji yang lewat waktu meninggalkan luka kecil di hati, {$sebutan}. || A promise past its time leaves a small wound in the heart, {$sebutan}.
+  ~ kampung: Lho, {$apa}-nya mana, Nak? Sudah lewat harinya. Aku nunggu terus lho. || Well, where's the {$apa}, child? The day's passed. I kept waiting.
+- [2] Aku menunggu di depan rumah setiap sore. {$apa} tidak pernah datang. || I waited outside every evening. The {$apa} never came.
+  ~ p: Aku sampai tidak berani menatap ibu mertuaku. {$apa} itu, {$sebutan}... || I can't even look my mother-in-law in the eye. That {$apa}, {$sebutan}...
+- Mungkin {$sebutan} sibuk. Tapi tetap saja... aku kecewa. || Maybe you were busy, {$sebutan}. Still... I'm disappointed.
+
+== kilas.utang
+niat: KILAS_BALIK
+topik: kilas.utang_pemain
+gestur: hitung_koin
+$jumlah: tipe=harga dari=konteks.jumlah
+$batas: tipe=waktu_depan dari=konteks.batas
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Ehem. Soal {$jumlah} yang kau pinjam... batasnya {$batas}. || Ahem. About the {$jumlah} you borrowed... it's due {$batas}.
+  ~ kasar: {$jumlah}. {$batas}. Kau tahu maksudku. || {$jumlah}. {$batas}. You know what I mean.
+  ~ kuno: Pinjaman {$jumlah} hendaknya dikembalikan {$batas}, {$sebutan}. || The loan of {$jumlah} ought to be returned {$batas}, {$sebutan}.
+  ~ iblis: {$jumlah}, {$batas}. Aku orang sabar. Penagihku tidak. || {$jumlah}, {$batas}. I'm a patient one. My collectors aren't.
+- [2] Bukan menagih, tapi {$jumlah} itu uang belanja keluargaku. {$batas}, ya? || Not to dun you, but that {$jumlah} is my family's food money. {$batas}, all right?
+  ~ kampung: Uang {$jumlah} itu, Nak... buat beli bibit. {$batas} bisa, kan? || That {$jumlah}, child... it's for seed. {$batas} works, right?
+- Kalau belum bisa semua, separuh dulu juga boleh. || If you can't pay it all, half for now will do.
+
+== kilas.lama
+niat: KILAS_BALIK
+topik: kilas.lama
+gestur: lambai
+seru: oh
+$lama: tipe=waktu_lalu dari=konteks.terakhir_jumpa
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Wah, lama tidak kelihatan! Terakhir {$lama}, kan? || Oh, haven't seen you in ages! Last time was {$lama}, wasn't it?
+  ~ kasar: Masih hidup rupanya. Terakhir {$lama}. || Still alive, then. Last saw you {$lama}.
+  ~ kuno: Lama tak bersua, {$sebutan}. Sejak {$lama} rasanya. Qi-mu makin dalam. || Long time no see, {$sebutan}. Since {$lama}, I think. Your Qi runs deeper.
+  ~ kampung: Lho, {$sebutan}! Ke mana saja sejak {$lama}? Kurusan kau, Nak. || Well, {$sebutan}! Where've you been since {$lama}? You've got thin, child.
+  ~ pelabuhan: Lama berlayar, Bung? Terakhir kulihat {$lama}! || Long voyage, mate? Last I saw you was {$lama}!
+- [2] {$sebutan}! Sudah lama sekali. Banyak yang berubah sejak {$lama}. || {$sebutan}! It's been so long. Much has changed since {$lama}.
+  ~ p: {$sebutan}! Ya ampun, sejak {$lama}! Anakku sudah bisa jalan sekarang. || {$sebutan}! Goodness, since {$lama}! My child walks now.
+  ~ oasis: Saudara! Mata air ini merindukanmu sejak {$lama}. || Friend! This spring has missed you since {$lama}.
+- Kukira {$sebutan} sudah lupa pada kami. Sejak {$lama} tidak mampir. || I thought you'd forgotten us, {$sebutan}. Not a visit since {$lama}.
+- Ceritakan, ke mana saja sejak {$lama}? Pasti banyak petualangan. || Tell me, where've you been since {$lama}? Plenty of adventures, surely.
+
+== kilas.copet
+niat: KILAS_BALIK
+topik: kilas.kabar_pemain
+syarat: fakta=COPET_TERTANGKAP
+gestur: kagum
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+$waktu_lalu: tipe=waktu_lalu dari=fakta.hariKejadian
+- [3] Sejak {$sebutan} menangkap copet itu, pasar jadi tenang. Semua orang berterima kasih. || Since you caught that pickpocket, {$sebutan}, the market's been calm. Everyone's grateful.
+  ~ kasar: Copet itu kau tangkap. Bagus. Sekarang jualan lebih tenang. || You caught that thief. Good. Selling's easier now.
+  ~ kuno: Sejak {$sebutan} menegakkan keadilan di pasar, rakyat kecil bisa tidur nyenyak. || Since you upheld justice in the market, {$sebutan}, the small folk sleep soundly.
+- Tuan yang menangkap copet di pasar {$waktu_lalu}, kan? Satu pasar membicarakannya. || You're the one who caught the pickpocket at the market {$waktu_lalu}, aren't you? The whole market's talking.
+  ~ p: I-iya... Tuan yang menangkap copet {$waktu_lalu}, kan? Dompetku ikut kembali, lho. || Y-yes... you caught the pickpocket {$waktu_lalu}, didn't you? My purse came back too.
+
+== kilas.peristiwa
+niat: KILAS_BALIK
+topik: kilas.kabar_pemain
+gestur: kagum
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+$waktu_lalu: tipe=waktu_lalu dari=fakta.hariKejadian
+- [2] Orang masih membicarakan apa yang {$sebutan} lakukan {$waktu_lalu}. || Folk still talk of what you did {$waktu_lalu}, {$sebutan}.
+  ~ kampung: Anak-anak masih main pura-pura jadi {$sebutan} sejak {$waktu_lalu}. Hehe. || The kids still play at being you since {$waktu_lalu}, {$sebutan}. Hehe.
+  ~ kuno: Perbuatan {$sebutan} {$waktu_lalu} sudah menjadi cerita di kedai teh. || Your deed {$waktu_lalu} has become a teahouse tale, {$sebutan}.
+- Sejak kejadian {$waktu_lalu}, namamu harum di kota ini. || Since what happened {$waktu_lalu}, your name smells sweet in this town.
+  ~ kasar: Sejak {$waktu_lalu} semua orang bicara soal kau. Membosankan. || Since {$waktu_lalu} everybody talks about you. Tiresome.
+- Aku dengar soal {$waktu_lalu}. Benar itu kau? || I heard about {$waktu_lalu}. Was that really you?
+
+== tagih
+niat: PERMINTAAN_NPC
+topik: uang
+gestur: marah_tunjuk
+$jumlah: tipe=harga dari=konteks.jumlah
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Sudah lewat batas. {$jumlah}, sekarang. || It's past the deadline. {$jumlah}, now.
+  ~ kasar: Bayar {$jumlah} sekarang, atau kuseret ke penjaga. || Pay the {$jumlah} now, or I drag you to the guards.
+  ~ kuno: Waktu telah tiba, {$sebutan}. {$jumlah} itu mohon dikembalikan. || The time has come, {$sebutan}. That {$jumlah}, kindly return it.
+  ~ iblis: {$jumlah}. Sekarang. Atau aku ambil sesuatu yang sama nilainya. Kau pilih bagian mana. || {$jumlah}. Now. Or I take something of equal worth. You pick which part.
+- [2] Aku sudah sabar, {$sebutan}. {$jumlah} itu harus kembali hari ini. || I've been patient, {$sebutan}. That {$jumlah} has to come back today.
+  ~ p: Anakku butuh obat. Tolong, {$jumlah} itu, {$sebutan}. Hari ini. || My child needs medicine. Please, the {$jumlah}, {$sebutan}. Today.
+  ~ pelabuhan: Kapalku butuh layar baru, Bung. {$jumlah}, hari ini. || My boat needs a new sail, mate. {$jumlah}, today.
+- Aku tidak mau ribut. Bayar saja {$jumlah}, lalu kita lupakan. || I don't want a fuss. Just pay the {$jumlah} and we'll forget it.
+
+== terima_kasih
+niat: TERIMA_KASIH
+gestur: hormat
+seru: terima_kasih
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+$doa: aturan=frag.doa opsional=0.4
+- [3] Terima kasih, {$sebutan}! Sungguh, terima kasih! || Thank you, {$sebutan}! Truly, thank you!
+  ~ kasar: Hm. Terima kasih. || Hm. Thanks.
+  ~ kuno: Budi baik {$sebutan} akan hamba ingat. Terima kasih. || This one will remember your kindness, {$sebutan}. Thank you.
+  ~ pelabuhan: Terima kasih, Bung! Kau kawan sejati! || Thanks, mate! A true friend!
+  ~ oasis: Semoga mata air selalu mengalir untukmu, Saudara. Terima kasih. || May the spring always flow for you, friend. Thank you.
+  ~ air: Terima kasih, Kakak... baik sekali... || Thank you, dear... so kind...
+  ~ kampung: Matur nuwun, Nak! Eh, terima kasih maksudku! || Thank you kindly, child! Er, thanks, I mean!
+  ~ iblis: Hm. Aku tidak biasa mengucapkan ini. Terima kasih. || Hm. I'm not used to saying this. Thank you.
+  ~ gunung: Amitaba. Semoga kebaikanmu kembali berlipat. || Amitabha. May your kindness return manifold.
+- [2] Wah, untukku? Tidak usah repot-repot... tapi terima kasih! Hehe. || Oh, for me? You shouldn't have... but thank you! Hehe.
+  ~ p: Aduh, untukku? Cantik sekali! Terima kasih, {$sebutan}! || Oh, for me? So pretty! Thank you, {$sebutan}!
+- Kau orang baik, {$sebutan}. {$doa} || You're a good person, {$sebutan}. {$doa}
+- Terima kasih. Lain kali biar aku yang membalas. || Thank you. Next time let me repay you.
+  ~ ibukota: Terima kasih, {$sebutan}. Akan kusebut kebaikanmu di hadapan petugas distrik. || Thank you, {$sebutan}. I'll mention your kindness to the district officer.
+
+== maaf
+niat: MAAF
+gestur: sikap_tunduk
+seru: maaf
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Maaf, {$sebutan}. Aku tidak bermaksud begitu. || Sorry, {$sebutan}. I didn't mean it that way.
+  ~ kasar: Ya, ya, maaf. Puas? || Yeah, yeah, sorry. Happy?
+  ~ kuno: Hamba mohon ampun, {$sebutan}. Kelancangan hamba tidak termaafkan. || This one begs forgiveness, {$sebutan}. My insolence is unforgivable.
+  ~ kampung: Nyuwun sewu, Nak. Aku keliru. || Begging your pardon, child. I was wrong.
+- [2] Maafkan aku. Tadi aku terbawa emosi. || Forgive me. I got carried away.
+  ~ p: Maafkan aku, ya. Tadi aku capek sekali. || Forgive me. I was so tired earlier.
+- Aku salah. Bisakah kita mulai lagi? || I was wrong. Can we start again?
+  ~ air: Maaf, Kakak... aku salah... jangan marah, ya... || Sorry, dear... my fault... don't be angry...
+- Maaf, maaf. Lain kali tidak kuulangi. || Sorry, sorry. Won't happen again.
+
+== tolak
+niat: TOLAK
+topik: minta
+gestur: geleng
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Maaf, {$sebutan}, aku tidak bisa. || Sorry, {$sebutan}, I can't.
+  ~ kasar: Tidak. Jangan tanya lagi. || No. Don't ask again.
+  ~ kuno: Mohon maaf, hamba tidak sanggup memenuhi permintaan itu. || Forgive me, this one cannot fulfil that request.
+  ~ pelabuhan: Tidak bisa, Bung. Aturan kapal. || Can't, mate. Ship's rules.
+  ~ iblis: Tidak. Kecuali kau mau membayar harga yang sebenarnya. || No. Unless you'll pay the real price.
+- [2] Aduh, bukannya tidak mau, tapi aku benar-benar tidak bisa. || Oh, it's not that I won't, I really can't.
+  ~ p: Aduh, maaf... suamiku pasti marah kalau aku setuju. || Oh, sorry... my husband would be furious if I agreed.
+  ~ kampung: Wah, berat, Nak. Aku cuma orang kecil. || Oh, that's heavy, child. I'm only small folk.
+- Itu di luar kemampuanku. Coba tanya orang lain. || That's beyond me. Try someone else.
+- Lain kali, mungkin. Hari ini tidak. || Another time, maybe. Not today.
+
+== minta_tolong
+niat: PERMINTAAN_NPC
+gestur: sikap_tunduk
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] {$sebutan}... boleh aku minta tolong? Hanya {$sebutan} yang bisa. || {$sebutan}... may I ask a favour? Only you can do it.
+  ~ kasar: Hei. Bantu aku. Nanti kubayar. || Hey. Help me. I'll pay.
+  ~ kuno: Hamba memberanikan diri memohon bantuan {$sebutan}. Masalah ini di luar daya orang fana. || This one dares beg your help, {$sebutan}. This matter is beyond mortal strength.
+  ~ kampung: Nak, tolong aku, ya. Aku sudah tidak tahu harus minta ke siapa. || Child, help me, please. I don't know who else to ask.
+  ~ air: Kakak... boleh minta tolong...? Aku malu, tapi... || Dear... may I ask a favour...? I'm ashamed, but...
+- [2] Aku punya masalah, {$sebutan}. Kalau tidak keberatan, maukah mendengar? || I have a problem, {$sebutan}. If you don't mind, will you hear it?
+  ~ pelabuhan: Ada urusan, Bung, dan cuma kau yang cukup gila untuk menanganinya. || Got a job, mate, and only you are mad enough for it.
+- Aku tidak punya banyak, tapi akan kubayar sebisaku. Tolonglah. || I don't have much, but I'll pay what I can. Please.
+- Maaf merepotkan... tapi ini menyangkut keluargaku. || Sorry to trouble you... but it concerns my family.

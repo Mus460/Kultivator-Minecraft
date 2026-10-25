@@ -38,6 +38,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import structgen  # noqa: E402
 import tempat_lib as tl  # noqa: E402
 import tempat_tema_lib as ttl  # noqa: E402
+import tema_hidup_kit as thk  # noqa: E402  (DESIGN 42 lots outside the wall, 42W-T)
 import kota_besar_kit as K  # noqa: E402
 from kota_besar_kit import FACE, OPP  # noqa: E402
 import hias_tema_oi as HO  # noqa: E402  (registers the desert room styles; H below is the canvas height)
@@ -2485,6 +2486,51 @@ def gen_tembok():
 
 
 # ===================================================================================================== main
+# ===================================================================================================== DESIGN 42 (42W-T)
+# 42.12.1 row tema: the night street, the recruitment office (2 booths), 10 kavling of gaya "oasis", the domed desert
+# cemetery (makam gurun berkubah) and the Ghost Market / rentable stall points, all on free lots OUTSIDE the
+# rammed-earth wall inside the keep-out zone of their district (tools/tema_hidup_kit.py; off the 48-grid, no side code).
+# Flat mud-brick roofs with parapets and domes; every campfire stays unlit.
+GAYA42 = {
+    "tema": "oasis", "pal": PAL, "pondasi": "minecraft:sandstone",
+    "tanah": ["minecraft:sand", "minecraft:sand", "minecraft:sand", "minecraft:sandstone", "minecraft:sand"],
+    "jalan": ["minecraft:smooth_sandstone", "minecraft:cut_sandstone", "minecraft:smooth_sandstone",
+              "minecraft:sandstone"],
+    "alas": "minecraft:cut_sandstone", "alas_tangga": "minecraft:sandstone_stairs",
+    "lantai": ["minecraft:smooth_sandstone", "minecraft:terracotta"],
+    "dinding": ["minecraft:mud_bricks", "minecraft:packed_mud", "minecraft:mud_bricks"],
+    "tiang": "minecraft:cut_sandstone", "balok": "minecraft:stripped_jungle_log",
+    "jendela": "minecraft:jungle_trapdoor", "pintu": "minecraft:jungle_door", "plafon": "minecraft:jungle_planks",
+    "atap": "kubah", "atap_tangga": "minecraft:sandstone_stairs", "atap_slab": "minecraft:smooth_sandstone_slab",
+    "atap_penuh": "minecraft:smooth_sandstone", "parapet": "minecraft:mud_brick_wall", "kubah": "minecraft:cut_sandstone",
+    "puncak": "minecraft:prismarine_bricks",
+    "kain": ("minecraft:orange_wool", "minecraft:white_wool"), "warna": "orange", "lampu": "minecraft:lantern",
+    "pohon": "palma", "kavling": "oasis", "makam": ("gurun", "kubah"),
+    "rencana": (("rumah_besar", "kedai_teh", "gudang", "rumah_toko", "bengkel", "kedai_arak", "sekolah"),
+                ("rumah_kecil", "taman", "kuil_kecil", "menara_jaga", "rumah_kecil")),
+    "bilik_warna": ("cyan", "orange"),
+}
+# (district, dx, dz, lot): south band west of the Gerbang Giok beside the caravan field (night street, kavling), east
+# of it (office, kavling); the cemetery in the dunes west of the Bazar Barat wall
+LOT42 = (("hunian_tanah", -48, 62, "hidup42/kavling_barat"), ("hunian_tanah", 0, 62, "hidup42/jalan_malam"),
+         ("karavanserai", -48, 62, "hidup42/kantor_rekrut"), ("karavanserai", 0, 62, "hidup42/kavling_timur"),
+         ("bazar_barat", -112, -24, "hidup42/makam"))
+
+
+def lot42_buat(dry=False):
+    """Writes the DESIGN 42 lots and registers them (lapak_sewa 0-4, pasar_hantu 0-3, nisan 0-31)."""
+    out = [thk.lot_jalan_malam(F, GAYA42, lapak0=0, hantu0=0),
+           thk.lot_kantor_rekrut(F, GAYA42, lapak0=2),
+           thk.lot_kavling(F, GAYA42, "hidup42/kavling_barat", 0),
+           thk.lot_kavling(F, GAYA42, "hidup42/kavling_timur", 1, hantu=3),
+           thk.lot_makam(F, GAYA42, nisan0=0, hantu0=1)]
+    if not dry:
+        for distrik, dx, dz, name in LOT42:
+            POOLS[pid(name)] = [tid(name)]
+            LOTS[distrik].append(ttl.lot_luar(dx, dz, pid(name), 0))
+    return out
+
+
 def main():
     gen_tembok()
     gen_kuil_air()
@@ -2497,6 +2543,7 @@ def main():
     gen_gerbang_giok()
     gen_karavanserai()
     gen_lapangan_kafilah()
+    lot42_buat()
     for name, ids in sorted(POOLS.items()):
         ttl.tulis_pool_tema(TEMA, name.split("/", 2)[2], ids)
     for d in ORDER:

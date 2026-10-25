@@ -82,6 +82,10 @@ public final class DuniaMarkers {
 		put("pos/penyeberangan", 60, 0x80B8E0, 1);
 		// DESIGN 39C: a captured disciple waiting for its master (live site of Tawanan, 3 world days): the bandit camp icon in alarm red
 		put("mandiri/tawanan", 48, 0xFF4040, 0);
+		// DESIGN 41.11.2: the NPC sect the player has joined (Gabung Sekte): the sect gate icon in a member's jade green
+		put("gabung/sekteku", 19, 0x8FE6B0, 0);
+		// DESIGN 42.5.5: a way a resident showed ([Tandai] of Tanya Jalan, live 5 minutes): the milestone icon in bright gold
+		put("kota/tujuan", 47, 0xFFE15A, 0);
 	}
 
 	/** Icons below this index are cells of {@code markers.png}; from it on, cells {@code icon - 32} of {@code markers_tempat.png}. */

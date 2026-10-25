@@ -130,6 +130,9 @@ final class Tawuran {
 	}
 
 	private static boolean hidup(MinecraftServer server, Perseteruan f) {
+		if (Adegan.asliSibuk(f)) {
+			return false;
+		}
 		Adegan.Pemeran p = Adegan.pemeran(server, f, true, MAX_TICKS + 1200);
 		if (p == null || p.kita() == null || p.mereka() == null) {
 			return false;
@@ -139,8 +142,9 @@ final class Tawuran {
 		List<Pasangan> pairs = new ArrayList<>();
 		pairs.add(new Pasangan(p.kita(), p.mereka()));
 		// a second pair: our second disciple's body and their second member's body, when both can be shown
-		if (f.jiwa.size() > 1 && f.tokoh.size() > 1) {
-			MuridInfo second = MuridInfo.dari(f.owner, f.jiwa.get(1));
+		MuridInfo second = f.jiwa.size() > 1 && f.tokoh.size() > 1 ? MuridInfo.dari(f.owner, f.jiwa.get(1)) : null;
+		// a busy real second disciple (breakthrough, the master's order...) is not pulled into the brawl
+		if (second != null && (second.tubuh() == null || !dev.kultivator.util.SibukMurid.busy(second.tubuh()))) {
 			DiscipleEntity ours = second.tubuh() != null ? second.tubuh() : second.jelmaan(level, p.kita().position());
 			if (ours == null) {
 				ours = TubuhSeteru.pengganti(level, p.pos().offset(-2, 0, 1), second, f.owner, f.id, MAX_TICKS + 1200);

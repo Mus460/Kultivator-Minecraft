@@ -1,0 +1,415 @@
+# topik_lain: corpus of the conversation engine (42K-C, DESIGN 42.5A.8). Source format: gen_kota_hidup_cakap.py.
+# Planner topics of topik.json with their own acts: BISIK / SINDIR on remembered facts (generic over predicates),
+# KHAWATIR, KELUH per topic, and the topics begal, makanan, panen, kenangan, kabar, kilas.utang_warga.
+@kelompok topik_lain
+
+== bisik.pemain
+niat: BISIK
+topik: pemain
+gestur: bisik
+seru: bisik
+$subjek: tipe=nama_warga dari=fakta.subjek
+$katanya: aturan=frag.katanya
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+$waktu_lalu: tipe=waktu_lalu dari=fakta.hariKejadian
+- [3] Sst... soal {$subjek}. {$katanya} ada cerita yang belum banyak orang tahu. || Shh... about {$subjek}. {$katanya} there's a tale few people know yet.
+  ~ kasar: Sst. {$subjek}. Kau tahu sendiri lah. Jangan bilang aku yang cerita. || Shh. {$subjek}. You know how it is. Don't say I told you.
+  ~ kuno: Ada bisikan tentang {$subjek}, {$sebutan}. Hanya untuk telinga yang dapat dipercaya. || There's a whisper about {$subjek}, {$sebutan}. Only for trustworthy ears.
+  ~ pelabuhan: Sini, Bung. Soal {$subjek}... orang dermaga sudah tahu semua sejak {$waktu_lalu}. || Come here, mate. About {$subjek}... the dock has known since {$waktu_lalu}.
+  ~ air: Kakak... soal {$subjek}... pelan-pelan saja, ya... || Dear... about {$subjek}... quietly, all right...
+- [2] Jangan keras-keras. {$subjek} itu... ah, kau dengar sendiri nanti. || Not so loud. {$subjek}, you see... ah, you'll hear soon enough.
+  ~ kampung: Sst, Nak. Si {$subjek}... sekampung sudah bisik-bisik sejak {$waktu_lalu}. || Shh, child. That {$subjek}... the village has whispered since {$waktu_lalu}.
+- Aku tidak bilang apa-apa, ya. Tapi perhatikan {$subjek} kalau lewat. || I'm saying nothing, mind. But watch {$subjek} when they pass.
+
+== bisik.tetangga
+niat: BISIK
+topik: tetangga
+gestur: bisik
+seru: bisik
+$subjek: tipe=nama_warga dari=fakta.subjek
+$objek: tipe=nama_warga dari=fakta.objek
+$penutup_kecil: aturan=frag.penutup_kecil opsional=0.4
+- [3] Sst... {$subjek} dan {$objek}. Ada apa-apa di antara mereka. Percayalah. || Shh... {$subjek} and {$objek}. Something's going on between them. Believe me.
+  ~ kasar: {$subjek} sama {$objek}. Busuk. Itu saja yang kubilang. || {$subjek} and {$objek}. Rotten. That's all I'll say.
+  ~ kuno: Ada simpul kusut antara {$subjek} dan {$objek}. Hamba tak berani berkata lebih. || There's a tangled knot between {$subjek} and {$objek}. This one dares say no more.
+  ~ kampung: Si {$subjek} sama si {$objek}, Nak... sst, nanti saja kuceritakan di sumur. || That {$subjek} and {$objek}, child... shh, I'll tell you at the well.
+- [2] Kau tahu kenapa {$objek} tidak pernah lewat depan rumah {$subjek} lagi? || Know why {$objek} never passes {$subjek}'s house any more?
+  ~ p: Ibu-ibu di sumur bilang {$subjek} dan {$objek} bertengkar hebat. Sst. || The women at the well say {$subjek} and {$objek} had a terrible row. Shh.
+- Aku dengar dari tembok. Tembok rumah di sini tipis sekali. {$penutup_kecil} || I heard it through the wall. The walls here are very thin. {$penutup_kecil}
+
+== bisik.asmara
+niat: BISIK
+topik: asmara
+gestur: bisik
+seru: bisik
+$subjek: tipe=nama_warga dari=fakta.subjek
+$objek: tipe=nama_warga dari=fakta.objek
+- [3] Hihi, sst... {$subjek} dan {$objek}! Kemarin kulihat mereka di jembatan, berdua saja. || Hehe, shh... {$subjek} and {$objek}! I saw them on the bridge yesterday, just the two.
+  ~ kasar: {$subjek} naksir {$objek}. Bodoh. Tapi lucu. || {$subjek} fancies {$objek}. Silly. But sweet.
+  ~ kuno: Benang merah sepertinya menghubungkan {$subjek} dan {$objek}. Sst, belum resmi. || The red thread seems to join {$subjek} and {$objek}. Shh, not yet official.
+  ~ air: Kakak... {$subjek} mengirim lentera untuk {$objek}... di kanal... romantis sekali... || Dear... {$subjek} sent a lantern to {$objek}... on the canal... so romantic...
+- [2] Jangan bilang siapa-siapa, ya. {$subjek} menulis surat untuk {$objek}. Tiga lembar! || Don't tell anyone. {$subjek} wrote {$objek} a letter. Three pages!
+  ~ kampung: Sst, Nak. {$subjek} sering nganter jambu ke rumah {$objek}. Hehe. || Shh, child. {$subjek} keeps bringing guavas to {$objek}'s house. Hehe.
+- Mak Comblang sudah mengendus. Kalau dia sudah mengendus, tinggal tunggu tanggal. || The matchmaker has sniffed it out. Once she sniffs, it's just a matter of the date.
+
+== bisik.pejabat
+niat: BISIK
+topik: pejabat
+gestur: bisik
+seru: bisik
+$tempat_fakta: tipe=tempat dari=fakta.objek
+$subjek: tipe=nama_warga dari=fakta.subjek
+- [3] Sst... pejabat di {$tempat_fakta}. Katanya {$subjek} punya urusan yang tidak beres. || Shh... the official at {$tempat_fakta}. They say {$subjek} has business that isn't clean.
+  ~ kasar: Pejabat. Semua sama. {$subjek} juga. || Officials. All the same. {$subjek} too.
+  ~ kuno: Ada desas-desus tentang {$subjek} di {$tempat_fakta}. Lebih baik hati-hati menyebutnya. || There are rumours of {$subjek} at {$tempat_fakta}. Best be careful saying it.
+  ~ ibukota: Di ibu kota, dinding punya telinga. Tapi... {$subjek}, di {$tempat_fakta}... kau mengerti. || In the capital, walls have ears. But... {$subjek}, at {$tempat_fakta}... you understand.
+- [2] Kalau mau urusan di {$tempat_fakta} cepat, cari {$subjek}. Bawa amplop. Sst. || If you want quick business at {$tempat_fakta}, find {$subjek}. Bring an envelope. Shh.
+- Aku tidak bilang apa-apa. Tapi rumah baru {$subjek} itu dari mana uangnya? || I'm saying nothing. But where did {$subjek}'s new house money come from?
+
+== bisik.pasar_hantu
+niat: BISIK
+topik: pasar_hantu
+gestur: bisik
+seru: bisik
+$tempat_fakta: tipe=tempat dari=fakta.objek
+- [3] Sst... {$tempat_fakta}. Tengah malam. Jangan bawa lentera merah, hanya putih. || Shh... {$tempat_fakta}. Midnight. No red lanterns, only white.
+  ~ kasar: {$tempat_fakta}. Malam. Kalau mati, bukan salahku. || {$tempat_fakta}. Night. If you die, not my fault.
+  ~ kuno: Gerbang pasar arwah akan terbuka di {$tempat_fakta}. Bawalah hati yang tenang. || The gate of the spirit market opens at {$tempat_fakta}. Bring a calm heart.
+  ~ iblis: {$tempat_fakta}. Aku tahu kau akan pergi. Belikan aku sesuatu. Jangan tanya apa. || {$tempat_fakta}. I know you'll go. Buy me something. Don't ask what.
+- [2] Kalau ke {$tempat_fakta} malam ini, jangan menjawab kalau ada yang memanggil namamu dari belakang. || If you go to {$tempat_fakta} tonight, don't answer if someone calls your name from behind.
+- Aku dengar ada yang menjual pil umur panjang di sana. Bayarannya... ingatan. Sst. || I hear someone sells long-life pills there. The price... memories. Shh.
+
+== sindir.pemain
+niat: SINDIR
+topik: pemain
+gestur: sikap_lipat_tangan
+$subjek: tipe=nama_warga dari=fakta.subjek
+- [3] Oh, {$subjek} yang terkenal itu. Pasti senang jadi buah bibir, ya. || Oh, the famous {$subjek}. Must be nice being the talk of the town.
+  ~ kasar: Hah, {$subjek}. Pahlawan pasar. Hebat sekali. || Hah, {$subjek}. Hero of the market. How marvellous.
+  ~ kuno: Nama {$subjek} melambung tinggi. Semoga tidak jatuh terlalu keras. || {$subjek}'s name soars high. May it not fall too hard.
+  ~ iblis: {$subjek}. Terkenal itu berbahaya, tahu. Lebih mudah dicari. || {$subjek}. Fame is dangerous, you know. Easier to find.
+- [2] Wah, wah, kultivator hebat datang. Tolong jangan rusak apa-apa hari ini. || Well, well, the great cultivator arrives. Please don't break anything today.
+  ~ kampung: Wah, wah, orang hebat mampir ke kampung kecil. Mimpi apa aku semalam? || Well, well, a great one visits our little village. What did I dream last night?
+- Hebat sekali, ya. Sampai-sampai kami orang kecil tidak perlu melakukan apa-apa lagi. || Very impressive. So much that small folk needn't do anything any more.
+
+== sindir.tetangga
+niat: SINDIR
+topik: tetangga
+gestur: sikap_lipat_tangan
+$subjek: tipe=nama_warga dari=fakta.subjek
+- [3] {$subjek} itu orang paling jujur di gang ini. Setidaknya menurut {$subjek} sendiri. || {$subjek} is the most honest person in this lane. According to {$subjek}, anyway.
+  ~ kasar: {$subjek}? Hah. Orang suci. Kalau gelap. || {$subjek}? Hah. A saint. In the dark.
+  ~ kuno: Sungguh berbudi {$subjek} itu. Budinya hanya terlihat ketika ada yang menonton. || How virtuous {$subjek} is. The virtue only shows when someone's watching.
+- [2] Oh, {$subjek} menolong orang? Pasti ada yang menonton waktu itu. || Oh, {$subjek} helped someone? Someone must have been watching.
+  ~ p: Oh, masakan {$subjek} enak? Tentu, kalau kau suka arang. Hihi. || Oh, {$subjek}'s cooking is good? Sure, if you like charcoal. Hehe.
+- {$subjek} bilang dia tidak pernah bergosip. Lalu dia cerita tentang semua orang. || {$subjek} says they never gossip. Then they tell you about everyone.
+
+== sindir.opini
+niat: SINDIR
+topik: opini
+gestur: sikap_lipat_tangan
+$subjek: tipe=nama_warga dari=fakta.subjek
+- [3] Ya, ya, {$subjek} selalu tahu segalanya. Sayang dia bukan menteri. || Yes, yes, {$subjek} always knows everything. Shame they're not a minister.
+  ~ kasar: {$subjek} banyak omong. Kerjanya mana? || {$subjek} talks a lot. Where's the work?
+  ~ kuno: Pendapat {$subjek} selalu lantang. Seperti tong kosong, kata pepatah. || {$subjek}'s opinions are always loud. Like an empty barrel, as the saying goes.
+- [2] Kalau omongan {$subjek} bisa dijual, dia sudah jadi orang terkaya di kota. || If {$subjek}'s talk could be sold, they'd be the richest in town.
+- Tentu saja {$subjek} benar. Dia selalu benar. Tanya saja dia. || Of course {$subjek} is right. Always right. Just ask them.
+
+== khawatir.kesehatan
+niat: KHAWATIR
+topik: kesehatan
+gestur: sikap_tangan_depan
+seru: aduh
+$subjek: tipe=nama_warga dari=fakta.subjek
+$waktu_lalu: tipe=waktu_lalu dari=fakta.hariKejadian
+- [3] Batuk {$subjek} makin parah. Aku takut ini bukan batuk biasa. || {$subjek}'s cough is getting worse. I fear it's no ordinary cough.
+  ~ kasar: Tabib di sini tidak becus. Aku khawatir. || The physician here is useless. I'm worried.
+  ~ kuno: Qi {$subjek} kian melemah. Hamba gelisah setiap malam. || {$subjek}'s Qi weakens day by day. This one is restless every night.
+  ~ kampung: Aduh, Nak, {$subjek} belum bisa bangun dari tikar sejak {$waktu_lalu}. || Oh, child, {$subjek} hasn't risen from the mat since {$waktu_lalu}.
+- [2] Obat dari tabib sudah habis, tapi demamnya belum turun. Aku harus bagaimana? || The physician's medicine is gone, but the fever won't drop. What do I do?
+  ~ p: Anakku tidak mau makan sejak kemarin. Hatiku tidak tenang. || My child hasn't eaten since yesterday. My heart can't rest.
+- Kalau saja ada pil penyembuh... tapi harganya setinggi langit. || If only there were a healing pill... but it costs the earth.
+
+== khawatir.anak
+niat: KHAWATIR
+topik: anak
+gestur: sikap_tangan_depan
+seru: aduh
+$anak: tipe=nama_warga dari=konteks.anak
+- [3] {$anak} belum pulang dari tadi siang. Biasanya sudah di rumah sebelum lentera menyala. || {$anak} hasn't come home since midday. Usually home before the lanterns are lit.
+  ~ kasar: {$anak} keluyuran lagi. Kalau pulang, kujewer. || {$anak} is roaming again. When they get back, I'll box their ears.
+  ~ kuno: Hati hamba gelisah. {$anak} belum kembali, dan hutan di luar tembok tidak ramah. || This one's heart is uneasy. {$anak} hasn't returned, and the woods beyond the wall are unkind.
+  ~ kampung: {$anak} main ke kali dari siang, Nak. Belum pulang. Aku takut. || {$anak} went to the stream at midday, child. Not back yet. I'm scared.
+- [2] {$anak} ingin masuk sekte. Aku takut dia terluka di sana. Tapi kalau kularang, dia membenciku. || {$anak} wants to join a sect. I fear they'll be hurt there. But if I forbid it, they'll hate me.
+  ~ p: {$anak} ingin jadi pendekar. Ibu mana yang tidak takut? || {$anak} wants to be a warrior. What mother wouldn't be afraid?
+- Teman-teman {$anak} anak nakal semua. Aku khawatir dia ikut-ikutan. || {$anak}'s friends are all rascals. I worry they'll lead them astray.
+
+== khawatir.cita
+niat: KHAWATIR
+topik: cita
+gestur: tatap_langit
+- [3] Aku ingin membuka kedai sendiri, tapi kalau gagal, keluargaku makan apa? || I want to open my own shop, but if it fails, what will my family eat?
+  ~ kasar: Cita-cita? Mimpi itu mahal. Aku tidak mampu. || Dreams? Dreams are expensive. I can't afford them.
+  ~ kuno: Jalan yang ingin hamba tempuh penuh duri. Hamba ragu apakah kaki ini cukup kuat. || The road I wish to walk is thorny. This one doubts these legs are strong enough.
+- [2] Ujian akar roh tahun depan. Kalau aku tidak punya akar, apa yang tersisa untukku? || The spirit root test is next year. If I have no roots, what's left for me?
+  ~ kampung: Mau merantau ke kota, Nak. Tapi siapa yang jaga simbok di rumah? || I want to try my luck in the city, child. But who'll look after Mother?
+- Semua orang bilang mimpiku terlalu tinggi. Mungkin mereka benar. || Everyone says my dream is too high. Maybe they're right.
+
+== khawatir.sekte
+niat: KHAWATIR
+topik: sekte
+gestur: lihat_sekeliling
+- [3] Kalau sekte-sekte berperang lagi, kota kita pasti terseret. Aku takut. || If the sects go to war again, our town will be dragged in. I'm afraid.
+  ~ kasar: Sekte bertarung, kita yang mati. Selalu begitu. || Sects fight, we die. Always the way.
+  ~ kuno: Pertikaian para sekte bagaikan dua gajah beradu; rumputlah yang terinjak. || The sects' strife is like two elephants clashing; it's the grass that gets trampled.
+- [2] Murid-murid sekte asing mulai sering lewat. Ada apa sebenarnya? || Foreign sect disciples pass more often lately. What's really going on?
+  ~ pelabuhan: Kapal-kapal sekte asing berlabuh tanpa berdagang, Bung. Aneh. Aku tidak suka. || Foreign sect ships dock without trading, mate. Strange. I don't like it.
+- Upeti untuk sekte pelindung naik lagi. Aku khawatir tahun ini tidak cukup. || The protector sect's tribute is up again. I fear we won't have enough this year.
+
+== khawatir.keluarga
+niat: KHAWATIR
+topik: keluarga
+gestur: sikap_tangan_depan
+seru: aduh
+$pasangan: tipe=nama_warga dari=konteks.pasangan
+- [3] {$pasangan} bekerja terlalu keras. Aku takut dia jatuh sakit. || {$pasangan} works too hard. I'm afraid they'll fall ill.
+  ~ kasar: {$pasangan} keras kepala. Kerja terus sampai rubuh. || {$pasangan}'s stubborn. Works till collapsing.
+  ~ kuno: Hamba cemas akan kesehatan {$pasangan}. Tubuh manusia ada batasnya. || This one fears for {$pasangan}'s health. The human body has limits.
+- [2] Ibuku sudah tua. Setiap pagi aku takut dia tidak bangun lagi. || My mother is old. Every morning I fear she won't wake.
+  ~ kampung: Simbok sudah sepuh, Nak. Tiap pagi aku cek napasnya dulu. || Mother's very old, child. Every morning I check she's breathing first.
+- Uang sekolah anak-anak, sewa rumah, obat... kadang aku tidak bisa tidur memikirkannya. || School fees, rent, medicine... sometimes I can't sleep for thinking of it.
+
+== khawatir.bahaya
+niat: KHAWATIR
+topik: bahaya
+gestur: lihat_sekeliling
+seru: takut
+$arah: tipe=arah dari=konteks.arah
+- [3] Semalam ada suara aneh dari hutan. Seperti raungan. Aku tidak bisa tidur. || Last night strange sounds came from the woods. Like roaring. I couldn't sleep.
+  ~ kasar: Ada yang tidak beres di luar tembok. Kunci pintumu. || Something's wrong beyond the wall. Lock your door.
+  ~ kuno: Hamba merasakan aura yang tidak menyenangkan dari arah {$arah}. || This one senses an unpleasant aura from the {$arah}.
+  ~ air: Airnya berubah warna, Kakak... ikan-ikan mati mengambang... aku takut... || The water's changed colour, dear... dead fish floating... I'm scared...
+- [2] Penjaga makin sering ronda. Kalau penjaga cemas, kami harus lebih cemas. || The guards patrol more often. If the guards are worried, we should be more so.
+  ~ pelabuhan: Camar-camar diam sejak kemarin, Bung. Itu bukan pertanda baik. || The gulls have been silent since yesterday, mate. Not a good sign.
+- Ternakku hilang dua ekor minggu ini. Tidak ada jejak manusia. || Two of my animals vanished this week. No human tracks.
+
+== keluh.cuaca
+niat: KELUH
+topik: cuaca
+gestur: geleng
+seru: aduh
+$cuaca: tipe=cuaca dari=konteks.cuaca
+$keluh: aturan=seru.keluh opsional=0.5
+- [3] {$cuaca} lagi. Jemuranku tidak kering-kering. {$keluh} || {$cuaca} again. My washing never dries. {$keluh}
+  ~ kasar: Cuaca sialan. Rugi terus. || Damn weather. Losing money nonstop.
+  ~ kuno: Langit sedang murung. Hamba hanya bisa bersabar. || Heaven is sullen. This one can only be patient.
+  ~ kampung: Cuacanya nggak karuan, Nak. Padi bisa busuk kalau begini terus. || The weather's all over the place, child. The rice could rot like this.
+- [2] Kalau cuaca begini terus, panen bisa gagal. Lalu apa? || If the weather stays like this, the harvest could fail. Then what?
+  ~ pelabuhan: Cuaca begini, Bung, kapal tidak bisa keluar. Upah tidak masuk. || Weather like this, mate, no boats go out. No wages come in.
+- Lututku sakit setiap cuaca berubah. Lebih tepat dari almanak. || My knees ache whenever the weather turns. More accurate than the almanac.
+
+== keluh.kerja
+niat: KELUH
+topik: kerja
+gestur: seka_keringat
+seru: aduh
+$keluh: aturan=seru.keluh opsional=0.5
+- [3] Mandor menambah jam kerja, tapi upahnya tetap. {$keluh} || The foreman added hours, but the pay's the same. {$keluh}
+  ~ kasar: Kerja seperti kerbau, dibayar seperti ayam. || Work like a buffalo, paid like a chicken.
+  ~ kuno: Jerih payah hamba tak sebanding dengan upahnya. Namun apa daya. || This one's toil isn't matched by the pay. But what can be done.
+  ~ kampung: Kerja dari subuh sampai sore, upahnya cuma cukup buat beras. || Working dawn to dusk, the pay barely covers rice.
+- [2] Punggungku sudah tidak lurus lagi. Tahun depan entah masih kuat atau tidak. || My back isn't straight any more. Next year, who knows if I'll still manage.
+  ~ p: Tanganku pecah-pecah kena air cucian majikan. Tapi siapa yang peduli? || My hands are cracked from the master's washing water. But who cares?
+- Mandor baru itu galak sekali. Salah sedikit, potong upah. || That new foreman is so harsh. One slip, docked pay.
+
+== keluh.pejabat
+niat: KELUH
+topik: pejabat
+gestur: geleng
+- [3] Pajak naik lagi. Pejabat makin gemuk, kami makin kurus. || Taxes up again. Officials grow fatter, we grow thinner.
+  ~ kasar: Pejabat lintah. Semuanya. || Leech officials. The lot.
+  ~ kuno: Para pejabat lupa bahwa kursi mereka ditopang punggung rakyat. || The officials forget their chairs rest on the people's backs.
+  ~ ibukota: Mengurus surat di kantor distrik butuh tiga bulan. Kalau tanpa amplop. || Getting a paper at the district office takes three months. Without an envelope.
+- [2] Jalan di depan rumahku sudah rusak dua tahun. Laporan sudah tiga kali. || The road outside my house has been broken two years. Reported three times.
+  ~ kampung: Pak Lurah janji bikin jembatan. Janji terus, jembatannya mana? || The headman promised a bridge. Promises, promises; where's the bridge?
+- Kalau mau keadilan, bawa uang. Kalau tidak punya uang, bawa kesabaran. || Want justice, bring money. No money, bring patience.
+
+== keluh.uang
+niat: KELUH
+topik: uang
+gestur: hitung_koin
+seru: aduh
+$keluh: aturan=seru.keluh opsional=0.5
+- [3] Uang di kantong tinggal beberapa keping. Akhir bulan masih lama. {$keluh} || Only a few coins left in my purse. Month's end is far off. {$keluh}
+  ~ kasar: Miskin. Itu saja masalahku. || Poor. That's my whole problem.
+  ~ kuno: Pundi-pundi hamba kering seperti sumur kemarau. || This one's purse is dry as a well in drought.
+  ~ kampung: Duit habis, Nak. Utang di warung sudah sepanjang lenganku. || Money's gone, child. My tab at the stall is as long as my arm.
+- [2] Rentenir datang lagi kemarin. Bunganya saja sudah lebih besar dari utangnya. || The lender came again yesterday. The interest alone is bigger than the debt.
+  ~ iblis: Utang di kota ini dibayar dengan uang atau jari. Aku masih punya sepuluh jari. Untuk sekarang. || Debts in this city are paid in coin or fingers. I still have ten fingers. For now.
+- Harga naik, upah tetap. Bagaimana orang kecil bisa menabung? || Prices up, wages flat. How are small folk to save?
+
+== keluh.harga
+niat: KELUH
+topik: harga
+gestur: geleng
+seru: aduh
+$barang_mahal: tipe=barang dari=konteks.barang_mahal fitur=jamak
+$keluh: aturan=seru.keluh opsional=0.5
+- [3] {$barang_mahal} sekarang semahal emas. Dulu sekeping dapat sekarung. {$keluh} || {$barang_mahal} costs like gold now. Once a coin bought a sackful. {$keluh}
+  ~ kasar: Harga gila. Pedagang rakus. || Mad prices. Greedy traders.
+  ~ kuno: Harga {$barang_mahal} melambung, dan rakyat kecil menanggungnya. || The price of {$barang_mahal} soars, and the small folk bear it.
+  ~ oasis: {$barang_mahal} makin mahal, Saudara. Kafilah pun tak sanggup membeli. || {$barang_mahal} costs more and more, friend. Even caravans can't afford it.
+- [2] Aku sampai menawar setengah jam hanya untuk {$barang_mahal} sedikit. || I haggled half an hour for just a little {$barang_mahal}.
+  ~ p: Belanja ke pasar sekarang seperti perang. Pulang-pulang kantong kosong, keranjang juga. || Market shopping now is like war. Come home with an empty purse and basket.
+- Kalau terus begini, kita makan apa musim dingin nanti? || If this goes on, what will we eat this winter?
+
+== keluh.kejahatan
+niat: KELUH
+topik: kejahatan
+gestur: geleng
+- [3] Copet makin berani. Siang bolong pun mereka beraksi. || The pickpockets grow bolder. They strike in broad daylight.
+  ~ kasar: Maling di mana-mana. Penjaga tidur semua. || Thieves everywhere. Guards all asleep.
+  ~ kuno: Kejahatan tumbuh seperti rumput liar ketika penjaga lengah. || Crime grows like weeds when the watch is lax.
+  ~ kampung: Ayam di kampung hilang terus, Nak. Malingnya belum ketangkap. || Chickens keep vanishing in the village, child. The thief's still not caught.
+- [2] Toko sebelah dibobol semalam. Aku mengunci pintuku tiga kali sekarang. || The shop next door was broken into last night. I lock my door three times now.
+  ~ iblis: Kejahatan? Di sini itu namanya berdagang. Masalahnya kalau yang dirampok aku. || Crime? Here it's called trading. Problem is when I'm the one robbed.
+- Penjaga datang setelah malingnya pergi. Selalu begitu. || The guards arrive after the thief has gone. Always.
+
+== begal.peringat
+niat: PERINGATAN
+topik: begal
+gestur: tunjuk
+seru: eh
+$arah: tipe=arah dari=konteks.arah
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Jangan lewat jalan {$arah} sendirian. Begal berkeliaran di sana sejak musim lalu. || Don't take the {$arah} road alone. Bandits have roamed there since last season.
+  ~ kasar: Jalan {$arah}? Kalau mau dirampok, silakan. || The {$arah} road? If you want robbing, go ahead.
+  ~ kuno: Jalan menuju {$arah} dikuasai gerombolan begal. Mohon waspada, {$sebutan}. || The road {$arah} is held by a bandit gang. Pray be wary, {$sebutan}.
+  ~ oasis: Begal gurun menunggu di balik bukit pasir {$arah}, Saudara. Mereka menyerang saat terik. || Desert bandits wait behind the dunes to the {$arah}, friend. They strike at the height of noon.
+- [2] Kafilah terakhir dirampok di hutan {$arah}. Dua pengawalnya terluka. || The last caravan was robbed in the {$arah} woods. Two guards were hurt.
+  ~ pelabuhan: Bukan begal, Bung, bajak laut! Di perairan {$arah}. Jangan berlayar sendirian. || Not bandits, mate, pirates! In the {$arah} waters. Don't sail alone.
+- Kalau terpaksa lewat, ikut rombongan. Begal tidak berani menyerang kelompok besar. || If you must go, join a group. Bandits won't attack a big party.
+
+== begal.keluh
+niat: KELUH
+topik: begal
+gestur: geleng
+seru: aduh
+$arah: tipe=arah dari=konteks.arah
+$keluh: aturan=seru.keluh opsional=0.5
+- [3] Gara-gara begal di jalan {$arah}, gerobak kami harus memutar dua hari. {$keluh} || Because of the bandits on the {$arah} road, our carts must detour two days. {$keluh}
+  ~ kasar: Begal sialan. Penjaga tidak berguna. || Damn bandits. Useless guards.
+  ~ kuno: Para begal merampas jerih payah rakyat. Langit pasti membalas. || The bandits rob the people's toil. Heaven will surely repay them.
+- [2] Daganganku dirampas begal bulan lalu. Sampai sekarang belum bisa bangkit. || Bandits took my goods last month. I still haven't recovered.
+  ~ kampung: Kerbau Pak Darmo digondol begal, Nak. Sekampung marah. || Bandits made off with old Darmo's buffalo, child. The whole village is furious.
+- Kalau ada kultivator yang mau membersihkan jalan itu, seluruh kota akan berterima kasih. || If any cultivator would clear that road, the whole town would be grateful.
+
+== makanan.basa
+niat: BASA_BASI
+topik: makanan
+gestur: makan
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+$musim: tipe=musim dari=konteks.musim
+- [3] Sudah makan? Bakpao di ujung jalan baru keluar dari kukusan. || Eaten yet? The buns down the road just came out of the steamer.
+  ~ kasar: Lapar? Beli sana. Jangan lihat makananku. || Hungry? Go buy. Don't eye my food.
+  ~ kuno: Perut yang kenyang menenangkan pikiran, {$sebutan}. Sudahkah bersantap? || A full belly calms the mind, {$sebutan}. Have you dined?
+  ~ kampung: Sudah makan, Nak? Jangan sungkan, nasi masih banyak di dapur. || Eaten, child? Don't be shy, there's plenty of rice in the kitchen.
+  ~ pelabuhan: Ikan bakar baru diangkat, Bung! Bau asapnya sampai ke kapal! || Grilled fish just off the fire, mate! You can smell it from the ships!
+  ~ oasis: Kurma dan roti pipih, Saudara. Makanan gurun sederhana, tapi mengenyangkan. || Dates and flatbread, friend. Simple desert food, but filling.
+- [2] Mi tarik di kedai sebelah enak sekali. Kuahnya direbus semalaman. || The pulled noodles next door are wonderful. The broth simmers all night.
+  ~ air: Bubur ikan di perahu pagi itu, Kakak... paling enak di kanal... || The fish congee on the morning boat, dear... the best on the canal...
+- Musim {$musim} begini paling enak makan sup jahe. || {$musim} like this is perfect for ginger soup.
+
+== makanan.tawar
+niat: TAWARAN
+topik: makanan
+gestur: bicara_tangan
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Mau coba kueku? Baru matang. Gratis, untuk {$sebutan}. || Want to try my cake? Fresh out. Free, for you, {$sebutan}.
+  ~ kasar: Ini. Makan. Jangan protes. || Here. Eat. No complaints.
+  ~ kuno: Sudilah mencicipi masakan sederhana ini, {$sebutan}. || Pray taste this humble cooking, {$sebutan}.
+  ~ kampung: Ini, Nak, singkong rebus. Masih anget. Ambil, ambil. || Here, child, boiled cassava. Still warm. Take some, take some.
+- [2] Aku masak terlalu banyak. Bawa pulang sebagian, ya? || I cooked too much. Take some home, will you?
+  ~ p: Kubuatkan pangsit tadi pagi. Bawa sebungkus untuk di jalan. || I made dumplings this morning. Take a packet for the road.
+- Teh baru diseduh. Duduk dulu, minum secangkir. || Tea's just brewed. Sit down, have a cup.
+
+== makanan.cerita
+niat: CERITA
+topik: makanan
+gestur: cerita
+- [3] Resep bakpao ini dari nenekku. Rahasianya sedikit arak di adonan. Jangan bilang siapa-siapa. || This bun recipe's from my grandmother. The secret is a splash of wine in the dough. Tell no one.
+  ~ kasar: Masakanku terkenal. Tanya siapa saja. || My cooking's famous. Ask anyone.
+  ~ kuno: Konon dahulu seorang kaisar tersesat dan memakan bubur rakyat. Sejak itu bubur ini disebut bubur istana. || Long ago, they say, an emperor got lost and ate a commoner's porridge. Since then it's been called palace porridge.
+- [2] Pernah makan bebek panggang ibu kota? Kulitnya renyah seperti kaca. || Ever had capital roast duck? The skin crackles like glass.
+  ~ pelabuhan: Di laut selatan, Bung, ada ikan yang dagingnya manis seperti madu. Aku pernah makan sekali. || In the southern sea, mate, there's a fish with meat sweet as honey. I ate it once.
+- Waktu kecil, kami cuma makan nasi dengan garam. Sekarang lihat, ada daging setiap minggu. || As kids we ate rice with salt. Look now, meat every week.
+
+== panen.kabar
+niat: BERI_KABAR
+topik: panen
+gestur: memanen
+$senang: aturan=seru.senang opsional=0.5
+- [3] Panen tahun ini bagus! Gabah bernas, lumbung hampir penuh. {$senang} || The harvest is good this year! Plump grain, the granary nearly full. {$senang}
+  ~ kasar: Panen lumayan. Akhirnya. || Decent harvest. Finally.
+  ~ kuno: Bumi bermurah hati tahun ini. Lumbung penuh, hati tenteram. || The earth is generous this year. Full granaries, peaceful hearts.
+  ~ kampung: Panen raya, Nak! Sawah Pak Lurah sampai butuh dua puluh orang. || Bumper harvest, child! The headman's paddies needed twenty hands.
+- [2] Kebun persik di bukit berbuah lebat. Harga persik pasti turun. || The peach orchard on the hill is heavy with fruit. Peach prices will surely fall.
+  ~ gunung: Daun teh musim ini paling harum dalam sepuluh tahun. Para biksu bersyukur. || This season's tea leaves are the most fragrant in ten years. The monks give thanks.
+- Semua orang sibuk di sawah. Pasar sepi, tapi hati senang. || Everyone's busy in the paddies. The market's quiet, but hearts are glad.
+
+== panen.keluh
+niat: KELUH
+topik: panen
+gestur: geleng
+seru: aduh
+$keluh: aturan=seru.keluh opsional=0.5
+- [3] Hama wereng menyerang sawah timur. Separuh padi habis. {$keluh} || Planthoppers struck the east paddies. Half the rice is gone. {$keluh}
+  ~ kasar: Panen gagal. Hidup makin sial. || Harvest failed. Life gets worse.
+  ~ kuno: Langit menahan rahmatnya tahun ini. Lumbung setengah kosong. || Heaven withholds its mercy this year. The granaries are half empty.
+  ~ kampung: Gabahnya kopong, Nak. Hujan telat sebulan. || The grain's hollow, child. The rain came a month late.
+- [2] Babi hutan masuk ladang semalam. Jagungku habis diinjak. || Wild boar got into the field last night. My corn is trampled flat.
+- Kalau panen gagal lagi, aku harus jual kerbau. || If the harvest fails again, I'll have to sell the buffalo.
+
+== kenangan.cerita
+niat: CERITA
+topik: kenangan
+gestur: tatap_langit
+- [3] Dulu, waktu aku kecil, sungai itu jernih sekali. Kami berenang sampai bibir biru. || Back when I was little, that river was crystal clear. We swam till our lips turned blue.
+  ~ kasar: Masa lalu. Tidak ada gunanya diingat. Tapi ya... dulu lebih baik. || The past. No use remembering. But yes... it was better.
+  ~ kuno: Kenangan masa muda bagaikan bunga yang dikeringkan dalam kitab; masih harum walau rapuh. || Memories of youth are like flowers pressed in a book; still fragrant though fragile.
+  ~ kampung: Dulu, Nak, kampung ini cuma sepuluh rumah. Malam-malam kami dengar harimau mengaum. || Once, child, this village was ten houses. At night we heard tigers roar.
+  ~ pelabuhan: Waktu aku muda, Bung, aku berlayar sampai ke pulau berasap. Ada gunung yang batuk api! || When I was young, mate, I sailed to the smoking isles. A mountain coughed fire!
+- [2] Ayahku dulu membawaku ke festival lentera. Aku masih ingat lentera ikan yang dia belikan. || My father used to take me to the lantern festival. I still remember the fish lantern he bought me.
+  ~ p: Ibuku dulu menyisir rambutku setiap pagi sambil bernyanyi. Aku masih hafal lagunya. || My mother used to comb my hair every morning, singing. I still know the song.
+- Aku pernah melihat kultivator terbang di atas kota. Jubahnya putih, berkibar seperti awan. Sejak itu aku tidak pernah lupa. || I once saw a cultivator fly over town. White robes billowing like clouds. I've never forgotten.
+
+== kabar.umum
+niat: BERI_KABAR
+topik: kabar
+gestur: bicara_tangan
+$katanya: aturan=frag.katanya
+$subjek: tipe=nama_warga dari=fakta.subjek
+$waktu_lalu: tipe=waktu_lalu dari=fakta.hariKejadian
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+$penutup_kecil: aturan=frag.penutup_kecil opsional=0.4
+- [3] {$katanya} ada kabar tentang {$subjek} sejak {$waktu_lalu}. Semua orang membicarakannya. || {$katanya} there's news about {$subjek} since {$waktu_lalu}. Everyone's talking about it.
+  ~ kasar: Ada kabar soal {$subjek}. Aku tidak peduli, tapi kau mungkin. || There's news about {$subjek}. I don't care, but you might.
+  ~ kuno: Kabar tentang {$subjek} telah beredar sejak {$waktu_lalu}, {$sebutan}. || News of {$subjek} has circulated since {$waktu_lalu}, {$sebutan}.
+- [2] Kau sudah dengar soal {$subjek}? Aku baru tahu tadi pagi. || Heard about {$subjek}? I only found out this morning.
+  ~ kampung: Wis krungu, Nak? Soal si {$subjek}. Sekampung geger. || Heard yet, child? About {$subjek}. The whole village is in uproar.
+- Soal {$subjek}... nanti kau dengar sendiri dari orang lain. Lebih lengkap. {$penutup_kecil} || About {$subjek}... you'll hear it from others. More complete. {$penutup_kecil}
+
+== kilas.utang_warga
+niat: KILAS_BALIK
+topik: kilas.utang_warga
+gestur: sikap_tunduk
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+$jumlah: tipe=harga dari=konteks.jumlah
+$batas: tipe=waktu_depan dari=konteks.batas
+- [3] {$sebutan}... aku belum lupa utangku padamu, {$jumlah}. Beri aku waktu sampai {$batas}, ya. || {$sebutan}... I haven't forgotten my debt to you, {$jumlah}. Give me until {$batas}, please.
+  ~ kasar: Utangku padamu. {$jumlah}. Akan kubayar. Jangan tagih di depan orang. || My debt to you. {$jumlah}. I'll pay. Don't dun me in public.
+  ~ kuno: Utang hamba sebesar {$jumlah} kepada {$sebutan} akan hamba lunasi sebelum {$batas}. || This one's debt of {$jumlah} to you, {$sebutan}, will be settled before {$batas}.
+  ~ kampung: Utangku {$jumlah}, Nak... panen nanti kubayar. Sumpah. || My debt of {$jumlah}, child... I'll pay after harvest. I swear.
+- [2] Maaf, {$sebutan}, uangnya belum terkumpul. Tapi aku tidak lari, sungguh. || Sorry, {$sebutan}, the money isn't together yet. But I'm not running, truly.
+  ~ p: Maaf, {$sebutan}... aku sudah menjual giwangku, tapi masih kurang sedikit. || Sorry, {$sebutan}... I sold my earrings, but it's still a little short.
+- Ini, separuh dulu. Sisanya {$batas}. Terima kasih sudah sabar. || Here, half for now. The rest {$batas}. Thank you for being patient.

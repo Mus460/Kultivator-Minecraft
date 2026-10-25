@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:sekte/gabung_lamar",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "kultivator.gabung.adv.diterima.desc"
+    },
+    "icon": {
+      "id": "minecraft:emerald"
+    },
+    "title": {
+      "translate": "kultivator.gabung.adv.diterima.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

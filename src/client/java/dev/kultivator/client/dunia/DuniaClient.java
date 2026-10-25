@@ -2,13 +2,12 @@ package dev.kultivator.client.dunia;
 
 import dev.kultivator.network.Actions;
 import dev.kultivator.network.Payloads;
-import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 
 /**
- * The spine's client side of the phase-8 Dunia screen (DESIGN 25.2 items 2 and 18, 25.10): routes each {@code DuniaSync}
- * channel to its module's client class, counts a version per channel so an open screen notices new data, and opens the
- * screen (asking every module for its data first).
+ * The spine's client side of the phase-8 Dunia data (DESIGN 25.2 items 2 and 18, 25.10): routes each {@code DuniaSync}
+ * channel to its module's client class and counts a version per channel so a shown page notices new data. The old Dunia
+ * tabs open as places in the Gulungan ({@link #open}, DESIGN 43.4.4).
  */
 public final class DuniaClient {
 
@@ -87,30 +86,19 @@ public final class DuniaClient {
 	}
 
 	/**
-	 * Opens the Dunia screen on {@code tab} ({@code Payloads.OpenScreen.DUNIA_*}), or switches the open one to it. The Desa
-	 * tab is gone (DESIGN 33.6 R4, C33.P4): {@code DUNIA_DESA} opens the player's own hall on its Desa tablet instead.
+	 * Opens the Gulungan on old Dunia tab {@code tab} ({@code Payloads.OpenScreen.DUNIA_*}, DESIGN 43.4.4): Dunia › Alam,
+	 * Diri › Pusaka, Dunia › Musuh, Sekte › Wilayah › Desa & Pakta, Dunia › Duel. The Dunia screen itself is gone.
 	 */
 	public static void open(int tab) {
-		if (tab == Payloads.OpenScreen.DUNIA_DESA) {
-			dev.kultivator.client.hub.HubNav.openHall(dev.kultivator.sect.hall.Halls.PAGE_DESA);
-			return;
-		}
-		Minecraft minecraft = Minecraft.getInstance();
-		if (minecraft.gui.screen() instanceof DuniaScreen screen && screen.getClass() == DuniaScreen.class) {
-			screen.showTab(tab);
-			return;
-		}
-		minecraft.gui.setScreen(new DuniaScreen(tab));
+		dev.kultivator.client.hub.HubNav.buka(dev.kultivator.client.hub.HubNav.tujuanDunia(tab));
 	}
 
-	/** Opens the Keabadian screen on {@code tab} ({@code Payloads.OpenScreen.ABADI_*}), or switches the open one to it. */
+	/**
+	 * Opens the Gulungan on old Keabadian tab {@code tab} ({@code Payloads.OpenScreen.ABADI_*}, DESIGN 43.4.4): its pages
+	 * live in the Keabadian section (M16), so no screen of its own is opened (and nothing here depends on that screen).
+	 */
 	public static void openAbadi(int tab) {
-		Minecraft minecraft = Minecraft.getInstance();
-		if (minecraft.gui.screen() instanceof dev.kultivator.client.keabadian.KeabadianScreen screen) {
-			screen.showTab(tab);
-			return;
-		}
-		minecraft.gui.setScreen(new dev.kultivator.client.keabadian.KeabadianScreen(tab));
+		dev.kultivator.client.hub.HubNav.buka(dev.kultivator.client.hub.HubNav.tujuanAbadi(tab));
 	}
 
 	private DuniaClient() {

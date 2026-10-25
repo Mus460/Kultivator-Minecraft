@@ -1,0 +1,45 @@
+{
+  "_catatan": "Kebiasaan #29 penabung (DESIGN 42.4.12)",
+  "nomor": 29,
+  "siapa": {
+    "umur": [
+      20,
+      200
+    ],
+    "tahap": [
+      "dewasa",
+      "tua"
+    ]
+  },
+  "sesi": [
+    {
+      "jam": [
+        10,
+        11
+      ],
+      "hari": [
+        3
+      ],
+      "tujuan": [
+        "kerja:meja_tulis",
+        "meja_tulis",
+        "@depan_lapak:2"
+      ],
+      "klip": "hitung_sempoa",
+      "kanan": "sempoa"
+    },
+    {
+      "jam": [
+        20,
+        20.5
+      ],
+      "peluang": 0.5,
+      "kegiatan": "kb_penabung_rumah",
+      "tujuan": [
+        "@rumah"
+      ],
+      "klip": "kota42:hitung_koin",
+      "kanan": "kantong_uang"
+    }
+  ]
+}

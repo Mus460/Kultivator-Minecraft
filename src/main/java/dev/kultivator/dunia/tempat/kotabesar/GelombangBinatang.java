@@ -45,6 +45,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.zombie.Zombie;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
@@ -57,6 +58,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 /**
  * The beast tide, the capital's defence (DESIGN 38.B.6.3). The calendar ({@link KotaBesarKalender}) starts it at dusk;
@@ -125,12 +127,31 @@ public final class GelombangBinatang {
 	}
 
 	private static final Map<Long, Serbuan> AKTIF = new HashMap<>();
+	private static boolean dengar;
 
 	static void init() {
+		dengarkan();
+	}
+
+	/** 42E ({@code SerbuanKota}): the listeners also when the capital module never started. Safe to call twice. */
+	public static void initTempat() {
+		dengarkan();
+	}
+
+	private static void dengarkan() {
+		if (dengar) {
+			return;
+		}
+		dengar = true;
 		Sibuk.registerEnemy("tempat.pertahanan", GelombangBinatang::terlibat);
 		ServerLivingEntityEvents.AFTER_DAMAGE.register((entity, source, base, taken, blocked) -> {
 			if (taken > 0.0F && entity.entityTags().contains(TAG) && source.getEntity() instanceof ServerPlayer p) {
 				for (Serbuan s : AKTIF.values()) {
+					if (s.monster.contains(entity.getUUID())) {
+						s.jasa.merge(p.getUUID(), taken, Float::sum);
+					}
+				}
+				for (SerbuanTempat s : TEMPAT.values()) {
 					if (s.monster.contains(entity.getUUID())) {
 						s.jasa.merge(p.getUUID(), taken, Float::sum);
 					}
@@ -142,6 +163,7 @@ public final class GelombangBinatang {
 
 	static void lupakan() {
 		AKTIF.clear();
+		TEMPAT.clear();
 	}
 
 	/** True while a tide holds the gates of {@code town} shut (omen and waves). */
@@ -160,6 +182,11 @@ public final class GelombangBinatang {
 	public static boolean terlibat(ServerPlayer player) {
 		for (Serbuan s : AKTIF.values()) {
 			if (!s.selesai && player.level().dimension() == s.dimensi && player.blockPosition().closerThan(s.gerbangPos, SIBUK_JARAK)) {
+				return true;
+			}
+		}
+		for (SerbuanTempat s : TEMPAT.values()) {
+			if (!s.selesai && player.level().dimension() == s.dimensi && player.blockPosition().closerThan(s.depan, SIBUK_JARAK)) {
 				return true;
 			}
 		}
@@ -442,6 +469,9 @@ public final class GelombangBinatang {
 		for (Serbuan s : AKTIF.values()) {
 			s.monster.remove(victim.getUUID());
 		}
+		for (SerbuanTempat s : TEMPAT.values()) {
+			s.monster.remove(victim.getUUID());
+		}
 	}
 
 	// ================================================================== end
@@ -569,6 +599,342 @@ public final class GelombangBinatang {
 	/** True while the 38 shops of {@code town} are shut after a lost defence. */
 	public static boolean tokoTutup(MinecraftServer server, long town) {
 		return Kota.day(server) <= KotaBesarData.get(server).getLong(town, "tutup_sampai", Long.MIN_VALUE);
+	}
+
+	// ================================================================== 42E: a raid on a protected town (DESIGN 42.8.2)
+
+	/** Raid kinds of {@link #mulai(ServerLevel, long, int, String, Consumer)}: beasts, bandits, demonic cultivators. */
+	public static final String JENIS_BINATANG = "binatang";
+	public static final String JENIS_BEGAL = "begal";
+	public static final String JENIS_IBLIS = "iblis";
+	/** Omen of a town raid (the raiders gather outside), then the time the town must hold. */
+	public static final long TEMPAT_PERTANDA = 600L;
+	public static final long TEMPAT_BATAS = 3600L;
+
+	/** A live raid on a town without the capital's gate entities: the waves come at one edge of the place's box. */
+	private static final class SerbuanTempat {
+		final long situs;
+		final ResourceKey<Level> dimensi;
+		final BoundingBox kotak;
+		final BlockPos pusat;
+		final BlockPos depan;
+		final Vec3 luar;
+		final int kekuatan;
+		final String jenis;
+		final long mulai;
+		final @Nullable Consumer<Boolean> selesaiFn;
+		int gelombang;
+		int kuota;
+		int lahir;
+		long berikut;
+		boolean selesai;
+		final Set<UUID> monster = new HashSet<>();
+		final Map<UUID, Float> jasa = new HashMap<>();
+
+		SerbuanTempat(long situs, ResourceKey<Level> dimensi, BoundingBox kotak, BlockPos pusat, BlockPos depan, Vec3 luar, int kekuatan,
+				String jenis, long mulai, @Nullable Consumer<Boolean> selesaiFn) {
+			this.situs = situs;
+			this.dimensi = dimensi;
+			this.kotak = kotak;
+			this.pusat = pusat;
+			this.depan = depan;
+			this.luar = luar;
+			this.kekuatan = kekuatan;
+			this.jenis = jenis;
+			this.mulai = mulai;
+			this.selesaiFn = selesaiFn;
+		}
+	}
+
+	private static final Map<Long, SerbuanTempat> TEMPAT = new HashMap<>();
+
+	/** {@link #mulai(ServerLevel, long, int, String, Consumer)} without a result listener. */
+	public static boolean mulai(ServerLevel level, long situs, int kekuatan, String jenis) {
+		return mulai(level, situs, kekuatan, jenis, null);
+	}
+
+	/**
+	 * Starts a live raid on place {@code situs} (42E {@code SerbuanKota}): after a short omen, three waves of {@code jenis}
+	 * ({@link #JENIS_BINATANG} spiders and the dead, {@link #JENIS_BEGAL} rogue cultivators, {@link #JENIS_IBLIS} demonic
+	 * ones) gather 22-34 blocks outside one edge of the place and march on its centre; {@code kekuatan} sets the wave size
+	 * ({@code clamp(kekuatan / 25, 6, 18)} plus 2 per defender) and the elites. The town holds when every wave is slain
+	 * before {@link #TEMPAT_BATAS}; {@code selesai} hears {@code true} then, {@code false} when time runs out. Nothing ever
+	 * breaks a block (zombies cannot break doors, no creepers). False (nothing started) when a raid already runs there, the
+	 * place is unknown or no player is within 96 blocks of it (the caller then decides the raid as data).
+	 */
+	public static boolean mulai(ServerLevel level, long situs, int kekuatan, String jenis, @Nullable Consumer<Boolean> selesai) {
+		initTempat();
+		if (TEMPAT.containsKey(situs)) {
+			return false;
+		}
+		BoundingBox box = kotakTempat(level, situs);
+		if (box == null) {
+			return false;
+		}
+		BlockPos tengah = box.getCenter();
+		boolean dekat = false;
+		for (ServerPlayer p : level.players()) {
+			if (!p.isSpectator() && box.inflatedBy(96, 64, 96).isInside(p.blockPosition())) {
+				dekat = true;
+				break;
+			}
+		}
+		if (!dekat) {
+			return false;
+		}
+		int sisi = (int) Math.floorMod(situs ^ Kota.day(level.getServer()) * 31L, 4L);
+		int x = switch (sisi) {
+			case 0 -> box.minX();
+			case 1 -> box.maxX();
+			default -> tengah.getX();
+		};
+		int z = switch (sisi) {
+			case 2 -> box.minZ();
+			case 3 -> box.maxZ();
+			default -> tengah.getZ();
+		};
+		BlockPos depan = TempatApi.groundSpot(level, x, z, tengah.getY());
+		if (depan == null) {
+			depan = new BlockPos(x, tengah.getY(), z);
+		}
+		Vec3 luar = new Vec3(depan.getX() - tengah.getX(), 0.0D, depan.getZ() - tengah.getZ());
+		luar = luar.lengthSqr() < 1.0E-4D ? new Vec3(1.0D, 0.0D, 0.0D) : luar.normalize();
+		BlockPos pusat = TempatApi.groundSpot(level, tengah.getX(), tengah.getZ(), tengah.getY());
+		SerbuanTempat s = new SerbuanTempat(situs, level.dimension(), box, pusat == null ? tengah : pusat, depan, luar, Math.max(1, kekuatan),
+				jenis == null ? JENIS_BINATANG : jenis, level.getGameTime(), selesai);
+		TEMPAT.put(situs, s);
+		for (int i = 0; i < 12; i++) {
+			int beat = i;
+			BlockPos at = depan;
+			Voice.later(i * 10, () -> level.playSound(null, at, SoundEvents.NOTE_BLOCK_BASEDRUM.value(), SoundSource.HOSTILE, 4.0F,
+					beat % 2 == 0 ? 0.5F : 0.6F));
+		}
+		HidupApi.bahaya(level, depan, (int) ((TEMPAT_PERTANDA + TEMPAT_BATAS) / 20L));
+		return true;
+	}
+
+	/** True while a live 42E raid runs at {@code situs} (omen and waves). */
+	public static boolean serbuTempat(long situs) {
+		SerbuanTempat s = TEMPAT.get(situs);
+		return s != null && !s.selesai;
+	}
+
+	/** The edge the raiders of {@code situs} come at, or null. */
+	public static @Nullable BlockPos depanTempat(long situs) {
+		SerbuanTempat s = TEMPAT.get(situs);
+		return s == null ? null : s.depan;
+	}
+
+	/** Raiders of {@code situs} still alive or to come. */
+	public static int sisaTempat(long situs) {
+		SerbuanTempat s = TEMPAT.get(situs);
+		return s == null ? 0 : s.monster.size() + Math.max(0, s.kuota - s.lahir) + Math.max(0, GELOMBANG - s.gelombang) * s.kuota;
+	}
+
+	/** Ends a live town raid at once (command); false when none. */
+	public static boolean hentikanTempat(ServerLevel level, long situs, boolean menang) {
+		SerbuanTempat s = TEMPAT.remove(situs);
+		if (s == null) {
+			return false;
+		}
+		akhirTempat(level, s, menang);
+		return true;
+	}
+
+	/** The box of a place: the union of its loaded pieces, else 40 blocks around its site; null when unknown. */
+	public static @Nullable BoundingBox kotakTempat(ServerLevel level, long situs) {
+		int minX = Integer.MAX_VALUE;
+		int minY = Integer.MAX_VALUE;
+		int minZ = Integer.MAX_VALUE;
+		int maxX = Integer.MIN_VALUE;
+		int maxY = Integer.MIN_VALUE;
+		int maxZ = Integer.MIN_VALUE;
+		for (dev.kultivator.dunia.tempat.PotonganInfo p : TempatApi.potongan(level, situs)) {
+			BoundingBox b = p.kotak();
+			minX = Math.min(minX, b.minX());
+			minY = Math.min(minY, b.minY());
+			minZ = Math.min(minZ, b.minZ());
+			maxX = Math.max(maxX, b.maxX());
+			maxY = Math.max(maxY, b.maxY());
+			maxZ = Math.max(maxZ, b.maxZ());
+		}
+		if (minX <= maxX) {
+			return new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
+		}
+		dev.kultivator.dunia.DuniaSites.Site site = dev.kultivator.dunia.DuniaSites.byId(level.getServer(), situs);
+		if (site == null || site.dim() != level.dimension()) {
+			return null;
+		}
+		BlockPos c = site.pos();
+		return new BoundingBox(c.getX() - 40, c.getY() - 16, c.getZ() - 40, c.getX() + 40, c.getY() + 24, c.getZ() + 40);
+	}
+
+	/** Every second from 42E ({@code SerbuanKota.tick}); independent of the capital's switch. */
+	public static void tickTempat(MinecraftServer server) {
+		if (TEMPAT.isEmpty()) {
+			return;
+		}
+		for (Iterator<SerbuanTempat> it = TEMPAT.values().iterator(); it.hasNext(); ) {
+			SerbuanTempat s = it.next();
+			ServerLevel level = server.getLevel(s.dimensi);
+			if (level == null || s.selesai) {
+				it.remove();
+				continue;
+			}
+			long now = level.getGameTime();
+			if (now < s.mulai + TEMPAT_PERTANDA) {
+				continue;
+			}
+			if (s.gelombang == 0 || s.gelombang < GELOMBANG && now >= s.berikut && s.lahir >= s.kuota) {
+				gelombangTempat(level, s, now);
+			}
+			s.monster.removeIf(id -> {
+				Entity e = level.getEntity(id);
+				return e == null || !e.isAlive();
+			});
+			spawnTempat(level, s);
+			gerakkanTempat(level, s);
+			if (s.gelombang >= GELOMBANG && s.lahir >= s.kuota && s.monster.isEmpty()) {
+				akhirTempat(level, s, true);
+				it.remove();
+			} else if (now >= s.mulai + TEMPAT_PERTANDA + TEMPAT_BATAS) {
+				akhirTempat(level, s, false);
+				it.remove();
+			}
+		}
+	}
+
+	private static List<ServerPlayer> pembelaTempat(ServerLevel level, SerbuanTempat s) {
+		List<ServerPlayer> out = new ArrayList<>();
+		BoundingBox area = s.kotak.inflatedBy(64, 48, 64);
+		for (ServerPlayer p : level.players()) {
+			if (!p.isSpectator() && area.isInside(p.blockPosition())) {
+				out.add(p);
+			}
+		}
+		return out;
+	}
+
+	private static void gelombangTempat(ServerLevel level, SerbuanTempat s, long now) {
+		s.gelombang++;
+		s.berikut = now + JEDA_GELOMBANG;
+		int players = Math.max(1, pembelaTempat(level, s).size());
+		s.kuota = Mth.clamp(s.kekuatan / 25, 6, 18) + 2 * (players - 1);
+		s.lahir = 0;
+		level.playSound(null, s.depan, SoundEvents.RAID_HORN.value(), SoundSource.HOSTILE, 6.0F, 0.8F + 0.1F * s.gelombang);
+		for (ServerPlayer p : pembelaTempat(level, s)) {
+			Msg.title(p, Component.translatable("kultivator.kota_besar.gelombang.ke", s.gelombang, GELOMBANG).withStyle(ChatFormatting.RED),
+					Component.translatable("kultivator.kota_besar.gelombang.ke.sub", s.kuota), 5, 40, 10);
+		}
+	}
+
+	private static void spawnTempat(ServerLevel level, SerbuanTempat s) {
+		int room = HIDUP_MAKS - s.monster.size();
+		RandomSource r = level.getRandom();
+		int realm = 0;
+		for (ServerPlayer p : pembelaTempat(level, s)) {
+			realm = Math.max(realm, Cultivators.get(p).realm().ordinal());
+		}
+		int batch = Math.min(4, room);
+		Vec3 lat = new Vec3(-s.luar.z, 0.0D, s.luar.x);
+		for (int i = 0; i < batch && s.lahir < s.kuota; i++) {
+			s.lahir++;
+			Vec3 at = Vec3.atCenterOf(s.depan).add(s.luar.scale(22.0D + r.nextDouble() * 12.0D)).add(lat.scale((r.nextDouble() - 0.5D) * 40.0D));
+			BlockPos spot = TempatApi.groundSpot(level, Mth.floor(at.x), Mth.floor(at.z), s.depan.getY());
+			if (spot == null) {
+				continue;
+			}
+			boolean elite = s.lahir <= s.gelombang;
+			Mob mob;
+			if (JENIS_BINATANG.equals(s.jenis)) {
+				int roll = r.nextInt(100);
+				EntityType<? extends Mob> type = roll < 50 ? EntityTypes.SPIDER : roll < 70 ? EntityTypes.CAVE_SPIDER : EntityTypes.ZOMBIE;
+				mob = type.create(level, EntitySpawnReason.EVENT);
+				if (mob == null) {
+					continue;
+				}
+				mob.snapTo(spot.getX() + 0.5D, spot.getY(), spot.getZ() + 0.5D, r.nextFloat() * 360.0F, 0.0F);
+				mob.finalizeSpawn(level, level.getCurrentDifficultyAt(spot), EntitySpawnReason.EVENT, null);
+				if (mob instanceof Zombie zombie) {
+					zombie.setCanBreakDoors(false);
+				}
+				mob.setPersistenceRequired();
+				mob.addTag(TAG);
+				if (elite) {
+					EliteMonsters.makeElite(mob, s.gelombang, null, realm);
+					TechniquePower.markRealmFoe(mob);
+				}
+				if (!level.addFreshEntity(mob)) {
+					continue;
+				}
+			} else {
+				int variant = JENIS_IBLIS.equals(s.jenis) ? dev.kultivator.musuh.RogueCultivators.VARIANT_DEMONIC
+						: dev.kultivator.musuh.RogueCultivators.VARIANT_ROGUE;
+				int tier = elite ? Math.min(3, 1 + s.gelombang / 2 + (s.kekuatan >= 300 ? 1 : 0)) : 1;
+				mob = dev.kultivator.musuh.RogueCultivators.spawn(level, Vec3.atBottomCenterOf(spot), tier, realm, variant,
+						dev.kultivator.musuh.RogueCultivators.ROLE_RAID, s.pusat);
+				if (mob == null) {
+					continue;
+				}
+				mob.addTag(TAG);
+			}
+			s.monster.add(mob.getUUID());
+		}
+	}
+
+	/** Raiders without a fight march on the centre of the place (they never touch a block). */
+	private static void gerakkanTempat(ServerLevel level, SerbuanTempat s) {
+		for (UUID id : s.monster) {
+			if (!(level.getEntity(id) instanceof Mob mob)) {
+				continue;
+			}
+			LivingEntity target = mob.getTarget();
+			if (target == null || !target.isAlive()) {
+				LivingEntity pick = sasaran(level, mob);
+				if (pick != null) {
+					mob.setTarget(pick);
+				} else if (mob.getNavigation().isDone()) {
+					BlockPos goal = mob.blockPosition().closerThan(s.depan, 6.0D) || s.kotak.isInside(mob.blockPosition()) ? s.pusat : s.depan;
+					mob.getNavigation().moveTo(goal.getX() + 0.5D, goal.getY(), goal.getZ() + 0.5D, 1.0D);
+				}
+			}
+		}
+	}
+
+	private static void akhirTempat(ServerLevel level, SerbuanTempat s, boolean menang) {
+		s.selesai = true;
+		for (UUID id : s.monster) {
+			Entity e = level.getEntity(id);
+			if (e != null && e.isAlive()) {
+				e.discard();
+			}
+		}
+		s.monster.clear();
+		Kultivator.LOGGER.debug("Town raid at {} ended: {}", s.situs, menang ? "held" : "lost");
+		if (s.selesaiFn != null) {
+			try {
+				s.selesaiFn.accept(menang);
+			} catch (RuntimeException exception) {
+				Kultivator.LOGGER.error("Town raid result listener failed at {}", s.situs, exception);
+			}
+		}
+	}
+
+	/** The player who dealt the most damage to the raiders of the running raid at {@code situs}, or null. */
+	public static @Nullable UUID jasaTerbesarTempat(long situs) {
+		SerbuanTempat s = TEMPAT.get(situs);
+		if (s == null) {
+			return null;
+		}
+		UUID top = null;
+		float best = 0.0F;
+		for (Map.Entry<UUID, Float> e : s.jasa.entrySet()) {
+			if (e.getValue() > best) {
+				best = e.getValue();
+				top = e.getKey();
+			}
+		}
+		return top;
 	}
 
 	private GelombangBinatang() {

@@ -1,12 +1,12 @@
 package dev.kultivator.client.disciple.path;
 
-import dev.kultivator.client.disciple.DiscipleScreen;
-import dev.kultivator.client.disciple.DiscipleTab;
+import dev.kultivator.client.disciple.MuridPage;
+import dev.kultivator.client.disciple.MuridSub;
 import dev.kultivator.client.kehancuran.KehancuranClient;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.client.screen.ui.Palette;
-import dev.kultivator.client.screen.ui.SectionPicker;
+import dev.kultivator.client.screen.ui.SegelKonfirmasi;
 import dev.kultivator.client.screen.ui.TalismanButton;
 import dev.kultivator.client.screen.ui.UiSound;
 import dev.kultivator.client.screen.ui.Widget;
@@ -23,12 +23,10 @@ import dev.kultivator.disciple.path.StarTitles;
 import dev.kultivator.network.Actions;
 import dev.kultivator.util.Msg;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -42,8 +40,8 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 /**
- * The Jalan tab of the disciple scroll ({@code DiscipleScreen.TAB_PATH}; DESIGN 20.3.18-20.3.21, module D). Four
- * sections chosen with small talismans at the top:
+ * The Jalan sub of Murid › Murid (DESIGN 20.3.18-20.3.21, module D; 43.5). Four parts stacked in one scroll
+ * ({@code Tumpuk}, one instance per part, its name as heading; was a section picker, 43.0.4):
  * <ul>
  *   <li><b>Bintang</b>: the Bintang Abadi title, the Qi Bintang bar, the seven calamities in three Trials, the star
  *   bonuses, soul lamps and Divine Clones; condense, Otomatis, start the calamity, put out a lamp, Tahan Petir.</li>
@@ -55,17 +53,17 @@ import java.util.function.Supplier;
  * </ul>
  * Everything shown comes from the {@code path} compound of the disciple's details ({@code PathInfo}).
  */
-public class PathTab extends DiscipleTab {
+public class PathTab extends MuridSub {
 
 	private static final String P = "kultivator.dpath.ui.";
 	private static final String[] SECTION_IDS = {"stars", "bond", "heir", "arts"};
 	private static final int CHIP_H = 14;
 	private static final int GAP = 3;
-	private static final long CONFIRM_MILLIS = 4000L;
 	private static final int MAX_RECALL = 4;
 	private static final int STAR_GOLD = 0xFFD54A;
 
-	private int section;
+	/** The part this instance shows (0 Bintang, 1 Ikatan, 2 Pewaris, 3 Pemusnah). */
+	private final int section;
 	private final Map<Widget, Integer> sectionOf = new IdentityHashMap<>();
 	private final Map<Widget, BooleanSupplier> shownWhen = new IdentityHashMap<>();
 	private int bodyTop;
@@ -74,15 +72,29 @@ public class PathTab extends DiscipleTab {
 	private int rightW;
 	private String signature = "";
 	private int pick;
-	private long heirArmedUntil;
+	/** The lowest line drawn this frame, and the height the part's lines needed (at 1.0 they grow past the old 140). */
+	private float bawah;
+	private int isi;
 
-	public PathTab(DiscipleScreen screen) {
-		super(screen);
+	public PathTab(MuridPage murid, int section) {
+		super(murid);
+		this.section = Math.max(0, Math.min(SECTION_IDS.length - 1, section));
+	}
+
+	@Override
+	public String helpTopic() {
+		return section == 3 ? "kehancuran" : section == 0 ? "bintang" : "ikatan";
+	}
+
+	/** Stacked under Jalan: room for the right column of talismans and for every line drawn (measured while drawing). */
+	@Override
+	public int tinggiMin() {
+		return Math.max(140, isi);
 	}
 
 	@Override
 	public Component title() {
-		return Component.translatable(P + "tab");
+		return Component.translatable(P + "section." + SECTION_IDS[section]);
 	}
 
 	@Override
@@ -105,17 +117,8 @@ public class PathTab extends DiscipleTab {
 		sectionOf.clear();
 		shownWhen.clear();
 		signature = signature();
-		// One "‹ section ›" selector at the top-left (DESIGN 5b: no strip of tabs along the top).
-		String[] keys = new String[SECTION_IDS.length];
-		for (int i = 0; i < SECTION_IDS.length; i++) {
-			keys[i] = P + "section." + SECTION_IDS[i];
-		}
-		SectionPicker picker = new SectionPicker(x, y, Math.min(w, Math.max(110, Math.round(w * 0.42F))), CHIP_H, keys, () -> section,
-				index -> section = index);
-		picker.tooltip(() -> List.of(Component.translatable(P + "section." + SECTION_IDS[section]),
-				Component.translatable(P + "section." + SECTION_IDS[section] + ".tip").withStyle(ChatFormatting.GRAY)));
-		add(picker);
-		bodyTop = y + CHIP_H + 5;
+		// The part's name is drawn as a heading (drawBehind); the controls start under it.
+		bodyTop = y + CHIP_H;
 		rightW = Math.max(96, Math.min(150, Math.round(w * 0.40F)));
 		rightX = x + w - rightW;
 		leftW = w - rightW - 6;
@@ -190,7 +193,7 @@ public class PathTab extends DiscipleTab {
 	/** Sends {@code text} and closes the scroll so the effect can be watched in the world. */
 	private void actAndClose(String text) {
 		send(Actions.DISCIPLE_PATH, text);
-		screen.onClose();
+		murid.tutup();
 	}
 
 	// ---- Bintang
@@ -235,7 +238,7 @@ public class PathTab extends DiscipleTab {
 		list.add(tahanButton());
 		int count = 0;
 		for (Tag tag : path().getListOrEmpty("sealed_list")) {
-			if (!(tag instanceof CompoundTag entry) || entry.getIntOr("id", 0) == screen.entityId()) {
+			if (!(tag instanceof CompoundTag entry) || entry.getIntOr("id", 0) == murid.entityId()) {
 				continue;
 			}
 			if (count >= MAX_RECALL) {
@@ -271,7 +274,7 @@ public class PathTab extends DiscipleTab {
 
 	private void buildHeir() {
 		List<Widget> list = new ArrayList<>();
-		list.add(button(() -> Component.translatable(flag("heir") ? P + "heir_done" : heirArmed() ? P + "heir_confirm" : P + "heir"),
+		list.add(button(() -> Component.translatable(flag("heir") ? P + "heir_done" : P + "heir"),
 				() -> !flag("heir") && path().getStringOr("heir_reason", "").isEmpty(), this::pressHeir, () -> {
 					List<Component> lines = tip(P + "heir", P + "heir.tip", blocked(null, "heir_reason"));
 					String other = path().getStringOr("heir_other", "");
@@ -280,8 +283,8 @@ public class PathTab extends DiscipleTab {
 					}
 					lines.add(source("heir.source"));
 					return lines;
-				}).urgentWhen(this::heirArmed));
-		list.add(new Picker());
+				}));
+		list.add(button(this::pickerLabel, () -> flag("heir") && !options().isEmpty(), () -> step(1), this::pickerTip).siklus(() -> step(1), () -> step(-1)));
 		list.add(button(() -> Component.translatable(P + "gen_hex"), () -> {
 			String id = current();
 			return flag("heir") && id != null && listed("gen_options", id) && !id.equals(path().getStringOr("gen_hex", ""));
@@ -316,21 +319,14 @@ public class PathTab extends DiscipleTab {
 		column(2, list);
 	}
 
-	private boolean heirArmed() {
-		return Util.getMillis() <= heirArmedUntil;
-	}
-
-	/** Naming the heir: with another heir the first click only arms the talisman (the old heir loses its hexes). */
+	/** Naming the heir: with another heir a held seal asks first (the old heir loses its hexes; 43.7 sedang). */
 	private void pressHeir() {
 		String other = path().getStringOr("heir_other", "");
 		if (other.isEmpty()) {
 			act("heir");
-		} else if (heirArmed()) {
-			heirArmedUntil = 0L;
-			act("heir_confirm");
 		} else {
-			heirArmedUntil = Util.getMillis() + CONFIRM_MILLIS;
 			UiSound.ask();
+			konfirmasi(SegelKonfirmasi.Tingkat.SEDANG, Component.translatable(P + "heir.replace", other), () -> act("heir_confirm"));
 		}
 	}
 
@@ -365,67 +361,39 @@ public class PathTab extends DiscipleTab {
 		return technique == null ? Component.literal(id) : technique.displayName();
 	}
 
-	/** "‹ technique ›": click the left half for the previous technique, the right half for the next. */
-	private final class Picker extends Widget {
-
-		Picker() {
-			super(0, 0, 10, 10);
-			tooltip(() -> {
-				List<Component> lines = new ArrayList<>();
-				lines.add(Component.translatable(P + "picker"));
-				lines.add(Component.translatable(P + "picker.tip").withStyle(ChatFormatting.GRAY));
-				String id = current();
-				if (id != null) {
-					if (id.equals(path().getStringOr("gen_hex", ""))) {
-						lines.add(Component.translatable(P + "picker.gen").withStyle(ChatFormatting.GOLD));
-					}
-					if (listed("hexes", id)) {
-						lines.add(Component.translatable(P + "picker.hexed").withStyle(ChatFormatting.GOLD));
-					}
-				}
-				return lines;
-			});
+	/** The technique picker is a cycling talisman (43.7 G08: click next, right click / ← previous); a red dot marks a hexed one. */
+	private Component pickerLabel() {
+		String id = current();
+		if (id == null) {
+			return Component.translatable(P + "picker.empty");
 		}
+		Component name = techniqueName(id);
+		return id.equals(path().getStringOr("gen_hex", "")) || listed("hexes", id)
+				? Component.literal("● ").withColor(Palette.SEAL & 0xFFFFFF).append(name) : name;
+	}
 
-		@Override
-		protected void draw(GuiGraphicsExtractor g, Font font, boolean over, float seconds) {
-			boolean on = flag("heir") && !options().isEmpty();
-			int top = on ? Palette.lighten(Palette.BAMBOO, 0.1F * hover.get()) : Palette.grey(Palette.BAMBOO, 0.7F);
-			g.fillGradient(x, y, x + w, y + h, top, Palette.BAMBOO_ALT);
-			Brush.frame(g, x, y, x + w, y + h, Palette.BAMBOO_KNOT);
-			float mid = y + h / 2.0F;
-			Brush.centered(g, font, Component.literal("‹"), x + 5.0F, mid - 4.0F, Palette.INK, 1.0F, false);
-			Brush.centered(g, font, Component.literal("›"), x + w - 5.0F, mid - 4.0F, Palette.INK, 1.0F, false);
-			String id = current();
-			Component text = id == null ? Component.translatable(P + "picker.empty") : techniqueName(id);
-			if (id != null) {
-				Technique technique = Technique.byId(id);
-				if (technique != null) {
-					Glyphs.technique(g, technique, x + 15.0F, mid, Math.min(9.0F, h - 6.0F), Palette.GOLD_DARK);
-				}
-				if (id.equals(path().getStringOr("gen_hex", "")) || listed("hexes", id)) {
-					Brush.disc(g, x + w - 13.0F, mid, 2.0F, Palette.SEAL);
-				}
-			}
-			Brush.fitCentered(g, font, text, x + w / 2.0F + 3.0F, mid - 3.5F, w - 40.0F, on ? Palette.INK : Palette.INK_FAINT, 0.8F, 0.5F, false);
+	private void step(int arah) {
+		List<String> options = options();
+		if (!options.isEmpty()) {
+			pick = Math.floorMod(pick + arah, options.size());
 		}
+	}
 
-		@Override
-		public boolean release(double mouseX, double mouseY) {
-			boolean was = pressed;
-			pressed = false;
-			if (!was || !contains(mouseX, mouseY)) {
-				return false;
+	private List<Component> pickerTip() {
+		List<Component> lines = new ArrayList<>();
+		lines.add(Component.translatable(P + "picker"));
+		lines.add(Component.translatable(P + "picker.tip").withStyle(ChatFormatting.GRAY));
+		String id = current();
+		if (id != null) {
+			lines.add(techniqueName(id));
+			if (id.equals(path().getStringOr("gen_hex", ""))) {
+				lines.add(Component.translatable(P + "picker.gen").withStyle(ChatFormatting.GOLD));
 			}
-			List<String> options = options();
-			if (options.isEmpty()) {
-				UiSound.denied();
-				return false;
+			if (listed("hexes", id)) {
+				lines.add(Component.translatable(P + "picker.hexed").withStyle(ChatFormatting.GOLD));
 			}
-			pick = Math.floorMod(pick + (mouseX < x + w / 2.0D ? -1 : 1), options.size());
-			UiSound.tab();
-			return true;
 		}
+		return lines;
 	}
 
 	// ---- Pemusnah
@@ -478,7 +446,7 @@ public class PathTab extends DiscipleTab {
 			send(Actions.KEHANCURAN, "seal");
 			return;
 		}
-		KehancuranClient.remember(screen.entityId(), path(), name());
+		KehancuranClient.remember(murid.entityId(), path(), name());
 		send(Actions.KEHANCURAN, "release");
 	}
 
@@ -499,7 +467,7 @@ public class PathTab extends DiscipleTab {
 		if (!name.isEmpty()) {
 			return Component.literal(name);
 		}
-		DiscipleEntity entity = screen.entity();
+		DiscipleEntity entity = murid.entity();
 		return entity != null ? entity.getName() : Component.literal("?");
 	}
 
@@ -564,11 +532,16 @@ public class PathTab extends DiscipleTab {
 
 	@Override
 	protected void drawBehind(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
+		heading(g, title(), x + 2.0F, y, w - 4.0F, 1.0F);
+		if (mouseX >= x && mouseX < x + w && mouseY >= y && mouseY < y + 11) {
+			tooltip(List.of(title(), Component.translatable(P + "section." + SECTION_IDS[section] + ".tip").withStyle(ChatFormatting.GRAY)));
+		}
 		CompoundTag p = path();
 		if (p.isEmpty()) {
-			Brush.wrap(g, font, Component.translatable(P + "waiting"), x + 4.0F, bodyTop, w - 8.0F, Palette.INK_SOFT, 0.75F, false);
+			Brush.wrap(g, font, Component.translatable(P + "waiting"), x + 4.0F, bodyTop, w - 8.0F, Palette.INK_SOFT, 1.0F, false);
 			return;
 		}
+		bawah = bodyTop;
 		g.enableScissor(x, bodyTop, x + leftW, y + h);
 		switch (section) {
 			case 0 -> drawStars(g, p, mouseX, mouseY);
@@ -577,11 +550,18 @@ public class PathTab extends DiscipleTab {
 			default -> drawArts(g, p);
 		}
 		g.disableScissor();
+		isi = Math.round(bawah - y) + 4;
 	}
 
-	/** A wrapped line in the left column; returns the next line's top. */
+	/** A wrapped line in the left column at 1.0 (43.0.5; the old per-line scale is ignored); returns the next line's top. */
 	private float line(GuiGraphicsExtractor g, Component text, float ty, int color, float scale) {
-		return ty + Brush.wrap(g, font, text, x + 4.0F, ty, leftW - 8.0F, color, scale, false) + 1.5F;
+		return reach(ty + Brush.wrap(g, font, text, x + 4.0F, ty, leftW - 8.0F, color, 1.0F, false) + 1.5F);
+	}
+
+	/** Notes how low the part has drawn ({@link #tinggiMin()}). */
+	private float reach(float bottom) {
+		bawah = Math.max(bawah, bottom);
+		return bottom;
 	}
 
 	/** A thin labelled bar with its numbers on the right and a tooltip. */
@@ -590,10 +570,11 @@ public class PathTab extends DiscipleTab {
 		float x0 = x + 4.0F;
 		float x1 = x + leftW - 4.0F;
 		Component value = Component.literal(numbers);
-		float valueW = Math.min((x1 - x0) * 0.55F, font.width(value) * 0.6F);
-		Brush.fit(g, font, label, x0, top, x1 - x0 - valueW - 3.0F, Palette.INK_SOFT, 0.6F, 0.45F, false);
-		Brush.fit(g, font, value, x1 - valueW, top, valueW, Palette.onPaper(color), 0.6F, 0.45F, false);
-		float by = top + 7.0F;
+		float valueW = Math.min((x1 - x0) * 0.55F, font.width(value));
+		Brush.fit(g, font, label, x0, top, x1 - x0 - valueW - 3.0F, Palette.INK_SOFT, 1.0F, 1.0F, false);
+		Brush.fit(g, font, value, x1 - valueW, top, valueW, Palette.onPaper(color), 1.0F, 1.0F, false);
+		float by = reach(top + 10.0F);
+		reach(by + 5.0F);
 		Brush.rect(g, x0, by, x1, by + 4.0F, Palette.mix(Palette.PAPER_BOTTOM, Palette.INK, 0.25F));
 		Brush.rect(g, x0 + 0.5F, by + 0.5F, x1 - 0.5F, by + 3.5F, Palette.mix(Palette.PAPER_BOTTOM, color, 0.15F));
 		float fill = x0 + 0.5F + (x1 - x0 - 1.0F) * Math.max(0.0F, Math.min(1.0F, fraction));
@@ -602,7 +583,7 @@ public class PathTab extends DiscipleTab {
 			Brush.rect(g, x0 + 0.5F, by + 0.5F, fill, by + 1.3F, light);
 		}
 		if (mouseX >= x0 && mouseX < x1 && mouseY >= top && mouseY < by + 5.0F) {
-			screen.showTooltip(tip);
+			tooltip(tip);
 		}
 	}
 
@@ -618,9 +599,9 @@ public class PathTab extends DiscipleTab {
 					.withColor(Palette.onPaper(StarTitles.color(stars)) & 0xFFFFFF);
 			Brush.fit(g, font, Brush.bold(title), x0, ty, room, Palette.INK, 1.0F, 0.6F, false);
 		} else {
-			Brush.fit(g, font, Brush.bold(Component.translatable(P + "no_stars")), x0, ty, room, Palette.INK_SOFT, 0.9F, 0.6F, false);
+			Brush.fit(g, font, Brush.bold(Component.translatable(P + "no_stars")), x0, ty, room, Palette.INK_SOFT, 1.0F, 1.0F, false);
 		}
-		ty += 11.0F;
+		ty = reach(ty + 11.0F);
 		if (!p.getBooleanOr("max_rank", false)) {
 			ty = line(g, Component.translatable(P + "not_peak"), ty, Palette.INK_SOFT, 0.65F);
 			ty = line(g, Component.translatable(P + "first_gate", p.getIntOr("first_gate", 6)), ty, Palette.INK_FAINT, 0.6F);
@@ -632,12 +613,12 @@ public class PathTab extends DiscipleTab {
 		bar(g, Component.translatable(P + "star_qi"), Msg.number(stored) + " / " + Msg.number(cost), (float) (stored / cost), Palette.STORED,
 				Palette.STORED_LIGHT, ty, mouseX, mouseY, List.of(Component.translatable(P + "star_qi"),
 						Component.translatable(P + "star_qi.tip", stars + 1, Msg.number(cost)).withStyle(ChatFormatting.GRAY)));
-		ty += 13.0F;
+		ty += 17.0F;
 
 		// The seven calamities in three Trials (2 + 2 + 3).
 		int passed = p.getIntOr("calamity", 0);
 		float px = x0 + 3.0F;
-		float py = ty + 3.5F;
+		float py = ty + 4.0F;
 		for (int k = 1; k <= Calamity.COUNT; k++) {
 			boolean done = k <= passed;
 			boolean next = k == passed + 1;
@@ -646,12 +627,12 @@ public class PathTab extends DiscipleTab {
 			px += 8.0F + (k == 2 || k == 4 ? 4.0F : 0.0F);
 		}
 		Component calamities = Component.translatable(P + "calamities", passed, Calamity.COUNT);
-		Brush.fit(g, font, calamities, px + 2.0F, ty, x0 + room - px - 2.0F, Palette.INK_SOFT, 0.6F, 0.45F, false);
-		if (mouseX >= x0 && mouseX < px && mouseY >= ty && mouseY < ty + 8) {
-			screen.showTooltip(List.of(Component.translatable(P + "calamities.name"), Component.translatable(P + "calamities.tip").withStyle(ChatFormatting.GRAY),
+		Brush.fit(g, font, calamities, px + 2.0F, ty, x0 + room - px - 2.0F, Palette.INK_SOFT, 1.0F, 1.0F, false);
+		if (mouseX >= x0 && mouseX < px && mouseY >= ty && mouseY < ty + 9) {
+			tooltip(List.of(Component.translatable(P + "calamities.name"), Component.translatable(P + "calamities.tip").withStyle(ChatFormatting.GRAY),
 					Component.translatable(P + "calamities.source").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC)));
 		}
-		ty += 10.0F;
+		ty = reach(ty + 11.0F);
 		if (passed >= Calamity.COUNT) {
 			ty = line(g, Component.translatable(P + "trampling").withColor(Palette.GOLD_DARK & 0xFFFFFF), ty, Palette.GOLD_DARK, 0.65F);
 		} else {
@@ -701,6 +682,7 @@ public class PathTab extends DiscipleTab {
 				}
 				lx += dot + 1.0F;
 			}
+			reach(ty + dot + 3.0F);
 		}
 	}
 
@@ -728,9 +710,9 @@ public class PathTab extends DiscipleTab {
 		// Marks at 50 (Soul Seal) and 80 (heir).
 		for (int mark : new int[]{Bond.SEAL_BOND, Bond.HEIR_BOND}) {
 			float mx = x0 + 0.5F + (x1 - x0 - 1.0F) * mark / 100.0F;
-			Brush.rect(g, mx - 0.5F, ty + 6.0F, mx + 0.5F, ty + 12.0F, bond >= mark ? Palette.GOLD_DARK : Palette.INK_SOFT);
+			Brush.rect(g, mx - 0.5F, ty + 9.0F, mx + 0.5F, ty + 15.0F, bond >= mark ? Palette.GOLD_DARK : Palette.INK_SOFT);
 		}
-		ty += 14.0F;
+		ty += 17.0F;
 
 		// The Soul Seal.
 		if (p.getBooleanOr("sealed", false)) {
@@ -773,7 +755,7 @@ public class PathTab extends DiscipleTab {
 			ty = line(g, Component.translatable(P + "tahan_left", Math.max(0, p.getIntOr("tahan_left", 0)), HuFa.TAHAN_MAX), ty, Palette.INK_SOFT, 0.58F);
 		}
 		if (mouseX >= x0 && mouseX < x1 && mouseY >= hufaTop && mouseY < ty) {
-			screen.showTooltip(List.of(Component.translatable(P + "hufa.name"), Component.translatable(P + "hufa.tip").withStyle(ChatFormatting.GRAY),
+			tooltip(List.of(Component.translatable(P + "hufa.name"), Component.translatable(P + "hufa.tip").withStyle(ChatFormatting.GRAY),
 					Component.translatable(P + "hufa.source").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC)));
 		}
 
@@ -785,10 +767,10 @@ public class PathTab extends DiscipleTab {
 		float fTop = ty;
 		ty = line(g, foundation, ty, type <= 0 ? Palette.INK_FAINT : Palette.onPaper(FoundationTypes.color(type)), 0.62F);
 		if (type > 0) {
-			ty = pillars(g, type, p.getIntOr("pillars", 9), x0 + 2.0F, ty + 1.0F, Math.min(x1 - x0 - 4.0F, 110.0F));
+			ty = reach(pillars(g, type, p.getIntOr("pillars", 9), x0 + 2.0F, ty + 1.0F, Math.min(x1 - x0 - 4.0F, 110.0F)));
 		}
 		if (mouseX >= x0 && mouseX < x1 && mouseY >= fTop && mouseY < ty) {
-			screen.showTooltip(List.of(Component.translatable(P + "foundation.name"), Component.translatable(P + "foundation.tip").withStyle(ChatFormatting.GRAY),
+			tooltip(List.of(Component.translatable(P + "foundation.name"), Component.translatable(P + "foundation.tip").withStyle(ChatFormatting.GRAY),
 					Component.translatable(P + "foundation.source").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC)));
 		}
 	}
@@ -840,7 +822,7 @@ public class PathTab extends DiscipleTab {
 		}
 		ty = line(g, Component.translatable(P + "generation", p.getIntOr("generation", 0)), ty, Palette.INK_FAINT, 0.55F);
 		if (mouseX >= x0 && mouseX < hx1 && mouseY >= bodyTop && mouseY < ty) {
-			screen.showTooltip(List.of(Component.translatable(P + "heir"), Component.translatable(P + "heir.tip").withStyle(ChatFormatting.GRAY),
+			tooltip(List.of(Component.translatable(P + "heir"), Component.translatable(P + "heir.tip").withStyle(ChatFormatting.GRAY),
 					source("heir.source")));
 		}
 		float progress = p.getFloatOr("heir_progress", -1.0F);
@@ -876,21 +858,21 @@ public class PathTab extends DiscipleTab {
 			float tx = gx + 3 * (cell + 2.0F) + 4.0F;
 			float room = x + leftW - 4.0F - tx;
 			float ly = gy;
-			Brush.fit(g, font, Component.translatable(P + "hexes", hexes.size(), Heir.MAX_HEXES), tx, ly, room, Palette.INK, 0.65F, 0.45F, false);
-			ly += 8.0F;
+			Brush.fit(g, font, Component.translatable(P + "hexes", hexes.size(), Heir.MAX_HEXES), tx, ly, room, Palette.INK, 1.0F, 1.0F, false);
+			ly += 10.0F;
 			String gen = p.getStringOr("gen_hex", "");
 			Brush.fit(g, font, Component.translatable(P + "gen_hex_now", gen.isEmpty() ? Component.translatable(P + "none") : techniqueName(gen)), tx, ly, room,
-					Palette.GOLD_DARK, 0.6F, 0.45F, false);
-			ly += 8.0F;
+					Palette.GOLD_DARK, 1.0F, 1.0F, false);
+			ly += 10.0F;
 			int pending = p.getIntOr("hex_pending", 0);
 			if (pending > 0) {
-				Brush.fit(g, font, Component.translatable(P + "hex_pending", pending), tx, ly, room, Palette.SEAL_DARK, 0.6F, 0.45F, false);
-				ly += 8.0F;
+				Brush.fit(g, font, Component.translatable(P + "hex_pending", pending), tx, ly, room, Palette.SEAL_DARK, 1.0F, 1.0F, false);
+				ly += 10.0F;
 			}
 			if (hexes.size() >= Heir.MAX_HEXES) {
-				Brush.fit(g, font, Component.translatable(P + "nine"), tx, ly, room, Palette.GOLD_DARK, 0.6F, 0.45F, false);
+				Brush.fit(g, font, Component.translatable(P + "nine"), tx, ly, room, Palette.GOLD_DARK, 1.0F, 1.0F, false);
 			}
-			ty = gy + 3 * (cell + 2.0F) + 3.0F;
+			ty = reach(gy + 3 * (cell + 2.0F) + 3.0F);
 		}
 
 		// The Master's Soul Ring.
@@ -915,7 +897,7 @@ public class PathTab extends DiscipleTab {
 		ty = line(g, Component.translatable(p.getBooleanOr("surpassed", false) ? P + "surpassed" : P + "not_surpassed"), ty,
 				p.getBooleanOr("surpassed", false) ? Palette.GOLD_DARK : Palette.INK_FAINT, 0.58F);
 		if (mouseX >= x0 && mouseX < hx1 && mouseY >= surpassTop && mouseY < ty) {
-			screen.showTooltip(List.of(Component.translatable(p.getBooleanOr("surpassed", false) ? P + "surpassed" : P + "not_surpassed"),
+			tooltip(List.of(Component.translatable(p.getBooleanOr("surpassed", false) ? P + "surpassed" : P + "not_surpassed"),
 					source("surpass.source")));
 		}
 	}
@@ -951,8 +933,8 @@ public class PathTab extends DiscipleTab {
 
 		// The red seal of Mode Kehancuran.
 		ty += 3.0F;
-		heading(g, Component.translatable(P + "red_seal"), x + 2.0F, ty, leftW - 4.0F, 0.7F);
-		ty += 11.0F;
+		heading(g, Component.translatable(P + "red_seal"), x + 2.0F, ty, leftW - 4.0F, 1.0F);
+		ty = reach(ty + 14.0F);
 		if (!p.getBooleanOr("k_server", false)) {
 			line(g, Component.translatable(P + "k_off"), ty, Palette.INK_SOFT, 0.58F);
 			return;
@@ -972,7 +954,7 @@ public class PathTab extends DiscipleTab {
 		int color = open ? Palette.DANGER : Palette.JADE;
 		Glyphs.lock(g, x + 8.0F, ty + 3.5F, 7.0F, color);
 		Component state = Component.translatable(open ? "kultivator.kehancuran.lock.open" : "kultivator.kehancuran.lock.closed").withColor(color & 0xFFFFFF);
-		return ty + Brush.wrap(g, font, Component.translatable("kultivator.kehancuran.ui.lock_line", text, state), x + 15.0F, ty, leftW - 19.0F,
-				Palette.INK, 0.6F, false) + 1.5F;
+		return reach(ty + Brush.wrap(g, font, Component.translatable("kultivator.kehancuran.ui.lock_line", text, state), x + 15.0F, ty, leftW - 19.0F,
+				Palette.INK, 1.0F, false) + 1.5F);
 	}
 }

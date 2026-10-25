@@ -1,0 +1,13 @@
+{
+  "kultivator.gui43.host.di_sini": "Di Sini",
+  "kultivator.gui43.host.di_sini.tip": "Tempat dan lawan bicara yang sedang kamu hadapi.",
+  "kultivator.gui43.host.tombol_angka": "Tombol %s",
+  "kultivator.gui43.host.judul": "%s · %s",
+  "kultivator.gui43.host.sumber": "Sumber: %s",
+  "kultivator.gui43.host.sumber.tip": "Klik untuk berganti sumber (Aulaku / Perguruanku).",
+  "kultivator.gui43.host.kembali": "Kembali (Esc)",
+  "kultivator.gui43.host.kosong": "Belum ada halaman di bagian ini.",
+  "kultivator.gui43.host.petunjuk": "Esc kembali · Q/E halaman · Tab fokus · / cari · [[key:quick]] tutup",
+  "kultivator.gui43.host.lainnya": "Lainnya",
+  "kultivator.gui43.host.tombol_baru": "Gulungan Utama punya tombol baru: %s Kitab Teknik, %s Panduan, %s Peta. Ubah di Pengaturan › Kontrol."
+}

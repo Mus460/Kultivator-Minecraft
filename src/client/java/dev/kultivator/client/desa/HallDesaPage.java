@@ -1,37 +1,38 @@
 package dev.kultivator.client.desa;
 
 import dev.kultivator.client.Keys;
-import dev.kultivator.client.hall.HallPage;
-import dev.kultivator.client.hall.HallScreen;
+import dev.kultivator.client.hall.HallClient;
+import dev.kultivator.client.screen.Page;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Glyphs;
-import dev.kultivator.client.screen.ui.JadeCoin;
+import dev.kultivator.client.screen.ui.KeadaanKosong;
+import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.TalismanButton;
+import dev.kultivator.client.sekte.wilayah.GulirIsi;
 import dev.kultivator.network.Actions;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
 
-import java.util.List;
-
 /**
- * The Desa tablet of the Sect Hall scroll ({@code Halls.PAGE_DESA}, DESIGN 25.10): a jade coin per vassal on the left and
- * the chosen village's scroll card on the right (loyalty bar, villagers, next tribute, the owed buffer, the open request
- * with "Ambil Surat", the Pelindung Desa with assign / release, the last raid), plus the Penjarahan log. Reads the
- * {@code desa} part of the hall info (filled by {@code desa.Desa}); a sect mate sees it read-only.
+ * Sekte › Wilayah › Desa &amp; Pakta (DESIGN 25.10, 43.5; was the Desa tablet of the Sect Hall scroll, {@code Halls.PAGE_DESA}):
+ * the vassal villages as a list (and the Penjarahan log as its last row) beside the chosen village's card (loyalty bar,
+ * villagers, next tribute, the owed buffer, the open request with "Ambil Surat", the Pelindung Desa with assign / release,
+ * the last raid). Narrow boxes (43.3.1 SEMPIT) show the list, and the card in its place with the back control. Reads the
+ * {@code desa} part of the hall info (filled by {@code desa.Desa}); a sect mate sees it read-only. Text 1.0.
  */
-public class HallDesaPage extends HallPage {
+public class HallDesaPage extends Page {
 
 	private static final int LOG = -1;
+	private static final int BARIS = 14;
 	private static int chosen;
-	private int lastCount = -1;
-
-	public HallDesaPage(HallScreen screen) {
-		super(screen);
-	}
+	/** SEMPIT only: the card (or log) is shown in place of the list. */
+	private boolean rinci;
+	private final GulirIsi gulirDaftar = new GulirIsi();
+	private final GulirIsi gulirKartu = new GulirIsi();
 
 	@Override
 	public Component title() {
@@ -44,146 +45,202 @@ public class HallDesaPage extends HallPage {
 	}
 
 	@Override
-	public int icon() {
+	public int glyph() {
 		return Glyphs.HALL;
 	}
 
 	@Override
-	public boolean shown() {
-		CompoundTag desa = desa();
-		return info().getBooleanOr("has", false) && desa.getBooleanOr("on", false);
+	public String helpTopic() {
+		return "desa";
 	}
 
-	private CompoundTag desa() {
-		return info().getCompoundOrEmpty("desa");
+	@Override
+	public boolean tampil() {
+		return HallClient.info().getBooleanOr("has", false) && desa().getBooleanOr("on", false);
 	}
 
-	private ListTag villages() {
+	private static CompoundTag desa() {
+		return HallClient.info().getCompoundOrEmpty("desa");
+	}
+
+	private static ListTag villages() {
 		return desa().getListOrEmpty("villages");
 	}
 
-	private boolean own() {
-		return desa().getBooleanOr("own", false) && !info().getBooleanOr("readonly", false);
+	private static boolean own() {
+		return desa().getBooleanOr("own", false) && !HallClient.info().getBooleanOr("readonly", false);
 	}
 
-	private CompoundTag current() {
+	private static CompoundTag current() {
 		ListTag list = villages();
 		return chosen >= 0 && chosen < list.size() ? list.getCompoundOrEmpty(chosen) : new CompoundTag();
 	}
 
 	@Override
+	public boolean rinci() {
+		return rinci && tata() == Tata.SEMPIT;
+	}
+
+	@Override
+	public boolean mundur() {
+		if (rinci()) {
+			rinci = false;
+			return true;
+		}
+		return false;
+	}
+
+	@Override
 	protected void build() {
-		ListTag list = villages();
-		lastCount = list.size();
-		if (chosen >= list.size()) {
-			chosen = list.isEmpty() ? LOG : 0;
+		if (tata() != Tata.SEMPIT) {
+			rinci = false;
 		}
-		int colW = Math.max(62, Math.min(84, Math.round(w * 0.28F)));
-		int top = y + 14;
-		for (int i = 0; i < list.size(); i++) {
-			int index = i;
-			JadeCoin coin = new JadeCoin(x + 2, top + i * 14, colW, 12, () -> Component.literal(villages().getCompoundOrEmpty(index).getStringOr("name", "?")),
-					() -> chosen == index);
-			coin.onPress(() -> chosen = index);
-			coin.tooltip(() -> List.of(DesaCards.headline(villages().getCompoundOrEmpty(index))));
-			add(coin);
-		}
-		JadeCoin log = new JadeCoin(x + 2, top + Math.max(1, list.size()) * 14 + 4, colW, 12, () -> Component.translatable(DesaCards.P + "log"),
-				() -> chosen == LOG);
-		log.onPress(() -> chosen = LOG);
-		add(log);
-
-		int cardX = x + colW + 8;
-		int cardW = x + w - cardX;
-		int buttonW = Math.max(60, (cardW - 6) / 2);
-		TalismanButton letter = new TalismanButton(cardX, y + h - 15, buttonW, 15, () -> Component.translatable(DesaCards.P + "letter"));
-		letter.enabledWhen(() -> Keys.connected() && own() && chosen >= 0 && !current().getStringOr("req", "").isEmpty());
-		letter.onPress(() -> send(Actions.DESA, 0, "letter:" + current().getIntOr("id", 0)));
-		letter.tooltip(() -> List.of(Component.translatable(DesaCards.P + "letter.tip").withStyle(ChatFormatting.GRAY)));
-		add(letter);
-		TalismanButton guard = new TalismanButton(cardX + buttonW + 6, y + h - 15, Math.min(buttonW, cardW - buttonW - 6), 15,
-				() -> Component.translatable(current().getStringOr("guard", "").isEmpty() ? DesaCards.P + "assign" : DesaCards.P + "release"));
-		guard.enabledWhen(() -> Keys.connected() && own() && chosen >= 0 && current().getBooleanOr("pledged", false));
-		guard.onPress(() -> send(Actions.DESA, 0, (current().getStringOr("guard", "").isEmpty() ? "guard:" : "release:") + current().getIntOr("id", 0)));
-		guard.tooltip(() -> List.of(Component.translatable(current().getStringOr("guard", "").isEmpty() ? DesaCards.P + "assign.tip"
-				: DesaCards.P + "release.tip").withStyle(ChatFormatting.GRAY)));
-		add(guard);
-	}
-
-	@Override
-	protected boolean visible(dev.kultivator.client.screen.ui.Widget widget) {
-		// The card's talismans are hidden on the log view.
-		return chosen >= 0 || !(widget instanceof TalismanButton);
-	}
-
-	@Override
-	public boolean needsRebuild() {
-		return villages().size() != lastCount;
 	}
 
 	@Override
 	protected void drawBehind(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
+	}
+
+	@Override
+	protected void lukis(Lukis l) {
 		CompoundTag desa = desa();
-		heading(g, Component.translatable(DesaCards.P + "hall_title", desa.getIntOr("count", 0), desa.getIntOr("max", 1)), x + 2.0F, y, w - 4.0F, 0.8F);
-		int colW = Math.max(62, Math.min(84, Math.round(w * 0.28F)));
-		float cardX = x + colW + 8.0F;
-		float cardW = x + w - cardX;
-		float scale = cardW >= 180 ? 0.68F : 0.6F;
 		ListTag list = villages();
-		if (chosen == LOG) {
-			drawLog(g, desa, cardX, cardW, scale);
+		if (chosen >= list.size()) {
+			chosen = list.isEmpty() ? LOG : 0;
+		}
+		int top = y + l.kepala(Component.translatable(DesaCards.P + "hall_title", desa.getIntOr("count", 0), desa.getIntOr("max", 1)), x + 2, y, x + w - 2);
+		if (tata() == Tata.SEMPIT) {
+			if (rinci) {
+				kartu(l, desa, list, x + 2, top, x + w - 2, y + h);
+			} else {
+				daftar(l, list, x + 2, top, x + w - 2, y + h);
+			}
+			return;
+		}
+		int colW = Math.max(80, Math.min(120, Math.round(w * 0.3F)));
+		daftar(l, list, x + 2, top, x + 2 + colW, y + h);
+		l.g.fill(x + colW + 6, top, x + colW + 7, y + h, Palette.argb(0x60, Palette.GOLD));
+		kartu(l, desa, list, x + colW + 12, top, x + w - 2, y + h);
+	}
+
+	/** The villages, then the Penjarahan log, one row each. */
+	private void daftar(Lukis l, ListTag list, int x0, int y0, int x1, int y1) {
+		boolean sempit = tata() == Tata.SEMPIT;
+		int ry = gulirDaftar.mulai(l, x0, y0, x1 - 5, y1);
+		for (int i = 0; i <= list.size(); i++) {
+			int index = i < list.size() ? i : LOG;
+			CompoundTag v = index >= 0 ? list.getCompoundOrEmpty(index) : null;
+			Component nama = v != null ? Component.literal(v.getStringOr("name", "?")) : Component.translatable(DesaCards.P + "log");
+			if (index == LOG) {
+				ry += 3;
+			}
+			boolean sorot = l.di(x0, ry, x1 - 5, ry + BARIS);
+			l.kartu(x0, ry, x1 - 5, ry + BARIS - 1, sorot ? 1.0F : 0.0F, !sempit && chosen == index);
+			l.teks(nama, x0 + 5, ry + 3, x1 - x0 - (sempit ? 24 : 12), index == LOG ? l.gaya.teksLemah : l.gaya.teks);
+			if (sempit) {
+				l.kanan(Component.literal("›"), x1 - 9, ry + 3, l.gaya.aksen);
+			}
+			l.zona("desa:" + index, x0, ry, x1 - 5, ry + BARIS - 1, () -> pilih(index), true, null, true);
+			if (sorot && v != null) {
+				l.tip(DesaCards.headline(v));
+			}
+			ry += BARIS;
+		}
+		gulirDaftar.selesai(l, ry);
+	}
+
+	private void pilih(int index) {
+		if (chosen != index) {
+			gulirKartu.atas();
+		}
+		chosen = index;
+		rinci = true;
+	}
+
+	/** The chosen village's card, or the log; the two talismans at the foot of a village card. */
+	private void kartu(Lukis l, CompoundTag desa, ListTag list, int x0, int y0, int x1, int y1) {
+		boolean log = chosen == LOG;
+		int kaki = log || list.isEmpty() ? 0 : 18;
+		int ty = gulirKartu.mulai(l, x0, y0, x1 - 5, y1 - kaki);
+		int tx = x0 + 4;
+		int tw = x1 - 5 - tx - 4;
+		if (log) {
+			ty += Math.round(l.bungkus(Brush.bold(Component.translatable(DesaCards.P + "log_title")), x0, ty, x1 - 5 - x0, l.gaya.aksen)) + 3;
+			ListTag entries = desa.getListOrEmpty("log");
+			if (entries.isEmpty()) {
+				ty += Math.round(l.bungkus(Component.translatable(DesaCards.P + "log_empty"), x0, ty, x1 - 5 - x0, l.gaya.teksSamar));
+			}
+			for (int i = entries.size() - 1; i >= 0; i--) {
+				CompoundTag entry = entries.getCompoundOrEmpty(i);
+				int color = entry.getIntOr("result", 0) == 1 ? DesaCards.LOYAL : DesaCards.WARN;
+				ty += Math.round(l.bungkus(DesaCards.logLine(entry), x0, ty, x1 - 5 - x0, color)) + 2;
+			}
+			gulirKartu.selesai(l, ty);
 			return;
 		}
 		if (list.isEmpty()) {
-			Brush.wrap(g, font, Component.translatable(DesaCards.P + "none", desa.getIntOr("range", 256)), cardX, y + 14.0F, cardW, Palette.INK_SOFT, scale,
-					false);
+			gulirKartu.selesai(l, ty);
+			KeadaanKosong.gambar(l, KeadaanKosong.Gambar.GULUNGAN, Component.translatable(DesaCards.P + "none", desa.getIntOr("range", 256)), null, null,
+					x0, y0, x1, y1);
 			return;
 		}
 		CompoundTag v = current();
 		long today = desa.getLongOr("day", 0L);
-		panel(g, Math.round(cardX), y + 13, x + w - 1, y + h - 18);
-		float cursor = y + 16.0F;
-		float tx = cardX + 4.0F;
-		float tw = cardW - 8.0F;
-		Brush.fit(g, font, Brush.bold(Component.literal(v.getStringOr("name", "?"))), tx, cursor, tw - 8.0F, Palette.SEAL_DARK, scale + 0.12F, 0.5F, false);
-		DesaCards.seal(g, font, v, cardX + cardW - 7.0F, cursor + 3.0F);
-		cursor += 11.0F;
-		cursor += Brush.wrap(g, font, DesaCards.headline(v), tx, cursor, tw, Palette.INK, scale, false) + 1.0F;
+		int kartuTop = ty;
+		ty += 3;
+		l.judul(Component.literal(v.getStringOr("name", "?")), tx, ty, tw - 12, l.gaya.aksen);
+		DesaCards.seal(l.g, font, v, x1 - 13.0F, ty + 5.0F);
+		ty += 16;
+		ty += Math.round(l.bungkus(DesaCards.headline(v), tx, ty, tw, l.gaya.teks)) + 2;
 		if (v.getBooleanOr("pledged", false)) {
-			DesaCards.loyaltyBar(g, tx, cursor, tw, v.getIntOr("loyalty", 0));
-			cursor += 6.0F;
-			cursor += Brush.wrap(g, font, Component.translatable(DesaCards.P + "tribute_owed", v.getLongOr("tribute_in", 0L), v.getIntOr("owed", 0)), tx, cursor,
-					tw, Palette.INK_SOFT, scale - 0.04F, false) + 1.0F;
+			DesaCards.loyaltyBar(l.g, tx, ty, tw, v.getIntOr("loyalty", 0));
+			ty += 7;
+			ty += Math.round(l.bungkus(Component.translatable(DesaCards.P + "tribute_owed", v.getLongOr("tribute_in", 0L), v.getIntOr("owed", 0)), tx, ty,
+					tw, l.gaya.teksLemah)) + 2;
 			Component request = DesaCards.request(v);
-			cursor += Brush.wrap(g, font, request == null ? Component.translatable(DesaCards.P + "no_request") : request, tx, cursor, tw,
-					request == null ? Palette.INK_FAINT : Palette.GOLD_DARK, scale - 0.04F, false) + 1.0F;
-			cursor += Brush.wrap(g, font, DesaCards.guard(v), tx, cursor, tw, Palette.INK_SOFT, scale - 0.04F, false) + 1.0F;
+			ty += Math.round(l.bungkus(request == null ? Component.translatable(DesaCards.P + "no_request") : request, tx, ty, tw,
+					request == null ? l.gaya.teksSamar : Palette.GOLD_DARK)) + 2;
+			ty += Math.round(l.bungkus(DesaCards.guard(v), tx, ty, tw, l.gaya.teksLemah)) + 2;
 			Component raid = DesaCards.lastRaid(v, today);
 			if (raid != null) {
-				cursor += Brush.wrap(g, font, raid, tx, cursor, tw, v.getIntOr("last_result", 0) == 1 ? DesaCards.LOYAL : DesaCards.WARN, scale - 0.04F, false)
-						+ 1.0F;
+				ty += Math.round(l.bungkus(raid, tx, ty, tw, v.getIntOr("last_result", 0) == 1 ? DesaCards.LOYAL : DesaCards.WARN)) + 2;
 			}
 			if (v.getBooleanOr("siege", false)) {
-				Brush.wrap(g, font, Brush.bold(Component.translatable(DesaCards.P + "siege")), tx, cursor, tw, DesaCards.WARN, scale, false);
+				ty += Math.round(l.bungkus(Brush.bold(Component.translatable(DesaCards.P + "siege")), tx, ty, tw, DesaCards.WARN)) + 2;
 			}
 		} else {
-			Brush.wrap(g, font, Component.translatable(DesaCards.P + "waiting_long"), tx, cursor, tw, Palette.INK_SOFT, scale - 0.04F, false);
+			ty += Math.round(l.bungkus(Component.translatable(DesaCards.P + "waiting_long"), tx, ty, tw, l.gaya.teksLemah)) + 2;
+		}
+		Brush.frame(l.g, x0, kartuTop, x1 - 5, ty + 2, Palette.argb(0x90, Palette.GOLD));
+		gulirKartu.selesai(l, ty + 4);
+
+		// the two talismans, fixed at the foot of the card
+		int by = y1 - 15;
+		int bw = Math.max(TalismanButton.MIN_W, (x1 - x0 - 6) / 2);
+		boolean bisa = Keys.connected() && own();
+		String req = v.getStringOr("req", "");
+		boolean surat = bisa && !req.isEmpty();
+		if (TalismanButton.gambar(l, "surat", x0, by, bw, 14, Component.translatable(DesaCards.P + "letter"), surat, null,
+				() -> send(Actions.DESA, 0, "letter:" + current().getIntOr("id", 0)))) {
+			l.tip(Component.translatable(DesaCards.P + "letter.tip"));
+		}
+		boolean tanpaPelindung = v.getStringOr("guard", "").isEmpty();
+		boolean pelindung = bisa && v.getBooleanOr("pledged", false);
+		if (TalismanButton.gambar(l, "pelindung", x0 + bw + 6, by, x1 - x0 - bw - 6, 14,
+				Component.translatable(tanpaPelindung ? DesaCards.P + "assign" : DesaCards.P + "release"), pelindung, null,
+				() -> send(Actions.DESA, 0, (current().getStringOr("guard", "").isEmpty() ? "guard:" : "release:") + current().getIntOr("id", 0)))) {
+			l.tip(Component.translatable(tanpaPelindung ? DesaCards.P + "assign.tip" : DesaCards.P + "release.tip"));
 		}
 	}
 
-	private void drawLog(GuiGraphicsExtractor g, CompoundTag desa, float cardX, float cardW, float scale) {
-		float cursor = y + 14.0F;
-		cursor += Brush.wrap(g, font, Brush.bold(Component.translatable(DesaCards.P + "log_title")), cardX, cursor, cardW, Palette.SEAL_DARK, scale, false)
-				+ 2.0F;
-		ListTag log = desa.getListOrEmpty("log");
-		if (log.isEmpty()) {
-			Brush.wrap(g, font, Component.translatable(DesaCards.P + "log_empty"), cardX, cursor, cardW, Palette.INK_FAINT, scale, false);
-			return;
-		}
-		for (int i = log.size() - 1; i >= 0 && cursor < y + h - 8.0F; i--) {
-			CompoundTag entry = log.getCompoundOrEmpty(i);
-			int color = entry.getIntOr("result", 0) == 1 ? DesaCards.LOYAL : DesaCards.WARN;
-			cursor += Brush.wrap(g, font, DesaCards.logLine(entry), cardX, cursor, cardW, color, scale - 0.04F, false) + 1.0F;
-		}
+	@Override
+	public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+		return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY) || gulirKartu.roda(mouseX, mouseY, scrollY)
+				|| gulirDaftar.roda(mouseX, mouseY, scrollY);
+	}
+
+	@Override
+	public boolean keyPressed(KeyEvent event) {
+		return super.keyPressed(event) || gulirKartu.tombol(event);
 	}
 }

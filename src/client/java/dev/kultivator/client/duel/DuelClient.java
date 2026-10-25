@@ -9,9 +9,6 @@ import dev.kultivator.client.duel.ui.DuelHud;
 import dev.kultivator.client.duel.ui.DuelResultCard;
 import dev.kultivator.client.duel.ui.DuelScreen;
 import dev.kultivator.client.duel.ui.DuelSettings;
-import dev.kultivator.client.hub.HubCards;
-import dev.kultivator.client.hub.HubNav;
-import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.duel.DuelIds;
 import dev.kultivator.duel.net.DuelPayloads;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -22,6 +19,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
@@ -46,7 +44,7 @@ import java.util.Map;
  * Deflect the local client is sure of is shown at once and reconciled with the server's {@code DuelClash}.
  * <p>
  * {@link #init()} (from {@code KultivatorClient}) registers the receivers, the keys, the HUD element (before the chat,
- * hidden with F1 and while a film hides the HUD), the hub card "Duel Pedang" in the Dunia section, then calls
+ * hidden with F1 and while a film hides the HUD), the page Gulungan › Dunia › Duel (DESIGN 43.5), then calls
  * {@code DuelFx.init()} (V) and {@code DuelAnim.init()} (A). Client thread only.
  */
 public final class DuelClient {
@@ -81,6 +79,8 @@ public final class DuelClient {
 	private static int lastPrefsSent = -1;
 	private static int predictedTotal;
 	private static int predictedRight;
+	/** The player's own record from the server ({@code DuelCatatan}, 43.14 S2), or null until asked and answered. */
+	private static @Nullable CompoundTag catatan;
 
 	/** A challenge waiting for an answer: the offer and the client tick it arrived. */
 	public record Offer(DuelPayloads.DuelChallengeOffer offer, long receivedAt) {
@@ -112,6 +112,7 @@ public final class DuelClient {
 		ClientPlayNetworking.registerGlobalReceiver(DuelPayloads.DuelResult.TYPE, (p, context) -> onResult(p));
 		ClientPlayNetworking.registerGlobalReceiver(DuelPayloads.DuelChallengeOffer.TYPE, (p, context) -> onOffer(p));
 		ClientPlayNetworking.registerGlobalReceiver(DuelPayloads.DuelPreview.TYPE, (p, context) -> onPreview(p));
+		ClientPlayNetworking.registerGlobalReceiver(DuelPayloads.DuelCatatan.TYPE, (p, context) -> catatan = p.data());
 		ClientTickEvents.END_CLIENT_TICK.register(DuelClient::tick);
 		ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
 			lastPrefsSent = -1;
@@ -125,8 +126,8 @@ public final class DuelClient {
 		DuelHud.init();
 		BetterCombatBridge.init();
 		DuelInput.init();
-		// Hub › Dunia › "Duel Pedang" (35.8.5): records, challenge the nearest, disciples, rules and quick settings.
-		HubCards.register(HubNav.DUNIA, "duel_pedang", Glyphs.TECHNIQUES, null, () -> HubNav.openChild(new DuelScreen(null), HubNav.DUNIA));
+		// Gulungan › Dunia › Duel (35.8.5, 43.5): challenge, running duel, record.
+		DuelScreen.daftar();
 		// The visual and animation modules (C35.U1).
 		dev.kultivator.client.duel.fx.DuelFx.init();
 		dev.kultivator.client.duel.anim.DuelAnim.init();
@@ -381,6 +382,7 @@ public final class DuelClient {
 		OFFERS.clear();
 		PREDICTIONS.clear();
 		lastResult = null;
+		catatan = null;
 		lastPrefsSent = -1;
 		DuelClock.reset();
 		DuelInput.clear();
@@ -608,7 +610,17 @@ public final class DuelClient {
 		}
 	}
 
-	/** Sends a challenge (the challenge screen). */
+	/** Asks the server for the player's own record (answered with a {@code DuelCatatan}: 43.14 S2). */
+	public static void mintaCatatan() {
+		send(new DuelPayloads.DuelAnswer(0, DuelPayloads.DuelAnswer.ANSWER_CATATAN, 0));
+	}
+
+	/** The record the server last sent, or null. */
+	public static @Nullable CompoundTag catatan() {
+		return catatan;
+	}
+
+	/** Sends a challenge (the challenge page). */
 	public static void challenge(DuelPayloads.DuelChallenge challenge) {
 		send(challenge);
 	}

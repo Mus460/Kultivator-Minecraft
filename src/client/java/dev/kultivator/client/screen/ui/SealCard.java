@@ -80,16 +80,16 @@ public class SealCard extends Widget {
 		}
 
 		float mid = (x0 + x1) / 2.0F;
-		boolean named = size >= 36;
+		boolean named = size >= 46; // room for the name at 1.0 under the mark (43.0.5)
 		float markSize = Math.max(7.0F, size * (named ? 0.34F : 0.42F));
 		float markY = y0 + (named ? 4.0F + markSize / 2.0F + 1.0F : size / 2.0F - 1.0F);
 		int mark = bright ? Palette.onPaper(tone) : Palette.INK_FAINT;
 		Glyphs.spec(g, spec, mid, markY, markSize, mark);
 
 		if (named) {
+			// 43.0.5: the name at 1.0, cut with "…" (the whole name in the tooltip and the detail slip); small cards show the mark only
 			Component name = dev.kultivator.client.codex.CodexNames.name(spec);
-			float scale = size >= 46 ? 0.5F : 0.42F;
-			Brush.fitCentered(g, font, name, mid, markY + markSize / 2.0F + 2.0F, size - 6.0F, bright ? Palette.INK : Palette.INK_SOFT, scale, scale * 0.8F,
+			Brush.fitCentered(g, font, name, mid, markY + markSize / 2.0F + 1.0F, size - 6.0F, bright ? Palette.INK : Palette.INK_SOFT, 1.0F, 1.0F,
 					false);
 		}
 
@@ -103,9 +103,11 @@ public class SealCard extends Widget {
 		}
 
 		// The loadout slot number (upper left), the crack mark (lower left) and the BARU badge.
-		if (look.slot() >= 0) {
+		if (look.slot() >= 0 && size >= 28) {
 			Component slot = Component.literal(String.valueOf(look.slot() + 1));
-			Brush.text(g, font, slot, x0 + 3.0F, y0 + 3.0F, look.slot() < 4 ? Palette.GOLD_DARK : Palette.INK_SOFT, 0.5F, false);
+			Brush.text(g, font, slot, x0 + 3.0F, y0 + 3.0F, look.slot() < 4 ? Palette.GOLD_DARK : Palette.INK_SOFT, 1.0F, false);
+		} else if (look.slot() >= 0) {
+			g.fill(x0 + 4, y0 + 4, x0 + 7, y0 + 7, look.slot() < 4 ? Palette.GOLD_DARK : Palette.INK_SOFT);
 		} else {
 			g.fill(x0 + 4, y0 + 4, x0 + 7, y0 + 7, bright ? Palette.SEAL : Palette.grey(Palette.SEAL, 0.8F));
 		}
@@ -119,9 +121,14 @@ public class SealCard extends Widget {
 		}
 		if (look.isNew() && bright) {
 			Component badge = Component.translatable("kultivator.codex.card.new");
-			float badgeW = font.width(badge) * 0.45F + 3.0F;
-			Brush.rect(g, x0 + 1.0F, y0 + 1.0F, x0 + 1.0F + badgeW, y0 + 6.0F, Palette.SEAL);
-			Brush.text(g, font, badge, x0 + 2.5F, y0 + 1.6F, 0xFFFFF4D6, 0.45F, false);
+			float badgeW = font.width(badge) + 3.0F;
+			if (badgeW <= size - 4.0F) {
+				Brush.rect(g, x0 + 1.0F, y0 + 1.0F, x0 + 1.0F + badgeW, y0 + 10.0F, Palette.SEAL);
+				Brush.text(g, font, badge, x0 + 2.5F, y0 + 2.0F, 0xFFFFF4D6, 1.0F, false);
+			} else {
+				// too small for the word at 1.0 (43.0.5): a red seal dot marks the new art
+				Brush.disc(g, x0 + 5.0F, y0 + 5.0F, 2.5F, Palette.SEAL);
+			}
 		}
 		if (look.stamped()) {
 			float r = Math.max(3.0F, size * 0.13F);

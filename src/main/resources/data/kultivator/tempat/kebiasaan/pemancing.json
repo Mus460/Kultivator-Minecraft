@@ -1,0 +1,64 @@
+{
+  "_catatan": "Kebiasaan #6 pemancing (DESIGN 42.4.12)",
+  "nomor": 6,
+  "siapa": {
+    "umur": [
+      16,
+      200
+    ],
+    "kelamin": "pria",
+    "tahap": [
+      "dewasa",
+      "tua"
+    ]
+  },
+  "sesi": [
+    {
+      "jam": [
+        15,
+        18
+      ],
+      "peluang": 0.75,
+      "syarat": [
+        "tidak_hujan"
+      ],
+      "tujuan": [
+        "pancing",
+        "kerja:pancing",
+        "jalur_perahu"
+      ],
+      "klip": "memancing",
+      "kanan": "joran",
+      "ganti": [
+        {
+          "klip": "memancing"
+        },
+        {
+          "klip": "memancing"
+        },
+        {
+          "klip": "memancing"
+        },
+        {
+          "klip": "angkat_bawa",
+          "kanan": "kota42:ikan"
+        }
+      ],
+      "ganti_menit": 8
+    },
+    {
+      "jam": [
+        18,
+        19
+      ],
+      "butuh": 0,
+      "kegiatan": "kb_pemancing_pulang",
+      "tujuan": [
+        "@rumah"
+      ],
+      "klip": "angkat_bawa",
+      "kanan": "kota42:ikan",
+      "jalan": "jalan_bawa"
+    }
+  ]
+}

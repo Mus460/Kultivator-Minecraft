@@ -3,23 +3,48 @@ package dev.kultivator.client.hall;
 import com.mojang.blaze3d.platform.InputConstants;
 import dev.kultivator.alchemy.AlchemyComponents;
 import dev.kultivator.alchemy.PillQuality;
+import dev.kultivator.client.hub.DiSini;
+import dev.kultivator.client.hub.HubNav;
+import dev.kultivator.client.hub.HubPages;
+import dev.kultivator.client.hub.LembarHub;
+import dev.kultivator.client.hub.Tujuan;
+import dev.kultivator.client.hub.Urutan;
+import dev.kultivator.client.screen.Page;
+import dev.kultivator.client.screen.ui.Bilah;
 import dev.kultivator.client.screen.ui.Brush;
-import dev.kultivator.client.screen.ui.Eased;
 import dev.kultivator.client.screen.ui.Glyphs;
+import dev.kultivator.client.screen.ui.KeadaanKosong;
+import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
+import dev.kultivator.client.screen.ui.TabBar;
 import dev.kultivator.client.screen.ui.TalismanButton;
 import dev.kultivator.client.screen.ui.UiSound;
-import dev.kultivator.client.screen.ui.Widget;
+import dev.kultivator.client.sekte.gabung.GabungClient;
+import dev.kultivator.client.sekte.mandiri.MandiriClient;
+import dev.kultivator.client.sekte.paviliun.PaviliunClient;
+import dev.kultivator.client.sekte.paviliun.PaviliunScreen;
+import dev.kultivator.client.tempat.ui.kit.LayarTempatDasar;
 import dev.kultivator.data.TechniqueRegistry;
 import dev.kultivator.data.TechniqueSpec;
+import dev.kultivator.dunia.kota.NilaiBatu;
+import dev.kultivator.dunia.tempat.ui.LembarKunci.BukuKas;
 import dev.kultivator.sect.hall.Halls;
+import dev.kultivator.sekte.SekteContent;
+import dev.kultivator.sekte.SekteIds;
+import dev.kultivator.sekte.gabung.ui.GabungLembar;
+import dev.kultivator.sekte.paviliun.PaviliunPayloads;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.locale.Language;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -27,73 +52,711 @@ import net.minecraft.world.item.Items;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 /**
- * The Perbendaharaan tablet (DESIGN 20.3.7-20.3.8). Left: the Kantor Misi, where every stack of the inventory the elder
- * accepts is a card with its value (one click offers it; sect mates donate the same way), with the daily cap bar, and
- * the lost sect arts with the pages carried and "Pulihkan Seni". Right: the Paviliun Yue Lu, its wares with price and
- * lock reason, and the pickers for the disciple (Ceramah Kitab, Manual Tubuh Abadi) and the technique scroll. Both
- * columns scroll with the wheel.
+ * Sekte › Kas &amp; Toko (DESIGN 43.5 page {@code kas}; G38, G39, G56, G66, G67): one page for every money place of a
+ * sect, registered by {@code UiHub}. Subs ({@code *} own hall only, {@code +} member of an NPC sect only):
+ * <ul>
+ * <li><b>kas</b>: one view at a time, picked with filter chips (a filter at the third level, 43.0.4): "Kantor Misi" (the
+ * hall's PK pool and the week's in/out, today's offerings against the cap, every offerable stack of the inventory as a card
+ * that offers it on click, the lost sect arts with "Pulihkan"), the ledger {@code buku_kas} views Hari ini / 7 hari /
+ * Sumber*, Politik Kas+ ({@code gabung_politik} tab Kas) and Kas Mandiri* (the independent disciples' pocket money and
+ * money book, from the {@code mandiri_papan} data that {@code HallClient.papanMandiri} hands over; was the Kas tab of the
+ * MandiriBoard);</li>
+ * <li><b>toko_pk</b>: the sect shop for PK. Sumber Aulaku = the hall's Paviliun Yue Lu (wares, pickers for the disciple and
+ * the jade slip, "Beli"); Sumber Perguruanku = the Paviliun Jasa sheet ({@code gabung_paviliun}) with its goods kinds as
+ * chips (Kediaman lives in Diri › Harta, G66). The Sumber chip shows only when both exist (43.2.1);</li>
+ * <li><b>rak</b>*, <b>makam</b>*: module A's Rak Kitab and Makam Leluhur ({@link PaviliunScreen});</li>
+ * <li><b>kafilah</b>*: the ledger's caravan tab.</li>
+ * </ul>
+ * The sheets are shown read-only from here ({@code OP_LIHAT}) through the sheet mounter's pages ({@link LembarHub}); a
+ * world context of the same sheet (the ledger counter, the Paviliun Jasa steward) opens live under Di Sini. Data is asked
+ * only while shown (43.0.12): the hall details through {@link HallClient#minta} (refreshed every 4 s while Sekte shows).
  */
-public class TreasuryPage extends HallPage {
+public final class TreasuryPage extends Page {
 
-	private static final int TOP = 14;
+	public static final String SUB_KAS = "kas";
+	public static final String SUB_TOKO = "toko_pk";
+	public static final String SUB_RAK = "rak";
+	public static final String SUB_MAKAM = "makam";
+	public static final String SUB_KAFILAH = "kafilah";
+	private static final String V_KANTOR = "kantor";
+	private static final String V_POLITIK = "politik";
+	private static final String V_MANDIRI = "mandiri";
+	private static final String M = "kultivator.gui43.m08.";
+	private static final String CHIP = "kas:chip";
 	private static final int CARD_W = 24;
 	private static final int CARD_H = 28;
-	private static final int ROW_H = 13;
-	private static final int BUTTON_H = 11;
+	private static final int ROW_H = 16;
+	private static final int BTN_H = 14;
+	private static final int CHIP_H = 14;
+	private static final float LANGKAH = 18.0F;
+	private static final String L_MANDIRI = "kultivator.sekte.mandiri.cerita.";
 
 	/** One offerable stack (from the last details). */
 	private record Offer(int slot, ItemStack stack, double unit) {
 	}
 
-	private final Eased leftShown = new Eased(14.0F);
-	private final Eased rightShown = new Eased(14.0F);
-	private final Map<Widget, Integer> baseY = new HashMap<>();
-	private final Map<Widget, Boolean> inRight = new HashMap<>();
+	private final LembarHub.Halaman buku = lembar(BukuKas.LAYAR, Set.of(BukuKas.TAB_HARI_INI, BukuKas.TAB_MINGGU, BukuKas.TAB_SUMBER, BukuKas.TAB_KAFILAH));
+	private static final Set<String> TAB_JASA = Set.of(GabungLembar.Paviliun.TAB_TEKNIK, GabungLembar.Paviliun.TAB_WARISAN,
+			GabungLembar.Paviliun.TAB_PIL, GabungLembar.Paviliun.TAB_PUSAKA, GabungLembar.Paviliun.TAB_BAHAN, GabungLembar.Paviliun.TAB_KUOTA,
+			GabungLembar.Paviliun.TAB_PESANAN, GabungLembar.Paviliun.TAB_CERAMAH);
+	private static final Set<String> TAB_POLITIK = Set.of(GabungLembar.Politik.TAB_KAS);
+	/** A world opener's wish for the next {@link #showSub}: {@link #V_POLITIK} or {@link #SUB_TOKO} (Perguruanku); null = none. */
+	private static @Nullable String tujuDunia;
+
+	private final LembarHub.Halaman jasa = lembar(GabungLembar.Paviliun.LAYAR, TAB_JASA);
+	private final LembarHub.Halaman politik = lembar(GabungLembar.Politik.LAYAR, TAB_POLITIK);
+	private final PaviliunScreen rak = new PaviliunScreen(PaviliunPayloads.PAGE_RAK);
+	private final PaviliunScreen makam = new PaviliunScreen(PaviliunPayloads.PAGE_MAKAM);
+	private final TabBar chips = new TabBar();
 	private final List<Offer> offers = new ArrayList<>();
-	private String builtKey = "";
-	private float leftScroll;
-	private float rightScroll;
-	private float leftContentH;
-	private float rightContentH;
-	private int leftW;
-	private int regionTop;
-	private int cardsTop;
-	private int cardCols;
-	private int artsTop;
-	private int waresTop;
+
+	private String sub = SUB_KAS;
+	private String view = V_KANTOR;
+	/** Toko PK source: 0 Aulaku, 1 Perguruanku. */
+	private int sumber;
+	private boolean terlihat;
+	/** True while the keyboard focus is inside the shown sheet / sub page (Tab ring of the child). */
+	private boolean diAnak;
+	private @Nullable Page anak;
+	private int anakY = Integer.MIN_VALUE;
+	private int anakW;
+	private int anakH;
+	private long seenInfo = -1L;
+	private float gulir;
+	private float isiTinggi;
 	private int targetIndex;
 	private int bookIndex;
 
-	public TreasuryPage(HallScreen screen) {
-		super(screen);
+	/**
+	 * Homes of the NPC-sect sheets mounted here (43.12.4, P5): the Paviliun Jasa NPC lands on Toko PK (Perguruanku) and the
+	 * treasury tab of the politics sheet on Kas › Politik Kas, with the live context, instead of under Di Sini.
+	 */
+	public static void daftarRumah() {
+		HubPages.daftarRumah(GabungLembar.Paviliun.LAYAR, TAB_JASA, HubNav.SEKTE, Urutan.ID_KAS, SUB_TOKO, () -> tujuDunia = SUB_TOKO);
+		HubPages.daftarRumah(GabungLembar.Politik.LAYAR, TAB_POLITIK, HubNav.SEKTE, Urutan.ID_KAS, SUB_KAS, () -> tujuDunia = V_POLITIK);
 	}
 
-	@Override
-	public Component title() {
-		return Component.translatable("kultivator.spine6.page.treasury");
+	/** Applies {@link #tujuDunia}; true when it changed what the sub shows. */
+	private boolean ambilTuju() {
+		String t = tujuDunia;
+		tujuDunia = null;
+		if (V_POLITIK.equals(t)) {
+			view = V_POLITIK;
+			return true;
+		}
+		if (SUB_TOKO.equals(t)) {
+			sumber = 1;
+			return true;
+		}
+		return false;
 	}
 
-	@Override
-	public Component shortName() {
-		return Component.translatable("kultivator.spine6.page.treasury.short");
+	private static LembarHub.Halaman lembar(String layar, Set<String> tab) {
+		return LembarHub.dari(new HubPages.Entri(HubNav.SEKTE, Urutan.ID_KAS, Urutan.KAS, () -> null, layar, tab));
 	}
 
-	@Override
-	public int icon() {
-		return Glyphs.SETTINGS;
+	// ================================================================== who sees what
+
+	private static CompoundTag info() {
+		return HallClient.info();
 	}
 
-	private boolean readonly() {
+	private static boolean infoAda() {
+		return HallClient.version() > 0L;
+	}
+
+	/** A hall is shown: the player's own, or another master's opened at its stele (read only). */
+	private static boolean adaAula() {
+		return info().getBooleanOr("has", false);
+	}
+
+	private static boolean readonly() {
 		return info().getBooleanOr("readonly", false);
 	}
 
+	/** The player's own hall (assumed until the first details arrive, so the subs do not jump). */
+	private static boolean milikAula() {
+		return !infoAda() || adaAula() && !readonly();
+	}
+
+	private static boolean anggota() {
+		return GabungClient.lencanaSendiri() != null;
+	}
+
+	private static boolean tokoAula() {
+		return !infoAda() || adaAula();
+	}
+
+	/** Toko PK shows the Paviliun Jasa (Perguruanku) rather than the hall's Yue Lu (Aulaku). */
+	private boolean tokoJasa() {
+		return anggota() && (!tokoAula() || sumber == 1);
+	}
+
+	// ================================================================== identity
+
+	@Override
+	public Component title() {
+		return Component.translatable("kultivator.gui43.hal.sekte.kas");
+	}
+
+	@Override
+	public int glyph() {
+		return Glyphs.TREASURE;
+	}
+
+	@Override
+	public String helpTopic() {
+		return "sekte_kas";
+	}
+
+	@Override
+	public boolean tampil() {
+		return !infoAda() || adaAula() || anggota();
+	}
+
+	@Override
+	public List<Sub> subs() {
+		List<Sub> list = new ArrayList<>();
+		list.add(new Sub(SUB_KAS, nama(SUB_KAS)));
+		if (tokoAula() || anggota()) {
+			list.add(new Sub(SUB_TOKO, nama(SUB_TOKO)));
+		}
+		if (milikAula() && PaviliunClient.aktif()) {
+			list.add(new Sub(SUB_RAK, nama(SUB_RAK)));
+			list.add(new Sub(SUB_MAKAM, nama(SUB_MAKAM)));
+		}
+		if (milikAula()) {
+			list.add(new Sub(SUB_KAFILAH, nama(SUB_KAFILAH)));
+		}
+		return list;
+	}
+
+	private static Component nama(String id) {
+		return Component.translatable("kultivator.gui43.sub.kas." + id);
+	}
+
+	@Override
+	public void showSub(String id) {
+		boolean dituju = ambilTuju();
+		if (id == null || id.equals(sub) && !dituju || subs().stream().noneMatch(s -> s.id().equals(id))) {
+			return;
+		}
+		sub = id;
+		gulir = 0.0F;
+		pasangAnak();
+	}
+
+	@Override
+	public @Nullable Sumber sumber() {
+		if (!SUB_TOKO.equals(sub) || !tokoAula() || !anggota()) {
+			return null;
+		}
+		return new Sumber(List.of(Component.translatable(M + "sumber.aulaku"), Component.translatable(M + "sumber.perguruanku")), () -> sumber, i -> {
+			sumber = i;
+			gulir = 0.0F;
+			pasangAnak();
+		});
+	}
+
+	@Override
+	public long uang() {
+		return anak != null ? anak.uang() : -1L;
+	}
+
+	@Override
+	public boolean rinci() {
+		return anak != null && anak.rinci();
+	}
+
+	@Override
+	public Palette.Gaya gaya() {
+		return anak != null ? anak.gaya() : Palette.Gaya.KERTAS;
+	}
+
+	@Override
+	public boolean lebar() {
+		return anak != null && anak.lebar();
+	}
+
+	// ================================================================== the views of sub kas
+
+	private List<TabBar.Tab> views() {
+		List<TabBar.Tab> list = new ArrayList<>();
+		if (!infoAda() || adaAula()) {
+			list.add(TabBar.Tab.of(V_KANTOR, Component.translatable(M + "v.kantor")));
+		}
+		if (milikAula()) {
+			list.add(TabBar.Tab.of(BukuKas.TAB_HARI_INI, Component.translatable(M + "v.hari_ini")));
+			list.add(TabBar.Tab.of(BukuKas.TAB_MINGGU, Component.translatable(M + "v.minggu")));
+			list.add(TabBar.Tab.of(BukuKas.TAB_SUMBER, Component.translatable(M + "v.sumber")));
+		}
+		if (anggota()) {
+			list.add(TabBar.Tab.of(V_POLITIK, Component.translatable(M + "v.politik")));
+		}
+		if (milikAula() && SekteContent.on(SekteIds.MANDIRI)) {
+			list.add(TabBar.Tab.of(V_MANDIRI, Component.translatable(M + "v.mandiri")));
+		}
+		if (list.isEmpty()) {
+			list.add(TabBar.Tab.of(V_KANTOR, Component.translatable(M + "v.kantor")));
+		}
+		return list;
+	}
+
+	private static boolean bukuView(String v) {
+		return BukuKas.TAB_HARI_INI.equals(v) || BukuKas.TAB_MINGGU.equals(v) || BukuKas.TAB_SUMBER.equals(v);
+	}
+
+	/** The chips above the body: the views of sub kas, or the Paviliun Jasa's goods kinds; fewer than two = no chip row. */
+	private List<TabBar.Tab> chipTabs() {
+		if (SUB_KAS.equals(sub)) {
+			return views();
+		}
+		if (SUB_TOKO.equals(sub) && tokoJasa()) {
+			List<TabBar.Tab> list = new ArrayList<>();
+			for (Sub s : jasa.subs()) {
+				list.add(new TabBar.Tab(s.id(), s.nama(), -1, s.kunci(), true));
+			}
+			return list;
+		}
+		return List.of();
+	}
+
+	private String chipAktif() {
+		if (SUB_KAS.equals(sub)) {
+			return view;
+		}
+		return jasa.isi() instanceof LayarTempatDasar l ? l.tabSekarang() : "";
+	}
+
+	private void pilihChip(String id) {
+		if (SUB_KAS.equals(sub)) {
+			view = id;
+			gulir = 0.0F;
+			pasangAnak();
+			mintaMandiri();
+		} else {
+			jasa.showSub(id);
+		}
+	}
+
+	private boolean adaChip() {
+		return chipTabs().size() > 1;
+	}
+
+	// ================================================================== the child page of the sub / view
+
+	private @Nullable Page anakSekarang() {
+		return switch (sub) {
+			case SUB_TOKO -> tokoJasa() ? jasa : null;
+			case SUB_RAK -> rak;
+			case SUB_MAKAM -> makam;
+			case SUB_KAFILAH -> buku;
+			default -> bukuView(view) ? buku : V_POLITIK.equals(view) ? politik : null;
+		};
+	}
+
+	/** Puts the page of the current sub / view in place (shown / hidden, laid out). */
+	private void pasangAnak() {
+		if (SUB_KAS.equals(sub) && views().stream().noneMatch(t -> t.id().equals(view))) {
+			view = views().get(0).id();
+		}
+		Page baru = anakSekarang();
+		if (baru == buku) {
+			buku.showSub(SUB_KAFILAH.equals(sub) ? BukuKas.TAB_KAFILAH : view);
+		}
+		if (baru == anak) {
+			return;
+		}
+		if (anak != null && terlihat) {
+			sembunyikan(anak);
+		}
+		anak = baru;
+		diAnak = false;
+		anakY = Integer.MIN_VALUE;
+		if (anak != null) {
+			if (screen != null) {
+				anak.pasang(screen);
+			}
+			tataAnak();
+			if (terlihat) {
+				anak.onShow(null);
+			}
+		}
+	}
+
+	/** A sheet that is the live Di Sini context keeps its session when this page leaves (43.8.1.4). */
+	private static void sembunyikan(Page p) {
+		if (DiSini.halaman() != p) {
+			p.onHide();
+		}
+	}
+
+	private int bodyY() {
+		return adaChip() ? y + CHIP_H + 3 : y;
+	}
+
+	private void tataAnak() {
+		if (anak == null || w <= 0) {
+			return;
+		}
+		int by = bodyY();
+		int bh = Math.max(20, y + h - by);
+		if (by != anakY || w != anakW || bh != anakH) {
+			anakY = by;
+			anakW = w;
+			anakH = bh;
+			anak.layout(x, by, w, bh);
+		}
+	}
+
+	// ================================================================== life
+
+	@Override
+	protected void build() {
+		anakY = Integer.MIN_VALUE;
+		if (anak != null && screen != null) {
+			anak.pasang(screen);
+		}
+		tataAnak();
+	}
+
+	/** The Kas Mandiri view asks for the board data when it comes on screen. */
+	private void mintaMandiri() {
+		if (terlihat && SUB_KAS.equals(sub) && V_MANDIRI.equals(view)) {
+			MandiriClient.aksi("papan", "", "", 0);
+		}
+	}
+
+	@Override
+	public void onShow(@Nullable CompoundTag fokus) {
+		HallClient.minta();
+		terlihat = false;
+		pasangAnak();
+		terlihat = true;
+		if (anak != null) {
+			anak.onShow(null);
+		}
+		mintaMandiri();
+		super.onShow(fokus);
+	}
+
+	@Override
+	public void onHide() {
+		terlihat = false;
+		if (anak != null) {
+			sembunyikan(anak);
+		}
+	}
+
+	@Override
+	public void tick() {
+		if (HallClient.version() != seenInfo) {
+			seenInfo = HallClient.version();
+			bacaTawaran();
+			if (subs().stream().noneMatch(s -> s.id().equals(sub))) {
+				// the sub went away (no hall after all, module off): back to Kas, and the Gulungan's sub bar with it
+				sub = SUB_KAS;
+				if (terlihat) {
+					tuju(Tujuan.of(HubNav.SEKTE, Urutan.ID_KAS).sub(SUB_KAS));
+				}
+			}
+			pasangAnak();
+		}
+		if (anak != null) {
+			anak.tick();
+		}
+	}
+
+	@Override
+	public void onData() {
+		if (anak != null) {
+			anak.onData();
+		}
+	}
+
+	@Override
+	public boolean needsRebuild() {
+		return anak != null && anak.needsRebuild();
+	}
+
+	/** The offerable stacks of the last details. */
+	private void bacaTawaran() {
+		offers.clear();
+		for (Tag tag : info().getListOrEmpty("offers")) {
+			if (!(tag instanceof CompoundTag entry)) {
+				continue;
+			}
+			Identifier id = Identifier.tryParse(entry.getStringOr("item", ""));
+			Item item = id == null ? Items.AIR : BuiltInRegistries.ITEM.getValue(id);
+			if (item == Items.AIR) {
+				continue;
+			}
+			ItemStack stack = new ItemStack(item, Math.max(1, entry.getIntOr("count", 1)));
+			int quality = entry.getIntOr("quality", -1);
+			if (quality >= 0) {
+				AlchemyComponents.withQuality(stack, PillQuality.byOrdinal(quality));
+			}
+			offers.add(new Offer(entry.getIntOr("slot", -1), stack, entry.getDoubleOr("unit", 0.0D)));
+		}
+	}
+
+	// ================================================================== drawing
+
+	@Override
+	protected void drawBehind(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
+		if (anak != null) {
+			tataAnak();
+			anak.render(g, mouseX, mouseY, seconds);
+		}
+	}
+
+	@Override
+	protected void lukis(Lukis l) {
+		List<TabBar.Tab> tabs = chipTabs();
+		if (tabs.size() > 1) {
+			chips.setTabs(tabs);
+			chips.gambar(l, CHIP, x, y, x + w, y + CHIP_H, false, TabBar.Rupa.SUB, true, chipAktif(), this::pilihChip);
+		}
+		if (anak != null) {
+			return;
+		}
+		int top = bodyY();
+		int bottom = y + h;
+		if (SUB_TOKO.equals(sub)) {
+			gulirIsi(l, top, bottom, this::yueLu);
+		} else if (V_MANDIRI.equals(view)) {
+			gulirIsi(l, top, bottom, this::kasMandiri);
+		} else if (!infoAda()) {
+			l.tengah(Component.translatable("kultivator.gui43.konteks.memuat"), x + w / 2.0F, (top + bottom) / 2.0F - 4.0F, w - 8, Palette.INK_FAINT);
+		} else if (!adaAula()) {
+			KeadaanKosong.gambar(l, KeadaanKosong.Gambar.GULUNGAN, Component.translatable(M + "tanpa_aula"), null, null, x, top, x + w, bottom);
+		} else {
+			gulirIsi(l, top, bottom, this::kantor);
+		}
+	}
+
+	/** A column painter: draws from y between x0 and x1, returns the y under it. */
+	@FunctionalInterface
+	private interface Kolom {
+		int lukis(Lukis l, int x0, int y, int x1);
+	}
+
+	/** One scrolled column in the body (stacked headings, 43.0.4) with the jade bead of the scroll. */
+	private void gulirIsi(Lukis l, int top, int bottom, Kolom kolom) {
+		int tinggi = bottom - top;
+		float maks = Math.max(0.0F, isiTinggi - tinggi);
+		gulir = Math.max(0.0F, Math.min(maks, gulir));
+		int atas = top + 2 - Math.round(gulir);
+		l.klip(x, top, x + w, bottom);
+		int akhir = kolom.lukis(l, x + 2, atas, x + w - (maks > 0.0F ? 6 : 2));
+		l.lepasKlip();
+		isiTinggi = akhir - atas + 4;
+		if (maks > 0.0F) {
+			float bead = top + 3.0F + (tinggi - 6.0F) * (gulir / maks);
+			l.g.fill(x + w - 2, top, x + w - 1, bottom, Palette.CORD);
+			Brush.disc(l.g, x + w - 1.5F, bead, 2.0F, Palette.JADE);
+		}
+	}
+
+	/** The pool line: the hall's PK and the week's in/out (S28). */
+	private static Component poolLine(CompoundTag info) {
+		Component line = Brush.bold(Component.translatable("kultivator.hall.ui.pool", info.getIntOr("pool", 0)));
+		int[] week = info.getIntArray("pool_week").orElse(new int[0]);
+		if (week.length >= 2) {
+			line = Component.empty().append(line).append(Component.literal("  "))
+					.append(Component.translatable("kultivator.sekte_sambung.kas.minggu", week[0], week[1]).withStyle(ChatFormatting.DARK_GRAY));
+		}
+		return line;
+	}
+
+	/** Kantor Misi: the pool, today's offerings, the offer cards (one click offers), the lost arts. */
+	private int kantor(Lukis l, int x0, int yy, int x1) {
+		CompoundTag info = info();
+		int w0 = x1 - x0;
+		boolean owner = !readonly();
+		l.teks(poolLine(info), x0, yy, w0, Palette.GOLD_DARK);
+		yy += 11;
+		int offered = info.getIntOr("offered_today", 0);
+		int cap = Math.max(1, info.getIntOr("offer_cap", 300));
+		yy += Bilah.baris(l, Component.translatable("kultivator.hall.ui.offered"), offered, cap, x0, yy, x1, Component.literal(offered + "/" + cap),
+				offered >= cap ? Palette.WARN : Palette.JADE) + 3;
+		yy += l.kepala(Component.translatable("kultivator.hall.ui.kantor"), x0, yy, x1);
+		yy += Math.round(l.bungkus(Component.translatable("kultivator.hall.ui.kantor.hint"), x0, yy, w0, l.gaya.teksSamar)) + 2;
+		if (offers.isEmpty()) {
+			yy += Math.round(l.bungkus(Component.translatable("kultivator.hall.ui.kantor.empty"), x0 + 2, yy, w0 - 4, l.gaya.teksSamar)) + 2;
+		}
+		int cols = Math.max(1, w0 / (CARD_W + 2));
+		for (int i = 0; i < offers.size(); i++) {
+			Offer offer = offers.get(i);
+			int cx = x0 + (i % cols) * (CARD_W + 2);
+			int cy = yy + (i / cols) * (CARD_H + 2);
+			String kunci = "kas:tawar" + i;
+			boolean over = l.di(cx, cy, cx + CARD_W, cy + CARD_H);
+			Brush.chamferGradient(l.g, cx, cy, cx + CARD_W, cy + CARD_H, 2, over ? 0xFFFBF2D8 : 0xFFF1E6C6, 0xFFE0D0A6);
+			Brush.frame(l.g, cx, cy, cx + CARD_W, cy + CARD_H, Palette.argb(over ? 0xF0 : 0xA0, Palette.GOLD));
+			l.g.item(offer.stack(), cx + (CARD_W - 16) / 2, cy + 2);
+			l.g.itemDecorations(font, offer.stack(), cx + (CARD_W - 16) / 2, cy + 2);
+			int value = (int) Math.floor(offer.unit() * offer.stack().getCount() + 1.0E-6D);
+			l.tengah(Component.literal("+" + value), cx + CARD_W / 2.0F, cy + CARD_H - 9, CARD_W, Palette.JADE_DARK);
+			int slot = offer.slot();
+			l.zona(kunci, cx, cy, cx + CARD_W, cy + CARD_H, () -> {
+				UiSound.press();
+				HallClient.send(Halls.OP_OFFER, String.valueOf(slot));
+			}, true, null, true);
+			l.fokusCincin(kunci, cx, cy, cx + CARD_W, cy + CARD_H);
+			if (over) {
+				l.tip(List.of(offer.stack().getHoverName().copy().append(Component.literal(" ×" + offer.stack().getCount())),
+						Component.translatable("kultivator.hall.ui.offer_value", formatUnit(offer.unit()), value).withStyle(ChatFormatting.AQUA),
+						Component.translatable(owner ? "kultivator.hall.ui.offer_click" : "kultivator.hall.ui.offer_donate").withStyle(ChatFormatting.GRAY),
+						Component.translatable("kultivator.hall.ui.kantor.source").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC)));
+			}
+		}
+		if (!offers.isEmpty()) {
+			yy += ((offers.size() + cols - 1) / cols) * (CARD_H + 2) + 2;
+		}
+		// the lost arts
+		yy += 4;
+		yy += l.kepala(Component.translatable("kultivator.hall.ui.arts"), x0, yy, x1);
+		int[] pages = info.getIntArray("pages").orElse(new int[3]);
+		int arts = info.getIntOr("arts", 0);
+		int bw = Math.min(70, w0 / 3);
+		for (int set = 1; set <= 3; set++) {
+			int art = set;
+			boolean restored = (arts & 1 << (set - 1)) != 0;
+			l.teks(Component.translatable("kultivator.hall.art." + set), x0, yy, w0 - bw - 40, restored ? Palette.JADE_DARK : l.gaya.teks);
+			int bits = set - 1 < pages.length ? pages[set - 1] : 0;
+			for (int piece = 0; piece < 5; piece++) {
+				float px = x1 - bw - 34 + piece * 6.0F;
+				boolean have = restored || (bits & 1 << piece) != 0;
+				Brush.rect(l.g, px, yy + 2.0F, px + 4.5F, yy + 7.0F, have ? Palette.argb(0xFF, 0xC27AE0) : Palette.argb(0x50, Palette.INK_FAINT));
+			}
+			if (restored) {
+				l.teks(Component.translatable("kultivator.hall.ui.art_restored"), x1 - bw, yy, bw, Palette.JADE_DARK);
+			} else if (owner) {
+				TalismanButton.gambar(l, "kas:pulih" + set, x1 - bw, yy - 2, bw, BTN_H, Component.translatable("kultivator.hall.ui.restore"), canRestore(art),
+						Component.translatable("kultivator.hall.ui.art_pages", Integer.bitCount(bits), 5), () -> HallClient.send(Halls.OP_RESTORE, String.valueOf(art)),
+						canRestore(art), false);
+			}
+			if (l.di(x0, yy - 2, x1, yy + ROW_H - 2)) {
+				l.tip(artTip(art));
+			}
+			yy += ROW_H;
+		}
+		if (!info.getBooleanOr("pavilion", false)) {
+			yy += Math.round(l.bungkus(Component.translatable("kultivator.hall.art.need_pavilion"), x0, yy, w0, l.gaya.teksSamar));
+		}
+		return yy;
+	}
+
+	/** Kas Mandiri: the pocket money of the last 7 days, the hall's contribution pool and the money book (newest data). */
+	private int kasMandiri(Lukis l, int x0, int yy, int x1) {
+		CompoundTag d = HallClient.papanMandiri();
+		int w0 = x1 - x0;
+		if (d == null) {
+			l.samar(Component.translatable("kultivator.gui43.konteks.memuat"), x0, yy, w0);
+			return yy + 10;
+		}
+		l.teks(Component.translatable(L_MANDIRI + "papan.kas.saku7", NilaiBatu.text(d.getLongOr("saku7", 0L))), x0, yy, w0, l.gaya.teks);
+		yy += 10;
+		l.teks(Component.translatable(L_MANDIRI + "papan.kas.pool", d.getIntOr("pool", 0)), x0, yy, w0, l.gaya.teksLemah);
+		yy += 12;
+		yy += l.kepala(Component.translatable(M + "v.mandiri"), x0, yy, x1);
+		ListTag book = d.getListOrEmpty("kas");
+		if (book.isEmpty()) {
+			return yy + Math.round(l.bungkus(Component.translatable(L_MANDIRI + "papan.kas.kosong"), x0 + 2, yy, w0 - 4, l.gaya.teksSamar));
+		}
+		int dayW = 44;
+		int sumW = 64;
+		int whoW = Math.max(30, (w0 - dayW - sumW) * 2 / 5);
+		for (int i = 0; i < book.size(); i++) {
+			CompoundTag b = book.getCompoundOrEmpty(i);
+			long amount = b.getLongOr("j", 0L);
+			l.teks(Component.translatable(L_MANDIRI + "papan.kabar_hari", b.getLongOr("h", 0L) + 1), x0, yy, dayW - 4, l.gaya.teksSamar);
+			l.teks(b.read("n", ComponentSerialization.CODEC).orElse(Component.literal("?")), x0 + dayW, yy, whoW - 4, l.gaya.teks);
+			String sebab = b.getStringOr("s", "");
+			String key = L_MANDIRI + "kas.sebab." + (sebab.indexOf(':') > 0 ? sebab.substring(0, sebab.indexOf(':')) : sebab);
+			Component why = Language.getInstance().has(key) ? Component.translatable(key) : Component.literal(sebab);
+			l.teks(why, x0 + dayW + whoW, yy, w0 - dayW - whoW - sumW - 4, l.gaya.teksLemah);
+			Component sum = Component.literal(amount > 0 ? "+" : amount < 0 ? "-" : "").append(NilaiBatu.text(Math.abs(amount)));
+			l.kanan(sum, x1, yy, amount >= 0 ? Palette.JADE_DARK : Palette.SEAL_DARK);
+			yy += 10;
+		}
+		return yy;
+	}
+
+	private static String formatUnit(double unit) {
+		return unit == Math.floor(unit) ? String.valueOf((int) unit) : String.format(java.util.Locale.ROOT, "%.1f", unit);
+	}
+
+	/** Toko PK, Sumber Aulaku: the hall's Paviliun Yue Lu: the pool, the two pickers, one row per ware with "Beli". */
+	private int yueLu(Lukis l, int x0, int yy, int x1) {
+		CompoundTag info = info();
+		int w0 = x1 - x0;
+		if (infoAda() && !adaAula()) {
+			l.samar(Component.translatable(M + "tanpa_aula"), x0, yy, w0);
+			return yy + 10;
+		}
+		boolean owner = !readonly();
+		l.teks(poolLine(info), x0, yy, w0, Palette.GOLD_DARK);
+		yy += 12;
+		if (owner) {
+			CompoundTag target = target();
+			Component untuk = Component.translatable("kultivator.hall.ui.for_disciple", target == null ? Component.translatable("kultivator.hall.ui.nobody")
+					: target.read("name", ComponentSerialization.CODEC).orElse(Component.translatable("entity.kultivator.disciple")));
+			TalismanButton.gambar(l, "kas:untuk", x0, yy, w0, BTN_H, untuk, targets().size() > 1, Component.translatable("kultivator.hall.ui.for_disciple.tip"),
+					() -> targetIndex++);
+			if (l.di(x0, yy, x1, yy + BTN_H)) {
+				l.tip(Component.translatable("kultivator.hall.ui.for_disciple.tip"));
+			}
+			yy += BTN_H + 2;
+			TechniqueSpec book = book();
+			Component kitab = Component.translatable("kultivator.hall.ui.for_book", book == null ? Component.literal("-") : book.displayName());
+			TalismanButton.gambar(l, "kas:kitab", x0, yy, w0, BTN_H, kitab, info.getListOrEmpty("books").size() > 1,
+					Component.translatable("kultivator.hall.ui.for_book.tip"), () -> bookIndex++);
+			if (l.di(x0, yy, x1, yy + BTN_H)) {
+				l.tip(Component.translatable("kultivator.hall.ui.for_book.tip"));
+			}
+			yy += BTN_H + 3;
+		}
+		yy += l.kepala(Component.translatable(M + "toko_aula"), x0, yy, x1);
+		int bw = 40;
+		for (Tag tag : info.getListOrEmpty("shop")) {
+			if (!(tag instanceof CompoundTag ware)) {
+				continue;
+			}
+			String id = ware.getStringOr("id", "");
+			boolean locked = ware.getBooleanOr("locked", false);
+			Component price = locked ? Component.translatable("kultivator.hall.ui.level_short", ware.getIntOr("need", 1))
+					: Component.literal(ware.getIntOr("price", 0) + " PK");
+			int priceX = owner ? x1 - bw - 4 : x1;
+			int pw = font.width(price);
+			l.teks(Component.translatable("kultivator.hall.ware." + id), x0, yy + 3, priceX - pw - 6 - x0, locked ? Palette.INK_FAINT : l.gaya.teks);
+			l.kanan(price, priceX, yy + 3, locked ? Palette.SEAL_DARK : Palette.GOLD_DARK);
+			if (owner) {
+				boolean bisa = canBuy(id);
+				TalismanButton.gambar(l, "kas:beli:" + id, x1 - bw, yy + 1, bw, BTN_H, Component.translatable("kultivator.hall.ui.buy"), bisa,
+						bisa ? null : alasanBeli(id), () -> HallClient.send(Halls.OP_BUY, id + ":" + param(id)));
+			}
+			l.g.fill(x0, yy + ROW_H, x1, yy + ROW_H + 1, Palette.argb(0x40, Palette.GOLD_DARK));
+			if (l.di(x0, yy, owner ? x1 - bw - 2 : x1, yy + ROW_H)) {
+				l.tip(wareTip(id));
+			}
+			yy += ROW_H + 1;
+		}
+		if (!owner) {
+			yy += 3 + Math.round(l.bungkus(Component.translatable("kultivator.hall.ui.shop_readonly"), x0, yy + 3, w0, l.gaya.teksLemah));
+		}
+		return yy;
+	}
+
+	// ================================================================== the Yue Lu's data (as the hall scroll had it)
+
 	/** Disciples that can receive a sermon or a codex now (loaded, not away). */
-	private List<CompoundTag> targets() {
+	private static List<CompoundTag> targets() {
 		List<CompoundTag> list = new ArrayList<>();
 		for (Tag tag : info().getListOrEmpty("disciples")) {
 			if (tag instanceof CompoundTag entry && !entry.getBooleanOr("away", false) && !entry.getBooleanOr("unloaded", false)) {
@@ -132,123 +795,13 @@ public class TreasuryPage extends HallPage {
 		return null;
 	}
 
-	private @Nullable CompoundTag ware(String id) {
+	private static @Nullable CompoundTag ware(String id) {
 		for (Tag tag : info().getListOrEmpty("shop")) {
 			if (tag instanceof CompoundTag entry && entry.getStringOr("id", "").equals(id)) {
 				return entry;
 			}
 		}
 		return null;
-	}
-
-	private String key() {
-		StringBuilder key = new StringBuilder(readonly() ? "r" : "o");
-		for (Tag tag : info().getListOrEmpty("shop")) {
-			if (tag instanceof CompoundTag entry) {
-				key.append(entry.getStringOr("id", "")).append(';');
-			}
-		}
-		return key.toString();
-	}
-
-	@Override
-	public boolean needsRebuild() {
-		return !key().equals(builtKey);
-	}
-
-	@Override
-	public void onInfo() {
-		offers.clear();
-		for (Tag tag : info().getListOrEmpty("offers")) {
-			if (!(tag instanceof CompoundTag entry)) {
-				continue;
-			}
-			Identifier id = Identifier.tryParse(entry.getStringOr("item", ""));
-			Item item = id == null ? Items.AIR : BuiltInRegistries.ITEM.getValue(id);
-			if (item == Items.AIR) {
-				continue;
-			}
-			ItemStack stack = new ItemStack(item, Math.max(1, entry.getIntOr("count", 1)));
-			int quality = entry.getIntOr("quality", -1);
-			if (quality >= 0) {
-				AlchemyComponents.withQuality(stack, PillQuality.byOrdinal(quality));
-			}
-			offers.add(new Offer(entry.getIntOr("slot", -1), stack, entry.getDoubleOr("unit", 0.0D)));
-		}
-	}
-
-	private void track(Widget widget, int base, boolean right) {
-		add(widget);
-		baseY.put(widget, base);
-		inRight.put(widget, right);
-	}
-
-	@Override
-	protected void build() {
-		builtKey = key();
-		baseY.clear();
-		inRight.clear();
-		leftW = Math.max(118, Math.min(160, Math.round(w * 0.47F)));
-		regionTop = y + TOP;
-		cardsTop = regionTop + 22;
-		cardCols = Math.max(1, (leftW - 8) / (CARD_W + 2));
-		boolean owner = !readonly();
-
-		// The lost arts (positions follow the card grid: placed in drawBehind through baseY + the grid's height).
-		artsTop = 0;
-		if (owner) {
-			for (int set = 1; set <= 3; set++) {
-				int art = set;
-				TalismanButton restore = new TalismanButton(x + leftW - 46, 0, 42, BUTTON_H, () -> Component.translatable("kultivator.hall.ui.restore"));
-				restore.enabledWhen(() -> canRestore(art));
-				restore.urgentWhen(() -> canRestore(art));
-				restore.onPress(() -> HallClient.send(Halls.OP_RESTORE, String.valueOf(art)));
-				restore.tooltip(() -> artTip(art));
-				track(restore, set, false);
-			}
-		}
-
-		// The Paviliun: the two pickers, then one row per ware.
-		int rx = x + leftW + 4;
-		int rw = x + w - rx;
-		int cursor = regionTop + 12;
-		if (owner) {
-			TalismanButton pickTarget = new TalismanButton(rx + 2, cursor, rw - 4, BUTTON_H, () -> {
-				CompoundTag target = target();
-				return Component.translatable("kultivator.hall.ui.for_disciple", target == null ? Component.translatable("kultivator.hall.ui.nobody")
-						: HallUi.name(target, "name"));
-			});
-			pickTarget.enabledWhen(() -> targets().size() > 1);
-			pickTarget.onPress(() -> targetIndex++);
-			pickTarget.tooltip(() -> List.of(Component.translatable("kultivator.hall.ui.for_disciple.tip")));
-			track(pickTarget, cursor, true);
-			cursor += BUTTON_H + 2;
-			TalismanButton pickBook = new TalismanButton(rx + 2, cursor, rw - 4, BUTTON_H, () -> {
-				TechniqueSpec book = book();
-				return Component.translatable("kultivator.hall.ui.for_book", book == null ? Component.literal("-") : book.displayName());
-			});
-			pickBook.enabledWhen(() -> info().getListOrEmpty("books").size() > 1);
-			pickBook.onPress(() -> bookIndex++);
-			pickBook.tooltip(() -> List.of(Component.translatable("kultivator.hall.ui.for_book.tip")));
-			track(pickBook, cursor, true);
-			cursor += BUTTON_H + 3;
-		}
-		waresTop = cursor;
-		for (Tag tag : info().getListOrEmpty("shop")) {
-			if (!(tag instanceof CompoundTag entry)) {
-				continue;
-			}
-			String id = entry.getStringOr("id", "");
-			if (owner) {
-				TalismanButton buy = new TalismanButton(x + w - 34, cursor + 1, 32, BUTTON_H, () -> Component.translatable("kultivator.hall.ui.buy"));
-				buy.enabledWhen(() -> canBuy(id));
-				buy.onPress(() -> HallClient.send(Halls.OP_BUY, id + ":" + param(id)));
-				buy.tooltip(() -> wareTip(id));
-				track(buy, cursor + 1, true);
-			}
-			cursor += ROW_H;
-		}
-		rightContentH = cursor - regionTop + 4;
 	}
 
 	private String param(String id) {
@@ -279,7 +832,32 @@ public class TreasuryPage extends HallPage {
 		return book() != null && (slip == null || slip.getBooleanOr("ok", false));
 	}
 
-	private boolean canRestore(int set) {
+	/** Why "Beli" is off (the disabled talisman's tooltip and footer line). */
+	private Component alasanBeli(String id) {
+		CompoundTag ware = ware(id);
+		if (ware == null) {
+			return Component.translatable("kultivator.hall.ware." + id);
+		}
+		if (ware.getBooleanOr("locked", false)) {
+			return Component.translatable("kultivator.hall.ui.needs_level", ware.getIntOr("need", 1));
+		}
+		if (ware.getBooleanOr("used_today", false)) {
+			return Component.translatable("kultivator.hall.ui.used_today");
+		}
+		if (ware.getBooleanOr("target", false) && target() == null) {
+			return Component.translatable("kultivator.hall.ui.need_target");
+		}
+		if (ware.getIntOr("price", 0) > info().getIntOr("pool", 0)) {
+			return Component.translatable("kultivator.hall.ui.pool_short");
+		}
+		CompoundTag slip = slip();
+		if ("technique".equals(id) && slip != null && slip.getIntOr("need", 1) > info().getIntOr("level", 99)) {
+			return Component.translatable("kultivator.hall.ui.needs_level", slip.getIntOr("need", 1));
+		}
+		return Component.translatable("kultivator.hall.ui.pool_short");
+	}
+
+	private static boolean canRestore(int set) {
 		CompoundTag info = info();
 		int[] pages = info.getIntArray("pages").orElse(new int[3]);
 		boolean restored = (info.getIntOr("arts", 0) & 1 << (set - 1)) != 0;
@@ -305,7 +883,9 @@ public class TreasuryPage extends HallPage {
 		if (ware.getBooleanOr("target", false)) {
 			CompoundTag target = target();
 			lines.add(target == null ? Component.translatable("kultivator.hall.ui.need_target").withStyle(ChatFormatting.RED)
-					: Component.translatable("kultivator.hall.ui.for_disciple", HallUi.name(target, "name")).withStyle(ChatFormatting.DARK_AQUA));
+					: Component.translatable("kultivator.hall.ui.for_disciple",
+							target.read("name", ComponentSerialization.CODEC).orElse(Component.translatable("entity.kultivator.disciple")))
+							.withStyle(ChatFormatting.DARK_AQUA));
 		}
 		if ("technique".equals(id)) {
 			TechniqueSpec book = book();
@@ -325,7 +905,7 @@ public class TreasuryPage extends HallPage {
 		return lines;
 	}
 
-	private List<Component> artTip(int set) {
+	private static List<Component> artTip(int set) {
 		List<Component> lines = new ArrayList<>();
 		lines.add(Component.translatable("kultivator.hall.art." + set));
 		lines.add(Component.translatable("kultivator.hall.art.effect." + set).withStyle(ChatFormatting.GRAY));
@@ -346,250 +926,135 @@ public class TreasuryPage extends HallPage {
 		return lines;
 	}
 
-	// ================================================================== scrolling regions
+	// ================================================================== input
 
 	@Override
-	protected boolean visible(Widget widget) {
-		Integer base = baseY.get(widget);
-		if (base == null) {
+	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+		if (super.mouseClicked(event, doubleClick)) {
+			diAnak = false;
 			return true;
 		}
-		return widget.y + widget.h > regionTop && widget.y < y + h;
+		if (anak != null && anak.mouseClicked(event, doubleClick)) {
+			diAnak = true;
+			return true;
+		}
+		return false;
 	}
 
 	@Override
-	protected int[] clipFor(Widget widget) {
-		Boolean right = inRight.get(widget);
-		if (right == null) {
-			return null;
-		}
-		return right ? new int[]{x + leftW + 1, regionTop, x + w, y + h} : new int[]{x, regionTop, x + leftW - 1, y + h};
+	public boolean mouseReleased(MouseButtonEvent event) {
+		boolean a = anak != null && anak.mouseReleased(event);
+		return super.mouseReleased(event) || a;
 	}
 
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button) {
-		if (mouseY < regionTop && mouseY >= y) {
-			return super.mouseClicked(mouseX, mouseY, button);
-		}
-		if (button == InputConstants.MOUSE_BUTTON_LEFT && mouseX < x + leftW) {
-			int index = cardAt(mouseX, mouseY);
-			if (index >= 0) {
-				UiSound.press();
-				HallClient.send(Halls.OP_OFFER, String.valueOf(offers.get(index).slot()));
-				return true;
-			}
-		}
-		return super.mouseClicked(mouseX, mouseY, button);
-	}
-
-	/** The offer card under the mouse, or -1. */
-	private int cardAt(double mouseX, double mouseY) {
-		if (mouseY < cardsTop - Math.round(leftShown.get()) || mouseY < regionTop || mouseY >= y + h) {
-			return -1;
-		}
-		int offset = Math.round(leftShown.get());
-		for (int i = 0; i < offers.size(); i++) {
-			int cx = x + 2 + (i % cardCols) * (CARD_W + 2);
-			int cy = cardsTop + (i / cardCols) * (CARD_H + 2) - offset;
-			if (mouseX >= cx && mouseX < cx + CARD_W && mouseY >= cy && mouseY < cy + CARD_H) {
-				return i;
-			}
-		}
-		return -1;
+	public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
+		return anak != null && anak.mouseDragged(event, dx, dy) || super.mouseDragged(event, dx, dy);
 	}
 
 	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-		if (!inside(mouseX, mouseY) || mouseY < regionTop) {
+	public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+		if (anak != null) {
+			return anak.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+		}
+		if (super.mouseScrolled(mouseX, mouseY, scrollX, scrollY)) {
+			return true;
+		}
+		if (!inside(mouseX, mouseY) || mouseY < bodyY() || isiTinggi <= y + h - bodyY()) {
 			return false;
 		}
-		if (mouseX < x + leftW) {
-			leftScroll -= (float) amount * 16.0F;
-		} else {
-			rightScroll -= (float) amount * 16.0F;
+		gulir -= (float) scrollY * LANGKAH;
+		return true;
+	}
+
+	@Override
+	public boolean keyPressed(KeyEvent event) {
+		if (anak != null && (diAnak || anak.mauTombol())) {
+			return anak.keyPressed(event) || super.keyPressed(event);
+		}
+		if (super.keyPressed(event)) {
+			return true;
+		}
+		if (anak != null) {
+			return anak.keyPressed(event);
+		}
+		int tinggi = y + h - bodyY();
+		if (isiTinggi <= tinggi) {
+			return false;
+		}
+		// 43.4.2: ↑↓ PgUp PgDn Home End move the stacked column (gulirIsi clamps)
+		float halaman = Math.max(LANGKAH, tinggi - LANGKAH);
+		switch (event.key()) {
+			case InputConstants.KEY_DOWN -> gulir += LANGKAH;
+			case InputConstants.KEY_UP -> gulir -= LANGKAH;
+			case InputConstants.KEY_PAGEDOWN -> gulir += halaman;
+			case InputConstants.KEY_PAGEUP -> gulir -= halaman;
+			case InputConstants.KEY_HOME -> gulir = 0.0F;
+			case InputConstants.KEY_END -> gulir = isiTinggi;
+			default -> {
+				return false;
+			}
 		}
 		return true;
 	}
 
-	// ================================================================== drawing
+	@Override
+	public boolean keyReleased(KeyEvent event) {
+		return anak != null && anak.keyReleased(event);
+	}
 
 	@Override
-	protected void drawBehind(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
-		CompoundTag info = info();
-		// Top: the pool and today's offerings against the cap.
-		int pool = info.getIntOr("pool", 0);
-		// S28: the pool's PK in and out over the last 7 days, beside the balance
-		int[] week = info.getIntArray("pool_week").orElse(new int[0]);
-		Component poolLine = Brush.bold(Component.translatable("kultivator.hall.ui.pool", pool));
-		if (week.length >= 2) {
-			poolLine = Component.empty().append(poolLine).append(Component.literal("  "))
-					.append(Component.translatable("kultivator.sekte_sambung.kas.minggu", week[0], week[1]).withStyle(ChatFormatting.DARK_GRAY));
+	public boolean charTyped(CharacterEvent event) {
+		if (anak != null && (diAnak || anak.mauTombol())) {
+			return anak.charTyped(event);
 		}
-		Brush.fit(g, font, poolLine, x + 2.0F, y + 1.0F, leftW - 6.0F, Palette.GOLD_DARK, 0.75F, 0.45F, false);
-		int offered = info.getIntOr("offered_today", 0);
-		int cap = Math.max(1, info.getIntOr("offer_cap", 300));
-		HallUi.bar(g, font, Component.translatable("kultivator.hall.ui.offered"), Component.literal(offered + "/" + cap), offered / (float) cap,
-				offered >= cap ? Palette.WARN : Palette.JADE, Palette.JADE_LIGHT, x + leftW + 4.0F, y - 1.0F, x + w - 2.0F, 0.5F);
-		Brush.rect(g, x, regionTop - 2.0F, x + w, regionTop - 1.4F, Palette.argb(0x90, Palette.GOLD));
-
-		drawLeft(g, info, mouseX, mouseY, seconds);
-		drawRight(g, info, mouseX, mouseY, seconds);
+		return super.charTyped(event);
 	}
 
-	/** The Kantor Misi cards (their items are drawn above, on their own layer) and the lost arts. */
-	private void drawLeft(GuiGraphicsExtractor g, CompoundTag info, int mouseX, int mouseY, float seconds) {
-		float maxScroll = Math.max(0.0F, leftContentH - (y + h - regionTop));
-		leftScroll = Math.max(0.0F, Math.min(maxScroll, leftScroll));
-		int offset = Math.round(leftShown.to(leftScroll, seconds));
-		g.enableScissor(x, regionTop, x + leftW - 1, y + h);
-		float tx = x + 2.0F;
-		float tw = leftW - 8.0F;
-		float cursor = regionTop - offset;
-		heading(g, Component.translatable("kultivator.hall.ui.kantor"), tx, cursor, tw, 0.72F);
-		Brush.fit(g, font, Component.translatable("kultivator.hall.ui.kantor.hint"), tx, cursor + 11.0F, tw, Palette.INK_SOFT, 0.5F, 0.35F, false);
-		int hovered = inside(mouseX, mouseY) ? cardAt(mouseX, mouseY) : -1;
-		for (int i = 0; i < offers.size(); i++) {
-			Offer offer = offers.get(i);
-			int cx = x + 2 + (i % cardCols) * (CARD_W + 2);
-			int cy = cardsTop + (i / cardCols) * (CARD_H + 2) - offset;
-			boolean over = i == hovered;
-			Brush.chamferGradient(g, cx, cy, cx + CARD_W, cy + CARD_H, 2, over ? 0xFFFBF2D8 : 0xFFF1E6C6, 0xFFE0D0A6);
-			Brush.frame(g, cx, cy, cx + CARD_W, cy + CARD_H, Palette.argb(over ? 0xF0 : 0xA0, Palette.GOLD));
-			int value = (int) Math.floor(offer.unit() * offer.stack().getCount() + 1.0E-6D);
-			Brush.fitCentered(g, font, Component.literal("+" + value), cx + CARD_W / 2.0F, cy + CARD_H - 8.0F, CARD_W - 2.0F, Palette.JADE_DARK, 0.5F,
-					0.35F, false);
-		}
-		if (offers.isEmpty()) {
-			Brush.wrap(g, font, Component.translatable("kultivator.hall.ui.kantor.empty"), tx + 2.0F, cardsTop - offset + 2.0F, tw - 2.0F,
-					Palette.INK_FAINT, 0.55F, false);
-		}
-		int rows = Math.max(1, (offers.size() + cardCols - 1) / cardCols);
-		artsTop = cardsTop + rows * (CARD_H + 2) + 4;
-		cursor = artsTop - offset;
-		heading(g, Component.translatable("kultivator.hall.ui.arts"), tx, cursor, tw, 0.72F);
-		cursor += 12.0F;
-		int[] pages = info.getIntArray("pages").orElse(new int[3]);
-		int arts = info.getIntOr("arts", 0);
-		for (int set = 1; set <= 3; set++) {
-			int rowY = Math.round(cursor);
-			boolean restored = (arts & 1 << (set - 1)) != 0;
-			Brush.fit(g, font, Component.translatable("kultivator.hall.art." + set), tx, rowY, tw - 48.0F, restored ? Palette.JADE_DARK : Palette.INK,
-					0.52F, 0.35F, false);
-			int bits = set - 1 < pages.length ? pages[set - 1] : 0;
-			for (int piece = 0; piece < 5; piece++) {
-				float px = tx + piece * 6.0F;
-				boolean have = restored || (bits & 1 << piece) != 0;
-				Brush.rect(g, px, rowY + 6.0F, px + 4.5F, rowY + 10.0F, have ? Palette.argb(0xFF, 0xC27AE0) : Palette.argb(0x50, Palette.INK_FAINT));
-			}
-			if (restored) {
-				Brush.fit(g, font, Component.translatable("kultivator.hall.ui.art_restored"), x + leftW - 46.0F, rowY + 2.0F, 42.0F, Palette.JADE_DARK,
-						0.5F, 0.35F, false);
-			}
-			if (mouseX >= tx && mouseX < x + leftW - 48 && mouseY >= rowY && mouseY < rowY + ROW_H && mouseY >= regionTop && inside(mouseX, mouseY)) {
-				screen.showTooltip(artTip(set));
-			}
-			cursor += ROW_H;
-		}
-		if (!info.getBooleanOr("pavilion", false)) {
-			cursor += Brush.wrap(g, font, Component.translatable("kultivator.hall.art.need_pavilion"), tx, cursor, tw, Palette.INK_FAINT, 0.5F, false);
-		}
-		leftContentH = cursor + offset - regionTop + 4.0F;
-		g.disableScissor();
-		// The restore talismans sit on their art rows.
-		for (Map.Entry<Widget, Integer> entry : baseY.entrySet()) {
-			if (!inRight.getOrDefault(entry.getKey(), false)) {
-				int set = entry.getValue();
-				boolean restored = (arts & 1 << (set - 1)) != 0;
-				entry.getKey().y = restored ? -1000 : artsTop + 12 + (set - 1) * ROW_H - offset;
-			}
-		}
-		if (maxScroll > 0.0F) {
-			float bead = regionTop + 3.0F + (y + h - regionTop - 6.0F) * (offset / maxScroll);
-			g.fill(x + leftW - 2, regionTop, x + leftW - 1, y + h, Palette.CORD);
-			Brush.disc(g, x + leftW - 1.5F, bead, 2.0F, Palette.JADE);
-		}
-		if (hovered >= 0) {
-			Offer offer = offers.get(hovered);
-			int value = (int) Math.floor(offer.unit() * offer.stack().getCount() + 1.0E-6D);
-			screen.showTooltip(List.of(offer.stack().getHoverName().copy().append(Component.literal(" ×" + offer.stack().getCount())),
-					Component.translatable("kultivator.hall.ui.offer_value", formatUnit(offer.unit()), value).withStyle(ChatFormatting.AQUA),
-					Component.translatable(readonly() ? "kultivator.hall.ui.offer_donate" : "kultivator.hall.ui.offer_click").withStyle(ChatFormatting.GRAY),
-					Component.translatable("kultivator.hall.ui.kantor.source").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC)));
-		}
-	}
-
-	private static String formatUnit(double unit) {
-		return unit == Math.floor(unit) ? String.valueOf((int) unit) : String.format(java.util.Locale.ROOT, "%.1f", unit);
-	}
-
-	/** The Paviliun Yue Lu: one row per ware with its price, or the hall level it waits for. */
-	private void drawRight(GuiGraphicsExtractor g, CompoundTag info, int mouseX, int mouseY, float seconds) {
-		int rx = x + leftW + 4;
-		int x1 = x + w;
-		panel(g, rx - 2, regionTop - 1, x1, y + h);
-		float maxScroll = Math.max(0.0F, rightContentH - (y + h - regionTop));
-		rightScroll = Math.max(0.0F, Math.min(maxScroll, rightScroll));
-		int offset = Math.round(rightShown.to(rightScroll, seconds));
-		for (Map.Entry<Widget, Integer> entry : baseY.entrySet()) {
-			if (inRight.getOrDefault(entry.getKey(), false)) {
-				entry.getKey().y = entry.getValue() - offset;
-			}
-		}
-		g.enableScissor(rx - 1, regionTop, x1 - 1, y + h);
-		float tx = rx + 2.0F;
-		float tw = x1 - rx - 4.0F;
-		heading(g, Component.translatable("kultivator.hall.ui.paviliun"), tx, regionTop + 1.0F - offset, tw, 0.72F);
-		int cursor = waresTop;
-		boolean owner = !readonly();
-		for (Tag tag : info.getListOrEmpty("shop")) {
-			if (!(tag instanceof CompoundTag ware)) {
-				continue;
-			}
-			String id = ware.getStringOr("id", "");
-			int rowY = cursor - offset;
-			boolean locked = ware.getBooleanOr("locked", false);
-			float nameW = tw - (owner ? 36.0F : 0.0F) - 30.0F;
-			Brush.fit(g, font, Component.translatable("kultivator.hall.ware." + id), tx, rowY + 3.0F, nameW, locked ? Palette.INK_FAINT : Palette.INK, 0.52F,
-					0.35F, false);
-			Component price = locked ? Component.translatable("kultivator.hall.ui.level_short", ware.getIntOr("need", 1))
-					: Component.literal(ware.getIntOr("price", 0) + " PK");
-			Brush.fit(g, font, price, tx + nameW + 2.0F, rowY + 3.0F, 28.0F, locked ? Palette.SEAL_DARK : Palette.GOLD_DARK, 0.5F, 0.35F, false);
-			Brush.rect(g, tx, rowY + ROW_H - 0.5F, x1 - 3.0F, rowY + ROW_H, Palette.argb(0x40, Palette.GOLD_DARK));
-			if (!owner && mouseX >= tx && mouseX < x1 && mouseY >= rowY && mouseY < rowY + ROW_H && mouseY >= regionTop && inside(mouseX, mouseY)) {
-				screen.showTooltip(wareTip(id));
-			}
-			cursor += ROW_H;
-		}
-		if (!owner) {
-			Brush.wrap(g, font, Component.translatable("kultivator.hall.ui.shop_readonly"), tx, cursor - offset + 3.0F, tw, Palette.INK_SOFT, 0.5F, false);
-		}
-		g.disableScissor();
-		if (maxScroll > 0.0F) {
-			float bead = regionTop + 3.0F + (y + h - regionTop - 6.0F) * (offset / maxScroll);
-			g.fill(x1 - 2, regionTop, x1 - 1, y + h, Palette.CORD);
-			Brush.disc(g, x1 - 1.5F, bead, 2.0F, Palette.JADE);
-		}
-	}
-
-	/** The offered stacks' items, on their own layer above the cards. */
 	@Override
-	protected void drawAbove(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
-		if (offers.isEmpty()) {
-			return;
+	public boolean mauTombol() {
+		return anak != null && anak.mauTombol() || super.mauTombol();
+	}
+
+	@Override
+	public boolean modal() {
+		return anak != null && anak.modal() || super.modal();
+	}
+
+	@Override
+	public boolean mundur() {
+		return anak != null && anak.mundur();
+	}
+
+	@Override
+	public boolean angka(int n) {
+		return anak != null && anak.angka(n);
+	}
+
+	/**
+	 * Tab walks the chip row, then the child page's ring (which wraps inside the child); Shift+Tab from inside the child goes
+	 * back to the chips. Without a child the page's own ring (cards, talismans) is walked.
+	 */
+	@Override
+	public boolean fokusTab(boolean back) {
+		if (anak == null) {
+			return super.fokusTab(back);
 		}
-		g.nextStratum();
-		g.enableScissor(x, regionTop, x + leftW - 1, y + h);
-		int offset = Math.round(leftShown.get());
-		for (int i = 0; i < offers.size(); i++) {
-			int cx = x + 2 + (i % cardCols) * (CARD_W + 2);
-			int cy = cardsTop + (i / cardCols) * (CARD_H + 2) - offset;
-			if (cy + CARD_H < regionTop || cy > y + h) {
-				continue;
+		boolean chip = adaChip();
+		if (diAnak) {
+			if (back && chip) {
+				diAnak = false;
+				fokusRing.set(CHIP);
+				return true;
 			}
-			ItemStack stack = offers.get(i).stack();
-			g.item(stack, cx + (CARD_W - 16) / 2, cy + 2);
-			g.itemDecorations(font, stack, cx + (CARD_W - 16) / 2, cy + 2);
+			return anak.fokusTab(back);
 		}
-		g.disableScissor();
+		if (chip && fokusRing.kunci() == null) {
+			fokusRing.set(CHIP);
+			return true;
+		}
+		fokusRing.set(null);
+		diAnak = true;
+		return anak.fokusTab(back);
 	}
 }

@@ -17,15 +17,14 @@ import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 
 public class KultivatorClient implements ClientModInitializer {
 
-	/** The server asked for the Dao choice while another screen was open: it opens once that screen is closed. */
-	private static boolean pendingDaoChoice;
-
 	@Override
 	public void onInitializeClient() {
 		EffectQuality.load();
 		Keys.init();
 		// UI/UX Terpadu (DESIGN 33.7 module N): the hub's back behaviour, the Akses Cepat wheel (V) and the one-time key move.
 		dev.kultivator.client.hub.HubNav.init();
+		// Gulungan Utama (DESIGN 43.6): the pages of the screen package, before the modules register theirs (same id replaces).
+		CultivationScreen.daftarBawaan();
 		dev.kultivator.client.hub.QuickWheel.init();
 		dev.kultivator.client.hub.KeyLayout.init();
 		PillTooltips.init();
@@ -89,6 +88,8 @@ public class KultivatorClient implements ClientModInitializer {
 		dev.kultivator.client.sekte.SekteContentClient.init();
 		// Sekte Langit (DESIGN 37): the client side of the four sky-sect modules (37V owns this line).
 		dev.kultivator.client.sekte.langit.LangitClient.init();
+		// Kota yang Hidup (DESIGN 42): the client side of the eleven living-town modules (42A owns this line).
+		dev.kultivator.client.dunia.kota42.KotaHidupClient.init();
 
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.SyncSelf.TYPE, (payload, context) -> ClientCultivation.update(payload));
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.Fx.TYPE, (payload, context) -> FxDispatcher.play(payload));
@@ -109,44 +110,13 @@ public class KultivatorClient implements ClientModInitializer {
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.DuniaSync.TYPE, (payload, context) ->
 				dev.kultivator.client.dunia.DuniaClient.onSync(payload));
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.OpenScreen.TYPE, (payload, context) -> {
-			if (payload.screen() == Payloads.OpenScreen.INFO) {
-				context.client().gui.setScreen(new CultivationScreen(payload.arg()));
-			} else if (payload.screen() == Payloads.OpenScreen.CHOOSE_DAO) {
-				// Never cover a screen the player is using (chat, inventory...): wait until it is closed.
-				if (context.client().gui.screen() == null) {
-					context.client().gui.setScreen(new CultivationScreen(CultivationScreen.TAB_ROOT_DAO));
-				} else {
-					pendingDaoChoice = true;
-				}
-			} else if (payload.screen() == Payloads.OpenScreen.DISCIPLE) {
-				dev.kultivator.client.disciple.DiscipleClient.openScreen(payload.arg());
-			} else if (payload.screen() == Payloads.OpenScreen.HALL) {
-				dev.kultivator.client.hall.HallClient.openScreen(payload.arg());
-			} else if (payload.screen() == Payloads.OpenScreen.KEHANCURAN_CONFIRM) {
-				dev.kultivator.client.kehancuran.KehancuranClient.openConfirm(payload.arg());
-			} else if (payload.screen() == Payloads.OpenScreen.SECT_TEMPLATE) {
-				dev.kultivator.client.sectbuild.BuildClient.openScreen(payload.arg());
-			} else if (payload.screen() == Payloads.OpenScreen.CODEX) {
-				dev.kultivator.client.codex.Codex.open(payload.arg());
-			} else if (payload.screen() == Payloads.OpenScreen.DUNIA) {
-				dev.kultivator.client.dunia.DuniaClient.open(payload.arg());
-			} else if (payload.screen() == Payloads.OpenScreen.ABADI) {
-				dev.kultivator.client.dunia.DuniaClient.openAbadi(payload.arg());
-			} else if (payload.screen() == Payloads.OpenScreen.TITAH) {
-				dev.kultivator.client.pusakalangit.TitahClient.openScreen(payload.arg());
-			}
+			// Gulungan Utama (DESIGN 43.4.4): every server-opened menu is a place of the one screen (old opener until migrated).
+			dev.kultivator.client.hub.HubNav.rute(payload.screen(), payload.arg());
 		});
 
 		HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, Kultivator.id("qi_hud"), new QiHud());
 		ClientTickEvents.END_CLIENT_TICK.register(FxDispatcher::tick);
-		ClientTickEvents.END_CLIENT_TICK.register(minecraft -> {
-			if (pendingDaoChoice && minecraft.player != null && minecraft.gui.screen() == null) {
-				pendingDaoChoice = false;
-				minecraft.gui.setScreen(new CultivationScreen(CultivationScreen.TAB_ROOT_DAO));
-			}
-		});
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
-			pendingDaoChoice = false;
 			ClientCultivation.clear();
 		});
 	}

@@ -70,6 +70,9 @@ public final class Kalimat {
 
 	/** A greeting line for the greeting sheet and speech bubbles (C38.NL chatter may use it too). */
 	public static Component sapa(ServerPlayer player, KultivatorNpc npc) {
+		if (dev.kultivator.dunia.kota42.cakap.Cakap.menangani(npc)) {
+			return dev.kultivator.dunia.kota42.cakap.Cakap.sapa(player, npc);    // 42K (42.5A.11)
+		}
 		String key = kunci(grup(npc), situasi(player, npc), npc.getRandom().nextInt(1 << 16));
 		return key == null ? Component.translatable("kultivator.cerita.sapa.umum") : Component.translatable(key);
 	}

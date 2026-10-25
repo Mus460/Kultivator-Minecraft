@@ -1,0 +1,217 @@
+# fragmen: corpus of the conversation engine (42K-C, DESIGN 42.5A.8). Source format: gen_kota_hidup_cakap.py.
+# Shared fragments (no niat): exclamations, sayings, hedges, small closers. Reached only through slots of other rules.
+@kelompok fragmen
+
+== seru.keluh
+- Aduh... || Oh dear...
+  ~ kampung: Aduh biyung... || Oh mother...
+  ~ kuno: Aduhai... || Alas...
+- Hah, mau bagaimana lagi. || Hah, what can you do.
+  ~ pelabuhan: Hah, ombak tidak bisa dilawan. || Hah, you can't fight the waves.
+- Nasib, nasib. || Such is fate.
+  ~ kuno: Takdir, takdir. || Fate, fate.
+  ~ oasis: Pasir mengalir, nasib mengalir. || Sand flows, fate flows.
+- Langit tidak adil, sungguh. || Heaven is not fair, truly.
+  ~ kasar: Langit itu buta. || Heaven is blind.
+- Hidup makin susah saja. || Life only gets harder.
+  ~ kampung: Urip saya susah wae. Eh, hidup makin susah saja. || Life just keeps getting harder.
+- Entah sampai kapan begini. || Who knows how long this will last.
+  ~ air: Entah sampai kapan, ya... || Who knows how long...
+- Kepalaku pusing memikirkannya. || My head spins just thinking of it.
+  ~ kasar: Pusing. Sudah. || Headache. Enough.
+- Ah, sudahlah. || Ah, never mind.
+  ~ kuno: Biarlah berlalu bersama angin. || Let it pass with the wind.
+  ~ kasar: Cih, sial betul. || Tch, rotten luck.
+- Doakan saja kami kuat. || Just pray we hold out.
+- Uang di kantong makin tipis. || The purse grows thinner.
+  ~ pelabuhan: Kantongku kering seperti dek di siang hari, Bung. || My purse is dry as a deck at noon, mate.
+- Yah, begitulah. || Well, that's how it is.
+  ~ gunung: Amitaba, begitulah dunia. || Amitabha, such is the world.
+
+== seru.kaget
+- Astaga! || Good heavens!
+  ~ kampung: Lho, lho, lho! || Whoa, whoa, whoa!
+  ~ pelabuhan: Demi ombak! || By the waves!
+  ~ oasis: Demi mata air! || By the spring!
+- Hah? Sungguh? || What? Truly?
+  ~ kasar: Hah? Serius? || Huh? Seriously?
+- Masa? || No!
+  ~ air: Masa, sih...? || Really...?
+- Demi langit! || By heaven!
+  ~ gunung: Amitaba! || Amitabha!
+- Ya ampun! || Oh my!
+  ~ p: Ya ampun, ya ampun! || Oh my, oh my!
+- Aku tidak percaya! || I don't believe it!
+  ~ kuno: Hamba sungguh tidak percaya! || This one truly cannot believe it!
+- Wah, wah, wah. || Well, well, well.
+  ~ iblis: Hm. Menarik. || Hm. Interesting.
+  ~ kuno: Sungguh di luar dugaan. || Truly beyond expectation.
+- Hei, jangan bercanda! || Hey, don't joke!
+- Bukan main! || Incredible!
+  ~ kasar: Gila! || Crazy!
+- Oh, jadi begitu! || Oh, so that's it!
+
+== seru.senang
+- Hehe, syukurlah! || Hehe, thank goodness!
+  ~ kampung: Syukur, syukur, Nak! || Thank goodness, child!
+  ~ kuno: Syukur kepada langit! || Thanks be to heaven!
+- Untung sekali! || What luck!
+  ~ pelabuhan: Angin baik, Bung! || Fair winds, mate!
+- Langit masih sayang kita. || Heaven still loves us.
+  ~ oasis: Mata air masih mengalir untuk kita. || The spring still flows for us.
+- Hatiku senang mendengarnya. || It gladdens my heart to hear it.
+- Bagus, bagus! || Good, good!
+  ~ kasar: Bagus. || Good.
+- Akhirnya! || At last!
+  ~ air: Akhirnya, ya...! || At last...!
+- Ini baru kabar enak. || Now that's tasty news.
+  ~ pelabuhan: Ini baru kabar segar, seperti ikan pagi! || Now that's fresh news, like morning fish!
+  ~ kuno: Sungguh berkah langit. || Truly a blessing of heaven.
+- Wah, mantap! || Splendid!
+- Nah, begitu dong. || There, that's more like it.
+  ~ kampung: Nah, gitu dong! || There, that's more like it!
+
+== seru.ragu
+- Entahlah... || Who knows...
+  ~ kuno: Siapa yang tahu kehendak langit... || Who knows heaven's will...
+- Hmm, aku kurang yakin. || Hmm, I'm not so sure.
+  ~ kasar: Aku tidak percaya. || I don't buy it.
+- Tapi itu kata orang, ya. || But that's only what people say.
+  ~ ibukota: Tapi itu belum tercatat resmi, ya. || But it isn't on official record, mind.
+- Jangan dipegang mentah-mentah. || Don't take it as gospel.
+  ~ pelabuhan: Jangan ditelan bulat-bulat, Bung. || Don't swallow it whole, mate.
+- Bisa jadi dibesar-besarkan. || It may be exaggerated.
+  ~ kampung: Biasa, Nak, dilebih-lebihkan. || Usual thing, child, exaggerated.
+- Aku sendiri tidak melihat. || I didn't see it myself.
+- Mungkin, mungkin juga tidak. || Maybe, maybe not.
+- Mulut orang pasar kan begitu. || You know how market mouths are.
+  ~ pelabuhan: Mulut orang dermaga kan begitu. || You know how dock mouths are.
+  ~ oasis: Mulut orang bazar kan begitu. || You know how bazaar mouths are.
+
+== frag.doa
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- Semoga langit melindungi {$sebutan}. || May heaven protect you, {$sebutan}.
+  ~ kuno: Semoga langit dan bumi melindungi {$sebutan}. || May heaven and earth protect you, {$sebutan}.
+  ~ gunung: Amitaba, semoga {$sebutan} terlindung. || Amitabha, may you be shielded, {$sebutan}.
+- Semoga jalanmu lapang. || May your road be wide.
+  ~ pelabuhan: Semoga anginmu selalu baik. || May your winds be ever fair.
+  ~ oasis: Semoga mata air selalu menantimu. || May a spring always await you.
+- Semoga rezekimu mengalir seperti sungai. || May your fortune flow like a river.
+  ~ kampung: Moga rejekimu lancar, Nak. || May your fortune flow, child.
+- Semoga Qi-mu jernih selalu. || May your Qi stay ever clear.
+- Semoga leluhur memberkati. || May the ancestors bless you.
+- Jaga diri baik-baik, ya. || Take good care of yourself.
+  ~ kampung: Ati-ati, Nak. || Take care, child.
+  ~ air: Jaga diri, ya, Kakak... || Look after yourself, dear...
+- Semoga panjang umur dan sehat. || Long life and good health to you.
+  ~ kuno: Semoga Dao menyertai setiap langkah. || May the Dao attend your every step.
+- Semoga tidak ketemu begal di jalan. || May you meet no bandits on the road.
+- Semoga pulang dengan selamat. || May you come home safe.
+  ~ pelabuhan: Semoga kembali ke pelabuhan dengan selamat. || May you return to port safe.
+
+== frag.pepatah
+- Kata orang tua dulu, air tenang menghanyutkan. || As the old folk said, still waters run deep.
+  ~ kampung: Kata simbah, air tenang menghanyutkan. || As granny says, still waters run deep.
+- Gunung tinggi pun didaki selangkah demi selangkah. || Even a tall mountain is climbed one step at a time.
+- Satu pohon tidak membuat hutan. || One tree does not make a forest.
+  ~ kuno: Sebatang pohon tak menjadikan hutan; seorang diri tak menjadikan sekte. || One tree is no forest; one person is no sect.
+- Mulut manis, hati belum tentu. || A sweet mouth does not mean a sweet heart.
+- Siapa menanam angin, menuai badai. || Who sows the wind reaps the storm.
+- Langit punya mata. || Heaven has eyes.
+  ~ kasar: Langit melihat. Ingat itu. || Heaven sees. Remember that.
+- Uang bisa dicari, nama baik sekali hilang susah kembali. || Money can be found; a good name once lost rarely returns.
+  ~ kuno: Harta dapat dicari, nama baik sekali tercemar sukar dipulihkan. || Wealth can be sought; a good name once stained is hard to restore.
+- Di atas langit masih ada langit. || Above the sky there is another sky.
+- Tamu datang, rezeki ikut. || When guests come, fortune follows.
+  ~ oasis: Tamu di gurun adalah berkah dari mata air. || A guest in the desert is a blessing of the spring.
+- Harimau mati meninggalkan belang, orang mati meninggalkan nama. || A tiger leaves its stripes, a man leaves his name.
+- Air yang menetes pun melubangi batu. || Even dripping water bores through stone.
+- Jangan menjual kulit beruang sebelum beruangnya tertangkap. || Don't sell the bear's hide before you've caught the bear.
+- Pelan-pelan asal selamat. || Slow and safe.
+  ~ pelabuhan: Pelan-pelan asal sampai pelabuhan. || Slowly, so long as we make port.
+- Burung yang keluar duluan dapat cacing. || The early bird gets the worm.
+
+== frag.katanya
+- katanya || they say
+  ~ kuno: konon kabarnya || it is said
+- kata orang || people say
+  ~ kampung: kata orang kampung || the villagers say
+- kudengar || I heard
+- kabarnya || word is
+- konon || rumour has it
+- dari mulut ke mulut, || mouth to mouth,
+  ~ pelabuhan: dari dermaga ke dermaga, || dock to dock,
+- kata tetangga || the neighbours say
+  ~ oasis: kata para penunggang unta || the camel riders say
+- di sumur tadi pagi orang bilang || at the well this morning folk said
+
+== frag.penutup_kecil
+- Nah, begitu. || So there.
+  ~ kasar: Sudah. || Done.
+- Begitulah ceritanya. || That's the story.
+- Jangan bilang siapa-siapa, ya. || Don't tell anyone, mind.
+  ~ kasar: Bilang-bilang, kucabut lidahmu. || Blab, and I'll pull your tongue.
+- Sudah, itu saja. || That's all.
+- Hm. || Hm.
+- Aneh-aneh saja dunia ini. || Strange old world.
+  ~ kuno: Dunia fana memang penuh keganjilan. || The mortal world is full of oddities.
+- Kita lihat saja nanti. || We'll see.
+- Kau dengar dariku, ya. || You heard it from me.
+
+== frag.ajakan
+- Mampir ke tempatku kapan-kapan. || Drop by my place some time.
+  ~ kampung: Mampir ke gubukku, Nak, kapan-kapan. || Drop by my hut some time, child.
+- Nanti kita minum teh bersama. || Let's have tea together later.
+  ~ kuno: Kelak kita bersama menikmati teh. || Someday we shall enjoy tea together.
+  ~ pelabuhan: Nanti kita minum di kedai pelaut, Bung. || Later we'll drink at the sailors' tavern, mate.
+- Kalau lapar, warung sebelah enak. || If you're hungry, the stall next door is good.
+- Jangan sungkan, anggap rumah sendiri. || Don't be shy, make yourself at home.
+  ~ oasis: Jangan sungkan, Saudara. Tenda kami tendamu. || Don't be shy, friend. Our tent is your tent.
+- Besok ke pasar? Kita jalan bersama. || Going to market tomorrow? Let's walk together.
+- Ajak teman-temanmu juga. || Bring your friends too.
+
+== frag.alasan_pergi
+- adonanku menunggu || my dough is waiting
+  ~ pelabuhan: jalaku belum dijemur || my nets aren't hung to dry
+- cucianku belum diangkat || my washing is still out
+  ~ p: jemuranku belum diangkat || my washing's still out
+- anakku belum makan || my child hasn't eaten
+- majikanku pasti mencariku || my master must be looking for me
+- tungku di rumah masih menyala || the stove at home is still lit
+  ~ kuno: tungku di rumah menanti hamba || the hearth at home awaits me
+- ada pembeli menunggu di lapak || a customer is waiting at my stall
+- aku harus antar barang ke gudang || I have to take goods to the warehouse
+- istriku menyuruhku beli garam || my wife sent me for salt
+  ~ p: suamiku menyuruhku beli garam || my husband sent me for salt
+- kambingku lepas lagi || my goat got loose again
+  ~ oasis: untaku lepas lagi || my camel got loose again
+- giliran jagaku sebentar lagi || my watch starts soon
+  ~ kasar: giliran jaga || my watch
+- mataku sudah berat || my eyes are heavy
+- ibu memanggilku || mother is calling me
+
+== frag.sebab_harga
+- Kafilah dari selatan tertahan begal. || The caravan from the south is held up by bandits.
+  ~ oasis: Kafilah dari timur tersesat badai pasir. || The eastern caravan was lost in a sandstorm.
+- Panen di hulu gagal kena hama. || The upstream harvest failed to pests.
+- Jalan barat longsor, gerobak tak bisa lewat. || The west road slid away; carts can't pass.
+  ~ pelabuhan: Badai menahan kapal di laut. || Storms are holding ships at sea.
+- Para sekte memborong semuanya untuk murid baru. || The sects bought everything up for new disciples.
+  ~ kuno: Para sekte menimbun bahan untuk murid baru. || The sects are stockpiling for new disciples.
+- Pajak gerbang naik lagi. || The gate tax went up again.
+  ~ ibukota: Bea gerbang ibu kota dinaikkan menteri. || The minister raised the capital's gate duty.
+- Ada yang menimbun di gudang, aku yakin. || Someone's hoarding in a warehouse, I'm sure of it.
+- Kapal dari seberang belum berlabuh. || The ship from across the sea hasn't docked.
+- Musimnya memang belum tiba. || It simply isn't the season yet.
+- Kabarnya ada binatang roh mengganggu ladang. || They say a spirit beast is raiding the fields.
+
+== frag.penguat
+- sungguh || truly
+  ~ kampung: tenan || for real
+- benar-benar || really
+- bukan main || incredibly
+- sumpah || I swear
+  ~ pelabuhan: demi ombak || by the waves
+- percayalah || believe me
+  ~ oasis: demi mata air || by the spring
+  ~ kuno: sungguh-sungguh || in all earnestness

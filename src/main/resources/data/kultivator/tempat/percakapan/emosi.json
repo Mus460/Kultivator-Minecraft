@@ -1,0 +1,294 @@
+{
+  "_catatan": "Tabel 42.5A.3 lengkap + peristiwa tambahan 42K (dihibur, kelahiran, janji_diundur, dikabari_baik/buruk).",
+  "temperamen": {
+    "p": {
+      "X": 0.21,
+      "A": 0.59,
+      "S": 0.19
+    },
+    "a": {
+      "O": 0.15,
+      "A": 0.3,
+      "S": -0.57
+    },
+    "d": {
+      "O": 0.25,
+      "C": 0.17,
+      "X": 0.6,
+      "A": -0.32
+    },
+    "bagi": 100,
+    "jepit": 0.6,
+    "suasana_bagi": 250
+  },
+  "paruh": {
+    "jam": 2.0,
+    "C": 200,
+    "E": -300
+  },
+  "simpan_hari": 2,
+  "peristiwa": [
+    {
+      "id": "dipuji",
+      "p": 0.3,
+      "a": 0.1,
+      "d": 0.1,
+      "berarah": true
+    },
+    {
+      "id": "dibantu",
+      "p": 0.3,
+      "a": 0.1,
+      "d": 0.1,
+      "berarah": true
+    },
+    {
+      "id": "hadiah_disukai",
+      "p": 0.25,
+      "a": 0.1,
+      "d": 0.0,
+      "berarah": true
+    },
+    {
+      "id": "hadiah_dibenci",
+      "p": -0.15,
+      "a": 0.1,
+      "d": 0.0,
+      "berarah": true
+    },
+    {
+      "id": "dihina",
+      "p": -0.4,
+      "a": 0.35,
+      "d": 0.2,
+      "d_bila_rendah": -0.2,
+      "berarah": true
+    },
+    {
+      "id": "diancam_kuat",
+      "p": -0.35,
+      "a": 0.5,
+      "d": -0.45,
+      "berarah": true
+    },
+    {
+      "id": "dicurangi",
+      "p": -0.45,
+      "a": 0.4,
+      "d": 0.1,
+      "berarah": true
+    },
+    {
+      "id": "dicuri",
+      "p": -0.45,
+      "a": 0.4,
+      "d": 0.1,
+      "berarah": true
+    },
+    {
+      "id": "dirayu_diterima",
+      "p": 0.25,
+      "a": 0.3,
+      "d": 0.1,
+      "berarah": true
+    },
+    {
+      "id": "dirayu_ditolak",
+      "p": -0.1,
+      "a": 0.3,
+      "d": -0.1,
+      "berarah": true
+    },
+    {
+      "id": "canda_berhasil",
+      "p": 0.2,
+      "a": 0.15,
+      "d": 0.0
+    },
+    {
+      "id": "canda_gagal",
+      "p": -0.15,
+      "a": 0.15,
+      "d": 0.0
+    },
+    {
+      "id": "duka_keluarga",
+      "p": -0.6,
+      "a": -0.2,
+      "d": -0.1
+    },
+    {
+      "id": "duka_kenalan",
+      "p": -0.2,
+      "a": -0.2,
+      "d": -0.1
+    },
+    {
+      "id": "festival",
+      "p": 0.2,
+      "a": 0.2,
+      "d": 0.0
+    },
+    {
+      "id": "pernikahan_di_tempat",
+      "p": 0.2,
+      "a": 0.2,
+      "d": 0.0
+    },
+    {
+      "id": "serangan_dekat",
+      "p": -0.5,
+      "a": 0.6,
+      "d": -0.3
+    },
+    {
+      "id": "menang_taruhan",
+      "p": 0.3,
+      "a": 0.3,
+      "d": 0.1
+    },
+    {
+      "id": "kalah_taruhan",
+      "p": -0.3,
+      "a": 0.3,
+      "d": -0.1
+    },
+    {
+      "id": "mabuk",
+      "p": 0.15,
+      "a": 0.1,
+      "d": 0.25,
+      "efek": {
+        "C": -30
+      }
+    },
+    {
+      "id": "janji_ditepati",
+      "p": 0.25,
+      "a": 0.0,
+      "d": 0.0,
+      "berarah": true
+    },
+    {
+      "id": "janji_diingkari",
+      "p": -0.35,
+      "a": 0.25,
+      "d": 0.0,
+      "berarah": true,
+      "fakta": "INGKAR"
+    },
+    {
+      "id": "dihibur",
+      "p": 0.2,
+      "a": -0.1,
+      "d": 0.05,
+      "berarah": true
+    },
+    {
+      "id": "kelahiran",
+      "p": 0.45,
+      "a": 0.25,
+      "d": 0.1
+    },
+    {
+      "id": "janji_diundur",
+      "p": -0.05,
+      "a": 0.05,
+      "d": 0.0,
+      "berarah": true
+    },
+    {
+      "id": "dikabari_baik",
+      "p": 0.15,
+      "a": 0.1,
+      "d": 0.0,
+      "berarah": true
+    },
+    {
+      "id": "dikabari_buruk",
+      "p": -0.15,
+      "a": 0.15,
+      "d": -0.05
+    }
+  ],
+  "label": [
+    {
+      "id": "gembira",
+      "p": 1,
+      "a": 1,
+      "d": 1,
+      "wajah": "senang",
+      "gestur": "tertawa"
+    },
+    {
+      "id": "puas",
+      "p": 1,
+      "a": -1,
+      "d": 1,
+      "wajah": "senang",
+      "gestur": "angguk"
+    },
+    {
+      "id": "kagum",
+      "p": 1,
+      "a": 1,
+      "d": -1,
+      "wajah": "senang",
+      "gestur": "kagum"
+    },
+    {
+      "id": "lega",
+      "p": 1,
+      "a": -1,
+      "d": -1,
+      "wajah": "netral",
+      "gestur": "angguk"
+    },
+    {
+      "id": "marah",
+      "p": -1,
+      "a": 1,
+      "d": 1,
+      "wajah": "marah",
+      "gestur": "marah_tunjuk"
+    },
+    {
+      "id": "cemas",
+      "p": -1,
+      "a": 1,
+      "d": -1,
+      "wajah": "takut",
+      "gestur": "tangan_di_dada"
+    },
+    {
+      "id": "jemu",
+      "p": -1,
+      "a": -1,
+      "d": 1,
+      "wajah": "netral",
+      "gestur": "geleng"
+    },
+    {
+      "id": "sedih",
+      "p": -1,
+      "a": -1,
+      "d": -1,
+      "wajah": "sedih",
+      "gestur": "seka_mata"
+    }
+  ],
+  "intensitas": [
+    {
+      "min": 0.0,
+      "kunci": "agak"
+    },
+    {
+      "min": 0.35,
+      "kunci": "sangat"
+    },
+    {
+      "min": 0.7,
+      "kunci": "bukan_main"
+    }
+  ]
+}

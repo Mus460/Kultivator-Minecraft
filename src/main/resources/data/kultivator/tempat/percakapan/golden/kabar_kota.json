@@ -1,0 +1,229 @@
+{
+  "id": "kabar_kota",
+  "jenis": "realisasi",
+  "_catatan": "Town news: caravan arrived, ghost market tonight, danger on the road, festival.",
+  "benih_dunia": 42,
+  "masukan": {
+    "niat": "BERI_KABAR",
+    "pembicara": 403,
+    "hari": 120,
+    "now": 2880000,
+    "cuaca": "cerah",
+    "musim": "semi",
+    "situasi": {
+      "jam": "pagi",
+      "cuaca": "cerah",
+      "musim": "semi",
+      "kelompok": "penjaga",
+      "watak": "ramah",
+      "kebiasaan": [],
+      "sifat": {
+        "H": 10,
+        "E": 0,
+        "X": 20,
+        "A": 30,
+        "C": 10,
+        "O": 0
+      },
+      "wajah": "netral",
+      "tempat": "kota_besar"
+    },
+    "pendengar": {
+      "nama": "Han",
+      "kelamin": "l",
+      "tahap": "dewasa",
+      "pemain": true
+    },
+    "kesan": "kenal",
+    "tahu_nama": false,
+    "register": "biasa",
+    "dialek": "oasis",
+    "label": "cemas",
+    "intensitas": "sangat",
+    "nilai": {
+      "konteks.arah": "barat_daya",
+      "konteks.jarak": 300
+    }
+  },
+  "langkah": [
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "penjaga",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar",
+          "fakta": "KAFILAH_TIBA"
+        },
+        "nilai": {
+          "fakta.subjek": {
+            "t": "Kafilah Pasir Emas"
+          },
+          "fakta.hariKejadian": 120
+        },
+        "topik": "kafilah"
+      },
+      "harap": {
+        "k": "kultivator.cakap.kabar.kafilah.3",
+        "a": []
+      },
+      "aturan": "kabar.kafilah",
+      "gestur": "tunjuk",
+      "seru": null,
+      "tik": null,
+      "id_id": "Aku membeli sutra dari kafilah. Lihat, warnanya seperti matahari terbenam.",
+      "en_us": "I bought silk from the caravan. Look, the colour of a sunset."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "penjaga",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar",
+          "fakta": "PASAR_HANTU_DI"
+        },
+        "nilai": {
+          "fakta.objek": {
+            "t": "gang belakang kuil"
+          },
+          "fakta.hariKejadian": 120,
+          "fakta.nilai": 121
+        },
+        "topik": "pasar_hantu"
+      },
+      "harap": {
+        "k": "kultivator.cakap.kabar.pasar_hantu.0",
+        "a": [
+          {
+            "t": "gang belakang kuil"
+          },
+          {
+            "k": "kultivator.cakap.lex.besok.oasis",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "kabar.pasar_hantu",
+      "gestur": "bisik",
+      "seru": null,
+      "tik": null,
+      "id_id": "Sst... Pasar Hantu buka di gang belakang kuil esok, bila matahari mengizinkan. Bawa lentera putih, jangan bicara keras.",
+      "en_us": "Shh... the Ghost Market opens at gang belakang kuil tomorrow, sun willing. Bring a white lantern and keep your voice down."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "penjaga",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar",
+          "fakta": "BAHAYA"
+        },
+        "nilai": {
+          "fakta.objek": {
+            "t": "jalan barat"
+          },
+          "fakta.hariKejadian": 119
+        },
+        "topik": "bahaya"
+      },
+      "harap": {
+        "t": ""
+      },
+      "aturan": null,
+      "gestur": null,
+      "seru": null,
+      "tik": null,
+      "id_id": "",
+      "en_us": ""
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "penjaga",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar",
+          "fakta": "ACARA"
+        },
+        "nilai": {
+          "fakta.objek": {
+            "t": "Festival Lentera"
+          },
+          "fakta.nilai": 123,
+          "fakta.hariKejadian": 120
+        },
+        "topik": "acara"
+      },
+      "harap": {
+        "k": "kultivator.cakap.kabar.acara.3",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.hari_lagi",
+            "a": [
+              {
+                "k": "kultivator.cakap.lex.angka.3",
+                "a": []
+              }
+            ]
+          }
+        ]
+      },
+      "aturan": "kabar.acara",
+      "gestur": "bicara_tangan",
+      "seru": null,
+      "tik": null,
+      "id_id": "Semua penjual makanan bersiap. Acara tiga hari lagi berarti dagangan habis.",
+      "en_us": "Every food seller is getting ready. in three days means a sell-out."
+    }
+  ]
+}

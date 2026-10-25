@@ -1,0 +1,701 @@
+# sapa: corpus of the conversation engine (42K-C, DESIGN 42.5A.8). Source format: gen_kota_hidup_cakap.py.
+# SAPA: opening greetings (42.5.2 axes: group, hour, weather, mood, impression, name known). Topic "sapa".
+@kelompok sapa
+
+== sapa.subuh
+niat: SAPA
+topik: sapa
+syarat: jam=subuh
+gestur: lambai
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- Oh, {$sebutan}, sepagi ini sudah keluar? || Oh, {$sebutan}, out this early?
+  ~ kampung: Lho, Nak, subuh-subuh begini sudah jalan? || Well, child, walking about at this hour?
+  ~ pelabuhan: Pagi buta begini, Bung? Mau ikut perahu? || This early, mate? Catching a boat?
+- Ayam pun belum berkokok, {$sebutan}. || Not even the cocks have crowed, {$sebutan}.
+  ~ kuno: Embun belum kering, {$sebutan} sudah melangkah. Tekun sekali. || The dew is not yet dry and you are already abroad, {$sebutan}. Most diligent.
+- Selamat subuh. Kabutnya masih tebal, hati-hati. || Good early morning. The mist is still thick; mind yourself.
+  ~ gunung: Amitaba. Lonceng subuh baru selesai berbunyi. || Amitabha. The dawn bell has only just finished.
+- [2] Pagi, {$sebutan}. Udara subuh paling bagus untuk napas, kata orang. || Morning, {$sebutan}. Dawn air is best for breathing, they say.
+  ~ air: Pagi, Kakak... air kanal masih dingin sekali, ya... || Morning, dear... the canal water is still so cold...
+- Wah, {$sebutan} juga tidak bisa tidur? || Ah, {$sebutan}, couldn't sleep either?
+
+== sapa.pagi
+niat: SAPA
+topik: sapa
+syarat: jam=pagi
+gestur: lambai
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Selamat pagi, {$sebutan}! || Good morning, {$sebutan}!
+  ~ kasar: Pagi. || Morning.
+  ~ kuno: Salam pagi, {$sebutan}. || Morning greetings, {$sebutan}.
+  ~ pelabuhan: Pagi, Bung! Angin laut segar, ya? || Morning, mate! Fresh sea wind, eh?
+  ~ oasis: Pagi, Saudara. Semoga mata air tidak kering untukmu. || Morning, friend. May the spring never run dry for you.
+  ~ iblis: Pagi. Masih hidup rupanya. || Morning. Still alive, I see.
+- Pagi, {$sebutan}. Sudah sarapan? || Morning, {$sebutan}. Eaten yet?
+  ~ kampung: Pagi, Nak. Sudah makan? Jangan jalan dengan perut kosong. || Morning, child. Eaten? Don't walk on an empty belly.
+  ~ ibukota: Selamat pagi, {$sebutan}. Sudahkah {$sebutan} bersantap pagi? || Good morning, {$sebutan}. Have you breakfasted?
+- Pagi yang cerah, {$sebutan}. Semoga harimu lancar. || A bright morning, {$sebutan}. May your day go smoothly.
+- Ah, {$sebutan}. Pagi! Jalanan masih lengang, enak berjalan. || Ah, {$sebutan}. Morning! The streets are still empty; good for walking.
+- [2] Pagi! Bubur di ujung jalan sudah matang, cium baunya? || Morning! The porridge down the road is done, smell it?
+- Pagi, {$sebutan}. Mau ke mana sepagi ini? || Morning, {$sebutan}. Where are you off to so early?
+  ~ air: Pagi, Kakak. Mau naik perahu ke pasar apung, ya? || Morning, dear. Taking a boat to the floating market?
+
+== sapa.siang
+niat: SAPA
+topik: sapa
+syarat: jam=siang
+gestur: lambai
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Selamat siang, {$sebutan}. || Good afternoon, {$sebutan}.
+  ~ kasar: Siang. Mau apa? || Afternoon. What do you want?
+  ~ kuno: Salam, {$sebutan}. Matahari tepat di atas kepala. || Greetings, {$sebutan}. The sun stands at its height.
+  ~ oasis: Siang, Saudara. Berteduhlah dulu, pasir sedang membara. || Afternoon, friend. Take shade; the sand is burning.
+- Siang, {$sebutan}. Panas, ya? Cari tempat teduh. || Afternoon, {$sebutan}. Hot, isn't it? Find some shade.
+  ~ kasar: Panas. Jangan halangi teduhanku. || Hot. Don't block my shade.
+  ~ kampung: Siang, Nak. Panas begini, pakai caping. || Afternoon, child. Heat like this, wear a straw hat.
+- Siang! Sudah makan siang, {$sebutan}? || Afternoon! Had lunch, {$sebutan}?
+  ~ kuno: Sudahkah {$sebutan} bersantap siang? Perut kosong mengacaukan Qi. || Have you taken your midday meal, {$sebutan}? An empty belly disturbs the Qi.
+  ~ kampung: Siang, Nak. Mampir minum air kendi dulu sini. || Afternoon, child. Come have some water from the jug.
+- Oh, {$sebutan}. Siang begini masih sibuk berjalan? || Oh, {$sebutan}. Still busy walking about at this hour?
+  ~ kasar: Kau lagi. Tidak capek berjalan terus? || You again. Not tired of walking about?
+- [2] Siang. Ramai sekali hari ini, ya. || Afternoon. So busy today, isn't it.
+  ~ air: Siang, Kakak... perahu-perahu ramai sekali, ya... || Afternoon, dear... the boats are so busy...
+  ~ pelabuhan: Siang, Bung. Dermaga penuh peti, hati-hati melangkah. || Afternoon, mate. The quay is full of crates; watch your step.
+
+== sapa.sore
+niat: SAPA
+topik: sapa
+syarat: jam=sore
+gestur: lambai
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Sore, {$sebutan}. || Evening, {$sebutan}.
+  ~ kuno: Senja menyapa, {$sebutan}. || Dusk greets you, {$sebutan}.
+  ~ air: Sore, Kakak... lihat, lentera-lentera mulai dinyalakan, ya... || Evening, dear... look, the lanterns are being lit...
+- Sore, {$sebutan}. Hari ini berat juga, ya? || Evening, {$sebutan}. A heavy day, wasn't it?
+  ~ kasar: Sore. Capek. Jangan banyak tanya. || Evening. Tired. Don't ask much.
+  ~ pelabuhan: Sore, Bung. Kapal-kapal mulai pulang. || Evening, mate. The boats are coming home.
+- Sore! Angin mulai sejuk, enak sekali. || Evening! The wind is cooling; lovely.
+  ~ oasis: Sore, Saudara! Akhirnya pasir mendingin. || Evening, friend! The sand is cooling at last.
+- Selamat sore. Pulang kerja, {$sebutan}? || Good evening. Heading home from work, {$sebutan}?
+  ~ kuno: Selamat sore, {$sebutan}. Apakah urusan hari ini telah tuntas? || Good evening, {$sebutan}. Is today's business concluded?
+  ~ kampung: Sore, Nak. Sapi-sapi sudah pulang kandang, kau juga cepat pulang. || Evening, child. The cows are home; you get home too.
+- [2] Sore, {$sebutan}. Langitnya merah sekali, besok pasti cerah. || Evening, {$sebutan}. Such a red sky; tomorrow will be fine.
+  ~ gunung: Senja merah di puncak, {$sebutan}. Lonceng sore segera berbunyi. || Red dusk on the peak, {$sebutan}. The evening bell will ring soon.
+- Oh, {$sebutan}, sore-sore begini enaknya minum teh. || Oh, {$sebutan}, an evening like this calls for tea.
+  ~ kasar: Sore. Teh? Bayar sendiri. || Evening. Tea? Pay your own.
+
+== sapa.malam
+niat: SAPA
+topik: sapa
+syarat: jam=malam
+gestur: lambai
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Selamat malam, {$sebutan}. || Good evening, {$sebutan}.
+  ~ kasar: Malam. Jangan bikin ribut. || Evening. Don't make trouble.
+  ~ kuno: Salam malam, {$sebutan}. Bulan menjadi saksi. || Night greetings, {$sebutan}. The moon is our witness.
+  ~ iblis: Malam. Di kota ini, malam milik yang berani. || Evening. In this city the night belongs to the bold.
+- Malam, {$sebutan}. Jangan lewat gang gelap, ya. || Evening, {$sebutan}. Stay out of the dark alleys.
+  ~ kuno: Malam, {$sebutan}. Bayang-bayang menyimpan bahaya; berjalanlah di bawah lentera. || Good night, {$sebutan}. Shadows hold danger; walk beneath the lanterns.
+  ~ iblis: Malam. Gang gelap di sini menelan orang. Ingat itu. || Evening. The dark alleys here swallow people. Remember.
+- Malam! Bulan terang sekali malam ini. || Evening! The moon is so bright tonight.
+  ~ air: Malam, Kakak... bulannya bercermin di kanal, cantik, ya... || Evening, dear... the moon is mirrored in the canal, lovely...
+- Oh, {$sebutan}. Malam-malam begini masih di luar? || Oh, {$sebutan}. Still out at this hour?
+  ~ kasar: Masih keluyuran? Pulang sana. || Still roaming? Go home.
+  ~ kampung: Lho, Nak, sudah malam. Nanti dicari orang rumah. || Child, it's dark. Your folks will be looking for you.
+- [2] Malam. Lentera kedai masih menyala, kalau mau mampir. || Evening. The tavern lantern is still lit, if you want to drop in.
+  ~ kasar: Malam. Kedai masih buka. Minum sana. || Evening. The tavern's open. Go drink.
+  ~ pelabuhan: Malam, Bung. Ombak tenang, bagus buat tidur. || Evening, mate. Calm waves, good for sleeping.
+
+== sapa.larut
+niat: SAPA
+topik: sapa
+syarat: jam=larut
+gestur: lambai
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- Siapa itu? Oh, {$sebutan}... kukira maling. || Who's there? Oh, {$sebutan}... I thought you were a thief.
+  ~ kuno: Siapa di sana? Oh... {$sebutan}. Hamba kira bayangan jahat. || Who goes there? Oh... {$sebutan}. This one took you for an evil shade.
+  ~ kampung: Sopo kuwi? Oh, {$sebutan}... bikin kaget, Nak. || Who's there? Oh, {$sebutan}... you startled me, child.
+  ~ kasar: Siapa?! Oh, kau. Bikin kaget saja. || Who's that?! Oh, you. Gave me a fright.
+- Selarut ini, {$sebutan}? Kota sudah tidur. || This late, {$sebutan}? The town is asleep.
+  ~ kasar: Larut begini? Mau mencuri? || This late? Here to steal?
+  ~ pelabuhan: Larut begini, Bung? Cuma penjaga suar yang masih bangun. || This late, mate? Only the lighthouse keeper's still awake.
+- Ssst, pelan-pelan, {$sebutan}. Orang-orang sudah tidur. || Shh, softly, {$sebutan}. People are asleep.
+  ~ air: Sst, Kakak... pelan-pelan... airnya pun sedang tidur... || Shh, dear... softly... even the water is sleeping...
+- [2] Malam sudah larut, {$sebutan}. Hati-hati, roh gentayangan suka jalan jam begini. || It's late, {$sebutan}. Careful, wandering spirits like this hour.
+  ~ iblis: Jam begini yang berkeliaran cuma roh dan pembunuh. Kau yang mana, {$sebutan}? || At this hour only ghosts and killers roam. Which are you, {$sebutan}?
+  ~ kuno: Tengah malam adalah waktu kultivator, bukan orang fana seperti hamba. || Midnight belongs to cultivators, not to mortals like this humble one.
+
+== sapa.hujan
+niat: SAPA
+topik: sapa
+syarat: cuaca=hujan
+gestur: lambai
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [2] Hujan lagi, {$sebutan}. Mau berteduh dulu? || Raining again, {$sebutan}. Want to take shelter?
+  ~ kasar: Hujan. Jangan basahi lapakku. || Rain. Don't drip on my stall.
+  ~ kuno: Hujan turun, {$sebutan}. Sudilah berteduh di emperan hamba. || The rain falls, {$sebutan}. Pray shelter under this one's eaves.
+- Basah kuyup begitu, {$sebutan}! Ayo masuk ke emperan. || Soaked through, {$sebutan}! Come under the eaves.
+  ~ kampung: Lho, basah semua, Nak! Sini, kuambilkan kain. || Oh, soaked through, child! Here, I'll fetch a cloth.
+- Hujan begini pembeli sepi... {$sebutan} mau payung? Murah saja. || Rain like this keeps the buyers away... want an umbrella, {$sebutan}? Cheap.
+  ~ pelabuhan: Hujan begini, Bung, ikan pun malas naik. Payung? Murah! || Rain like this, mate, even the fish won't rise. Umbrella? Cheap!
+- Selamat datang, {$sebutan}. Hujannya deras, ya? || Welcome, {$sebutan}. Heavy rain, isn't it?
+  ~ kasar: Hujan. Ya. Jangan berdiri di situ. || Rain. Yes. Don't stand there.
+  ~ air: Hujan di kanal itu cantik, ya, Kakak... seperti seribu lonceng kecil... || Rain on the canal is pretty, isn't it, dear... like a thousand little bells...
+- Hujan turun, sawah senang, jemuranku menangis. || The rain falls; the paddies rejoice and my washing weeps.
+  ~ kuno: Hujan menyuburkan sawah dan membasahi jemuran. Langit tidak bisa menyenangkan semua orang. || Rain feeds the paddies and soaks the washing. Heaven can't please everyone.
+
+== sapa.badai
+niat: SAPA
+topik: sapa
+syarat: cuaca=badai
+gestur: lambai
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- Cepat masuk, {$sebutan}! Petirnya dekat sekali! || Quick, inside, {$sebutan}! The lightning is close!
+  ~ kasar: Masuk! Mau mati tersambar? || Inside! Want to get struck?
+  ~ kuno: Petir mengamuk, {$sebutan}! Bahkan kultivator pun harus menghormati langit! || The lightning rages, {$sebutan}! Even cultivators must respect heaven!
+- Badai begini {$sebutan} masih jalan? Nekat sekali! || Out in a storm like this, {$sebutan}? How reckless!
+  ~ kampung: Badai begini masih keluyuran, Nak? Ayo masuk, kuseduhkan jahe! || Out in a storm like this, child? Come in, I'll brew ginger!
+- Langit sedang marah, {$sebutan}. Jangan berdiri di bawah pohon. || Heaven is angry, {$sebutan}. Don't stand under a tree.
+  ~ gunung: Amitaba. Badai adalah napas gunung yang marah. Berlindunglah, {$sebutan}. || Amitabha. The storm is the mountain's angry breath. Take shelter, {$sebutan}.
+  ~ pelabuhan: Badai, Bung! Semua perahu sudah diikat, semoga talinya kuat. || A storm, mate! Every boat's tied down; pray the ropes hold.
+
+== sapa.salju
+niat: SAPA
+topik: sapa
+syarat: cuaca=salju
+gestur: hangat_tangan
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- Brr... dingin sekali, {$sebutan}. Tanganku sampai kaku. || Brr... so cold, {$sebutan}. My hands are stiff.
+  ~ kasar: Dingin. Jangan ajak bicara lama. || Cold. Don't keep me talking.
+  ~ gunung: Salju menutup jalan setapak, {$sebutan}. Hangatkan tangan di tungku biara. || Snow covers the path, {$sebutan}. Warm your hands at the monastery stove.
+- Salju turun lagi! {$sebutan} tidak kedinginan? || Snowing again! Aren't you cold, {$sebutan}?
+  ~ kuno: Salju turun lagi. Apakah dingin tidak mengusik {$sebutan}? || Snow falls again. Does the cold not trouble you, {$sebutan}?
+- Selamat datang, {$sebutan}. Masuklah, dekat tungku hangat. || Welcome, {$sebutan}. Come in by the warm stove.
+  ~ kampung: Masuk, Nak, masuk. Dekat tungku, kuambilkan wedang. || Come in, child, come in. By the stove; I'll get you something hot.
+- Lihat, atap-atap jadi putih semua. Cantik, tapi kayu bakar mahal. || Look, every roof turned white. Pretty, but firewood is dear.
+  ~ pelabuhan: Dek kapal licin semua, Bung. Salju di pelabuhan, pemandangan langka. || Every deck's slippery, mate. Snow in the harbour, a rare sight.
+
+== sapa.kabut_qi
+niat: SAPA
+topik: sapa
+syarat: cuaca=kabut_qi
+gestur: lihat_sekeliling
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- {$sebutan}, kabut Qi turun lagi. Kepalaku agak ringan rasanya. || {$sebutan}, the Qi mist is down again. My head feels light.
+  ~ kasar: Kabut Qi. Kepalaku pusing. Jangan bicara keras. || Qi mist. My head's spinning. Don't talk loud.
+- Kabut berkilau begini, kata orang tua, langit sedang bernapas. || Glittering mist like this, the old folk say, is heaven breathing.
+  ~ gunung: Para biksu bilang kabut berkilau adalah napas gunung yang sedang bersemedi. || The monks say glittering mist is the mountain breathing in meditation.
+- Hati-hati, {$sebutan}. Dalam kabut Qi orang suka tersesat ke tempat aneh. || Careful, {$sebutan}. In the Qi mist people wander into strange places.
+  ~ kampung: Hati-hati, Nak. Waktu kabut begini, simbahku dulu tersesat sampai ke kampung sebelah. || Careful, child. In mist like this my granddad once wandered to the next village.
+  ~ kuno: Kabut Qi pekat. Bagi {$sebutan} ini berkah, bagi hamba hanya membuat batuk. || Dense Qi mist. A blessing for you, {$sebutan}; for this humble one only a cough.
+
+== sapa.gerhana
+niat: SAPA
+topik: sapa
+syarat: cuaca=gerhana,meteor
+gestur: kaget
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- {$sebutan}! Lihat langit! Pertanda apa ini? || {$sebutan}! Look at the sky! What omen is this?
+  ~ kasar: Lihat langit! Sial, pasti ada bencana. || Look at the sky! Damn, disaster's coming.
+  ~ kuno: {$sebutan}, lihatlah! Langit memberi pertanda. Entah baik, entah buruk. || {$sebutan}, behold! Heaven gives an omen. Good or ill, who knows.
+- Langit gelap di siang hari... ibuku sedang membakar dupa di rumah. || Dark sky at midday... my mother is burning incense at home.
+  ~ kampung: Langit gelap siang-siang, Nak... ibu sudah bakar dupa sejak tadi. || Dark sky at noon, child... Mother's been burning incense since.
+- Bintang berjatuhan! Cepat buat permohonan, {$sebutan}! || Stars are falling! Make a wish, quick, {$sebutan}!
+  ~ air: Bintang jatuh ke kanal, Kakak... cepat buat permohonan, ya... || Stars falling into the canal, dear... make a wish, quick...
+- Kata almanak, hari ini jangan bepergian jauh. {$sebutan} tidak takut? || The almanac says no long journeys today. Aren't you afraid, {$sebutan}?
+  ~ kasar: Almanak bilang jangan pergi jauh. Terserah kau. || The almanac says no far trips. Your choice.
+
+== sapa.gembira
+niat: SAPA
+topik: sapa
+syarat: label_emosi=gembira,puas,kagum
+gestur: tertawa
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [2] {$sebutan}! Hehe, hari ini hatiku ringan sekali! || {$sebutan}! Hehe, my heart is so light today!
+  ~ kasar: Hari ini bagus. Jangan rusak. || Today is good. Don't spoil it.
+  ~ kuno: {$sebutan}! Hati hamba lapang hari ini, seperti langit setelah hujan. || {$sebutan}! This one's heart is open today, like the sky after rain.
+- Wah, {$sebutan}! Pas sekali, aku sedang senang! || Oh, {$sebutan}! Perfect timing, I'm in a fine mood!
+  ~ pelabuhan: Wah, {$sebutan}! Angin baik hari ini, Bung, hatiku ikut baik! || Oh, {$sebutan}! Fair wind today, mate, and so's my mood!
+- Selamat datang, selamat datang! Hari baik, orang baik datang! || Welcome, welcome! A good day brings good people!
+  ~ kampung: Monggo, monggo! Eh, silakan, silakan! Hari baik! || Come in, come in! A fine day!
+- Ha! {$sebutan}! Langit cerah, dagangan laku, dan kau datang. Lengkap sudah. || Ha! {$sebutan}! Clear sky, goods selling, and here you are. Complete.
+  ~ oasis: Ha! {$sebutan}! Mata air jernih, unta sehat, dan kau datang. Sempurna, Saudara! || Ha! {$sebutan}! Clear spring, healthy camels, and here you are. Perfect, friend!
+- Mari, mari, {$sebutan}! Senyumku tidak bisa kusembunyikan hari ini. || Come, come, {$sebutan}! I can't hide my smile today.
+  ~ air: Mari, Kakak... senyumku tidak bisa berhenti hari ini... || Come, dear... I can't stop smiling today...
+
+== sapa.sedih
+niat: SAPA
+topik: sapa
+syarat: label_emosi=sedih
+gestur: menangis
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- Oh... {$sebutan}. Maaf, aku sedang tidak bersemangat. || Oh... {$sebutan}. Forgive me, I'm not in good spirits.
+  ~ kasar: Oh. Kau. Aku sedang tidak mau bicara. || Oh. You. I don't feel like talking.
+  ~ kuno: Maafkan, {$sebutan}. Hati hamba sedang diselimuti mendung. || Forgive me, {$sebutan}. This one's heart is under clouds.
+- Ah, {$sebutan}... hari ini terasa panjang sekali. || Ah, {$sebutan}... today feels so long.
+  ~ air: Ah, Kakak... hari ini terasa panjang sekali, ya... || Ah, dear... today feels so long...
+- Halo, {$sebutan}. Jangan pedulikan mataku yang merah. || Hello, {$sebutan}. Don't mind my red eyes.
+  ~ kampung: Halo, Nak. Jangan lihat mataku. Cuma kelilipan. || Hello, child. Don't look at my eyes. Just dust.
+- {$sebutan}... ya, aku baik-baik saja. Kurasa. || {$sebutan}... yes, I'm fine. I suppose.
+  ~ kasar: Baik. Sudah. Jangan tanya lagi. || Fine. Enough. Don't ask again.
+
+== sapa.marah
+niat: SAPA
+topik: sapa
+syarat: label_emosi=marah
+gestur: marah_hentak
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- Apa?! Oh, {$sebutan}. Maaf, bukan marah padamu. || What?! Oh, {$sebutan}. Sorry, I'm not angry at you.
+  ~ kasar: Apa lihat-lihat?! || What are you staring at?!
+- Hmph. Hari ini semua orang membuatku kesal. Ada apa? || Hmph. Everyone's vexing me today. What is it?
+  ~ kuno: Hmph. Hari ini kesabaranku diuji berulang kali. Ada keperluan apa? || Hmph. My patience has been tried again and again today. What is your business?
+- Jangan dekat-dekat dulu, {$sebutan}. Darahku masih mendidih. || Keep back a bit, {$sebutan}. My blood is still boiling.
+  ~ kasar: Mundur. Aku sedang marah. || Back off. I'm angry.
+- {$sebutan}. Kalau kau mau mengeluh juga, antre di belakang. || {$sebutan}. If you've come to complain too, get in line.
+  ~ kasar: Kalau mau mengeluh, pergi. || Want to complain, go away.
+
+== sapa.cemas
+niat: SAPA
+topik: sapa
+syarat: label_emosi=cemas
+gestur: lihat_sekeliling
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- Oh! {$sebutan}... kau mengagetkanku. || Oh! {$sebutan}... you startled me.
+  ~ kasar: Hah! Jangan muncul tiba-tiba! || Hah! Don't sneak up like that!
+  ~ air: Oh! Kakak... aku kaget... || Oh! Dear... you startled me...
+- {$sebutan}, kau tidak melihat sesuatu yang aneh di jalan tadi? || {$sebutan}, did you see anything strange on the road just now?
+  ~ kuno: {$sebutan}, apakah di perjalanan tadi ada yang ganjil? || {$sebutan}, was anything amiss on your way?
+- S-salam, {$sebutan}. Maaf, pikiranku sedang ke mana-mana. || G-greetings, {$sebutan}. Sorry, my mind is all over the place.
+- Ah, untung kau, {$sebutan}. Kukira orang lain. || Ah, thank goodness it's you, {$sebutan}. I thought it was someone else.
+  ~ kampung: Ah, syukur kamu, Nak. Kukira penagih utang. || Ah, thank goodness it's you, child. Thought you were a debt collector.
+
+== sapa.jemu
+niat: SAPA
+topik: sapa
+syarat: label_emosi=jemu
+gestur: menguap_peregangan
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- Oh. {$sebutan}. Hm. || Oh. {$sebutan}. Hm.
+  ~ kasar: Hm. Kau. || Hm. You.
+- Hari ini sama saja seperti kemarin. Halo, {$sebutan}. || Today is just like yesterday. Hello, {$sebutan}.
+  ~ kuno: Hari demi hari berlalu tanpa beda, {$sebutan}. Salam. || Day after day passes unchanged, {$sebutan}. Greetings.
+- Ya, ya, selamat datang. Ada perlu? || Yes, yes, welcome. Need something?
+  ~ kasar: Ya. Apa? || Yeah. What?
+- Bosan sekali rasanya, {$sebutan}. Ceritakan sesuatu yang menarik. || I'm so bored, {$sebutan}. Tell me something interesting.
+  ~ pelabuhan: Bosan, Bung. Laut tenang terus, tidak ada cerita. Ceritakan sesuatu! || Bored, mate. Sea's calm, no stories. Tell me something!
+
+== sapa.mabuk
+niat: SAPA
+topik: sapa
+syarat: wajah=mabuk
+gestur: jalan_mabuk
+seru: mabuk
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- Hik... {$sebutan}! Saudaraku! Eh, bukan... hik... siapa ya? || Hic... {$sebutan}! My brother! Er, no... hic... who are you?
+  ~ kampung: Hik... {$sebutan}! Konco lawas! Eh, bukan... hik... || Hic... {$sebutan}! Old pal! Er, no... hic...
+- Ha! Ada dua {$sebutan}! Atau satu? Hik. || Ha! Two of you, {$sebutan}! Or one? Hic.
+  ~ pelabuhan: Ha! Dua {$sebutan}! Kapalnya oleng atau aku? Hik. || Ha! Two of you, {$sebutan}! Is the ship rolling or me? Hic.
+- Temani aku minum, {$sebutan}! Bulan pun minum malam ini! || Drink with me, {$sebutan}! Even the moon is drinking tonight!
+  ~ kuno: Hik... marilah minum bersama, {$sebutan}... arak ini... menembus meridian... || Hic... come drink with me, {$sebutan}... this wine... pierces the meridians...
+- Hik... jangan bilang istriku kau lihat aku di sini, ya. || Hic... don't tell my wife you saw me here.
+  ~ p: Hik... jangan bilang suamiku kau lihat aku di sini, ya. || Hic... don't tell my husband you saw me here.
+
+== sapa.sakit
+niat: SAPA
+topik: sapa
+syarat: wajah=sakit
+gestur: batuk
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- Uhuk... uhuk... maaf, {$sebutan}. Badanku sedang tidak enak. || Cough... cough... sorry, {$sebutan}. I'm unwell.
+  ~ kasar: Uhuk! Jangan dekat. Sakit. || Cough! Don't come close. Sick.
+  ~ kuno: Uhuk... ampuni hamba, {$sebutan}. Tubuh hamba sedang lemah. || Cough... forgive me, {$sebutan}. This one's body is weak.
+- Salam, {$sebutan}. Jangan terlalu dekat, nanti tertular. || Greetings, {$sebutan}. Not too close, you'll catch it.
+  ~ kampung: Salam, Nak. Jangan dekat-dekat, nanti ketularan meriang. || Greetings, child. Don't come close, you'll catch the fever.
+- {$sebutan}... kepalaku berat sekali. Tabib bilang istirahat, tapi siapa yang mau kerja? || {$sebutan}... my head is so heavy. The physician says rest, but who'll do the work?
+  ~ gunung: Para biksu memberiku ramuan, {$sebutan}... kepalaku masih berat. Amitaba. || The monks gave me a brew, {$sebutan}... my head's still heavy. Amitabha.
+
+== sapa.asing
+niat: SAPA
+topik: sapa
+syarat: kesan=asing
+gestur: hormat
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+$tempat: tipe=tempat dari=konteks.tempat
+- [3] Salam, {$sebutan}. Orang baru di {$tempat}? || Greetings, {$sebutan}. New to {$tempat}?
+  ~ kasar: Kau bukan orang sini. Ada urusan apa? || You're not from here. What's your business?
+  ~ kuno: Salam, {$sebutan}. Hamba belum pernah melihat {$sebutan} di sini. || Greetings, {$sebutan}. This humble one has not seen you here before.
+- Oh, wajah baru. Selamat datang di {$tempat}, {$sebutan}. || Oh, a new face. Welcome to {$tempat}, {$sebutan}.
+  ~ kasar: Wajah baru. Jangan buat masalah di {$tempat}. || New face. Make no trouble in {$tempat}.
+  ~ kampung: Wah, orang baru. Selamat datang di {$tempat}, Nak. || Oh, someone new. Welcome to {$tempat}, child.
+  ~ ibukota: Selamat datang di ibu kota, {$sebutan}. Jangan sampai tersesat, jalannya banyak. || Welcome to the capital, {$sebutan}. Don't get lost; there are many streets.
+  ~ oasis: Selamat datang, Saudara pengembara. Air dan bayangan untuk tamu selalu ada. || Welcome, traveller. There is always water and shade for guests.
+- Permisi, {$sebutan} dari mana? Pakaianmu bukan gaya sini. || Excuse me, where are you from, {$sebutan}? Your clothes aren't from around here.
+  ~ pelabuhan: Bung dari mana? Bajunya bukan gaya pelaut. || Where are you from, mate? Those aren't sailor's clothes.
+- Salam. Ada yang bisa kubantu, {$sebutan}? || Greetings. Anything I can help with, {$sebutan}?
+  ~ kuno: Salam. Adakah yang dapat hamba bantu, {$sebutan}? || Greetings. Is there aught this one may help with, {$sebutan}?
+  ~ kasar: Mau apa? || What do you want?
+- [2] Oh! Seorang kultivator. Salam hormat, {$sebutan}. || Oh! A cultivator. My respects, {$sebutan}.
+  ~ kasar: Kultivator lagi. Jangan rusak apa-apa, ya. || Another cultivator. Don't break anything.
+
+== sapa.kenal
+niat: SAPA
+topik: sapa
+syarat: kesan=kenal
+gestur: lambai
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [2] Oh, {$sebutan}, datang lagi. || Oh, {$sebutan}, back again.
+  ~ kasar: Kau lagi. || You again.
+  ~ kuno: Ah, {$sebutan} berkunjung kembali. || Ah, {$sebutan} visits again.
+- {$sebutan}! Apa kabar? || {$sebutan}! How are you?
+  ~ pelabuhan: {$sebutan}! Apa kabar, Bung? || {$sebutan}! How's it going, mate?
+  ~ kampung: Lho, {$sebutan}! Sehat, Nak? || Well, {$sebutan}! Keeping well, child?
+- Salam, {$sebutan}. Senang melihatmu lagi. || Greetings, {$sebutan}. Good to see you again.
+  ~ kuno: Salam, {$sebutan}. Pertemuan kembali ini menggembirakan. || Greetings, {$sebutan}. This reunion is gladdening.
+- Ah, kau rupanya, {$sebutan}. Mampir? || Ah, it's you, {$sebutan}. Dropping by?
+  ~ air: Ah, Kakak rupanya... mampir, ya? || Ah, it's you, dear... dropping in?
+- {$sebutan}. Sudah lama juga, ya. || {$sebutan}. It's been a while, hasn't it.
+  ~ kasar: Lama juga. Kukira kau sudah mati. || Been a while. Thought you'd died.
+
+== sapa.akrab
+niat: SAPA
+topik: sapa
+syarat: kesan=akrab
+gestur: tepuk_bahu
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [2] {$sebutan}! Ke sini, ke sini! || {$sebutan}! Over here, over here!
+  ~ kasar: Hei, sini! Cepat! || Hey, here! Quick!
+  ~ kampung: {$sebutan}! Sini, Nak, sini! || {$sebutan}! Over here, child!
+- Nah, ini dia orangnya! Apa kabar, {$sebutan}? || There they are! How are you, {$sebutan}?
+  ~ kuno: Inilah dia yang ditunggu. Apa kabar, {$sebutan}? || Here is the awaited one. How fare you, {$sebutan}?
+- {$sebutan}! Pas sekali, aku baru saja memikirkanmu. || {$sebutan}! Perfect, I was just thinking of you.
+  ~ air: Kakak... pas sekali, aku baru memikirkan Kakak... || Dear... perfect timing, I was just thinking of you...
+- Hei, {$sebutan}! Mau teh? Kubuatkan. || Hey, {$sebutan}! Tea? I'll make some.
+  ~ kasar: Teh? Duduk. Kubuatkan. || Tea? Sit. I'll make it.
+  ~ pelabuhan: {$sebutan}! Duduk sini, ikannya baru diangkat! || {$sebutan}! Sit down, the fish just came in!
+- Lama tak jumpa, {$sebutan}! Badanmu makin tegap saja. || Long time, {$sebutan}! You look sturdier than ever.
+  ~ kampung: Lama tak jumpa, Nak! Makin gagah saja. || Long time, child! Looking stronger than ever.
+
+== sapa.sahabat
+niat: SAPA
+topik: sapa
+syarat: kesan=sahabat
+gestur: peluk
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [2] {$sebutan}! Sahabatku! Ayo masuk, ayo! || {$sebutan}! My friend! Come in, come in!
+  ~ kasar: Akhirnya datang juga kau. Masuk. || Finally you show up. Come in.
+  ~ pelabuhan: {$sebutan}! Saudara sekapalku! Masuk, masuk! || {$sebutan}! My shipmate! Come in, come in!
+- Langit pasti sayang padaku, {$sebutan} datang hari ini. || Heaven must love me; {$sebutan} came today.
+  ~ kampung: Wah, rejeki nomplok, {$sebutan} datang! || Oh, what luck, {$sebutan} came!
+- {$sebutan}! Istriku masak banyak, kau harus ikut makan. || {$sebutan}! My wife cooked plenty; you must eat with us.
+  ~ p: {$sebutan}! Suamiku masak banyak, kau harus ikut makan. || {$sebutan}! My husband cooked plenty; you must eat with us.
+- Wah, {$sebutan}! Kursi terbaik untukmu, tentu saja. || Ah, {$sebutan}! The best seat for you, of course.
+  ~ kasar: Kursi itu untukmu. Jangan protes. || That chair's yours. No arguing.
+- Akhirnya kau datang, {$sebutan}. Anak-anak terus menanyakanmu. || You finally came, {$sebutan}. The children keep asking for you.
+  ~ p: Akhirnya kau datang, {$sebutan}. Anak-anak terus menanyakan, aku sampai bosan menjawab. || You finally came, {$sebutan}. The kids kept asking till I was tired of answering.
+  ~ kuno: Kehadiran {$sebutan} membuat rumah hamba bersinar. || Your presence makes this humble house shine, {$sebutan}.
+
+== sapa.musuh
+niat: SAPA
+topik: sapa
+syarat: kesan=musuh
+gestur: sikap_lipat_tangan
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [2] Kau lagi. Mau apa? || You again. What do you want?
+  ~ kasar: Kau. Pergi. || You. Leave.
+  ~ iblis: Kau lagi. Masih punya semua jari? || You again. Still have all your fingers?
+- Hmph. Masih berani menampakkan muka di sini, {$sebutan}? || Hmph. Still dare show your face here, {$sebutan}?
+  ~ kuno: Masih berani pula {$sebutan} menampakkan diri. || You still dare show yourself, {$sebutan}.
+- Pergilah. Aku tidak mau ada urusan denganmu. || Go away. I want nothing to do with you.
+  ~ kampung: Wis, sana pergi. Aku tidak mau urusan. || Go on, off. I want no dealings.
+  ~ kuno: Silakan jalan terus. Hamba tidak punya urusan. || Please walk on. This one has no business with you.
+- Jangan dekat-dekat. Aku masih ingat perbuatanmu. || Keep away. I still remember what you did.
+  ~ kasar: Jauh-jauh dariku. || Stay away from me.
+- Cih. Hari ini memang hari sial. || Tch. Today really is an unlucky day.
+  ~ kuno: Hari yang buruk telah tiba. || An ill day has come.
+
+== sapa.tahu_nama
+niat: SAPA
+topik: sapa
+syarat: tahu_nama=true kesan=kenal,akrab,sahabat
+gestur: lambai
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+$tempat: tipe=tempat dari=konteks.tempat
+- {$sebutan}! Aku masih ingat namamu, lho. || {$sebutan}! I still remember your name, you know.
+  ~ kasar: {$sebutan}. Ya, aku ingat. Jangan senang dulu. || {$sebutan}. Yes, I remember. Don't get excited.
+  ~ kuno: {$sebutan}. Nama itu telah hamba simpan dalam ingatan. || {$sebutan}. This one has kept that name in memory.
+- Ah, {$sebutan}, kan? Tentu saja aku ingat. || Ah, {$sebutan}, isn't it? Of course I remember.
+  ~ pelabuhan: Ah, {$sebutan}, kan, Bung? Mana mungkin lupa! || Ah, {$sebutan}, right, mate? How could I forget!
+- Siapa yang tidak kenal {$sebutan} di {$tempat} ini? || Who in {$tempat} doesn't know {$sebutan}?
+  ~ kampung: Siapa yang tidak kenal {$sebutan} di {$tempat}, Nak? || Who in {$tempat} doesn't know {$sebutan}, child?
+
+== sapa.pedagang
+niat: SAPA
+topik: sapa
+syarat: kelompok=pedagang
+gestur: seru_dagang
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Silakan, silakan, {$sebutan}! Lihat-lihat dulu, tidak beli juga tidak apa. || Come, come, {$sebutan}! Have a look; no need to buy.
+  ~ kasar: Lihat boleh. Pegang beli. || Look, fine. Touch, buy.
+  ~ kuno: Silakan, {$sebutan}. Barang hamba sederhana, namun jujur. || Please, {$sebutan}. My goods are humble, but honest.
+  ~ pelabuhan: Mari, Bung! Barang dari seberang, belum ada di kota lain! || Come on, mate! Goods from overseas, not in any other town!
+  ~ oasis: Mari, Saudara! Rempah dari tiga gurun, harum sampai ke mimpi! || Come, friend! Spices from three deserts, fragrant into your dreams!
+- Selamat datang, {$sebutan}! Barang baru datang pagi ini. || Welcome, {$sebutan}! New stock came in this morning.
+  ~ kampung: Monggo, {$sebutan}! Barang baru datang pagi ini, Nak. || Come in, {$sebutan}! New stock this morning, child.
+- Untung-rugi urusan nanti, yang penting {$sebutan} senang dulu. || Profit and loss come later; first, your satisfaction, {$sebutan}.
+  ~ kasar: Beli dulu, senang belakangan. || Buy first, be happy later.
+- [2] {$sebutan}! Penglarisan hari ini, kuberi harga teman. || {$sebutan}! First sale of the day; a friend's price for you.
+  ~ kuno: {$sebutan}, pembeli pertama hari ini. Hamba beri harga sahabat. || {$sebutan}, first buyer today. This one offers a friend's price.
+- Mari mampir, {$sebutan}. Mata {$sebutan} jeli, pasti tahu barang bagus. || Do stop by, {$sebutan}. You've a keen eye; you know good goods.
+  ~ pelabuhan: Mampir, Bung! Matamu tajam, pasti tahu barang laut yang bagus. || Stop by, mate! Sharp eyes; you'll know good sea goods.
+- Oh, pembeli! Silakan, jangan malu-malu. || Oh, a customer! Please, don't be shy.
+  ~ kasar: Pembeli. Bagus. Pilih cepat. || A buyer. Good. Choose fast.
+
+== sapa.pedagang.hujan
+niat: SAPA
+topik: sapa
+syarat: kelompok=pedagang cuaca=hujan
+gestur: seru_dagang
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- Hujan begini pembeli sepi... {$sebutan} mau payung? Murah saja. || Rain like this keeps buyers away... want an umbrella, {$sebutan}? Cheap.
+  ~ kasar: Hujan. Sepi. Payung? || Rain. Dead. Umbrella?
+- Masuk, {$sebutan}, berteduh di lapakku. Sambil lihat-lihat, tentu. || Come in, {$sebutan}, shelter at my stall. And have a look, of course.
+  ~ kuno: Silakan berteduh, {$sebutan}. Lapak hamba terbuka bagi siapa saja. || Please take shelter, {$sebutan}. This one's stall is open to all.
+- Hujan rezeki, kata orang. Semoga {$sebutan} rezekiku hari ini. || Rain is fortune, they say. May you be my fortune today, {$sebutan}.
+
+== sapa.pekerja
+niat: SAPA
+topik: sapa
+syarat: kelompok=pekerja
+gestur: seka_keringat
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+$kerja: tipe=pekerjaan dari=pembicara
+- [2] Oh, {$sebutan}. Maaf, tanganku kotor. Salam! || Oh, {$sebutan}. Sorry, my hands are dirty. Greetings!
+  ~ kasar: Tanganku kotor. Salam saja dari situ. || Hands are dirty. Greet from there.
+  ~ kuno: Maaf, {$sebutan}, tangan hamba kotor oleh kerja. Salam hormat. || Forgive me, {$sebutan}, this one's hands are soiled by work. My respects.
+- Salam, {$sebutan}. Kerjaan menumpuk, tapi untukmu ada waktu sebentar. || Greetings, {$sebutan}. Work's piling up, but I've a moment for you.
+  ~ kampung: Salam, Nak. Kerjaan banyak, tapi sebentar boleh. || Greetings, child. Lots of work, but a moment's fine.
+- {$sebutan}! Mau lihat? Hari ini aku sedang {$kerja}. || {$sebutan}! Want to watch? I'm busy as {$kerja} today.
+  ~ kasar: Lihat saja. Jangan ganggu kerjaku sebagai {$kerja}. || Watch, then. Don't disturb my work as a {$kerja}.
+- Ah, {$sebutan}. Punggungku pegal, tapi hati senang. || Ah, {$sebutan}. My back aches but my heart is glad.
+  ~ pelabuhan: Ah, {$sebutan}. Bahuku pegal angkat peti, Bung, tapi hati senang. || Ah, {$sebutan}. My shoulders ache from crates, mate, but my heart is glad.
+- Salam! Jangan berdiri di situ, nanti kena serbuk kayu. || Greetings! Don't stand there; you'll get sawdust on you.
+  ~ kasar: Minggir. Serbuk kayu. || Move. Sawdust.
+
+== sapa.pekerja.pagi
+niat: SAPA
+topik: sapa
+syarat: kelompok=pekerja jam=pagi label_emosi=gembira,puas,netral
+gestur: lambai
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- Pagi, {$sebutan}! Adonan bakpao sudah naik, nanti mampir, ya. || Morning, {$sebutan}! The bun dough has risen; drop by later.
+  ~ kampung: Pagi, Nak! Adonan bakpao sudah ngembang. Nanti mampir! || Morning, child! The bun dough's risen. Drop by later!
+- Pagi! Tungku sudah panas sejak subuh. || Morning! The forge has been hot since dawn.
+  ~ kasar: Pagi. Tungku panas. Jangan dekat. || Morning. Forge is hot. Keep back.
+- Pagi, {$sebutan}. Kalau mau sesuatu dibuat, pagi begini aku masih segar. || Morning, {$sebutan}. If you want something made, I'm still fresh this early.
+  ~ kuno: Pagi, {$sebutan}. Bila hendak memesan sesuatu, pagi inilah tangan hamba paling cekatan. || Morning, {$sebutan}. If you'd order something, this one's hands are deftest in the morning.
+
+== sapa.penjaga
+niat: SAPA
+topik: sapa
+syarat: kelompok=penjaga
+gestur: sikap_tombak
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+$tempat: tipe=tempat dari=konteks.tempat
+- [2] Berhenti. Oh, {$sebutan}. Silakan lewat. || Halt. Oh, {$sebutan}. You may pass.
+  ~ kasar: Jangan bikin onar di wilayahku. Paham? || No trouble on my watch. Understood?
+  ~ kuno: Salam, {$sebutan}. Penjaga ini bertugas menjaga ketenteraman. || Greetings, {$sebutan}. This guard keeps the peace.
+- Salam. Semua tenang hari ini, {$sebutan}. || Greetings. All quiet today, {$sebutan}.
+  ~ kasar: Tenang. Jaga tetap tenang. || Quiet. Keep it quiet.
+- {$sebutan}. Senjata tetap di sarungnya selama di kota, ya. || {$sebutan}. Weapons stay sheathed within the town.
+  ~ kuno: {$sebutan}, mohon senjata tetap bersarung selama di dalam kota. || {$sebutan}, kindly keep weapons sheathed within the town.
+- Selamat datang di {$tempat}. Patuhi aturan dan kita berteman. || Welcome to {$tempat}. Keep the rules and we're friends.
+  ~ kasar: Ini {$tempat}. Patuhi aturan, atau keluar. || This is {$tempat}. Keep the rules or get out.
+- Hm, {$sebutan}. Mataku mengawasimu, tapi bukan karena curiga. Itu kerjaku. || Hm, {$sebutan}. My eyes are on you, not from suspicion. It's my job.
+  ~ kasar: Aku mengawasimu, {$sebutan}. Itu saja. || I'm watching you, {$sebutan}. That's all.
+
+== sapa.anak
+niat: SAPA
+topik: sapa
+syarat: kelompok=anak
+gestur: lari_lambai
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [2] Kakak! Kakak! Halo! || Big sibling! Hello!
+  ~ kampung: Kak! Kak! Halo, Kak! || Mister! Mister! Hello!
+- Halo, {$sebutan}! Kakak kultivator, ya? Bisa terbang? || Hello, {$sebutan}! You're a cultivator, right? Can you fly?
+  ~ kuno: Salam, Kakak Kultivator! Bisakah Kakak terbang di atas awan? || Greetings, cultivator! Can you fly above the clouds?
+- Hehe, halo! Ibu bilang jangan bicara dengan orang asing... tapi Kakak baik, kan? || Hehe, hi! Mum says don't talk to strangers... but you're nice, right?
+  ~ kampung: Hehe, halo! Kata Mak jangan ngomong sama orang asing... tapi Kakak baik, kan? || Hehe, hi! Ma says don't talk to strangers... but you're nice, right?
+- Kakak mau main petak umpet? Aku jagonya! || Want to play hide and seek? I'm the best!
+  ~ pelabuhan: Kak, mau main petak umpet di antara peti-peti? Aku jagonya! || Want to play hide and seek among the crates? I'm the best!
+- Halo! Lihat, gigiku copot satu! || Hi! Look, I lost a tooth!
+  ~ kasar: Lihat! Gigiku copot! Keren, kan? || Look! Lost a tooth! Cool, huh?
+- {$sebutan}! Tadi aku lihat kucing besar sekali di atap! || {$sebutan}! I saw a huge cat on the roof just now!
+  ~ air: {$sebutan}! Tadi ada ikan besar sekali lompat di kanal! || {$sebutan}! A huge fish jumped in the canal just now!
+
+== sapa.tetua
+niat: SAPA
+topik: sapa
+syarat: kelompok=tetua
+gestur: sikap_tua
+seru: tetua_hmm
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [2] Ho ho. Anak muda, datang menjenguk orang tua ini? || Ho ho. Young one, come to visit this old man?
+  ~ p: Ho ho. Anak muda, datang menjenguk nenek tua ini? || Ho ho. Young one, come to visit this old woman?
+- Salam, {$sebutan}. Mataku sudah rabun, tapi suaramu kukenal. || Greetings, {$sebutan}. My eyes are dim, but I know your voice.
+  ~ kasar: Mataku rabun, tapi suaramu yang cempreng itu kukenal. || My eyes are dim, but I know that shrill voice of yours.
+- Duduklah, {$sebutan}. Kakiku tidak sekuat dulu, jadi kita bicara sambil duduk. || Sit, {$sebutan}. My legs aren't what they were, so let's talk sitting down.
+  ~ kuno: Duduklah, {$sebutan}. Tulang tua ini lebih suka bercakap sambil duduk. || Sit, {$sebutan}. These old bones prefer to converse seated.
+- Uhuk... salam, salam. Zaman sekarang anak muda jarang menyapa orang tua. || Cough... greetings, greetings. Young folk rarely greet the old these days.
+  ~ kampung: Uhuk... salam, Nak. Jarang anak muda mau nyapa simbah. || Cough... greetings, child. Few youngsters greet old granny.
+- Ah, {$sebutan}. Dulu, waktu aku seumurmu, gerbang ini belum ada. || Ah, {$sebutan}. When I was your age, this gate didn't exist.
+  ~ kuno: Ah, {$sebutan}. Ketika hamba seusia {$sebutan}, gerbang ini belum berdiri. || Ah, {$sebutan}. When this one was your age, this gate didn't stand.
+
+== sapa.kultivator
+niat: SAPA
+topik: sapa
+syarat: kelompok=kultivator
+gestur: hormat
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [2] Rekan Daois. Salam. || Fellow Daoist. Greetings.
+  ~ kuno: Pertemuan ini adalah takdir, Rekan Daois. || This meeting is fate, fellow Daoist.
+  ~ kasar: Hmph. Qi-mu lumayan. Ada perlu? || Hmph. Your Qi is passable. Need something?
+- Salam, {$sebutan}. Fondasimu kokoh, kulihat. || Greetings, {$sebutan}. Your foundation is firm, I see.
+  ~ kuno: Salam, {$sebutan}. Fondasi Dao-mu kokoh bagai akar beringin. || Greetings, {$sebutan}. Your Dao foundation is firm as banyan roots.
+  ~ kasar: Fondasimu lumayan. Jangan sombong. || Your foundation's decent. Don't get cocky.
+- Ah, sesama penempuh jalan. Semoga Dao-mu lancar, {$sebutan}. || Ah, a fellow walker of the path. May your Dao go smoothly, {$sebutan}.
+  ~ iblis: Sesama penempuh jalan... jalan yang mana, itu pertanyaannya. || A fellow walker of the path... which path, that's the question.
+- {$sebutan}. Di kota fana ini kita harus menahan Qi, bukan? || {$sebutan}. In a mortal town we must restrain our Qi, no?
+  ~ kuno: {$sebutan}, di dunia fana kita menahan aura, agar tidak mengusik rakyat. || {$sebutan}, in the mortal world we restrain our aura so as not to disturb the people.
+
+== sapa.kultivator.senior
+niat: SAPA
+topik: sapa
+syarat: ranah_selisih=>=3
+gestur: hormat_dalam
+- [2] S-Senior! Junior ini memberi hormat! || S-Senior! This junior pays respects!
+  ~ kasar: Eh... Senior. Maaf tadi aku kurang ajar. || Er... Senior. Sorry if I was rude.
+- Hamba hanya orang kecil, Senior. Mohon maafkan bila kurang sopan. || This humble one is nobody, Senior. Forgive any discourtesy.
+  ~ kuno: Hamba hanyalah debu di bawah kaki Senior. Mohon ampuni kelancangan hamba. || This one is only dust beneath your feet, Senior. Forgive my insolence.
+- Tuan Abadi! Mohon jangan marah, hamba hanya penjual biasa! || Immortal! Please don't be angry; this one is only a common seller!
+  ~ pelabuhan: Tuan Abadi! Ampun, Bung... eh, Tuan! Aku cuma nelayan! || Immortal! Mercy, mate... er, sir! I'm only a fisher!
+- Aura Senior begitu dalam... lututku gemetar sendiri. || Your aura is so deep, Senior... my knees shake on their own.
+  ~ kampung: Aura Senior... lututku lemas... ampun, Senior. || Your aura, Senior... my knees went weak... mercy, Senior.
+
+== sapa.cendekia
+niat: SAPA
+topik: sapa
+syarat: kelompok=cendekia
+gestur: hormat
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [2] Salam, {$sebutan}. Seperti kata kitab, tamu datang dari jauh, bukankah itu menyenangkan? || Greetings, {$sebutan}. As the classic says, is it not a joy when friends come from afar?
+  ~ kuno: Salam, {$sebutan}. Sahabat datang dari jauh, bukankah sungguh membahagiakan? || Greetings, {$sebutan}. A friend from afar; is that not a true joy?
+- Ah, {$sebutan}. Maaf, aku sedang tenggelam dalam gulungan ini. || Ah, {$sebutan}. Forgive me, I was lost in this scroll.
+  ~ kasar: Sst. Aku sedang membaca. || Shh. I'm reading.
+- Salam. Pikiran yang lapar lebih berbahaya dari perut yang lapar, {$sebutan}. || Greetings. A hungry mind is more dangerous than a hungry belly, {$sebutan}.
+  ~ kuno: Salam. Pikiran yang haus ilmu lebih berbahaya dari perut yang lapar, {$sebutan}. || Greetings. A mind thirsting for learning is more dangerous than a hungry belly, {$sebutan}.
+- {$sebutan}! Kau datang tepat saat tintaku kering. Takdir. || {$sebutan}! You came just as my ink dried. Fate.
+
+== sapa.rahib
+niat: SAPA
+topik: sapa
+syarat: kelompok=rahib
+gestur: sikap_doa
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [2] Amitaba. Selamat datang, Dermawan. || Amitabha. Welcome, benefactor.
+  ~ kuno: Amitaba. Selamat datang, Dermawan. Semoga jalanmu terang. || Amitabha. Welcome, benefactor. May your road be bright.
+- Semoga damai menyertaimu, {$sebutan}. || May peace be with you, {$sebutan}.
+  ~ kasar: Damai. Jangan berisik di sini. || Peace. Don't make noise here.
+- Langkahmu berat, {$sebutan}. Bebanmu banyak? Duduklah sejenak. || Your steps are heavy, {$sebutan}. Many burdens? Sit a while.
+  ~ kuno: Langkahmu menyimpan beban, {$sebutan}. Letakkan sejenak di sini. || Your steps carry burdens, {$sebutan}. Set them down here a while.
+- Salam, {$sebutan}. Dupa pagi baru dinyalakan. Wanginya membersihkan pikiran. || Greetings, {$sebutan}. The morning incense is lit. Its scent clears the mind.
+
+== sapa.pejabat
+niat: SAPA
+topik: sapa
+syarat: kelompok=pejabat
+gestur: sikap_tangan_belakang
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [2] Hm. {$sebutan}. Ada urusan dengan kantor ini? || Hm. {$sebutan}. Business with this office?
+  ~ sopan: Selamat datang, {$sebutan}. Kantor kami siap melayani. || Welcome, {$sebutan}. Our office is at your service.
+- Salam. Waktuku sempit, jadi bicaralah langsung. || Greetings. My time is short, so speak plainly.
+  ~ kasar: Cepat. Aku sibuk. || Quick. I'm busy.
+  ~ ibukota: Salam. Waktu hamba sempit karena urusan istana; silakan langsung saja. || Greetings. My time is short with palace affairs; pray be direct.
+- Oh, {$sebutan}. Aku sudah mendengar namamu disebut-sebut di kantor. || Oh, {$sebutan}. I've heard your name mentioned at the office.
+  ~ kuno: Oh, {$sebutan}. Nama {$sebutan} kerap disebut di balai kantor. || Oh, {$sebutan}. Your name is often mentioned in the office hall.
+- Salam, {$sebutan}. Kota ini berjalan karena aturan. Semoga kau ingat itu. || Greetings, {$sebutan}. This town runs on rules. I trust you'll remember that.
+
+== sapa.khusus
+niat: SAPA
+topik: sapa
+syarat: kelompok=khusus
+gestur: lambai
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- Salam, {$sebutan}. Kau pandai memilih waktu. || Greetings, {$sebutan}. You've a knack for timing.
+  ~ kuno: Salam, {$sebutan}. Waktu kedatanganmu sungguh tepat. || Greetings, {$sebutan}. Your arrival is most timely.
+- Oh, wajah yang menarik. Silakan mendekat, {$sebutan}. || Oh, an interesting face. Come closer, {$sebutan}.
+  ~ iblis: Wajah yang menarik. Sayang kalau rusak. Mendekatlah, {$sebutan}. || An interesting face. Shame if it got damaged. Come closer, {$sebutan}.
+- Hehe. {$sebutan}. Dunia kecil, ya? || Hehe. {$sebutan}. Small world, eh?
+  ~ kasar: Kau. Dunia memang sempit. || You. Small world indeed.
+
+== sapa.dialek.iblis
+niat: SAPA
+topik: sapa
+syarat: dialek=iblis
+gestur: sikap_berkacak
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [2] Hah. Pendatang. Hitung jarimu sebelum pergi. || Hah. An outsider. Count your fingers before you leave.
+- Selamat datang di kota tanpa ampun, {$sebutan}. Bersikap sopanlah, itu gratis. || Welcome to the merciless city, {$sebutan}. Be polite; it's free.
+  ~ kasar: Kota tanpa ampun. Jaga sikapmu. || Merciless city. Mind yourself.
+- Kau berjalan seperti orang yang belum pernah ditusuk. Menarik. || You walk like someone who's never been stabbed. Interesting.
+  ~ kasar: Kau belum pernah ditusuk, ya? Kelihatan. || Never been stabbed, eh? Shows.
+- Salam, {$sebutan}. Di sini senyum itu mahal, jadi jangan buang-buang. || Greetings, {$sebutan}. Smiles are costly here, so don't waste them.
+
+== sapa.dialek.gunung
+niat: SAPA
+topik: sapa
+syarat: dialek=gunung
+gestur: sikap_doa
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- Amitaba, Dermawan. Jalan setapak ke atas licin, hati-hati. || Amitabha, benefactor. The path up is slippery; be careful.
+  ~ kuno: Amitaba, Dermawan. Jalan menuju puncak licin; langkahlah dengan hati. || Amitabha, benefactor. The road to the peak is slick; step with care.
+- Selamat datang di kaki gunung, {$sebutan}. Udara di sini membersihkan paru dan hati. || Welcome to the mountain's foot, {$sebutan}. The air here cleans lungs and heart.
+  ~ kasar: Udara gunung. Bersih. Jangan dikotori. || Mountain air. Clean. Don't foul it.
+- Dermawan datang dari jauh. Minumlah teh gunung, hangat untuk kaki yang lelah. || You've come far, benefactor. Drink mountain tea; it warms tired feet.
+  ~ kuno: Dermawan datang dari jauh. Teh gunung ini menghangatkan langkah yang lelah. || You've come far, benefactor. This mountain tea warms weary steps.
+
+== sapa.dialek.pelabuhan
+niat: SAPA
+topik: sapa
+syarat: dialek=pelabuhan
+gestur: lambai
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- Ahoy, Bung! Kakimu masih goyang dari kapal? || Ahoy, mate! Legs still wobbly from the ship?
+  ~ kasar: Hei. Kaki darat. Minggir dari tali. || Hey. Landlubber. Off the ropes.
+- {$sebutan}! Laut tenang, ikan banyak, hidup enak! || {$sebutan}! Calm sea, plenty of fish, good life!
+  ~ kuno: {$sebutan}! Laut tenang dan berlimpah ikan; hidup sungguh baik. || {$sebutan}! The sea is calm and teeming; life is truly good.
+- Hei, Bung! Jangan berdiri di jalur tali, nanti tersangkut! || Hey, mate! Don't stand in the rope's path, you'll get caught!
+
+== sapa.dialek.oasis
+niat: SAPA
+topik: sapa
+syarat: dialek=oasis
+gestur: hormat
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- Salam, Saudara. Demi mata air, kau datang di hari baik. || Peace, friend. By the spring, you came on a good day.
+  ~ kasar: Salam. Mata air ini bukan untuk dikotori. || Peace. This spring is not to be fouled.
+- {$sebutan}! Unta-unta saja menyambutmu, apalagi aku! || {$sebutan}! Even the camels welcome you, let alone me!
+  ~ kuno: {$sebutan}! Bahkan unta pun menyambutmu, apalagi hamba. || {$sebutan}! Even the camels greet you, let alone this one.
+- Selamat datang di bawah pohon kurma, Saudara. Pasir di luar, damai di dalam. || Welcome under the date palms, friend. Sand outside, peace within.
+
+== sapa.dialek.air
+niat: SAPA
+topik: sapa
+syarat: dialek=air
+gestur: lambai
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- Kakak... selamat datang, ya. Mau naik perahu? || Welcome, dear... want a boat ride?
+  ~ kasar: Naik perahu? Bayar dulu. || Boat ride? Pay first.
+- Halo, {$sebutan}... airnya jernih hari ini, ya... || Hello, {$sebutan}... the water's so clear today...
+  ~ kuno: Salam, {$sebutan}... air hari ini jernih bagaikan cermin langit... || Greetings, {$sebutan}... the water today is clear as heaven's mirror...
+- Ah, Kakak. Hati-hati di jembatan lengkung, licin kena embun, ya. || Ah, dear. Careful on the arched bridge; it's slick with dew.
+  ~ kasar: Hati-hati di jembatan. Licin. Jatuh sendiri. || Careful on the bridge. Slick. You fall, your problem.

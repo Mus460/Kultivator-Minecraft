@@ -57,7 +57,8 @@ public final class KontrakKota {
 	public static BlockPos tiba(ServerLevel level, long town) {
 		BlockPos centre = Towns.centre(level.getServer(), town);
 		if (centre == null) {
-			return BlockPos.ZERO;
+			// no known town: callers then pass the destination's packed BlockPos as the id (Tahap, Jelmaan)
+			return BlockPos.of(town);
 		}
 		DuniaSites.Site site = situs(level, town);
 		if (site != null) {

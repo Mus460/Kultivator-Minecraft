@@ -1,0 +1,71 @@
+{
+  "_catatan": "DESIGN 42.4A.1 (42S). Zone kinds, hour multipliers per band, capacity per titik kind, building-name rules. Read by dev.kultivator.dunia.kota42.ragam.Kapasitas; the code holds the same values as defaults.",
+  "jam": [4, 6, 8, 11, 13, 17, 19, 23],
+  "pengali": {
+    "pasar":   [0.1, 0.8, 1.0, 0.6, 0.6, 0.8, 0.2, 0.0],
+    "makan":   [0.1, 0.6, 0.3, 1.0, 0.4, 0.9, 0.5, 0.0],
+    "teh":     [0.0, 0.3, 0.5, 0.5, 0.9, 0.6, 0.5, 0.0],
+    "arak":    [0.0, 0.0, 0.0, 0.2, 0.2, 0.5, 1.0, 0.4],
+    "rumah":   [1.0, 0.6, 0.25, 0.4, 0.25, 0.5, 0.7, 1.0],
+    "kuil":    [1.0, 0.6, 0.3, 0.2, 0.3, 0.6, 0.2, 0.0],
+    "sekolah": [0.0, 0.2, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    "kerja":   [0.0, 0.5, 1.0, 0.4, 1.0, 0.3, 0.0, 0.0],
+    "ladang":  [0.2, 0.9, 1.0, 0.4, 0.9, 0.4, 0.0, 0.0],
+    "alun":    [0.6, 0.7, 0.5, 0.4, 0.7, 0.9, 0.7, 0.05],
+    "ruas":    [0.1, 0.9, 0.6, 0.7, 0.6, 0.9, 0.5, 0.05],
+    "gerbang": [0.2, 0.6, 0.5, 0.4, 0.5, 0.6, 0.3, 0.1]
+  },
+  "acara": {
+    "_catatan": "An event (HidupApi.timpaan / the capital's running event, matched by prefix) lifts these zone kinds to at least the given multiplier for its length; a scene at x,z (tonton:<x,z>) lifts its own zone to 1.0 x 2. Targets never pass the physical capacity.",
+    "festival_lentera": {"alun": 1.0, "ruas": 1.0, "kuil": 0.8},
+    "turnamen": {"alun": 1.0},
+    "pertemuan_sekte": {"alun": 1.0},
+    "pasar_hantu": {"pasar": 1.0, "ruas": 0.8},
+    "pasar_malam": {"pasar": 1.0},
+    "rombongan": {"alun": 1.0, "ruas": 0.9},
+    "upacara": {"kuil": 1.0, "ruas": 0.8},
+    "nikah": {"rumah": 0.8, "ruas": 0.9},
+    "makam": {"kuil": 1.0, "ruas": 0.8}
+  },
+  "kapasitas": {
+    "kursi": 1, "kursi_lantai": 1, "meja_makan": 1, "lapak": 2, "kerja:*": 1, "kasur": 1, "obrol": 2, "main": 3,
+    "catur": 5, "sumur": 4, "sumur_timba": 4, "panggung": 12, "penonton": 1, "pandang": 2, "dupa": 2, "latihan": 2,
+    "meditasi": 1, "meja_tulis": 1, "jaga": 1, "tambatan": 2, "kandang_unta": 2, "alat_tenun": 1, "jalan_lentera": 1,
+    "pancing": 1, "jongkok": 1, "tiba": 2
+  },
+  "ruasPerPejalan": 6,
+  "luasPerOrang": 25,
+  "titikJenis": {
+    "lapak": "pasar", "kerja:kios": "pasar", "kerja:timbangan": "pasar",
+    "kerja:teko": "teh",
+    "kerja:kuali": "makan", "kerja:tungku": "makan", "meja_makan": "makan",
+    "dupa": "kuil", "kerja:dupa": "kuil",
+    "meja_tulis": "sekolah", "kerja:meja_tulis": "sekolah",
+    "kerja:cangkul": "ladang", "kerja:sabit": "ladang", "kerja:pancing": "ladang", "kerja:jala": "ladang", "kerja:dayung": "ladang",
+    "tambatan": "ladang", "jalur_perahu": "ladang", "jalur_kapal": "ladang", "pancing": "ladang", "kandang_unta": "ladang",
+    "main": "alun", "obrol": "alun", "panggung": "alun", "penonton": "alun", "pandang": "alun", "catur": "alun",
+    "sumur": "alun", "sumur_timba": "alun", "latihan": "alun", "meditasi": "alun", "kursi": "alun", "kursi_lantai": "alun",
+    "jalan_lentera": "ruas", "lentera_air": "ruas",
+    "jaga": "gerbang", "tiba": "gerbang", "jaga_suar": "gerbang", "arena_pintu": "gerbang",
+    "kasur": "rumah", "peti_milik": "rumah",
+    "kerja:*": "kerja"
+  },
+  "nama": [
+    ["rumah_makan", "makan"], ["warung", "makan"], ["penginapan", "makan"], ["karavanserai", "makan"], ["dapur", "makan"],
+    ["kedai_teh", "teh"], ["paviliun_teh", "teh"], ["rumah_teh", "teh"], ["teh", "teh"],
+    ["kedai", "arak"], ["arak", "arak"], ["judi", "arak"], ["paviliun_minum", "arak"], ["perjamuan", "arak"], ["dadu", "arak"],
+    ["pasar", "pasar"], ["kios", "pasar"], ["lapak", "pasar"], ["toko", "pasar"], ["lelang", "pasar"], ["rumah_tukar", "pasar"], ["bazar", "pasar"],
+    ["kuil", "kuil"], ["biara", "kuil"], ["pagoda", "kuil"], ["ibadah", "kuil"], ["altar", "kuil"], ["makam", "kuil"],
+    ["sekolah", "sekolah"], ["akademi", "sekolah"], ["perpustakaan", "sekolah"], ["arsip", "sekolah"], ["kitab", "sekolah"],
+    ["pandai", "kerja"], ["bengkel", "kerja"], ["gudang", "kerja"], ["tenun", "kerja"], ["penenun", "kerja"], ["lumbung", "kerja"],
+    ["kandang", "kerja"], ["galangan", "kerja"], ["dermaga", "ladang"], ["kantor", "kerja"], ["balai", "kerja"], ["rumah_uang", "kerja"],
+    ["perbendaharaan", "kerja"], ["rumah_bea", "kerja"], ["tambang", "kerja"], ["apotek", "kerja"], ["tabib", "kerja"],
+    ["pos", "gerbang"], ["penjaga", "gerbang"], ["tenda_jaga", "gerbang"], ["mercusuar", "gerbang"], ["gerbang", "gerbang"], ["menara", "gerbang"],
+    ["lapangan", "alun"], ["taman", "alun"], ["panggung", "alun"], ["alun", "alun"],
+    ["rumah", "rumah"], ["siheyuan", "rumah"], ["pondok", "rumah"], ["wisma", "rumah"], ["paviliun", "rumah"], ["asrama", "rumah"]
+  ],
+  "umum": [
+    "obrol", "main", "kursi", "kursi_lantai", "meja_makan", "dupa", "pandang", "sumur", "sumur_timba", "catur", "penonton",
+    "lapak", "latihan", "meditasi", "@kedai", "@depan_lapak", "@jalan"
+  ]
+}

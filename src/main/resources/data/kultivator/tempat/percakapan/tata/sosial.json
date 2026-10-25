@@ -1,0 +1,211 @@
+{
+  "_dibuat": "tools/gen_kota_hidup_cakap.py dari tools/kota_cakap_sumber (jangan disunting tangan)",
+  "kelompok": "sosial",
+  "isi": [
+    {
+      "aturan": "puji.pemain",
+      "niat": "PUJI",
+      "topik": "pemain",
+      "bingkai": [
+        {
+          "kunci": "puji.pemain.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "pelabuhan",
+            "oasis",
+            "air",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "puji.pemain.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "puji.pemain.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "puji.pemain.3",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "puji.pemain.4",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "kagum"
+    },
+    {
+      "aturan": "hina.pemain",
+      "niat": "HINA",
+      "topik": "pemain",
+      "bingkai": [
+        {
+          "kunci": "hina.pemain.0",
+          "slot": [],
+          "bobot": 3,
+          "varian": [
+            "kuno",
+            "pelabuhan",
+            "iblis",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "hina.pemain.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "hina.pemain.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "air"
+          ]
+        },
+        {
+          "kunci": "hina.pemain.3",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {},
+      "gestur": "marah_tunjuk",
+      "seru": "cih"
+    },
+    {
+      "aturan": "selamat.pemain",
+      "niat": "SELAMAT",
+      "bingkai": [
+        {
+          "kunci": "selamat.pemain.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "pelabuhan",
+            "oasis",
+            "kampung",
+            "gunung"
+          ]
+        },
+        {
+          "kunci": "selamat.pemain.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "selamat.pemain.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "selamat.pemain.3",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "ucap_selamat",
+      "seru": "oh"
+    },
+    {
+      "aturan": "peringat.pemain",
+      "niat": "PERINGATAN",
+      "topik": "bahaya",
+      "bingkai": [
+        {
+          "kunci": "peringat.pemain.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "pelabuhan",
+            "iblis",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "peringat.pemain.1",
+          "slot": [
+            "$arah"
+          ],
+          "bobot": 2,
+          "varian": [
+            "oasis",
+            "gunung"
+          ]
+        },
+        {
+          "kunci": "peringat.pemain.2",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "peringat.pemain.3",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        },
+        "$arah": {
+          "tipe": "arah",
+          "dari": "konteks.arah"
+        }
+      },
+      "gestur": "bisik"
+    }
+  ]
+}

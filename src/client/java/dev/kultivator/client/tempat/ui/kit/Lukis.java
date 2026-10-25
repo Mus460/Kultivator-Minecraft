@@ -173,21 +173,26 @@ public final class Lukis {
 		return Math.round(v * skala);
 	}
 
-	// ---------------------------------------------------------------- text shortcuts (sizes of 38.U.2)
+	// ---------------------------------------------------------------- text shortcuts (43.0.5: text at 1.0 or 1.5 only)
 
-	/** Body text, cut with ".." when wider than {@code lebar}, full text as tooltip when cut and hovered. */
+	/** Text size never below 1.0 (43.0.5): an older 0.6-0.85 request draws at 1.0 and is cut instead. */
+	private static float ukuran(float diminta) {
+		return Math.max(1.0F, diminta);
+	}
+
+	/** Body text, cut with "…" when wider than {@code lebar}, full text as tooltip when cut and hovered. */
 	public void teks(Component t, float x, float y, float lebar, int warna) {
 		teks(t, x, y, lebar, warna, 1.0F);
 	}
 
 	public void teks(Component t, float x, float y, float lebar, int warna, float ukuran) {
-		float w = font.width(t) * ukuran;
-		if (w <= lebar) {
-			Brush.text(g, font, t, x, y, warna, ukuran, false);
+		float s = ukuran(ukuran);
+		if (font.width(t) * s <= lebar) {
+			Brush.text(g, font, t, x, y, warna, s, false);
 			return;
 		}
-		float s = Brush.fitScale(font, t, lebar, ukuran, Math.max(0.6F, ukuran * 0.8F));
-		Brush.fit(g, font, t, x, y, lebar, warna, s, Math.max(0.6F, ukuran * 0.8F), false);
+		s = Brush.fitScale(font, t, lebar, s, 1.0F);
+		Brush.fit(g, font, t, x, y, lebar, warna, s, 1.0F, false);
 		if (font.width(t) * s > lebar && di(Math.round(x), Math.round(y), Math.round(x + lebar), Math.round(y + 9 * s))) {
 			tip(t);
 		}
@@ -195,46 +200,39 @@ public final class Lukis {
 
 	/** Right-aligned text (numbers). */
 	public void kanan(Component t, float xKanan, float y, int warna, float ukuran) {
-		Brush.text(g, font, t, xKanan - font.width(t) * ukuran, y, warna, ukuran, false);
+		float s = ukuran(ukuran);
+		Brush.text(g, font, t, xKanan - font.width(t) * s, y, warna, s, false);
 	}
 
 	/** Title: x1.5 with an ink shadow. */
 	public void judul(Component t, float x, float y, float lebar, int warna) {
-		float s = Brush.fitScale(font, t, lebar, 1.5F, 0.8F);
+		float s = Brush.fitScale(font, Brush.bold(t), lebar, 1.5F, 1.0F) < 1.5F ? 1.0F : 1.5F;
 		int bayang = gaya.gelap() ? 0xA0000000 : Palette.argb(0x60, Palette.GOLD_DARK & 0xFFFFFF);
-		Brush.fit(g, font, Brush.bold(t), x + 1.0F, y + 1.0F, lebar, bayang, s, 0.8F, false);
-		Brush.fit(g, font, Brush.bold(t), x, y, lebar, warna, s, 0.8F, false);
+		Brush.fit(g, font, Brush.bold(t), x + 1.0F, y + 1.0F, lebar, bayang, s, s, false);
+		Brush.fit(g, font, Brush.bold(t), x, y, lebar, warna, s, s, false);
 	}
 
-	/** Caption 0.75. */
+	/** Caption (was 0.75; 1.0 since 43.0.5, cut with "…" and tooltip). */
 	public void keterangan(Component t, float x, float y, float lebar, int warna) {
-		teks(t, x, y, lebar, warna, 0.75F);
+		teks(t, x, y, lebar, warna, 1.0F);
 	}
 
 	/** Wrapped text; returns the height used. */
 	public float bungkus(Component t, float x, float y, float lebar, int warna, float ukuran) {
-		return Brush.wrap(g, font, t, x, y, lebar, warna, ukuran, false);
+		return Brush.wrap(g, font, t, x, y, lebar, warna, ukuran(ukuran), false);
 	}
 
 	/**
 	 * Wrapped text kept inside {@code maksTinggi} (38.U.2: no overlap at GUI scale 4): the lines that fit are drawn, the
-	 * last one is cut with ".." when more follow, and the whole text becomes the tooltip when the block is hovered. When
-	 * the text does not fit at {@code ukuran} it first tries 0.85 x (never below 0.6). Returns the height used.
+	 * last one is cut with "…" when more follow, and the whole text becomes the tooltip when the block is hovered. The
+	 * text is never drawn below 1.0 (43.0.5). Returns the height used.
 	 */
 	public float bungkus(Component t, float x, float y, float lebar, int warna, float ukuran, float maksTinggi) {
 		if (maksTinggi < 6.0F || lebar < 10.0F) {
 			return 0.0F;
 		}
-		float s = ukuran;
+		float s = ukuran(ukuran);
 		List<FormattedCharSequence> lines = font.split(t, Math.max(10, (int) (lebar / s)));
-		if (muat(lines.size(), s) > maksTinggi && ukuran * 0.85F >= 0.6F) {
-			float kecil = ukuran * 0.85F;
-			List<FormattedCharSequence> lain = font.split(t, Math.max(10, (int) (lebar / kecil)));
-			if (lain.size() * 9.0F * kecil < lines.size() * 9.0F * s) {
-				s = kecil;
-				lines = lain;
-			}
-		}
 		float lh = 9.0F * s;
 		int boleh = Math.max(0, (int) Math.floor((maksTinggi + s) / lh));
 		if (boleh <= 0) {
@@ -250,18 +248,13 @@ public final class Lukis {
 			Brush.text(g, font, lines.get(i), x, y + i * lh, warna, s, false);
 		}
 		String akhir = polos(lines.get(boleh - 1));
-		int ruang = (int) (lebar / s) - font.width("..");
-		String cut = font.plainSubstrByWidth(akhir, Math.max(0, ruang)) + "..";
+		int ruang = (int) (lebar / s) - font.width(Brush.CUT);
+		String cut = font.plainSubstrByWidth(akhir, Math.max(0, ruang)) + Brush.CUT;
 		Brush.text(g, font, Component.literal(cut).withStyle(t.getStyle()), x, y + (boleh - 1) * lh, warna, s, false);
 		if (di(Math.round(x), Math.round(y), Math.round(x + lebar), Math.round(y + boleh * lh))) {
 			tip(t);
 		}
 		return boleh * lh;
-	}
-
-	/** Height of {@code n} wrapped lines at {@code ukuran} (the last line without its gap). */
-	private static float muat(int n, float ukuran) {
-		return n <= 0 ? 0.0F : n * 9.0F * ukuran - ukuran;
 	}
 
 	/** The plain characters of a wrapped line. */

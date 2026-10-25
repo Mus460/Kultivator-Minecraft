@@ -3,7 +3,6 @@ package dev.kultivator.client.hub;
 import dev.kultivator.Kultivator;
 import dev.kultivator.client.ClientCultivation;
 import dev.kultivator.client.Keys;
-import dev.kultivator.client.codex.Codex;
 import dev.kultivator.client.codex.SealWheel;
 import dev.kultivator.client.epic.camera.CinematicDirector;
 import dev.kultivator.client.screen.ui.Brush;
@@ -27,7 +26,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.Util;
 
 /**
- * Akses Cepat (DESIGN 33.3.1): one key beside WASD, V by default. A tap (under 250 ms) opens the jade-scroll hub on its
+ * Akses Cepat (DESIGN 33.3.1): one key beside WASD, V by default. A tap (under 250 ms) opens the Gulungan Utama on its
  * last section; holding it opens this wheel around the crosshair, drawn as a HUD element (GUI fills only, no new
  * rendering). The mouse moves a virtual pointer instead of the camera ({@code MouseHandlerMixin}), WASD keeps working.
  * Releasing the key on a slice chooses it, releasing in the centre opens the hub, right click (use) or Esc cancels, the
@@ -185,7 +184,7 @@ public final class QuickWheel implements HudElement {
 			if (open) {
 				release();
 			} else if (now - pressedAt < HOLD_MILLIS) {
-				HubNav.openHub(HubNav.lastSection());
+				HubNav.buka(Tujuan.bagian(HubNav.lastSection()));
 			}
 		} else if (!open && now - pressedAt >= HOLD_MILLIS) {
 			if (!blocked()) {
@@ -214,7 +213,7 @@ public final class QuickWheel implements HudElement {
 		if (slice >= 0) {
 			run(slice);
 		} else {
-			HubNav.openHub(HubNav.lastSection());
+			HubNav.buka(Tujuan.bagian(HubNav.lastSection()));
 		}
 	}
 
@@ -228,12 +227,13 @@ public final class QuickWheel implements HudElement {
 		switch (slice) {
 			case MEDITASI -> Keys.send(Payloads.Action.of(Actions.MEDITATE_TOGGLE));
 			case PEDANG -> Keys.send(Payloads.Action.of(Actions.FLYING_SWORD_TOGGLE));
-			case KITAB_TEKNIK -> Codex.open(-1);
-			case MURID -> Keys.send(new Payloads.Action(Actions.DISCIPLE_OPEN, -1, ""));
+			// The navigation slices open the Gulungan like their section keys (DESIGN 43.10.3; old opener until the page exists).
+			case KITAB_TEKNIK -> HubNav.bukaKunci(Keys.CODEX);
+			case MURID -> HubNav.bukaKunci(Keys.MURID);
 			case CINCIN -> Keys.send(new Payloads.Action(Actions.TEMPA, 0, "ring:open"));
-			case DUNIA -> HubNav.openHub(HubNav.DUNIA);
-			case KEABADIAN -> HubNav.openHub(HubNav.KEABADIAN);
-			case PANDUAN -> dev.kultivator.client.guide.GuideClient.open(null);
+			case DUNIA -> HubNav.bukaKunci(Keys.DUNIA);
+			case KEABADIAN -> HubNav.bukaKunci(Keys.ABADI);
+			case PANDUAN -> HubNav.bukaKunci(Keys.GUIDE);
 			default -> {
 			}
 		}
@@ -314,17 +314,21 @@ public final class QuickWheel implements HudElement {
 		float inner = ring - tile - 2.0F;
 		Brush.disc(g, cx, cy, inner, Palette.argb(0xD0, 0x101824));
 		Brush.ring(g, cx, cy, inner - 0.8F, inner, Palette.GOLD_DARK);
-		float room = inner * 1.75F;
+		// 43.0.5: all text at 1.0. The centre holds the name and its number key; the title sits above the wheel and the
+		// slice's hint under it, where a whole line fits (the centre is only ~50 px wide at GUI scale 4).
+		float room = inner * 1.8F;
+		float outer = ring + tile + 6.0F;
+		float wide = Math.min(g.guiWidth() - 16.0F, 240.0F);
 		Component name = hovered >= 0 ? sliceName(hovered) : Component.translatable("kultivator.hub.wheel.centre");
 		Component tip = hovered >= 0 ? Component.translatable("kultivator.hub.wheel." + NAMES[hovered] + ".tip")
 				: Component.translatable("kultivator.hub.wheel.hint");
-		Brush.fitCentered(g, font, Component.translatable("kultivator.hub.wheel.title"), cx, cy - inner * 0.62F, room, Palette.GOLD, 0.6F, 0.6F, true);
-		Brush.fitCentered(g, font, Brush.bold(name), cx, cy - inner * 0.22F, room, Palette.JADE_PALE, 0.8F, 0.6F, true);
-		Brush.fitCentered(g, font, tip, cx, cy + inner * 0.18F, room, Palette.QI_LIGHT, 0.6F, 0.6F, true);
+		Brush.fitCentered(g, font, Component.translatable("kultivator.hub.wheel.title"), cx, cy - outer - 11.0F, wide, Palette.GOLD, 1.0F, 1.0F, true);
+		Brush.fitCentered(g, font, Brush.bold(name), cx, cy - (hovered >= 0 ? 9.0F : 4.0F), room, Palette.JADE_PALE, 1.0F, 1.0F, true);
 		if (hovered >= 0) {
-			Brush.fitCentered(g, font, Component.translatable("kultivator.hub.wheel.number", hovered + 1), cx, cy + inner * 0.48F, room,
-					Palette.GOLD_DARK, 0.6F, 0.6F, true);
+			Brush.fitCentered(g, font, Component.translatable("kultivator.hub.wheel.number", hovered + 1), cx, cy + 2.0F, room, Palette.GOLD_LIGHT,
+					1.0F, 1.0F, true);
 		}
+		Brush.fitCentered(g, font, tip, cx, cy + outer + 3.0F, wide, Palette.QI_LIGHT, 1.0F, 1.0F, true);
 	}
 
 	private static Component sliceName(int slice) {
@@ -340,7 +344,7 @@ public final class QuickWheel implements HudElement {
 		Brush.disc(g, cx, cy, half, on ? Palette.GOLD : Palette.JADE_DARK);
 		Brush.disc(g, cx, cy, half - 1.0F, hover ? Palette.JADE_LIGHT : Palette.JADE);
 		Glyphs.tab(g, GLYPHS[slice], cx, cy, size * 0.6F, hover ? Palette.GOLD_LIGHT : Palette.JADE_PALE);
-		Brush.text(g, font, Component.literal(String.valueOf(slice + 1)), cx - half + 0.5F, cy - half + 0.5F, Palette.GOLD_LIGHT, 0.6F, true);
-		Brush.centered(g, font, sliceName(slice), cx, cy + half + 1.5F, hover ? Palette.GOLD_LIGHT : 0xFFE6EDDB, 0.6F, true);
+		// the number key at 1.0 just outside the tile's upper left (the name shows in the centre while hovered)
+		Brush.text(g, font, Component.literal(String.valueOf(slice + 1)), cx - half - 4.0F, cy - half - 4.0F, Palette.GOLD_LIGHT, 1.0F, true);
 	}
 }

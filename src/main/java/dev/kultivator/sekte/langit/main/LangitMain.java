@@ -65,6 +65,8 @@ public final class LangitMain {
 		LangitNpcPack.registerContent();
 		DuniaCommands.test("langit_sekte", LangitTests::node);
 		DuniaCommands.player("langit", LangitMain::playerNode);
+		// Always: with the module off the screen still gets its "mati" answer instead of hanging on "memuat".
+		LangitUi.register();
 		if (!LangitConfig.on()) {
 			return;
 		}
@@ -72,7 +74,6 @@ public final class LangitMain {
 		LangitSaksi.register();
 		LangitSerbu.register();
 		LangitTangga.register();
-		LangitUi.register();
 		LangitNpcPack.register(LangitConfig.get().strukturNpc);
 		HeavenlyWrath.addWinListener(LangitUtusan::onWrathWon);
 		LangitPayloads.onSaw(LangitMain::saw);

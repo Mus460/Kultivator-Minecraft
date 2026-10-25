@@ -26,8 +26,12 @@ import java.util.UUID;
  * vengeful, proud; righteous: loyal, brave, humble), the Dao follows the sect's ink colour when one is close, the voice
  * and the body follow the name's sex. A sect that grows a tier gains members; members who defected or left are replaced
  * when it grows. Built lazily on first use, never on a tick.
+ * <p>
+ * DESIGN 41.6.12: the public readers {@link #daftar}, {@link #tokoh}, {@link #sikap}, {@link #ubahSikap}, {@link #lukai}
+ * and {@link #ikutPergi} let Gabung Sekte use the same people as seniors and rivals of a player member (a player's UUID is
+ * the {@code sikap.<uuid>} key beside our disciples' souls). The roster record itself stays package-private.
  */
-final class Roster {
+public final class Roster {
 
 	static final int MAKS = 10;
 
@@ -250,6 +254,106 @@ final class Roster {
 			}
 		}
 		return best;
+	}
+
+	// ================================================================== public readers (DESIGN 41.6.12, Gabung Sekte)
+
+	/**
+	 * A read-only view of one roster member: id {@code <sect>#<slot>}, name key (and nickname key or ""), role id
+	 * ({@code luar|dalam|inti|kakak|tetua}), the rank on {@code hari}, two trait ids, Dao id, sex, voice, weapon, body
+	 * posture/seed, wounded until (world day) and status ({@code AKTIF|MEMBELOT|PERGI}).
+	 */
+	public record Tokoh(String id, String sekte, int slot, String kunciNama, String kunciJulukan, String peran, int peranNomor,
+			dev.kultivator.data.Rank rank, List<Sifat> sifat, String dao, boolean perempuan, String suara, int senjata, int postur,
+			int benih, long lukaSampai, String status) {
+
+		/** The shown name ("Name 'Nickname'" once earned). */
+		public net.minecraft.network.chat.MutableComponent nama() {
+			net.minecraft.network.chat.MutableComponent name = net.minecraft.network.chat.Component.translatable(kunciNama);
+			return kunciJulukan.isEmpty() ? name : net.minecraft.network.chat.Component.translatable(SeteruIds.k("nama_julukan"), name,
+					net.minecraft.network.chat.Component.translatable(kunciJulukan));
+		}
+
+		public boolean aktif() {
+			return SeteruIds.TOKOH_AKTIF.equals(status);
+		}
+
+		public boolean luka(long hari) {
+			return hari < lukaSampai;
+		}
+
+		public boolean punya(Sifat s) {
+			return sifat.contains(s);
+		}
+	}
+
+	/** Every member of {@code sekte} (filled up to the sect's size first), as views; empty when D does not know the sect. */
+	public static List<Tokoh> daftar(MinecraftServer server, String sekte) {
+		List<Tokoh> out = new ArrayList<>();
+		if (server == null || sekte == null) {
+			return out;
+		}
+		long hari = Ingatan.today(server);
+		int tier = SekteApi.diplomasi().tier(sekte);
+		for (TokohSekte t : anggota(server, sekte)) {
+			out.add(view(t, hari, tier));
+		}
+		return out;
+	}
+
+	/** The member {@code id} ({@code <sect>#<slot>}) as a view, or null. */
+	public static @Nullable Tokoh tokoh(MinecraftServer server, String id) {
+		TokohSekte t = server == null ? null : SeteruData.get(server).tokoh(id);
+		return t == null ? null : view(t, Ingatan.today(server), SekteApi.diplomasi().tier(t.sekte));
+	}
+
+	/** The member's attitude toward {@code soul} (a player UUID or a disciple soul), -100..100; 0 when unknown. */
+	public static int sikap(MinecraftServer server, String id, UUID soul) {
+		TokohSekte t = server == null || soul == null ? null : SeteruData.get(server).tokoh(id);
+		return t == null ? 0 : t.sikap(soul);
+	}
+
+	/** Changes the member's attitude toward {@code soul} by {@code delta} (clamped -100..100); false when unknown. */
+	public static boolean ubahSikap(MinecraftServer server, String id, UUID soul, int delta) {
+		SeteruData data = server == null || soul == null ? null : SeteruData.get(server);
+		TokohSekte t = data == null ? null : data.tokoh(id);
+		if (t == null) {
+			return false;
+		}
+		t.ubahSikap(soul, delta);
+		data.setDirty();
+		return true;
+	}
+
+	/** "Terluka" (DESIGN 41.0 item 5): the member is not met for {@code hari} world days; nobody dies. */
+	public static void lukai(MinecraftServer server, String id, int hari) {
+		SeteruData data = server == null ? null : SeteruData.get(server);
+		TokohSekte t = data == null ? null : data.tokoh(id);
+		if (t != null && hari > 0) {
+			t.lukaSampai = Math.max(t.lukaSampai, Ingatan.today(server) + hari);
+			data.setDirty();
+		}
+	}
+
+	/**
+	 * The member follows a player who left the sect (DESIGN 41.7.4, "ikut kakaknya"): status {@code MEMBELOT}, replaced when
+	 * the sect grows. False when unknown or not active.
+	 */
+	public static boolean ikutPergi(MinecraftServer server, String id) {
+		SeteruData data = server == null ? null : SeteruData.get(server);
+		TokohSekte t = data == null ? null : data.tokoh(id);
+		if (t == null || !t.aktif()) {
+			return false;
+		}
+		t.status = SeteruIds.TOKOH_MEMBELOT;
+		data.setDirty();
+		return true;
+	}
+
+	private static Tokoh view(TokohSekte t, long hari, int tier) {
+		return new Tokoh(t.id, t.sekte, t.slot, t.kunciNama(), t.julukan >= 0 ? SeteruIds.k("julukan." + t.julukan) : "",
+				TokohSekte.PERAN[Math.max(0, Math.min(TokohSekte.PERAN.length - 1, t.peran))], t.peran, t.rank(hari, Math.max(1, tier)),
+				List.copyOf(t.sifat), t.dao, t.perempuan(), t.suara, t.senjata, t.postur, t.benih, t.lukaSampai, t.status);
 	}
 
 	private Roster() {

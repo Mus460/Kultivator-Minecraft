@@ -243,6 +243,7 @@ public final class Calamity {
 			if (entity.isRemoved()) {
 				// Unloaded, departed or discarded: the marker in its saved data settles the calamity later.
 				RUNS.remove(entity.soulId(), run);
+				DaoProtectors.clearFor(entity); // as finishRun does: no hostile protectors left behind
 				HuFa.end(entity, false);
 				continue;
 			}

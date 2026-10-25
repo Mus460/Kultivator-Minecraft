@@ -1,0 +1,54 @@
+{
+  "_catatan": "Kebiasaan #22 pencerita_anak (DESIGN 42.4.12)",
+  "nomor": 22,
+  "siapa": {
+    "umur": [
+      55,
+      200
+    ],
+    "tahap": [
+      "tua"
+    ]
+  },
+  "sesi": [
+    {
+      "jam": [
+        18,
+        19
+      ],
+      "peluang": 0.8,
+      "syarat": [
+        "tidak_hujan"
+      ],
+      "tujuan": [
+        "serambi",
+        "obrol",
+        "panggung"
+      ],
+      "klip": "cerita",
+      "ganti": [
+        {
+          "klip": "cerita"
+        },
+        {
+          "klip": "bicara_tangan"
+        },
+        {
+          "klip": "cerita"
+        },
+        {
+          "klip": "tertawa"
+        }
+      ],
+      "ganti_menit": 6,
+      "undang": {
+        "umur": [
+          4,
+          11
+        ],
+        "maks": 4,
+        "klip": "duduk_lantai"
+      }
+    }
+  ]
+}

@@ -1,146 +1,120 @@
 package dev.kultivator.client.dunia.reruntuhan;
 
 import dev.kultivator.client.screen.ui.Brush;
-import dev.kultivator.client.screen.ui.KeyHints;
+import dev.kultivator.client.screen.ui.DaftarGulir;
+import dev.kultivator.client.screen.ui.KeadaanKosong;
+import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.dunia.reruntuhan.RNet;
 import dev.kultivator.dunia.reruntuhan.menara.PenjagaLantaiEntity;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * The "Menara Seratus" card of the hub's Dunia section (DESIGN 34.6 T, at most one card for module R): an ink painting
- * of the nine-tier pagoda's hundred floors as ten bands, lit up to the player's best floor (each band named by its
- * guardian), the open gates, Luka Menara, the floor pattern of a band, the week's ranking and the best of all time, and
- * the module's other records (ancestral ruins cleared, Pahala from the prisons, the seals broken now). The data comes
- * from the server on opening ({@code RNet.Action "menara_info"} → {@code op: "info"}); until then it says it is
- * loading. Esc goes back to the hub.
+ * Dunia › Alam › Menara (DESIGN 34.6 T, 43.5, 43.12.1: the old "Menara Seratus" card screen is now this sub of the Alam
+ * page): an ink painting of the nine-tier pagoda's hundred floors as ten bands, lit up to the player's best floor (each
+ * band's guardian in its tooltip), and beside it one scroll with the best floor and its bar, the open gates, Luka Menara,
+ * the floor pattern, the week's ranking with the best of all time, and the module's other records (ancestral ruins,
+ * Pahala from the prisons, the seals broken). The numbers come from the server while the sub is shown
+ * ({@code RNet.Action "menara_info"} → {@code op: "info"}, {@link #onInfo}); until then it says it is loading. Text at 1.0
+ * (43.0.5); the pagoda narrows on a small box instead of shrinking text.
  */
-public class MenaraScreen extends Screen {
+public final class MenaraScreen {
 
-	private static @Nullable MenaraScreen open;
-	private @Nullable CompoundTag data;
-	private final @Nullable Screen back;
-	private final long openedAt = Util.getMillis();
-	/** The "?" seal: Panduan › Ensiklopedia on the tower topic (audit M5, S11). */
-	private final KeyHints.SealCorner help = new KeyHints.SealCorner("menara_seratus");
-	private int x0;
-	private int y0;
-	private int x1;
-	private int y1;
+	private static final String K = "kultivator.reruntuhan.menara.";
+	private static final long WAIT_MILLIS = 4000L;
 
-	public MenaraScreen(@Nullable Screen back) {
-		super(Component.translatable("kultivator.reruntuhan.menara.ui.title"));
-		this.back = back;
+	private static @Nullable CompoundTag data;
+	private static long askedAt;
+
+	/** One line of the scroll: a heading, a wrapped text line, or the progress bar ({@code bar}). */
+	private record Row(@Nullable Component judul, @Nullable FormattedCharSequence teks, int warna, boolean bar) {
 	}
 
-	/** Opens the card and asks the server for the numbers. */
-	static void request() {
-		ClientPlayNetworking.send(new RNet.Action("menara_info", 0, 0));
+	private final List<Row> rows = new ArrayList<>();
+	private final DaftarGulir daftar = new DaftarGulir().judul(i -> i < rows.size() && rows.get(i).judul() != null, 13);
+
+	/** Asks the server for the tower's numbers (the sub came on screen; a quiet no-op while not connected). */
+	public static void request() {
+		askedAt = Util.getMillis();
+		if (ClientPlayNetworking.canSend(RNet.Action.TYPE)) {
+			ClientPlayNetworking.send(new RNet.Action("menara_info", 0, 0));
+		}
 	}
 
-	/** The server's answer: fills the open card (ignored when none is open). */
+	/** The server's answer ({@code op: "info"}). */
 	static void onInfo(CompoundTag tag) {
-		MenaraScreen screen = open;
-		if (screen != null) {
-			screen.data = tag.copy();
-		}
+		data = tag.copy();
 	}
 
-	@Override
-	protected void init() {
-		open = this;
-		int w = Math.min(400, width - 16);
-		int h = Math.min(262, height - 12);
-		x0 = (width - w) / 2;
-		x1 = x0 + w;
-		y0 = (height - h) / 2;
-		y1 = y0 + h;
-		help.place(x1 - 10.0F, y0 + 10.0F);
+	/** Forgets the numbers (disconnect). */
+	static void reset() {
+		data = null;
 	}
 
-	@Override
-	public void removed() {
-		if (open == this) {
-			open = null;
-		}
-		super.removed();
-	}
-
-	@Override
-	public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float a) {
-		g.fillGradient(0, 0, width, height, Palette.NIGHT, Palette.MOUNTAIN);
-	}
-
-	@Override
-	public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float a) {
-		super.extractRenderState(g, mouseX, mouseY, a);
-		drawCard(g);
-		help.render(g, font, mouseX, mouseY, width, height);
-	}
-
-	private void drawCard(GuiGraphicsExtractor g) {
-		long now = Util.getMillis();
-		g.fill(x0 + 3, y0 + 4, x1 + 3, y1 + 4, 0x60000000);
-		g.fillGradient(x0, y0, x1, y1, Palette.PAPER_TOP, Palette.PAPER_BOTTOM);
-		g.fillGradient(x0 - 4, y0 - 3, x1 + 4, y0 + 3, Palette.ROD_LIGHT, Palette.ROD_DARK);
-		g.fillGradient(x0 - 4, y1 - 3, x1 + 4, y1 + 3, Palette.ROD_LIGHT, Palette.ROD_DARK);
-		Brush.frame(g, x0, y0, x1, y1, Palette.JADE_DARK);
-		float cx = (x0 + x1) / 2.0F;
-		Brush.fitCentered(g, font, Brush.bold(title), cx, y0 + 8.0F, x1 - x0 - 40.0F, Palette.INK, 1.15F, 0.6F, false);
-		Brush.rect(g, x0 + 16.0F, y0 + 20.0F, x1 - 16.0F, y0 + 21.0F, Palette.argb(0x90, Palette.JADE_DARK));
+	/** Draws the sub into the box. */
+	public void gambar(Lukis l, int x0, int y0, int x1, int y1) {
 		CompoundTag d = data;
 		if (d == null) {
-			int dots = (int) ((now - openedAt) / 300L % 4L);
-			Brush.fitCentered(g, font, Component.translatable("kultivator.reruntuhan.menara.ui.loading").append(".".repeat(dots)), cx, (y0 + y1) / 2.0F,
-					200.0F, Palette.INK_SOFT, 0.9F, 0.6F, false);
+			boolean late = Util.getMillis() - askedAt > WAIT_MILLIS;
+			Component line = late ? Component.translatable("kultivator.gui43.m13.menara.diam")
+					: Component.translatable(K + "ui.loading").append(".".repeat((int) ((Util.getMillis() - askedAt) / 300L % 4L)));
+			KeadaanKosong.gambar(l, KeadaanKosong.Gambar.GULUNGAN, line, null, null, x0, y0, x1, y1);
 			return;
 		}
-		int best = d.getIntOr("best", 0);
-		int unlocked = d.getIntOr("unlocked", 1);
-		pagoda(g, best, unlocked, now);
-		float tx = x0 + 168.0F;
-		float room = x1 - tx - 14.0F;
-		float y = y0 + 28.0F;
-		float s = 0.72F;
-		y += line(g, Component.translatable("kultivator.reruntuhan.menara.ui.best", best), tx, y, room, Palette.INK, 0.85F);
-		// the progress to the hundredth floor
-		Brush.rect(g, tx, y, tx + room, y + 4.0F, Palette.argb(0x50, Palette.INK_FAINT));
-		Brush.rect(g, tx, y, tx + room * best / 100.0F, y + 4.0F, Palette.GOLD);
-		for (int b = 1; b < 10; b++) {
-			Brush.rect(g, tx + room * b / 10.0F, y, tx + room * b / 10.0F + 0.6F, y + 4.0F, Palette.argb(0x80, Palette.PAPER_TOP));
-		}
-		y += 8.0F;
-		y += line(g, Component.translatable("kultivator.reruntuhan.menara.ui.gates", unlocked, unlocked * 10 - 9), tx, y, room, Palette.INK_SOFT, s);
+		int best = Mth.clamp(d.getIntOr("best", 0), 0, 100);
+		int unlocked = Mth.clamp(d.getIntOr("unlocked", 1), 1, 10);
+		int pagodaW = Mth.clamp((x1 - x0) * 2 / 5, 70, 150);
+		pagoda(l, best, unlocked, x0, y0 + 2, x0 + pagodaW, y1);
+		int lx = x0 + pagodaW + 8;
+		isi(l, d, best, unlocked, x1 - lx - 8);
+		daftar.gambar(l, "menara", lx, y0, x1, y1, rows.size(), 10, (lk, i, rx0, ry0, rx1, ry1, sorot, pilih) -> {
+			Row r = rows.get(i);
+			if (r.judul() != null) {
+				lk.kepala(r.judul(), rx0, ry0, rx1);
+			} else if (r.bar()) {
+				lk.g.fill(rx0, ry0 + 2, rx1 - 2, ry0 + 6, Palette.argb(0x50, Palette.INK_FAINT));
+				lk.g.fill(rx0, ry0 + 2, rx0 + (rx1 - 2 - rx0) * best / 100, ry0 + 6, Palette.GOLD);
+				for (int b = 1; b < 10; b++) {
+					int tx = rx0 + (rx1 - 2 - rx0) * b / 10;
+					lk.g.fill(tx, ry0 + 2, tx + 1, ry0 + 6, Palette.argb(0x80, Palette.PAPER_TOP));
+				}
+			} else if (r.teks() != null) {
+				Brush.text(lk.g, lk.font, r.teks(), rx0, ry0, r.warna(), 1.0F, false);
+			}
+		}, null, null);
+	}
+
+	/** Builds the scroll's rows for {@code lebar}. */
+	private void isi(Lukis l, CompoundTag d, int best, int unlocked, int lebar) {
+		rows.clear();
+		teks(l, Component.translatable(K + "ui.best", best), Palette.INK, lebar);
+		rows.add(new Row(null, null, 0, true));
+		teks(l, Component.translatable(K + "ui.gates", unlocked, unlocked * 10 - 9), Palette.INK_SOFT, lebar);
 		int luka = d.getIntOr("luka", 0);
 		if (luka > 0) {
-			y += line(g, Component.translatable("kultivator.reruntuhan.menara.ui.luka", (luka + 59) / 60), tx, y, room, Palette.DANGER, s);
+			teks(l, Component.translatable(K + "ui.luka", (luka + 59) / 60), Palette.DANGER, lebar);
 		}
 		if (d.getBooleanOr("penakluk", false)) {
-			y += line(g, Component.translatable("kultivator.reruntuhan.menara.ui.title_conqueror").withStyle(ChatFormatting.BOLD), tx, y, room, Palette.GOLD_DARK,
-					s);
+			teks(l, Component.translatable(K + "ui.title_conqueror").withStyle(ChatFormatting.BOLD), Palette.GOLD_DARK, lebar);
 		}
 		if (!d.getBooleanOr("tower", true)) {
-			y += line(g, Component.translatable("kultivator.reruntuhan.menara.closed"), tx, y, room, Palette.LOCKED, s);
+			teks(l, Component.translatable(K + "closed"), Palette.LOCKED, lebar);
 		}
-		y += 3.0F;
-		// the floor pattern of every band
-		y += line(g, Brush.bold(Component.translatable("kultivator.reruntuhan.menara.ui.pattern")), tx, y, room, Palette.JADE_DARK, s);
-		y += line(g, Component.translatable("kultivator.reruntuhan.menara.ui.pattern.text"), tx, y, room, Palette.INK_SOFT, 0.6F);
-		y += 3.0F;
-		// the ranking
-		y += line(g, Brush.bold(Component.translatable("kultivator.reruntuhan.menara.ui.week")), tx, y, room, Palette.JADE_DARK, s);
+		rows.add(new Row(Component.translatable(K + "ui.pattern"), null, 0, false));
+		teks(l, Component.translatable(K + "ui.pattern.text"), Palette.INK_SOFT, lebar);
+		rows.add(new Row(Component.translatable(K + "ui.week"), null, 0, false));
 		int rank = 0;
 		for (Tag t : d.getListOrEmpty("weekly")) {
 			if (t instanceof StringTag entry) {
@@ -149,110 +123,71 @@ public class MenaraScreen extends Screen {
 				String name = bar < 0 ? value : value.substring(0, bar);
 				String floor = bar < 0 ? "?" : value.substring(bar + 1);
 				rank++;
-				int color = rank == 1 ? Palette.GOLD_DARK : Palette.INK;
-				y += line(g, Component.translatable("kultivator.reruntuhan.menara.stele.row", rank, name, floor), tx + 4.0F, y, room - 4.0F, color, 0.66F);
+				teks(l, Component.translatable(K + "stele.row", rank, name, floor), rank == 1 ? Palette.GOLD_DARK : Palette.INK, lebar);
 			}
 		}
 		if (rank == 0) {
-			y += line(g, Component.translatable("kultivator.reruntuhan.menara.stele.empty"), tx + 4.0F, y, room - 4.0F, Palette.INK_FAINT, 0.66F);
+			teks(l, Component.translatable(K + "stele.empty"), Palette.INK_FAINT, lebar);
 		}
 		String bestName = d.getStringOr("best_name", "");
 		if (!bestName.isEmpty()) {
-			y += line(g, Component.translatable("kultivator.reruntuhan.menara.stele.best", bestName, d.getIntOr("best_floor", 0)), tx, y, room,
-					Palette.STORED, 0.66F);
+			teks(l, Component.translatable(K + "stele.best", bestName, d.getIntOr("best_floor", 0)), Palette.STORED, lebar);
 		}
-		y += 3.0F;
-		// the rest of module R
-		y += line(g, Brush.bold(Component.translatable("kultivator.reruntuhan.menara.ui.records")), tx, y, room, Palette.JADE_DARK, s);
+		rows.add(new Row(Component.translatable(K + "ui.records"), null, 0, false));
 		int ruins = d.getIntOr("ruins", 0);
 		int ruinBest = Mth.clamp(d.getIntOr("ruin_best", 0), 0, 3);
-		y += line(g, ruins == 0 ? Component.translatable("kultivator.reruntuhan.menara.ui.ruins_none")
-				: Component.translatable("kultivator.reruntuhan.menara.ui.ruins", ruins, Component.translatable("kultivator.reruntuhan.gua.tier." + Math.max(1, ruinBest))),
-				tx + 4.0F, y, room - 4.0F, Palette.INK, 0.66F);
-		y += line(g, Component.translatable("kultivator.reruntuhan.menara.ui.pahala", d.getIntOr("pahala", 0)), tx + 4.0F, y, room - 4.0F, Palette.INK, 0.66F);
-		int prisons = d.getIntOr("prisons", 0);
+		teks(l, ruins == 0 ? Component.translatable(K + "ui.ruins_none")
+				: Component.translatable(K + "ui.ruins", ruins, Component.translatable("kultivator.reruntuhan.gua.tier." + Math.max(1, ruinBest))),
+				Palette.INK, lebar);
+		teks(l, Component.translatable(K + "ui.pahala", d.getIntOr("pahala", 0)), Palette.INK, lebar);
 		int broken = d.getIntOr("prisons_broken", 0);
-		y += line(g, Component.translatable("kultivator.reruntuhan.menara.ui.prisons", prisons, broken), tx + 4.0F, y, room - 4.0F,
-				broken > 0 ? Palette.DANGER : Palette.INK, 0.66F);
-		// the Sumber line at the foot
-		Brush.wrap(g, font, Component.translatable("kultivator.reruntuhan.menara.source").withStyle(ChatFormatting.ITALIC), x0 + 14.0F, y1 - 22.0F,
-				x1 - x0 - 28.0F, Palette.INK_FAINT, 0.55F, false);
+		teks(l, Component.translatable(K + "ui.prisons", d.getIntOr("prisons", 0), broken), broken > 0 ? Palette.DANGER : Palette.INK, lebar);
+		teks(l, Component.translatable(K + "source").withStyle(ChatFormatting.ITALIC), Palette.INK_FAINT, lebar);
 	}
 
-	private float line(GuiGraphicsExtractor g, Component text, float x, float y, float room, int color, float scale) {
-		return Brush.wrap(g, font, text, x, y, room, color, scale, false) + 1.5F;
+	private void teks(Lukis l, Component text, int warna, int lebar) {
+		for (FormattedCharSequence line : l.font.split(text, Math.max(20, lebar))) {
+			rows.add(new Row(null, line, warna, false));
+		}
 	}
 
-	/** The ten bands as the tiers of a pagoda, the widest at the bottom; lit up to the best floor. */
-	private void pagoda(GuiGraphicsExtractor g, int best, int unlocked, long now) {
-		float left = x0 + 12.0F;
-		float right = x0 + 160.0F;
+	/** The ten bands as the tiers of a pagoda, the widest at the bottom; lit up to the best floor; a tier's tooltip names its band. */
+	private static void pagoda(Lukis l, int best, int unlocked, int left, int top0, int right, int bottom0) {
 		float mid = (left + right) / 2.0F;
-		float top = y0 + 28.0F;
-		float bottom = y1 - 30.0F;
+		float top = top0 + 8.0F;
+		float bottom = bottom0 - 5.0F;
 		float tier = (bottom - top) / 10.0F;
-		float pulse = 0.5F + 0.5F * (float) Math.sin(now / 350.0D);
-		// the spire
-		Brush.rect(g, mid - 0.8F, top - 6.0F, mid + 0.8F, top + 2.0F, Palette.GOLD);
-		Brush.disc(g, mid, top - 6.0F, 2.0F, Palette.GOLD_LIGHT);
+		float widest = (right - left) / 2.0F - 4.0F;
+		float pulse = l.denyut();
+		Brush.rect(l.g, mid - 0.8F, top - 6.0F, mid + 0.8F, top + 2.0F, Palette.GOLD);
+		Brush.disc(l.g, mid, top - 6.0F, 2.0F, Palette.GOLD_LIGHT);
 		for (int b = 10; b >= 1; b--) {
 			int i = 10 - b;
 			float y = top + i * tier;
-			float half = 18.0F + b * 5.2F;
+			float half = widest * (0.3F + 0.07F * b);
 			boolean cleared = best >= b * 10;
 			boolean open = b <= unlocked;
 			int rgb = LobbyState.bandRgb(b);
 			int roof = cleared ? Palette.opaque(rgb) : open ? Palette.mix(Palette.opaque(rgb), Palette.INK_FAINT, 0.55F) : Palette.LOCKED;
 			int wall = cleared ? Palette.ROD_LIGHT : open ? Palette.argb(0xC0, Palette.ROD_LIGHT) : Palette.LOCKED_PAPER;
-			// the storey's wall, then its curled roof
-			Brush.rect(g, mid - half * 0.62F, y + tier * 0.45F, mid + half * 0.62F, y + tier - 1.0F, wall);
-			Brush.rect(g, mid - half, y + tier * 0.3F, mid + half, y + tier * 0.45F, roof);
-			Brush.line(g, mid - half, y + tier * 0.3F, mid - half - 3.0F, y + tier * 0.12F, 1.2F, roof);
-			Brush.line(g, mid + half, y + tier * 0.3F, mid + half + 3.0F, y + tier * 0.12F, 1.2F, roof);
-			Brush.rect(g, mid - half * 0.7F, y + tier * 0.18F, mid + half * 0.7F, y + tier * 0.3F, Palette.mix(roof, 0xFF000000, 0.2F));
+			Brush.rect(l.g, mid - half * 0.62F, y + tier * 0.45F, mid + half * 0.62F, y + tier - 1.0F, wall);
+			Brush.rect(l.g, mid - half, y + tier * 0.3F, mid + half, y + tier * 0.45F, roof);
+			Brush.line(l.g, mid - half, y + tier * 0.3F, mid - half - 3.0F, y + tier * 0.12F, 1.2F, roof);
+			Brush.line(l.g, mid + half, y + tier * 0.3F, mid + half + 3.0F, y + tier * 0.12F, 1.2F, roof);
+			Brush.rect(l.g, mid - half * 0.7F, y + tier * 0.18F, mid + half * 0.7F, y + tier * 0.3F, Palette.mix(roof, 0xFF000000, 0.2F));
 			if (b == unlocked && !cleared) {
-				Brush.halo(g, mid, y + tier * 0.6F, half * 0.5F, 4.0F, rgb, 0.35F + 0.35F * pulse);
+				Brush.halo(l.g, mid, y + tier * 0.6F, half * 0.5F, 4.0F, rgb, 0.35F + 0.35F * pulse);
 			}
-			Component label = Component.translatable("kultivator.reruntuhan.menara.ui.band", LobbyState.NUMERALS[b],
-					Component.translatable("entity.kultivator.penjaga_lantai." + (b == 10 ? "bayangan_diri" : PenjagaLantaiEntity.IDS[b - 1])));
-			Brush.fitCentered(g, font, label, mid, y + tier * 0.5F, half * 1.2F, cleared ? 0xFF1B1008 : open ? Palette.INK : Palette.INK_FAINT, 0.55F,
-					0.4F, false);
+			if (tier >= 11.0F) {
+				Brush.centered(l.g, l.font, Component.literal(LobbyState.NUMERALS[b]), mid, y + tier * 0.45F, cleared ? 0xFF1B1008 : Palette.INK, 1.0F, false);
+			}
+			if (l.di(Math.round(mid - half), Math.round(y), Math.round(mid + half), Math.round(y + tier))) {
+				Component guardian = Component.translatable("entity.kultivator.penjaga_lantai." + (b == 10 ? "bayangan_diri" : PenjagaLantaiEntity.IDS[b - 1]));
+				l.tip(List.of(Component.translatable(K + "ui.band", LobbyState.NUMERALS[b], guardian),
+						Component.translatable(cleared ? "kultivator.gui43.m13.menara.tingkat.lulus" : open ? "kultivator.gui43.m13.menara.tingkat.buka"
+								: "kultivator.gui43.m13.menara.tingkat.tutup", b * 10 - 9, b * 10)));
+			}
 		}
-		Brush.rect(g, left, bottom, right, bottom + 3.0F, Palette.ROD_DARK);
-	}
-
-	@Override
-	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-		if (event.button() == 0 && help.click(event.x(), event.y())) {
-			return true;
-		}
-		return super.mouseClicked(event, doubleClick);
-	}
-
-	@Override
-	public boolean mouseReleased(MouseButtonEvent event) {
-		if (help.release(event.x(), event.y())) {
-			return true;
-		}
-		return super.mouseReleased(event);
-	}
-
-	@Override
-	public boolean keyPressed(KeyEvent event) {
-		if (event.isEscape()) {
-			onClose();
-			return true;
-		}
-		return super.keyPressed(event);
-	}
-
-	@Override
-	public void onClose() {
-		minecraft.gui.setScreen(back);
-	}
-
-	@Override
-	public boolean isPauseScreen() {
-		return false;
+		Brush.rect(l.g, left + 4.0F, bottom, right - 4.0F, bottom + 3.0F, Palette.ROD_DARK);
 	}
 }

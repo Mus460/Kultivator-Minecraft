@@ -1,6 +1,7 @@
 package dev.kultivator.client.aura;
 
 import dev.kultivator.client.epic.film.FilmDirector;
+import dev.kultivator.client.fx.spec.ScreenFlash;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
@@ -10,7 +11,8 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
  * Your own Aura Kultivasi seen through your own eyes (DESIGN 31.2.7): no world geometry, only a soft glow along the
  * screen edges, a vignette of four gradient strips at most 0.16 × the fade strong, in the realm's body colour mixed 35 %
  * with the Dao tint, breathing by alpha over 80 ticks; a full bottleneck pulses the edges amber (31.3). Hidden with F1,
- * while a film plays, in spectator and when the aura is off. Unaffected by shader packs (a HUD fill).
+ * while a film plays, in spectator and when the aura is off. Unaffected by shader packs (a HUD fill). Drawn by the one
+ * edge painter {@link ScreenFlash#tepi} (DESIGN 43.9): a stronger edge (danger, red sky) wins over it.
  */
 final class AuraHud implements HudElement {
 
@@ -43,32 +45,6 @@ final class AuraHud implements HudElement {
 			rgb = AuraColors.mix(rgb, palette.warn(pulse), 0.55F + 0.35F * pulse);
 			alpha = Math.min(MAX_ALPHA, alpha * (0.85F + 0.3F * pulse));
 		}
-		edges(g, rgb, alpha);
-	}
-
-	/** Four soft strips fading inward from the screen edges. */
-	private static void edges(GuiGraphicsExtractor g, int rgb, float alpha) {
-		int width = g.guiWidth();
-		int height = g.guiHeight();
-		int band = Math.max(10, Math.min(width, height) / 5);
-		int edge = argb(alpha, rgb);
-		int clear = argb(0.0F, rgb);
-		g.fillGradient(0, 0, width, band, edge, clear);
-		g.fillGradient(0, height - band, width, height, clear, edge);
-		int step = 2;
-		for (int i = 0; i < band; i += step) {
-			float k = 1.0F - i / (float) band;
-			int color = argb(alpha * k * k, rgb);
-			if ((color >>> 24) == 0) {
-				continue;
-			}
-			// the side strips leave the corners to the top and bottom ones (no doubled corners)
-			g.fill(i, band, i + step, height - band, color);
-			g.fill(width - i - step, band, width - i, height - band, color);
-		}
-	}
-
-	private static int argb(float alpha, int rgb) {
-		return (Math.max(0, Math.min(255, Math.round(alpha * 255.0F))) << 24) | (rgb & 0xFFFFFF);
+		ScreenFlash.tepi(rgb, alpha);
 	}
 }

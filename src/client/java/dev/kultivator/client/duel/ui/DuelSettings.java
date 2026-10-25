@@ -29,7 +29,8 @@ import java.util.function.Supplier;
  * </ul>
  * The visual and animation modules read the same keys ({@link #CAMERA}, {@link #SPARKS}, {@link #TRAILS}, ...) through
  * the accessors here. A change of {@link #KIAI}, {@link #INPUT}, {@link #INTRO} or {@link #PARRY_OUTSIDE} is sent to the
- * server as {@code DuelPrefs} (by {@code DuelClient}).
+ * server as {@code DuelPrefs} (by {@code DuelClient}). The duel page has no quick settings of its own any more: its "Atur
+ * di Pengaturan" link opens these rows (DESIGN 43.10.1, G49).
  */
 public final class DuelSettings {
 
@@ -198,43 +199,6 @@ public final class DuelSettings {
 
 	public static boolean pal() {
 		return flag(PAL, false);
-	}
-
-	// ================================================================== quick settings (the duel screen)
-
-	public static void cycleInput() {
-		setInput(next(input(), InputMode.values()));
-	}
-
-	public static void cycleKiai() {
-		store(KIAI, next(kiai(), Kiai.values()).id());
-		prefsChanged.run();
-	}
-
-	public static void cycleSparks() {
-		store(SPARKS, next(sparks(), Sparks.values()).id());
-	}
-
-	public static void cycleTrails() {
-		store(TRAILS, next(trails(), Trails.values()).id());
-	}
-
-	public static void toggleIntro() {
-		store(INTRO, !intro());
-		prefsChanged.run();
-	}
-
-	public static void toggleParryOutside() {
-		store(PARRY_OUTSIDE, !parryOutside());
-		prefsChanged.run();
-	}
-
-	public static void toggleCrowd() {
-		store(CROWD, !flag(CROWD, true));
-	}
-
-	public static void toggleHudWorld() {
-		store(HUD_WORLD, !hudWorld());
 	}
 
 	/** Set once by {@code DuelClient.init}: sends {@code DuelPrefs}. */

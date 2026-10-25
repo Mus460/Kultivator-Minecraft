@@ -4,6 +4,8 @@ import dev.kultivator.dunia.DuniaSites;
 import dev.kultivator.dunia.kota.KultivatorNpc;
 import dev.kultivator.dunia.kota.NilaiBatu;
 import dev.kultivator.dunia.kota.NpcRole;
+import dev.kultivator.dunia.kota42.api.Kategori;
+import dev.kultivator.dunia.kota42.ekonomi.HargaKota;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import dev.kultivator.dunia.tempat.ui.TempatLayar;
 import dev.kultivator.sosok.GerakId;
@@ -47,14 +49,15 @@ public final class Penginapan {
 		});
 	}
 
-	/** Room price at this inn: road posts are cheaper. */
+	/** Room price at this inn: road posts are cheaper; the town's service factor applies. */
 	static long hargaKamar(ServerPlayer player, @Nullable KultivatorNpc npc) {
 		boolean pos = false;
 		if (npc != null) {
 			DuniaSites.Site site = DuniaSites.byId(player.level().getServer(), npc.anchorSite());
 			pos = site != null && site.kind().startsWith("pos/");
 		}
-		return Barang.harga(pos ? KAMAR_POS : KAMAR, 1.0D);
+		// one HargaKota.faktor (JASA) per price, 42.6.3
+		return Barang.harga(pos ? KAMAR_POS : KAMAR, HargaKota.faktor(player, npc, Kategori.JASA));
 	}
 
 	/** True when the player already slept on a paid room this night. */

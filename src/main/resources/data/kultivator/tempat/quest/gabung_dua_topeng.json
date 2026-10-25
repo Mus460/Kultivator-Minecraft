@@ -1,0 +1,136 @@
+{
+  "pemberi": "peran:tetua_sekte",
+  "tempat": "gabung_sekte",
+  "tahap": [
+    {
+      "id": "panggilan",
+      "tujuan": [
+        "gabung_titik papan_misi"
+      ],
+      "akibat_masuk": [
+        "gabung.cerita dua_topeng panggilan luar"
+      ],
+      "batas_hari": 3,
+      "gagal_ke": "tolak",
+      "arah": "sekte/kompleks"
+    },
+    {
+      "id": "tawaran",
+      "tujuan": [
+        "gabung pilih:dua_topeng"
+      ],
+      "akibat_masuk": [
+        "gabung.cerita dua_topeng tawaran luar",
+        "gabung.pilihan dua_topeng tawaran terima tolak"
+      ],
+      "cabang": [
+        {
+          "syarat": [
+            "bendera gabung.dua_topeng.terima"
+          ],
+          "ke": "menyusup"
+        }
+      ],
+      "ke": "tolak",
+      "batas_hari": 3,
+      "gagal_ke": "tolak"
+    },
+    {
+      "id": "tolak",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "gabung.cerita dua_topeng tolak luar",
+        "gabung.sikap luar -5"
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "menyusup",
+      "tujuan": [
+        "gabung_titik samaran:gerbang"
+      ],
+      "akibat_masuk": [
+        "gabung.samaran mulai",
+        "gabung.cerita dua_topeng menyusup luar"
+      ],
+      "batas_hari": 5,
+      "gagal_ke": "pulang_kosong",
+      "arah": "sekte/gerbang"
+    },
+    {
+      "id": "rahasia",
+      "tujuan": [
+        "gabung pilih:dua_topeng"
+      ],
+      "akibat_masuk": [
+        "gabung.cerita dua_topeng rahasia",
+        "gabung.pilihan dua_topeng rahasia bocor berpaling"
+      ],
+      "cabang": [
+        {
+          "syarat": [
+            "bendera gabung.dua_topeng.berpaling"
+          ],
+          "ke": "berpaling"
+        },
+        {
+          "syarat": [
+            "acak 25"
+          ],
+          "ke": "ketahuan"
+        }
+      ],
+      "ke": "bocor",
+      "batas_hari": 3,
+      "gagal_ke": "ketahuan"
+    },
+    {
+      "id": "bocor",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "gabung.samaran bocor",
+        "gabung.cerita dua_topeng bocor luar",
+        "gabung.pk 300"
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "ketahuan",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "gabung.samaran ketahuan",
+        "gabung.cerita dua_topeng ketahuan"
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "berpaling",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "gabung.cerita dua_topeng berpaling",
+        "gabung.samaran berpaling"
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "pulang_kosong",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "gabung.samaran selesai",
+        "gabung.cerita dua_topeng pulang_kosong luar",
+        "gabung.sikap luar -5"
+      ],
+      "ke": "selesai"
+    }
+  ]
+}

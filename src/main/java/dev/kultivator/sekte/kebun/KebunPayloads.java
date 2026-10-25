@@ -406,6 +406,9 @@ public final class KebunPayloads {
 					if (done == 0) {
 						problem = Component.translatable("kultivator.sekte.kebun.bed.none_ripe");
 					}
+				} else if (action.a() >= Kebun.plotCount(owner)) {
+					// client-sent index: PetakHerba.of would grow the list up to it
+					problem = Component.translatable("kultivator.sekte.kebun.bed.none");
 				} else if (PetakHerba.of(aula.sec(), action.a()).ripe()) {
 					Pertumbuhan.harvest(aula, action.a(), null, player);
 				} else {

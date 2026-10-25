@@ -2,13 +2,21 @@ package dev.kultivator.client.duel.ui;
 
 import dev.kultivator.client.duel.DuelClient;
 import dev.kultivator.client.duel.DuelKeys;
+import dev.kultivator.client.hub.HubNav;
+import dev.kultivator.client.hub.HubPages;
+import dev.kultivator.client.hub.Tujuan;
+import dev.kultivator.client.hub.Urutan;
+import dev.kultivator.client.screen.Page;
 import dev.kultivator.client.screen.ui.Brush;
+import dev.kultivator.client.screen.ui.CincinWaktu;
+import dev.kultivator.client.screen.ui.DaftarGulir;
 import dev.kultivator.client.screen.ui.Glyphs;
-import dev.kultivator.client.screen.ui.JadeCoin;
-import dev.kultivator.client.screen.ui.KeyHints;
+import dev.kultivator.client.screen.ui.KartuHasil;
+import dev.kultivator.client.screen.ui.KeadaanKosong;
+import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
+import dev.kultivator.client.screen.ui.SegelKonfirmasi;
 import dev.kultivator.client.screen.ui.TalismanButton;
-import dev.kultivator.client.screen.ui.UiSound;
 import dev.kultivator.data.Realm;
 import dev.kultivator.disciple.DiscipleEntity;
 import dev.kultivator.duel.DuelIds;
@@ -17,8 +25,9 @@ import dev.kultivator.musuh.RogueCultivatorEntity;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Util;
 import net.minecraft.world.entity.Entity;
@@ -33,40 +42,155 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * The duel screen (DESIGN 35.8.5, Hub › Dunia › "Duel Pedang", {@code /kultivasi duel layar}): on the left, whom the
- * player can challenge right now (the one under the crosshair first, then players, his own disciples and rogue
- * cultivators within 24 blocks, nearest first; a row opens the {@link ChallengeScreen}), and "Duel Tonton" to pick two
- * of his disciples to watch. On the right: an incoming challenge with Terima / Tolak, the running duel with Menyerah
- * (two clicks) and Tunda, the quick settings (input, camera, kiai, sparks, intro film, deflect outside duels, crowd,
- * bars over heads), the record and the salute, and the last result. The controls in a footnote. Jade scroll, fits
- * 320 × 240, tooltips on every control; Esc returns to the hub when opened from it.
+ * Gulungan › Dunia › Duel (DESIGN 35.8.5, 43.5; the former duel screen, now a page: G82, G49, G50, R4, R6). Three subs:
+ * <ul>
+ * <li>{@code tantang}: whom the player can challenge now (the one under the crosshair first, then players, his own
+ * disciples and rogue cultivators within 24 blocks, nearest first) and "Duel Tonton" to pick two of his disciples to
+ * watch; the challenge rules ({@link ChallengeScreen}) open as the page's detail view (back = header control / Esc).</li>
+ * <li>{@code berjalan}: an incoming challenge with Terima / Tolak and its countdown, the running duel with Menyerah
+ * (confirm seal, sedang) and Tunda (ringan), the salute (closes the Gulungan so the pose is seen), the controls and the
+ * link to the duel rows of Pengaturan (the quick settings moved there: 43.10.1).</li>
+ * <li>{@code catatan}: the player's record from the server ({@code DuelCatatan}, asked for while shown: 43.14 S2) and
+ * the last result as a result card.</li>
+ * </ul>
+ * Everything is drawn immediately with the single kit; text at 1.0, fits the 289 × 148 content box of GUI scale 4.
  */
-public final class DuelScreen extends DuelScrollScreen {
+public final class DuelScreen extends Page {
 
-	private static final int ROW = 13;
+	public static final String TANTANG = "tantang";
+	public static final String BERJALAN = "berjalan";
+	public static final String CATATAN = "catatan";
+
+	private static final String K = "kultivator.gui43.m14.";
+	private static final String S = "kultivator.duel.ui.screen.";
+	private static final int ROW = 14;
+	private static final int BTN = 14;
 	private static final double RANGE = 24.0D;
-	private static final long SURRENDER_CONFIRM_MILLIS = 3000L;
 
 	/** One entity the player may challenge. */
 	record Candidate(int id, Component name, String kind, int pair, float distance, Component detail, int rgb) {
 	}
 
 	private final List<Candidate> candidates = new ArrayList<>();
-	private long candidatesAt;
-	private String signature = "";
+	private final DaftarGulir daftar = new DaftarGulir();
+	private final DaftarGulir daftarCatatan = new DaftarGulir();
+	private final KartuHasil kartu = new KartuHasil();
+	private long candidatesAt = Long.MIN_VALUE / 2;
 	private boolean pickingTwo;
 	private int firstPick = -1;
-	private long surrenderArmedAt = Long.MIN_VALUE / 2;
-	private int listTop;
-	private int listRows;
+	private @Nullable ChallengeScreen tantangan;
+	private String sub = TANTANG;
+	private @Nullable DuelPayloads.DuelResult hasilDiminta;
 
-	public DuelScreen(@Nullable Screen parent) {
-		super(Component.translatable("kultivator.duel.ui.screen.title"), parent);
+	/** Registers the page (from {@code DuelClient.init}). */
+	public static void daftar() {
+		HubPages.daftar(HubNav.DUNIA, Urutan.ID_DUEL, Urutan.DUEL, DuelScreen::new);
+	}
+
+	// ================================================================== identity
+
+	@Override
+	public Component title() {
+		return Component.translatable("kultivator.gui43.hal.dunia.duel");
+	}
+
+	@Override
+	public int glyph() {
+		return Glyphs.TECHNIQUES;
+	}
+
+	@Override
+	public String helpTopic() {
+		return "duel_pedang";
+	}
+
+	@Override
+	public List<Sub> subs() {
+		int waiting = DuelClient.offers().size();
+		Component berjalan = waiting > 0 ? Component.translatable(K + "sub.berjalan_n", waiting)
+				: Component.translatable("kultivator.gui43.sub.duel.berjalan");
+		return List.of(new Sub(TANTANG, Component.translatable("kultivator.gui43.sub.duel.tantang")), new Sub(BERJALAN, berjalan),
+				new Sub(CATATAN, Component.translatable("kultivator.gui43.sub.duel.catatan")));
+	}
+
+	@Override
+	public void showSub(String id) {
+		if (TANTANG.equals(id) || BERJALAN.equals(id) || CATATAN.equals(id)) {
+			sub = id;
+		}
+		if (CATATAN.equals(sub)) {
+			mintaCatatan();
+		}
+	}
+
+	@Override
+	public boolean rinci() {
+		return TANTANG.equals(sub) && (tantangan != null || pickingTwo);
+	}
+
+	// ================================================================== life
+
+	@Override
+	protected void build() {
+		// immediate page: everything is drawn in lukis()
+	}
+
+	@Override
+	public void onShow(@Nullable CompoundTag fokus) {
+		refreshCandidates();
+		if (CATATAN.equals(sub)) {
+			mintaCatatan();
+		}
+		super.onShow(fokus);
+	}
+
+	@Override
+	public void tick() {
+		if (TANTANG.equals(sub) && Util.getMillis() - candidatesAt > 1000L) {
+			refreshCandidates();
+		}
+		// a new result while the record is shown: ask again
+		if (CATATAN.equals(sub) && DuelClient.lastResult() != hasilDiminta) {
+			mintaCatatan();
+		}
+	}
+
+	@Override
+	public boolean mundur() {
+		if (TANTANG.equals(sub) && tantangan != null) {
+			tantangan = null;
+			return true;
+		}
+		if (TANTANG.equals(sub) && pickingTwo) {
+			pickingTwo = false;
+			firstPick = -1;
+			refreshCandidates();
+			return true;
+		}
+		return false;
+	}
+
+	private void mintaCatatan() {
+		hasilDiminta = DuelClient.lastResult();
+		DuelClient.mintaCatatan();
 	}
 
 	// ================================================================== candidates
 
 	private void refreshCandidates() {
+		int dipilih = daftar.pilihan();
+		int dipilihId = dipilih >= 0 && dipilih < candidates.size() ? candidates.get(dipilih).id() : -1;
+		refreshList();
+		// keep the selection on the same entity while distances reorder the rows
+		for (int i = 0; i < candidates.size(); i++) {
+			if (candidates.get(i).id() == dipilihId) {
+				daftar.setPilih(i);
+				break;
+			}
+		}
+	}
+
+	private void refreshList() {
 		candidates.clear();
 		candidatesAt = Util.getMillis();
 		Minecraft mc = Minecraft.getInstance();
@@ -76,10 +200,12 @@ public final class DuelScreen extends DuelScrollScreen {
 		}
 		List<Integer> seen = new ArrayList<>();
 		Entity aimed = mc.crosshairPickEntity;
-		if (aimed instanceof LivingEntity living && living.isAlive() && living.distanceTo(player) <= 12.0F && candidate(player, living) != null) {
+		if (!pickingTwo && aimed instanceof LivingEntity living && living.isAlive() && living.distanceTo(player) <= 12.0F) {
 			Candidate c = candidate(player, living);
-			candidates.add(c);
-			seen.add(living.getId());
+			if (c != null) {
+				candidates.add(c);
+				seen.add(living.getId());
+			}
 		}
 		List<Candidate> near = new ArrayList<>();
 		AABB box = player.getBoundingBox().inflate(RANGE);
@@ -96,10 +222,11 @@ public final class DuelScreen extends DuelScrollScreen {
 			}
 		}
 		near.sort(Comparator.comparingDouble(Candidate::distance));
-		if (pickingTwo) {
-			candidates.removeIf(c -> !c.kind().equals("murid"));
-		}
 		candidates.addAll(near);
+		// the challenged entity went away: close its form
+		if (tantangan != null && mc.level.getEntity(tantangan.targetId()) == null) {
+			tantangan = null;
+		}
 	}
 
 	private static @Nullable Candidate candidate(LocalPlayer player, LivingEntity living) {
@@ -132,146 +259,224 @@ public final class DuelScreen extends DuelScrollScreen {
 				Component.translatable("kultivator.duel.ui.kind.npc"), 0xE8DCC0);
 	}
 
-	/** What decides the layout: rebuilt when it changes. */
-	private String currentSignature() {
-		DuelPayloads.DuelSessionSync s = DuelClient.localSession();
-		List<DuelClient.Offer> offers = DuelClient.offers();
-		return (s == null ? "-" : s.sessionId() + ":" + s.phase()) + "|" + (offers.isEmpty() ? "-" : offers.get(0).offer().challengeId()) + "|"
-				+ candidates.size() + "|" + pickingTwo;
+	/** The row the player picked: opens the rules, or takes a disciple of a watched duel. */
+	private void pakai(Candidate c) {
+		if (pickingTwo) {
+			if (firstPick < 0 || firstPick == c.id()) {
+				firstPick = firstPick == c.id() ? -1 : c.id();
+				return;
+			}
+			Component firstName = Component.literal("?");
+			for (Candidate other : candidates) {
+				if (other.id() == firstPick) {
+					firstName = other.name();
+				}
+			}
+			tantangan = new ChallengeScreen(firstPick, c.id(), Component.translatable("kultivator.duel.ui.challenge.pair_names", firstName, c.name()),
+					DuelIds.PAIR_TONTON, -1);
+			pickingTwo = false;
+			firstPick = -1;
+			return;
+		}
+		int realm = -1;
+		Entity entity = minecraft.level == null ? null : minecraft.level.getEntity(c.id());
+		if (entity instanceof DiscipleEntity disciple) {
+			realm = disciple.syncedRealm();
+		} else if (entity instanceof RogueCultivatorEntity rogue) {
+			realm = rogue.realm();
+		}
+		tantangan = new ChallengeScreen(c.id(), -1, c.name(), c.pair(), realm);
 	}
 
-	// ================================================================== layout
+	// ================================================================== drawing
 
 	@Override
-	protected void build() {
-		if (Util.getMillis() - candidatesAt > 1000L || candidates.isEmpty()) {
+	protected void drawBehind(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
+	}
+
+	@Override
+	protected void lukis(Lukis l) {
+		int x0 = x + 4;
+		int y0 = y + 3;
+		int x1 = x + w - 4;
+		int y1 = y + h - 3;
+		switch (sub) {
+			case BERJALAN -> berjalan(l, x0, y0, x1, y1);
+			case CATATAN -> catatan(l, x0, y0, x1, y1);
+			default -> {
+				ChallengeScreen form = tantangan;
+				if (form != null) {
+					form.gambar(l, x0, y0, x1, y1, sent -> {
+						tantangan = null;
+						pesan(sent, Palette.OK);
+					});
+				} else {
+					tantang(l, x0, y0, x1, y1);
+				}
+			}
+		}
+	}
+
+	// ---------------------------------------------------------------- tantang
+
+	private void tantang(Lukis l, int x0, int y0, int x1, int y1) {
+		// toolbar: the heading of the list, Duel Tonton at the right
+		Component tonton = Component.translatable(pickingTwo ? S + "tonton_cancel" : S + "tonton");
+		int tw = TalismanButton.lebar(l.font, tonton, 60, (x1 - x0) / 2);
+		if (TalismanButton.gambar(l, "duel#tonton", x1 - tw, y0, tw, BTN, tonton, true, null, () -> {
+			pickingTwo = !pickingTwo;
+			firstPick = -1;
 			refreshCandidates();
+		}, false, pickingTwo)) {
+			l.tip(List.of(Component.translatable(S + "tonton"), Component.translatable(S + "tonton.tip").withStyle(ChatFormatting.GRAY)));
 		}
-		signature = currentSignature();
-		int mid = left + Math.round((right - left) * 0.56F);
-		// the "?" seal: Panduan › Ensiklopedia on the Sword Duel topic (audit M5, S11)
-		add(new KeyHints.HelpSeal(right - 5.0F, top + 5.0F, 10, () -> "duel_pedang"));
-		// ---- left column: the list, then "Duel Tonton"
-		listTop = top + 26;
-		int listBottom = bottom - 32;
-		listRows = Math.max(1, (listBottom - listTop) / ROW);
-		int lw = mid - left - 6;
-		add(new TalismanButton(left, bottom - 28, lw, 14,
-				() -> Component.translatable(pickingTwo ? "kultivator.duel.ui.screen.tonton_cancel" : "kultivator.duel.ui.screen.tonton"))
-				.stampedWhen(() -> pickingTwo)
-				.onPress(() -> {
-					pickingTwo = !pickingTwo;
-					firstPick = -1;
-					refreshCandidates();
-					rebuildWidgets();
-				})
-				.tooltip(() -> List.of(Component.translatable("kultivator.duel.ui.screen.tonton"),
-						Component.translatable("kultivator.duel.ui.screen.tonton.tip").withStyle(ChatFormatting.GRAY))));
+		Component judul = Component.translatable(pickingTwo ? (firstPick < 0 ? S + "pick_first" : S + "pick_second") : S + "challenge");
+		l.teks(Brush.bold(judul), x0, y0 + 3, x1 - x0 - tw - 6, l.gaya.aksen);
+		int top = y0 + BTN + 4;
+		int bottom = y1 - BTN - 4;
+		if (candidates.isEmpty()) {
+			KeadaanKosong.gambar(l, KeadaanKosong.Gambar.LENTERA,
+					Component.translatable(pickingTwo ? S + "no_disciples" : S + "nobody"), null, null, x0, top, x1, y1);
+			return;
+		}
+		l.sumur(x0, top, x1, bottom);
+		daftar.gambar(l, "duel#calon", x0 + 1, top + 1, x1 - 1, bottom - 1, candidates.size(), ROW, this::baris, () -> {
+			int i = daftar.pilihan();
+			if (i >= 0 && i < candidates.size()) {
+				pakai(candidates.get(i));
+			}
+		}, null);
+		// the action of the selected row (a second click or Enter does the same)
+		int i = daftar.pilihan();
+		Candidate c = i >= 0 && i < candidates.size() ? candidates.get(i) : null;
+		Component aksi = c == null ? Component.translatable(K + "pilih_dulu")
+				: Component.translatable(pickingTwo ? (firstPick < 0 ? K + "jadi_pertama" : firstPick == c.id() ? K + "lepas_pertama" : K + "jadi_kedua")
+				: K + "atur_tantangan", c.name());
+		int aw = TalismanButton.lebar(l.font, aksi, 90, x1 - x0);
+		if (TalismanButton.gambar(l, "duel#pakai", x1 - aw, y1 - BTN, aw, BTN, aksi, c != null, null, () -> {
+			if (c != null) {
+				pakai(c);
+			}
+		}, c != null && !pickingTwo, false) && c != null) {
+			l.tip(List.of(c.name(), c.detail(),
+					Component.translatable(pickingTwo ? S + "pick.tip" : S + "row.tip").withStyle(ChatFormatting.GRAY)));
+		}
+		l.samar(Component.translatable(K + "jumlah_calon", candidates.size()), x0, y1 - BTN + 3, x1 - x0 - aw - 6);
+	}
 
-		// ---- right column
-		int rx = mid + 4;
-		int rw = right - rx;
-		int y = top + 26;
+	private void baris(Lukis l, int i, int rx0, int ry0, int rx1, int ry1, boolean sorot, boolean pilih) {
+		Candidate c = candidates.get(i);
+		boolean picked = c.id() == firstPick;
+		l.kartu(rx0, ry0, rx1, ry1 - 1, sorot ? 1.0F : 0.0F, pilih || picked);
+		int glyph = switch (c.kind()) {
+			case "player" -> Glyphs.STATUS;
+			case "murid" -> Glyphs.TALENT;
+			case "perampok" -> Glyphs.TECHNIQUES;
+			default -> Glyphs.PATH;
+		};
+		Glyphs.tab(l.g, glyph, rx0 + 8.0F, ry0 + 6.5F, 9.0F, Palette.onPaper(c.rgb()));
+		Component jarak = Component.translatable(K + "jarak", Math.round(c.distance()));
+		int jw = l.font.width(jarak);
+		int lebar = rx1 - rx0 - 18 - jw - 6;
+		int nameW = Math.min(l.font.width(c.name()), lebar * 6 / 10);
+		l.teks(c.name(), rx0 + 16, ry0 + 3, nameW, picked ? Palette.SEAL_DARK : l.gaya.teks);
+		l.teks(c.detail(), rx0 + 20 + nameW, ry0 + 3, lebar - nameW - 4, l.gaya.teksSamar);
+		l.kanan(jarak, rx1 - 3, ry0 + 3, l.gaya.teksLemah);
+	}
+
+	// ---------------------------------------------------------------- berjalan
+
+	private void berjalan(Lukis l, int x0, int y0, int x1, int y1) {
+		int y = y0;
 		List<DuelClient.Offer> offers = DuelClient.offers();
-		if (!offers.isEmpty()) {
-			DuelPayloads.DuelChallengeOffer offer = offers.get(0).offer();
-			y += 28;
-			int bw = (rw - 4) / 2;
-			add(new TalismanButton(rx, y, bw, 14, () -> Component.translatable("kultivator.duel.ui.offer.accept"))
-					.urgentWhen(() -> true)
-					.onPress(() -> DuelClient.answer(offer.challengeId(), DuelIds.ANSWER_TERIMA))
-					.tooltip(() -> List.of(Component.translatable("kultivator.duel.ui.offer.accept"),
-							ChallengeOfferToast.rulesLine(offer.rules()), ChallengeOfferToast.stakeLine(offer))));
-			add(new TalismanButton(rx + bw + 4, y, bw, 14, () -> Component.translatable("kultivator.duel.ui.offer.decline"))
-					.onPress(() -> DuelClient.answer(offer.challengeId(), DuelIds.ANSWER_TOLAK))
-					.tooltip(() -> List.of(Component.translatable("kultivator.duel.ui.offer.decline"),
-							Component.translatable("kultivator.duel.ui.offer.decline.tip").withStyle(ChatFormatting.GRAY))));
-			y += 20;
-		}
 		DuelPayloads.DuelSessionSync s = DuelClient.localSession();
-		if (s != null && s.phase() != DuelIds.PHASE_ENDED) {
-			y += 20;
-			int bw = (rw - 4) / 2;
-			add(new TalismanButton(rx, y, bw, 14, () -> Component.translatable(surrenderArmed()
-					? "kultivator.duel.ui.screen.surrender_confirm" : "kultivator.duel.ui.screen.surrender"))
-					.urgentWhen(this::surrenderArmed)
-					.enabledWhen(() -> DuelClient.inFight())
-					.onPress(() -> {
-						if (surrenderArmed()) {
-							command("kultivasi duel menyerah");
-							surrenderArmedAt = Long.MIN_VALUE / 2;
-						} else {
-							surrenderArmedAt = Util.getMillis();
-						}
-					})
-					.tooltip(() -> List.of(Component.translatable("kultivator.duel.ui.screen.surrender"),
-							Component.translatable("kultivator.duel.ui.screen.surrender.tip", DuelHud.parryKey()).withStyle(ChatFormatting.GRAY))));
-			add(new TalismanButton(rx + bw + 4, y, bw, 14, () -> Component.translatable("kultivator.duel.ui.screen.pause"))
-					.onPress(() -> command("kultivasi duel tunda"))
-					.tooltip(() -> List.of(Component.translatable("kultivator.duel.ui.screen.pause"),
-							Component.translatable("kultivator.duel.ui.screen.pause.tip").withStyle(ChatFormatting.GRAY))));
-			y += 20;
+		boolean jalan = s != null && s.phase() != DuelIds.PHASE_ENDED;
+		int bottomRow = y1 - BTN;
+		if (!offers.isEmpty()) {
+			DuelClient.Offer o = offers.get(0);
+			DuelPayloads.DuelChallengeOffer offer = o.offer();
+			y += l.kepala(Component.translatable(K + "tantangan_masuk"), x0, y, x1);
+			int cardBottom = y + 59;
+			l.kartu(x0, y, x1, cardBottom, 0.0F, true);
+			int tw = CincinWaktu.teks(l, x1 - 4, y + 3, o.ticksLeft(), offer.expiresTicks(), l.kini, true);
+			l.teks(offer.name(), x0 + 5, y + 3, x1 - x0 - tw - 14, l.gaya.aksen);
+			l.teks(offer.rankLine(), x0 + 5, y + 13, x1 - x0 - 10, l.gaya.teksLemah);
+			l.teks(ChallengeOfferToast.rulesLine(offer.rules()), x0 + 5, y + 23, x1 - x0 - 10, l.gaya.teksSamar);
+			l.teks(ChallengeOfferToast.stakeLine(offer), x0 + 5, y + 33, x1 - x0 - 10, l.gaya.teksSamar);
+			int bw = (x1 - x0 - 14) / 2;
+			Component terima = Component.translatable(K + "terima");
+			if (TalismanButton.gambar(l, "duel#terima", x0 + 5, y + 44, bw, BTN - 1, terima, true, null,
+					() -> DuelClient.answer(offer.challengeId(), DuelIds.ANSWER_TERIMA), true, false)) {
+				l.tip(List.of(terima, ChallengeOfferToast.rulesLine(offer.rules()), ChallengeOfferToast.stakeLine(offer)));
+			}
+			Component tolak = Component.translatable(K + "tolak");
+			if (TalismanButton.gambar(l, "duel#tolak", x0 + 9 + bw, y + 44, bw, BTN - 1, tolak, true, null,
+					() -> DuelClient.answer(offer.challengeId(), DuelIds.ANSWER_TOLAK))) {
+				l.tip(List.of(tolak, Component.translatable("kultivator.duel.ui.offer.decline.tip").withStyle(ChatFormatting.GRAY)));
+			}
+			y = cardBottom + 3;
+			if (offers.size() > 1) {
+				l.samar(Component.translatable(K + "tantangan_lain", offers.size() - 1), x0, y, x1 - x0);
+				y += 11;
+			}
 		}
-		// quick settings: cycles as talismans, switches as jade coins
-		y += 12;
-		int sh = 13;
-		if (y + sh * 4 + 30 <= bottom) {
-			add(cycle(rx, y, rw, sh, "input", () -> DuelSettings.input().id(), DuelSettings::cycleInput));
-			y += sh + 2;
-			add(cycle(rx, y, rw, sh, "camera", () -> DuelSettings.camera().id(), () -> DuelSettings.nextCamera(true)));
-			y += sh + 2;
-			add(cycle(rx, y, rw, sh, "kiai", () -> DuelSettings.kiai().id(), DuelSettings::cycleKiai));
-			y += sh + 2;
-			add(cycle(rx, y, rw, sh, "sparks", () -> DuelSettings.sparks().id(), DuelSettings::cycleSparks));
-			y += sh + 3;
+		if (jalan && y + 13 + 26 <= bottomRow) {
+			LocalPlayer player = minecraft.player;
+			boolean isA = player != null && s.aId() == player.getId();
+			Component opponent = isA ? s.bName() : s.aName();
+			y += l.kepala(Component.translatable(S + "running", Component.translatable("kultivator.duel.ui.phase." + s.phase())), x0, y, x1);
+			int tw = 0;
+			if (s.phase() == DuelIds.PHASE_FIGHT) {
+				tw = CincinWaktu.teks(l, x1, y, DuelClient.fightTicksLeft(s), 0L, l.kini, true) + 4;
+			}
+			l.teks(Component.translatable(S + "versus", opponent), x0, y, x1 - x0 - tw, l.gaya.aksen);
+			y += 11;
+			int bw = (x1 - x0 - 4) / 2;
+			Component menyerah = Component.translatable(S + "surrender");
+			boolean bisa = DuelClient.inFight();
+			if (TalismanButton.gambar(l, "duel#menyerah", x0, y, bw, BTN, menyerah, bisa, bisa ? null : Component.translatable(K + "hanya_bertarung"),
+					() -> konfirmasi(SegelKonfirmasi.Tingkat.SEDANG, Component.translatable(K + "yakin_menyerah", opponent),
+							() -> command("kultivasi duel menyerah")), bisa, false)) {
+				l.tip(List.of(menyerah, Component.translatable(S + "surrender.tip", DuelHud.parryKey()).withStyle(ChatFormatting.GRAY)));
+			}
+			Component tunda = Component.translatable(S + "pause");
+			if (TalismanButton.gambar(l, "duel#tunda", x0 + bw + 4, y, bw, BTN, tunda, true, null,
+					() -> konfirmasi(SegelKonfirmasi.Tingkat.RINGAN, Component.translatable(K + "yakin_tunda"), () -> {
+						command("kultivasi duel tunda");
+						pesan(Component.translatable(K + "tunda_dikirim"), Palette.OK);
+					}))) {
+				l.tip(List.of(tunda, Component.translatable(S + "pause.tip").withStyle(ChatFormatting.GRAY)));
+			}
+			y += BTN + 4;
 		}
-		if (y + 22 + 16 <= bottom) {
-			int cw = (rw - 4) / 2;
-			add(coin(rx, y, cw, "intro", DuelSettings::intro, DuelSettings::toggleIntro));
-			add(coin(rx + cw + 4, y, cw, "parry_outside", DuelSettings::parryOutside, DuelSettings::toggleParryOutside));
-			y += 12;
-			add(coin(rx, y, cw, "crowd", DuelSettings::crowd, DuelSettings::toggleCrowd));
-			add(coin(rx + cw + 4, y, cw, "hud_world", DuelSettings::hudWorld, DuelSettings::toggleHudWorld));
-			y += 14;
+		if (offers.isEmpty() && !jalan) {
+			KeadaanKosong.gambar(l, KeadaanKosong.Gambar.GULUNGAN, Component.translatable(K + "tidak_berjalan"),
+					Component.translatable(K + "ke_tantang"), () -> tuju(Tujuan.of(HubNav.DUNIA, Urutan.ID_DUEL).sub(TANTANG)), x0, y0, x1,
+					bottomRow - 14);
+			y = bottomRow - 14;
 		}
-		int bw = (rw - 4) / 2;
-		add(new TalismanButton(rx, bottom - 28, bw, 14, () -> Component.translatable("kultivator.duel.ui.screen.records"))
-				.onPress(() -> {
-					command("kultivasi duel catatan");
-					onClose();
-				})
-				.tooltip(() -> List.of(Component.translatable("kultivator.duel.ui.screen.records"),
-						Component.translatable("kultivator.duel.ui.screen.records.tip").withStyle(ChatFormatting.GRAY))));
-		add(new TalismanButton(rx + bw + 4, bottom - 28, bw, 14, () -> Component.translatable("kultivator.duel.ui.screen.salute"))
-				.onPress(() -> {
-					command("kultivasi duel hormat");
-					onClose();
-				})
-				.tooltip(() -> List.of(Component.translatable("kultivator.duel.ui.screen.salute"),
-						Component.translatable("kultivator.duel.ui.screen.salute.tip").withStyle(ChatFormatting.GRAY))));
-	}
-
-	private TalismanButton cycle(int x, int y, int w, int h, String key, java.util.function.Supplier<String> value, Runnable next) {
-		String t = "kultivator.duel.setting.";
-		TalismanButton button = new TalismanButton(x, y, w, h,
-				() -> Component.translatable(t + key, Component.translatable(t + key + "." + value.get())));
-		button.onPress(next).tooltip(() -> List.of(Component.translatable(t + key, Component.translatable(t + key + "." + value.get())),
-				Component.translatable(t + key + ".tip").withStyle(ChatFormatting.GRAY),
-				Component.translatable(t + key + "." + value.get() + ".tip").withStyle(ChatFormatting.DARK_AQUA)));
-		return button;
-	}
-
-	private JadeCoin coin(int x, int y, int w, String key, java.util.function.BooleanSupplier on, Runnable toggle) {
-		String t = "kultivator.duel.setting.";
-		JadeCoin coin = new JadeCoin(x, y, w, 10, () -> Component.translatable(t + key), on);
-		coin.onPress(toggle).tooltip(() -> List.of(Component.translatable(t + key), Component.translatable(t + key + ".tip").withStyle(ChatFormatting.GRAY),
-				Component.translatable(on.getAsBoolean() ? t + "on" : t + "off")
-						.withStyle(on.getAsBoolean() ? ChatFormatting.DARK_GREEN : ChatFormatting.DARK_GRAY)));
-		return coin;
-	}
-
-	private boolean surrenderArmed() {
-		return Util.getMillis() - surrenderArmedAt < SURRENDER_CONFIRM_MILLIS;
+		// the controls, wrapped in the room left
+		Component keys = Component.translatable(S + "controls", DuelHud.parryKey(),
+				DuelKeys.CAMERA.isUnbound() ? Component.literal("-") : DuelKeys.CAMERA.getTranslatedKeyMessage());
+		float room = bottomRow - 3 - y;
+		if (room >= 9.0F) {
+			l.bungkus(keys, x0, y, x1 - x0, l.gaya.teksSamar, room);
+		}
+		// salute and the settings link
+		int bw = (x1 - x0 - 4) / 2;
+		Component hormat = Component.translatable(S + "salute");
+		if (TalismanButton.gambar(l, "duel#hormat", x0, bottomRow, bw, BTN, hormat, true, null, () -> {
+			command("kultivasi duel hormat");
+			// the pose is meant to be seen (43.13 R6)
+			HubNav.tutupSemua();
+		})) {
+			l.tip(List.of(hormat, Component.translatable(S + "salute.tip").withStyle(ChatFormatting.GRAY)));
+		}
+		Component atur = Component.translatable(K + "atur");
+		if (TalismanButton.gambar(l, "duel#atur", x0 + bw + 4, bottomRow, bw, BTN, atur, true, null,
+				() -> HubNav.openSettings(HubNav.GROUP_KONTROL))) {
+			l.tip(List.of(atur, Component.translatable(K + "atur.tip").withStyle(ChatFormatting.GRAY)));
+		}
 	}
 
 	private static void command(String command) {
@@ -281,147 +486,77 @@ public final class DuelScreen extends DuelScrollScreen {
 		}
 	}
 
-	// ================================================================== drawing
+	// ---------------------------------------------------------------- catatan
 
-	@Override
-	protected void drawPaper(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
-		if (Util.getMillis() - candidatesAt > 1000L) {
-			refreshCandidates();
-		}
-		if (!signature.equals(currentSignature())) {
-			rebuildWidgets();
-			return;
-		}
-		int mid = left + Math.round((right - left) * 0.56F);
-		// title
-		Brush.fitCentered(g, font, Brush.bold(title), (left + right) / 2.0F, top, right - left, Palette.INK, 1.0F, 0.6F, false);
-		Brush.fitCentered(g, font, Component.translatable("kultivator.duel.ui.screen.subtitle"), (left + right) / 2.0F, top + 10.0F, right - left,
-				Palette.INK_SOFT, 0.6F, 0.45F, false);
-		g.fill(mid, top + 22, mid + 1, bottom - 4, Palette.argb(0x60, Palette.GOLD_DARK));
-
-		drawList(g, mouseX, mouseY, mid);
-		drawRight(g, mid);
-		// the controls, in a footnote
-		Component keys = Component.translatable("kultivator.duel.ui.screen.controls", DuelHud.parryKey(),
-				DuelKeys.CAMERA.isUnbound() ? Component.literal("-") : DuelKeys.CAMERA.getTranslatedKeyMessage());
-		Brush.fit(g, font, keys, left, bottom - 10.0F, right - left, Palette.INK_FAINT, 0.5F, 0.4F, false);
-	}
-
-	private void drawList(GuiGraphicsExtractor g, int mouseX, int mouseY, int mid) {
-		float lw = mid - left - 6.0F;
-		heading(g, Component.translatable(pickingTwo
-				? (firstPick < 0 ? "kultivator.duel.ui.screen.pick_first" : "kultivator.duel.ui.screen.pick_second")
-				: "kultivator.duel.ui.screen.challenge"), left, top + 12.0F, lw);
-		if (candidates.isEmpty()) {
-			Brush.wrap(g, font, Component.translatable(pickingTwo ? "kultivator.duel.ui.screen.no_disciples" : "kultivator.duel.ui.screen.nobody"),
-					left + 2.0F, listTop + 2.0F, lw - 4.0F, Palette.INK_SOFT, 0.6F, false);
-			return;
-		}
-		int shown = Math.min(listRows, candidates.size());
-		for (int i = 0; i < shown; i++) {
-			Candidate c = candidates.get(i);
-			int y = listTop + i * ROW;
-			boolean over = mouseX >= left && mouseX < mid - 6 && mouseY >= y && mouseY < y + ROW - 1;
-			boolean picked = c.id() == firstPick;
-			if (over || picked) {
-				g.fill(left, y, mid - 6, y + ROW - 1, Palette.argb(picked ? 0x70 : 0x40, picked ? Palette.SEAL : Palette.JADE_PALE));
-			}
-			int glyph = switch (c.kind()) {
-				case "player" -> Glyphs.STATUS;
-				case "murid" -> Glyphs.TALENT;
-				case "perampok" -> Glyphs.TECHNIQUES;
-				default -> Glyphs.PATH;
-			};
-			Glyphs.tab(g, glyph, left + 6.0F, y + 6.0F, 9.0F, Palette.onPaper(c.rgb()));
-			float nameW = Brush.fit(g, font, c.name(), left + 13.0F, y + 1.0F, lw * 0.55F, Palette.INK, 0.7F, 0.5F, false);
-			Brush.fit(g, font, c.detail(), left + 15.0F + nameW, y + 2.0F, lw - 30.0F - nameW, Palette.INK_SOFT, 0.55F, 0.4F, false);
-			Brush.fit(g, font, Component.literal(Math.round(c.distance()) + " b"), mid - 28.0F, y + 2.0F, 20.0F, Palette.INK_FAINT, 0.55F, 0.4F, false);
-			if (over) {
-				tooltip = List.of(c.name(), c.detail(), Component.translatable(pickingTwo ? "kultivator.duel.ui.screen.pick.tip"
-						: "kultivator.duel.ui.screen.row.tip").withStyle(ChatFormatting.GRAY));
-			}
-		}
-		if (candidates.size() > shown) {
-			Brush.fit(g, font, Component.translatable("kultivator.duel.ui.screen.more", candidates.size() - shown), left + 2.0F, listTop + shown * ROW,
-					lw, Palette.INK_FAINT, 0.5F, 0.4F, false);
-		}
-	}
-
-	private void drawRight(GuiGraphicsExtractor g, int mid) {
-		float rx = mid + 4.0F;
-		float rw = right - rx;
-		float y = top + 12.0F;
-		List<DuelClient.Offer> offers = DuelClient.offers();
-		DuelPayloads.DuelSessionSync s = DuelClient.localSession();
-		if (!offers.isEmpty()) {
-			DuelClient.Offer o = offers.get(0);
-			y = heading(g, Component.translatable("kultivator.duel.ui.screen.incoming", o.ticksLeft() / 20), rx, y, rw);
-			Brush.fit(g, font, o.offer().name(), rx, y, rw, Palette.SEAL_DARK, 0.75F, 0.5F, false);
-			Brush.fit(g, font, ChallengeOfferToast.rulesLine(o.offer().rules()), rx, y + 9.0F, rw, Palette.INK_SOFT, 0.5F, 0.38F, false);
-			Brush.fit(g, font, ChallengeOfferToast.stakeLine(o.offer()), rx, y + 16.0F, rw, Palette.INK_SOFT, 0.5F, 0.38F, false);
-			y += 40.0F;
-		}
-		if (s != null && s.phase() != DuelIds.PHASE_ENDED) {
-			LocalPlayer player = Minecraft.getInstance().player;
-			boolean isA = player != null && s.aId() == player.getId();
-			Component opponent = isA ? s.bName() : s.aName();
-			y = heading(g, Component.translatable("kultivator.duel.ui.screen.running", Component.translatable("kultivator.duel.ui.phase." + s.phase())),
-					rx, y, rw);
-			Brush.fit(g, font, Component.translatable("kultivator.duel.ui.screen.versus", opponent), rx, y, rw, Palette.SEAL_DARK, 0.7F, 0.45F, false);
-			y += 28.0F;
-		}
-		heading(g, Component.translatable("kultivator.duel.ui.screen.settings"), rx, y, rw);
+	private void catatan(Lukis l, int x0, int y0, int x1, int y1) {
+		CompoundTag t = DuelClient.catatan();
 		DuelPayloads.DuelResult last = DuelClient.lastResult();
-		if (last != null) {
-			Component line = Component.translatable("kultivator.duel.ui.screen.last", last.title(),
-					Component.translatable("kultivator.duel.ui.reason." + Math.max(0, Math.min(6, last.reason()))));
-			Brush.fit(g, font, line, rx, bottom - 40.0F, rw, Palette.INK_SOFT, 0.5F, 0.38F, false);
+		boolean kanan = tata() != Tata.SEMPIT && last != null;
+		int lx1 = kanan ? x0 + (x1 - x0) * 11 / 20 : x1;
+		if (kanan) {
+			hasil(l, last, lx1 + 6, y0, x1, y1);
 		}
+		if (t == null) {
+			KeadaanKosong.gambar(l, KeadaanKosong.Gambar.GULUNGAN,
+					Component.translatable(DuelClient.connected() ? K + "memuat" : "kultivator.duel.ui.challenge.offline"), null, null, x0, y0, lx1, y1);
+			return;
+		}
+		int honour = t.getIntOr("kehormatan", 1000);
+		Component gelar = Component.translatable("kultivator.duel.title." + t.getStringOr("gelar", "pendekar"));
+		int y = y0;
+		l.judul(gelar, x0, y, lx1 - x0, l.gaya.aksen);
+		y += 15;
+		l.teks(Component.translatable(K + "kehormatan", honour), x0, y, lx1 - x0, l.gaya.teks);
+		y += 11;
+		if (t.getIntOr("ada", 0) == 0) {
+			l.bungkus(Component.translatable(K + "belum_duel"), x0, y, lx1 - x0, l.gaya.teksLemah, y1 - y);
+			return;
+		}
+		l.teks(Component.translatable(K + "skor", t.getIntOr("menang", 0), t.getIntOr("kalah", 0), t.getIntOr("seri", 0)), x0, y, lx1 - x0,
+				l.gaya.teks);
+		y += 11;
+		Component lebih = Component.translatable(K + "lebih", t.getIntOr("sempurna", 0), t.getIntOr("penentu", 0), t.getIntOr("kunci", 0),
+				t.getIntOr("rantai", 0));
+		y += Math.round(l.bungkus(lebih, x0, y, lx1 - x0, l.gaya.teksLemah, 18.0F)) + 2;
+		if (!kanan && last != null && y + 11 <= y1) {
+			l.teks(Component.translatable(S + "last", last.title(), alasan(last)), x0, y, lx1 - x0, l.gaya.teksSamar);
+			y += 11;
+		}
+		ListTag baru = t.getListOrEmpty("baru");
+		if (baru.isEmpty() || y + 13 + ROW > y1) {
+			return;
+		}
+		y += l.kepala(Component.translatable(K + "terbaru"), x0, y, lx1);
+		daftarCatatan.gambar(l, "duel#baru", x0, y, lx1, y1, baru.size(), 11, (lk, i, rx0, ry0, rx1, ry1, sorot, pilih) -> {
+			CompoundTag r = baru.getCompoundOrEmpty(i);
+			int hasil = r.getIntOr("hasil", 0);
+			String key = hasil > 0 ? K + "baru.menang" : hasil < 0 ? K + "baru.kalah" : K + "baru.seri";
+			int warna = hasil > 0 ? Palette.OK : hasil < 0 ? Palette.DANGER : lk.gaya.teksLemah;
+			Brush.disc(lk.g, rx0 + 4.0F, ry0 + 4.0F, 2.5F, warna);
+			lk.teks(Component.translatable(key, r.getStringOr("nama", "?"), r.getIntOr("hari", 0)), rx0 + 10, ry0, rx1 - rx0 - 10, lk.gaya.teks);
+		}, null, null);
 	}
 
-	@Override
-	protected boolean clickPaper(double mouseX, double mouseY) {
-		int mid = left + Math.round((right - left) * 0.56F);
-		if (mouseX < left || mouseX >= mid - 6 || mouseY < listTop) {
-			return false;
+	/** The last result as a result card (G65). */
+	private void hasil(Lukis l, DuelPayloads.DuelResult r, int x0, int y0, int x1, int y1) {
+		LocalPlayer player = minecraft.player;
+		int me = player == null ? -1 : player.getId();
+		int tingkat = r.winnerId() < 0 ? 1 : r.winnerId() == me ? 2 : r.loserId() == me ? 0 : 1;
+		List<KartuHasil.Bagian> isi = new ArrayList<>();
+		isi.add(KartuHasil.Bagian.of(Component.translatable(K + "hasil.alasan", alasan(r))));
+		isi.add(KartuHasil.Bagian.of(Component.translatable(K + "hasil.pukulan", r.hitsA(), r.hitsB())));
+		isi.add(KartuHasil.Bagian.of(Component.translatable(K + "hasil.sempurna", r.perfectA(), r.perfectB(), r.maxChain())));
+		isi.add(KartuHasil.Bagian.of(Component.translatable(K + "hasil.lama", Brush.waktu(r.durationTicks()))));
+		if (r.honourDelta() != 0) {
+			isi.add(new KartuHasil.Bagian(null, Component.translatable(K + "hasil.kehormatan", (r.honourDelta() > 0 ? "+" : "") + r.honourDelta()),
+					r.honourDelta() > 0 ? KartuHasil.BERHASIL : KartuHasil.GAGAL, 0));
 		}
-		int index = (int) ((mouseY - listTop) / ROW);
-		if (index < 0 || index >= Math.min(listRows, candidates.size())) {
-			return false;
-		}
-		Candidate c = candidates.get(index);
-		UiSound.press();
-		if (pickingTwo) {
-			if (firstPick < 0) {
-				firstPick = c.id();
-				return true;
-			}
-			if (firstPick == c.id()) {
-				firstPick = -1;
-				return true;
-			}
-			Candidate first = null;
-			for (Candidate other : candidates) {
-				if (other.id() == firstPick) {
-					first = other;
-				}
-			}
-			Component firstName = first == null ? Component.literal("?") : first.name();
-			minecraft.gui.setScreen(new ChallengeScreen(this, firstPick, c.id(), Component.translatable("kultivator.duel.ui.challenge.pair_names",
-					firstName, c.name()), DuelIds.PAIR_TONTON, -1));
-			pickingTwo = false;
-			firstPick = -1;
-			return true;
-		}
-		int realm = -1;
-		Minecraft mc = Minecraft.getInstance();
-		Entity entity = mc.level == null ? null : mc.level.getEntity(c.id());
-		if (entity instanceof DiscipleEntity disciple) {
-			realm = disciple.syncedRealm();
-		} else if (entity instanceof RogueCultivatorEntity rogue) {
-			realm = rogue.realm();
-		}
-		minecraft.gui.setScreen(new ChallengeScreen(this, c.id(), -1, c.name(), c.pair(), realm));
-		return true;
+		isi.add(KartuHasil.Bagian.of(r.stakeLine()));
+		kartu.gambar(l, "duel#hasil", Glyphs.Atlas.PIALA, r.title(), Component.translatable(K + "hasil.judul"), KartuHasil.Nilai.of(tingkat), null,
+				isi, x0, y0, x1, y1);
+	}
+
+	private static Component alasan(DuelPayloads.DuelResult r) {
+		return Component.translatable("kultivator.duel.ui.reason." + Math.max(0, Math.min(6, r.reason())));
 	}
 }

@@ -1,0 +1,130 @@
+{
+  "id": "sapa_register_kuno",
+  "jenis": "realisasi",
+  "_catatan": "SAPA in register kuno: address forms (Tuan/Nona, Kakak, Kawan, Senior/Leluhur).",
+  "benih_dunia": 42,
+  "masukan": {
+    "niat": "SAPA",
+    "pembicara": 203,
+    "hari": 120,
+    "now": 2880000,
+    "cuaca": "cerah",
+    "musim": "semi",
+    "situasi": {
+      "jam": "pagi",
+      "cuaca": "cerah",
+      "musim": "semi",
+      "kelompok": "pekerja",
+      "watak": "ramah",
+      "kebiasaan": [],
+      "sifat": {
+        "H": 10,
+        "E": 0,
+        "X": 20,
+        "A": 30,
+        "C": 10,
+        "O": 0
+      },
+      "wajah": "netral",
+      "tempat": "kota_besar"
+    },
+    "pendengar": {
+      "nama": "Han",
+      "kelamin": "l",
+      "tahap": "dewasa",
+      "pemain": true
+    },
+    "kesan": "kenal",
+    "tahu_nama": false,
+    "register": "kuno",
+    "dialek": "kampung"
+  },
+  "langkah": [
+    {
+      "ubah": {
+        "ranah_selisih": 1
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.pekerja.pagi.2.kuno",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.senior.kampung",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "sapa.pekerja.pagi",
+      "gestur": "lambai",
+      "seru": null,
+      "tik": null,
+      "id_id": "Pagi, Tuan Pendekar. Bila hendak memesan sesuatu, pagi inilah tangan hamba paling cekatan.",
+      "en_us": "Morning, Master Warrior. If you'd order something, this one's hands are deftest in the morning."
+    },
+    {
+      "ubah": {
+        "ranah_selisih": 4,
+        "pendengar": {
+          "nama": "Mei",
+          "kelamin": "p",
+          "tahap": "dewasa",
+          "pemain": true
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.pekerja.pagi.0.kampung",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.tuan_abadi.kampung.p",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "sapa.pekerja.pagi",
+      "gestur": "lambai",
+      "seru": null,
+      "tik": null,
+      "id_id": "Pagi, Nak! Adonan bakpao sudah ngembang. Nanti mampir!",
+      "en_us": "Morning, child! The bun dough's risen. Drop by later!"
+    },
+    {
+      "ubah": {
+        "ranah_selisih": 7
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.pagi.0.kuno",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.leluhur.kampung",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "sapa.pagi",
+      "gestur": "lambai",
+      "seru": null,
+      "tik": null,
+      "id_id": "Salam pagi, Mbah Leluhur.",
+      "en_us": "Morning greetings, Grand Ancestor."
+    },
+    {
+      "ubah": {
+        "ranah_selisih": -3
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.kenal.0.kuno",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.anak_muda.kampung",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "sapa.kenal",
+      "gestur": "lambai",
+      "seru": null,
+      "tik": null,
+      "id_id": "Ah, Nak berkunjung kembali.",
+      "en_us": "Ah, Child visits again."
+    }
+  ]
+}

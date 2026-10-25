@@ -1,0 +1,18 @@
+{
+  "kultivator.gui43.m18.gerak": "Peringatan gerak: Kamera Spektakuler memakai sapuan cepat, zoom kilat, putaran dan waktu melambat. Bila gerakan cepat membuatmu pusing, batalkan dan tetap pakai Penuh.",
+  "kultivator.gui43.m18.dampak": "Peringatan fotosensitif: Bingkai dampak Penuh memakai kilatan layar penuh dan pembalikan warna. Jangan aktifkan bila kamu peka terhadap cahaya berkedip.",
+  "kultivator.gui43.m18.hardcore.nyala": "Nyalakan Terobosan Hardcore? Terobosan yang gagal akan menurunkanmu satu ranah penuh.",
+  "kultivator.gui43.m18.hardcore.mati": "Matikan Terobosan Hardcore? Terobosan yang gagal kembali hanya menyebabkan Penyimpangan Qi.",
+  "kultivator.gui43.m18.hardcore.how": "Menyalakan perlu menahan segel 1,5 detik.",
+  "kultivator.gui43.m18.keys.petunjuk": "Klik baris untuk mengganti tombolnya; klik kanan mengembalikan bawaan.",
+  "kultivator.gui43.m18.clash_note": "Tombol merah juga dipakai tombol lain (namanya tertulis di sebelahnya). Klik barisnya untuk mengganti.",
+  "kultivator.gui43.m18.key.tekan": "tekan tombol…",
+  "kultivator.gui43.m18.key.bentrok": "%s · juga %s",
+  "kultivator.gui43.m18.key.ubah": "Klik: ganti tombol · klik kanan: kembali ke bawaan",
+  "kultivator.gui43.m18.key.tangkap": "Tekan tombol baru untuk %s. Esc batal, Backspace melepas ikatan.",
+  "kultivator.gui43.m18.key.diikat": "%s sekarang memakai %s.",
+  "kultivator.gui43.m18.key.dilepas": "%s tidak diikat lagi.",
+  "kultivator.gui43.m18.key.bentrok_pesan": "%s sekarang memakai %s, juga dipakai %s.",
+  "kultivator.gui43.m18.vanilla": "Semua tombol Minecraft…",
+  "kultivator.gui43.m18.vanilla.tip": "Membuka layar Kontrol Minecraft untuk tombol bawaan permainan. Selesai atau Esc kembali ke sini."
+}

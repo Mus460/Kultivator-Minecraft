@@ -1,5 +1,6 @@
 package dev.kultivator.client.sekte.mandiri;
 
+import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.UiSound;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
@@ -35,6 +36,26 @@ final class Sentuh {
 
 	void tambah(float x0, float y0, float x1, float y1, @Nullable Runnable aksi, @Nullable Supplier<List<Component>> tip) {
 		drawn.add(new Area(x0, y0, x1, y1, aksi, tip));
+	}
+
+	/**
+	 * Hands the areas with an action drawn this frame to the page's Tab ring ({@code Page.lukis}): each becomes a focusable
+	 * {@link Lukis} zone (Tab reaches it, Enter/Space runs it, a click goes through the ring) with the gold focus ring.
+	 */
+	void zonakan(Lukis l, String awalan) {
+		for (int i = 0; i < drawn.size(); i++) {
+			Area a = drawn.get(i);
+			if (a.aksi() == null) {
+				continue;
+			}
+			int x0 = (int) Math.floor(a.x0());
+			int y0 = (int) Math.floor(a.y0());
+			int x1 = (int) Math.ceil(a.x1());
+			int y1 = (int) Math.ceil(a.y1());
+			String kunci = awalan + i;
+			l.zona(kunci, x0, y0, x1, y1, a.aksi(), true, null, true);
+			l.fokusCincin(kunci, x0, y0, x1, y1);
+		}
 	}
 
 	/** True when the mouse is over an area drawn this frame. */

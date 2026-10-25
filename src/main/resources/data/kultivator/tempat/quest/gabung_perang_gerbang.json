@@ -1,0 +1,97 @@
+{
+  "pemberi": "peran:tetua_sekte",
+  "tempat": "gabung_sekte",
+  "tahap": [
+    {
+      "id": "pertanda",
+      "tujuan": [
+        "gabung_titik gerbang"
+      ],
+      "akibat_masuk": [
+        "bendera gabung.perang_gerbang.selesai off",
+        "gabung.cerita perang_gerbang pertanda luar corak"
+      ],
+      "batas_hari": 2,
+      "gagal_ke": "bela",
+      "arah": "sekte/kompleks"
+    },
+    {
+      "id": "bela",
+      "tujuan": [
+        "gabung perang:bela"
+      ],
+      "akibat_masuk": [
+        "gabung.cerita perang_gerbang bela luar"
+      ],
+      "batas_hari": 3,
+      "gagal_ke": "pos",
+      "arah": "sekte/kompleks"
+    },
+    {
+      "id": "pos",
+      "tujuan": [
+        "gabung perang:pos"
+      ],
+      "akibat_masuk": [
+        "gabung.cerita perang_gerbang pos luar"
+      ],
+      "batas_hari": 3,
+      "gagal_ke": "duel"
+    },
+    {
+      "id": "duel",
+      "tujuan": [
+        "gabung perang:duel"
+      ],
+      "akibat_masuk": [
+        "gabung.cerita perang_gerbang duel kakak"
+      ],
+      "batas_hari": 4,
+      "gagal_ke": "akhir"
+    },
+    {
+      "id": "akhir",
+      "tujuan": [
+        "bendera gabung.perang_gerbang.selesai"
+      ],
+      "akibat_masuk": [
+        "gabung.cerita perang_gerbang akhir"
+      ],
+      "cabang": [
+        {
+          "syarat": [
+            "bendera gabung.perang_gerbang.menang"
+          ],
+          "ke": "menang"
+        }
+      ],
+      "ke": "kalah",
+      "batas_hari": 12,
+      "gagal_ke": "kalah"
+    },
+    {
+      "id": "menang",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "gabung.cerita perang_gerbang menang luar",
+        "gelar pahlawan_gerbang",
+        "gabung.pk 150",
+        "gabung.standing 5"
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "kalah",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "gabung.cerita perang_gerbang kalah ketua",
+        "gabung.pk 50"
+      ],
+      "ke": "selesai"
+    }
+  ]
+}

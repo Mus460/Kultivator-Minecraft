@@ -42,6 +42,8 @@ public class GerobakRenderer extends BendaRenderer<GerobakEntity, GerobakRendere
 		public float wheel;
 		public float rolling;
 		public int load;
+		/** Overturned (42D-P street event): on its side, loads spilled, the upper wheel idling. */
+		public boolean terguling;
 	}
 
 	public GerobakRenderer(EntityRendererProvider.Context context) {
@@ -83,6 +85,10 @@ public class GerobakRenderer extends BendaRenderer<GerobakEntity, GerobakRendere
 		state.wheel = (float) (r[2] / RADIUS);
 		state.rolling = (float) Math.min(1.0D, r[3] * 20.0D);
 		state.load = Math.floorMod(KaitModel.gerobakMuatan.baca(entity), 3);
+		state.terguling = entity.terguling();
+		if (state.terguling) {
+			state.rolling = 0.0F;
+		}
 	}
 
 	static LayerDefinition mesh() {
@@ -195,9 +201,18 @@ public class GerobakRenderer extends BendaRenderer<GerobakEntity, GerobakRendere
 			// the lantern swings against the bed's rocking, and a little in the wind when the cart stands
 			lantern.zRot = -bed.zRot * 3.0F + Mth.sin(state.ageInTicks * 0.05F) * 0.05F;
 			lantern.xRot = Mth.sin(state.ageInTicks * 0.42F + 1.3F) * 0.25F * state.rolling + Mth.sin(state.ageInTicks * 0.037F) * 0.04F;
-			chests.visible = state.load == 0;
-			sacks.visible = state.load == 1;
-			jars.visible = state.load == 2;
+			chests.visible = state.load == 0 && !state.terguling;
+			sacks.visible = state.load == 1 && !state.terguling;
+			jars.visible = state.load == 2 && !state.terguling;
+			if (state.terguling) {
+				// laid on its right side (DESIGN 42.7.4): the outer rim of the right wheel and the bed edge on the ground,
+				// the left wheel turning slowly in the air
+				root.zRot = Mth.HALF_PI;
+				root.x = 10.0F;
+				root.y = 9.0F;
+				wheelL.xRot = state.ageInTicks * 0.08F;
+				wheelR.xRot = 0.0F;
+			}
 		}
 	}
 }

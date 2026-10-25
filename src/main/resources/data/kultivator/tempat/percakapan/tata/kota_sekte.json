@@ -1,0 +1,465 @@
+{
+  "_dibuat": "tools/gen_kota_hidup_cakap.py dari tools/kota_cakap_sumber (jangan disunting tangan)",
+  "kelompok": "kota_sekte",
+  "isi": [
+    {
+      "aturan": "cerita.kota",
+      "niat": "CERITA",
+      "topik": "kota",
+      "bingkai": [
+        {
+          "kunci": "cerita.kota.0",
+          "slot": [
+            "$arah",
+            "$tempat"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "cerita.kota.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "air",
+            "pelabuhan",
+            "oasis",
+            "gunung",
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "cerita.kota.2",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "ibukota"
+          ]
+        },
+        {
+          "kunci": "cerita.kota.3",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "cerita.kota.4",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "cerita.kota.5",
+          "slot": [
+            "$musim"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$arah": {
+          "tipe": "arah",
+          "dari": "konteks.arah"
+        },
+        "$tempat": {
+          "tipe": "tempat",
+          "dari": "konteks.tempat"
+        },
+        "$musim": {
+          "tipe": "musim",
+          "dari": "konteks.musim"
+        }
+      },
+      "lanjut": [
+        "kota",
+        "keluarga"
+      ],
+      "gestur": "cerita"
+    },
+    {
+      "aturan": "sekte.dilindungi",
+      "niat": "PUJI",
+      "topik": "sekte_pemain",
+      "bingkai": [
+        {
+          "kunci": "sekte.dilindungi.0",
+          "slot": [
+            "$sekte_pelindung"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "sekte.dilindungi.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "pelabuhan",
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "sekte.dilindungi.2",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "sekte.dilindungi.3",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sekte_pelindung": {
+          "tipe": "tempat",
+          "dari": "konteks.sekte_pelindung"
+        }
+      },
+      "lanjut": [
+        "sekte",
+        "kota"
+      ],
+      "gestur": "hormat"
+    },
+    {
+      "aturan": "sekte.curiga",
+      "niat": "TANYA_BALIK",
+      "topik": "sekte_pemain",
+      "syarat": {
+        "kesan": [
+          "asing",
+          "musuh"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sekte.curiga.0",
+          "slot": [],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "sekte.curiga.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "sekte.curiga.2",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "sekte.curiga.3",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {},
+      "lanjut": [
+        "sekte"
+      ],
+      "gestur": "sikap_lipat_tangan"
+    },
+    {
+      "aturan": "perkenalan",
+      "niat": "REAKSI",
+      "topik": "kenalan",
+      "bingkai": [
+        {
+          "kunci": "perkenalan.0",
+          "slot": [
+            "$sebutan",
+            "$kerja"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "pelabuhan",
+            "oasis",
+            "air",
+            "kampung",
+            "iblis",
+            "gunung"
+          ]
+        },
+        {
+          "kunci": "perkenalan.1",
+          "slot": [
+            "$kerja",
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "varian": [
+            "ibukota"
+          ]
+        },
+        {
+          "kunci": "perkenalan.2",
+          "slot": [
+            "$kerja"
+          ],
+          "bobot": 1
+        },
+        {
+          "kunci": "perkenalan.3",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        },
+        "$kerja": {
+          "tipe": "pekerjaan",
+          "dari": "pembicara"
+        }
+      },
+      "gestur": "hormat"
+    },
+    {
+      "aturan": "tunjuk.jalan",
+      "niat": "BERI_KABAR",
+      "topik": "perjalanan",
+      "bingkai": [
+        {
+          "kunci": "tunjuk.jalan.0",
+          "slot": [
+            "$titik",
+            "$arah",
+            "$jarak",
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "pelabuhan",
+            "oasis",
+            "air",
+            "kampung",
+            "gunung",
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "tunjuk.jalan.1",
+          "slot": [
+            "$titik",
+            "$jarak",
+            "$arah"
+          ],
+          "bobot": 2,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "tunjuk.jalan.2",
+          "slot": [
+            "$titik",
+            "$arah",
+            "$jarak"
+          ],
+          "bobot": 1,
+          "varian": [
+            "ibukota"
+          ]
+        },
+        {
+          "kunci": "tunjuk.jalan.3",
+          "slot": [
+            "$titik",
+            "$arah",
+            "$jarak"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$titik": {
+          "tipe": "tempat",
+          "dari": "konteks.titik"
+        },
+        "$arah": {
+          "tipe": "arah",
+          "dari": "konteks.arah"
+        },
+        "$jarak": {
+          "tipe": "jarak",
+          "dari": "konteks.jarak"
+        },
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "tunjuk"
+    },
+    {
+      "aturan": "peraga.minta",
+      "niat": "TANYA_BALIK",
+      "topik": "ranah",
+      "syarat": {
+        "kelompok": [
+          "anak"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "peraga.minta.0",
+          "slot": [],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "peraga.minta.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "peraga.minta.2",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "peraga.minta.3",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {},
+      "gestur": "kagum",
+      "seru": "wah_anak"
+    },
+    {
+      "aturan": "peraga.kagum",
+      "niat": "REAKSI",
+      "syarat": {
+        "kelompok": [
+          "anak",
+          "pekerja",
+          "pedagang"
+        ],
+        "label_emosi": [
+          "kagum",
+          "gembira"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "peraga.kagum.0",
+          "slot": [],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "peraga.kagum.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "peraga.kagum.2",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "peraga.kagum.3",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {},
+      "gestur": "tepuk_tangan",
+      "seru": "wah_anak"
+    },
+    {
+      "aturan": "tanya.luar",
+      "niat": "TANYA_BALIK",
+      "topik": "perjalanan",
+      "bingkai": [
+        {
+          "kunci": "tanya.luar.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "pelabuhan",
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "tanya.luar.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "tanya.luar.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "tanya.luar.3",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "lanjut": [
+        "dunia",
+        "sekte"
+      ],
+      "gestur": "garuk_kepala"
+    }
+  ]
+}

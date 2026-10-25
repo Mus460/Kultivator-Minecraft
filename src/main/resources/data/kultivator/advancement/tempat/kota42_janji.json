@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:tempat/kota42_kenal",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.tempat.kota42_janji.description"
+    },
+    "icon": {
+      "id": "minecraft:lead"
+    },
+    "title": {
+      "translate": "advancement.kultivator.tempat.kota42_janji.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

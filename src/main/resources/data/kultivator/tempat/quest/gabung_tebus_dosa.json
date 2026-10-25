@@ -1,0 +1,57 @@
+{
+  "pemberi": "peran:tetua_sekte",
+  "tempat": "gabung_sekte",
+  "tahap": [
+    {
+      "id": "setor",
+      "tujuan": [
+        "gabung tebus:setor"
+      ],
+      "akibat_masuk": [
+        "gabung.cerita tebus_dosa setor hukum",
+        "gabung.tebus_setor"
+      ],
+      "arah": "sekte/gerbang"
+    },
+    {
+      "id": "duel",
+      "tujuan": [
+        "gabung tanding:hukum"
+      ],
+      "akibat_masuk": [
+        "gabung.cerita tebus_dosa duel hukum",
+        "gabung.tanding hukum"
+      ],
+      "cabang": [
+        {
+          "syarat": [
+            "bendera gabung.tanding.hukum.menang"
+          ],
+          "ke": "ampun"
+        }
+      ],
+      "ke": "ulang"
+    },
+    {
+      "id": "ulang",
+      "tujuan": [
+        "tunggu 2"
+      ],
+      "akibat": [
+        "gabung.cerita tebus_dosa ulang hukum"
+      ],
+      "ke": "duel"
+    },
+    {
+      "id": "ampun",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "gabung.cerita tebus_dosa ampun hukum",
+        "gabung.tebus_selesai"
+      ],
+      "ke": "selesai"
+    }
+  ]
+}

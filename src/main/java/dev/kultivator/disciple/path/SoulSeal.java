@@ -204,6 +204,19 @@ public final class SoulSeal {
 		}
 	}
 
+	/** Returns the jade taken at the ritual's start (a refused or broken ritual). */
+	private static void giveJadeBack(ServerPlayer master) {
+		ItemStack back = new ItemStack(ITEM);
+		if (!master.hasInfiniteMaterials() && !master.getInventory().add(back) && !back.isEmpty()) {
+			// Never through a portal (an End portal would build its platform) and never on a plate.
+			ItemEntity item = new ItemEntity(master.level(), master.getX(), master.getY() + 0.5D, master.getZ(), back);
+			item.setDefaultPickUpDelay();
+			item.addTag(NoGrief.TAG);
+			item.setPortalCooldown();
+			master.level().addFreshEntity(item);
+		}
+	}
+
 	private static void tickRitual(MinecraftServer server, UUID soul, Ritual ritual) {
 		DiscipleEntity entity = ritual.entity();
 		ServerPlayer master = server.getPlayerList().getPlayer(ritual.master());
@@ -213,15 +226,7 @@ public final class SoulSeal {
 			RITUALS.remove(soul);
 			if (master != null) {
 				Msg.chat(master, Component.translatable(DisciplePaths.PREFIX + "seal.broken", DisciplePaths.name(entity)).withColor(DisciplePaths.REFUSE));
-				ItemStack back = new ItemStack(ITEM);
-				if (!master.hasInfiniteMaterials() && !master.getInventory().add(back) && !back.isEmpty()) {
-					// Never through a portal (an End portal would build its platform) and never on a plate.
-					ItemEntity item = new ItemEntity(master.level(), master.getX(), master.getY() + 0.5D, master.getZ(), back);
-					item.setDefaultPickUpDelay();
-					item.addTag(NoGrief.TAG);
-					item.setPortalCooldown();
-					master.level().addFreshEntity(item);
-				}
+				giveJadeBack(master);
 			}
 			return;
 		}
@@ -245,6 +250,7 @@ public final class SoulSeal {
 			// The limit was reached meanwhile (another ritual ended first).
 			Msg.chat(master, Component.translatable(DisciplePaths.PREFIX + "why.seal_max", DisciplePaths.name(entity), Bond.SEAL_BOND,
 					maxSealed(master)).withColor(DisciplePaths.REFUSE));
+			giveJadeBack(master); // the jade was taken when the ritual started
 			return;
 		}
 		DisciplePaths.section(entity.data()).putBoolean("sealed", true);

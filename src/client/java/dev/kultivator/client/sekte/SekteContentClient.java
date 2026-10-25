@@ -3,7 +3,7 @@ package dev.kultivator.client.sekte;
 /**
  * Sekte yang Hidup on the client (DESIGN 36): the one client entry of the ten modules, called once from
  * {@code KultivatorClient.onInitializeClient}. Each module owns exactly ONE line below (DESIGN 36.4) and registers there
- * its payload receivers, renderers, screens, hub cards ({@code client.hub.HubCards.register}), poses
+ * its payload receivers, renderers, screens, Gulungan pages ({@code client.hub.HubPages.daftar}), poses
  * ({@link SektePoses#register}) and HUD layers. Client code never references a module's server internals; it reads only
  * what its own payloads bring and the shared constants of {@code sekte.SekteIds} and {@code sekte.api} records.
  */
@@ -38,6 +38,8 @@ public final class SekteContentClient {
 		dev.kultivator.client.sekte.kebun.KebunClient.init();
 		// Murid Mandiri, DESIGN 39 + 39.F (39E owns MandiriClient, which calls 39F's SeteruClient):
 		dev.kultivator.client.sekte.mandiri.MandiriClient.init();
+		// Gabung Sekte, DESIGN 41 (41A owns GabungClient, which calls the client inits of 41U, 41V and the model module):
+		dev.kultivator.client.sekte.gabung.GabungClient.init();
 	}
 
 	private SekteContentClient() {

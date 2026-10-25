@@ -1,0 +1,85 @@
+{
+  "_catatan": "CANDA 42.5A.9: olok ringan / lelucon > tawa (X keduanya > 20, P >= 0). 42K-C.",
+  "jenis": "canda",
+  "syarat": {},
+  "mulai": {
+    "dasar": 0.3,
+    "X": 300,
+    "hubungan": 400
+  },
+  "jeda_tick": [
+    30,
+    60
+  ],
+  "langkah": [
+    {
+      "id": "sapa",
+      "oleh": "A",
+      "niat": "SAPA",
+      "lanjut": [
+        "cerita",
+        "olok_a"
+      ]
+    },
+    {
+      "id": "cerita",
+      "oleh": "A",
+      "niat": "CERITA",
+      "lanjut": [
+        "tawa_b"
+      ]
+    },
+    {
+      "id": "olok_a",
+      "oleh": "A",
+      "niat": "OLOK",
+      "lanjut": [
+        "tawa_b",
+        "olok_b"
+      ]
+    },
+    {
+      "id": "olok_b",
+      "oleh": "B",
+      "niat": "OLOK",
+      "syarat": {
+        "ronde_maks": 1
+      },
+      "lanjut": [
+        "tawa_a"
+      ]
+    },
+    {
+      "id": "tawa_b",
+      "oleh": "B",
+      "niat": "TAWA",
+      "lanjut": [
+        "olok_b",
+        "cerita_b"
+      ]
+    },
+    {
+      "id": "cerita_b",
+      "oleh": "B",
+      "niat": "CERITA",
+      "syarat": {
+        "ronde_maks": 1
+      },
+      "lanjut": [
+        "tawa_a"
+      ]
+    },
+    {
+      "id": "tawa_a",
+      "oleh": "A",
+      "niat": "TAWA"
+    }
+  ],
+  "efek": {
+    "hubungan": [
+      2,
+      2
+    ],
+    "emosi": "canda_berhasil"
+  }
+}

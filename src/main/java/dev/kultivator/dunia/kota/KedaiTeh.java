@@ -10,6 +10,10 @@ import dev.kultivator.data.Realm;
 import dev.kultivator.dunia.DuniaSites;
 import dev.kultivator.dunia.api.DuniaApi;
 import dev.kultivator.dunia.api.TreasureBirth;
+import dev.kultivator.dunia.kota42.api.Kategori;
+import dev.kultivator.dunia.kota42.ekonomi.HargaKota;
+import dev.kultivator.dunia.kota42.ekonomi.KotaEkonomiItems;
+import dev.kultivator.dunia.kota42.ekonomi.PasarHantu;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
 import net.minecraft.ChatFormatting;
@@ -39,6 +43,11 @@ import java.util.UUID;
  * provider (while meditating), Teh Awan Ungu as a small comprehension stream while meditating (there is no
  * comprehension-gain hook), Teh Penenang Hati by giving back a fifth of every Heart Demon pressure rise (the public
  * pressure value).
+ * <p>
+ * DESIGN 42.6.7 (42C-2): the token now also tells tonight's <i>sandi malam</i>, the riddle of where the Ghost Market opens
+ * ({@code PasarHantu.sandi}); a token holder asks for it again with verb {@code sandi}; verb {@code topeng} sells the
+ * Ghost Market mask (20 NB) to players who were offered the token. Every price carries one {@code HargaKota.faktor}
+ * (teas by their item's category, rumours, token and mask as services).
  */
 public final class KedaiTeh {
 
@@ -64,6 +73,8 @@ public final class KedaiTeh {
 	/** KotaData player key: the in-game day of the last free rumour of a Lencana Pengembara. */
 	public static final String BADGE_DAY = "lencana_hari";
 	public static final long TOKEN_PRICE = 60L;
+	/** The Ghost Market mask (42.6.7), sold to players offered the token. */
+	public static final long TOPENG_PRICE = 20L;
 	/** Teh Awan Ungu: comprehension per minute of meditation. */
 	public static final double AWAN_PER_MINUTE = 0.03D;
 
@@ -152,6 +163,8 @@ public final class KedaiTeh {
 			case "teh", "beliteh" -> buyTea(player, npc, Kota.arg(parts, 1, -1), "beliteh".equals(verb));
 			case "kabar" -> rumour(player, npc, Kota.arg(parts, 1, 0), Kota.arg(parts, 2, 0), true);
 			case "token" -> buyToken(player, npc);
+			case "sandi" -> tellPassword(player, npc, false);
+			case "topeng" -> buyMask(player, npc);
 			default -> {
 				return false;
 			}
@@ -167,7 +180,7 @@ public final class KedaiTeh {
 			Msg.actionBar(player, Component.translatable("kultivator.kota.teh.ranah", GATE[kind].displayName()).withStyle(ChatFormatting.RED));
 			return;
 		}
-		long price = Math.max(1L, Math.round(PRICE[kind] * Kota.config().priceScale * Toko.discount(player, npc)));
+		long price = teaPrice(player, npc, kind);
 		if (!NilaiBatu.pay(player, price)) {
 			Msg.actionBar(player, Component.translatable("kultivator.kota.kurang_batu", NilaiBatu.text(price)).withStyle(ChatFormatting.RED));
 			return;
@@ -192,7 +205,7 @@ public final class KedaiTeh {
 			Msg.actionBar(player, Component.translatable("kultivator.kota.teh.token_belum", TOKEN_AFTER).withStyle(ChatFormatting.RED));
 			return;
 		}
-		long price = Math.max(1L, Math.round(TOKEN_PRICE * Kota.config().priceScale));
+		long price = servicePrice(player.level().getServer(), npc.town(), TOKEN_PRICE);
 		if (!NilaiBatu.pay(player, price)) {
 			Msg.actionBar(player, Component.translatable("kultivator.kota.kurang_batu", NilaiBatu.text(price)).withStyle(ChatFormatting.RED));
 			return;
@@ -203,6 +216,54 @@ public final class KedaiTeh {
 		}
 		KotaVoice.say(npc, KotaVoice.BLACK_WHISPER, npc.voiceKey("careful"), null);
 		Msg.chat(player, Component.translatable("kultivator.kota.teh.token_bisik").withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.ITALIC));
+		tellPassword(player, npc, true);
+	}
+
+	/** The sandi malam of tonight's Ghost Market in this town, for a token holder (free; 42.6.7). */
+	private static void tellPassword(ServerPlayer player, KultivatorNpc npc, boolean justBought) {
+		if (!justBought && !player.getInventory().contains(stack -> stack.is(KotaItems.TOKEN_PASAR_GELAP))) {
+			Msg.actionBar(player, Component.translatable("kultivator.kota42.pasar_hantu.sandi_token").withStyle(ChatFormatting.RED));
+			return;
+		}
+		Component riddle = PasarHantu.sandiUntuk(player, npc.town());
+		if (riddle == null) {
+			if (!justBought) {
+				Msg.chat(player, Component.translatable("kultivator.kota42.pasar_hantu.sandi_tiada").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
+			}
+			return;
+		}
+		KotaVoice.say(npc, KotaVoice.BLACK_WHISPER, npc.voiceKey("careful"), null);
+		Msg.chat(player, Component.translatable("kultivator.kota42.pasar_hantu.sandi", riddle).withStyle(ChatFormatting.DARK_GREEN, ChatFormatting.ITALIC));
+	}
+
+	/** The Ghost Market mask, for players who were offered the token (three rumours heard). */
+	private static void buyMask(ServerPlayer player, KultivatorNpc npc) {
+		KotaData data = KotaData.get(player.level().getServer());
+		if (data.getInt(player, "rumours", 0) < TOKEN_AFTER) {
+			Msg.actionBar(player, Component.translatable("kultivator.kota.teh.token_belum", TOKEN_AFTER).withStyle(ChatFormatting.RED));
+			return;
+		}
+		long price = servicePrice(player.level().getServer(), npc.town(), TOPENG_PRICE);
+		if (!NilaiBatu.pay(player, price)) {
+			Msg.actionBar(player, Component.translatable("kultivator.kota.kurang_batu", NilaiBatu.text(price)).withStyle(ChatFormatting.RED));
+			return;
+		}
+		ItemStack mask = new ItemStack(KotaEkonomiItems.TOPENG_PASAR_HANTU);
+		if (!player.getInventory().add(mask) && !mask.isEmpty()) {
+			Kota.drop(player, mask);
+		}
+		Msg.chat(player, Component.translatable("kultivator.kota42.pasar_hantu.topeng_beli").withStyle(ChatFormatting.DARK_GREEN, ChatFormatting.ITALIC));
+	}
+
+	/** A tea's price for this player here: base x town price scale x discount x {@code HargaKota.faktor} of the tea item. */
+	static long teaPrice(ServerPlayer player, KultivatorNpc npc, int kind) {
+		double town = HargaKota.faktor(player.level().getServer(), npc.town(), Kategori.dari(Harga.item("teh_" + teaItem(kind))));
+		return Math.max(1L, Math.round(PRICE[kind] * Kota.config().priceScale * Toko.discount(player, npc) * town));
+	}
+
+	/** A service price (rumour, token, mask): base x town price scale x {@code HargaKota.faktor(JASA)}. */
+	static long servicePrice(MinecraftServer server, long town, long base) {
+		return Math.max(1L, Math.round(base * Kota.config().priceScale * HargaKota.faktor(server, town, Kategori.JASA)));
 	}
 
 	/**
@@ -217,7 +278,7 @@ public final class KedaiTeh {
 		}
 		int b = Math.max(0, Math.min(2, band));
 		int k = Math.max(0, Math.min(RUMOUR_KINDS.length - 1, kind));
-		long price = paid ? Math.max(1L, Math.round(RUMOUR_PRICE[b] * Kota.config().priceScale)) : 0L;
+		long price = paid ? servicePrice(player.level().getServer(), npc != null ? npc.town() : 0L, RUMOUR_PRICE[b]) : 0L;
 		if (paid && NilaiBatu.total(player) < price) {
 			Msg.actionBar(player, Component.translatable("kultivator.kota.kurang_batu", NilaiBatu.text(price)).withStyle(ChatFormatting.RED));
 			return false;
@@ -354,7 +415,7 @@ public final class KedaiTeh {
 		int realm = Cultivators.get(player).realm().ordinal();
 		for (int i = 0; i < 3; i++) {
 			CompoundTag entry = new CompoundTag();
-			entry.putLong("price", Math.max(1L, Math.round(PRICE[i] * Kota.config().priceScale * Toko.discount(player, npc))));
+			entry.putLong("price", teaPrice(player, npc, i));
 			entry.putBoolean("open", realm >= GATE[i].ordinal());
 			entry.putInt("gate", GATE[i].ordinal());
 			teas.add(entry);
@@ -363,14 +424,16 @@ public final class KedaiTeh {
 		ListTag rumours = new ListTag();
 		for (int b = 0; b < 3; b++) {
 			CompoundTag entry = new CompoundTag();
-			entry.putLong("price", Math.max(1L, Math.round(RUMOUR_PRICE[b] * Kota.config().priceScale)));
+			entry.putLong("price", servicePrice(player.level().getServer(), npc.town(), RUMOUR_PRICE[b]));
 			entry.putInt("radius", RUMOUR_RADIUS[b]);
 			rumours.add(entry);
 		}
 		tag.put("rumours", rumours);
 		tag.putInt("heard", data.getIntOr("rumours", 0));
 		tag.putBoolean("token", Kota.config().blackMarket && data.getIntOr("rumours", 0) >= TOKEN_AFTER);
-		tag.putLong("token_price", Math.max(1L, Math.round(TOKEN_PRICE * Kota.config().priceScale)));
+		tag.putLong("token_price", servicePrice(player.level().getServer(), npc.town(), TOKEN_PRICE));
+		tag.putLong("topeng_price", servicePrice(player.level().getServer(), npc.town(), TOPENG_PRICE));
+		tag.putBoolean("sandi", player.getInventory().contains(stack -> stack.is(KotaItems.TOKEN_PASAR_GELAP)));
 		tag.putLong("cooldown", DuniaSites.locateCooldown(player));
 		// today's rumour is free (Lencana Pengembara); the screen may show it, the server decides on purchase
 		tag.putBoolean("lencana", badgeFree(player));

@@ -1,0 +1,48 @@
+{
+  "_catatan": "Kebiasaan #12 penyulam (DESIGN 42.4.12)",
+  "nomor": 12,
+  "siapa": {
+    "umur": [
+      14,
+      200
+    ],
+    "kelamin": "wanita",
+    "tahap": [
+      "dewasa",
+      "tua"
+    ]
+  },
+  "sesi": [
+    {
+      "jam": [
+        9,
+        11
+      ],
+      "hari": [
+        0
+      ],
+      "kegiatan": "kb_penyulam_jual",
+      "tujuan": [
+        "@depan_lapak:3",
+        "lapak",
+        "obrol"
+      ],
+      "klip": "seru_dagang",
+      "kanan": "kain"
+    },
+    {
+      "jam": [
+        13,
+        16
+      ],
+      "peluang": 0.85,
+      "tujuan": [
+        "serambi",
+        "kursi",
+        "@rumah"
+      ],
+      "klip": "kota42:menyulam",
+      "kanan": "kota42:bingkai_sulam"
+    }
+  ]
+}

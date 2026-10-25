@@ -1,0 +1,150 @@
+# kota_sekte: corpus of the conversation engine (42K-C, DESIGN 42.5A.8). Source format: gen_kota_hidup_cakap.py.
+# CERITA about the town (topik kota), PUJI / TANYA_BALIK on the player's sect (topik sekte_pemain), REAKSI to the player's
+# introduction (topik kenalan), BERI_KABAR directions and TANYA_BALIK about travels (topik perjalanan), TANYA_BALIK on the
+# realm (topik ranah, children begging for a demonstration), REAKSI after a demonstration.
+@kelompok kota_sekte
+
+== cerita.kota
+niat: CERITA
+topik: kota
+lanjut: kota keluarga
+gestur: cerita
+$arah: tipe=arah dari=konteks.arah
+$tempat: tipe=tempat dari=konteks.tempat
+$musim: tipe=musim dari=konteks.musim
+- [3] Kakekku ikut membangun gerbang ini. Katanya batu pertamanya dari sungai di {$arah}. || My grandfather helped build this gate. Says its first stone came from the river to the {$arah}.
+  ~ kasar: Kota ini tua. Bau juga. Tapi rumahku di sini. || This town is old. Smelly too. But home is here.
+  ~ kuno: {$tempat} berdiri sejak zaman dinasti lama. Banyak darah dan keringat di bawah batu jalannya. || {$tempat} has stood since the old dynasty. Much blood and sweat lies under its paving.
+  ~ kampung: Dulu di sini cuma hutan bambu, Nak. Simbahku yang pertama buka ladang. || This was once all bamboo forest, child. My granddad cleared the first field.
+- [2] Sumur di tengah kota itu tidak pernah kering, bahkan di musim kemarau terpanjang. Orang bilang ada naga tidur di bawahnya. || The well in the town centre never dries, even in the longest drought. They say a dragon sleeps beneath.
+  ~ air: Kanal-kanal ini digali seratus tahun lalu, Kakak... katanya oleh seribu orang dalam satu musim... || These canals were dug a hundred years ago, dear... by a thousand men in one season, they say...
+  ~ pelabuhan: Mercusuar itu dulu kapal, Bung. Kandas, lalu dijadikan menara. Sungguh! || That lighthouse was once a ship, mate. Ran aground, then made into a tower. Truly!
+  ~ oasis: Mata air ini ditemukan seorang gadis penggembala, Saudara. Kambingnya menggali pasir. || This spring was found by a shepherd girl, friend. Her goat dug the sand.
+  ~ gunung: Biara ini didirikan biksu yang berjalan dari barat dengan satu mangkuk. Amitaba. || This monastery was founded by a monk who walked from the west with a single bowl. Amitabha.
+  ~ iblis: Kota ini dibangun di atas medan perang lama. Kalau malam, tanahnya masih berbisik. || This city stands on an old battlefield. At night the ground still whispers.
+- [2] Pohon besar di alun-alun sudah ada sebelum kota ini. Tidak ada yang berani menebangnya. || The great tree in the square predates the town. No one dares cut it.
+  ~ ibukota: Istana ini sudah tiga kali terbakar dan tiga kali dibangun lagi. Setiap kali lebih megah. || This palace has burned three times and been rebuilt three times. Grander each time.
+- Dulu ada kultivator yang menyelamatkan kota ini dari banjir. Patungnya ada di dekat kuil. || A cultivator once saved this town from a flood. Their statue stands by the temple.
+  ~ kuno: Konon seorang kultivator membelah banjir dengan satu tebasan. Patungnya kini dijaga dupa. || It's said a cultivator split a flood with one stroke. Incense now guards the statue.
+- Jembatan batu itu dibangun dua bersaudara yang bertengkar. Lihat, kedua ujungnya tidak sama. || That stone bridge was built by two quarrelling brothers. Look, the two ends don't match.
+- Setiap musim {$musim}, orang tua di sini bercerita tentang malam bintang jatuh. Aku masih kecil waktu itu. || Every {$musim} the old folk here tell of the night the stars fell. I was little then.
+
+== sekte.dilindungi
+niat: PUJI
+topik: sekte_pemain
+lanjut: sekte kota
+gestur: hormat
+$sekte_pelindung: tipe=tempat dari=konteks.sekte_pelindung
+- [3] Sejak panji {$sekte_pelindung} berkibar di gerbang, anakku berani main sampai sore. || Since {$sekte_pelindung}'s banner flew at the gate, my child dares play till evening.
+  ~ kasar: Sektemu lumayan. Begal tidak berani dekat lagi. || Your sect's all right. The bandits don't dare come near now.
+  ~ kuno: {$sekte_pelindung} telah menjadi payung bagi kota ini. Hamba berterima kasih. || {$sekte_pelindung} has become this town's umbrella. This one is grateful.
+  ~ kampung: Murid-murid sektemu baik, Nak. Kemarin ada yang bantu angkat padi. || Your sect's disciples are kind, child. One helped carry rice yesterday.
+- [2] Murid sektemu sering mampir ke kedaiku. Sopan-sopan, bayarnya tidak pernah kurang. || Your sect's disciples often drop by my shop. Polite, always pay in full.
+  ~ pelabuhan: Sejak sektemu menjaga laut, bajak laut menjauh, Bung. Kami melaut lebih tenang. || Since your sect guards the sea, the pirates keep away, mate. We fish in peace.
+  ~ oasis: Kafilah sekarang berani lewat jalan gurun berkat sektemu, Saudara. || Caravans now dare the desert road thanks to your sect, friend.
+- Aku dengar sektemu menerima murid dari kalangan biasa. Benarkah? Anakku berbakat, lho. || I hear your sect takes disciples from ordinary families. True? My child is gifted, you know.
+- Upeti untuk sekte memang berat, tapi lebih ringan dari diserang binatang roh. || The sect tribute is heavy, but lighter than being attacked by spirit beasts.
+
+== sekte.curiga
+niat: TANYA_BALIK
+topik: sekte_pemain
+syarat: kesan=asing,musuh
+lanjut: sekte
+gestur: sikap_lipat_tangan
+- [3] Sekte? Hmph. Apa bedanya sektemu dengan yang lain? Datang kalau butuh upeti, hilang kalau ada bahaya, bukan? || Your sect? Hmph. How is it any different? Comes for tribute, vanishes at danger, doesn't it?
+  ~ kasar: Sektemu? Belum pernah dengar. Memangnya penting? || Your sect? Never heard of it. Does it matter?
+  ~ kuno: Nama sektemu belum sampai ke telinga hamba. Sekte macam apakah itu? || Your sect's name hasn't reached this one's ears. What manner of sect is it?
+  ~ iblis: Sekte lurus? Berapa lama kau kira panjinya bertahan di kota ini? || A righteous sect? How long do you think its banner lasts in this city?
+- [2] Murid sekte pernah merusak lapakku waktu bertarung. Sektemu mau mengganti, tidak? || Sect disciples once wrecked my stall fighting. Will your sect pay for it?
+  ~ kampung: Sekte-sekte itu ambil anak-anak terbaik kampung, lalu tidak pernah kembali. Sektemu juga begitu? || Those sects take the village's best children and they never return. Is yours the same?
+- Apa yang sudah sektemu lakukan untuk kota ini? Sebutkan satu saja. || What has your sect done for this town? Name one thing.
+- Kalau sektemu mau dihormati, kenapa tidak menjaga kota ini dulu? || If your sect wants respect, why not guard this town first?
+
+== perkenalan
+niat: REAKSI
+topik: kenalan
+gestur: hormat
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+$kerja: tipe=pekerjaan dari=pembicara
+- [3] Oh, jadi itu namamu. Senang berkenalan, {$sebutan}. Aku bekerja sebagai {$kerja} di sini. || Oh, so that's your name. Pleased to meet you, {$sebutan}. I work as a {$kerja} here.
+  ~ kasar: Hm. Nama sudah kuingat. Jangan bikin masalah. || Hm. Name noted. Don't make trouble.
+  ~ kuno: Nama {$sebutan} akan hamba ukir dalam ingatan. Hamba hanya seorang {$kerja}. || This one will carve your name in memory, {$sebutan}. I am only a humble {$kerja}.
+  ~ pelabuhan: Nama yang bagus, Bung! Aku {$kerja} di dermaga ini. Panggil saja kalau perlu. || Good name, mate! I'm a {$kerja} on this dock. Call if you need me.
+  ~ oasis: Semoga namamu harum seperti kurma, Saudara. Aku {$kerja} di oasis ini. || May your name be sweet as dates, friend. I'm a {$kerja} at this oasis.
+  ~ air: Nama yang indah... aku {$kerja}, Kakak... senang berkenalan, ya... || What a lovely name... I'm a {$kerja}, dear... nice to meet you...
+  ~ kampung: Wah, namanya bagus. Aku cuma {$kerja} di kampung ini, Nak. || Oh, a fine name. I'm just a {$kerja} in this village, child.
+  ~ iblis: Nama. Baik. Sekarang aku tahu siapa yang harus dicari kalau ada masalah. || A name. Good. Now I know whom to look for when there's trouble.
+  ~ gunung: Amitaba. Aku {$kerja} di biara ini. Semoga pertemuan ini membawa berkah. || Amitabha. I'm a {$kerja} at this monastery. May this meeting bring blessing.
+- [2] Akhirnya aku tahu nama orang yang sering lewat ini! Aku {$kerja}, kalau kau penasaran. || At last I know the name of the one who passes so often! I'm a {$kerja}, if you're curious.
+  ~ ibukota: Kehormatan bagi hamba, {$sebutan}. Hamba {$kerja} di distrik ini. || An honour, {$sebutan}. I'm a {$kerja} in this district.
+- Nama yang mudah diingat. Mampirlah kalau butuh {$kerja}. || An easy name to remember. Drop by if you need a {$kerja}.
+- Senang sekali! Nanti kuceritakan ke keluargaku, aku kenal seorang kultivator. Hehe. || How lovely! I'll tell my family I know a cultivator. Hehe.
+
+== tunjuk.jalan
+niat: BERI_KABAR
+topik: perjalanan
+gestur: tunjuk
+$titik: tipe=tempat dari=konteks.titik
+$arah: tipe=arah dari=konteks.arah
+$jarak: tipe=jarak dari=konteks.jarak
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] {$titik}? Ke arah {$arah}, kira-kira {$jarak}. Belok di dekat sumur. || {$titik}? Head {$arah}, about {$jarak}. Turn by the well.
+  ~ kasar: {$titik} di {$arah}. Jalan sendiri. || {$titik}'s to the {$arah}. Walk yourself.
+  ~ kuno: {$titik} berada di arah {$arah}, sekitar {$jarak}. Semoga langkah {$sebutan} ringan. || {$titik} lies to the {$arah}, about {$jarak}. May your steps be light, {$sebutan}.
+  ~ pelabuhan: {$titik}? Ke {$arah}, Bung, {$jarak}. Ikuti bau ikan, pasti sampai. || {$titik}? Go {$arah}, mate, {$jarak}. Follow the fish smell, you'll get there.
+  ~ oasis: {$titik} ada di {$arah}, Saudara, {$jarak}. Ikuti pohon kurma. || {$titik} is to the {$arah}, friend, {$jarak}. Follow the date palms.
+  ~ air: {$titik}, Kakak? Naik perahu ke {$arah}, {$jarak}... atau jalan lewat jembatan... || {$titik}, dear? Take a boat {$arah}, {$jarak}... or walk across the bridge...
+  ~ kampung: {$titik}? Lurus saja ke {$arah}, Nak, {$jarak}. Kalau lihat pohon beringin, sudah dekat. || {$titik}? Straight {$arah}, child, {$jarak}. When you see the banyan, you're close.
+  ~ gunung: {$titik} ada di {$arah}, {$jarak}. Tangganya banyak, hemat napas. || {$titik} is to the {$arah}, {$jarak}. Lots of steps; save your breath.
+  ~ iblis: {$titik}? {$arah}, {$jarak}. Jangan lewat gang gelap. Atau lewat, terserah. || {$titik}? {$arah}, {$jarak}. Avoid the dark alleys. Or don't, your call.
+- [2] Oh, {$titik}. Tidak jauh, {$jarak} ke {$arah}. Mau kuantar? || Oh, {$titik}. Not far, {$jarak} to the {$arah}. Shall I take you?
+  ~ p: Oh, {$titik}. {$jarak} ke {$arah}. Aku juga mau ke sana, ayo jalan bersama. || Oh, {$titik}. {$jarak} to the {$arah}. I'm heading there too, let's walk together.
+- {$titik}... hmm, ke {$arah}, kurasa. Sekitar {$jarak}. Kalau tersesat, tanya penjaga. || {$titik}... hmm, {$arah}, I think. About {$jarak}. If you get lost, ask a guard.
+  ~ ibukota: {$titik} ada di distrik sebelah {$arah}, {$jarak}. Ikuti jalan utama yang berlantai batu. || {$titik} is in the district to the {$arah}, {$jarak}. Follow the main paved road.
+- Lihat menara itu? {$titik} di baliknya, ke {$arah}. {$jarak} saja. || See that tower? {$titik} is behind it, to the {$arah}. Only {$jarak}.
+
+== peraga.minta
+niat: TANYA_BALIK
+topik: ranah
+syarat: kelompok=anak
+gestur: kagum
+seru: wah_anak
+- [3] Kakak bisa terbang? Sekali saja, tunjukkan pedangnya! Aku janji tidak bilang ibu! || Can you fly? Just once, show me your sword! I promise not to tell Mum!
+  ~ kasar: Kau kultivator? Buktikan. Pecahkan batu itu. || You're a cultivator? Prove it. Smash that rock.
+  ~ kuno: Mohon tunjukkan satu jurus saja, Senior! Murid kecil ini ingin belajar! || Please show just one move, Senior! This little disciple wants to learn!
+  ~ kampung: Kak, Kak! Lompat setinggi pohon kelapa, bisa? Bisa, kan? || Mister, mister! Can you jump as high as a coconut tree? You can, right?
+- [2] Ayo, Kak, satu jurus saja! Teman-temanku tidak percaya aku kenal kultivator! || Come on, just one move! My friends don't believe I know a cultivator!
+  ~ pelabuhan: Kak, bisa jalan di atas air? Kalau bisa, aku mau ikut sekte Kakak! || Can you walk on water? If you can, I'll join your sect!
+- Kakak pernah melawan naga? Besar tidak? Lebih besar dari rumah? || Have you ever fought a dragon? Was it big? Bigger than a house?
+- Aku sudah latihan kuda-kuda tiga hari! Lihat! ...Kakiku gemetar. Hehe. || I've practised horse stance for three days! Look! ...My legs are shaking. Hehe.
+
+== peraga.kagum
+niat: REAKSI
+syarat: kelompok=anak,pekerja,pedagang label_emosi=kagum,gembira
+gestur: tepuk_tangan
+seru: wah_anak
+- [3] Waaah! Hebat! Sekali lagi, sekali lagi! || Wooow! Amazing! Again, again!
+  ~ kasar: Hah. Oke. Itu... keren. || Hah. Okay. That was... cool.
+  ~ kuno: Luar biasa! Jurus itu bagaikan naga menari di awan! || Extraordinary! That move was like a dragon dancing in the clouds!
+  ~ kampung: Wah, Kak! Daunnya terbelah semua! Nanti kuceritakan ke seluruh kampung! || Wow, mister! Every leaf split! I'll tell the whole village!
+- [2] Aku mau jadi seperti Kakak! Besok aku latihan dari subuh! || I want to be like you! Tomorrow I'll train from dawn!
+  ~ p: Aku juga bisa jadi pendekar perempuan, kan? Seperti di cerita! || I can become a swordswoman too, right? Like in the stories!
+- Teman-teman! Lihat! Dia benar-benar kultivator! || Everyone! Look! A real cultivator!
+- Wah... anginnya sampai terasa ke sini. || Wow... I could feel the wind from here.
+
+== tanya.luar
+niat: TANYA_BALIK
+topik: perjalanan
+lanjut: dunia sekte
+gestur: garuk_kepala
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] {$sebutan} sudah ke mana saja? Benarkah ada kota di atas awan? || Where all have you been, {$sebutan}? Is there truly a city above the clouds?
+  ~ kasar: Di luar sana bagaimana? Lebih baik dari sini? Pasti. || What's it like out there? Better than here? Surely.
+  ~ kuno: Bolehkah hamba bertanya, {$sebutan}, seperti apa dunia di luar tembok kota ini? || May this one ask, {$sebutan}, what the world beyond these walls is like?
+  ~ pelabuhan: Kau pernah ke seberang laut, Bung? Katanya orang di sana berkulit biru. || Ever been across the sea, mate? They say folk there have blue skin.
+  ~ oasis: Kau pernah melihat salju, Saudara? Katanya air yang turun seperti bulu putih. || Have you seen snow, friend? They say it's water falling like white feathers.
+- [2] Seperti apa rasanya menembus ranah? Sakit? Enak? || What's it feel like to break through a realm? Painful? Nice?
+  ~ p: Apa benar kultivator perempuan bisa awet muda ratusan tahun? Bagaimana caranya? || Is it true women cultivators stay young for centuries? How?
+- {$sebutan} pernah bertemu binatang roh yang bisa bicara? || Have you ever met a spirit beast that can talk, {$sebutan}?
+  ~ kampung: Kak, di kota besar rumahnya setinggi gunung, ya? || Mister, in the big cities the houses are tall as mountains, right?
+- Kalau {$sebutan} pergi lagi, bawakan cerita, ya. Aku suka cerita. || When you leave again, bring back stories, {$sebutan}. I love stories.

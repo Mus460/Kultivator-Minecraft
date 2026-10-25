@@ -1,0 +1,20 @@
+{
+  "kultivator.gui43.hal.teknik.kodeks": "Kodeks",
+  "kultivator.gui43.hal.teknik.cincin_segel": "Cincin Segel",
+  "kultivator.gui43.hal.teknik.kehancuran": "Kehancuran",
+  "kultivator.gui43.sub.kehancuran.diri": "Diri",
+  "kultivator.gui43.sub.kehancuran.murid": "Murid",
+  "kultivator.gui43.m02.urut": "Urut: %s",
+  "kultivator.gui43.m02.keadaan": "Keadaan",
+  "kultivator.gui43.m02.strip": "Terpilih: %s · Kekuatan %s · Penguasaan tertinggi: %s",
+  "kultivator.gui43.m02.luring": "Tidak terhubung ke server.",
+  "kultivator.gui43.m02.pasang.tip": "Pindah ke Cincin Segel sambil membawa kartu ini; klik soket untuk memasangnya.",
+  "kultivator.gui43.m02.bawa": "Klik soket untuk %s (Esc batal)",
+  "kultivator.gui43.m02.kosongkan.tanya": "Kosongkan Cincin Segel? Kedua belas soket dilepas.",
+  "kultivator.gui43.m02.kosongkan.tip": "Melepas semua segel dari kedua belas soket (dengan konfirmasi).",
+  "kultivator.gui43.m02.pulihkan.kosong": "Tidak ada jurus yang bisa dipulihkan sekarang.",
+  "kultivator.gui43.m02.baca_saja": "Aula sesama sekte: hanya bisa dilihat.",
+  "kultivator.gui43.m02.kunci.server": "Mode Kehancuran dimatikan oleh server.",
+  "kultivator.gui43.m02.kunci.aula": "Butuh Aula Sekte milikmu sendiri.",
+  "kultivator.gui43.m02.memuat": "Memuat data aula…"
+}

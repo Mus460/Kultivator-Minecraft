@@ -1,0 +1,74 @@
+{
+  "pemberi": "peran:tetua_sekte",
+  "tempat": "gabung_sekte",
+  "tahap": [
+    {
+      "id": "berangkat",
+      "tujuan": [
+        "gabung.di_alam"
+      ],
+      "akibat_masuk": [
+        "gabung.cerita tanah_terlarang berangkat kakak"
+      ],
+      "batas_hari": 5,
+      "gagal_ke": "batal"
+    },
+    {
+      "id": "khianat",
+      "tujuan": [
+        "gabung pilih:tanah_terlarang"
+      ],
+      "akibat_masuk": [
+        "gabung.cerita tanah_terlarang khianat saingan",
+        "gabung.pilihan tanah_terlarang khianat selamatkan tinggalkan"
+      ],
+      "cabang": [
+        {
+          "syarat": [
+            "bendera gabung.tanah_terlarang.selamatkan"
+          ],
+          "ke": "selamat"
+        }
+      ],
+      "ke": "tinggal",
+      "batas_hari": 2,
+      "gagal_ke": "tinggal"
+    },
+    {
+      "id": "selamat",
+      "tujuan": [
+        "!gabung.di_alam"
+      ],
+      "akibat": [
+        "gabung.cerita tanah_terlarang selamat saingan",
+        "gabung.sikap saingan 40",
+        "gabung.sikap kakak 5",
+        "gabung.pk 50"
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "tinggal",
+      "tujuan": [
+        "!gabung.di_alam"
+      ],
+      "akibat": [
+        "gabung.cerita tanah_terlarang tinggal kakak",
+        "gabung.infami 2",
+        "gabung.pk 100",
+        "gabung.sikap saingan -30"
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "batal",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "gabung.cerita tanah_terlarang batal kakak"
+      ],
+      "ke": "selesai"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "pemberi": "peran:tetua_sekte",
+  "tempat": "gabung_sekte",
+  "tahap": [
+    {
+      "id": "barisan",
+      "tujuan": [
+        "tanda gabung_tugas_pagi x2"
+      ],
+      "akibat": [
+        "gabung.sikap kakak 5"
+      ]
+    },
+    {
+      "id": "teladan",
+      "tujuan": [
+        "tanda gabung_tugas_pagi"
+      ],
+      "akibat": [
+        "gabung.pk 15",
+        "efek minecraft:speed 2400 0"
+      ]
+    }
+  ]
+}

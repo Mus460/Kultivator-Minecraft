@@ -134,7 +134,7 @@ public final class Simulasi {
 			}
 			sect.sumber += gain;
 			feudDay(server, data, sect, random, sect.grownDay);
-			if (sect.tier < SekteNpc.MAX_TIER && sect.sumber >= sect.nextTierCost()) {
+			if (sect.tier < SekteNpc.MAX_TIER && sect.sumber >= sect.nextTierCost() && DiplomasiGabung.bolehTumbuh(sect)) {
 				sect.sumber -= sect.nextTierCost();
 				sect.tier++;
 				data.addNews(sect.grownDay, Component.translatable(GeneratorNama.KEY + "berita.tumbuh", sect.name(), sect.tier));

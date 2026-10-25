@@ -1,12 +1,12 @@
 package dev.kultivator.client.tempat.ui.tema;
 
 import dev.kultivator.client.screen.ui.Brush;
+import dev.kultivator.client.screen.ui.Glyphs;
+import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
+import dev.kultivator.client.screen.ui.TalismanButton;
 import dev.kultivator.client.screen.ui.UiSound;
-import dev.kultivator.client.tempat.ui.kit.IkonTempat;
 import dev.kultivator.client.tempat.ui.kit.Lembar;
-import dev.kultivator.client.tempat.ui.kit.Lukis;
-import dev.kultivator.client.tempat.ui.kit.PanelTempat;
 import dev.kultivator.client.tempat.ui.kit.TabLentera;
 import dev.kultivator.client.tempat.ui.kit.TempatWarna;
 import dev.kultivator.dunia.tempat.tema.bersama.TemaLayar.Dokumen;
@@ -24,8 +24,9 @@ import net.minecraft.util.Util;
  * their paper (one at a time with arrows on a narrow window). Hovering a line lights the same line in the ledger and in
  * the other manifests, a click circles it in red ink as suspicious (a note for the player only), and the chosen manifest
  * is accused with "Tandai palsu" (Space). The tries left are the harbour master's seals; a wrong accusation shakes the desk.
+ * A Di Sini page on the single kit (43.8.3); the number keys pick a manifest under Di Sini (43.17 K3).
  */
-public final class LayarDokumen extends LayarTemaDasar {
+public final class LayarDokumen extends TemaHalaman {
 
 	private int pilih = -1;
 	private int lihat;
@@ -67,8 +68,9 @@ public final class LayarDokumen extends LayarTemaDasar {
 		}
 	}
 
+	/** K3 under Di Sini: the number keys pick a manifest. */
 	@Override
-	protected boolean angka(int n) {
+	public boolean angka(int n) {
 		List<Lembar> surat = lembar.daftar(Dokumen.SURAT);
 		if (n >= 1 && n <= surat.size()) {
 			pilih = n - 1;
@@ -97,7 +99,7 @@ public final class LayarDokumen extends LayarTemaDasar {
 	}
 
 	@Override
-	protected void gambar(Lukis l, int x0, int y0, int x1, int y1) {
+	protected void lukisTema(Lukis l, int x0, int y0, int x1, int y1) {
 		List<Lembar> surat = lembar.daftar(Dokumen.SURAT);
 		List<Lembar> catatan = lembar.daftar(LembarKunci.CATATAN);
 		boolean getar = getarSejak >= 0L && l.kini - getarSejak < 450L;
@@ -113,10 +115,10 @@ public final class LayarDokumen extends LayarTemaDasar {
 			kosong(l, TemaUi.k("dokumen.kosong"), x0, y, x1, bawah);
 		} else if (tata == Tata.SEMPIT) {
 			lihat = Math.max(0, Math.min(lihat, surat.size() - 1));
-			int ax = x0 + 14;
-			panah(l, "kiri", x0, y + (bawah - y) / 2 - 7, IkonTempat.PANAH_KIRI, lihat > 0, () -> lihat--);
-			panah(l, "kanan", x1 - 14, y + (bawah - y) / 2 - 7, IkonTempat.PANAH_KANAN, lihat < surat.size() - 1, () -> lihat++);
-			lembarSurat(l, surat.get(lihat), lihat, ax + 2, y, x1 - 16, bawah, catatan, sorotTadi);
+			int ay = y + (bawah - y) / 2 - 8;
+			panah(l, "kiri", x0, ay, Glyphs.Atlas.PANAH_KIRI, lihat > 0, () -> lihat--);
+			panah(l, "kanan", x1 - 16, ay, Glyphs.Atlas.PANAH_KANAN, lihat < surat.size() - 1, () -> lihat++);
+			lembarSurat(l, surat.get(lihat), lihat, x0 + 18, y, x1 - 18, bawah, catatan, sorotTadi);
 		} else {
 			int n = Math.min(3, surat.size());
 			int w = (x1 - x0 - (n - 1) * 5) / n;
@@ -126,13 +128,13 @@ public final class LayarDokumen extends LayarTemaDasar {
 			}
 		}
 		l.g.pose().popMatrix();
-		kaki(l, x0, y1 - 17, x1);
+		kaki(l, x0, y1 - 16, x1);
 	}
 
 	private void panah(Lukis l, String kunci, int x, int y, int ikon, boolean aktif, Runnable aksi) {
-		IkonTempat.gambar(l.g, ikon, x, y, 14, aktif ? 0xFFFFFFFF : 0x60FFFFFF);
-		l.zona(kunci, x, y, x + 14, y + 14, aksi, aktif, null, true);
-		l.fokusCincin(kunci, x, y, x + 14, y + 14);
+		Glyphs.Atlas.ikon(l.g, ikon, x + 1, y + 1, 14, aktif ? 0xFFFFFFFF : 0x60FFFFFF);
+		l.zona(kunci, x, y, x + 16, y + 16, aksi, aktif, null, true);
+		l.fokusCincin(kunci, x, y, x + 16, y + 16);
 	}
 
 	/** The customs ledger: a green-bound strip of label / value pairs. Returns the height used. */
@@ -148,19 +150,18 @@ public final class LayarDokumen extends LayarTemaDasar {
 		l.g.fill(x0 + 5, y0, x0 + 6, y0 + h, 0xFF183A26);
 		Brush.frame(l.g, x0, y0, x1, y0 + h, 0x80403020);
 		TemaUi.ikon(l.g, TemaUi.I_CAP, x0 + 8, y0 + 2, 11);
-		l.teks(Brush.bold(TemaUi.k("dokumen.buku")), x0 + 21, y0 + 3, x1 - x0 - 26, 0xFF2E3A2E, 0.8F);
+		l.teks(Brush.bold(TemaUi.k("dokumen.buku")), x0 + 21, y0 + 3, x1 - x0 - 26, 0xFF2E3A2E);
 		int cw = (x1 - x0 - 12) / kolom;
 		for (int i = 0; i < catatan.size(); i++) {
 			Lembar c = catatan.get(i);
 			int cx = x0 + 9 + (i % kolom) * cw;
 			int cy = y0 + 14 + (i / kolom) * 10;
 			String label = c.teks(Dokumen.LABEL).getString();
-			boolean lit = label.equals(sorot);
-			if (lit) {
+			if (label.equals(sorot)) {
 				l.g.fill(cx - 2, cy - 1, cx + cw - 3, cy + 9, 0x60F7DC7E);
 			}
-			l.teks(c.teks(Dokumen.LABEL), cx, cy, cw * 0.42F, 0xFF5A5040, 0.7F);
-			l.teks(c.teks(Dokumen.ISI), cx + cw * 0.44F, cy, cw * 0.54F, 0xFF1B2521, 0.7F);
+			l.teks(c.teks(Dokumen.LABEL), cx, cy, cw * 0.42F, 0xFF5A5040);
+			l.teks(c.teks(Dokumen.ISI), cx + cw * 0.44F, cy, cw * 0.54F, 0xFF1B2521);
 		}
 		return h + 5;
 	}
@@ -173,20 +174,21 @@ public final class LayarDokumen extends LayarTemaDasar {
 		l.g.fill(x0 + 2, y0 + 4, x1 + 2, y1 + 2, 0x40000000);
 		TemaUi.surat(l.g, x0, ay, x1, y1 - 2);
 		if (dipilih) {
-			Brush.frame(l.g, x0 - 1, ay - 1, x1 + 1, y1 - 1, TempatWarna.SEGEL);
-			Brush.halo(l.g, (x0 + x1) / 2.0F, ay, 3.0F, 1.0F, TempatWarna.SEGEL & 0xFFFFFF, l.denyut());
+			Brush.frame(l.g, x0 - 1, ay - 1, x1 + 1, y1 - 1, Palette.SEAL);
+			Brush.halo(l.g, (x0 + x1) / 2.0F, ay, 3.0F, 1.0F, Palette.SEAL & 0xFFFFFF, l.denyut());
 		}
 		int ink = 0xFF2A2218;
 		int ix0 = x0 + 7;
 		int ix1 = x1 - 7;
-		int y = ay + 6;
-		Brush.fitCentered(l.g, font, Brush.bold(s.teks(LembarKunci.JUDUL).getString().isEmpty() ? TemaUi.k("dokumen.surat_no", i + 1)
-				: s.teks(LembarKunci.JUDUL)), (ix0 + ix1) / 2.0F, y, ix1 - ix0, ink, 0.85F, 0.6F, false);
-		y += 10;
+		int y = ay + 5;
+		Component judul = s.teks(LembarKunci.JUDUL).getString().isEmpty() ? TemaUi.k("dokumen.surat_no", i + 1) : s.teks(LembarKunci.JUDUL);
+		l.tengah(Brush.bold(judul), (ix0 + ix1) / 2.0F, y, ix1 - ix0, ink);
+		y += 11;
 		l.g.fill(ix0, y, ix1, y + 1, 0x80604830);
-		y += 4;
+		y += 3;
 		List<Lembar> baris = s.daftar(Dokumen.BARIS);
 		int lineH = Math.max(11, Math.min(20, (y1 - y - 26) / Math.max(1, baris.size())));
+		int tampil = 0;
 		for (int r = 0; r < baris.size() && y + lineH <= y1 - 22; r++) {
 			Lembar b = baris.get(r);
 			String label = b.teks(Dokumen.LABEL).getString();
@@ -196,14 +198,14 @@ public final class LayarDokumen extends LayarTemaDasar {
 				labelSorot = label;
 			}
 			if (label.equals(sorot)) {
-				// the same line lit on every paper and in the ledger; the player compares, the screen never tells
+				// the same line lit on every paper and in the ledger; the player compares, the page never tells
 				l.g.fill(ix0 - 2, y - 1, ix1 + 2, y + lineH - 2, cari(catatan, label) != null ? 0x50F7DC7E : 0x30F7DC7E);
 			}
-			l.teks(b.teks(Dokumen.LABEL), ix0, y, (ix1 - ix0) * 0.38F, 0xFF6A5A44, 0.7F);
-			l.teks(b.teks(Dokumen.ISI), ix0 + (ix1 - ix0) * 0.4F, y, (ix1 - ix0) * 0.6F, ink, 0.75F);
-			l.g.fill(ix0, y + lineH - 3, ix1, y + lineH - 2, 0x30604830);
+			l.teks(b.teks(Dokumen.LABEL), ix0, y, (ix1 - ix0) * 0.38F, 0xFF6A5A44);
+			l.teks(b.teks(Dokumen.ISI), ix0 + (ix1 - ix0) * 0.4F, y, (ix1 - ix0) * 0.6F, ink);
+			l.g.fill(ix0, y + lineH - 2, ix1, y + lineH - 1, 0x30604830);
 			if (curiga.contains(kunci)) {
-				lingkaranTinta(l, ix0 + (ix1 - ix0) * 0.4F - 2, y - 2, ix1 + 1, y + lineH - 3);
+				lingkaranTinta(l, ix0 + (ix1 - ix0) * 0.4F - 2, y - 2, ix1 + 1, y + lineH - 2);
 			}
 			l.zona("baris:" + kunci, ix0 - 2, y - 1, ix1 + 2, y + lineH - 1, () -> {
 				if (!curiga.remove(kunci)) {
@@ -212,14 +214,17 @@ public final class LayarDokumen extends LayarTemaDasar {
 				UiSound.toggle(curiga.contains(kunci));
 			}, true, null, false);
 			y += lineH;
+			tampil++;
+		}
+		if (tampil < baris.size()) {
+			l.samar(Component.literal("+" + (baris.size() - tampil)), ix0, y, ix1 - ix0);
 		}
 		// the manifest's own seal and the pick zone
 		int sealY = y1 - 22;
-		IkonTempat.stempel(l.g, IkonTempat.Stempel.BULAT, x1 - 26, sealY - 2, 18, 18, Palette.argb(0xB0, 0xB3281D));
-		Brush.text(l.g, font, Component.literal(Integer.toString(i + 1)), x0 + 7, sealY + 4, 0xFF6A5A44, 0.75F, false);
+		Glyphs.Atlas.stempel(l.g, Glyphs.Atlas.Stempel.BULAT, x1 - 26, sealY - 2, 18, 18, Palette.argb(0xB0, 0xB3281D));
+		Brush.text(l.g, font, Component.literal(Integer.toString(i + 1)), x0 + 7, sealY + 4, 0xFF6A5A44, 1.0F, false);
 		Component pilihTeks = TemaUi.k(dipilih ? "dokumen.dipilih" : "dokumen.pilih");
-		Brush.fitCentered(l.g, font, pilihTeks, (x0 + x1) / 2.0F, sealY + 5, x1 - x0 - 50, dipilih ? TempatWarna.SEGEL : 0xFF6A5A44, 0.75F, 0.6F,
-				false);
+		l.tengah(pilihTeks, (x0 + x1) / 2.0F, sealY + 4, x1 - x0 - 50, dipilih ? Palette.SEAL : 0xFF6A5A44);
 		final int idx = i;
 		l.zona("surat" + i, x0, sealY - 4, x1, y1 - 2, () -> pilih = idx == pilih ? -1 : idx, true, null, true);
 		l.fokusCincin("surat" + i, x0, sealY - 4, x1, y1 - 2);
@@ -256,20 +261,24 @@ public final class LayarDokumen extends LayarTemaDasar {
 	/** Footer: tries as seals, the hint and the accuse button. */
 	private void kaki(Lukis l, int x0, int y, int x1) {
 		int sisa = lembar.i(Dokumen.PERCOBAAN, 3);
-		l.keterangan(TemaUi.k("dokumen.percobaan"), x0, y + 3, 52, gaya.teksLemah);
+		Component label = TemaUi.k("dokumen.percobaan");
+		int lw = Math.min(70, font.width(label) + 4);
+		l.teks(label, x0, y + 3, lw, gaya.teksLemah);
 		for (int i = 0; i < 3; i++) {
-			int cx = x0 + 54 + i * 14;
-			IkonTempat.stempel(l.g, IkonTempat.Stempel.BULAT, cx, y, 12, 12, i < sisa ? Palette.argb(0xE0, 0xB3281D) : 0x40808080);
+			int cx = x0 + lw + i * 14;
+			Glyphs.Atlas.stempel(l.g, Glyphs.Atlas.Stempel.BULAT, cx, y + 1, 12, 12, i < sisa ? Palette.argb(0xE0, 0xB3281D) : 0x40808080);
 		}
-		int bw = Math.min(140, (x1 - x0) / 2);
+		int bw = Math.min(140, (x1 - x0) / 2 - 10);
 		boolean bisa = bisaTuduh();
 		Component alasan = sisa <= 0 ? TemaUi.k("dokumen.habis") : pilih < 0 ? TemaUi.k("dokumen.pilih_dulu") : null;
-		tombol.gambar(l, "palsu", x1 - bw, y - 1, bw, 15, TemaUi.k("dokumen.tandai"), bisa, bisa ? null : alasan != null ? alasan : alasanBaca(),
+		TalismanButton.gambar(l, "palsu", x1 - bw, y, bw, 15, TemaUi.k("dokumen.tandai"), bisa, bisa ? null : alasan != null ? alasan : alasanBaca(),
 				this::tuduh, bisa, false);
+		int hx = x0 + lw + 46;
+		int hw = x1 - bw - hx - 4;
 		if (!curiga.isEmpty()) {
-			l.keterangan(TemaUi.k("dokumen.curiga", curiga.size()), x0 + 100, y + 3, x1 - bw - x0 - 104, TempatWarna.SEGEL);
+			l.teks(TemaUi.k("dokumen.curiga", curiga.size()), hx, y + 3, hw, Palette.SEAL);
 		} else {
-			l.keterangan(TemaUi.k("dokumen.tips"), x0 + 100, y + 3, x1 - bw - x0 - 104, gaya.teksSamar);
+			l.samar(TemaUi.k("dokumen.tips"), hx, y + 3, hw);
 		}
 	}
 }

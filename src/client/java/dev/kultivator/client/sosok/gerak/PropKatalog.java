@@ -16,8 +16,8 @@ import java.util.Set;
  * The prop catalog of the Gerak system (DESIGN 40.5.7, contract C40.G1): which item model shows a prop index and how a
  * hand, two hands or the back hold it. Indexes 1-40 are DESIGN 38.O.4 ({@code kultivator:fx/tempat/<name>}, 38MD), 41-62
  * DESIGN 38.T.8.1 ({@code kultivator:fx/tempat/tema/<name>}, 38TV), 63-88 DESIGN 40 ({@code kultivator:fx/sosok/<name>},
- * 40K); the names are {@link PropId}'s. 100-149 belong to DESIGN 39 (39E 100-129, 39F 130-149) and 150-199 to later
- * DESIGN 38 work, registered from their client init with {@link #daftar}.
+ * 40K); the names are {@link PropId}'s. 100-149 belong to DESIGN 39 (39E 100-129, 39F 130-149), 150-169 to later
+ * DESIGN 38 work and DESIGN 41, 170-239 to DESIGN 42, registered from their client init with {@link #daftar}.
  * <p>
  * A prop is drawn as a lazily made {@code ItemStack(Items.STICK)} carrying {@code DataComponents.ITEM_MODEL} (pattern of
  * {@code PhysiqueVisuals.fx}; never in a static initializer), cached per index. A model whose
@@ -60,7 +60,7 @@ public final class PropKatalog {
 		}
 	}
 
-	private static final int UKURAN = PropId.TEMPAT_TAMBAHAN_LAST + 1;
+	private static final int UKURAN = PropId.KOTA_HIDUP_LAST + 1;
 	private static final Pegangan TANGAN_BAWAAN = new Pegangan(0.0F, 0.0F, 0.0F, 90.0F, 0.0F, 0.0F, 1.0F, 0);
 	private static final Pegangan PUNGGUNG_BAWAAN = new Pegangan(0.0F, 4.0F, 2.7F, 0.0F, 0.0F, 0.0F, 1.0F, 0);
 	private static final Pegangan DUA_BAWAAN = new Pegangan(0.0F, 1.0F, -2.0F, 0.0F, 0.0F, 0.0F, 1.0F, 0);
@@ -184,8 +184,8 @@ public final class PropKatalog {
 	// ================================================================== registration (C40.G1)
 
 	/**
-	 * Registers a prop of another module: ids 100-149 for DESIGN 39 (39E 100-129, 39F 130-149) and 150-199 for later
-	 * DESIGN 38. {@code modelItem} is the item model id ({@code assets/<ns>/items/<path>.json}). The default grip holds it
+	 * Registers a prop of another module: ids 100-149 for DESIGN 39 (39E 100-129, 39F 130-149), 150-169 for later
+	 * DESIGN 38 and DESIGN 41, 170-239 for DESIGN 42. {@code modelItem} is the item model id ({@code assets/<ns>/items/<path>.json}). The default grip holds it
 	 * forward out of the fist; use {@link #daftar(int, Identifier, Pegangan)} for another one.
 	 */
 	public static void daftar(int id, Identifier modelItem) {
@@ -194,8 +194,8 @@ public final class PropKatalog {
 
 	/** {@link #daftar(int, Identifier)} with the hand grip (also used on two hands and the back). */
 	public static void daftar(int id, Identifier modelItem, @Nullable Pegangan pegangan) {
-		if (id < PropId.MANDIRI_FIRST || id > PropId.TEMPAT_TAMBAHAN_LAST) {
-			throw new IllegalArgumentException("Gerak prop id outside 100-199: " + id);
+		if (id < PropId.MANDIRI_FIRST || id > PropId.KOTA_HIDUP_LAST) {
+			throw new IllegalArgumentException("Gerak prop id outside 100-239: " + id);
 		}
 		MODEL[id] = modelItem;
 		STACK[id] = null;

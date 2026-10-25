@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:tempat/kota42_kavling",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.tempat.kota42_bangun_kembali.description"
+    },
+    "icon": {
+      "id": "minecraft:bricks"
+    },
+    "title": {
+      "translate": "advancement.kultivator.tempat.kota42_bangun_kembali.title"
+    },
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

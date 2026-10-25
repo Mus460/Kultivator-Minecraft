@@ -3,8 +3,11 @@ package dev.kultivator.duel.net;
 import dev.kultivator.duel.DuelConfig;
 import dev.kultivator.duel.clash.Fighters;
 import dev.kultivator.duel.session.DuelChallenges;
+import dev.kultivator.duel.session.DuelRecords;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.Nullable;
@@ -43,6 +46,7 @@ public final class DuelNet {
 		PayloadTypeRegistry.clientboundPlay().register(DuelPayloads.DuelBindSync.TYPE, DuelPayloads.DuelBindSync.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(DuelPayloads.DuelResult.TYPE, DuelPayloads.DuelResult.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(DuelPayloads.DuelPreview.TYPE, DuelPayloads.DuelPreview.CODEC);
+		PayloadTypeRegistry.clientboundPlay().register(DuelPayloads.DuelCatatan.TYPE, DuelPayloads.DuelCatatan.CODEC);
 
 		ServerPlayNetworking.registerGlobalReceiver(DuelPayloads.DuelInput.TYPE, (payload, context) -> {
 			if (DuelConfig.get().enabled) {
@@ -55,7 +59,9 @@ public final class DuelNet {
 			}
 		});
 		ServerPlayNetworking.registerGlobalReceiver(DuelPayloads.DuelAnswer.TYPE, (payload, context) -> {
-			if (DuelConfig.get().enabled) {
+			if (payload.answer() == DuelPayloads.DuelAnswer.ANSWER_CATATAN) {
+				send(context.player(), new DuelPayloads.DuelCatatan(catatan(context.player())));
+			} else if (DuelConfig.get().enabled) {
 				DuelChallenges.answer(context.player(), payload.challengeId(), payload.answer());
 			}
 		});
@@ -64,6 +70,38 @@ public final class DuelNet {
 			PREFS.put(player.getUUID(), payload);
 			Fighters.applyPrefs(player, payload);
 		});
+	}
+
+	/** The record of {@code player} as {@code /kultivasi duel catatan} prints it, for {@link DuelPayloads.DuelCatatan} (43.14 S2). */
+	static CompoundTag catatan(ServerPlayer player) {
+		DuelRecords records = DuelRecords.get(player.level().getServer());
+		DuelRecords.Entry entry = records.entry(player.getUUID());
+		int honour = records.honour(player.getUUID());
+		CompoundTag tag = new CompoundTag();
+		tag.putInt("ada", entry == null ? 0 : 1);
+		tag.putInt("kehormatan", honour);
+		tag.putString("gelar", DuelRecords.titleId(honour));
+		if (entry == null) {
+			return tag;
+		}
+		tag.putInt("menang", entry.wins);
+		tag.putInt("kalah", entry.losses);
+		tag.putInt("seri", entry.draws);
+		tag.putInt("sempurna", entry.perfects);
+		tag.putInt("penentu", entry.deathblows);
+		tag.putInt("kunci", entry.bindsWon);
+		tag.putInt("rantai", entry.maxChain);
+		ListTag baru = new ListTag();
+		long now = player.level().getGameTime();
+		for (DuelRecords.Recent recent : entry.recent) {
+			CompoundTag r = new CompoundTag();
+			r.putString("nama", recent.name());
+			r.putInt("hasil", Integer.signum(recent.result()));
+			r.putInt("hari", (int) Math.max(0L, (now - recent.time()) / 24000L));
+			baru.add(r);
+		}
+		tag.put("baru", baru);
+		return tag;
 	}
 
 	/** The duel settings {@code player}'s client reported, or null (no client module, or not yet). */

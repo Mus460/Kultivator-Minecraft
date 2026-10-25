@@ -1,0 +1,45 @@
+{
+  "_catatan": "Kebiasaan #15 pelit (DESIGN 42.4.12)",
+  "nomor": 15,
+  "siapa": {
+    "umur": [
+      18,
+      200
+    ],
+    "tahap": [
+      "dewasa",
+      "tua"
+    ]
+  },
+  "sesi": [
+    {
+      "jam": [
+        9,
+        11
+      ],
+      "peluang": 0.55,
+      "tujuan": [
+        "@depan_lapak:5",
+        "lapak",
+        "obrol"
+      ],
+      "klip": "tawar",
+      "ganti": [
+        {
+          "klip": "tawar"
+        },
+        {
+          "klip": "tawar"
+        },
+        {
+          "klip": "kota42:hitung_koin",
+          "kanan": "kantong_uang"
+        },
+        {
+          "klip": "marah_tunjuk"
+        }
+      ],
+      "ganti_menit": 5
+    }
+  ]
+}

@@ -6,6 +6,9 @@ import dev.kultivator.data.Cultivators;
 import dev.kultivator.data.Rank;
 import dev.kultivator.data.RootGrade;
 import dev.kultivator.fx.Fx;
+import dev.kultivator.sekte.mandiri.MandiriConfig;
+import dev.kultivator.sekte.mandiri.api.JenisLuka;
+import dev.kultivator.sekte.mandiri.api.MandiriApi;
 import dev.kultivator.sosok.Gaya;
 import dev.kultivator.sosok.Sosok;
 import dev.kultivator.sosok.SosokApi;
@@ -58,6 +61,7 @@ import net.minecraft.world.entity.monster.creaking.Creaking;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.portal.TeleportTransition;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -437,6 +441,20 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity, Soso
 	 * (it only fights back when hurt).
 	 */
 	public void setMode(Mode mode) {
+		applyMode(mode);
+		if (!this.level().isClientSide()) {
+			for (Consumer<DiscipleEntity> listener : MODE_LISTENERS) {
+				try {
+					listener.accept(this);
+				} catch (RuntimeException exception) {
+					Kultivator.LOGGER.error("A disciple mode listener failed", exception);
+				}
+			}
+		}
+	}
+
+	/** setMode without the listeners: for restoring a saved mode, which is not a master's order. */
+	private void applyMode(Mode mode) {
 		this.mode = mode;
 		// GUARD_HALL keeps the current spot as its fallback anchor while it has no active hall in this dimension.
 		this.post = mode.guardsPost() || mode == Mode.GUARD_HALL ? this.blockPosition() : null;
@@ -449,15 +467,6 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity, Soso
 			refreshHallAnchor();
 		}
 		this.getNavigation().stop();
-		if (!this.level().isClientSide()) {
-			for (Consumer<DiscipleEntity> listener : MODE_LISTENERS) {
-				try {
-					listener.accept(this);
-				} catch (RuntimeException exception) {
-					Kultivator.LOGGER.error("A disciple mode listener failed", exception);
-				}
-			}
-		}
 	}
 
 	// ================================================================== phase 6: roles, activities, synced values
@@ -974,7 +983,7 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity, Soso
 		setData(DiscipleData.load(tag.getCompoundOrEmpty("disciple")));
 		loadSosok(tag.getIntOr("sosok", Sosok.KOSONG), tag.getIntOr("gaya", 0));
 		Mode saved = Mode.byId(tag.getStringOr("mode", Mode.FOLLOW.id()));
-		setMode(saved == null ? Mode.FOLLOW : saved);
+		applyMode(saved == null ? Mode.FOLLOW : saved); // not setMode: listeners would read the return as a master's order
 		float health = tag.getFloatOr("health", this.getMaxHealth());
 		this.setHealth(Math.max(1.0F, Math.min(this.getMaxHealth(), health)));
 	}
@@ -1253,13 +1262,23 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity, Soso
 	@Override
 	public void die(DamageSource source) {
 		boolean first = !this.isRemoved() && !this.dead;
-		if (first && role == Role.DISCIPLE && releaseTicks <= 0 && !this.level().isClientSide() && !source.is(DamageTypes.GENERIC_KILL)
-				&& DiscipleHooks.onDeath(this, source)) {
-			// Handled by a module (the Undying Blood, the Nascent Soul's flight...): no death, no tablet.
-			if (!this.isRemoved() && this.getHealth() <= 0.0F) {
-				this.setHealth(1.0F);
+		if (first && role == Role.DISCIPLE && releaseTicks <= 0 && !this.level().isClientSide() && !source.is(DamageTypes.GENERIC_KILL)) {
+			if (DiscipleHooks.onDeath(this, source)) {
+				// Handled by a module (the Undying Blood, the Nascent Soul's flight...): no death, no tablet.
+				if (!this.isRemoved() && this.getHealth() <= 0.0F) {
+					this.setHealth(1.0F);
+				}
+				return;
 			}
-			return;
+			if (!MandiriConfig.get().bolehGugur) {
+				// The user's rule: disciples never die (only /kill). It collapses with a heavy wound and rests a day instead.
+				this.setHealth(Math.max(1.0F, this.getMaxHealth() * 0.25F));
+				this.clearFire();
+				this.setInvulnerableTime(60);
+				long now = this.level().getGameTime();
+				MandiriApi.lukai(data, JenisLuka.BERAT, now, now + 24000L, "pingsan");
+				return;
+			}
 		}
 		super.die(source);
 		if (first && this.dead && this.level() instanceof ServerLevel level) {
@@ -1292,6 +1311,16 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity, Soso
 	protected void onBelowWorld() {
 		ServerPlayer owner = owner();
 		if (owner != null && owner.level() == this.level() && !owner.isSpectator() && teleportNear(owner)) {
+			return;
+		}
+		if (role == Role.DISCIPLE && !MandiriConfig.get().bolehGugur) {
+			// It cannot die, so the void must not hold it: back up onto the ground above (or the world spawn).
+			BlockPos top = this.level().getHeightmapPos(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, this.blockPosition());
+			if (top.getY() <= this.level().getMinY() && this.level() instanceof ServerLevel level) {
+				top = level.getRespawnData().globalPos().pos();
+			}
+			this.setDeltaMovement(Vec3.ZERO);
+			this.teleportTo(top.getX() + 0.5D, top.getY() + 1.0D, top.getZ() + 0.5D);
 			return;
 		}
 		super.onBelowWorld();

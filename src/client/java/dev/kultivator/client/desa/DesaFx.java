@@ -2,10 +2,10 @@ package dev.kultivator.client.desa;
 
 import dev.kultivator.client.EffectQuality;
 import dev.kultivator.client.fx.CommonFx;
+import dev.kultivator.client.hud.Kabar;
+import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.desa.DesaFxIds;
 import dev.kultivator.network.Payloads;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.RandomSource;
@@ -26,7 +26,6 @@ public final class DesaFx {
 	private static final int JADE = 0x8FE3C8;
 	private static final int SEAL = 0xD23A2A;
 	private static final int MAX_ANIMATIONS = 8;
-	private static final SystemToast.SystemToastId TOAST = new SystemToast.SystemToastId(6000L);
 	private static final List<Oath> OATHS = new ArrayList<>();
 
 	private static final class Oath {
@@ -81,7 +80,6 @@ public final class DesaFx {
 	}
 
 	private static void toast(int b) {
-		Minecraft minecraft = Minecraft.getInstance();
 		Component title;
 		Component body;
 		if (b >= 10) {
@@ -92,7 +90,8 @@ public final class DesaFx {
 			title = Component.translatable("kultivator.desa.toast.request");
 			body = Component.translatable("kultivator.desa.request." + types[Math.max(0, Math.min(types.length - 1, b))]);
 		}
-		SystemToast.addOrUpdate(minecraft.gui.toastManager(), TOAST, title, body);
+		// the single notice slot (DESIGN 43.9); a siege is important
+		Kabar.kirim(title, body, Kabar.segel("村", b >= 10 ? Palette.SEAL : Palette.JADE_DARK), b >= 10);
 	}
 
 	/** Every client tick: the oath seals rise and fade. */

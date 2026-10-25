@@ -5,10 +5,13 @@ import dev.kultivator.client.ClientCultivation;
 import dev.kultivator.client.Keys;
 import dev.kultivator.client.QiHud;
 import dev.kultivator.client.goals.PrepView;
+import dev.kultivator.client.hub.HubNav;
 import dev.kultivator.client.screen.ui.Brush;
+import dev.kultivator.client.screen.ui.DaftarGulir;
 import dev.kultivator.client.screen.ui.Eased;
 import dev.kultivator.client.screen.ui.JadeCoin;
 import dev.kultivator.client.screen.ui.KeyHints;
+import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.TalismanButton;
 import dev.kultivator.cultivation.ImmortalPerks;
@@ -27,7 +30,7 @@ import dev.kultivator.util.Msg;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
@@ -37,19 +40,21 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Status: the big dantian circle (gold ring cultivation, blue ring qi, violet ring stored qi, the realm written in
- * the ink core) with the numbers on a column of bamboo slips beside it, and the meditate / breakthrough / root test
- * talismans under them. The "Persiapan" coin above the slips folds out the breakthrough forecast (DESIGN 19.3.10), the
- * "Gua Kediaman" coin beside it sets or (on a second click) removes the Cave Abode (Action KULTIVASI {@code abode:set} /
- * {@code abode:clear}, DESIGN 19.3.5). A "Perkokoh Fondasi" talisman joins the row while a recorded quality can still rise
- * ({@code reforge}), and at True Immortal Peak the breakthrough talisman becomes "Padatkan Bintang" ({@code star}, with
- * Shift {@code star:all}); the player's Immortal Stars circle the dantian (DESIGN 19.3.11).
+ * Diri › Status (DESIGN 43.5): the big dantian circle (gold ring cultivation, blue ring qi, violet ring stored qi, the
+ * realm written in the ink core) with the numbers on a column of bamboo slips beside it ({@code DaftarGulir}: wheel, rail,
+ * ↑↓ after Tab), and the meditate / breakthrough / root test talismans under them. The "Persiapan" coin above the slips
+ * folds out the breakthrough forecast (DESIGN 19.3.10). A "Perkokoh Fondasi" talisman joins the row while a recorded
+ * quality can still rise ({@code reforge}), and at True Immortal Peak the breakthrough talisman becomes "Padatkan Bintang"
+ * ({@code star}, with Shift {@code star:all}); the player's Immortal Stars circle the dantian (DESIGN 19.3.11). The Cave
+ * Abode point moved to Diri › Harta › Kediaman (G66, {@link HartaPage}). All text is drawn at 1.0 (43.0.5).
  */
 final class StatusPage extends Page {
 
 	private static final int BUTTON_H = 18;
+	private static final int COIN_H = 12;
+	private static final int SLAT_H = 12;
+	private static final int PREP_LINE_H = 10;
 	private static final String S = "kultivator.goals.status.";
-	private static final long CONFIRM_MILLIS = 3000L;
 	/** The qi formation tier Perkokoh Fondasi needs (DESIGN 19.3.11; the server checks it again). */
 	private static final int REFORGE_FORMATION = 2;
 	/** At most this many Immortal Stars orbit the dantian (the count is written beside it). */
@@ -58,21 +63,19 @@ final class StatusPage extends Page {
 	private final Eased bar = new Eased(5.0F);
 	private final Eased qi = new Eased(5.0F);
 	private final Eased stored = new Eased(5.0F);
-	private final Eased scrollShown = new Eased(14.0F);
 	private final List<Slip> slips = new ArrayList<>();
-	private float scroll;
+	private final DaftarGulir slipList = new DaftarGulir().judul(i -> i < slips.size() && slips.get(i).value() == null, SLAT_H);
 	private long slipsBuiltAt;
 	private boolean builtMortalUntested;
 	private int lastStep = -1;
 	/** The Persiapan fold-out (DESIGN 19.3.10) replaces the bamboo slips while open. */
 	private static boolean prepOpen;
-	private float prepScroll;
-	private float prepHeight;
-	private final Eased prepShown = new Eased(14.0F);
+	/** The forecast pre-wrapped into lines of the slip column's width (rebuilt each frame from {@code PrepView}). */
+	private final List<PrepLine> prepLines = new ArrayList<>();
+	private final DaftarGulir prepList = new DaftarGulir().judul(i -> i < prepLines.size() && prepLines.get(i).heading() != null, SLAT_H);
 	/** Phase-7 controls that exist only in some states (DESIGN 19.3.5, 19.3.11). */
 	private boolean builtSummit;
 	private boolean builtReforge;
-	private long abodeAskUntil;
 
 	private float cx;
 	private float cy;
@@ -86,17 +89,21 @@ final class StatusPage extends Page {
 	private record Slip(Component label, Component value, int color) {
 	}
 
+	/** One line of the Persiapan fold-out: a heading, or one wrapped line of a forecast row. */
+	private record PrepLine(@Nullable Component heading, @Nullable FormattedCharSequence text, int color) {
+	}
+
 	StatusPage(CultivationScreen screen) {
 		super(screen);
 	}
 
 	@Override
-	Component title() {
+	public Component title() {
 		return Component.translatable("kultivator.screen.tab.status");
 	}
 
 	@Override
-	Component shortName() {
+	public Component shortName() {
 		return Component.translatable("kultivator.screen.tab.status.short");
 	}
 
@@ -117,38 +124,19 @@ final class StatusPage extends Page {
 		cy = y + availH / 2.0F;
 		slipX = x + circleW + 4;
 		slipW = x + w - slipX;
-		// The Persiapan coin (DESIGN 19.3.10) and the Cave Abode coin (DESIGN 19.3.5) on top of the slip column.
-		int coinH = 11;
-		boolean twoCoins = slipW >= 96;
-		int half = (slipW - 4) / 2;
-		JadeCoin prep = new JadeCoin(slipX + 2, y, twoCoins ? half - 2 : slipW - 4, coinH, () -> Component.translatable("kultivator.goals.prep.coin"),
-				() -> prepOpen);
+		// The Persiapan coin (DESIGN 19.3.10) on top of the slip column.
+		JadeCoin prep = new JadeCoin(slipX + 2, y, Math.max(TalismanButton.MIN_W, slipW - 4), COIN_H,
+				() -> Component.translatable("kultivator.goals.prep.coin"), () -> prepOpen);
 		prep.onPress(() -> {
 			prepOpen = !prepOpen;
-			prepScroll = 0.0F;
+			prepList.mulaiUlang(Util.getMillis());
+			slipList.mulaiUlang(Util.getMillis());
 		});
 		prep.tooltip(() -> List.of(Component.translatable("kultivator.goals.prep.coin"), Component.translatable("kultivator.goals.prep.coin.tip")
 				.withStyle(ChatFormatting.GRAY)));
 		add(prep);
-		if (twoCoins) {
-			JadeCoin abodeCoin = new JadeCoin(slipX + 2 + half, y, half - 2, coinH, () -> Component.translatable(S + "abode"), () -> abode(data()) != null);
-			abodeCoin.askingWhen(() -> Util.getMillis() < abodeAskUntil);
-			abodeCoin.enabledWhen(Keys::connected);
-			abodeCoin.onPress(() -> {
-				if (abode(data()) == null) {
-					send(Actions.KULTIVASI, 0, "abode:set");
-				} else if (Util.getMillis() < abodeAskUntil) {
-					abodeAskUntil = 0L;
-					send(Actions.KULTIVASI, 0, "abode:clear");
-				} else {
-					abodeAskUntil = Util.getMillis() + CONFIRM_MILLIS;
-				}
-			});
-			abodeCoin.tooltip(this::abodeTip);
-			add(abodeCoin);
-		}
-		slipY = y + coinH + 2;
-		slipH = availH - coinH - 2;
+		slipY = y + COIN_H + 2;
+		slipH = availH - COIN_H - 2;
 
 		List<TalismanButton> row = new ArrayList<>();
 		TalismanButton meditate = new TalismanButton(0, 0, 0, BUTTON_H, () -> Component.translatable(data().meditating()
@@ -165,6 +153,8 @@ final class StatusPage extends Page {
 			// At True Immortal Peak no breakthrough is left: the talisman condenses Immortal Stars instead (DESIGN 19.3.11).
 			TalismanButton star = new TalismanButton(0, 0, 0, BUTTON_H, () -> Component.translatable(S + "star", ImmortalPerks.stars(data()) + 1));
 			star.enabledWhen(() -> Keys.connected() && canCondense(data()));
+			star.alasanWhen(() -> Keys.connected() ? Component.translatable(S + "star.cost", Msg.number(ImmortalPerks.nextStarCost(data())),
+					Msg.number(data().storedQi())) : luring());
 			star.urgentWhen(() -> canCondense(data()));
 			star.onPress(() -> send(Actions.KULTIVASI, 0, Minecraft.getInstance().hasShiftDown() ? "star:all" : "star"));
 			star.tooltip(StatusPage::starTip);
@@ -172,6 +162,7 @@ final class StatusPage extends Page {
 		} else {
 			TalismanButton breakthrough = new TalismanButton(0, 0, 0, BUTTON_H, () -> Component.translatable("kultivator.screen.btn.breakthrough"));
 			breakthrough.enabledWhen(() -> canBreakthrough(data()));
+			breakthrough.alasanWhen(StatusPage::breakthroughWhy);
 			breakthrough.urgentWhen(() -> canBreakthrough(data()));
 			breakthrough.onPress(() -> send(Actions.BREAKTHROUGH));
 			breakthrough.tooltip(StatusPage::breakthroughTip);
@@ -186,6 +177,7 @@ final class StatusPage extends Page {
 					: Component.translatable(S + "reforge"));
 			reforge.stampedWhen(() -> reforging(data()));
 			reforge.enabledWhen(() -> Keys.connected() && canReforge(data()));
+			reforge.alasanWhen(() -> Keys.connected() ? reforgeWhy(data()) : luring());
 			reforge.urgentWhen(() -> canReforge(data()));
 			reforge.onPress(() -> send(Actions.KULTIVASI, 0, "reforge"));
 			reforge.tooltip(StatusPage::reforgeTip);
@@ -199,7 +191,7 @@ final class StatusPage extends Page {
 			root.onPress(() -> {
 				// The testing ceremony plays around the player in the world: close the scroll so it can be watched.
 				send(Actions.ROOT_TEST);
-				screen.onClose();
+				HubNav.tutupSemua();
 			});
 			root.tooltip(() -> List.of(Component.translatable("kultivator.screen.btn.root_test"),
 					Component.translatable("kultivator.screen.btn.root_test.tip")));
@@ -221,49 +213,12 @@ final class StatusPage extends Page {
 	}
 
 	@Override
-	boolean needsRebuild() {
+	public boolean needsRebuild() {
 		CultivationData data = data();
 		return builtMortalUntested != mortalUntested(data) || builtSummit != data.rank().isMax() || builtReforge != reforgeOffered(data);
 	}
 
-	// ================================================================== phase 7: abode, Perkokoh Fondasi, stars
-
-	/** The Cave Abode saved in {@code extra.kultivasi.abode {dim, x, y, z}} (DESIGN 19.9), or null when none is set. */
-	private static @Nullable CompoundTag abode(CultivationData data) {
-		CompoundTag tag = data.extra().getCompoundOrEmpty("kultivasi").getCompoundOrEmpty("abode");
-		return tag.getStringOr("dim", "").isEmpty() ? null : tag;
-	}
-
-	private List<Component> abodeTip() {
-		CultivationData data = data();
-		List<Component> lines = new ArrayList<>();
-		lines.add(Component.translatable(S + "abode"));
-		CompoundTag abode = abode(data);
-		if (abode == null) {
-			lines.add(Component.translatable(S + "abode.none").withStyle(ChatFormatting.GRAY));
-			lines.add(Component.translatable(S + "abode.how").withStyle(ChatFormatting.GRAY));
-			return lines;
-		}
-		String dim = abode.getStringOr("dim", "");
-		Component where = switch (dim) {
-			case "minecraft:overworld" -> Component.translatable(S + "dim.overworld");
-			case "minecraft:the_nether" -> Component.translatable(S + "dim.nether");
-			case "minecraft:the_end" -> Component.translatable(S + "dim.end");
-			default -> Component.literal(dim);
-		};
-		lines.add(Component.translatable(S + "abode.at", abode.getIntOr("x", 0), abode.getIntOr("y", 0), abode.getIntOr("z", 0), where)
-				.withColor(Palette.JADE_LIGHT));
-		int state = data.sessionExtra().getIntOr("abode", 0);
-		if (state > 0) {
-			lines.add(Component.translatable(S + "abode.active").withStyle(ChatFormatting.GREEN));
-		} else if (state < 0) {
-			lines.add(Component.translatable(S + "abode.unprotected").withStyle(ChatFormatting.GOLD));
-		}
-		lines.add(Component.translatable(S + "abode.bonus").withStyle(ChatFormatting.GRAY));
-		lines.add(Component.translatable(Util.getMillis() < abodeAskUntil ? S + "abode.confirm" : S + "abode.clear")
-				.withStyle(Util.getMillis() < abodeAskUntil ? ChatFormatting.RED : ChatFormatting.DARK_GRAY));
-		return lines;
-	}
+	// ================================================================== phase 7: Perkokoh Fondasi, stars
 
 	/** True at True Immortal Peak with enough Qi Abadi for the next star. */
 	static boolean canCondense(CultivationData data) {
@@ -302,6 +257,24 @@ final class StatusPage extends Page {
 	static boolean canReforge(CultivationData data) {
 		return Reforge.target(data) != null && !reforging(data) && data.meditating() && data.formationTier() >= REFORGE_FORMATION
 				&& !data.deviating() && !data.breakingThrough() && data.storedQi() + 1.0E-6D >= Reforge.cost(data);
+	}
+
+	/** Why Perkokoh Fondasi is dim: the first unmet line of its tooltip (footer reason of the disabled talisman). */
+	private static Component reforgeWhy(CultivationData data) {
+		if (reforging(data)) {
+			return Component.translatable(S + "reforge.running", clock((int) reforgeLeft(data)));
+		}
+		if (data.deviating()) {
+			return Component.translatable("kultivator.screen.bt.deviation");
+		}
+		if (!data.meditating() || data.formationTier() < REFORGE_FORMATION) {
+			return Component.translatable(S + "reforge.need", QiFormations.name(REFORGE_FORMATION));
+		}
+		return Component.translatable(S + "reforge.cost", Msg.number(Reforge.cost(data)), Msg.number(data.storedQi()));
+	}
+
+	private static Component luring() {
+		return Component.translatable("kultivator.gui43.m02.luring");
 	}
 
 	private static List<Component> reforgeTip() {
@@ -347,11 +320,11 @@ final class StatusPage extends Page {
 			Brush.rect(g, sx - 0.35F, sy - 1.6F, sx + 0.35F, sy + 1.6F, color);
 			Brush.dot(g, sx, sy, 0.6F, 0xFFFFFFFF);
 		}
-		Brush.text(g, font, Component.literal("★" + stars), cx + r * 0.72F, cy - r - 1.0F, Palette.GOLD_DARK, 0.65F, false);
+		Brush.text(g, font, Component.literal("★" + stars), cx + r * 0.72F, cy - r - 4.0F, Palette.GOLD_DARK, 1.0F, false);
 	}
 
 	@Override
-	void onData() {
+	public void onData() {
 		rebuildSlips();
 	}
 
@@ -385,6 +358,28 @@ final class StatusPage extends Page {
 	/** Full bar at a bottleneck that the player could break through (an untested Mortal must test the root first). */
 	private static boolean ready(CultivationData data, Rank rank) {
 		return data.barFull() && rank.nextIsBreakthrough() && !mortalRootUnknown(data);
+	}
+
+	/** Why the breakthrough talisman is dim: the first red line of its tooltip (footer reason of the disabled talisman). */
+	private static @Nullable Component breakthroughWhy() {
+		CultivationData data = data();
+		Rank rank = data.rank();
+		if (data.breakingThrough()) {
+			return Component.translatable("kultivator.screen.bt.running");
+		}
+		if (data.deviating()) {
+			return Component.translatable("kultivator.screen.bt.deviation");
+		}
+		if (rank.realm().isMortal() && !data.rootTested()) {
+			return Component.translatable("kultivator.screen.bt.root_first");
+		}
+		if (!rank.isBottleneck() || !rank.nextIsBreakthrough()) {
+			return Component.translatable("kultivator.screen.bt.not_peak");
+		}
+		if (!data.barFull()) {
+			return Component.translatable("kultivator.screen.bt.not_full", Msg.number(data.xp()), Msg.number(rank.xpRequired()));
+		}
+		return mortalRootUnknown(data) ? Component.translatable("kultivator.roots.info.reading") : null;
 	}
 
 	private static List<Component> breakthroughTip() {
@@ -537,7 +532,6 @@ final class StatusPage extends Page {
 		drawDantian(g, data, rank, barT, qiT, storedT, mouseX, mouseY);
 		// A fresh layer keeps the GUI's overlap bookkeeping short after the many small pieces of the circle.
 		g.nextStratum();
-		drawSlips(g, mouseX, mouseY, seconds);
 	}
 
 	private void drawDantian(GuiGraphicsExtractor g, CultivationData data, Rank rank, float barT, float qiT, float storedT, int mouseX, int mouseY) {
@@ -584,33 +578,33 @@ final class StatusPage extends Page {
 				? Component.translatable("kultivator.screen.status.layer_stage", rank.layer() + 1, rank.stageName())
 				: Component.translatable("kultivator.screen.status.stage", rank.stageName());
 		Component third = Component.literal(Math.round(barT * 100.0F) + "%");
-		float room = core * 1.62F;
-		// A long realm name is written over two lines rather than shrunk into dust.
+		float room = core * 1.8F;
+		// A long realm name is written over two lines (never shrunk below 1.0, 43.0.5); a word still too wide loses its
+		// bold weight before it is cut with "…".
 		List<Component> nameLines = List.of(name);
-		float s1 = Brush.fitScale(font, name, room, 1.35F, 0.5F);
+		float s1 = Brush.fitScale(font, name, room, 1.35F, 1.0F);
 		String plain = rank.realm().displayName().getString();
 		int space = plain.indexOf(' ', plain.length() / 2 - 1);
 		if (space < 0) {
 			space = plain.lastIndexOf(' ');
 		}
-		if (s1 < 0.8F && space > 0) {
-			Component a = Brush.bold(Component.literal(plain.substring(0, space)));
-			Component b = Brush.bold(Component.literal(plain.substring(space + 1)));
-			nameLines = List.of(a, b);
-			s1 = Math.min(Brush.fitScale(font, a, room * 0.92F, 1.2F, 0.5F), Brush.fitScale(font, b, room * 0.92F, 1.2F, 0.5F));
+		if (font.width(name) * s1 > room && space > 0) {
+			nameLines = List.of(fitWeight(plain.substring(0, space), room), fitWeight(plain.substring(space + 1), room));
+			s1 = 1.0F;
+		} else if (font.width(name) > room) {
+			nameLines = List.of(fitWeight(plain, room));
+			s1 = 1.0F;
 		}
-		float s2 = Math.min(0.85F, Brush.fitScale(font, second, room, 0.85F, 0.45F));
-		float s3 = 0.7F;
-		float total = 9.0F * s1 * nameLines.size() + 9.0F * s2 + 9.0F * s3 + 3.0F;
+		float total = 9.0F * s1 * nameLines.size() + 9.0F + 9.0F + 3.0F;
 		float ty = cy - total / 2.0F;
 		for (Component line : nameLines) {
-			Brush.fitCentered(g, font, line, cx, ty, room, Palette.opaque(rank.realm().color()), s1, 0.5F, true);
+			Brush.fitCentered(g, font, line, cx, ty, room, Palette.opaque(rank.realm().color()), s1, 1.0F, true);
 			ty += 9.0F * s1;
 		}
 		ty += 1.5F;
-		Brush.fitCentered(g, font, second, cx, ty, room, Palette.JADE_PALE, s2, 0.45F, false);
-		ty += 9.0F * s2 + 1.5F;
-		Brush.fitCentered(g, font, third, cx, ty, room, ready ? Palette.GOLD_LIGHT : Palette.GOLD, s3, 0.5F, false);
+		Brush.fitCentered(g, font, second, cx, ty, room, Palette.JADE_PALE, 1.0F, 1.0F, false);
+		ty += 9.0F + 1.5F;
+		Brush.fitCentered(g, font, third, cx, ty, room, ready ? Palette.GOLD_LIGHT : Palette.GOLD, 1.0F, 1.0F, false);
 		int stars = ImmortalPerks.stars(data);
 		if (stars > 0) {
 			drawStars(g, stars, r, now);
@@ -622,15 +616,15 @@ final class StatusPage extends Page {
 		float distance = (float) Math.sqrt(dx * dx + dy * dy);
 		if (distance <= r + 1.0F) {
 			if (distance >= r - t - 1.0F) {
-				screen.showTooltip(List.of(Component.translatable("kultivator.screen.status.cultivation"),
+				tooltip(List.of(Component.translatable("kultivator.screen.status.cultivation"),
 						Component.literal(Msg.number(data.xp()) + " / " + Msg.number(rank.xpRequired())).withColor(Palette.GOLD_LIGHT),
 						Component.translatable(ready ? "kultivator.screen.status.ready" : "kultivator.screen.status.cultivation.tip")));
 			} else if (distance >= qInner - 1.0F) {
-				screen.showTooltip(List.of(Component.translatable("kultivator.screen.status.qi"),
+				tooltip(List.of(Component.translatable("kultivator.screen.status.qi"),
 						Component.literal(Msg.number(data.qi()) + " / " + Msg.number(Qi.max(data))).withColor(Palette.QI_LIGHT),
 						Component.translatable("kultivator.screen.status.qi.tip")));
 			} else if (distance >= sInner - 1.0F) {
-				screen.showTooltip(List.of(Component.translatable(rank.isMax() ? "kultivator.screen.status.stored_immortal"
+				tooltip(List.of(Component.translatable(rank.isMax() ? "kultivator.screen.status.stored_immortal"
 								: "kultivator.screen.status.stored"),
 						Component.literal(Msg.number(data.storedQi())).withColor(Palette.STORED_LIGHT),
 						Component.translatable("kultivator.screen.status.stored.tip")));
@@ -640,114 +634,87 @@ final class StatusPage extends Page {
 				if (stars > 0) {
 					tip.add(Component.translatable(S + "star.count", stars).withColor(Palette.GOLD_LIGHT));
 				}
-				screen.showTooltip(tip);
+				tooltip(tip);
 			}
 		}
 	}
 
-	/** The Persiapan fold-out: the forecast lines of {@code PrepView} on a pale slip, scrolling with the wheel. */
-	private void drawPrep(GuiGraphicsExtractor g, float seconds) {
+	/** A bold word, or the plain word when bold does not fit {@code room} (it is cut with "…" only when even that is too wide). */
+	private Component fitWeight(String word, float room) {
+		Component bold = Brush.bold(Component.literal(word));
+		return font.width(bold) <= room ? bold : Component.literal(word);
+	}
+
+	// ================================================================== the slip column (DaftarGulir)
+
+	@Override
+	protected void lukis(Lukis l) {
 		if (slipW < 30) {
 			return;
 		}
+		if (prepOpen) {
+			lukisPrep(l);
+			return;
+		}
+		if (slips.isEmpty()) {
+			return;
+		}
+		// Binding cords running down behind the slips.
+		l.g.fill(slipX + 4, slipY, slipX + 5, slipY + slipH, Palette.CORD);
+		l.g.fill(slipX + slipW - 5, slipY, slipX + slipW - 4, slipY + slipH, Palette.CORD);
+		slipList.gambar(l, "slips", slipX, slipY, slipX + slipW, slipY + slipH, slips.size(), SLAT_H, this::drawSlip, null, null);
+	}
+
+	/** One bamboo slip (label left, value right, both at 1.0; a value too long is cut and shown whole in the tooltip). */
+	private void drawSlip(Lukis l, int i, int x0, int y0, int x1, int y1, boolean over, boolean chosen) {
+		Slip slip = slips.get(i);
+		GuiGraphicsExtractor g = l.g;
+		float textY = y0 + (y1 - y0 - 8) / 2.0F;
+		if (slip.value() == null) {
+			Brush.rect(g, x0 + 4.0F, (y0 + y1) / 2.0F - 1.5F, x0 + 7.0F, (y0 + y1) / 2.0F + 1.5F, Palette.SEAL);
+			Brush.fit(g, font, Brush.bold(slip.label()), x0 + 10.0F, textY, x1 - x0 - 14.0F, slip.color(), 1.0F, 1.0F, false);
+			Brush.rect(g, x0 + 4.0F, y1 - 0.5F, x1 - 4.0F, y1, Palette.argb(0xA0, Palette.GOLD));
+			return;
+		}
+		int slat = i % 2 == 0 ? Palette.BAMBOO : Palette.BAMBOO_ALT;
+		Brush.rect(g, x0 + 1.0F, y0, x1 - 1.0F, y1, over || chosen && l.difokus("slips") ? Palette.mix(slat, 0xFFFFFFFF, 0.25F) : slat);
+		Brush.rect(g, x0 + 1.0F, y0, x1 - 1.0F, y0 + 0.5F, 0x40FFFFFF);
+		Brush.rect(g, x0 + 1.0F, y1 - 0.5F, x1 - 1.0F, y1, 0x30000000);
+		Brush.rect(g, x0 + 2.0F, y0 + 1.0F, x0 + 3.0F, y1 - 1.0F, Palette.BAMBOO_KNOT);
+		Brush.rect(g, x1 - 3.0F, y0 + 1.0F, x1 - 2.0F, y1 - 1.0F, Palette.BAMBOO_KNOT);
+		float inner = x1 - x0 - 12.0F;
+		float valueRoom = inner * 0.55F;
+		float valueWidth = Math.min(valueRoom, font.width(slip.value()));
+		Brush.fit(g, font, slip.label(), x0 + 6.0F, textY, inner - valueWidth - 4.0F, Palette.INK_SOFT, 1.0F, 1.0F, false);
+		Brush.fit(g, font, slip.value(), x1 - 6.0F - valueWidth, textY, valueRoom, slip.color(), 1.0F, 1.0F, false);
+	}
+
+	/** The Persiapan fold-out: the forecast of {@code PrepView} on a pale slip, wrapped to lines, in a {@code DaftarGulir}. */
+	private void lukisPrep(Lukis l) {
+		GuiGraphicsExtractor g = l.g;
 		g.fill(slipX + 1, slipY, slipX + slipW - 1, slipY + slipH, Palette.argb(0x70, 0xFFF4E6B8));
 		Brush.frame(g, slipX, slipY, slipX + slipW, slipY + slipH, Palette.argb(0xB0, Palette.GOLD_DARK));
-		float maxScroll = Math.max(0.0F, prepHeight - slipH + 6.0F);
-		prepScroll = Math.max(0.0F, Math.min(maxScroll, prepScroll));
-		float offset = prepShown.to(prepScroll, seconds);
-		float scale = slipW >= 130 ? 0.62F : 0.55F;
-		float room = slipW - 10.0F;
-		g.enableScissor(slipX + 1, slipY + 1, slipX + slipW - 1, slipY + slipH - 1);
-		float top = slipY + 3.0F - offset;
-		float cursor = top;
+		prepLines.clear();
+		int room = slipW - 18;
 		for (PrepView.Row row : PrepView.rows(data())) {
 			if (row.heading()) {
-				cursor += 1.0F;
-				Brush.rect(g, slipX + 4.0F, cursor + 1.5F, slipX + 7.0F, cursor + 4.5F, Palette.SEAL);
-				Brush.fit(g, font, Brush.bold(row.text()), slipX + 9.0F, cursor, room - 5.0F, row.color(), scale + 0.06F, 0.45F, false);
-				cursor += 9.0F * (scale + 0.06F);
-				Brush.rect(g, slipX + 4.0F, cursor, slipX + slipW - 4.0F, cursor + 0.6F, Palette.argb(0xA0, Palette.GOLD));
-				cursor += 2.0F;
-			} else {
-				cursor += Brush.wrap(g, font, row.text(), slipX + 5.0F, cursor, room, row.color(), scale, false) + 1.0F;
-			}
-		}
-		prepHeight = cursor - top;
-		g.disableScissor();
-		if (maxScroll > 0.0F) {
-			float bead = slipY + 3.0F + (slipH - 6.0F) * (offset / maxScroll);
-			Brush.disc(g, slipX + slipW - 2.5F, bead, 2.0F, Palette.JADE);
-		}
-	}
-
-	private void drawSlips(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
-		if (prepOpen) {
-			drawPrep(g, seconds);
-			return;
-		}
-		if (slipW < 30 || slips.isEmpty()) {
-			return;
-		}
-		float slatH = Math.max(9.0F, Math.min(12.0F, slipH / (float) slips.size()));
-		float scale = slatH >= 11.0F ? 0.8F : 0.68F;
-		float total = slips.size() * slatH;
-		float maxScroll = Math.max(0.0F, total - slipH);
-		scroll = Math.max(0.0F, Math.min(maxScroll, scroll));
-		float offset = scrollShown.to(scroll, seconds);
-
-		// Binding cords running down over the slips.
-		g.fill(slipX + 4, slipY, slipX + 5, slipY + slipH, Palette.CORD);
-		g.fill(slipX + slipW - 5, slipY, slipX + slipW - 4, slipY + slipH, Palette.CORD);
-		g.enableScissor(slipX, slipY, slipX + slipW, slipY + slipH);
-		for (int i = 0; i < slips.size(); i++) {
-			float top = slipY + i * slatH - offset;
-			if (top + slatH < slipY || top > slipY + slipH) {
+				prepLines.add(new PrepLine(row.text(), null, row.color()));
 				continue;
 			}
-			Slip slip = slips.get(i);
-			float textY = top + (slatH - 1.0F - 8.0F * scale) / 2.0F;
-			if (slip.value() == null) {
-				Brush.rect(g, slipX + 8.0F, top + slatH / 2.0F - 1.5F, slipX + 11.0F, top + slatH / 2.0F + 1.5F, Palette.SEAL);
-				Brush.fit(g, font, Brush.bold(slip.label()), slipX + 14.0F, textY, slipW - 22.0F, slip.color(), scale, 0.5F, false);
-				Brush.rect(g, slipX + 8.0F, top + slatH - 1.0F, slipX + slipW - 8.0F, top + slatH - 0.5F, Palette.argb(0xA0, Palette.GOLD));
-				continue;
+			for (FormattedCharSequence line : font.split(row.text(), Math.max(10, room))) {
+				prepLines.add(new PrepLine(null, line, row.color()));
 			}
-			int slat = i % 2 == 0 ? Palette.BAMBOO : Palette.BAMBOO_ALT;
-			Brush.rect(g, slipX + 1.0F, top, slipX + slipW - 1.0F, top + slatH - 1.0F, slat);
-			Brush.rect(g, slipX + 1.0F, top, slipX + slipW - 1.0F, top + 0.5F, 0x40FFFFFF);
-			Brush.rect(g, slipX + 1.0F, top + slatH - 1.5F, slipX + slipW - 1.0F, top + slatH - 1.0F, 0x30000000);
-			Brush.rect(g, slipX + 2.0F, top + 1.0F, slipX + 3.0F, top + slatH - 2.0F, Palette.BAMBOO_KNOT);
-			Brush.rect(g, slipX + slipW - 3.0F, top + 1.0F, slipX + slipW - 2.0F, top + slatH - 2.0F, Palette.BAMBOO_KNOT);
-			g.fill(slipX + 4, Math.round(top), slipX + 5, Math.round(top + slatH - 1.0F), Palette.CORD);
-			g.fill(slipX + slipW - 5, Math.round(top), slipX + slipW - 4, Math.round(top + slatH - 1.0F), Palette.CORD);
-
-			float inner = slipW - 16.0F;
-			float valueWidth = Math.min(inner * 0.55F, font.width(slip.value()) * scale);
-			float labelRoom = inner - valueWidth - 3.0F;
-			Brush.fit(g, font, slip.label(), slipX + 8.0F, textY, labelRoom, Palette.INK_SOFT, scale, 0.45F, false);
-			float valueScale = Brush.fitScale(font, slip.value(), inner * 0.55F, scale, 0.45F);
-			float drawnValue = Math.min(inner * 0.55F, font.width(slip.value()) * valueScale);
-			Brush.fit(g, font, slip.value(), slipX + slipW - 8.0F - drawnValue, textY, inner * 0.55F, slip.color(), scale, 0.45F, false);
 		}
-		g.disableScissor();
-		if (maxScroll > 0.0F) {
-			// A jade bead sliding on the right cord shows where the list is.
-			float bead = slipY + 3.0F + (slipH - 6.0F) * (offset / maxScroll);
-			Brush.disc(g, slipX + slipW - 4.5F, bead, 2.2F, Palette.JADE);
-			Brush.disc(g, slipX + slipW - 5.0F, bead - 0.6F, 0.8F, Palette.JADE_PALE);
-		}
-	}
-
-	@Override
-	boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-		if (mouseX >= slipX && mouseX < slipX + slipW && mouseY >= slipY && mouseY < slipY + slipH) {
-			if (prepOpen) {
-				prepScroll -= (float) amount * 12.0F;
-			} else {
-				scroll -= (float) amount * 12.0F;
-			}
-			return true;
-		}
-		return false;
+		prepList.gambar(l, "prep", slipX + 2, slipY + 2, slipX + slipW - 2, slipY + slipH - 2, prepLines.size(), PREP_LINE_H,
+				(lk, i, x0, y0, x1, y1, over, chosen) -> {
+					PrepLine line = prepLines.get(i);
+					if (line.heading() != null) {
+						Brush.rect(lk.g, x0 + 2.0F, y0 + 3.5F, x0 + 5.0F, y0 + 6.5F, Palette.SEAL);
+						Brush.fit(lk.g, font, Brush.bold(line.heading()), x0 + 7.0F, y0 + 2.0F, x1 - x0 - 9.0F, line.color(), 1.0F, 1.0F, false);
+						Brush.rect(lk.g, x0 + 2.0F, y1 - 0.6F, x1 - 2.0F, y1, Palette.argb(0xA0, Palette.GOLD));
+					} else if (line.text() != null) {
+						Brush.text(lk.g, font, line.text(), x0 + 3.0F, y0 + 1.0F, line.color(), 1.0F, false);
+					}
+				}, null, null);
 	}
 }

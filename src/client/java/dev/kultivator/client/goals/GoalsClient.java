@@ -4,7 +4,6 @@ import dev.kultivator.Kultivator;
 import dev.kultivator.client.ClientCultivation;
 import dev.kultivator.client.Keys;
 import dev.kultivator.client.QiHud;
-import dev.kultivator.client.codex.CodexScreen;
 import dev.kultivator.goals.Guide;
 import dev.kultivator.network.Actions;
 import dev.kultivator.network.Payloads;
@@ -18,12 +17,9 @@ import net.minecraft.nbt.CompoundTag;
 /**
  * Client side of P7-jalan (DESIGN 19.3.9, 19.3.10, 19.3.15): registers the guide tracker (right edge), the tribulation
  * HUD (left edge) and the meditation danger alert as HUD elements, and ticks them, the formation blueprints and the HUD
- * comfort counters. Tells the server once when the Kitab Teknik was opened (Action JALAN {@code seen:codex}, the chapter-5
- * step). Called once from {@code KultivatorClient}.
+ * comfort counters. Called once from {@code KultivatorClient}.
  */
 public final class GoalsClient {
-
-	private static boolean seenSent;
 
 	public static void init() {
 		HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, Kultivator.id("guide_tracker"), new GuideTracker());
@@ -41,16 +37,10 @@ public final class GoalsClient {
 		MeditationAlert.tick(minecraft);
 		FormationBlueprint.tick(minecraft);
 		QiHud.clientTick(minecraft);
-		if (Guide.seen(ClientCultivation.data())) {
-			seenSent = false;
-		} else if (!seenSent && minecraft.gui.screen() instanceof CodexScreen && Keys.connected()) {
-			seenSent = true;
-			Keys.send(new Payloads.Action(Actions.JALAN, 0, "seen:codex"));
-		}
+		// "seen:codex" is sent by Teknik › Kodeks itself (KodeksPage.onShow, DESIGN 43)
 	}
 
 	private static void reset() {
-		seenSent = false;
 		GuideTracker.reset();
 		MeditationAlert.reset();
 		FormationBlueprint.reset();

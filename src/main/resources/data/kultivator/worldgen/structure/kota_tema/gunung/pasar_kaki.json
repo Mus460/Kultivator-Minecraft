@@ -40,6 +40,18 @@
     },
     {
       "dx": -48,
+      "dz": 58,
+      "pool": "kultivator:kota_tema/gunung/hidup42/kantor_rekrut",
+      "putar": 0
+    },
+    {
+      "dx": 0,
+      "dz": 58,
+      "pool": "kultivator:kota_tema/gunung/hidup42/kavling_timur",
+      "putar": 0
+    },
+    {
+      "dx": -48,
       "dz": 48,
       "pool": "kultivator:kota_tema/gunung/tembok/lurus_jaga",
       "putar": 0

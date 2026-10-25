@@ -1,0 +1,71 @@
+# Global slot library of the corpus (sumber.py). A placeholder {$name} not defined by its rule or file resolves here.
+# konteks.<name> values are filled by 42K (Cakap.Konteks.isian / place state); see docs/progres/m2-42K-C.md.
+
+# --- the listener and the speaker
+slot: $sebutan tipe=sebutan_pendengar dari=pendengar
+slot: $lawan tipe=nama_warga dari=lawan
+slot: $sebutan_lawan tipe=sebutan_pendengar dari=lawan
+slot: $kerja tipe=pekerjaan dari=pembicara
+slot: $kerja_lawan tipe=pekerjaan dari=lawan
+slot: $emosi tipe=kata_emosi dari=pembicara
+slot: $tik tipe=tik dari=pembicara
+
+# --- the fact being told
+slot: $subjek tipe=nama_warga dari=fakta.subjek
+slot: $objek tipe=nama_warga dari=fakta.objek
+slot: $ganti tipe=ganti dari=fakta.subjek
+slot: $barang tipe=barang dari=fakta.objek fitur=jamak
+slot: $harga tipe=harga dari=fakta.nilai
+slot: $angka tipe=angka dari=fakta.nilai
+slot: $waktu_lalu tipe=waktu_lalu dari=fakta.hariKejadian
+slot: $waktu_depan tipe=waktu_depan dari=fakta.nilai
+slot: $tempat_fakta tipe=tempat dari=fakta.objek
+slot: $sekte_fakta tipe=tempat dari=fakta.objek
+slot: $tempat_subjek tipe=tempat dari=fakta.subjek
+
+# --- the place and the moment
+slot: $tempat tipe=tempat dari=konteks.tempat
+slot: $distrik tipe=tempat dari=konteks.distrik
+slot: $titik tipe=tempat dari=konteks.titik
+slot: $cuaca tipe=cuaca dari=konteks.cuaca
+slot: $musim tipe=musim dari=konteks.musim
+slot: $arah tipe=arah dari=konteks.arah
+slot: $jarak tipe=jarak dari=konteks.jarak
+slot: $sekte_pelindung tipe=tempat dari=konteks.sekte_pelindung
+slot: $barang_murah tipe=barang dari=konteks.barang_murah
+slot: $barang_mahal tipe=barang dari=konteks.barang_mahal fitur=jamak
+slot: $tahun tipe=angka dari=konteks.tahun
+slot: $lama tipe=waktu_lalu dari=konteks.terakhir_jumpa
+
+# --- people around the speaker (42.5.2 isian)
+slot: $pasangan tipe=nama_warga dari=konteks.pasangan
+slot: $anak tipe=nama_warga dari=konteks.anak
+slot: $sahabat tipe=nama_warga dari=konteks.sahabat
+slot: $musuh tipe=nama_warga dari=konteks.musuh
+slot: $almarhum tipe=nama_warga dari=konteks.almarhum
+slot: $kekasih tipe=nama_warga dari=konteks.kekasih
+slot: $guru tipe=nama_warga dari=konteks.guru
+slot: $murid tipe=nama_warga dari=konteks.murid
+slot: $hub_pasangan tipe=hubungan dari=konteks.pasangan
+slot: $hub_anak tipe=hubungan dari=konteks.anak
+slot: $hub_subjek tipe=hubungan dari=fakta.subjek
+slot: $penyebar tipe=nama_warga dari=konteks.penyebar
+slot: $tetangga tipe=nama_warga dari=konteks.tetangga
+
+# --- player promises and debts (KILAS_BALIK, TAGIH)
+slot: $utang tipe=harga dari=konteks.utang
+slot: $batas tipe=waktu_depan dari=konteks.batas
+
+# --- shared fragments (rules defined in fragmen.txt)
+slot: $keluh aturan=seru.keluh opsional=0.5
+slot: $kaget aturan=seru.kaget opsional=0.5
+slot: $senang aturan=seru.senang opsional=0.5
+slot: $ragu aturan=seru.ragu opsional=0.5
+slot: $doa aturan=frag.doa opsional=0.4
+slot: $pepatah aturan=frag.pepatah opsional=0.25
+slot: $katanya aturan=frag.katanya
+slot: $penutup_kecil aturan=frag.penutup_kecil opsional=0.4
+slot: $ajakan aturan=frag.ajakan opsional=0.35
+slot: $alasan_pergi aturan=frag.alasan_pergi
+slot: $sebab_harga aturan=frag.sebab_harga opsional=0.5
+slot: $penguat aturan=frag.penguat opsional=0.3

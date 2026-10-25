@@ -50,7 +50,7 @@ public final class DimensiClient {
 		EntityRenderers.register(DimensiEntities.PENYU_DEK, NoopRenderer::new);
 		EntityRenderers.register(DimensiEntities.TANDA, TandaRenderer::new);
 		// payloads (handlers run on the client thread)
-		ClientPlayNetworking.registerGlobalReceiver(DimensiNet.Open.TYPE, (payload, context) -> DimensiScreen.open(payload));
+		ClientPlayNetworking.registerGlobalReceiver(DimensiNet.Open.TYPE, (payload, context) -> DimensiJembatan.buka(payload));
 		ClientPlayNetworking.registerGlobalReceiver(DimensiNet.State.TYPE, (payload, context) -> DimensiState.onState(payload));
 		ClientPlayNetworking.registerGlobalReceiver(DimensiNet.Fx.TYPE, (payload, context) -> DimensiFx.onFx(payload));
 		// the soul's view
@@ -58,6 +58,7 @@ public final class DimensiClient {
 		ClientTickEvents.END_CLIENT_TICK.register(DimensiClient::tick);
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
 			DimensiState.clear();
+			DimensiJembatan.reset();
 			DimensiFx.clear();
 			UlarLautRenderer.clearChains();
 		});

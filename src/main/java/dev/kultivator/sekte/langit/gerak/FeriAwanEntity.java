@@ -363,6 +363,12 @@ public class FeriAwanEntity extends Entity {
 			return;
 		}
 		if (owner == null || route == null || LIVE.get(owner) != this && LIVE.containsKey(owner)) {
+			// removePassenger skips its soft fall once removed: riders mid-air get it here.
+			for (Entity passenger : getPassengers()) {
+				if (passenger instanceof LivingEntity living) {
+					living.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 240, 0, false, true));
+				}
+			}
 			discard();
 			return;
 		}

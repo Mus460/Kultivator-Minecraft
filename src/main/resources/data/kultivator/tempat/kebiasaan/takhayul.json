@@ -1,0 +1,40 @@
+{
+  "_catatan": "Kebiasaan #18 takhayul (DESIGN 42.4.12); ilham: almanak rakyat (huangli)",
+  "nomor": 18,
+  "siapa": {
+    "umur": [
+      16,
+      200
+    ],
+    "tahap": [
+      "dewasa",
+      "tua"
+    ]
+  },
+  "sial": true,
+  "sesi": [
+    {
+      "jam": [
+        6,
+        6.75
+      ],
+      "tujuan": [
+        "@rumah"
+      ],
+      "klip": "membaca",
+      "kanan": "kota42:almanak_merah"
+    },
+    {
+      "jam": [
+        6.75,
+        7.25
+      ],
+      "kegiatan": "kb_takhayul_dupa",
+      "tujuan": [
+        "@rumah"
+      ],
+      "klip": "sujud_dupa",
+      "kanan": "dupa"
+    }
+  ]
+}

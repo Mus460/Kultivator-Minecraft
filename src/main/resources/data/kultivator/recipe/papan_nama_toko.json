@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "C": "minecraft:iron_chain",
+    "P": "#minecraft:planks",
+    "L": "minecraft:lantern",
+    "D": "minecraft:red_dye"
+  },
+  "pattern": [
+    "C C",
+    "PLP",
+    "DPD"
+  ],
+  "result": {
+    "id": "kultivator:papan_nama_toko"
+  }
+}

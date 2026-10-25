@@ -1053,7 +1053,8 @@ public final class Candidates {
 			return;
 		}
 		int colour = Talents.soulColor(data);
-		TESTS.add(new Test(owner, id, player.getUUID(), level, stele, level.getServer().getTickCount(), tiers(data), Talents.duan(data), colour));
+		// +1: started from a packet between ticks, the next tick already counts one higher, and t == 0 opens the test.
+		TESTS.add(new Test(owner, id, player.getUUID(), level, stele, level.getServer().getTickCount() + 1L, tiers(data), Talents.duan(data), colour));
 		entity.getNavigation().stop();
 		entity.getLookControl().setLookAt(stele.getX() + 0.5D, stele.getY() + 1.0D, stele.getZ() + 0.5D);
 		Msg.chat(player, Component.translatable("kultivator.hall.cand.test_start", nameOf(rec)).withStyle(ChatFormatting.AQUA));

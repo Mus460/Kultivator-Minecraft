@@ -57,18 +57,19 @@ public final class KotakCari {
 	}
 
 	public void gambar(Lukis l, String kunci, int x, int y, int w, int h) {
+		dev.kultivator.client.screen.ui.Ketik.fokus(this, aktif);
 		l.zona(kunci, x, y, x + w, y + h, this::mulai, true, null, true);
 		boolean over = l.di(x, y, x + w, y + h);
 		PanelTempat.sumur(l.g, l.gaya, x, y, x + w, y + h);
 		Brush.frame(l.g, x, y, x + w, y + h, aktif ? Palette.SEAL : Palette.argb(over ? 0xE0 : 0x90, TempatWarna.EMAS & 0xFFFFFF));
 		Brush.line(l.g, x + 3.0F, y + h - 3.0F, x + 7.0F, y + 3.0F, 1.2F, Palette.INK_SOFT);
 		Brush.dot(l.g, x + 3.0F, y + h - 3.0F, 1.0F, Palette.INK);
-		float ukuran = Math.min(0.8F, (h - 3) / 9.0F);
+		float ukuran = 1.0F; // 43.0.5
 		float tx = x + 10.0F;
 		float ty = y + (h - 8.0F * ukuran) / 2.0F;
 		int warnaTeks = l.gaya.teksSumur();
 		if (teks.isEmpty() && !aktif) {
-			Brush.fit(l.g, l.font, TeksTempat.k("cari.petunjuk"), tx, ty, w - 13.0F, Palette.argb(0x90, warnaTeks & 0xFFFFFF), ukuran, 0.6F, false);
+			Brush.fit(l.g, l.font, TeksTempat.k("cari.petunjuk"), tx, ty, w - 13.0F, Palette.argb(0x90, warnaTeks & 0xFFFFFF), ukuran, ukuran, false);
 		} else {
 			boolean caret = aktif && l.kini / 400L % 2L == 0L;
 			String shown = teks;

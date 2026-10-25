@@ -1,0 +1,13 @@
+{
+  "kultivator.gui43.hal.murid.daftar": "Roster",
+  "kultivator.gui43.hal.murid.jaring": "Web",
+  "kultivator.gui43.sub.daftar.ringkas": "Overview",
+  "kultivator.gui43.sub.daftar.suasana": "Moods",
+  "kultivator.gui43.sub.daftar.tangga": "Stair",
+  "kultivator.gui43.m04.daftar.judul": "Disciple Roster",
+  "kultivator.gui43.m04.klik_murid": "Click: open this disciple in Disciples › Disciple.",
+  "kultivator.gui43.m04.hanya_pemilik": "Only the hall's owner can change the policy.",
+  "kultivator.gui43.m04.jaring.klik": "Click: select · click again or Enter: open the disciple (Ties tab).",
+  "kultivator.gui43.m04.jaring.petunjuk": "Point at a disciple or Tab to it to see its ties. Click to hold it, click again to open its scroll. Esc lets go.",
+  "kultivator.gui43.m04.jaring.buka": "Open disciple"
+}

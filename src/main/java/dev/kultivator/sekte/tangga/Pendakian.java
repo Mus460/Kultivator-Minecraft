@@ -647,12 +647,20 @@ final class Pendakian {
 		int since = ticks - announceAt;
 		List<Peserta> order = new ArrayList<>(climbers);
 		order.sort(Comparator.comparingInt((Peserta p) -> p.limit));
-		int index = since / ANNOUNCE_GAP;
-		if (since % ANNOUNCE_GAP == 0 && index < order.size()) {
-			reveal(server, order.get(index));
+		// The first one not yet revealed, not order.get(since / GAP): the list changes when a climber leaves mid-announcement.
+		Peserta next = null;
+		for (Peserta p : order) {
+			if (!p.revealed) {
+				next = p;
+				break;
+			}
+		}
+		if (since % ANNOUNCE_GAP == 0 && next != null) {
+			reveal(server, next);
 			send(true);
 		}
-		if (index >= order.size() && since >= order.size() * ANNOUNCE_GAP + 20 || order.isEmpty()) {
+		// Reveals fall on multiples of ANNOUNCE_GAP: the fade comes 20 ticks after the last one.
+		if (next == null && since % ANNOUNCE_GAP >= 20 || order.isEmpty()) {
 			phase = TanggaPayloads.PHASE_FADE;
 			fadeAt = ticks;
 			send(true);

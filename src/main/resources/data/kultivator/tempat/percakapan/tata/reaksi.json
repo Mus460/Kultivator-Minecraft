@@ -1,0 +1,782 @@
+{
+  "_dibuat": "tools/gen_kota_hidup_cakap.py dari tools/kota_cakap_sumber (jangan disunting tangan)",
+  "kelompok": "reaksi",
+  "isi": [
+    {
+      "aturan": "umpan.gosip",
+      "niat": "UMPAN_GOSIP",
+      "bingkai": [
+        {
+          "kunci": "umpan.gosip.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "pelabuhan",
+            "oasis",
+            "air"
+          ]
+        },
+        {
+          "kunci": "umpan.gosip.1",
+          "slot": [
+            "$waktu_lalu"
+          ],
+          "bobot": 2,
+          "varian": [
+            "kampung",
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "umpan.gosip.2",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "umpan.gosip.3",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "umpan.gosip.4",
+          "slot": [
+            "$katanya"
+          ],
+          "bobot": 1,
+          "varian": [
+            "ibukota"
+          ]
+        },
+        {
+          "kunci": "umpan.gosip.5",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "gunung"
+          ]
+        },
+        {
+          "kunci": "umpan.gosip.6",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        },
+        "$waktu_lalu": {
+          "tipe": "waktu_lalu",
+          "dari": "fakta.hariKejadian"
+        },
+        "$katanya": {
+          "aturan": "frag.katanya"
+        }
+      },
+      "gestur": "bisik",
+      "seru": "bisik"
+    },
+    {
+      "aturan": "reaksi.kaget",
+      "niat": "KAGET",
+      "bingkai": [
+        {
+          "kunci": "reaksi.kaget.0",
+          "slot": [
+            "$kaget"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "pelabuhan",
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "reaksi.kaget.1",
+          "slot": [
+            "$subjek"
+          ],
+          "bobot": 2,
+          "varian": [
+            "air",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "reaksi.kaget.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "reaksi.kaget.3",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "reaksi.kaget.4",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$kaget": {
+          "aturan": "seru.kaget",
+          "opsional": 0.5
+        },
+        "$subjek": {
+          "tipe": "nama_warga",
+          "dari": "fakta.subjek"
+        }
+      },
+      "gestur": "kaget",
+      "seru": "eh"
+    },
+    {
+      "aturan": "reaksi.ragu",
+      "niat": "RAGU",
+      "bingkai": [
+        {
+          "kunci": "reaksi.ragu.0",
+          "slot": [
+            "$ragu",
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "reaksi.ragu.1",
+          "slot": [
+            "$subjek"
+          ],
+          "bobot": 2,
+          "varian": [
+            "kampung",
+            "ibukota"
+          ]
+        },
+        {
+          "kunci": "reaksi.ragu.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "air"
+          ]
+        },
+        {
+          "kunci": "reaksi.ragu.3",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "reaksi.ragu.4",
+          "slot": [
+            "$pepatah"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$ragu": {
+          "aturan": "seru.ragu",
+          "opsional": 0.5
+        },
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        },
+        "$subjek": {
+          "tipe": "nama_warga",
+          "dari": "fakta.subjek"
+        },
+        "$pepatah": {
+          "aturan": "frag.pepatah",
+          "opsional": 0.25
+        }
+      },
+      "gestur": "garuk_kepala",
+      "seru": "hmm"
+    },
+    {
+      "aturan": "reaksi.gembira",
+      "niat": "REAKSI",
+      "syarat": {
+        "label_emosi": [
+          "gembira",
+          "puas",
+          "lega"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "reaksi.gembira.0",
+          "slot": [
+            "$senang"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "reaksi.gembira.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "p",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "reaksi.gembira.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "reaksi.gembira.3",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "reaksi.gembira.4",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        }
+      ],
+      "slot": {
+        "$senang": {
+          "aturan": "seru.senang",
+          "opsional": 0.5
+        }
+      },
+      "gestur": "tertawa",
+      "seru": "oh"
+    },
+    {
+      "aturan": "reaksi.sedih",
+      "niat": "REAKSI",
+      "syarat": {
+        "label_emosi": [
+          "sedih"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "reaksi.sedih.0",
+          "slot": [
+            "$keluh"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "reaksi.sedih.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "air",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "reaksi.sedih.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "gunung"
+          ]
+        },
+        {
+          "kunci": "reaksi.sedih.3",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "reaksi.sedih.4",
+          "slot": [
+            "$doa"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$keluh": {
+          "aturan": "seru.keluh",
+          "opsional": 0.5
+        },
+        "$doa": {
+          "aturan": "frag.doa",
+          "opsional": 0.4
+        }
+      },
+      "gestur": "menangis",
+      "seru": "aduh"
+    },
+    {
+      "aturan": "reaksi.marah",
+      "niat": "REAKSI",
+      "syarat": {
+        "label_emosi": [
+          "marah"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "reaksi.marah.0",
+          "slot": [],
+          "bobot": 3,
+          "varian": [
+            "kuno",
+            "pelabuhan",
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "reaksi.marah.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "kampung",
+            "p"
+          ]
+        },
+        {
+          "kunci": "reaksi.marah.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "reaksi.marah.3",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "ibukota"
+          ]
+        }
+      ],
+      "slot": {},
+      "gestur": "marah_hentak",
+      "seru": "cih"
+    },
+    {
+      "aturan": "reaksi.cemas",
+      "niat": "REAKSI",
+      "syarat": {
+        "label_emosi": [
+          "cemas"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "reaksi.cemas.0",
+          "slot": [],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "air"
+          ]
+        },
+        {
+          "kunci": "reaksi.cemas.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "reaksi.cemas.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "reaksi.cemas.3",
+          "slot": [
+            "$doa"
+          ],
+          "bobot": 1
+        },
+        {
+          "kunci": "reaksi.cemas.4",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$doa": {
+          "aturan": "frag.doa",
+          "opsional": 0.4
+        }
+      },
+      "gestur": "lihat_sekeliling",
+      "seru": "takut"
+    },
+    {
+      "aturan": "reaksi.jemu",
+      "niat": "REAKSI",
+      "syarat": {
+        "label_emosi": [
+          "jemu"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "reaksi.jemu.0",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "reaksi.jemu.1",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "reaksi.jemu.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "reaksi.jemu.3",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {},
+      "gestur": "menguap_peregangan"
+    },
+    {
+      "aturan": "reaksi.kagum",
+      "niat": "REAKSI",
+      "syarat": {
+        "label_emosi": [
+          "kagum"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "reaksi.kagum.0",
+          "slot": [],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "reaksi.kagum.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "kampung",
+            "air"
+          ]
+        },
+        {
+          "kunci": "reaksi.kagum.2",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "reaksi.kagum.3",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {},
+      "gestur": "kagum",
+      "seru": "oh"
+    },
+    {
+      "aturan": "reaksi.netral",
+      "niat": "REAKSI",
+      "bingkai": [
+        {
+          "kunci": "reaksi.netral.0",
+          "slot": [],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "pelabuhan",
+            "oasis",
+            "air",
+            "kampung",
+            "iblis",
+            "gunung"
+          ]
+        },
+        {
+          "kunci": "reaksi.netral.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "reaksi.netral.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "reaksi.netral.3",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "reaksi.netral.4",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "angguk"
+    },
+    {
+      "aturan": "koreksi.saksi",
+      "niat": "KOREKSI",
+      "bingkai": [
+        {
+          "kunci": "koreksi.saksi.0",
+          "slot": [],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "pelabuhan",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "koreksi.saksi.1",
+          "slot": [
+            "$subjek"
+          ],
+          "bobot": 2,
+          "varian": [
+            "ibukota",
+            "air"
+          ]
+        },
+        {
+          "kunci": "koreksi.saksi.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "koreksi.saksi.3",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "koreksi.saksi.4",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "p"
+          ]
+        }
+      ],
+      "slot": {
+        "$subjek": {
+          "tipe": "nama_warga",
+          "dari": "fakta.subjek"
+        }
+      },
+      "gestur": "geleng"
+    },
+    {
+      "aturan": "sambung.rasa",
+      "niat": "SAMBUNG_RASA",
+      "bingkai": [
+        {
+          "kunci": "sambung.rasa.0",
+          "slot": [],
+          "bobot": 4,
+          "varian": [
+            "kasar",
+            "kuno",
+            "air"
+          ]
+        },
+        {
+          "kunci": "sambung.rasa.1",
+          "slot": [],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "pelabuhan",
+            "oasis",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "sambung.rasa.2",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "kuno",
+            "air"
+          ]
+        },
+        {
+          "kunci": "sambung.rasa.3",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "gunung",
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "sambung.rasa.4",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "sambung.rasa.5",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "sambung.rasa.6",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "sambung.rasa.7",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "sambung.rasa.8",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {},
+      "gestur": "angguk_dengar"
+    },
+    {
+      "aturan": "setuju",
+      "niat": "KOMENTAR",
+      "bingkai": [
+        {
+          "kunci": "setuju.0",
+          "slot": [],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "pelabuhan",
+            "oasis",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "setuju.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "setuju.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "ibukota"
+          ]
+        },
+        {
+          "kunci": "setuju.3",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "setuju.4",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {},
+      "gestur": "angguk",
+      "seru": "setuju"
+    }
+  ]
+}

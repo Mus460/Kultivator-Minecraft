@@ -181,8 +181,8 @@ public final class KeyHints {
 			Brush.disc(g, cx + 0.5F, cy + 0.8F, r, 0x40000000);
 			Brush.disc(g, cx, cy, r, Palette.mix(Palette.SEAL, Palette.SEAL_GLOW, glow * 0.6F));
 			Brush.ring(g, cx, cy, r - 1.4F, r - 0.8F, Palette.argb(0xB0, Palette.TALISMAN));
-			float scale = Math.max(0.6F, Math.min(0.9F, (w - 3.0F) / 7.0F));
-			Brush.centered(g, font, Brush.bold(Component.literal("?")), cx + 0.4F, cy - 3.6F * scale, Palette.TALISMAN, scale, false);
+			// 43.0.5: the "?" at 1.0 (the seal is 13 px; a smaller one keeps the glyph at 1.0 and lets it touch the rim)
+			Brush.centered(g, font, Brush.bold(Component.literal("?")), cx + 0.4F, cy - 4.0F, Palette.TALISMAN, 1.0F, false);
 		}
 
 		@Override

@@ -1,0 +1,8 @@
+{
+  "kultivator.gui43.m19.lelang.batu_asal": "%s Origin Stones",
+  "kultivator.gui43.m19.lelang.dasar": "Base price %s",
+  "kultivator.gui43.m19.lelang.kurang": "Short by %s",
+  "kultivator.gui43.m19.lelang.terjual": "Sold for %s",
+  "kultivator.gui43.m19.lelang.tetap": "The house values every item itself; the value is fixed and becomes the lot's base price.",
+  "kultivator.gui43.m19.lelang.titipkan": "Consign the item in hand"
+}

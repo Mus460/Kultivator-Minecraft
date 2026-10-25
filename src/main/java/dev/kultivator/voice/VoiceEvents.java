@@ -92,6 +92,46 @@ public final class VoiceEvents {
 	public static final List<String> SEKTE_LANGIT = List.of("bajak_datang", "longbo_datang", "longbo_kalah", "tamu_salam", "utusan_salam",
 			"utusan_tantang");
 	/**
+	 * DESIGN 41.11.7 (41V-P, docs/progres/m2-voices.md): Gabung Sekte, joining an NPC sect (the gate call, the test stair,
+	 * the verdict, the oath, the Shifu, senior and rival, war, the Hall of Law, leaving, the hunters, succession, the guest
+	 * elder, a class rising); keys {@code gabung.<line>}.
+	 */
+	public static final List<String> GABUNG = List.of("gerbang_panggil", "tangga_tekanan", "ujian_mulai", "ujian_lulus", "ujian_gagal", "diterima",
+			"istimewa", "sumpah_aturan_1", "sumpah_aturan_2", "sumpah_aturan_3", "shifu_pilih", "shifu_lindungi", "shifu_lampaui", "sapa_adik",
+			"sapa_kakak", "saingan_ejek", "panggilan_perang", "hukum_tegur", "hukum_kurung", "usir", "pamit", "pemburu", "ketua_serah", "ketua_baru",
+			"tamu_sambut", "naik_kelas");
+	/**
+	 * True once the {@link #GABUNG} clips are in {@code sounds.json} (the voice pass F-END sets it). While false the group
+	 * is not registered, so {@link #exists} is false and every 41 caller keeps its listed fallback line (41.11.7) instead
+	 * of playing an empty event.
+	 */
+	public static final boolean GABUNG_SIAP = false;
+	/**
+	 * DESIGN 42.12.7 + 42.5A.8 (42V-B, docs/progres/m2-voices.md): Kota yang Hidup, 102 clips: 78 town lines (greetings,
+	 * gossip, the night watch's five calls, street events, weddings and funerals, the recruitment office, the protecting
+	 * sect, growth, the night district, festivals, the court, the named characters) and 24 short interjections played at
+	 * the start of a speech bubble ({@code seru.*}; an {@code _l}/{@code _p} pair is chosen by the speaker's sex); keys
+	 * {@code kota42.<line>}.
+	 */
+	public static final List<String> KOTA42 = List.of("sapa_pagi", "sapa_kenal", "sapa_asing", "sapa_akrab", "terima_kasih", "diselamatkan",
+			"anak_kagum", "tanya_jalan", "tidak_tahu", "gosip_bisik", "gosip_tawa", "duka", "bayi_lahir", "nikah_undang", "takut_serangan", "marah",
+			"mabuk", "catur_skak", "catur_kalah", "pedagang_seru", "harga_naik", "ronda_geng1", "ronda_geng2", "ronda_geng3", "ronda_geng4",
+			"ronda_geng5", "copet_teriak", "copet_tabrak", "copet_tertangkap", "kebakaran", "api_padam", "gerobak", "lerai", "lao_shuo_buka",
+			"lao_shuo_tutup", "akrobat_buka", "penjual_obat", "sekolah_hafal", "guru_panggil", "taichi", "comblang", "nikah_jemput", "nikah_sembah",
+			"bersulang", "makam_pimpin", "makam_ratap", "zhuazhou_kuas", "zhuazhou_pedang", "rekrut_terima", "rekrut_pamit", "restu_tolak",
+			"pelindung_sapa", "bela_panggil", "bela_menang", "panji_naik", "mandor", "kavling_selesai", "bangun_kembali", "sandi_malam",
+			"lentera_hijau", "razia", "dadu_besar", "dadu_kecil", "huaquan", "wayang_buka", "sup_nenek", "laba", "tahun_baru", "pindah",
+			"pejabat_sapa", "putusan", "suap", "pajak_keluh", "cucu_cerita", "ah_qin", "lao_geng_pamit", "xiao_bang", "xiao_yu", "seru.ya_l",
+			"seru.ya_p", "seru.eh_l", "seru.eh_p", "seru.hmm_l", "seru.hmm_p", "seru.oh_l", "seru.oh_p", "seru.tawa_l", "seru.tawa_p", "seru.cih",
+			"seru.aduh_l", "seru.aduh_p", "seru.terima_kasih_l", "seru.terima_kasih_p", "seru.maaf_l", "seru.maaf_p", "seru.wah_anak",
+			"seru.tetua_hmm", "seru.tetua_marah", "seru.mabuk", "seru.bisik_p", "seru.takut_p", "seru.setuju_l");
+	/**
+	 * True once the {@link #KOTA42} clips are in {@code sounds.json} (the voice pass F-END sets it). While false the group
+	 * is not registered, so {@link #exists} is false and every 42 caller keeps its text bubble (and the old
+	 * {@code kotabesar.*}/{@code tempat.*} clips or the far murmurs it falls back to, 42.12.7).
+	 */
+	public static final boolean KOTA42_SIAP = false;
+	/**
 	 * Kota yang Hidup (docs/progres/suara-kota.md): the far murmurs under the residents' gestured talks, voice type
 	 * ({@code pria}, {@code wanita}, {@code kakek}, {@code nenek}, {@code anak}) to its line count; keys {@code gumam.<tipe>.<n>}.
 	 * The client picks the type from the speaker's Sosok and a random line ({@code client/dunia/tempat/hidup/ObrolanSuara}).
@@ -140,6 +180,12 @@ public final class VoiceEvents {
 		group("tema.gunung", TEMA_GUNUNG);
 		group("tema.iblis", TEMA_IBLIS);
 		group("tema.dagang", TEMA_DAGANG);
+		if (GABUNG_SIAP) {
+			group("gabung", GABUNG);
+		}
+		if (KOTA42_SIAP) {
+			group("kota42", KOTA42);
+		}
 		for (String tipe : List.of("pria", "wanita", "kakek", "nenek", "anak")) {
 			List<String> nomor = new ArrayList<>();
 			for (int n = 0; n < GUMAM.get(tipe); n++) {

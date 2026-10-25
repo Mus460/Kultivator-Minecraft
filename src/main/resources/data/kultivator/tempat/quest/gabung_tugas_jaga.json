@@ -1,0 +1,25 @@
+{
+  "pemberi": "peran:tetua_sekte",
+  "tempat": "gabung_sekte",
+  "tahap": [
+    {
+      "id": "malam",
+      "tujuan": [
+        "tanda gabung_tugas_jaga x2"
+      ],
+      "akibat": [
+        "gabung.sikap hukum 5"
+      ]
+    },
+    {
+      "id": "jejak",
+      "tujuan": [
+        "tanda gabung_tugas_jaga"
+      ],
+      "akibat": [
+        "gabung.pk 20",
+        "efek minecraft:night_vision 3600 0"
+      ]
+    }
+  ]
+}

@@ -15,7 +15,7 @@
     {
       "dx": -72,
       "dz": -72,
-      "pool": "kultivator:kota_besar/kumuh/gubuk_a",
+      "pool": "kultivator:kota_besar/kumuh/malam_utara",
       "putar": 0
     },
     {
@@ -27,7 +27,7 @@
     {
       "dx": -72,
       "dz": 24,
-      "pool": "kultivator:kota_besar/kumuh/dapur_umum",
+      "pool": "kultivator:kota_besar/kumuh/malam_selatan",
       "putar": 0
     },
     {
@@ -45,7 +45,7 @@
     {
       "dx": -24,
       "dz": 24,
-      "pool": "kultivator:kota_besar/kumuh/gubuk_d",
+      "pool": "kultivator:kota_besar/kumuh/dapur_umum",
       "putar": 0
     },
     {

@@ -1,0 +1,108 @@
+{
+  "_catatan": "DEBAT 42.5A.9: tuduh > bantah > eskalasi (A rendah) > pergi; perkelahian 42.7.4 bila A < -40 dan D tinggi. 42K-C.",
+  "jenis": "debat",
+  "syarat": {
+    "hubungan": [
+      "musuh",
+      "saingan"
+    ]
+  },
+  "mulai": {
+    "dasar": 0.3,
+    "X": 300,
+    "hubungan": 400
+  },
+  "jeda_tick": [
+    30,
+    60
+  ],
+  "langkah": [
+    {
+      "id": "tuduh",
+      "oleh": "A",
+      "niat": "TUDUH",
+      "lanjut": [
+        "bantah"
+      ]
+    },
+    {
+      "id": "bantah",
+      "oleh": "B",
+      "niat": "BANTAH",
+      "lanjut": [
+        "eskalasi_a",
+        "tuduh_lagi",
+        "pergi_a"
+      ]
+    },
+    {
+      "id": "tuduh_lagi",
+      "oleh": "A",
+      "niat": "TUDUH",
+      "syarat": {
+        "ronde_maks": 1,
+        "sifat": {
+          "A": "<10"
+        }
+      },
+      "lanjut": [
+        "bantah_lagi"
+      ]
+    },
+    {
+      "id": "bantah_lagi",
+      "oleh": "B",
+      "niat": "BANTAH",
+      "syarat": {
+        "ronde_maks": 1
+      },
+      "lanjut": [
+        "eskalasi_a",
+        "pergi_a",
+        "pergi_b"
+      ]
+    },
+    {
+      "id": "eskalasi_a",
+      "oleh": "A",
+      "niat": "ESKALASI",
+      "syarat": {
+        "A_maks": -10
+      },
+      "lanjut": [
+        "eskalasi_b",
+        "pergi_b"
+      ]
+    },
+    {
+      "id": "eskalasi_b",
+      "oleh": "B",
+      "niat": "ESKALASI",
+      "syarat": {
+        "A_maks": -10
+      },
+      "lanjut": [
+        "pergi_a",
+        "pergi_b"
+      ]
+    },
+    {
+      "id": "pergi_a",
+      "oleh": "A",
+      "niat": "PERGI_MARAH"
+    },
+    {
+      "id": "pergi_b",
+      "oleh": "B",
+      "niat": "PERGI_MARAH"
+    }
+  ],
+  "efek": {
+    "hubungan": [
+      -8,
+      -2
+    ],
+    "emosi": "dihina",
+    "perkelahian": true
+  }
+}

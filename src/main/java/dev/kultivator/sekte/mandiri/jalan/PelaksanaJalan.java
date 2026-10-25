@@ -633,12 +633,12 @@ final class PelaksanaJalan {
 					Entity target = penerima(murid, gift);
 					if (target == null || lama > 400L) {
 						Hadiah.beri(murid, gift, false);
-						a.hadiahKe++;
+						gifts.remove(a.hadiahKe); // off the live arrival list, so an early end (antar) never gives it twice
 						a.t0 = now;
 					} else if (murid.distanceToSqr(target) <= 2.5D * 2.5D) {
 						murid.getLookControl().setLookAt(target, 30.0F, 30.0F);
 						Hadiah.beri(murid, gift, true);
-						a.hadiahKe++;
+						gifts.remove(a.hadiahKe);
 						a.t0 = now;
 					} else {
 						a.sasaran = target.blockPosition();

@@ -107,7 +107,8 @@ public final class Classifier {
 				return Kind.CONTAINER;
 			}
 			if (entity instanceof Container container) {
-				return container.isEmpty() ? Kind.PLAYER_MADE : Kind.CONTAINER;
+				// An empty barrel or chest of a ruin is worldgen decoration, taken up like the stones around it.
+				return !container.isEmpty() ? Kind.CONTAINER : worldgen(level, pos) ? Kind.NATURAL : Kind.PLAYER_MADE;
 			}
 			if (naturalTagged(state)) {
 				// A tree's bee nest or a pale garden's creaking heart: displaced like the ground around it.
@@ -122,13 +123,14 @@ public final class Classifier {
 			return Kind.FLUID;
 		}
 		// A waterlogged block or a water plant is classified as the block itself (the fluid is sealed afterwards).
-		if (clearedPlant(state)) {
+		// Any replaceable block (grass, ferns and the like of other mods too) is ground cover, cleared like vanilla grass.
+		if (clearedPlant(state) || state.canBeReplaced()) {
 			return Kind.PLANT;
 		}
 		if (state.is(BlockTags.LOGS)) {
-			return naturalLog(level, pos, state, site) ? Kind.NATURAL : Kind.PLAYER_MADE;
+			return naturalLog(level, pos, state, site) || fallenLog(level, pos, state) || worldgen(level, pos) ? Kind.NATURAL : Kind.PLAYER_MADE;
 		}
-		if (naturalTagged(state) || rockySurface(level, pos, state)) {
+		if (naturalTagged(state) || rockySurface(level, pos, state) || worldgen(level, pos)) {
 			return Kind.NATURAL;
 		}
 		return Kind.PLAYER_MADE;
@@ -168,7 +170,10 @@ public final class Classifier {
 
 	/** Never touched, whatever is authorized (DESIGN 21.10 "Protected, never touched"). */
 	public static boolean protectedBlock(ServerLevel level, BlockPos pos, BlockState state) {
-		if (state.is(PROTECTED) || state.is(ProtectedZones.INDESTRUCTIBLE) || state.is(Blocks.BEDROCK)) {
+		// Obsidian and lodestone are in the indestructible tag for Mode Kehancuran, but here only a lit portal's frame and a
+		// formation's lodestone are protected (below): the obsidian of a lava pool is natural.
+		boolean loose = state.is(Blocks.OBSIDIAN) || state.is(Blocks.CRYING_OBSIDIAN) || state.is(Blocks.LODESTONE);
+		if (state.is(PROTECTED) || !loose && state.is(ProtectedZones.INDESTRUCTIBLE) || state.is(Blocks.BEDROCK)) {
 			return true;
 		}
 		if (state.getDestroySpeed(level, pos) < 0.0F) {
@@ -265,7 +270,18 @@ public final class Classifier {
 			return false;
 		}
 		if (site != null && site.snapshot != null && site.snapshot.knownAt(pos.getX(), pos.getZ())) {
-			return (site.snapshot.flagsAt(pos.getX(), pos.getZ()) & TerrainView.TREE) != 0;
+			// A branch reaches past its trunk's columns (dark oak, jungle, big modded trees): a tree column within 3 blocks
+			// at scan time makes it the same tree, even after the canopy above it was cleared.
+			for (int dx = -3; dx <= 3; dx++) {
+				for (int dz = -3; dz <= 3; dz++) {
+					int x = pos.getX() + dx;
+					int z = pos.getZ() + dz;
+					if (site.snapshot.knownAt(x, z) && (site.snapshot.flagsAt(x, z) & TerrainView.TREE) != 0) {
+						return true;
+					}
+				}
+			}
+			return touchesNaturalLeaves(level, pos);
 		}
 		BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
 		for (int dy = 1; dy <= 12; dy++) {
@@ -278,10 +294,52 @@ public final class Classifier {
 				return true;
 			}
 			if (!treeLog(above)) {
-				return false;
+				return touchesNaturalLeaves(level, pos);
 			}
 		}
 		return false;
+	}
+
+	/** A log with a decaying leaf beside it (a branch keeps its leaves within reach; a player's log wall has none). */
+	static boolean touchesNaturalLeaves(ServerLevel level, BlockPos pos) {
+		BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
+		for (int dx = -1; dx <= 1; dx++) {
+			for (int dy = -1; dy <= 1; dy++) {
+				for (int dz = -1; dz <= 1; dz++) {
+					cursor.set(pos.getX() + dx, pos.getY() + dy, pos.getZ() + dz);
+					if ((dx != 0 || dy != 0 || dz != 0) && level.isLoaded(cursor) && naturalLeaves(level.getBlockState(cursor))) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * A fallen tree of worldgen (a horizontal trunk lying on natural ground, or its one-log stump): no leaves anywhere,
+	 * still natural.
+	 */
+	static boolean fallenLog(ServerLevel level, BlockPos pos, BlockState state) {
+		if (!treeLog(state) || level.getBlockState(pos.above()).is(BlockTags.LOGS)) {
+			return false;
+		}
+		// shortcut: a lone log on natural ground counts as fallen even when a player laid it; its drops are still credited.
+		BlockState below = level.getBlockState(pos.below());
+		return naturalTagged(below) || rockySurface(level, pos.below(), below);
+	}
+
+	/**
+	 * Inside a piece of another mod's or vanilla's generated structure (Structory, Dungeons and Taverns, ruins, mineshafts):
+	 * its walls and floors are worldgen, cleared like natural ground (drops credited). This mod's own places stay protected.
+	 * Only reached for a block that would otherwise block, so the lookup cost stays small.
+	 */
+	public static boolean worldgen(ServerLevel level, BlockPos pos) {
+		if (!level.isLoaded(pos)) {
+			return false;
+		}
+		return level.structureManager().getStructureWithPieceAt(pos,
+				holder -> holder.unwrapKey().map(key -> !Kultivator.MOD_ID.equals(key.identifier().getNamespace())).orElse(false)).isValid();
 	}
 
 	private Classifier() {

@@ -2,11 +2,11 @@ package dev.kultivator.client.tempat.ui.tema;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import dev.kultivator.client.screen.ui.Brush;
+import dev.kultivator.client.screen.ui.KartuBarang;
+import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
+import dev.kultivator.client.screen.ui.TalismanButton;
 import dev.kultivator.client.screen.ui.UiSound;
-import dev.kultivator.client.tempat.ui.kit.KartuBarang;
-import dev.kultivator.client.tempat.ui.kit.Lukis;
-import dev.kultivator.client.tempat.ui.kit.PanelTempat;
 import dev.kultivator.client.tempat.ui.kit.TabLentera;
 import dev.kultivator.client.tempat.ui.kit.TempatWarna;
 import dev.kultivator.dunia.tempat.tema.bersama.TemaLayar.Irama;
@@ -27,9 +27,10 @@ import net.minecraft.util.Util;
  * crosses it: within 3 ticks "Pas!" (full), within 6 "Baik" (60 %), a note that passes unhit is "Luput". The score is the
  * share of the full marks, 0-100. Space starts after a three-beat count-in. The side picture follows the pattern: the
  * dancer whirls a frame on every hit, the shuttle flies across the warp and the cloth grows, the drumstick strikes the
- * drum and the boat surges.
+ * drum and the boat surges. A Di Sini page on the single kit (43.8.3): the arrow keys (and W D S A) reach the game
+ * before the focus ring ({@link TemaHalaman#keyPressed} asks {@link #tombolLain} first); text is 1.0 / 1.5.
  */
-public final class LayarIrama extends LayarTemaDasar {
+public final class LayarIrama extends TemaHalaman {
 
 	private static final float PAS = 3.0F;
 	private static final float BAIK = 6.0F;
@@ -144,15 +145,6 @@ public final class LayarIrama extends LayarTemaDasar {
 		return true;
 	}
 
-	@Override
-	public boolean keyPressed(KeyEvent event) {
-		// the arrows must reach the game before the kit's list and amount handling
-		if (fase == Fase.MAIN && tombolLain(event)) {
-			return true;
-		}
-		return super.keyPressed(event);
-	}
-
 	private void tekan(int d) {
 		long kini = Util.getMillis();
 		laneNyala[d] = kini;
@@ -227,26 +219,32 @@ public final class LayarIrama extends LayarTemaDasar {
 	}
 
 	@Override
-	protected void gambar(Lukis l, int x0, int y0, int x1, int y1) {
+	protected void lukisTema(Lukis l, int x0, int y0, int x1, int y1) {
 		majukan(l.kini);
 		int babak = lembar.i(Irama.BABAK, 1);
 		int babakTotal = lembar.i(Irama.BABAK_TOTAL, 1);
 		int lulus = lembar.i(Irama.LULUS, 70);
-		// header line: round, pass mark, live score, combo
+		// header line: round, pass mark, live score
 		int y = y0;
-		if (babakTotal > 1) {
-			l.keterangan(TemaUi.k("irama.babak", babak, babakTotal), x0, y, 80, gaya.teksLemah);
-		}
-		l.keterangan(TemaUi.k("irama.lulus", lulus), x0 + 84, y, 80, gaya.teksLemah);
 		int kini = fase == Fase.SELESAI ? skor : hitungSkorSementara();
-		l.kanan(TemaUi.k("irama.skor", kini), x1, y, kini >= lulus ? TempatWarna.EMAS_TERANG : gaya.teks, 0.85F);
-		y += 11;
+		Component skorT = TemaUi.k("irama.skor", kini);
+		int sw = font.width(skorT);
+		l.kanan(skorT, x1, y, kini >= lulus ? Palette.GOLD_LIGHT : gaya.teks);
+		int hx = x0;
+		if (babakTotal > 1) {
+			Component b = TemaUi.k("irama.babak", babak, babakTotal);
+			int bw = Math.min((x1 - x0 - sw) / 2, font.width(b) + 8);
+			l.teks(b, hx, y, bw, gaya.teksLemah);
+			hx += bw;
+		}
+		l.teks(TemaUi.k("irama.lulus", lulus), hx, y, x1 - hx - sw - 6, gaya.teksLemah);
+		y += 12;
 		boolean lebar = tata != Tata.SEMPIT;
 		int gambarW = lebar ? Math.min(120, (x1 - x0) / 3) : 0;
 		int jx1 = x1 - (gambarW > 0 ? gambarW + 6 : 0);
 		jalur(l, x0, y, jx1, y1 - 16);
 		if (gambarW > 0) {
-			PanelTempat.sumur(l.g, gaya, x1 - gambarW, y, x1, y1 - 16);
+			l.sumur(x1 - gambarW, y, x1, y1 - 16);
 			ilustrasi(l, x1 - gambarW, y, x1, y1 - 16);
 		}
 		// time bar
@@ -256,15 +254,16 @@ public final class LayarIrama extends LayarTemaDasar {
 			lapis(l, x0, y, jx1, y1 - 16, TemaUi.k(ketukan.length == 0 ? "irama.tanpa_lagu" : "irama.mulai"));
 			if (ketukan.length > 0) {
 				int bw = 90;
-				tombol.gambar(l, "mulai", (x0 + jx1 - bw) / 2, (y + y1 - 16) / 2 + 10, bw, 15, TemaUi.k("irama.tombol_mulai"), tulisBoleh(), alasanBaca(),
-						this::mulaiMain);
+				TalismanButton.gambar(l, "mulai", (x0 + jx1 - bw) / 2, (y + y1 - 16) / 2 + 10, bw, 15, TemaUi.k("irama.tombol_mulai"), tulisBoleh(),
+						alasanBaca(), this::mulaiMain);
 			}
 		} else if (fase == Fase.HITUNG) {
 			long sisa = HITUNG_MS - (l.kini - mulai);
 			int n = (int) Math.max(1L, (sisa + 499L) / 500L);
-			float s = 2.0F + 0.6F * ((sisa % 500L) / 500.0F);
-			Brush.centered(l.g, font, Brush.bold(Component.literal(Integer.toString(n))), (x0 + jx1) / 2.0F, (y + y1) / 2.0F - 12, TempatWarna.EMAS_TERANG,
-					s, true);
+			// the count-in pulses by its ink, not its size (43.0.5: 1.5 is the largest text)
+			int alfa = Math.round(160 + 95 * ((sisa % 500L) / 500.0F));
+			Brush.centered(l.g, font, Brush.bold(Component.literal(Integer.toString(n))), (x0 + jx1) / 2.0F, (y + y1) / 2.0F - 10,
+					Palette.argb(alfa, Palette.GOLD_LIGHT), 1.5F, true);
 		} else if (fase == Fase.SELESAI) {
 			hasil(l, x0, y, jx1, y1 - 16, lulus);
 		}
@@ -279,7 +278,7 @@ public final class LayarIrama extends LayarTemaDasar {
 	}
 
 	private void jalur(Lukis l, int x0, int y0, int x1, int y1) {
-		PanelTempat.sumur(l.g, gaya, x0, y0, x1, y1);
+		l.sumur(x0, y0, x1, y1);
 		l.g.fillGradient(x0 + 1, y0 + 1, x1 - 1, y1 - 1, 0xF02A0E22, 0xF0180818);
 		int h = (y1 - y0 - 6) / 4;
 		int hitX = x0 + 26;
@@ -325,12 +324,13 @@ public final class LayarIrama extends LayarTemaDasar {
 		if (kini - nilaiSejak < 600L && nilaiTerakhir != 0) {
 			float age = (kini - nilaiSejak) / 600.0F;
 			String kunci = nilaiTerakhir == 1 ? "irama.pas" : nilaiTerakhir == 2 ? "irama.baik" : "irama.luput";
-			int warna = nilaiTerakhir == 1 ? TempatWarna.EMAS_TERANG : nilaiTerakhir == 2 ? 0xFF9AE0B0 : 0xFFFF8A7A;
+			int warna = nilaiTerakhir == 1 ? Palette.GOLD_LIGHT : nilaiTerakhir == 2 ? 0xFF9AE0B0 : 0xFFFF8A7A;
 			Brush.centered(l.g, font, Brush.bold(TemaUi.k(kunci)), hitX + 40, y0 + 4 - age * 6, Palette.argb(Math.round(255 * (1.0F - age)), warna & 0xFFFFFF),
 					1.0F, true);
 		}
 		if (kombo >= 3) {
-			Brush.text(l.g, font, TemaUi.k("irama.kombo", kombo), x1 - 60, y1 - 12, TempatWarna.EMAS_TERANG, 0.85F, true);
+			Component k = TemaUi.k("irama.kombo", kombo);
+			Brush.text(l.g, font, k, x1 - 4 - font.width(k), y1 - 11, Palette.GOLD_LIGHT, 1.0F, true);
 		}
 	}
 
@@ -433,9 +433,10 @@ public final class LayarIrama extends LayarTemaDasar {
 			baik += v == 2 ? 1 : 0;
 			luput += v == 3 ? 1 : 0;
 		}
-		Brush.centered(l.g, font, TemaUi.k("irama.rincian", pas, baik, luput, komboMaks), cx, cy - 8, 0xFFD8C8B8, 0.75F, false);
+		l.tengah(TemaUi.k("irama.rincian", pas, baik, luput, komboMaks), cx, cy - 8, x1 - x0 - 8, 0xFFD8C8B8);
 		float t = Math.min(1.0F, (l.kini - mulai - HITUNG_MS - durasi * 50L) / 400.0F);
 		KartuBarang.cap(l, TemaUi.k(skor >= lulus ? "irama.cap_lulus" : "irama.cap_gagal"), cx, cy + 16, 70, Math.max(0.05F, t));
-		Brush.centered(l.g, font, TemaUi.k("irama.dikirim"), cx, y1 - 12, 0xFFB8A890, 0.7F, false);
+		l.tengah(TemaUi.k("irama.dikirim"), cx, y1 - 12, x1 - x0 - 8, 0xFFB8A890);
+
 	}
 }

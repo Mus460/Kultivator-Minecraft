@@ -1,0 +1,268 @@
+{
+  "id": "kabar_keluarga",
+  "jenis": "realisasi",
+  "_catatan": "Family news of neighbours: wedding, birth, sickness, death.",
+  "benih_dunia": 42,
+  "masukan": {
+    "niat": "BERI_KABAR",
+    "pembicara": 401,
+    "hari": 120,
+    "now": 2880000,
+    "cuaca": "cerah",
+    "musim": "semi",
+    "situasi": {
+      "jam": "pagi",
+      "cuaca": "cerah",
+      "musim": "semi",
+      "kelompok": "pekerja",
+      "watak": "ramah",
+      "kebiasaan": [
+        "gosip_sumur"
+      ],
+      "sifat": {
+        "H": 10,
+        "E": 0,
+        "X": 20,
+        "A": 30,
+        "C": 10,
+        "O": 0
+      },
+      "wajah": "netral",
+      "tempat": "kota_besar"
+    },
+    "pendengar": {
+      "nama": "Han",
+      "kelamin": "l",
+      "tahap": "dewasa",
+      "pemain": true
+    },
+    "kesan": "kenal",
+    "tahu_nama": false,
+    "register": "biasa",
+    "dialek": "kampung",
+    "kelamin": "p",
+    "label": "netral"
+  },
+  "langkah": [
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [
+            "gosip_sumur"
+          ],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar",
+          "fakta": "NIKAH"
+        },
+        "nilai": {
+          "fakta.subjek": {
+            "orang": {
+              "nama": "Bibi Zhang",
+              "kelamin": "p",
+              "tahap": "dewasa"
+            }
+          },
+          "fakta.objek": {
+            "orang": {
+              "nama": "Paman Li",
+              "kelamin": "l",
+              "tahap": "dewasa"
+            }
+          },
+          "fakta.hariKejadian": 117
+        },
+        "topik": "keluarga"
+      },
+      "harap": {
+        "k": "kultivator.cakap.kabar.nikah.3",
+        "a": [
+          {
+            "t": "Bibi Zhang"
+          },
+          {
+            "t": "Paman Li"
+          }
+        ]
+      },
+      "aturan": "kabar.nikah",
+      "gestur": "tertawa",
+      "seru": null,
+      "tik": null,
+      "id_id": "Ibu Bibi Zhang menangis bahagia sepanjang upacara. Katanya Paman Li menantu idaman.",
+      "en_us": "Bibi Zhang's mother wept with joy all ceremony. Says Paman Li is the perfect in-law."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [
+            "gosip_sumur"
+          ],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar",
+          "fakta": "LAHIR"
+        },
+        "nilai": {
+          "fakta.subjek": {
+            "orang": {
+              "nama": "Bibi Zhang",
+              "kelamin": "p",
+              "tahap": "dewasa"
+            }
+          },
+          "fakta.hariKejadian": 119
+        },
+        "topik": "keluarga"
+      },
+      "harap": {
+        "k": "kultivator.cakap.keluarga.umum.1",
+        "a": []
+      },
+      "aturan": "keluarga.umum",
+      "gestur": "bicara_tangan",
+      "seru": null,
+      "tik": null,
+      "id_id": "Kakakku merantau ke ibu kota. Suratnya datang setiap bulan purnama.",
+      "en_us": "My elder brother went to the capital. His letters come every full moon."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [
+            "gosip_sumur"
+          ],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar",
+          "fakta": "SAKIT"
+        },
+        "nilai": {
+          "fakta.subjek": {
+            "orang": {
+              "nama": "Paman Li",
+              "kelamin": "l",
+              "tahap": "dewasa"
+            }
+          },
+          "fakta.hariKejadian": 120
+        },
+        "topik": "kesehatan"
+      },
+      "harap": {
+        "k": "kultivator.cakap.kabar.sakit.0.kampung",
+        "a": [
+          {
+            "t": "Paman Li"
+          },
+          {
+            "k": "kultivator.cakap.lex.tadi.kampung",
+            "a": []
+          },
+          {
+            "t": ""
+          }
+        ]
+      },
+      "aturan": "kabar.sakit",
+      "gestur": "geleng",
+      "seru": null,
+      "tik": null,
+      "id_id": "Paman Li meriang sejak mau tadi. Sudah dikerokin, belum juga baikan.",
+      "en_us": "Paman Li's been feverish since just earlier. Scraped with a coin, still no better."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [
+            "gosip_sumur"
+          ],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar",
+          "fakta": "WAFAT"
+        },
+        "nilai": {
+          "fakta.subjek": {
+            "orang": {
+              "nama": "Kakek Sun",
+              "kelamin": "l",
+              "tahap": "tua"
+            }
+          },
+          "fakta.hariKejadian": 110
+        },
+        "topik": "duka"
+      },
+      "harap": {
+        "k": "kultivator.cakap.kabar.wafat.1",
+        "a": [
+          {
+            "t": "Kakek Sun"
+          },
+          {
+            "t": ""
+          },
+          {
+            "k": "kultivator.cakap.lex.minggu_lalu.kampung",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "kabar.wafat",
+      "gestur": "menangis",
+      "seru": null,
+      "tik": null,
+      "id_id": "Pemakaman Kakek Sun besok di bukit timur. Bawa uang kertas kalau mau ikut. ",
+      "en_us": "Kakek Sun's funeral is tomorrow on the east hill. Bring spirit money if you'll come. "
+    }
+  ]
+}

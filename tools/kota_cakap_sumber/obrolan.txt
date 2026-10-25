@@ -1,0 +1,292 @@
+# obrolan: corpus of the conversation engine (42K-C, DESIGN 42.5A.8). Source format: gen_kota_hidup_cakap.py.
+# Speech acts of the NPC-NPC chats (42.5A.9), topik = chat kind: debat (TUDUH BANTAH ESKALASI LERAI PERGI_MARAH), merayu
+# (PUJI_RAYU MALU_MALU JANJI_TEMU), ajar (NASIHAT TANYA_MURID TEGUR PUJI_MURID), curhat (KELUH HIBUR), canda (OLOK; TAWA generic),
+# CERITA on topik lelucon. {$lawan} = the other warga.
+@kelompok obrolan
+
+== debat.tuduh
+niat: TUDUH
+topik: debat
+gestur: marah_tunjuk
+$lawan: tipe=nama_warga dari=lawan
+- [3] Kau, {$lawan}! Ayamku hilang sejak kau pindah ke sebelah! || You, {$lawan}! My chickens went missing since you moved next door!
+  ~ kasar: Hei, maling! Kembalikan ayamku! || Hey, thief! Give back my chickens!
+  ~ kuno: {$lawan}, perbuatanmu tidak luput dari mata langit. Ayam-ayamku menjadi saksi. || {$lawan}, your deeds do not escape heaven's eye. My chickens bear witness.
+  ~ kampung: {$lawan}! Ayamku tiga ekor raib! Siapa lagi kalau bukan kau? || {$lawan}! Three of my hens gone! Who else but you?
+- [2] Kau yang menyebar cerita tentang aku di sumur, kan, {$lawan}? || You're the one spreading tales about me at the well, aren't you, {$lawan}?
+  ~ p: Jangan pura-pura, {$lawan}. Ibu-ibu bilang kau yang mulai gosip tentang aku. || Don't pretend, {$lawan}. The women say you started the gossip about me.
+  ~ iblis: {$lawan}. Lidahmu terlalu panjang. Di kota ini, lidah panjang bisa dipotong. || {$lawan}. Your tongue's too long. In this city long tongues get trimmed.
+- [2] Timbanganmu curang, {$lawan}! Sekati-mu cuma tiga perempat! || Your scales cheat, {$lawan}! Your catty is only three quarters!
+  ~ pelabuhan: Timbangan ikanmu diberi pemberat, {$lawan}! Semua nelayan tahu! || Your fish scale is weighted, {$lawan}! Every fisher knows!
+  ~ oasis: Kurma yang kau jual busuk di dalam, {$lawan}! Demi mata air, kau penipu! || The dates you sell are rotten inside, {$lawan}! By the spring, you swindler!
+- Pagar itu milikku, {$lawan}! Kau geser satu jengkal tiap musim! || That fence is mine, {$lawan}! You shift it a hand-span every season!
+  ~ kampung: Pematang sawahku kau geser, {$lawan}! Kau kira aku tidak menghitung? || You moved my paddy bund, {$lawan}! Think I don't count?
+- Karena kau, {$lawan}, pelangganku pindah semua! Kau menjelekkan daganganku! || Because of you, {$lawan}, all my customers left! You badmouthed my goods!
+  ~ ibukota: Kau memfitnah usahaku di depan petugas pasar, {$lawan}. Itu pelanggaran. || You slandered my trade before the market officer, {$lawan}. That's an offence.
+- Air sumur kau habiskan untuk menyiram kebunmu sendiri, {$lawan}! Yang lain mau minum apa? || You use up the well water on your own garden, {$lawan}! What are the rest to drink?
+
+== debat.bantah
+niat: BANTAH
+topik: debat
+gestur: berdebat
+$lawan: tipe=nama_warga dari=lawan
+- [3] Omong kosong! Aku tidak pernah menyentuh barangmu, {$lawan}! || Nonsense! I never touched your things, {$lawan}!
+  ~ kasar: Tutup mulutmu! Buktikan dulu, baru bicara! || Shut your mouth! Prove it first, then talk!
+  ~ kuno: Tuduhan tanpa bukti adalah racun bagi hati sendiri, {$lawan}. || An accusation without proof is poison to one's own heart, {$lawan}.
+  ~ kampung: Ngawur! Aku ini orang jujur, satu kampung tahu! || Rubbish! I'm an honest soul, the whole village knows!
+- [2] Kau sendiri yang lupa menutup kandang, {$lawan}! Ayammu lari ke hutan! || You forgot to shut the coop yourself, {$lawan}! Your hens ran to the woods!
+  ~ pelabuhan: Kau sendiri yang lupa mengikat perahu, {$lawan}! Jangan salahkan aku kalau hanyut! || You forgot to tie your boat yourself, {$lawan}! Don't blame me when it drifts!
+- [2] Timbanganku diperiksa petugas pasar setiap bulan! Tanyakan saja! || My scales are checked by the market officer every month! Go ask!
+  ~ ibukota: Timbanganku bercap resmi kantor pasar, {$lawan}. Lihat sendiri capnya. || My scales bear the market office's official seal, {$lawan}. Look at the seal yourself.
+- Justru kau yang selalu mencari gara-gara, {$lawan}! || It's you who always picks fights, {$lawan}!
+  ~ p: Justru kau yang suka mengadu ke ibu-ibu, {$lawan}! || It's you who loves tattling to the women, {$lawan}!
+  ~ iblis: Kau mau mencari masalah, {$lawan}? Di sini masalah dibayar mahal. || Looking for trouble, {$lawan}? Trouble's expensive here.
+- Pagar itu sudah begitu sejak zaman kakekku! Tanya saja kepala desa! || That fence has stood there since my grandfather's day! Ask the headman!
+- Kalau pelangganmu pergi, salahkan masakanmu sendiri, {$lawan}. || If your customers leave, blame your own cooking, {$lawan}.
+
+== debat.ancam
+niat: ESKALASI
+topik: debat
+gestur: ancam
+seru: cih
+$lawan: tipe=nama_warga dari=lawan
+- [3] Sekali lagi kau bilang begitu, {$lawan}, kupatahkan timbanganmu! || Say that once more, {$lawan}, and I'll break your scales!
+  ~ kasar: Mau kuhajar sekarang, {$lawan}? Ayo! || Want a thrashing now, {$lawan}? Come on!
+  ~ kuno: Kesabaranku ada batasnya, {$lawan}. Jangan paksa aku melupakan sopan santun. || My patience has limits, {$lawan}. Don't force me to forget my manners.
+  ~ iblis: Teruskan bicara, {$lawan}. Aku suka mendengar orang memilih nasibnya sendiri. || Keep talking, {$lawan}. I like hearing folk choose their own fate.
+- [2] Awas kau, {$lawan}! Tunggu saja malam ini! || Watch yourself, {$lawan}! Just wait till tonight!
+  ~ pelabuhan: Awas, {$lawan}! Kulempar kau ke laut biar dimakan hiu! || Watch it, {$lawan}! I'll throw you to the sharks!
+  ~ kampung: Awas, {$lawan}! Kalau ketemu di pematang, kudorong kau ke lumpur! || Watch it, {$lawan}! Meet me on the bund and I'll shove you in the mud!
+- Jangan dekati lapakku lagi, {$lawan}, atau kau menyesal! || Don't come near my stall again, {$lawan}, or you'll regret it!
+  ~ ibukota: Jangan dekati tokoku lagi, {$lawan}, atau aku lapor ke penjaga! || Stay away from my shop, {$lawan}, or I'll report you to the guards!
+- Kau kira aku takut padamu, {$lawan}? Sini, maju! || Think I fear you, {$lawan}? Come on, step up!
+
+== debat.lerai
+niat: LERAI
+topik: debat
+gestur: lerai
+- [3] Sudah, sudah! Malu dilihat orang! || Enough, enough! People are watching!
+  ~ kasar: Diam kalian berdua! Berisik! || Shut up, both of you! Racket!
+  ~ kuno: Tenangkan hati kalian. Amarah membakar rumah sendiri. || Calm your hearts. Anger burns one's own house.
+  ~ kampung: Sudah, sudah, malu sama anak-anak! Damai, damai! || Enough, enough, shame on you before the children! Peace, peace!
+  ~ gunung: Amitaba. Saudara-saudara, kebencian tidak padam oleh kebencian. || Amitabha. Brothers, hatred is not quenched by hatred.
+- [2] Hei, hei! Kalian sudah bertetangga dua puluh tahun! Masa gara-gara ayam? || Hey, hey! You've been neighbours twenty years! Over chickens?
+  ~ pelabuhan: Hei! Kalian satu kapal dulu! Masa gara-gara ikan? || Hey! You sailed one ship once! Over a fish?
+- Ayo, ke kedai teh. Duduk, minum, bicara baik-baik. || Come on, to the teahouse. Sit, drink, talk it out.
+  ~ ibukota: Kalau tidak bisa damai, bawa saja ke balai hakim. Jangan di jalan. || If you can't make peace, take it to the magistrate's hall. Not in the street.
+- Penjaga sudah melihat ke sini. Mau dipenjara berdua? || The guards are looking this way. Want to share a cell?
+  ~ iblis: Kalau mau saling bunuh, ke arena. Di sana ada yang bayar. || If you want to kill each other, go to the arena. Someone pays there.
+
+== debat.pergi
+niat: PERGI_MARAH
+topik: debat
+gestur: marah_hentak
+$lawan: tipe=nama_warga dari=lawan
+- [3] Hmph! Bicara denganmu buang waktu! || Hmph! Talking to you is a waste of time!
+  ~ kasar: Cih. Pergi sana. || Tch. Get lost.
+  ~ kuno: Tidak ada gunanya berbicara dengan katak dalam sumur. || No use talking to a frog in a well.
+  ~ kampung: Wis, embuh! Terserah kau saja! || Fine, whatever! Have it your way!
+- [2] Aku pergi! Jangan sapa aku lagi, {$lawan}! || I'm leaving! Don't greet me again, {$lawan}!
+  ~ p: Aku pulang! Jangan berani-berani lewat depan rumahku, {$lawan}! || I'm going home! Don't you dare pass my house, {$lawan}!
+- Ingat ini, {$lawan}. Aku tidak akan lupa. || Remember this, {$lawan}. I won't forget.
+  ~ iblis: Ingat wajahku, {$lawan}. Kau akan melihatnya lagi. Dalam gelap. || Remember my face, {$lawan}. You'll see it again. In the dark.
+- Sudahlah. Dengan orang keras kepala tidak ada habisnya. || Forget it. With a mule there's no end.
+
+== rayu.puji
+niat: PUJI_RAYU
+topik: merayu
+gestur: bicara_tangan
+$lawan: tipe=nama_warga dari=lawan
+- [3] {$lawan}, jepit rambut itu cocok sekali denganmu. || {$lawan}, that hairpin suits you so well.
+  ~ kasar: Hei, {$lawan}. Kau... lumayan hari ini. || Hey, {$lawan}. You look... all right today.
+  ~ kuno: Bulan pun malu bersinar bila {$lawan} lewat. || Even the moon shies from shining when {$lawan} passes.
+  ~ p: {$lawan}, bajumu baru, ya? Gagah sekali kelihatannya. || {$lawan}, new clothes? You look very dashing.
+- [2] Setiap lewat lapakmu, {$lawan}, entah kenapa aku jadi lapar. Bukan karena kuenya. || Every time I pass your stall, {$lawan}, somehow I get hungry. Not for the cakes.
+  ~ pelabuhan: Mata {$lawan} itu lebih biru dari laut pagi. Sumpah demi layarku. || {$lawan}'s eyes are bluer than the morning sea. I swear by my sail.
+  ~ oasis: {$lawan}, senyummu lebih segar dari mata air di siang terik. || {$lawan}, your smile is fresher than a spring at blazing noon.
+  ~ air: {$lawan}... suaramu seperti air kanal di malam hari... tenang sekali... || {$lawan}... your voice is like the canal at night... so calm...
+- [2] Aku memetik bunga ini di jalan. Entah kenapa aku ingat {$lawan}. || I picked this flower on the way. Somehow it made me think of {$lawan}.
+  ~ kampung: Ini, {$lawan}, jambu dari pohon belakang. Yang paling manis kupilihkan untukmu. || Here, {$lawan}, guavas from the back tree. I picked the sweetest for you.
+- Kau tahu, {$lawan}, hari terasa lebih pendek kalau aku melihatmu. || You know, {$lawan}, the day feels shorter when I see you.
+- Teh buatanmu yang paling enak di kota ini, {$lawan}. Aku serius. || Your tea is the best in this town, {$lawan}. I mean it.
+
+== rayu.malu
+niat: MALU_MALU
+topik: merayu
+gestur: sikap_tunduk
+$lawan: tipe=nama_warga dari=lawan
+- [3] A-apa sih... jangan bicara begitu di depan orang... || W-what... don't say that in front of people...
+  ~ kasar: Diam! Jangan mengada-ada! ...tapi terima kasih. || Quiet! Don't make things up! ...but thanks.
+  ~ kuno: Kata-katamu membuat wajahku panas, {$lawan}. || Your words make my face burn, {$lawan}.
+  ~ air: Aduh... {$lawan}... aku jadi tidak tahu harus bilang apa... || Oh... {$lawan}... now I don't know what to say...
+- [2] Hihi... kau ini. Ada-ada saja. || Hehe... you. The things you say.
+  ~ l: Hehe... kau bisa saja, {$lawan}. || Heh... you're too much, {$lawan}.
+  ~ kampung: Hus, {$lawan}! Nanti didengar ibuku! Hihi. || Hush, {$lawan}! My mother will hear! Hehe.
+- Bunganya... akan kutaruh di jendela. || The flower... I'll put it on my windowsill.
+- Jangan menatapku begitu, nanti teh tumpah. || Don't look at me like that, I'll spill the tea.
+  ~ pelabuhan: Jangan menatap begitu, nanti jalaku kusut. || Don't stare like that, my net will tangle.
+
+== rayu.ajak
+niat: JANJI_TEMU
+topik: merayu
+gestur: bisik
+$lawan: tipe=nama_warga dari=lawan
+- [3] Nanti malam ada lentera di jembatan. Mau melihat bersamaku, {$lawan}? || There are lanterns on the bridge tonight. Want to see them with me, {$lawan}?
+  ~ kasar: Besok. Kedai teh. Jangan telat. || Tomorrow. Teahouse. Don't be late.
+  ~ kuno: Bila {$lawan} berkenan, besok senja kita berjalan menyusuri sungai. || If {$lawan} is willing, tomorrow at dusk we shall walk along the river.
+  ~ air: Besok sore, naik perahu bersamaku, ya, {$lawan}...? Aku yang mendayung... || Tomorrow evening, take a boat with me, {$lawan}...? I'll row...
+- [2] Ada penjual tanghulu baru di ujung pasar. Mau kutraktir, {$lawan}? || There's a new candied haw seller at the end of the market. My treat, {$lawan}?
+  ~ kampung: Besok ke sawah bareng, {$lawan}? Kubawakan bekal. || Walk to the paddies with me tomorrow, {$lawan}? I'll bring lunch.
+  ~ pelabuhan: Besok perahu kosong, {$lawan}. Mau lihat matahari terbenam dari laut? || The boat's free tomorrow, {$lawan}. Want to see the sunset from the sea?
+- Festival nanti, berdirilah di sampingku waktu kembang api. Mau? || At the festival, stand beside me for the fireworks. Will you?
+- Kalau kau tidak sibuk... mungkin kita bisa makan mi bersama? || If you're not busy... maybe we could have noodles together?
+
+== ajar.nasihat
+niat: NASIHAT
+topik: ajar
+gestur: mengajar
+$lawan: tipe=nama_warga dari=lawan
+$pepatah: aturan=frag.pepatah opsional=0.25
+- [3] Dengar, {$lawan}. Pekerjaan yang dikerjakan pelan tapi benar lebih baik dari cepat tapi salah. || Listen, {$lawan}. Work done slow but right beats work done fast but wrong.
+  ~ kasar: Pegang yang benar! Berapa kali harus kuajari? || Hold it properly! How many times must I teach you?
+  ~ kuno: Muridku, kuasai napasmu dulu. Jurus tanpa napas hanyalah tarian. || My pupil, master your breath first. Forms without breath are mere dance.
+  ~ kampung: Nak {$lawan}, tanam padi itu jangan terlalu dalam. Biar akarnya bernapas. || Young {$lawan}, don't plant rice too deep. Let the roots breathe.
+- [2] Kalau mau jadi pedagang, {$lawan}, ingat: senyum dulu, hitung belakangan. || If you'd be a merchant, {$lawan}, remember: smile first, count later.
+  ~ pelabuhan: Laut tidak bisa dilawan, {$lawan}. Baca anginnya, ikuti arusnya. || You can't fight the sea, {$lawan}. Read the wind, follow the current.
+  ~ gunung: Sapu halamannya, {$lawan}, bersihkan juga hatimu. Itu pelajaran pertama. || Sweep the yard, {$lawan}, and sweep your heart too. That's the first lesson.
+- [2] Jangan pernah memalu besi yang sudah dingin, {$lawan}. Itu cuma menyiksa tanganmu. || Never hammer iron once it's cold, {$lawan}. You only torment your hands.
+  ~ ibukota: Tulisan yang rapi adalah wajah pejabat, {$lawan}. Latih kuasmu setiap pagi. || Neat writing is an official's face, {$lawan}. Train your brush every morning.
+- Kakekku dulu bilang padaku, sekarang aku bilang padamu: {$pepatah} || My grandfather told me, and now I tell you: {$pepatah}
+- Jangan malu bertanya, {$lawan}. Yang malu bertanya sesat di jalan. || Don't be shy to ask, {$lawan}. Who's shy to ask gets lost.
+
+== ajar.tanya
+niat: TANYA_MURID
+topik: ajar
+gestur: garuk_kepala
+- [3] Guru, kenapa harus begitu? Bukankah lebih cepat begini? || Master, why must it be so? Isn't this way faster?
+  ~ kasar: Kenapa sih harus begitu? Ribet. || Why does it have to be that way? Such a fuss.
+  ~ kuno: Mohon petunjuk, Guru. Murid ini belum memahami maknanya. || Pray guide me, Master. This disciple has yet to grasp its meaning.
+  ~ kampung: Pak, kenapa padinya harus direndam dulu? || Sir, why must the seed rice be soaked first?
+- [2] Kalau Qi-nya macet di sini, apa yang harus kulakukan, Guru? || If the Qi stalls here, what should I do, Master?
+  ~ gunung: Guru, kalau pikiran terus berlari waktu bersemedi, bagaimana menangkapnya? || Master, if the mind keeps running during meditation, how do I catch it?
+- Boleh aku coba sendiri sekarang? || May I try it myself now?
+  ~ p: Boleh aku coba sekarang? Aku sudah lihat tiga kali. || May I try now? I've watched three times.
+- Kenapa langit biru dan laut juga biru? Siapa yang mengecatnya? || Why is the sky blue and the sea blue too? Who painted them?
+- Benarkah dulu Guru pernah bertemu kultivator abadi? || Is it true you once met an immortal cultivator, Master?
+
+== ajar.tegur
+niat: TEGUR
+topik: ajar
+gestur: marah_tunjuk
+$lawan: tipe=nama_warga dari=lawan
+- [3] Salah lagi, {$lawan}! Perhatikan baik-baik! || Wrong again, {$lawan}! Pay attention!
+  ~ kasar: Bodoh! Begitu saja tidak bisa! || Fool! Can't even do that!
+  ~ kuno: Hatimu tidak di sini, {$lawan}. Kembalikan dulu pikiranmu, baru berlatih. || Your heart is not here, {$lawan}. Bring your mind back first, then train.
+  ~ kampung: Lho, {$lawan}, itu rumput, bukan padi! Dicabut yang benar! || Hey, {$lawan}, that's weeds, not rice! Pull the right ones!
+- [2] Kau mengantuk, {$lawan}? Mata yang mengantuk melukai tangan. || Sleepy, {$lawan}? Sleepy eyes hurt hands.
+  ~ pelabuhan: Simpulmu longgar, {$lawan}! Kalau badai, perahu lepas! || Your knot's loose, {$lawan}! In a storm the boat breaks free!
+- Jangan terburu-buru. Ulangi dari awal. || Don't rush. Start again from the beginning.
+- Sekali lagi kau main-main, kusuruh menyapu halaman seminggu. || Fool around once more and you'll sweep the yard for a week.
+
+== ajar.puji
+niat: PUJI_MURID
+topik: ajar
+gestur: tepuk_bahu
+seru: oh
+$lawan: tipe=nama_warga dari=lawan
+- [3] Bagus, {$lawan}! Itu baru benar! || Good, {$lawan}! Now that's right!
+  ~ kasar: Hm. Lumayan. Jangan sombong. || Hm. Not bad. Don't get cocky.
+  ~ kuno: Kemajuanmu pesat, {$lawan}. Akarmu ternyata lebih baik dari dugaanku. || Your progress is swift, {$lawan}. Your roots are better than I thought.
+  ~ kampung: Pinter, Nak {$lawan}! Nanti kubilang ke bapakmu. || Clever, young {$lawan}! I'll tell your father.
+- [2] Kau belajar cepat sekali, {$lawan}. Sebentar lagi aku tidak punya apa-apa lagi untuk diajarkan. || You learn so fast, {$lawan}. Soon I'll have nothing left to teach.
+  ~ pelabuhan: Simpul yang bagus, {$lawan}! Bisa menahan badai itu! || Fine knot, {$lawan}! That'll hold through a storm!
+- Begitu caranya. Ingat rasanya di tanganmu. || That's the way. Remember how it feels in your hands.
+- Kalau kakekmu masih hidup, dia pasti bangga, {$lawan}. || If your grandfather were alive, he'd be proud, {$lawan}.
+
+== curhat.keluh
+niat: KELUH
+topik: curhat
+gestur: menangis
+seru: aduh
+$lawan: tipe=nama_warga dari=lawan
+$almarhum: tipe=nama_warga dari=konteks.almarhum
+- [3] Aku capek, {$lawan}. Kerja dari subuh, uang tetap tidak cukup. || I'm tired, {$lawan}. Working since dawn and the money's never enough.
+  ~ kasar: Hidup ini busuk, {$lawan}. Busuk. || This life stinks, {$lawan}. Stinks.
+  ~ kuno: Hatiku berat, {$lawan}. Jalan di depan tertutup kabut. || My heart is heavy, {$lawan}. The road ahead is shrouded in fog.
+  ~ kampung: Aduh, {$lawan}... panen gagal, utang menumpuk. Bingung aku. || Oh, {$lawan}... the harvest failed, the debts pile up. I'm lost.
+- [2] Anakku tidak mau mendengar lagi, {$lawan}. Setiap kunasihati, dia pergi. || My child won't listen any more, {$lawan}. Every time I advise, they walk off.
+  ~ p: Suamiku pulang larut terus, {$lawan}. Katanya kerja... entahlah. || My husband keeps coming home late, {$lawan}. Says it's work... who knows.
+  ~ l: Istriku marah terus, {$lawan}. Apa pun yang kulakukan salah. || My wife's always angry, {$lawan}. Whatever I do is wrong.
+- [2] Aku rindu {$almarhum}, {$lawan}. Kadang aku masih menyiapkan dua mangkuk. || I miss {$almarhum}, {$lawan}. Sometimes I still set out two bowls.
+  ~ kuno: Bayangan {$almarhum} masih kulihat di setiap sudut rumah, {$lawan}. || I still see {$almarhum}'s shadow in every corner of the house, {$lawan}.
+- Pelanggan sepi, sewa lapak naik. Mungkin aku harus pulang kampung saja. || Customers are few, the stall rent's up. Maybe I should just go back home.
+  ~ pelabuhan: Ikan menjauh, jala robek, perahu bocor. Laut sedang marah padaku, {$lawan}. || The fish stay away, the net's torn, the boat leaks. The sea is angry with me, {$lawan}.
+- Tidak ada yang mengerti aku, {$lawan}. Hanya kau yang mau mendengar. || No one understands me, {$lawan}. Only you will listen.
+
+== curhat.hibur
+niat: HIBUR
+topik: curhat
+gestur: tepuk_bahu
+$lawan: tipe=nama_warga dari=lawan
+$almarhum: tipe=nama_warga dari=konteks.almarhum
+$doa: aturan=frag.doa opsional=0.4
+- [3] Sudah, jangan sedih, {$lawan}. Besok matahari terbit lagi. || There now, don't be sad, {$lawan}. The sun rises again tomorrow.
+  ~ kasar: Berhenti merengek. Ayo minum, nanti lupa sendiri. || Stop whining. Come drink, you'll forget.
+  ~ kuno: Setiap musim dingin berakhir dengan semi, {$lawan}. Bersabarlah. || Every winter ends in spring, {$lawan}. Be patient.
+  ~ kampung: Wis, ora apa-apa, {$lawan}. Kita semua di sini. Nanti kubantu. || There, it's all right, {$lawan}. We're all here. I'll help.
+- [2] Kau tidak sendirian, {$lawan}. Kalau butuh apa-apa, ketuk pintuku. || You're not alone, {$lawan}. If you need anything, knock on my door.
+  ~ p: Sini, {$lawan}. Malam ini makan di rumahku. Kubuatkan sup. || Come, {$lawan}. Eat at my place tonight. I'll make soup.
+  ~ pelabuhan: Laut kadang marah, {$lawan}, tapi selalu tenang lagi. Kau juga. || The sea gets angry sometimes, {$lawan}, but always calms again. So will you.
+- [2] Anak muda memang begitu. Dulu kita juga keras kepala, ingat? || Young ones are like that. We were stubborn too, remember?
+  ~ kuno: Pohon muda harus melawan angin dulu sebelum berakar kuat, {$lawan}. || A young tree must fight the wind before it roots deep, {$lawan}.
+- {$almarhum} pasti tidak ingin kau terus menangis, {$lawan}. || {$almarhum} surely wouldn't want you crying forever, {$lawan}.
+- Ayo ke kuil. Bakar dupa, tenangkan hati. {$doa} || Let's go to the temple. Burn incense, calm the heart. {$doa}
+- Ingat waktu kita kecil dan tersesat di hutan? Kita selamat juga, kan. Ini juga akan lewat. || Remember when we were small and lost in the woods? We made it, didn't we. This too shall pass.
+
+== canda.lelucon
+niat: CERITA
+topik: lelucon
+gestur: tertawa
+seru: tawa
+$tetangga: tipe=nama_warga dari=konteks.tetangga
+- [3] Tahu kenapa kucing {$tetangga} gemuk? Karena dia makan ikanku setiap malam! Hahaha! || Know why {$tetangga}'s cat is fat? It eats my fish every night! Hahaha!
+  ~ kasar: Kau tahu bedanya kau dan kerbau? Kerbau bekerja. Hahaha! || Know the difference between you and a buffalo? The buffalo works. Hahaha!
+  ~ kuno: Seorang kultivator bersemedi seratus tahun, lalu bangun dan bertanya: siapa yang memakan bakpaoku? || A cultivator meditated a hundred years, then woke and asked: who ate my bun?
+  ~ pelabuhan: Pelaut mabuk mencari pelabuhan semalaman, Bung. Ternyata dia di atas dermaga sejak awal! || A drunk sailor searched for port all night, mate. Turned out he was on the dock all along!
+- [2] Kemarin aku menawar ikan sampai penjualnya menawarkan ikannya sendiri untuk pulang! || Yesterday I haggled so hard over a fish the seller offered to walk home with it himself!
+  ~ kampung: Kemarin kerbau Pak Lurah masuk sekolah, Nak. Duduk paling depan. Lebih rajin dari anakku! || Yesterday the headman's buffalo walked into school, child. Sat at the front. More diligent than my boy!
+  ~ oasis: Unta temanku bisa menghitung, Saudara. Tapi cuma sampai dua. Selebihnya dia meludah. || My friend's camel can count, friend. Only to two, though. After that it spits.
+- [2] Kau dengar? Ayam jago {$tetangga} berkokok tengah malam. Katanya dia ikut aliran sesat. || Hear that? {$tetangga}'s rooster crows at midnight. They say it joined a heretic sect.
+  ~ gunung: Biksu muda tertidur waktu berdoa. Dengkurannya lebih merdu dari lonceng. Amitaba. || A young monk fell asleep at prayers. His snore was sweeter than the bell. Amitabha.
+- Istriku bilang masakanku seperti obat. Aku bilang: berarti sehat! || My wife says my cooking tastes like medicine. I said: so it's healthy!
+  ~ p: Suamiku bilang aku cerewet seperti burung. Kubilang: tapi burung tidak pernah lupa ulang tahunmu! || My husband says I chatter like a bird. I said: but birds never forget your birthday!
+- Kalau aku jadi kultivator, aku mau terbang ke pasar. Biar tidak antre. || If I were a cultivator, I'd fly to market. To skip the queue.
+
+== canda.olok
+niat: OLOK
+topik: canda
+gestur: tunjuk
+$lawan: tipe=nama_warga dari=lawan
+- [3] Wah, {$lawan}, bajumu terbalik! Mau ke festival atau ke pemakaman? || Oh, {$lawan}, your shirt's inside out! Off to a festival or a funeral?
+  ~ kasar: {$lawan}, mukamu kusut seperti kain cucian. Hahaha! || {$lawan}, your face is crumpled as laundry. Hahaha!
+  ~ kuno: Langkah {$lawan} hari ini seperti bangau patah sayap. || {$lawan} walks today like a crane with a broken wing.
+  ~ kampung: {$lawan}, kau mandi lumpur atau mandi air tadi? Hihi. || {$lawan}, did you bathe in water or mud this morning? Hehe.
+- [2] {$lawan}, kudengar kau kalah main catur dengan anak tujuh tahun? || {$lawan}, I hear you lost at chess to a seven-year-old?
+  ~ pelabuhan: {$lawan}, kudengar kau mabuk laut di kolam ikan? Hahaha! || {$lawan}, I hear you got seasick at the fish pond? Hahaha!
+- Kau ini, {$lawan}, kalau tertawa seperti ayam bertelur. || You, {$lawan}, laugh like a hen laying an egg.
+- {$lawan}, topimu kebesaran. Dari jauh kukira payung berjalan. || {$lawan}, your hat's too big. From afar I took you for a walking umbrella.
+
+== canda.tawa
+niat: TAWA
+gestur: tertawa
+seru: tawa
+- [3] Hahaha! Kau ini ada-ada saja! || Hahaha! The things you come up with!
+  ~ kasar: Hah! Bodoh. Tapi lucu. || Hah! Stupid. But funny.
+  ~ kuno: Ho ho ho. Jenaka sekali. || Ho ho ho. Most witty.
+  ~ p: Hihihi! Aduh, perutku sakit! || Hehehe! Oh, my belly hurts!
+  ~ air: Hihi... Kakak lucu sekali... || Hehe... you're so funny, dear...
+- [2] Hahaha! Sudah, sudah, aku tidak kuat! || Hahaha! Stop, stop, I can't take it!
+  ~ pelabuhan: Hahaha! Lelucon kapal! Kuceritakan ke kru nanti! || Hahaha! A ship's joke! I'll tell the crew later!
+  ~ kampung: Hahaha! Wis, wis, mataku sampai berair! || Hahaha! Enough, enough, my eyes are watering!
+- Hehe, awas kau, kubalas nanti. || Hehe, just you wait, I'll get you back.
+- Hahaha! Itu yang terlucu yang kudengar bulan ini! || Hahaha! Funniest thing I've heard this month!

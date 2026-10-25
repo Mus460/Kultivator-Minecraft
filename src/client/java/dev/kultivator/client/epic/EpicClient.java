@@ -43,10 +43,9 @@ public final class EpicClient {
 		dev.kultivator.client.epic.film.FilmParticleProviders.init();
 		// Film Kosmik 3D (DESIGN 32.1): creates nothing, registers the disconnect release
 		dev.kultivator.client.epic.kosmik.Kosmik3D.init();
-		EpicSettings.motionWarning(() -> {
-			net.minecraft.client.Minecraft minecraft = net.minecraft.client.Minecraft.getInstance();
-			minecraft.gui.setScreen(new dev.kultivator.client.epic.screen.MotionWarningScreen(minecraft.gui.screen()));
-		});
+		// The Pengaturan pages (DESIGN 43.5 [8]) with the motion and photosensitivity warnings as a seal over Kamera & Film
+		// (43.10.1); after CultivationScreen.daftarBawaan, whose single Pengaturan page they replace.
+		dev.kultivator.client.screen.SettingsPage.daftar();
 		LevelRenderEvents.COLLECT_SUBMITS.register(EpicRenderer::collect);
 		LevelRenderEvents.BEFORE_BLOCK_OUTLINE.register((context, outline) -> !CinematicDirector.active());
 		ClientLifecycleEvents.CLIENT_STARTED.register(client -> registerHud());

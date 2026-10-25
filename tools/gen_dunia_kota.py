@@ -287,6 +287,7 @@ def connect_all(p):
 
 def save(p, name):
     connect_all(p)
+    hidup42(p, name)
     titik_hidup(p, name)
     path = out_path(folder(), name)
     p.save(path)
@@ -311,6 +312,7 @@ def save(p, name):
 # At most 96 points per piece (38.C.10). A standing point needs an explicit air cell (or carpet / pressure plate) with a
 # free cell above and a solid block below, so no NPC is sent into a wall.
 import tempat_lib as TL  # noqa: E402
+import kota_hidup_kit as khk  # noqa: E402  (registers the DESIGN 42 titik types in tempat_lib, TL.titik_sah accepts them)
 
 TITIK_MAKS = 96
 KERJA_BLOK = {
@@ -395,6 +397,10 @@ def titik_hidup(p, name):
     for (x, y, z), ((bid, props), _nbt) in cells:
         alat = KERJA_BLOK.get(bid)
         if alat is None:
+            continue
+        # a DESIGN 42 interior kit already set its own work spot for this tool next to the block
+        if any(t["jenis"] == "kerja:" + alat and abs(t["pos"][0] - x) + abs(t["pos"][2] - z) <= 2 and t["pos"][1] == y
+               for t in p.titik_list):
             continue
         pd = dict(props)
         order = sorted(STEPS, key=lambda st: 0 if st[0] == pd.get("facing") else 1)
@@ -2060,69 +2066,108 @@ def kantor_sekte_2():
 
 
 # ======================================================================================================== houses and decorations
-def furnish(p, sx, sz, y, variant, bedroom=True):
-    """Furniture for a small house interior (walls at 1..sx-2 / 1..sz-2)."""
-    p.put(2, y, 2, "minecraft:barrel", {"facing": "up", "open": "false"})
-    if sx >= 9 and bedroom:
-        bed(p, sx - 3, y, 3, "north")
-        p.put(2, y, 3, "minecraft:crafting_table")
-        table(p, sx // 2, y, sz // 2)
-        chair(p, sx // 2 - 1, y, sz // 2, "east")
-    else:
-        p.put(sx - 3, y, 2, "minecraft:composter", {"level": "0"})
-        p.put(2, y, sz - 3, "rug")
-    if variant == 1:
-        p.put(sx // 2, y, 2, "minecraft:loom", {"facing": "south"})
-    elif variant == 2:
-        p.put(sx // 2, y, 2, "minecraft:cartography_table")
-    else:
-        shelf(p, sx // 2, y + 1, 2, "south")
-        p.put(sx // 2, y, 2, "minecraft:decorated_pot", {"facing": "south", "cracked": "false", "waterlogged": "false"})
+# DESIGN 42.9.1 (42W-K): every town house carries a profession interior of tools/kota_hidup_kit.py. The rooms grew to the
+# kits' minimum sizes (new worlds only): kecil 11 x 10 (room 7 x 6), sedang 11 x 11 (7 x 7), besar 13 x 15 (a 9 x 7
+# workroom and a bedroom behind a partition), courtyard houses 19 x 19 (a 13 x 8 hall), shophouses 11 wide (6 x 6 shop).
+KIT_RUMAH = {
+    "kecil": ("rumah_petani", "rumah_nelayan", "rumah_petani"),
+    "sedang": ("rumah_sarjana", "penjahit", "apotek"),
+    "besar": ("pandai", "tukang_kayu", "rumah_gadai"),
+    "halaman": ("rumah_sarjana", "apotek", "sekolah"),
+    "toko": ("toko_kue", "toko_lentera", "toko_buku", "penjual_ikan", "toko_jimat"),
+}
+# Houses offered for sale (42.6.1): template -> price class; each gets a `bangunan` box (data nama) and the `dijual`
+# point inside its door. With 15-25 houses per town drawn from 20 house templates a town shows about 2-6 of them.
+DIJUAL = {"rumah_kecil_1": "kecil", "rumah_sedang_2": "sedang", "rumah_besar_0": "besar", "rumah_halaman_1": "besar",
+          "rumah_toko_2": "toko"}
 
 
-def rumah(name, sx, sz, h, seed, variant):
-    p = piece(sx, h + 11, sz, seed=seed)
+def jual(p, name, x0, y0, z0, x1, y1, z1, pintu, hadap="north"):
+    """The 42.6.1 sale marker of a DIJUAL template: the house's `bangunan` box and the `dijual` point at its door."""
+    ukuran = DIJUAL.get(name)
+    if ukuran is None:
+        return
+    p.titik("bangunan", x0, y0, z0, "south", {"dx": str(x1 - x0), "dy": str(y1 - y0), "dz": str(z1 - z0), "nama": name})
+    khk.dijual(p, pintu[0], pintu[1], pintu[2], hadap, rumah=name, ukuran=ukuran)
+
+
+def kamar_tidur(p, x0, z0, x1, z1, y, beds):
+    """A bedroom strip x0..x1 x z0..z1 (y = standing level): beds along the back wall (heads north, feet one step
+    south), a barrel with a shelf and a candle, a jar, a rug by the door."""
+    xs = list(range(x0, x1 + 1, 2))[:beds]
+    for x in xs:
+        bed(p, x, y, z0, "north")
+    free = [x for x in range(x0, x1 + 1) if x not in xs]
+    if free:
+        p.put(free[0], y, z0, "minecraft:barrel", {"facing": "up", "open": "false"})
+        shelf(p, free[0], y + 1, z0, "south")
+        p.put(free[0], y + 2, z0, "minecraft:candle", {"candles": "2", "lit": "false", "waterlogged": "false"})
+    if len(free) > 1:
+        p.put(free[-1], y, z0, "minecraft:decorated_pot", {"facing": "south", "cracked": "false", "waterlogged": "false"})
+    p.put(x1, y, z1, "rug")
+
+
+def rumah(name, kind, sx, sz, h, seed, variant):
+    """A town house sx x sz with an h-block storey and the KIT_RUMAH[kind][variant] interior (42.9.1); besar houses put
+    the workroom in front and a bedroom behind a partition. Front garden, roof, lanterns, sale marker."""
+    kit = KIT_RUMAH[kind][variant]
+    p = piece(sx, h + 12, sz, seed=seed)
     p.foundation(0, 0, sx - 1, sz - 1, depth=1, role="kerb")
     p.floor(1, 1, 1, sx - 2, sz - 2, role="wood_alt", alt="minecraft:oak_planks" if CUR["v"] == "sedang" else "wood", alt_chance=0.2)
     wall = ["plaster", "minecraft:mud_bricks" if CUR["v"] != "salju" else "wall", "wall"][variant % 3]
     p.walls(1, 2, 1, sx - 2, 1 + h, sz - 2, role=wall, pillar="beam", windows=3, door=("south", 1))
-    furnish(p, sx, sz, 2, variant)
-    # a small garden in front, a bench and a pot at the door
+    top = 2 + h
+    cx = sx // 2
+    p.fill(2, top, 2, sx - 3, top, sz - 3, "wood")      # ceiling boards: the kit hangs its lanterns from them
+    # a small garden in front, a pot beside the door
     for x in range(0, sx):
-        if x != sx // 2:
+        if x != cx:
             p.put(x, 0, sz - 1, "ground", {"snowy": "false"} if p.b("ground").endswith("grass_block") else None)
             r = p.rng.random()
             if r < 0.35:
                 small_flower(p, x, 1, sz - 1, "flower" if r < 0.2 else "flower_alt")
             elif r < 0.5:
-                p.put(x, 1, sz - 1, "minecraft:short_grass" if CUR["v"] != "salju" else "minecraft:snow", None if CUR["v"] != "salju" else {"layers": "1"})
-    p.put(sx // 2 - 1 if sx // 2 - 1 > 0 else 1, 1, sz - 1, "minecraft:decorated_pot", {"facing": "south", "cracked": "false", "waterlogged": "false"})
-    top = 2 + h
+                p.put(x, 1, sz - 1, "minecraft:short_grass" if CUR["v"] != "salju" else "minecraft:snow",
+                      None if CUR["v"] != "salju" else {"layers": "1"})
+    p.put(cx - 2, 1, sz - 1, "minecraft:decorated_pot", {"facing": "south", "cracked": "false", "waterlogged": "false"})
     beam_band(p, 1, 1, sx - 2, sz - 2, top)
     if variant == 0:
-        gable(p, 1, top + 1, 1, sx - 2, sz - 2, along="x", overhang=1, pearl=sx >= 9)
+        gable(p, 1, top + 1, 1, sx - 2, sz - 2, along="x", overhang=1, pearl=True)
     elif variant == 1:
         hip(p, 1, top + 1, 1, sx - 2, sz - 2, overhang=1, top="rod")
     else:
-        gable(p, 1, top + 1, 1, sx - 2, sz - 2, along="z", overhang=1, pearl=sx >= 9)
-    if sx >= 9:
-        brackets(p, 1, 1, sx - 2, sz - 2, top, every=3)
-    lit(p, sx // 2, 1 + h, sz // 2, chain=1)
+        gable(p, 1, top + 1, 1, sx - 2, sz - 2, along="z", overhang=1, pearl=True)
+    brackets(p, 1, 1, sx - 2, sz - 2, top, every=3)
+    z0, d = 2, sz - 4
+    if kind == "besar":
+        zp = 5          # the partition: a doorway in the middle, the bedroom behind it
+        for x in range(2, sx - 2):
+            for y in range(2, top):
+                p.put(x, y, zp, "minecraft:air" if x == cx and y < 4 else wall)
+        kamar_tidur(p, 2, 2, sx - 3, zp - 1, 2, 3)
+        z0, d = zp + 1, sz - 3 - zp
+    khk.interior(kit, p, 2, 1, z0, sx - 4, d, h, "south", pintu=cx)
+    khk.cerobong_dapur(p, 1, 1, sx - 2, sz - 2, 1, maks=1)
     if variant != 2:
-        lit(p, sx // 2 + 1, top + 1, sz - 1, chain=1, role="lamp")
+        lit(p, cx + 1, top + 1, sz - 1, chain=1, role="lamp")
     else:
         post(p, 0, 1, sz - 1, height=1)
-    if variant == 1 and sx >= 9:
-        wall_banner(p, sx // 2 - 1, top - 1, sz - 1, "south")
-    anchor(p, sx / 2.0, 2.0, sz / 2.0, "kota/warga", 180.0)
-    finish_lights(p, sx // 2, 2, sz // 2)
-    front_door(p, sx, sz, sx // 2, y=1)
+    if variant == 1:
+        wall_banner(p, cx - 1, top - 1, sz - 1, "south")
+    emper(p, (1, sx - 2), sz - 1, salt=seed)
+    khk.kucing_atap(p, 0, 0, sx - 1, sz - 1, 1, maks=1, salt=seed)
+    jual(p, name, 1, 1, 1, sx - 2, top + 1, sz - 2, (cx, 2, sz - 3))
+    anchor(p, cx + 0.5, 2.0, sz - 3.5, "kota/warga", 180.0)
+    finish_lights(p, cx, 2, sz // 2)
+    front_door(p, sx, sz, cx, y=1)
     save(p, name)
 
 
 def rumah_halaman(name, seed, variant):
-    """A courtyard house (siheyuan): a gate house, two side wings, the main hall, a tree and a well in the yard."""
-    sx, sy, sz = 15, 14, 15
+    """A courtyard house (siheyuan) 19 x 19: a gate house, the main hall with the KIT_RUMAH["halaman"] interior (scholar's
+    study, healer's hall or a family school), two bedroom wings, a yard with a tree, a xiangqi table and plants."""
+    sx, sy, sz = 19, 16, 19
+    kit = KIT_RUMAH["halaman"][variant]
     p = piece(sx, sy, sz, seed=seed)
     p.foundation(0, 0, sx - 1, sz - 1, depth=1, role="kerb")
     p.air(0, 1, 0, sx - 1, sy - 1, sz - 1)
@@ -2140,94 +2185,93 @@ def rumah_halaman(name, seed, variant):
             for y in (2, 3):
                 p.put(x, y, z, "plaster")
             p.put(x, 4, z, "roof_slab", {"type": "bottom", "waterlogged": "false"})
+    cx = sx // 2
     for y in (2, 3, 4):
-        p.put(7, y, sz - 1, "minecraft:air")
-        p.put(6, y, sz - 1, "red" if y < 4 else "minecraft:air")
-        p.put(8, y, sz - 1, "red" if y < 4 else "minecraft:air")
-    gable(p, 5, 5, sz - 2, 9, sz - 1, along="x", overhang=0, pearl=False)
-    # the main hall (north)
-    p.walls(2, 2, 1, sx - 3, 5, 5, role="plaster" if variant != 1 else "wall", pillar="red", windows=3, window_role="window", door=("south", 1))
-    beam_band(p, 2, 1, sx - 3, 5, 6)
-    gable(p, 2, 7, 1, sx - 3, 5, along="x", overhang=1)
-    bed(p, 4, 2, 3, "north")
-    table(p, 9, 2, 3)
-    chair(p, 8, 2, 3, "east")
-    shelf(p, 11, 3, 2, "south")
-    p.put(11, 2, 2, "minecraft:barrel", {"facing": "up", "open": "false"})
-    # the side wings (east and west)
-    for x0 in (1, sx - 5):
-        p.walls(x0, 2, 7, x0 + 3, 4, 11, role="wall" if variant != 2 else "plaster", pillar="beam", windows=2, window_role="window",
+        p.put(cx, y, sz - 1, "minecraft:air")
+        p.put(cx - 1, y, sz - 1, "red" if y < 4 else "minecraft:air")
+        p.put(cx + 1, y, sz - 1, "red" if y < 4 else "minecraft:air")
+    gable(p, cx - 2, 5, sz - 2, cx + 2, sz - 1, along="x", overhang=0, pearl=False)
+    # the main hall (north): a 13 x 8 room under ceiling boards
+    p.walls(2, 2, 1, sx - 3, 5, 10, role="plaster" if variant != 1 else "wall", pillar="red", windows=3, window_role="window",
+            door=("south", 1))
+    p.fill(3, 6, 2, sx - 4, 6, 9, "wood")
+    beam_band(p, 2, 1, sx - 3, 10, 6)
+    brackets(p, 2, 1, sx - 3, 10, 6, every=3)
+    gable(p, 2, 7, 1, sx - 3, 10, along="x", overhang=1)
+    khk.interior(kit, p, 3, 1, 2, sx - 6, 8, 4, "south", pintu=cx)
+    # the side wings (west and east): a bedroom each with its door to the yard
+    for x0 in (1, sx - 6):
+        p.walls(x0, 2, 12, x0 + 4, 4, 16, role="wall" if variant != 2 else "plaster", pillar="beam", windows=2, window_role="window",
                 door=("east" if x0 == 1 else "west", 1))
-        gable(p, x0, 5, 7, x0 + 3, 11, along="z", overhang=1, pearl=False)
-    p.put(2, 2, 8, "minecraft:crafting_table")
-    p.put(2, 2, 10, "minecraft:loom", {"facing": "east"}) if variant == 0 else p.put(2, 2, 10, "minecraft:barrel", {"facing": "up", "open": "false"})
-    bed(p, sx - 3, 2, 8, "north")
-    # the yard: a tree, a little well, potted plants, a rock
-    p.put(7, 1, 9, "ground_alt", {"snowy": "false"})
+        p.fill(x0 + 1, 5, 13, x0 + 3, 5, 15, "wood")
+        gable(p, x0, 6, 12, x0 + 4, 16, along="z", overhang=1, pearl=False)
+        inner = x0 + 3 if x0 == 1 else x0 + 1          # the column inside the door stays walkable
+        for bx in [x for x in range(x0 + 1, x0 + 4) if x != inner]:
+            bed(p, bx, 2, 13, "north")
+        p.put(inner, 2, 13, "minecraft:barrel", {"facing": "south", "open": "false"})
+        shelf(p, inner, 3, 13, "south")
+        p.put(inner, 2, 15, "rug")
+        p.put(x0 + 2, 2, 15, "minecraft:decorated_pot", {"facing": "north", "cracked": "false", "waterlogged": "false"})
+    # the yard: a tree, potted plants, a xiangqi table
+    tx, tz = cx - 2, 15
+    p.put(tx, 1, tz, "ground_alt", {"snowy": "false"})
     if PAL()["tree"] == "cherry" or variant == 2:
-        cherry(p, 7, 2, 9, 4, 2)
+        cherry(p, tx, 2, tz, 4, 2)
     elif PAL()["tree"] == "acacia":
-        acacia(p, 7, 2, 9, 5)
+        acacia(p, tx, 2, tz, 5)
     else:
-        p.put(7, 2, 9, "bush", {"persistent": "true", "distance": "1", "waterlogged": "false"} if p.b("bush").endswith("leaves") else None)
-        p.put(6, 2, 8, "minecraft:potted_azalea_bush") if variant == 0 else None
-    p.put(9, 2, 11, "kerb_wall")
-    p.put(9, 3, 11, "minecraft:lantern", {"hanging": "false", "waterlogged": "false"})
-    note_light(p, 9, 3, 11)
-    p.put(5, 2, 11, "minecraft:decorated_pot", {"facing": "north", "cracked": "false", "waterlogged": "false"})
-    p.put(9, 2, 6, p.b("potted"))
-    snow_drift(p, 1, 6, sx - 2, sz - 2, 2, 0.4)
-    petals(p, 1, 6, sx - 2, sz - 2, 2, 0.25)
-    lit(p, 7, 5, sz - 2, chain=1, role="lamp")
-    lit(p, 7, 6, 6, chain=1, role="lamp")
-    anchor(p, 7.5, 2.0, 7.5, "kota/warga", 180.0)
-    anchor(p, 4.5, 2.0, 3.5, "kota/warga", 180.0)
-    finish_lights(p, 7, 2, 7)
-    front_door(p, sx, sz, 7, y=1)
+        p.put(tx, 2, tz, "bush", {"persistent": "true", "distance": "1", "waterlogged": "false"} if p.b("bush").endswith("leaves") else None)
+    p.put(cx + 3, 2, 12, p.b("potted"))
+    p.put(cx - 3, 2, 12, "minecraft:decorated_pot", {"facing": "north", "cracked": "false", "waterlogged": "false"})
+    khk.catur(p, cx + 2, 1, 14, "south", pohon=False)
+    khk.kucing_tidur(p, 0, 5, 7, "east")
+    snow_drift(p, 1, 11, sx - 2, sz - 2, 2, 0.4)
+    petals(p, 1, 11, sx - 2, sz - 2, 2, 0.25)
+    lit(p, cx, 5, sz - 2, chain=1, role="lamp")
+    lit(p, cx, 7, 11, chain=1, role="lamp")
+    for x in (cx - 4, cx + 4):
+        khk.lentera_gantung(p, x, 5, 11, "south", "merah", kait=True)
+    jual(p, name, 0, 1, 0, sx - 1, 11, sz - 1, (cx, 2, sz - 2))
+    anchor(p, cx + 0.5, 2.0, 12.5, "kota/warga", 180.0)
+    anchor(p, cx + 0.5, 2.0, 3.5, "kota/warga", 180.0)
+    finish_lights(p, cx, 2, 12)
+    front_door(p, sx, sz, cx, y=1)
     save(p, name)
 
 
 def rumah_toko(name, seed, variant):
-    """A two-storey shophouse: an open shop front with a counter and goods, living rooms above, a hanging sign."""
-    sx, sy, sz = 9, 19, 11
+    """A two-storey shophouse 11 x 11: an open shop front with the KIT_RUMAH["toko"] interior (bakery, lantern maker,
+    bookseller, fishmonger or talisman shop), a staircase at the side, living rooms above, a balcony, lanterns."""
+    sx, sy, sz = 11, 20, 11
+    kit = KIT_RUMAH["toko"][variant]
     p = piece(sx, sy, sz, seed=seed)
     p.foundation(0, 0, sx - 1, sz - 1, depth=1, role="kerb")
     p.air(0, 1, 0, sx - 1, sy - 1, sz - 1)
     p.floor(1, 1, 1, sx - 2, sz - 2, role="wood_alt", alt="wood", alt_chance=0.3)
     p.walls(1, 2, 1, sx - 2, 5, sz - 3, role="plaster", pillar="beam", windows=3)
-    # the open shop front: shutters folded up, a counter, goods by kind
+    # the open shop front (shutters folded up over it, the sign bay left open)
     p.air(2, 2, sz - 3, sx - 3, 4, sz - 3)
+    pu = 6
     for x in range(2, sx - 2):
-        p.put(x, 5, sz - 2, "wood_trapdoor", {"facing": "south", "half": "top", "open": "false", "powered": "false", "waterlogged": "false"})
-    for x in range(2, sx - 2):
-        if x != sx // 2:
-            p.put(x, 2, sz - 4, "wood")
-    goods = [("minecraft:decorated_pot", {"facing": "south", "cracked": "false", "waterlogged": "false"}),
-             ("minecraft:flower_pot", None), ("minecraft:white_candle", {"candles": "3", "lit": "true", "waterlogged": "false"})]
-    if variant == 1:
-        goods = [("minecraft:melon", None), ("minecraft:pumpkin", {}), ("minecraft:hay_block", {"axis": "y"})]
-    elif variant == 2:
-        goods = [("minecraft:bookshelf", None), ("minecraft:lectern", {"facing": "south", "has_book": "false", "powered": "false"}),
-                 ("minecraft:cartography_table", None)]
-    for i, x in enumerate((2, 3, 5, 6)):
-        if x < sx - 2:
-            bid, props = goods[i % len(goods)]
-            if bid in ("minecraft:melon", "minecraft:pumpkin", "minecraft:hay_block", "minecraft:bookshelf", "minecraft:cartography_table",
-                       "minecraft:lectern"):
-                p.put(x, 2, 2, bid, props or None)
-            else:
-                p.put(x, 3, sz - 4, bid, props) if x != sx // 2 else None
-    for x in range(2, sx - 2):
-        shelf(p, x, 3, 2, "south") if variant != 2 else None
-    # upstairs
+        if abs(x - pu) > 1:
+            p.put(x, 5, sz - 2, "wood_trapdoor", {"facing": "south", "half": "top", "open": "false", "powered": "false", "waterlogged": "false"})
+    # the upper floor with the stair well along x = 2; the shop below gets the kit
     p.fill(1, 6, 1, sx - 2, 6, sz - 2, "wood")
-    p.walls(1, 7, 1, sx - 2, 9, sz - 2, role="plaster", pillar="beam", windows=3)
     p.staircase(2, 2, 6, "north", 5, role="wood_stairs", support="wood")
     p.air(2, 6, 3, 2, 6, 6)
+    khk.interior(kit, p, 3, 1, 2, 6, 6, 4, "south", pintu=pu)
+    khk.cerobong_dapur(p, 1, 1, sx - 2, sz - 2, 1, maks=1)
+    p.walls(1, 7, 1, sx - 2, 9, sz - 2, role="plaster", pillar="beam", windows=3)
+    p.fill(2, 10, 2, sx - 3, 10, sz - 3, "wood")
     bed(p, sx - 3, 7, 3, "north")
+    bed(p, sx - 5, 7, 3, "north")
     p.put(4, 7, 2, "minecraft:barrel", {"facing": "up", "open": "false"})
+    shelf(p, 5, 8, 2, "south")
+    table(p, sx - 4, 7, sz - 4)
+    chair(p, sx - 5, 7, sz - 4, "east")
     p.put(sx - 3, 7, sz - 3, "rug")
-    # a balcony rail on the upper storey, the hanging shop sign, lanterns
+    lit(p, 6, 10, 6, chain=1)
+    # a balcony rail on the upper storey, lanterns at the corners
     rail_line(p, (1, sz - 1), (sx - 2, sz - 1), 7)
     for x in range(1, sx - 1):
         p.slab(x, 6, sz - 1, "wood_slab", "top")
@@ -2235,10 +2279,13 @@ def rumah_toko(name, seed, variant):
     gable(p, 1, 11, 1, sx - 2, sz - 2, along="x" if variant != 1 else "z", overhang=1, pearl=False)
     lit(p, 0, 10, sz - 1, chain=2, role="lamp")
     lit(p, sx - 1, 10, sz - 1, chain=2, role="lamp")
-    lit(p, 4, 5, 5, chain=1)
-    anchor(p, 4.5, 2.0, 6.5, "kota/warga", 180.0)
-    finish_lights(p, 4, 2, 5)
-    front_door(p, sx, sz, sx // 2, y=1)
+    for x in (2, sx - 3):
+        khk.lentera_gantung(p, x, 8, sz - 1, "south", "merah", kait=True)
+    khk.kucing_atap(p, 0, 0, sx - 1, sz - 1, 1, maks=1, salt=seed)
+    jual(p, name, 1, 1, 1, sx - 2, 10, sz - 2, (pu, 2, sz - 3))
+    anchor(p, pu + 0.5, 7.0, 6.5, "kota/warga", 180.0)
+    finish_lights(p, 5, 2, 5)
+    front_door(p, sx, sz, pu, y=1)
     save(p, name)
 
 
@@ -2706,6 +2753,420 @@ def build_rumah_abadi_2(p, sx, sz):
     finish_lights(p, sx // 2, DECK + 1, sz // 2)
 
 
+# ======================================================================================================== DESIGN 42 (42W-K)
+# Living towns (DESIGN 42.12.1 row "kota 34", 42.9.1-42.9.6, 42.12.1A): the new pool pieces (kavling, wine house,
+# warehouse, chicken pen, the wall end with the little grave hill) and the 42 life points of the town pieces.
+# Numbered points (ronda_<n>, pasar_pagi_<n>, lapak_sewa_<n>) go only into the pieces a town has exactly once (gate, the
+# two main streets, the square) so their numbers stay unique per town; nisan_<n> of the two grave-hill variants run 0-15
+# and 16-31; pasar_hantu_<n> sit by the grave hill (0-1 / 2-3), at the bridges (4) and the warehouse yard (5). Every point
+# and every small builder is checked against the piece first (berdiri / pasang_jika), so nothing is written into a wall,
+# a table or another point. Kavling pieces keep their full growth height (khk.TINGGI_RENCANA) inside the piece box so
+# 42F's stage check finds every stage block inside our own piece (42.12.1A rule 1); above the cleared 6 blocks the
+# template is void, so the terrain is never cut.
+AIR = (None, "minecraft:air", "minecraft:cave_air")
+GAYA_KAVLING = "kota_kultivator"
+VISUAL = ("lentera_gantung", "panji", "spanduk_a", "spanduk_b", "nama_jalan", "cerobong", "kucing_tidur")
+
+
+def kosong(p, x, y, z):
+    return p.inside(x, y, z) and p.get(x, y, z) in AIR
+
+
+def pasang_jika(p, fn, lantai=0):
+    """Dry-runs builder fn(piece) on a blank piece of the same size and palette. When every block it writes above row
+    `lantai` lands on a free cell of p, every standing point it writes is a free cell over ground and no point lands on an
+    existing point, runs fn(p) and returns True; otherwise p is untouched and the result is False."""
+    blank = Piece(p.size[0], p.size[1], p.size[2], seed=0, palette=p.pal)
+    try:
+        fn(blank)
+    except ValueError:
+        return False
+    if blank.clipped:
+        return False
+    for (x, y, z) in blank.cells:
+        if y > lantai and not kosong(p, x, y, z):
+            return False
+    used = {tuple(t["pos"]) for t in p.titik_list}
+    for t in blank.titik_list:
+        x, y, z = t["pos"]
+        if (x, y, z) in used or not kosong(p, x, y, z):
+            return False
+        if t["jenis"] not in VISUAL and not t["jenis"].startswith("pajangan:"):
+            below = blank.get(x, y - 1, z) or p.get(x, y - 1, z)
+            if below in AIR or "water" in below:
+                return False
+    fn(p)
+    return True
+
+
+def coba(p, fn, calon, lantai=0, maks=1):
+    """Tries fn(p, *c) at each candidate c in order until `maks` placements succeeded; returns the count."""
+    n = 0
+    for c in calon:
+        if n >= maks:
+            break
+        if pasang_jika(p, lambda k, c=c: fn(k, *c), lantai):
+            n += 1
+    return n
+
+
+def titik_bebas(p, jenis, calon, hadap, maks=1, **data):
+    """Writes point `jenis` at the first `maks` standing cells of calon [(x, y, z), ...] (y = standing level)."""
+    used = {tuple(t["pos"]) for t in p.titik_list}
+    n = 0
+    for x, y, z in calon:
+        if n >= maks:
+            break
+        if (x, y, z) not in used and berdiri(p, x, y, z):
+            khk.titik42(p, jenis, x, y, z, hadap, **data)
+            used.add((x, y, z))
+            n += 1
+    return n
+
+
+def emper(p, xs, z=None, salt=0, maks=2, jarak=4, warna="merah", y_min=0, sel=None):
+    """Town paper lanterns (42.9.2) hung from an eave, beam or balcony: for each column (x, z) (xs along row z, or the
+    cells of `sel`) the lowest block above the open space over row y_min (a roof stair, slab, beam, plank) that has
+    at least three free cells under it gets a chain under it and the lentera_gantung point under the chain (the
+    lantern is drawn by the client, no block). At most `maks` points, at least `jarak` apart, deterministic."""
+    cells = list(sel) if sel is not None else [(x, z) for x in range(xs[0], xs[1] + 1)]
+    used = {tuple(t["pos"]) for t in p.titik_list}
+    kand = []
+    for (x, zz) in cells:
+        top = None
+        for y in range(y_min + 1, min(p.size[1], y_min + 10)):
+            if not kosong(p, x, y, zz):
+                top = y
+                break
+        if top is None or top - 2 < y_min + 3:
+            continue
+        bid = p.get(x, top, zz)
+        if any(t in bid for t in ("leaves", "lantern", "chain", "banner", "carpet", "candle", "pot", "flower", "torch",
+                                  "froglight", "bell", "sign", "glass_pane", "bars", "trapdoor")):
+            continue
+        if (x, top - 2, zz) in used:
+            continue
+        kand.append((khk._seed("emper", x, zz, salt), x, top, zz))
+    kand.sort()
+    out = []
+    for _h, x, top, zz in kand:
+        if len(out) >= maks:
+            break
+        if any(abs(x - a) + abs(zz - b) < jarak for a, b in out):
+            continue
+        khk.lentera_gantung(p, x, top - 2, zz, "south", warna, kait=True)
+        out.append((x, zz))
+    return len(out)
+
+
+def lentera_area(p, x0, z0, x1, z1, y_min=0, maks=4, salt=0, warna="merah", jarak=5):
+    return emper(p, None, sel=[(x, z) for x in range(x0, x1 + 1) for z in range(z0, z1 + 1)], salt=salt, maks=maks,
+                 jarak=jarak, warna=warna, y_min=y_min)
+
+
+def ronda_titik(p, n, x, y, z, hadap="north"):
+    """One stop of the night-watch route of the town (42.7.3): gate 0, main street a 1-2, main street b 3-4, square 5."""
+    if berdiri(p, x, y, z):
+        khk.bernomor(p, "ronda", n, x, y, z, hadap, rute="kota", urut=n)
+
+
+# -------------------------------------------------------------------------------------------- new pool pieces
+def kavling_kota(name, rencana, seed):
+    """A growth lot of the town (42.9.4): the kit's fenced earth plot with stakes, surveyor's string, gate and the
+    'Kavling Kota' board post, its `kavling` box point (rencana, gaya kota_kultivator); paving outside the ring."""
+    kelas = khk.KELAS_JENIS[rencana]
+    w, d = khk.UKURAN_KELAS[kelas]
+    sx, sz = w + 2, d + 2
+    p = piece(sx, khk.TINGGI_RENCANA + 1, sz, seed=seed)
+    for x in range(sx):
+        for z in range(sz):
+            p.put(x, 0, z, "kerb" if x in (0, sx - 1) or z in (0, sz - 1) else "ground_alt",
+                  {"snowy": "false"} if x not in (0, sx - 1) and z not in (0, sz - 1) and p.b("ground_alt").endswith(("podzol", "grass_block")) else None)
+    khk.kavling(p, 1, 0, 1, rencana, GAYA_KAVLING, "south")     # no snow or petals: the plot stays bare earth for 42F
+    front_door(p, sx, sz, sx // 2, y=0)
+    save(p, name)
+
+
+def kedai_arak():
+    """The town's night corner (42.9.6): a wine house 15 x 14 under a hip roof; the kit's long tables, wine jars and the
+    dice table inside, the jiu board and the triangular wine flag at the door, a terrace with two tables, red lanterns
+    under the eave and a flag pole at the corner."""
+    sx, sy, sz = 15, 16, 14
+    p = piece(sx, sy, sz, seed=53130)
+    p.foundation(0, 0, sx - 1, sz - 1, depth=1, role="kerb")
+    p.air(0, 1, 0, sx - 1, sy - 1, sz - 1)
+    p.floor(1, 1, 1, sx - 2, 11, role="wood_alt", alt="wood", alt_chance=0.25)
+    for x in range(sx):
+        for z in (0, 12, 13):
+            p.put(x, 1, z, "paving" if p.rng.random() < 0.75 else "paving_alt")
+    p.walls(1, 2, 1, sx - 2, 5, 11, role="plaster", pillar="red", windows=3, window_role="window", door=("south", 3))
+    p.fill(2, 6, 2, sx - 3, 6, 10, "wood")
+    beam_band(p, 1, 1, sx - 2, 11, 6)
+    brackets(p, 1, 1, sx - 2, 11, 6, every=3)
+    hip(p, 1, 7, 1, sx - 2, 11, overhang=1, top="pearl")
+    khk.interior("kedai_arak", p, 2, 1, 2, sx - 4, 9, 4, "south", pintu=7, titik_maks=20)
+    for tx in (3, 11):
+        table(p, tx, 2, 13)
+        chair(p, tx - 1, 2, 13, "east")
+        chair(p, tx + 1, 2, 13, "west")
+    for x, z in ((1, 12), (13, 12)):
+        p.put(x, 2, z, "minecraft:decorated_pot", {"facing": "south", "cracked": "false", "waterlogged": "false"})
+    p.put(1, 2, 13, "minecraft:barrel", {"facing": "up", "open": "false"})
+    coba(p, lambda k, x, z: khk.panji(k, x, 1, z, "south", "bendera_arak", "jiu", tiang=5), [(13, 13), (14, 13), (0, 13)], lantai=1)
+    emper(p, (1, sx - 2), 12, salt=53130, maks=4, jarak=3, y_min=1)
+    lit(p, 7, 7, 12, chain=1, role="lamp")
+    finish_lights(p, 7, 2, 5)
+    front_door(p, sx, sz, 7, y=1)
+    save(p, "kedai_arak")
+
+
+def gudang():
+    """A town warehouse 13 x 14 (42.9.1 gudang, 42.6.5): the kit's barrels, crates, sacks and the big steelyard inside
+    (gudang, lumbung, pajangan:dacing), a hoist beam over the double door, a loaded hand cart and sacks in the yard."""
+    sx, sy, sz = 13, 16, 14
+    p = piece(sx, sy, sz, seed=53131)
+    p.foundation(0, 0, sx - 1, sz - 1, depth=1, role="kerb")
+    p.air(0, 1, 0, sx - 1, sy - 1, sz - 1)
+    p.floor(1, 1, 1, sx - 2, 10, role="paving", alt="kerb", alt_chance=0.25)
+    for x in range(sx):
+        for z in (0, 11, 12, 13):
+            p.put(x, 1, z, "paving" if p.rng.random() < 0.7 else "paving_alt")
+    p.walls(1, 2, 1, sx - 2, 5, 10, role="wall", pillar="beam", windows=4, window_role="window", door=("south", 3))
+    p.fill(2, 6, 2, sx - 3, 6, 9, "wood")
+    beam_band(p, 1, 1, sx - 2, 10, 6)
+    gable(p, 1, 7, 1, sx - 2, 10, along="z", overhang=1, pearl=False)
+    khk.interior("gudang", p, 2, 1, 2, sx - 4, 8, 4, "south", pintu=6, titik_maks=10)
+    # the hoist over the door: a beam, its chain and a bale on the hook
+    p.put(6, 6, 11, "beam", {"axis": "z"})
+    p.put(6, 5, 11, "minecraft:iron_chain", {"axis": "y", "waterlogged": "false"})
+    p.put(6, 4, 11, "minecraft:hay_block", {"axis": "y"})
+    # the hand cart and sacks in the yard
+    p.put(2, 2, 12, "minecraft:hay_block", {"axis": "x"})
+    p.put(3, 2, 12, "minecraft:barrel", {"facing": "up", "open": "false"})
+    p.put(2, 3, 12, "minecraft:barrel", {"facing": "east", "open": "false"})
+    for x, f in ((2, "south"), (3, "south")):
+        p.put(x, 2, 13, "wood_trapdoor", {"facing": f, "half": "bottom", "open": "true", "powered": "false", "waterlogged": "false"})
+    p.put(4, 2, 12, "wood_fence")
+    for x in (9, 10):
+        p.put(x, 2, 12, "minecraft:white_wool")
+        p.put(x, 3, 12, "minecraft:white_carpet")
+    p.put(10, 2, 13, "minecraft:composter", {"level": "5"})
+    titik_bebas(p, "pasar_hantu_5", [(8, 2, 13), (11, 2, 13), (1, 2, 13)], "north", tempat="gudang_kosong")
+    emper(p, (1, sx - 2), 11, salt=53131, maks=2, jarak=4, y_min=1)
+    finish_lights(p, 6, 2, 5)
+    front_door(p, sx, sz, 6, y=1)
+    save(p, "gudang")
+
+
+def hias_kandang(name="hias_kandang", seed=53132):
+    """A chicken pen on a street side (42.7.5): the kit's fenced run with its coop, trough and hay; point kandang
+    (hewan ayam_kota, five birds)."""
+    p = piece(7, 9, 7, seed=seed)
+    for x in range(7):
+        for z in range(7):
+            for y in range(1, 8):
+                p.put(x, y, z, "minecraft:air")
+    khk.kandang(p, 0, 0, 0, 6, 6, "ayam_kota", "south")
+    snow_drift(p, 1, 1, 5, 5, 1, 0.2)
+    front_door(p, 7, 7, 3)
+    save(p, name)
+
+
+def tembok_ujung_makam(name, seed, mulai, hantu):
+    """A wall section closing a street with the town's grave hill behind it (42.12.1 kota 34, 42.7.7): the kit's terraced
+    cemetery 23 x 22 with 16 graves (nisan_<mulai>..), the gate arch and the paper-money burner, a wooded crest behind
+    the last terrace; the crenellated wall with a gate passage, white funeral lanterns, a walkway stair and a quiet
+    corner for the Ghost Market (pasar_hantu_<hantu>, _<hantu + 1>) on the town side."""
+    sx, sy, sz = 23, 18, 29
+    zw = 22
+    p = piece(sx, sy, sz, seed=seed)
+    khk.makam(p, 0, 0, 0, sx, zw, "south", 16, mulai=mulai, gaya="bukit", bertingkat=True, gapura=True, pembakar=True)
+    # the crest behind the top terrace (rows z 0..2): earth up to the terrace level, grass, pines and a stone lantern
+    for x in range(sx):
+        for z in range(0, 3):
+            for y in range(0, 3):
+                p.put(x, y, z, "minecraft:dirt")
+            p.put(x, 3, z, "ground", {"snowy": "false"} if p.b("ground").endswith("grass_block") else None)
+    for x in (3, 11, 19):
+        tree(p, x, 4, 1, 7 if PAL()["tree"] in ("pine", "spruce") else 5)
+    stone_lantern(p, 7, 4, 1)
+    stone_lantern(p, 15, 4, 1)
+    # the wall (rows zw..zw+2) with crenels, a walkway on top and a gate passage to the hill
+    for x in range(sx):
+        for z in range(zw, sz):
+            p.put(x, 0, z, "kerb")
+        for y in range(1, 7):
+            for z in (zw, zw + 1, zw + 2):
+                p.put(x, y, z, "kerb" if p.rng.random() < 0.85 else "kerb_alt")
+        p.put(x, 7, zw, "kerb_wall" if x % 2 == 0 else "minecraft:air")
+        p.put(x, 7, zw + 2, "kerb_wall" if x % 2 == 0 else "minecraft:air")
+        p.put(x, 7, zw + 1, "minecraft:air")
+        for z in range(zw + 3, sz):
+            for y in range(1, 6):
+                p.put(x, y, z, "minecraft:air")
+    gx = sx // 2
+    for x in range(gx - 1, gx + 2):
+        for y in range(1, 4):
+            for z in (zw, zw + 1, zw + 2):
+                p.put(x, y, z, "minecraft:air")
+    p.fill(gx - 1, 4, zw, gx + 1, 4, zw + 2, "beam", {"axis": "x"})
+    plaque(p, gx, 5, zw + 2)
+    for z in (zw, zw + 2):
+        for y in (1, 2, 3):
+            p.put(gx - 1, y, z, "wood_trapdoor", {"facing": "east", "half": "bottom", "open": "true", "powered": "false", "waterlogged": "false"})
+            p.put(gx + 1, y, z, "wood_trapdoor", {"facing": "west", "half": "bottom", "open": "true", "powered": "false", "waterlogged": "false"})
+    # white lanterns of mourning on arms out of the wall, both sides of the gate (town side)
+    for x in (gx - 3, gx + 3):
+        p.put(x, 5, zw + 3, "wood_fence")
+        khk.lentera_gantung(p, x, 3, zw + 3, "south", "putih", kait=True)
+    # the stair up to the walkway on the town side, a drum and a banner on the walk
+    for i in range(6):
+        p.stairs(2 + i, 1 + i, zw + 3, "kerb_stairs", "east")
+        for y in range(1, 1 + i):
+            p.put(2 + i, y, zw + 3, "kerb")
+    p.put(16, 7, zw + 1, "minecraft:note_block", {"instrument": "basedrum", "note": "0", "powered": "false"})
+    banner_pole(p, 18, 7, zw + 1, height=3, color="white", rotation=0)
+    post(p, 20, 1, zw + 5)
+    # the quiet corner behind the stair: an empty bench, a jar, where the Ghost Market sets up at night
+    p.stairs(1, 1, zw + 5, "wood_stairs", "east")
+    p.put(1, 1, zw + 6, "minecraft:decorated_pot", {"facing": "east", "cracked": "true", "waterlogged": "false"})
+    titik_bebas(p, "pasar_hantu_%d" % hantu, [(gx + 4, 1, zw + 4), (gx + 5, 1, zw + 4)], "north", tempat="dekat_makam")
+    titik_bebas(p, "pasar_hantu_%d" % (hantu + 1), [(2, 1, zw + 5), (3, 1, zw + 6)], "west", tempat="gang_buntu")
+    snow_drift(p, 0, zw + 3, sx - 1, sz - 1, 1, 0.3)
+    finish_lights(p, gx, 1, zw + 4)
+    p.weather(0.08)
+    conn(p, gx, 0, sz - 1, "south", "kota/masuk", "kota/keluar", "minecraft:empty", "minecraft:stone_bricks")
+    save(p, name)
+
+
+# -------------------------------------------------------------------------------------------- 42 points of the old pieces
+def _h_gerbang(p, name):
+    ronda_titik(p, 0, 11, 1, 2, "north")
+    coba(p, lambda k, x, z: khk.panji(k, x, 0, z, "south", "panji", None, tiang=5), [(8, 1), (8, 2), (7, 1)])
+    coba(p, lambda k, x, z: khk.panji(k, x, 0, z, "south", "panji", None, tiang=5), [(14, 1), (14, 2), (15, 1)])
+    coba(p, lambda k, x, z, f: khk.tambat(k, x, 0, z, f), [(x, z, f) for f in ("north", "south") for z in (2, 3, 10, 11)
+                                                           for x in (3, 4, 18, 19, 17, 5)], maks=2)
+    lentera_area(p, 0, 0, sx_of(p) - 1, sz_of(p) - 1, 0, maks=6, salt=1)
+    khk.kucing_atap(p, 0, 0, sx_of(p) - 1, sz_of(p) - 1, 0, maks=1, salt=2)
+
+
+def _h_jalan_utama(p, name):
+    a = name.endswith("_a")
+    ronda_titik(p, 1 if a else 3, 4, 1, 16, "north")
+    ronda_titik(p, 2 if a else 4, 4, 1, 4, "north")
+    base = 0 if a else 2
+    coba(p, lambda k, x, z, f: khk.lapak_sewa(k, base, x, 0, z, f),
+             [(2, z, "east") for z in (4, 7, 12, 18)] + [(6, z, "west") for z in (4, 7, 12, 18)])
+    coba(p, lambda k, x, z, f: khk.lapak_sewa(k, base + 1, x, 0, z, f),
+         [(6, z, "west") for z in (18, 12, 7, 4)] + [(2, z, "east") for z in (18, 12, 7, 4)])
+    if not a:
+        coba(p, lambda k, z: khk.spanduk(k, 0, z, 8, z, 0, tinggi=6, pasangan="a"), [(11,), (12,), (13,)])
+    else:
+        coba(p, lambda k, x, z, f: khk.nama_jalan(k, x, 0, z, f, jalan="utama"), [(8, 1, "west"), (0, 1, "east"), (8, 20, "west")])
+    emper(p, None, sel=[(x, z) for x in range(9) for z in (6, 17)], salt=3, maks=3, jarak=2)
+
+
+def _h_alun(p, name):
+    titik_bebas(p, "sumur", [(16, 1, 19), (13, 1, 16), (19, 1, 16)], "north")
+    coba(p, lambda k, x, z: khk.catur(k, x, 0, z, "south", pohon=False), [(6, 13), (5, 13), (7, 14), (25, 13)])
+    coba(p, lambda k, x, z, f: khk.gantung_sangkar(k, x, 0, z, f, pohon=False, bangku=False), [(9, 6, "west"), (6, 9, "north"), (9, 7, "west")])
+    coba(p, lambda k, x, z: khk.jongkok(k, x, 0, z, "south", 2), [(24, 13), (23, 12), (8, 18), (24, 9)])
+    # the morning market (pasar_pagi_0..3): each tent needs its 3 x 3 free
+    n = 0
+    for x, z in ((4, 16), (4, 22), (28, 24), (28, 28), (20, 28), (12, 28), (4, 28), (28, 10), (22, 16), (10, 16)):
+        if n >= 4:
+            break
+        if all(berdiri(p, x + dx, 1, z + dz) for dx in (-1, 0, 1) for dz in (-1, 0, 1)) and \
+                not any(abs(t["pos"][0] - x) <= 1 and abs(t["pos"][2] - z) <= 1 for t in p.titik_list):
+            khk.pasar_pagi(p, n, x, 1, z, "north" if z > 16 else "south")
+            n += 1
+    ronda_titik(p, 5, 16, 1, 28, "north")
+    coba(p, lambda k, x, z: khk.panji(k, x, 0, z, "south", "panji", None, tiang=5), [(13, 31), (14, 31)])
+    coba(p, lambda k, x, z: khk.panji(k, x, 0, z, "south", "panji", None, tiang=5), [(19, 31), (18, 31)])
+    lentera_area(p, 0, 0, 32, 32, 0, maks=8, salt=4)
+    khk.kucing_atap(p, 0, 0, 32, 32, 0, maks=1, salt=5)
+
+
+def _h_kantor(p, name):
+    calon = [(6, 3, 7), (8, 3, 7), (7, 3, 9)] if name == "kantor_sekte" else [(8, 2, 4), (10, 2, 4), (9, 2, 6)]
+    titik_bebas(p, "rekrut", calon, "east" if name == "kantor_sekte" else "east", bilik="0")
+    lentera_area(p, 0, 0, sx_of(p) - 1, sz_of(p) - 1, 1, maks=4, salt=6)
+
+
+def _h_penginapan(p, name):
+    sx, sz = sx_of(p), sz_of(p)
+    coba(p, lambda k, x, z, f: khk.tambat(k, x, 0, z, f), [(x, z, "south") for z in (sz - 3, sz - 2) for x in range(3, sx - 3)]
+         + [(x, z, "north") for z in (sz - 1,) for x in range(3, sx - 3)], maks=1)
+    lentera_area(p, 0, 0, sx - 1, sz - 1, 1, maks=4, salt=7)
+    khk.kucing_atap(p, 0, 0, sx - 1, sz - 1, 1, maks=1, salt=8)
+
+
+def _h_unik(p, name):
+    """Tea houses, the auction hall, the pavilions, the coffin shop: lanterns under the eaves, a roof cat."""
+    lentera_area(p, 0, 0, sx_of(p) - 1, sz_of(p) - 1, 1, maks=4, salt=khk._seed(name) % 97)
+    khk.kucing_atap(p, 0, 0, sx_of(p) - 1, sz_of(p) - 1, 1, maks=1, salt=9)
+
+
+def _h_jalan(p, name):
+    coba(p, lambda k, x, z, f: khk.nama_jalan(k, x, 0, z, f), [(6, 2, "west"), (0, 13, "east"), (6, 4, "west")])
+    if name == "jalan_lurus_3":
+        coba(p, lambda k, x, z: khk.jongkok(k, x, 0, z, "south", 2), [(2, 9), (2, 5), (3, 12)])
+    elif name == "jalan_lurus_5":
+        coba(p, lambda k, x, z, f: khk.gantung_sangkar(k, x, 0, z, f, pohon=False, bangku=False),
+             [(3, 8, "east"), (3, 7, "east"), (3, 9, "east"), (2, 8, "east")])
+    elif name == "jalan_lurus_2":
+        coba(p, lambda k, x, z: khk.jongkok(k, x, 0, z, "south", 1), [(4, 12), (4, 3)])
+    lentera_area(p, 0, 0, sx_of(p) - 1, sz_of(p) - 1, 0, maks=2, salt=khk._seed(name) % 89, jarak=6)
+
+
+def _h_jembatan(p, name):
+    khk.pancing_kolam(p, 0, 0, sx_of(p) - 1, sz_of(p) - 1, 0, maks=2, jarak=4)
+    titik_bebas(p, "pasar_hantu_4", [(1, 1, 12), (9, 1, 12), (1, 1, 2), (9, 1, 2)], "north", tempat="bawah_jembatan")
+    lentera_area(p, 0, 0, sx_of(p) - 1, sz_of(p) - 1, 0, maks=2, salt=10)
+
+
+def _h_tembok(p, name):
+    coba(p, lambda k, x: khk.panji(k, x, 6, 2, "south", "panji", None, tiang=3, alas=False), [(4,), (5,), (6,), (8,)], lantai=6)
+    lentera_area(p, 0, 0, sx_of(p) - 1, sz_of(p) - 1, 0, maks=2, salt=11)
+
+
+def _h_hias(p, name):
+    if name == "hias_sumur":
+        titik_bebas(p, "sumur", [(3, 1, 5), (1, 1, 3)], "north")
+    elif name == "hias_pohon":
+        titik_bebas(p, "gantung_sangkar", [(3, 1, 6), (0, 1, 3), (6, 1, 3)], "north")
+    elif name == "hias_gerobak":
+        titik_bebas(p, "jongkok", [(3, 1, 5), (2, 1, 5), (4, 1, 5)], "north", maks=2)
+    elif name == "hias_batu":
+        titik_bebas(p, "jongkok", [(1, 1, 6), (5, 1, 6)], "north")
+    elif name == "hias_kios":
+        lentera_area(p, 0, 0, 6, 6, 0, maks=1, salt=12)
+
+
+def sx_of(p):
+    return p.size[0]
+
+
+def sz_of(p):
+    return p.size[2]
+
+
+HIDUP42 = {"gerbang": _h_gerbang, "gerbang_2": _h_gerbang, "jalan_utama_a": _h_jalan_utama, "jalan_utama_b": _h_jalan_utama,
+           "alun": _h_alun, "kantor_sekte": _h_kantor, "kantor_sekte_2": _h_kantor, "penginapan": _h_penginapan,
+           "penginapan_2": _h_penginapan, "balai_lelang": _h_unik, "kedai_teh": _h_unik, "kedai_teh_2": _h_unik,
+           "toko_peti": _h_unik, "paviliun_pil": _h_unik, "paviliun_pusaka": _h_unik, "paviliun_pil_2": _h_unik,
+           "paviliun_pusaka_2": _h_unik, "jembatan": _h_jembatan, "jembatan_2": _h_jembatan, "tembok_ujung_1": _h_tembok,
+           "tembok_ujung_2": _h_tembok, "tembok_ujung_3": _h_tembok}
+HIDUP42_AWAL = (("jalan_lurus", _h_jalan), ("hias_", _h_hias))
+
+
+def hidup42(p, name):
+    """The 42 points of a town piece (called by save() before titik_hidup derives the 38 points)."""
+    fn =HIDUP42.get(name) or next((f for k, f in HIDUP42_AWAL if name.startswith(k)), None)
+    if fn is not None:
+        fn(p, name)
+
+
 # ======================================================================================================== JSON
 TOWN_BIOMES = {
     "sedang": ["minecraft:plains", "minecraft:meadow", "minecraft:forest", "minecraft:birch_forest", "minecraft:flower_forest"],
@@ -2745,14 +3206,20 @@ def write_town_pools():
         "jalan_ujung": [(S("jalan_lurus_1", utuh, terr), 3), (S("jalan_lurus_2", utuh, terr), 2), (S("jalan_lurus_4", utuh, terr), 2),
                         (S("jalan_lurus_5", utuh, terr), 1), (S("jalan_silang", utuh, terr), 2), (S("jalan_silang_2", utuh, terr), 1),
                         (S("jembatan", utuh, terr), 1), (S("jembatan_2", utuh, terr), 1),
-                        (S("tembok_ujung_1"), 2), (S("tembok_ujung_2"), 2), (S("tembok_ujung_3"), 1)],
-        "tembok_ujung": [(S("tembok_ujung_1"), 2), (S("tembok_ujung_2"), 2), (S("tembok_ujung_3"), 1)],
+                        (S("tembok_ujung_1"), 2), (S("tembok_ujung_2"), 2), (S("tembok_ujung_3"), 1),
+                        (S("tembok_ujung_makam"), 1), (S("tembok_ujung_makam_2"), 1)],
+        "tembok_ujung": [(S("tembok_ujung_1"), 2), (S("tembok_ujung_2"), 2), (S("tembok_ujung_3"), 1),
+                         (S("tembok_ujung_makam"), 2), (S("tembok_ujung_makam_2"), 1)],
         "rumah": [(S("rumah_kecil_%d" % i), 3) for i in range(3)]
                  + [(S("rumah_sedang_%d" % i), 2) for i in range(3)]
                  + [(S("rumah_besar_%d" % i), 1) for i in range(3)]
                  + [(S("rumah_halaman_%d" % i), 1) for i in range(3)]
-                 + [(S("rumah_toko_%d" % i), 2) for i in range(3)]
-                 + [(S("hias_%s" % k, utuh), 1) for k in ("kios", "gerobak", "lentera", "sumur", "kuil", "batu", "latihan", "pohon")]
+                 + [(S("rumah_toko_%d" % i), 2 if i < 3 else 1) for i in range(len(KIT_RUMAH["toko"]))]
+                 + [(S("hias_%s" % k, utuh), 1) for k in ("kios", "gerobak", "lentera", "sumur", "kuil", "batu", "latihan", "pohon",
+                                                          "kandang")]
+                 # DESIGN 42.9.4 / 42.9.6: growth lots (about 6 per town), the wine house and the warehouse
+                 + [(S("kavling_kecil", utuh), 2), (S("kavling_kecil_2", utuh), 1), (S("kavling_besar", utuh), 2),
+                    (S("kavling_besar_2", utuh), 1), (S("kedai_arak"), 1), (S("gudang"), 1)]
                  + [({"element_type": "minecraft:empty_pool_element"}, 1)],
     }
     fallback = {"jalan": ref("tembok_ujung"), "jalan_ujung": ref("tembok_ujung")}
@@ -2896,13 +3363,24 @@ def build_town():
     kantor_sekte()
     kantor_sekte_2()
     for i in range(3):
-        rumah("rumah_kecil_%d" % i, 7, 7, 3, 53060 + i, i)
-        rumah("rumah_sedang_%d" % i, 9, 9, 4, 53070 + i, i)
-        rumah("rumah_besar_%d" % i, 11, 9, 4, 53080 + i, i)
+        rumah("rumah_kecil_%d" % i, "kecil", 11, 10, 3, 53060 + i, i)
+        rumah("rumah_sedang_%d" % i, "sedang", 11, 11, 4, 53070 + i, i)
+        rumah("rumah_besar_%d" % i, "besar", 13, 15, 4, 53080 + i, i)
         rumah_halaman("rumah_halaman_%d" % i, 53100 + i, i)
+    for i in range(len(KIT_RUMAH["toko"])):
         rumah_toko("rumah_toko_%d" % i, 53110 + i, i)
     for i, k in enumerate(("kios", "gerobak", "lentera", "sumur", "kuil", "batu", "latihan", "pohon")):
         hias("hias_" + k, 53090 + i, k)
+    # DESIGN 42 (42W-K): growth lots, the night corner, the warehouse, a chicken pen, the wall end with the grave hill
+    kavling_kota("kavling_kecil", "rumah_kecil", 53120)
+    kavling_kota("kavling_kecil_2", "kuil_kecil", 53121)
+    kavling_kota("kavling_besar", "rumah_toko", 53122)
+    kavling_kota("kavling_besar_2", "bengkel", 53123)
+    kedai_arak()
+    gudang()
+    hias_kandang()
+    tembok_ujung_makam("tembok_ujung_makam", 53125, 0, 0)
+    tembok_ujung_makam("tembok_ujung_makam_2", 53126, 16, 2)
     write_town_pools()
 
 

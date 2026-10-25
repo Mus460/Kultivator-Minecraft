@@ -2,13 +2,14 @@ package dev.kultivator.client.sectbuild;
 
 import dev.kultivator.client.EffectQuality;
 import dev.kultivator.client.fx.CommonFx;
+import dev.kultivator.client.hud.Kabar;
+import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.fx.FxType;
 import dev.kultivator.network.Payloads;
 import dev.kultivator.sect.build.api.BuildFxIds;
 import dev.kultivator.sect.build.api.SectTemplates;
 import dev.kultivator.sect.build.flow.Ceremonies;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
@@ -46,7 +47,6 @@ public final class BuildFx {
 	private static final int RED = 0xFF3A2A;
 	private static final int PETAL = 0xF6B7CF;
 	private static final int MAX_ANIMATIONS = 32;
-	private static final SystemToast.SystemToastId TIER_TOAST = new SystemToast.SystemToastId(7000L);
 	private static final Map<String, Long> RECENT = new HashMap<>();
 	private static final List<Animation> ANIMATIONS = new ArrayList<>();
 
@@ -97,9 +97,10 @@ public final class BuildFx {
 			case Ceremonies.FX_WORK -> work(pos, target, b);
 			case Ceremonies.FX_DEPOSIT -> deposit(pos, target, b, f);
 			case Ceremonies.FX_ORB -> animate(new Animation(Ceremonies.FX_ORB, pos, pos, b, 50));
-			case Ceremonies.FX_TOAST -> SystemToast.addOrUpdate(Minecraft.getInstance().gui.toastManager(), TIER_TOAST,
-					Component.translatable("kultivator.sectbuild.toast.title", b), Component.translatable("kultivator.sectbuild.toast.text",
-							SectTemplates.tierName(b), SectTemplates.name(Math.round(f))));
+			// the single notice slot (DESIGN 43.9), a little longer than a plain notice
+			case Ceremonies.FX_TOAST -> Kabar.kirim(Kabar.kartu(Component.translatable("kultivator.sectbuild.toast.title", b),
+					Component.translatable("kultivator.sectbuild.toast.text", SectTemplates.tierName(b), SectTemplates.name(Math.round(f))))
+					.ikon(Kabar.glyph(Glyphs.BUILD)).lama(7000L));
 			case Ceremonies.FX_GRAND -> animate(new Animation(Ceremonies.FX_GRAND, pos, target, b, 120));
 			case Ceremonies.FX_PUFF -> CommonFx.burst(pos, b == 0 ? JADE : b, 10, 0.6F);
 			default -> {

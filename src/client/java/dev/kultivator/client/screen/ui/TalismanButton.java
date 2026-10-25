@@ -6,22 +6,116 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.Util;
 
 import java.util.function.BooleanSupplier;
+import java.util.function.IntConsumer;
 import java.util.function.Supplier;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * A talisman: a strip of paper-yellow paper with a red seal stamp at its left end and the label in ink. The seal glows
  * under the mouse, the paper sinks 1 px while pressed, an "urgent" talisman's seal pulses (ready to act or waiting for
  * a confirming click) and a "stamped" one (the chosen option of a stack) slides right and carries a round red stamp.
+ *
+ * <p>The single button of the kit (DESIGN 43.7): at least 16 x 12, label at 1.0 cut with "…" (never shrunk), a disabled
+ * talisman names its reason ({@link #alasanWhen}) in the tooltip and the footer, a cycling talisman ({@link #siklus}) steps
+ * forward on a click and back on a right click with small arrows at its end. Immediate pages draw it with
+ * {@link #gambar(Lukis, String, int, int, int, int, Component, boolean, Component, Runnable)}.
  */
 public class TalismanButton extends Widget {
+
+	/** Smallest clickable box (43.0.6). */
+	public static final int MIN_W = 16;
+	public static final int MIN_H = 12;
 
 	private final Supplier<Component> label;
 	private BooleanSupplier stamped = () -> false;
 	private BooleanSupplier urgent = () -> false;
+	private boolean cycle;
 
 	public TalismanButton(int x, int y, int w, int h, Supplier<Component> label) {
-		super(x, y, w, h);
+		super(x, y, Math.max(MIN_W, w), Math.max(MIN_H, h));
 		this.label = label;
+	}
+
+	/** Cycle mode: a click runs {@code maju}, a right click {@code mundur} (G08). */
+	public TalismanButton siklus(Runnable maju, Runnable mundur) {
+		this.cycle = true;
+		onPress(maju);
+		onRightPress(mundur);
+		return this;
+	}
+
+	/** A cycling talisman steps with ←/→ while focused. */
+	@Override
+	public @Nullable IntConsumer geser() {
+		if (!cycle) {
+			return null;
+		}
+		return arah -> {
+			if (!isEnabled()) {
+				UiSound.denied();
+				return;
+			}
+			Runnable r = arah > 0 ? action : kanan;
+			if (r != null) {
+				UiSound.press();
+				r.run();
+			}
+		};
+	}
+
+	/** Width that fits {@code label} at 1.0 plus the seal and margins (clamped to {@code min..max}). */
+	public static int lebar(Font font, Component label, int min, int max) {
+		return Math.max(Math.max(MIN_W, min), Math.min(max, font.width(label) + 24));
+	}
+
+	// ------------------------------------------------------------------ immediate use
+
+	/** Per-key state of an immediate talisman (kept by the page's {@link Fokus}). */
+	private static final class Imediat {
+		final TalismanButton widget;
+		Component label = Component.empty();
+		boolean aktif = true;
+		boolean mendesak;
+		boolean terpilih;
+		@Nullable Component alasan;
+		@Nullable Runnable aksi;
+
+		Imediat() {
+			widget = new TalismanButton(0, 0, MIN_W, MIN_H, () -> label);
+			widget.enabledWhen(() -> aktif);
+			widget.urgentWhen(() -> mendesak);
+			widget.stampedWhen(() -> terpilih);
+			widget.alasanWhen(() -> alasan);
+			widget.onPress(() -> {
+				if (aksi != null) {
+					aksi.run();
+				}
+			});
+		}
+	}
+
+	/** Draws immediate talisman {@code kunci}; returns true when the mouse is over it. */
+	public static boolean gambar(Lukis l, String kunci, int x, int y, int w, int h, Component label, boolean aktif, @Nullable Component alasan,
+			@Nullable Runnable aksi) {
+		return gambar(l, kunci, x, y, w, h, label, aktif, alasan, aksi, false, false);
+	}
+
+	/** Like {@link #gambar(Lukis, String, int, int, int, int, Component, boolean, Component, Runnable)} with urgent / chosen. */
+	public static boolean gambar(Lukis l, String kunci, int x, int y, int w, int h, Component label, boolean aktif, @Nullable Component alasan,
+			@Nullable Runnable aksi, boolean mendesak, boolean terpilih) {
+		Imediat t = l.fokusRing().simpan("talisman:" + kunci, Imediat::new);
+		t.label = label;
+		t.aktif = aktif;
+		t.mendesak = mendesak;
+		t.terpilih = terpilih;
+		t.alasan = alasan;
+		t.aksi = aksi;
+		t.widget.x = x;
+		t.widget.y = y;
+		t.widget.w = Math.max(MIN_W, w);
+		t.widget.h = Math.max(MIN_H, h);
+		l.widget(kunci, t.widget);
+		return l.di(x, y, x + t.widget.w, y + t.widget.h);
 	}
 
 	public TalismanButton stampedWhen(BooleanSupplier stamped) {
@@ -87,11 +181,17 @@ public class TalismanButton extends Widget {
 			textRight = Math.round(scx - stampR - 2.0F);
 		}
 
+		if (cycle) {
+			// small arrows at the end: click forward, right click back
+			int ink = on ? Palette.argb(0xB0, Palette.INK_SOFT) : Palette.argb(0x80, Palette.INK_FAINT);
+			Brush.text(g, font, Component.literal("‹›"), textRight - font.width("‹›"), by + (h - 8.0F) / 2.0F, ink, 1.0F, false);
+			textRight -= font.width("‹›") + 2;
+		}
+
 		Component text = label.get();
 		int tx = sx + size + 4;
 		float room = textRight - tx;
-		float scale = Brush.fitScale(font, text, room, 1.0F, 0.6F);
-		float ty = by + (h - 8.0F * scale) / 2.0F;
-		Brush.fit(g, font, text, tx, ty, room, on ? Palette.INK : Palette.INK_FAINT, 1.0F, 0.6F, false);
+		float ty = by + (h - 8.0F) / 2.0F;
+		Brush.fit(g, font, text, tx, ty, room, on ? Palette.INK : Palette.INK_FAINT, 1.0F, 1.0F, false);
 	}
 }

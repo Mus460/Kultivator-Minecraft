@@ -1,21 +1,32 @@
 package dev.kultivator.client.dunia.peta;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import dev.kultivator.client.dunia.kapal.HelmScreen;
+import dev.kultivator.client.hub.HubNav;
+import dev.kultivator.client.hub.HubPages;
+import dev.kultivator.client.hub.LembarHub;
+import dev.kultivator.client.hub.Tujuan;
+import dev.kultivator.client.hub.Urutan;
+import dev.kultivator.client.screen.Page;
 import dev.kultivator.client.screen.ui.Brush;
-import dev.kultivator.client.screen.ui.KeyHints;
+import dev.kultivator.client.screen.ui.DaftarGulir;
+import dev.kultivator.client.screen.ui.Glyphs;
+import dev.kultivator.client.screen.ui.InkField;
+import dev.kultivator.client.screen.ui.JadeCoin;
+import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
-import dev.kultivator.client.screen.ui.ScrollFrame;
-import dev.kultivator.client.screen.ui.SlipTooltip;
+import dev.kultivator.client.screen.ui.TalismanButton;
 import dev.kultivator.client.screen.ui.UiSound;
+import dev.kultivator.client.screen.ui.Widget;
 import dev.kultivator.dunia.DuniaMarkers;
+import dev.kultivator.dunia.kapal.KapalRohEntity;
 import dev.kultivator.dunia.peta.PetaItems;
 import dev.kultivator.dunia.peta.PetaNet;
+import dev.kultivator.dunia.tempat.ui.LembarKunci.PetaKota;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.player.LocalPlayer;
@@ -38,22 +49,41 @@ import java.util.Locale;
 import java.util.Set;
 
 /**
- * Peta Dunia Kultivasi, the world map screen (DESIGN 34.5.16): an ink-wash parchment of the explored world
- * ({@link PetaPainter}), the known sites with their marker icons (DESIGN 34.4.8; undiscovered sites never show), live
- * omens, waypoints, the own ship and its voyage line, the return point and a soul's body, sect territories with their
- * vassal villages, the NPC sect domains with inked borders and seals, and the overlay coins (Cuaca Roh, Peristiwa
- * Langit, Segel, Jalur Kapal). Drag to pan, wheel for the three zooms (1 px = 16 / 64 / 256 b), click a marker for its
- * card ("Berlayar ke sini" for a captain, "Tandai"), right-click the paper to set a waypoint; a search box and a list of
- * known sites on the side. Markers and overlays are GUI fills; one texture holds the painted paper. Client only.
+ * Dunia › Peta (DESIGN 34.5.16, 43.5, module M12 of 43.16.2), the one map page of the Gulungan Utama, on the wide paper.
+ * <ul>
+ * <li>Sub {@code dunia}: Peta Dunia Kultivasi, an ink-wash parchment of the explored world ({@link PetaPainter}), the known
+ * sites with their marker icons (34.4.8; undiscovered sites never show), live omens, waypoints, the own ship and its
+ * voyage line, the return point and a soul's body, sect territories with their vassal villages, the NPC sect domains with
+ * inked borders and seals, and the layers (Cuaca Roh, Peristiwa Langit, Segel, Jalur Kapal). Drag to pan, wheel or +/- for
+ * the three zooms (1 px = 16 / 64 / 256 b), click a marker for its card ("Berlayar" for a captain, "Tandai"), right-click
+ * the paper to set a waypoint; Tab focuses the map, then arrows pan and Home centres. The side panel (search, category
+ * coins, the known sites) shows from 360 px; narrower, "Daftar" swaps the map for that list.</li>
+ * <li>Subs {@code kota}, {@code layanan}, {@code tokoh}, {@code acara}: the capital's sheet {@code peta_kota}
+ * ({@code LayarPetaKota}, G23/G70) mounted through {@link LembarHub} without a registration of its own; its four tabs are
+ * this page's subs (no fourth level, 43.0.4).</li>
+ * <li>Sail mode (R13, G58): the helm's "Pilih tujuan di Peta" ({@link #berlayar}) opens the map with a banner; the list
+ * starts with the helm's voyages (the own sect hall, the routes other modules registered), every marker's card sails; after
+ * a choice, "‹ Kemudi" or Esc the Gulungan goes back to Di Sini › Kemudi. The mode ends with the helm context.</li>
+ * </ul>
+ * Markers and layers are GUI fills; one texture holds the painted paper. Text at 1.0 (43.0.5). The map asks the server for
+ * a fresh sheet when shown and for explored regions in view while shown (43.0.12). Client only.
  */
-public final class PetaScreen extends Screen {
+public final class PetaScreen extends Page {
 
+	public static final String SUB_DUNIA = "dunia";
+	public static final String SUB_KOTA = "kota";
+	private static final String M = "kultivator.gui43.m12.";
+	private static final String SUB = "kultivator.gui43.sub." + Urutan.ID_PETA + ".";
 	private static final int[] ZOOMS = {16, 64, 256};
 	private static final Identifier MARKERS = dev.kultivator.Kultivator.id("textures/dunia/peta/markers.png");
 	/** Second marker atlas (38W), cells {@link dev.kultivator.dunia.DuniaMarkers#ATLAS2_FIRST} and up, same 8 x 4 layout. */
 	private static final Identifier MARKERS_TEMPAT = dev.kultivator.Kultivator.id("textures/dunia/peta/markers_tempat.png");
 	private static final Identifier COMPASS = dev.kultivator.Kultivator.id("textures/dunia/peta/compass.png");
-	private static final int SIDE_W = 108;
+	private static final int SIDE_W = 118;
+	private static final int HEAD_H = 11;
+	private static final int BAR_H = 14;
+	private static final int BANNER_H = 16;
+	private static final int ROW_H = 13;
 
 	/** Marker categories (the side panel's filter coins). */
 	enum Category {
@@ -129,148 +159,320 @@ public final class PetaScreen extends Screen {
 	private static double viewX = Double.NaN;
 	private static double viewZ = Double.NaN;
 	private static String viewDim = "";
+	/** Sail mode (R13): asked by the helm; valid only while the helm is the Di Sini context ({@link #modeBerlayar}). */
+	private static boolean berlayar;
 
 	private final List<Mark> marks = new ArrayList<>();
 	private final List<Mark> listed = new ArrayList<>();
-	private final List<PetaUi.Button> buttons = new ArrayList<>();
-	private final List<PetaUi.Button> cardButtons = new ArrayList<>();
 	private int seenSheet = -1;
-	private String search = "";
-	private @Nullable EditBox searchBox;
+	private final InkField cari;
+	private final DaftarGulir daftar = new DaftarGulir();
 	private @Nullable Mark selected;
-	private int x0;
-	private int y0;
-	private int x1;
-	private int y1;
+	private @Nullable Mark hover;
 	private int mx0;
 	private int my0;
 	private int mx1;
 	private int my1;
 	private boolean side;
+	/** Without the side panel: the list shown instead of the map. */
+	private boolean daftarTampil;
 	private boolean dragging;
 	private double dragX;
 	private double dragY;
 	private double pressX;
 	private double pressY;
-	private long openedAt;
-	private float listScroll;
 	private long lastAsk;
-	private @Nullable List<Component> tooltip;
 	private int cardX;
 	private int cardY;
 	private int cardW;
 	private int cardH;
+	private @Nullable TalismanButton tombolDaftar;
 
-	/** The "?" seal: Panduan › Ensiklopedia on the world-map topic (audit M5, S11). */
-	private final KeyHints.SealCorner help = new KeyHints.SealCorner("peta_dunia");
+	/** The capital's sheet (subs kota, layanan, tokoh, acara). */
+	private final LembarHub.Halaman kota;
+	private String sub = SUB_DUNIA;
+	private boolean ditampilkan;
+	private String laidKota = "";
 
 	public PetaScreen() {
-		super(Component.translatable("kultivator.peta.title"));
+		cari = new InkField(0, 0, 80, 14, 32, null).cari(Component.translatable("kultivator.peta.search"), value -> rebuildList());
+		// an unregistered mount: the page id stays "peta" (one coin); the sheet's read-only view and its ops work from here
+		kota = LembarHub.dari(new HubPages.Entri(HubNav.DUNIA, Urutan.ID_PETA, Urutan.PETA, () -> null, PetaKota.LAYAR, Set.of()));
+		daftar.judul(this::judulBaris, 13);
 	}
 
-	// ================================================================== layout
+	/** The helm's "Pilih tujuan di Peta": opens the map in sail mode (R13). */
+	public static void berlayar() {
+		berlayar = true;
+		HubNav.buka(Tujuan.of(HubNav.DUNIA, Urutan.ID_PETA).sub(SUB_DUNIA));
+	}
+
+	/** The helm page when sail mode is on and the helm context still lives; ends the mode otherwise. */
+	private static @Nullable HelmScreen modeBerlayar() {
+		HelmScreen helm = berlayar ? HelmScreen.terbuka() : null;
+		if (helm == null) {
+			berlayar = false;
+		}
+		return helm;
+	}
+
+	/** Ends sail mode and goes back to Di Sini › Kemudi. */
+	private void kembaliKeKemudi() {
+		boolean ada = HelmScreen.terbuka() != null;
+		berlayar = false;
+		selected = null;
+		if (ada) {
+			tuju(Tujuan.bagian(HubNav.DI_SINI));
+		}
+	}
+
+	private boolean subKota() {
+		return !SUB_DUNIA.equals(sub);
+	}
+
+	private static String subDari(String tab) {
+		return PetaKota.TAB_PETA.equals(tab) ? SUB_KOTA : tab;
+	}
+
+	private static String tabDari(String sub) {
+		return SUB_KOTA.equals(sub) ? PetaKota.TAB_PETA : sub;
+	}
+
+	// ================================================================== identity
 
 	@Override
-	protected void init() {
-		if (openedAt == 0L) {
-			openedAt = Util.getMillis();
-			UiSound.open();
-			PetaClient.request(PetaNet.OP_OPEN, 0, 0, "", new long[0]);
-			PetaCache.forgetAsked();
+	public Component title() {
+		return Component.translatable("kultivator.gui43.hal.dunia." + Urutan.ID_PETA);
+	}
+
+	@Override
+	public int glyph() {
+		return Glyphs.PATH;
+	}
+
+	@Override
+	public String helpTopic() {
+		return subKota() ? kota.helpTopic() : "peta_dunia";
+	}
+
+	@Override
+	public List<Sub> subs() {
+		List<Sub> subs = new ArrayList<>();
+		subs.add(new Sub(SUB_DUNIA, Component.translatable(SUB + SUB_DUNIA)));
+		for (String tab : PetaKota.TABS) {
+			subs.add(new Sub(subDari(tab), Component.translatable(SUB + subDari(tab))));
 		}
-		int w = Math.min(width - 8, 480);
-		int h = Math.min(height - 8, 290);
-		x0 = (width - w) / 2;
-		y0 = (height - h) / 2;
-		x1 = x0 + w;
-		y1 = y0 + h;
-		help.place(x1 - 10.0F, y0 + 12.0F);
-		side = w >= 300;
-		mx0 = x0 + 10;
-		my0 = y0 + 24;
-		mx1 = side ? x1 - SIDE_W - 14 : x1 - 10;
-		my1 = y1 - 28;
-		LocalPlayer player = minecraft == null ? null : minecraft.player;
+		return subs;
+	}
+
+	@Override
+	public void showSub(String id) {
+		String next = id == null || id.isEmpty() ? SUB_DUNIA : id;
+		if (!SUB_DUNIA.equals(next) && !PetaKota.TABS.contains(tabDari(next))) {
+			return;
+		}
+		boolean dulu = subKota();
+		sub = next;
+		boolean kini = subKota();
+		if (kini) {
+			kota.showSub(tabDari(next));
+		}
+		if (ditampilkan && dulu != kini) {
+			if (dulu) {
+				kota.onHide();
+				bukaPeta();
+			} else {
+				tutupPeta();
+				pasangKota();
+				kota.onShow(null);
+			}
+		}
+	}
+
+	@Override
+	public boolean lebar() {
+		return true;
+	}
+
+	@Override
+	public long uang() {
+		return subKota() ? kota.uang() : -1L;
+	}
+
+	@Override
+	public boolean rinci() {
+		return subKota() ? kota.rinci() : daftarTampil || berlayar && modeBerlayar() != null;
+	}
+
+	@Override
+	public Palette.Gaya gaya() {
+		return subKota() ? kota.gaya() : Palette.Gaya.KERTAS;
+	}
+
+	@Override
+	public boolean angka(int n) {
+		return subKota() ? kota.angka(n) : super.angka(n);
+	}
+
+	// ================================================================== life
+
+	@Override
+	protected void build() {
+		laidKota = "";
+		side = w >= 360;
+		mx0 = x;
+		my0 = y + HEAD_H + 1;
+		mx1 = side ? x + w - SIDE_W - 6 : x + w;
+		my1 = y + h - BAR_H - 3;
+		// toolbar: zoom (one cycling talisman), the four layers, centre; without the side panel the list toggle
+		int by = y + h - BAR_H;
+		TalismanButton zoom = new TalismanButton(x, by, 58, BAR_H, () -> Component.translatable("kultivator.peta.zoom." + zoomIndex));
+		zoom.siklus(() -> setZoom((zoomIndex + 1) % ZOOMS.length, (mx0 + mx1) / 2.0D, (my0 + my1) / 2.0D),
+				() -> setZoom((zoomIndex + ZOOMS.length - 1) % ZOOMS.length, (mx0 + mx1) / 2.0D, (my0 + my1) / 2.0D));
+		zoom.tooltip(() -> List.of(Component.translatable("kultivator.peta.zoom.tip", bpp())));
+		add(zoom);
+		Component centreLabel = Component.translatable("kultivator.peta.centre");
+		int centreW = TalismanButton.lebar(font, centreLabel, 40, 72);
+		Component daftarLabel = Component.translatable(M + "daftar");
+		int daftarW = side ? 0 : TalismanButton.lebar(font, daftarLabel, 40, 64) + 4;
+		String[] ids = {"weather", "sky", "seal", "route"};
+		int labelled = 0;
+		for (String id : ids) {
+			labelled += BAR_H + 4 + font.width(Component.translatable("kultivator.peta.overlay." + id)) + 4;
+		}
+		boolean label = 62 + labelled + daftarW + centreW + 4 <= w;
+		int bx = x + 62;
+		for (String id : ids) {
+			Component name = Component.translatable("kultivator.peta.overlay." + id);
+			int cw = label ? BAR_H + 4 + font.width(name) + 1 : TalismanButton.MIN_W;
+			JadeCoin coin = new JadeCoin(bx, by + 1, cw, BAR_H - 2, () -> label ? name : Component.empty(), () -> overlay(id));
+			coin.onPress(() -> toggleOverlay(id));
+			coin.tooltip(() -> List.of(Brush.bold(name), Component.translatable("kultivator.peta.overlay." + id + ".tip").withStyle(ChatFormatting.GRAY)));
+			add(coin);
+			bx += cw + (label ? 4 : 3);
+		}
+		TalismanButton centre = new TalismanButton(x + w - centreW, by, centreW, BAR_H, () -> centreLabel);
+		centre.onPress(this::centre);
+		add(centre);
+		tombolDaftar = null;
+		if (!side) {
+			TalismanButton t = new TalismanButton(x + w - centreW - daftarW, by, daftarW - 4, BAR_H,
+					() -> Component.translatable(daftarTampil ? M + "peta" : M + "daftar"));
+			t.onPress(() -> {
+				daftarTampil = !daftarTampil;
+				selected = null;
+			});
+			t.stampedWhen(() -> daftarTampil);
+			tombolDaftar = add(t);
+		} else {
+			daftarTampil = false;
+		}
+		if (subKota()) {
+			pasangKota();
+		}
+	}
+
+	/** Lays the capital's sheet page into the box when the box changed since its last layout. */
+	private void pasangKota() {
+		if (w <= 0 || h <= 0) {
+			return;
+		}
+		if (screen != null) {
+			kota.pasang(screen);
+		}
+		String box = x + "," + y + "," + w + "," + h;
+		if (!box.equals(laidKota)) {
+			laidKota = box;
+			kota.layout(x, y, w, h);
+		}
+	}
+
+	@Override
+	protected boolean visible(Widget widget) {
+		if (subKota()) {
+			return false;
+		}
+		return widget == tombolDaftar || !daftarTampil;
+	}
+
+	@Override
+	public void onShow(@Nullable CompoundTag fokus) {
+		ditampilkan = true;
+		if (subKota()) {
+			pasangKota();
+			kota.onShow(fokus);
+		} else {
+			bukaPeta();
+		}
+	}
+
+	@Override
+	public void onHide() {
+		ditampilkan = false;
+		if (subKota()) {
+			kota.onHide();
+		} else {
+			tutupPeta();
+		}
+	}
+
+	/** The world map came on screen: a fresh sheet, the view on the player when the dimension changed. */
+	private void bukaPeta() {
+		PetaClient.request(PetaNet.OP_OPEN, 0, 0, "", new long[0]);
+		PetaCache.forgetAsked();
+		LocalPlayer player = minecraft.player;
 		String dim = PetaCache.dim();
 		if (player != null && (Double.isNaN(viewX) || !dim.equals(viewDim))) {
 			viewX = player.getX();
 			viewZ = player.getZ();
 			viewDim = dim;
 		}
-		buttons.clear();
-		// toolbar: zooms, overlays, centre
-		int bx = mx0;
-		int by = y1 - 22;
-		for (int i = 0; i < ZOOMS.length; i++) {
-			int index = i;
-			PetaUi.Button zoom = new PetaUi.Button(Component.translatable("kultivator.peta.zoom." + i), () -> setZoom(index, (mx0 + mx1) / 2.0D,
-					(my0 + my1) / 2.0D));
-			zoom.at(bx, by, 30, 13);
-			zoom.selected = zoomIndex == i;
-			zoom.tip = Component.translatable("kultivator.peta.zoom.tip", ZOOMS[i]);
-			buttons.add(zoom);
-			bx += 32;
-		}
-		bx += 6;
-		bx = overlay(bx, by, "weather", overlayWeather, () -> overlayWeather = !overlayWeather);
-		bx = overlay(bx, by, "sky", overlaySky, () -> overlaySky = !overlaySky);
-		bx = overlay(bx, by, "seal", overlaySeals, () -> overlaySeals = !overlaySeals);
-		bx = overlay(bx, by, "route", overlayRoute, () -> overlayRoute = !overlayRoute);
-		PetaUi.Button centre = new PetaUi.Button(Component.translatable("kultivator.peta.centre"), this::centre);
-		centre.at(Math.max(bx + 4, mx1 - 54), by, 54, 13);
-		centre.accent = Palette.JADE;
-		buttons.add(centre);
-		if (side) {
-			int sx = mx1 + 8;
-			searchBox = new EditBox(font, sx, my0, SIDE_W, 12, Component.translatable("kultivator.peta.search"));
-			searchBox.setMaxLength(32);
-			searchBox.setHint(Component.translatable("kultivator.peta.search").withStyle(ChatFormatting.DARK_GRAY));
-			searchBox.setValue(search);
-			searchBox.setResponder(value -> {
-				search = value == null ? "" : value;
-				listScroll = 0.0F;
-				rebuildList();
-			});
-			addRenderableWidget(searchBox);
-			int fx = sx;
-			int fy = my0 + 16;
-			for (Category category : Category.values()) {
-				PetaUi.Button coin = new PetaUi.Button(Component.empty(), () -> {
-					if (!HIDDEN.remove(category)) {
-						HIDDEN.add(category);
-					}
-					rebuildList();
-					rebuildWidgets();
-				});
-				coin.at(fx, fy, 20, 14);
-				coin.selected = !HIDDEN.contains(category);
-				coin.accent = category.ordinal();
-				coin.tip = Component.translatable("kultivator.peta.category." + category.name().toLowerCase(Locale.ROOT));
-				buttons.add(coin);
-				fx += 22;
-				if (fx + 20 > sx + SIDE_W) {
-					fx = sx;
-					fy += 16;
-				}
-			}
-		} else {
-			searchBox = null;
-		}
 		readSheet(true);
 	}
 
-	private int overlay(int x, int y, String id, boolean on, Runnable toggle) {
-		PetaUi.Button b = new PetaUi.Button(Component.translatable("kultivator.peta.overlay." + id), () -> {
-			toggle.run();
-			rebuildWidgets();
-		});
-		int w = Math.max(30, Math.min(52, font.width(b.label) + 8));
-		b.at(x, y, w, 13);
-		b.selected = on;
-		b.accent = Palette.JADE;
-		b.tip = Component.translatable("kultivator.peta.overlay." + id + ".tip");
-		buttons.add(b);
-		return x + w + 2;
+	private void tutupPeta() {
+		dragging = false;
+		PetaClient.request(PetaNet.OP_CLOSE, 0, 0, "", new long[0]);
+	}
+
+	@Override
+	public void tick() {
+		if (subKota()) {
+			kota.tick();
+			return;
+		}
+		readSheet(false);
+		askRegions();
+	}
+
+	@Override
+	public void onData() {
+		if (subKota()) {
+			kota.onData();
+		}
+	}
+
+	@Override
+	public boolean needsRebuild() {
+		return subKota() && kota.needsRebuild();
+	}
+
+	private boolean overlay(String id) {
+		return switch (id) {
+			case "weather" -> overlayWeather;
+			case "sky" -> overlaySky;
+			case "seal" -> overlaySeals;
+			default -> overlayRoute;
+		};
+	}
+
+	private void toggleOverlay(String id) {
+		switch (id) {
+			case "weather" -> overlayWeather = !overlayWeather;
+			case "sky" -> overlaySky = !overlaySky;
+			case "seal" -> overlaySeals = !overlaySeals;
+			default -> overlayRoute = !overlayRoute;
+		}
 	}
 
 	private int bpp() {
@@ -295,11 +497,10 @@ public final class PetaScreen extends Screen {
 		viewX = wx - (sx - cx) * bpp();
 		viewZ = wz - (sy - cy) * bpp();
 		UiSound.tab();
-		rebuildWidgets();
 	}
 
 	private void centre() {
-		LocalPlayer player = minecraft == null ? null : minecraft.player;
+		LocalPlayer player = minecraft.player;
 		if (player != null) {
 			viewX = player.getX();
 			viewZ = player.getZ();
@@ -438,13 +639,12 @@ public final class PetaScreen extends Screen {
 
 	private void rebuildList() {
 		listed.clear();
-		String query = search.strip().toLowerCase(Locale.ROOT);
-		LocalPlayer player = minecraft == null ? null : minecraft.player;
+		LocalPlayer player = minecraft.player;
 		for (Mark mark : marks) {
 			if (HIDDEN.contains(mark.category)) {
 				continue;
 			}
-			if (!query.isEmpty() && !mark.name.getString().toLowerCase(Locale.ROOT).contains(query) && !mark.kind.contains(query)) {
+			if (!cari.kosong() && !cari.cocok(mark.name) && !mark.kind.contains(cari.text().strip().toLowerCase(Locale.ROOT))) {
 				continue;
 			}
 			listed.add(mark);
@@ -458,15 +658,6 @@ public final class PetaScreen extends Screen {
 		double dx = mark.x - player.getX();
 		double dz = mark.z - player.getZ();
 		return dx * dx + dz * dz;
-	}
-
-	// ================================================================== drawing
-
-	@Override
-	public void tick() {
-		super.tick();
-		readSheet(false);
-		askRegions();
 	}
 
 	/** Asks for the explored regions in view that were never asked (at most 64 per half second). */
@@ -508,64 +699,10 @@ public final class PetaScreen extends Screen {
 		}
 	}
 
-	@Override
-	public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float a) {
-		g.fillGradient(0, 0, width, height, Palette.argb(0xA0, Palette.NIGHT), Palette.argb(0xC8, Palette.NIGHT_MIST));
-	}
-
-	@Override
-	public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float a) {
-		tooltip = null;
-		ScrollFrame.paper(g, x0, x1, y0, y1, y0, y1);
-		ScrollFrame.rod(g, x0, x1, y0);
-		ScrollFrame.rod(g, x0, x1, y1);
-		g.nextStratum();
-		drawHeader(g, mouseX, mouseY);
-		drawMap(g, mouseX, mouseY);
-		if (side) {
-			drawSide(g, mouseX, mouseY);
-		}
-		for (PetaUi.Button button : buttons) {
-			if (button.label.getString().isEmpty()) {
-				drawCoin(g, button, mouseX, mouseY);
-			} else {
-				button.draw(g, font, mouseX, mouseY);
-			}
-			if (button.over(mouseX, mouseY) && button.tip != null) {
-				tooltip = List.of(button.tip);
-			}
-		}
-		Brush.fit(g, font, Component.translatable("kultivator.peta.hint"), mx0, y1 - 8, x1 - mx0 - 10, Palette.INK_FAINT, 0.55F, 0.4F, false);
-		super.extractRenderState(g, mouseX, mouseY, a);
-		g.nextStratum();
-		if (selected != null) {
-			drawCard(g, mouseX, mouseY);
-		}
-		if (tooltip != null && !tooltip.isEmpty()) {
-			SlipTooltip.draw(g, font, tooltip, mouseX, mouseY, width, height);
-		}
-		help.render(g, font, mouseX, mouseY, width, height);
-	}
-
-	private void drawHeader(GuiGraphicsExtractor g, int mouseX, int mouseY) {
-		Brush.fit(g, font, Brush.bold(title), x0 + 12, y0 + 9, 180, Palette.SEAL_DARK, 0.95F, 0.6F, false);
-		String dim = PetaCache.dim();
-		String path = dim.contains(":") ? dim.substring(dim.indexOf(':') + 1) : dim;
-		Component dimName = Component.translatableWithFallback("kultivator.peta.dim." + path, pretty("x/" + path));
-		CompoundTag sheet = PetaCache.sheet();
-		Component sub = Component.translatable("kultivator.peta.header", dimName, sheet.getIntOr("known", 0), sheet.getIntOr("explored", 0));
-		Brush.fit(g, font, sub, x0 + 196, y0 + 10, Math.min(mx1, x1 - 24) - x0 - 200, Palette.INK_SOFT, 0.62F, 0.45F, false);
-		if (overMap(mouseX, mouseY)) {
-			int wx = (int) Math.floor(worldX(mouseX));
-			int wz = (int) Math.floor(worldZ(mouseY));
-			Component at = Component.translatable("kultivator.peta.cursor", wx, wz);
-			float w = font.width(at) * 0.62F;
-			Brush.text(g, font, at, x1 - 24 - w, y0 + 10, Palette.INK_SOFT, 0.62F, false);
-		}
-	}
+	// ================================================================== drawing: the map (behind)
 
 	private boolean overMap(double mx, double my) {
-		return mx >= mx0 && mx < mx1 && my >= my0 && my < my1;
+		return !daftarTampil && mx >= mx0 && mx < mx1 && my >= my0 && my < my1;
 	}
 
 	private double worldX(double sx) {
@@ -584,10 +721,23 @@ public final class PetaScreen extends Screen {
 		return (float) ((my0 + my1) / 2.0D + (wz - viewZ) / bpp());
 	}
 
+	@Override
+	protected void drawBehind(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
+		if (subKota()) {
+			pasangKota();
+			kota.render(g, mouseX, mouseY, seconds);
+			return;
+		}
+		hover = null;
+		if (!daftarTampil) {
+			drawMap(g, mouseX, mouseY);
+		}
+	}
+
 	private void drawMap(GuiGraphicsExtractor g, int mouseX, int mouseY) {
 		int bpp = bpp();
 		PetaPainter.frame(viewX, viewZ, bpp);
-		g.fill(mx0 - 2, my0 - 2, mx1 + 2, my1 + 2, Palette.argb(0xFF, 0x3A2A1A));
+		g.fill(mx0 - 1, my0 - 1, mx1 + 1, my1 + 1, Palette.argb(0xFF, 0x3A2A1A));
 		g.fill(mx0, my0, mx1, my1, 0xFFDCCFA8);
 		g.enableScissor(mx0, my0, mx1, my1);
 		if (PetaPainter.ready()) {
@@ -596,13 +746,14 @@ public final class PetaScreen extends Screen {
 			float sy = screenY(PetaPainter.shownZ());
 			g.pose().pushMatrix();
 			g.pose().translate(sx, sy);
+			// a picture scale (the painted texture), not text
 			g.pose().scale(f, f);
 			g.blit(RenderPipelines.GUI_TEXTURED, PetaPainter.TEXTURE, 0, 0, 0.0F, 0.0F, PetaPainter.SIZE, PetaPainter.SIZE, PetaPainter.SIZE,
 					PetaPainter.SIZE);
 			g.pose().popMatrix();
 		} else {
-			Brush.fitCentered(g, font, Component.translatable("kultivator.peta.painting"), (mx0 + mx1) / 2.0F, (my0 + my1) / 2.0F, mx1 - mx0,
-					Palette.INK_SOFT, 0.8F, 0.5F, false);
+			Brush.fitCentered(g, font, Component.translatable("kultivator.peta.painting"), (mx0 + mx1) / 2.0F, (my0 + my1) / 2.0F - 4.0F, mx1 - mx0 - 8,
+					Palette.INK_SOFT, 1.0F, 1.0F, false);
 		}
 		// the painted paper below everything drawn on it
 		g.nextStratum();
@@ -620,18 +771,18 @@ public final class PetaScreen extends Screen {
 		g.disableScissor();
 		// frame, compass, scale bar, sky banner
 		Brush.frame(g, mx0 - 1, my0 - 1, mx1 + 1, my1 + 1, Palette.GOLD_DARK);
-		Brush.frame(g, mx0 - 3, my0 - 3, mx1 + 3, my1 + 3, Palette.argb(0x80, Palette.GOLD));
-		int cs = Math.min(40, Math.max(24, (mx1 - mx0) / 8));
-		g.blit(RenderPipelines.GUI_TEXTURED, COMPASS, mx1 - cs - 4, my0 + 4, 0.0F, 0.0F, cs, cs, 64, 64, 64, 64, 0xD8FFFFFF);
+		int top = my0 + (modeBerlayar() != null ? BANNER_H : 0);
+		int cs = Math.min(40, Math.max(20, (mx1 - mx0) / 8));
+		g.blit(RenderPipelines.GUI_TEXTURED, COMPASS, mx1 - cs - 4, top + 4, 0.0F, 0.0F, cs, cs, 64, 64, 64, 64, 0xD8FFFFFF);
 		drawScale(g);
 		if (overlaySky && sheet.contains("sky")) {
 			Component sky = Component.translatable("kultivator.peta.sky", Component.translatable("kultivator.peta.sky."
 					+ sheet.getStringOr("sky", "").toLowerCase(Locale.ROOT)));
-			int w = Math.min(mx1 - mx0 - 60, Math.round(font.width(sky) * 0.7F) + 22);
-			int bx = (mx0 + mx1 - w) / 2;
-			g.fill(bx, my0 + 3, bx + w, my0 + 15, Palette.argb(0xC0, 0x1A1410));
-			icon(g, 29, bx + 2, my0 + 3, 12, 0xFFFFFFFF);
-			Brush.fit(g, font, sky, bx + 16, my0 + 6, w - 18, 0xFFFFE070, 0.7F, 0.5F, false);
+			int bw = Math.min(mx1 - mx0 - cs - 16, font.width(sky) + 22);
+			int bx = Math.max(mx0 + 4, (mx0 + mx1 - bw) / 2 - cs / 2);
+			g.fill(bx, top + 3, bx + bw, top + 16, Palette.argb(0xC0, 0x1A1410));
+			icon(g, 29, bx + 2, top + 3, 12, 0xFFFFFFFF);
+			Brush.fit(g, font, sky, bx + 16, top + 5, bw - 18, 0xFFFFE070, 1.0F, 1.0F, false);
 		}
 	}
 
@@ -645,17 +796,17 @@ public final class PetaScreen extends Screen {
 			}
 		}
 		int len = Math.round(pick / (float) bpp);
-		int x = mx0 + 6;
-		int y = my1 - 8;
-		g.fill(x, y, x + len, y + 2, 0xE01E1E1B);
-		g.fill(x, y - 3, x + 1, y + 2, 0xE01E1E1B);
-		g.fill(x + len - 1, y - 3, x + len, y + 2, 0xE01E1E1B);
-		g.fill(x + len / 2, y - 2, x + len / 2 + 1, y + 2, 0xA01E1E1B);
-		Brush.text(g, font, Component.translatable("kultivator.peta.scale", pick), x, y - 9, 0xFF1E1E1B, 0.55F, false);
+		int sx = mx0 + 6;
+		int sy = my1 - 6;
+		g.fill(sx, sy, sx + len, sy + 2, 0xE01E1E1B);
+		g.fill(sx, sy - 3, sx + 1, sy + 2, 0xE01E1E1B);
+		g.fill(sx + len - 1, sy - 3, sx + len, sy + 2, 0xE01E1E1B);
+		g.fill(sx + len / 2, sy - 2, sx + len / 2 + 1, sy + 2, 0xA01E1E1B);
+		Brush.text(g, font, Component.translatable("kultivator.peta.scale", pick), sx, sy - 11, 0xFF1E1E1B, 1.0F, false);
 	}
 
 	private void drawDomains(GuiGraphicsExtractor g, CompoundTag sheet) {
-		var registries = minecraft == null || minecraft.level == null ? null : minecraft.level.registryAccess();
+		var registries = minecraft.level == null ? null : minecraft.level.registryAccess();
 		for (Tag tag : sheet.getListOrEmpty("domains")) {
 			if (!(tag instanceof CompoundTag d)) {
 				continue;
@@ -679,6 +830,15 @@ public final class PetaScreen extends Screen {
 						cy + (float) Math.sin(a1) * r, 1.2F, Palette.argb(0xB0, Palette.darken(0xFF000000 | color, 0.45F)));
 			}
 			if (r >= 8.0F) {
+				String seal = d.getStringOr("seal", "?");
+				if (seal.startsWith("#")) {
+					seal = Language.getInstance().getOrDefault(seal.substring(1), "?");
+				}
+				g.fill(Math.round(cx - 6), Math.round(cy - r + 2), Math.round(cx + 6), Math.round(cy - r + 14), Palette.argb(0xE0, Palette.SEAL));
+				Brush.centered(g, font, Component.literal(seal), cx, cy - r + 4, 0xFFF4E0D0, 1.0F, false);
+			}
+			if (r >= 24.0F) {
+				// the domain's name at 1.0 only where it has room (43.0.5); the seal alone below that
 				Component name = Component.literal(d.getStringOr("id", "?"));
 				if (registries != null) {
 					try {
@@ -687,14 +847,8 @@ public final class PetaScreen extends Screen {
 						// keep the id
 					}
 				}
-				String seal = d.getStringOr("seal", "?");
-				if (seal.startsWith("#")) {
-					seal = Language.getInstance().getOrDefault(seal.substring(1), "?");
-				}
-				g.fill(Math.round(cx - 6), Math.round(cy - r + 2), Math.round(cx + 6), Math.round(cy - r + 14), Palette.argb(0xE0, Palette.SEAL));
-				Brush.centered(g, font, Component.literal(seal), cx, cy - r + 4, 0xFFF4E0D0, 0.8F, false);
-				Brush.fitCentered(g, font, name, cx, cy - r + 16, Math.max(40.0F, r * 1.6F), Palette.argb(0xF0, Palette.darken(0xFF000000
-						| color, 0.55F)), 0.62F, 0.45F, false);
+				Brush.fitCentered(g, font, name, cx, cy - r + 16, r * 1.6F, Palette.argb(0xF0, Palette.darken(0xFF000000 | color, 0.55F)), 1.0F, 1.0F,
+						false);
 			}
 		}
 	}
@@ -765,13 +919,14 @@ public final class PetaScreen extends Screen {
 		}
 	}
 
+	private boolean shown(Mark mark) {
+		return !HIDDEN.contains(mark.category) && (markerZoom() >= mark.minZoom || mark.live || mark.waypoint >= 0);
+	}
+
 	private void drawMarks(GuiGraphicsExtractor g, int mouseX, int mouseY) {
-		int zoom = markerZoom();
-		Mark hover = null;
 		float best = 49.0F;
-		long time = minecraft != null && minecraft.level != null ? minecraft.level.getGameTime() : 0L;
 		for (Mark mark : marks) {
-			if (HIDDEN.contains(mark.category) || zoom < mark.minZoom && !mark.live && mark.waypoint < 0) {
+			if (!shown(mark)) {
 				continue;
 			}
 			float sx = screenX(mark.x);
@@ -787,10 +942,8 @@ public final class PetaScreen extends Screen {
 				Brush.ring(g, sx, sy, 6.5F + pulse * 2.0F, 7.6F + pulse * 2.0F, Palette.fade(ring, 0.85F));
 			}
 			if (overlaySeals && mark.seal >= 0) {
-				float t = mark.seal / 100.0F;
-				int ring = Palette.mix(0xFFD5322A, 0xFF2E8963, t);
-				Brush.ring(g, sx, sy, 7.0F, 8.4F, ring);
-				Brush.centered(g, font, Component.literal(mark.seal + "%"), sx, sy + 8.0F, ring, 0.55F, false);
+				// the seal's strength as the ring colour; the number is in the tooltip and the card (text at 1.0 only)
+				Brush.ring(g, sx, sy, 7.0F, 8.4F, Palette.mix(0xFFD5322A, 0xFF2E8963, mark.seal / 100.0F));
 			}
 			int tint = mark.waypoint >= 0 ? 0xFF000000 | mark.color : 0xFFFFFFFF;
 			icon(g, mark.icon, Math.round(sx - size / 2.0F), Math.round(sy - size / 2.0F), size, tint);
@@ -802,17 +955,6 @@ public final class PetaScreen extends Screen {
 			if (mark == selected) {
 				Brush.ring(g, sx, sy, 8.5F, 9.6F, Palette.GOLD);
 			}
-		}
-		if (hover != null && selected == null) {
-			List<Component> lines = new ArrayList<>();
-			lines.add(Brush.bold(hover.name));
-			lines.add(Component.translatable("kultivator.peta.card.where", distanceText(hover)).withStyle(ChatFormatting.GRAY));
-			if (hover.live && hover.ends > time) {
-				lines.add(Component.translatable("kultivator.peta.card.ends", PetaUi.duration((hover.ends - time) / 20L))
-						.withStyle(ChatFormatting.LIGHT_PURPLE));
-			}
-			lines.add(Component.translatable("kultivator.peta.card.click").withStyle(ChatFormatting.DARK_GREEN));
-			tooltip = lines;
 		}
 	}
 
@@ -863,7 +1005,7 @@ public final class PetaScreen extends Screen {
 	}
 
 	private void drawPlayer(GuiGraphicsExtractor g) {
-		LocalPlayer player = minecraft == null ? null : minecraft.player;
+		LocalPlayer player = minecraft.player;
 		if (player == null) {
 			return;
 		}
@@ -889,94 +1031,103 @@ public final class PetaScreen extends Screen {
 		Brush.dot(g, sx, sy, 1.3F, Palette.GOLD_LIGHT);
 	}
 
-	private void icon(GuiGraphicsExtractor g, int index, int x, int y, int size, int tint) {
+	private void icon(GuiGraphicsExtractor g, int index, int ix, int iy, int size, int tint) {
 		int i = Mth.clamp(index, 0, 63);
-		Identifier atlas = i >= dev.kultivator.dunia.DuniaMarkers.ATLAS2_FIRST ? MARKERS_TEMPAT : MARKERS;
+		Identifier atlas = i >= DuniaMarkers.ATLAS2_FIRST ? MARKERS_TEMPAT : MARKERS;
 		int c = i % 32;
-		g.blit(RenderPipelines.GUI_TEXTURED, atlas, x, y, (c % 8) * 16.0F, (c / 8) * 16.0F, size, size, 16, 16, 128, 64, tint);
+		g.blit(RenderPipelines.GUI_TEXTURED, atlas, ix, iy, (c % 8) * 16.0F, (c / 8) * 16.0F, size, size, 16, 16, 128, 64, tint);
 	}
 
-	private void drawCoin(GuiGraphicsExtractor g, PetaUi.Button coin, int mouseX, int mouseY) {
-		Category category = Category.values()[Mth.clamp(coin.accent, 0, Category.values().length - 1)];
-		boolean on = !HIDDEN.contains(category);
-		boolean hover = coin.over(mouseX, mouseY);
-		g.fill(coin.x, coin.y, coin.x + coin.w, coin.y + coin.h, on ? (hover ? 0xFFF6EBC4 : Palette.TALISMAN_LOW) : Palette.LOCKED_PAPER);
-		Brush.frame(g, coin.x, coin.y, coin.x + coin.w, coin.y + coin.h, on ? Palette.GOLD_DARK : Palette.argb(0x90, Palette.LOCKED));
-		icon(g, category.icon, coin.x + (coin.w - 12) / 2, coin.y + 1, 12, on ? 0xFFFFFFFF : 0x70FFFFFF);
+	// ================================================================== drawing: controls (immediate)
+
+	@Override
+	protected void lukis(Lukis l) {
+		if (subKota()) {
+			return;
+		}
+		HelmScreen helm = modeBerlayar();
+		if (daftarTampil) {
+			sisi(l, helm, x, y, x + w, y + h - BAR_H - 3);
+			return;
+		}
+		kepala(l);
+		// the map itself: Tab focuses it, then arrows pan, +/- zoom, Home centres
+		l.zona("peta", mx0, my0, mx1, my1, null, true, null, true);
+		l.fokusCincin("peta", mx0, my0, mx1, my1);
+		if (helm != null) {
+			spanduk(l, helm);
+		}
+		if (hover != null && selected == null) {
+			l.tip(hoverLines(hover));
+		}
+		if (selected != null) {
+			kartu(l, selected, helm);
+		}
+		if (side) {
+			sisi(l, helm, mx1 + 6, y, x + w, my1);
+		}
 	}
 
-	private void drawSide(GuiGraphicsExtractor g, int mouseX, int mouseY) {
-		int sx = mx1 + 8;
-		int top = my0 + 16 + 2 * 16 + 4;
-		int bottom = my1;
-		PetaUi.panel(g, sx - 2, top - 2, sx + SIDE_W + 2, bottom + 2);
-		Brush.fit(g, font, Brush.bold(Component.translatable("kultivator.peta.list", listed.size())), sx + 3, top + 2, SIDE_W - 6, Palette.SEAL_DARK,
-				0.62F, 0.45F, false);
-		int rowH = 13;
-		int listTop = top + 12;
-		int rows = Math.max(1, (bottom - listTop - 2) / rowH);
-		int maxScroll = Math.max(0, listed.size() - rows);
-		listScroll = Mth.clamp(listScroll, 0.0F, maxScroll);
-		int first = Math.round(listScroll);
-		LocalPlayer player = minecraft == null ? null : minecraft.player;
-		for (int r = 0; r < rows && first + r < listed.size(); r++) {
-			Mark mark = listed.get(first + r);
-			int y = listTop + r * rowH;
-			boolean hover = mouseX >= sx && mouseX < sx + SIDE_W && mouseY >= y && mouseY < y + rowH;
-			if (hover || mark == selected) {
-				g.fill(sx, y, sx + SIDE_W, y + rowH, mark == selected ? 0x50D4A637 : 0x30FFFFFF);
-			}
-			icon(g, mark.icon, sx + 1, y + 1, 11, mark.waypoint >= 0 ? 0xFF000000 | mark.color : 0xFFFFFFFF);
-			Brush.fit(g, font, mark.name, sx + 14, y + 3, SIDE_W - 46, Palette.INK, 0.6F, 0.4F, false);
-			if (player != null) {
-				int d = (int) Math.round(Math.sqrt(dist2(player, mark)));
-				Component dt = Component.literal(d >= 10000 ? (d / 1000) + "k" : String.valueOf(d));
-				float w = font.width(dt) * 0.55F;
-				Brush.text(g, font, dt, sx + SIDE_W - 3 - w, y + 4, Palette.INK_FAINT, 0.55F, false);
-			}
+	/** The strip above the map: dimension, sites and explored count; the cursor's coordinates at the right. */
+	private void kepala(Lukis l) {
+		String dim = PetaCache.dim();
+		String path = dim.contains(":") ? dim.substring(dim.indexOf(':') + 1) : dim;
+		Component dimName = Component.translatableWithFallback("kultivator.peta.dim." + path, pretty("x/" + path));
+		CompoundTag sheet = PetaCache.sheet();
+		int right = mx1;
+		if (overMap(l.mx, l.my)) {
+			Component at = Component.translatable("kultivator.peta.cursor", (int) Math.floor(worldX(l.mx)), (int) Math.floor(worldZ(l.my)));
+			l.kanan(at, mx1, y, l.gaya.teksLemah);
+			right = mx1 - l.font.width(at) - 6;
 		}
-		if (listed.isEmpty()) {
-			Brush.wrap(g, font, Component.translatable(marks.isEmpty() ? "kultivator.peta.list.none" : "kultivator.peta.list.filtered"), sx + 3,
-					listTop + 2, SIDE_W - 6, Palette.INK_FAINT, 0.58F, false);
+		l.samar(Component.translatable("kultivator.peta.header", dimName, sheet.getIntOr("known", 0), sheet.getIntOr("explored", 0)), x, y, right - x);
+	}
+
+	/** Sail mode banner over the map's top: what to do, and back to the helm. */
+	private void spanduk(Lukis l, HelmScreen helm) {
+		int by0 = my0;
+		int by1 = my0 + BANNER_H;
+		l.g.fill(mx0, by0, mx1, by1, Palette.argb(0xE0, 0x1A1410));
+		l.g.fill(mx0, by1 - 1, mx1, by1, Palette.argb(0xC0, Palette.GOLD));
+		Component back = Component.translatable(M + "berlayar.kembali");
+		int bw = TalismanButton.lebar(l.font, back, 50, 90);
+		TalismanButton.gambar(l, "berlayar_kembali", mx1 - bw - 2, by0 + 1, bw, BANNER_H - 2, back, true, null, this::kembaliKeKemudi);
+		Component judul = Component.translatable(helm.kapten() ? M + "berlayar.judul" : "kultivator.kapal.helm.voyage.not_captain");
+		l.teks(judul, mx0 + 5, by0 + 4, mx1 - mx0 - bw - 12, helm.kapten() ? 0xFFFFE070 : 0xFFFF8A7A);
+	}
+
+	private List<Component> hoverLines(Mark mark) {
+		long time = minecraft.level != null ? minecraft.level.getGameTime() : 0L;
+		List<Component> lines = new ArrayList<>();
+		lines.add(Brush.bold(mark.name));
+		lines.add(Component.translatable("kultivator.peta.card.where", distanceText(mark)).withStyle(ChatFormatting.GRAY));
+		if (mark.seal >= 0) {
+			lines.add(Component.translatable(mark.broken ? "kultivator.peta.card.seal_broken" : "kultivator.peta.card.seal", mark.seal)
+					.withStyle(mark.broken ? ChatFormatting.RED : ChatFormatting.DARK_GREEN));
 		}
+		if (mark.live && mark.ends > time) {
+			lines.add(Component.translatable("kultivator.peta.card.ends", PetaUi.duration((mark.ends - time) / 20L)).withStyle(ChatFormatting.LIGHT_PURPLE));
+		}
+		lines.add(Component.translatable("kultivator.peta.card.click").withStyle(ChatFormatting.DARK_GREEN));
+		return lines;
 	}
 
 	// ================================================================== the marker card
 
 	private void openCard(Mark mark) {
 		selected = mark;
-		cardButtons.clear();
-		cardW = 150;
-		CompoundTag sheet = PetaCache.sheet();
-		boolean captain = sheet.getBooleanOr("captain", false);
-		List<PetaUi.Button> list = new ArrayList<>();
-		PetaUi.Button sail = new PetaUi.Button(Component.translatable("kultivator.peta.card.sail"), () -> {
-			PetaClient.request(PetaNet.OP_SAIL, mark.x, mark.z, mark.name.getString(), new long[0]);
-			onClose();
-		});
-		sail.enabled = captain;
-		sail.tip = Component.translatable(captain ? "kultivator.peta.card.sail.tip" : "kultivator.peta.sail.not_captain");
-		sail.accent = Palette.JADE;
-		list.add(sail);
-		if (mark.waypoint >= 0) {
-			PetaUi.Button delete = new PetaUi.Button(Component.translatable("kultivator.peta.card.delete"), () -> {
-				PetaClient.request(PetaNet.OP_WAYPOINT_DELETE, mark.waypoint, 0, "", new long[0]);
-				selected = null;
-			});
-			list.add(delete);
-		} else {
-			PetaUi.Button mark2 = new PetaUi.Button(Component.translatable("kultivator.peta.card.mark"), () -> {
-				PetaClient.request(PetaNet.OP_WAYPOINT_ADD, mark.x, mark.z, mark.name.getString(), new long[0]);
-				selected = null;
-			});
-			list.add(mark2);
-		}
-		list.add(new PetaUi.Button(Component.translatable("kultivator.peta.card.close"), () -> selected = null));
-		cardButtons.addAll(list);
+		UiSound.press();
+	}
+
+	/** Centres the map on {@code mark} and opens its card (from the list). */
+	private void lihat(Mark mark) {
+		viewX = mark.x;
+		viewZ = mark.z;
+		openCard(mark);
 	}
 
 	private Component distanceText(Mark mark) {
-		LocalPlayer player = minecraft == null ? null : minecraft.player;
+		LocalPlayer player = minecraft.player;
 		if (player == null) {
 			return Component.empty();
 		}
@@ -1002,7 +1153,7 @@ public final class PetaScreen extends Screen {
 			lines.add(Component.translatable(mark.broken ? "kultivator.peta.card.seal_broken" : "kultivator.peta.card.seal", mark.seal)
 					.withColor(mark.broken ? 0xFFB3281D : 0xFF2E8963));
 		}
-		long time = minecraft != null && minecraft.level != null ? minecraft.level.getGameTime() : 0L;
+		long time = minecraft.level != null ? minecraft.level.getGameTime() : 0L;
 		if (mark.live && mark.ends > time) {
 			lines.add(Component.translatable("kultivator.peta.card.ends", PetaUi.duration((mark.ends - time) / 20L)).withColor(0xFF8E5BD8));
 		}
@@ -1017,7 +1168,7 @@ public final class PetaScreen extends Screen {
 	}
 
 	private Component guardName(String id) {
-		var registries = minecraft == null || minecraft.level == null ? null : minecraft.level.registryAccess();
+		var registries = minecraft.level == null ? null : minecraft.level.registryAccess();
 		for (Tag tag : PetaCache.sheet().getListOrEmpty("domains")) {
 			if (tag instanceof CompoundTag d && id.equals(d.getStringOr("id", "")) && registries != null) {
 				try {
@@ -1030,86 +1181,250 @@ public final class PetaScreen extends Screen {
 		return Component.literal(id);
 	}
 
-	private void drawCard(GuiGraphicsExtractor g, int mouseX, int mouseY) {
-		Mark mark = selected;
-		if (mark == null) {
-			return;
-		}
+	/** The marker card beside its marker, kept inside the map; its text never leaves the card (cut with "…"). */
+	private void kartu(Lukis l, Mark mark, @Nullable HelmScreen helm) {
 		List<Component> lines = cardLines(mark);
-		float scale = 0.62F;
+		int mapW = mx1 - mx0;
+		int mapH = my1 - my0 - (helm != null ? BANNER_H : 0);
+		cardW = Math.max(100, Math.min(176, mapW - 8));
 		int textW = cardW - 12;
-		float h = 18.0F;
+		float want = 0.0F;
 		for (Component line : lines) {
-			h += Brush.wrapHeight(font, line, textW, scale) + 1.0F;
+			want += Brush.wrapHeight(font, line, textW, 1.0F) + 1.0F;
 		}
-		cardH = Math.round(h) + 22;
+		cardH = Math.min(mapH - 4, Math.round(want) + 20 + 20);
 		float sx = screenX(mark.x);
 		float sy = screenY(mark.z);
+		int top = my0 + (helm != null ? BANNER_H : 0) + 2;
 		cardX = Mth.clamp(Math.round(sx + 12), mx0 + 2, mx1 - cardW - 2);
-		cardY = Mth.clamp(Math.round(sy - cardH / 2.0F), my0 + 2, my1 - cardH - 2);
+		cardY = Mth.clamp(Math.round(sy - cardH / 2.0F), top, my1 - cardH - 2);
 		if (cardX < sx && sx < cardX + cardW) {
 			cardX = Mth.clamp(Math.round(sx - 12 - cardW), mx0 + 2, mx1 - cardW - 2);
 		}
-		PetaUi.panel(g, cardX, cardY, cardX + cardW, cardY + cardH);
-		icon(g, mark.icon, cardX + 5, cardY + 5, 13, mark.waypoint >= 0 ? 0xFF000000 | mark.color : 0xFFFFFFFF);
-		Brush.fit(g, font, Brush.bold(mark.name), cardX + 21, cardY + 8, cardW - 26, Palette.SEAL_DARK, 0.78F, 0.5F, false);
-		float y = cardY + 21;
+		PetaUi.panel(l.g, cardX, cardY, cardX + cardW, cardY + cardH);
+		// the card swallows clicks on its paper (the map under it does not pan)
+		l.zona("kartu", cardX, cardY, cardX + cardW, cardY + cardH, null, true, null, false);
+		icon(l.g, mark.icon, cardX + 5, cardY + 4, 13, mark.waypoint >= 0 ? 0xFF000000 | mark.color : 0xFFFFFFFF);
+		l.teks(Brush.bold(mark.name), cardX + 21, cardY + 7, cardW - 26, Palette.SEAL_DARK);
+		float ty = cardY + 20;
+		float room = cardY + cardH - 20 - ty;
 		for (Component line : lines) {
-			y += Brush.wrap(g, font, line, cardX + 6, y, textW, 0xFF1B2521, scale, false) + 1.0F;
+			if (room < 9.0F) {
+				break;
+			}
+			float used = l.bungkus(line, cardX + 6, ty, textW, 0xFF1B2521, room);
+			ty += used + 1.0F;
+			room -= used + 1.0F;
 		}
-		int bw = (cardW - 12 - 4 * (cardButtons.size() - 1)) / Math.max(1, cardButtons.size());
+		boolean captain = PetaCache.sheet().getBooleanOr("captain", false) || helm != null && helm.kapten();
+		int n = 3;
+		int bw = (cardW - 12 - 4 * (n - 1)) / n;
 		int bx = cardX + 6;
 		int by = cardY + cardH - 17;
-		for (PetaUi.Button button : cardButtons) {
-			button.at(bx, by, bw, 12);
-			button.draw(g, font, mouseX, mouseY);
-			if (button.over(mouseX, mouseY) && button.tip != null) {
-				tooltip = List.of(button.tip);
-			}
-			bx += bw + 4;
+		TalismanButton.gambar(l, "kartu_layar", bx, by, bw, 14, Component.translatable("kultivator.peta.card.sail"), captain,
+				Component.translatable("kultivator.peta.sail.not_captain"), () -> layarKe(mark), helm != null && captain, false);
+		bx += bw + 4;
+		if (mark.waypoint >= 0) {
+			TalismanButton.gambar(l, "kartu_tanda", bx, by, bw, 14, Component.translatable("kultivator.peta.card.delete"), true, null, () -> {
+				PetaClient.request(PetaNet.OP_WAYPOINT_DELETE, mark.waypoint, 0, "", new long[0]);
+				selected = null;
+			});
+		} else {
+			TalismanButton.gambar(l, "kartu_tanda", bx, by, bw, 14, Component.translatable("kultivator.peta.card.mark"), true, null, () -> {
+				PetaClient.request(PetaNet.OP_WAYPOINT_ADD, mark.x, mark.z, mark.name.getString(), new long[0]);
+				selected = null;
+			});
 		}
+		bx += bw + 4;
+		TalismanButton.gambar(l, "kartu_tutup", bx, by, bw, 14, Component.translatable("kultivator.peta.card.close"), true, null, () -> selected = null);
+	}
+
+	/** "Berlayar": the ship's autopilot to the marker (the server checks the captain); in sail mode back to the helm. */
+	private void layarKe(Mark mark) {
+		PetaClient.request(PetaNet.OP_SAIL, mark.x, mark.z, mark.name.getString(), new long[0]);
+		if (modeBerlayar() != null) {
+			kembaliKeKemudi();
+		} else {
+			selected = null;
+			pesan(Component.translatable(M + "berlayar_ke", mark.name), Palette.JADE_DARK);
+		}
+	}
+
+	// ================================================================== the side list (or the whole box without side panel)
+
+	/** Rows of the list: in sail mode a heading, the hall and the routes, then a heading; then the listed sites. */
+	private int barisRute(@Nullable HelmScreen helm) {
+		if (helm == null) {
+			return 0;
+		}
+		return 2 + (helm.info().contains("hall_x") ? 1 : 0) + helm.info().getListOrEmpty("routes").size();
+	}
+
+	private boolean judulBaris(int i) {
+		int extra = barisRute(modeBerlayar());
+		return extra > 0 && (i == 0 || i == extra - 1);
+	}
+
+	private void sisi(Lukis l, @Nullable HelmScreen helm, int sx0, int sy0, int sx1, int sy1) {
+		int y0 = sy0;
+		cari.x = sx0;
+		cari.y = y0;
+		cari.w = sx1 - sx0;
+		cari.h = 14;
+		l.widget("cari", cari);
+		y0 += 17;
+		// category coins: show / hide each kind of marker
+		int fx = sx0;
+		for (Category category : Category.values()) {
+			if (fx + 18 > sx1) {
+				fx = sx0;
+				y0 += 16;
+			}
+			boolean on = !HIDDEN.contains(category);
+			String kunci = "kategori:" + category.name();
+			boolean over = l.di(fx, y0, fx + 18, y0 + 14);
+			l.g.fill(fx, y0, fx + 18, y0 + 14, on ? (over ? 0xFFF6EBC4 : Palette.TALISMAN_LOW) : Palette.LOCKED_PAPER);
+			Brush.frame(l.g, fx, y0, fx + 18, y0 + 14, on ? Palette.GOLD_DARK : Palette.argb(0x90, Palette.LOCKED));
+			icon(l.g, category.icon, fx + 3, y0 + 1, 12, on ? 0xFFFFFFFF : 0x70FFFFFF);
+			l.zona(kunci, fx, y0, fx + 18, y0 + 14, () -> {
+				if (!HIDDEN.remove(category)) {
+					HIDDEN.add(category);
+				}
+				UiSound.toggle(HIDDEN.contains(category));
+				rebuildList();
+			}, true, null, true);
+			l.fokusCincin(kunci, fx, y0, fx + 18, y0 + 14);
+			if (over) {
+				l.tip(Component.translatable("kultivator.peta.category." + category.name().toLowerCase(Locale.ROOT)));
+			}
+			fx += 20;
+		}
+		y0 += 17;
+		int extra = barisRute(helm);
+		if (extra == 0) {
+			l.teks(Brush.bold(Component.translatable("kultivator.peta.list", listed.size())), sx0 + 2, y0, sx1 - sx0 - 4, Palette.SEAL_DARK);
+			y0 += 11;
+		}
+		if (listed.isEmpty() && extra == 0) {
+			l.bungkus(Component.translatable(marks.isEmpty() ? "kultivator.peta.list.none" : "kultivator.peta.list.filtered"), sx0 + 2, y0 + 2,
+					sx1 - sx0 - 4, l.gaya.teksSamar, sy1 - y0 - 4);
+			return;
+		}
+		List<CompoundTag> routes = new ArrayList<>();
+		if (helm != null) {
+			for (Tag tag : helm.info().getListOrEmpty("routes")) {
+				routes.add(tag instanceof CompoundTag r ? r : new CompoundTag());
+			}
+		}
+		boolean hall = helm != null && helm.info().contains("hall_x");
+		LocalPlayer player = minecraft.player;
+		daftar.gambar(l, "situs", sx0, y0, sx1, sy1, extra + listed.size(), ROW_H, (lk, i, rx0, ry0, rx1, ry1, sorot, pilih) -> {
+			if (i < extra) {
+				baris(lk, helm, hall, routes, i, extra, rx0, ry0, rx1, sorot, pilih);
+				return;
+			}
+			Mark mark = listed.get(i - extra);
+			if (sorot || pilih || mark == selected) {
+				lk.g.fill(rx0, ry0, rx1, ry1, pilih || mark == selected ? 0x50D4A637 : 0x30FFFFFF);
+			}
+			icon(lk.g, mark.icon, rx0 + 1, ry0 + 1, 11, mark.waypoint >= 0 ? 0xFF000000 | mark.color : 0xFFFFFFFF);
+			int nameRight = rx1 - 3;
+			if (player != null) {
+				int d = (int) Math.round(Math.sqrt(dist2(player, mark)));
+				Component dt = Component.literal(d >= 10000 ? (d / 1000) + "k" : String.valueOf(d));
+				lk.kanan(dt, rx1 - 2, ry0 + 2, lk.gaya.teksSamar);
+				nameRight = rx1 - lk.font.width(dt) - 6;
+			}
+			lk.teks(mark.name, rx0 + 14, ry0 + 2, nameRight - rx0 - 14, lk.gaya.teks);
+		}, () -> pakai(helm, hall, routes, extra), i -> {
+			if (side && i >= extra && i - extra < listed.size()) {
+				lihat(listed.get(i - extra));
+			}
+		});
+	}
+
+	/** A sail-mode row: headings, the own sect hall, a route. */
+	private void baris(Lukis l, @Nullable HelmScreen helm, boolean hall, List<CompoundTag> routes, int i, int extra, int rx0, int ry0, int rx1,
+			boolean sorot, boolean pilih) {
+		if (i == 0 || i == extra - 1) {
+			l.kepala(i == 0 ? Component.translatable(M + "berlayar.rute") : Component.translatable("kultivator.peta.list", listed.size()), rx0, ry0, rx1);
+			return;
+		}
+		boolean captain = helm != null && helm.kapten();
+		Component label;
+		boolean allowed;
+		Component reason;
+		if (hall && i == 1) {
+			label = Component.translatable("kultivator.kapal.helm.dest.hall", helm.info().getStringOr("hall_name", ""));
+			allowed = captain;
+			reason = Component.translatable("kultivator.kapal.helm.voyage.not_captain");
+		} else {
+			CompoundTag route = routes.get(i - 1 - (hall ? 1 : 0));
+			Component name = HelmScreen.namaRute(route);
+			label = Component.translatable("kultivator.kapal.helm.dest.route", name);
+			allowed = captain && route.getBooleanOr("allowed", false);
+			reason = !captain ? Component.translatable("kultivator.kapal.helm.voyage.not_captain") : Component.translatable("kultivator.kapal.route_closed", name);
+		}
+		if (sorot || pilih) {
+			l.g.fill(rx0, ry0, rx1, ry0 + ROW_H - 1, pilih ? 0x50D4A637 : 0x30FFFFFF);
+		}
+		icon(l.g, 17, rx0 + 1, ry0 + 1, 11, allowed ? 0xFFFFFFFF : 0x70FFFFFF);
+		l.teks(label, rx0 + 14, ry0 + 2, rx1 - rx0 - 16, allowed ? l.gaya.teks : l.gaya.teksSamar);
+		if (sorot) {
+			l.tip(List.of(Brush.bold(label), (allowed ? Component.translatable(M + "berlayar.ulang") : reason).copy().withStyle(ChatFormatting.GRAY)));
+		}
+	}
+
+	/** Enter / a second click on the selected row: a site opens on the map; a voyage row sails (sail mode). */
+	private void pakai(@Nullable HelmScreen helm, boolean hall, List<CompoundTag> routes, int extra) {
+		int i = daftar.pilihan();
+		if (i >= extra) {
+			if (i - extra < listed.size()) {
+				daftarTampil = false;
+				lihat(listed.get(i - extra));
+			}
+			return;
+		}
+		if (helm == null || i <= 0 || i >= extra - 1) {
+			return;
+		}
+		if (!helm.kapten()) {
+			fokusRing.tolak(Component.translatable("kultivator.kapal.helm.voyage.not_captain"));
+			return;
+		}
+		if (hall && i == 1) {
+			helm.perintah(KapalRohEntity.OP_HALL, 0, "");
+		} else {
+			CompoundTag route = routes.get(i - 1 - (hall ? 1 : 0));
+			if (!route.getBooleanOr("allowed", false)) {
+				fokusRing.tolak(Component.translatable("kultivator.kapal.route_closed", HelmScreen.namaRute(route)));
+				return;
+			}
+			helm.perintah(KapalRohEntity.OP_ROUTE, 0, route.getStringOr("id", ""));
+		}
+		UiSound.press();
+		kembaliKeKemudi();
 	}
 
 	// ================================================================== input
 
+	/** True over the map's overlays that take their own clicks (the card, the sail banner). */
+	private boolean diAtasPeta(double mx, double my) {
+		if (selected != null && mx >= cardX && mx < cardX + cardW && my >= cardY && my < cardY + cardH) {
+			return true;
+		}
+		return modeBerlayar() != null && my < my0 + BANNER_H;
+	}
+
 	@Override
 	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+		if (subKota()) {
+			return kota.mouseClicked(event, doubleClick);
+		}
 		double mx = event.x();
 		double my = event.y();
-		if (event.button() == InputConstants.MOUSE_BUTTON_LEFT && help.click(mx, my)) {
-			return true;
-		}
-		if (selected != null && mx >= cardX && mx < cardX + cardW && my >= cardY && my < cardY + cardH) {
-			for (PetaUi.Button button : cardButtons) {
-				if (button.over(mx, my)) {
-					if (button.enabled) {
-						UiSound.press();
-						button.action.run();
-					} else {
-						UiSound.denied();
-					}
-					return true;
-				}
-			}
-			return true;
-		}
-		if (event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
-			for (PetaUi.Button button : buttons) {
-				if (button.over(mx, my)) {
-					if (button.enabled) {
-						UiSound.press();
-						button.action.run();
-					} else {
-						UiSound.denied();
-					}
-					return true;
-				}
-			}
-			if (side && clickList(mx, my)) {
-				return true;
-			}
-		}
-		if (overMap(mx, my)) {
+		if (!modal() && overMap(mx, my) && !diAtasPeta(mx, my)) {
+			fokusRing.set("peta");
 			if (event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
 				dragging = true;
 				dragX = mx;
@@ -1121,16 +1436,12 @@ public final class PetaScreen extends Screen {
 			if (event.button() == InputConstants.MOUSE_BUTTON_RIGHT) {
 				Mark near = markAt(mx, my);
 				if (near != null) {
-					UiSound.press();
 					openCard(near);
+				} else if (PetaCache.sheet().getIntOr("max_waypoints", 32) > 0) {
+					UiSound.toggle(true);
+					PetaClient.request(PetaNet.OP_WAYPOINT_ADD, (int) Math.floor(worldX(mx)), (int) Math.floor(worldZ(my)), "", new long[0]);
 				} else {
-					int max = PetaCache.sheet().getIntOr("max_waypoints", 32);
-					if (max > 0) {
-						UiSound.toggle(true);
-						PetaClient.request(PetaNet.OP_WAYPOINT_ADD, (int) Math.floor(worldX(mx)), (int) Math.floor(worldZ(my)), "", new long[0]);
-					} else {
-						UiSound.denied();
-					}
+					UiSound.denied();
 				}
 				return true;
 			}
@@ -1138,31 +1449,11 @@ public final class PetaScreen extends Screen {
 		return super.mouseClicked(event, doubleClick);
 	}
 
-	private boolean clickList(double mx, double my) {
-		int sx = mx1 + 8;
-		int top = my0 + 16 + 2 * 16 + 4;
-		int listTop = top + 12;
-		if (mx < sx || mx >= sx + SIDE_W || my < listTop || my >= my1) {
-			return false;
-		}
-		int index = Math.round(listScroll) + (int) Math.floor((my - listTop) / 13.0D);
-		if (index >= 0 && index < listed.size()) {
-			Mark mark = listed.get(index);
-			viewX = mark.x;
-			viewZ = mark.z;
-			UiSound.press();
-			openCard(mark);
-			return true;
-		}
-		return false;
-	}
-
 	private @Nullable Mark markAt(double mx, double my) {
 		Mark best = null;
 		double bestD = 49.0D;
-		int zoom = markerZoom();
 		for (Mark mark : marks) {
-			if (HIDDEN.contains(mark.category) || zoom < mark.minZoom && !mark.live && mark.waypoint < 0) {
+			if (!shown(mark)) {
 				continue;
 			}
 			double dx = screenX(mark.x) - mx;
@@ -1178,6 +1469,9 @@ public final class PetaScreen extends Screen {
 
 	@Override
 	public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
+		if (subKota()) {
+			return kota.mouseDragged(event, dx, dy);
+		}
 		if (dragging) {
 			viewX -= (event.x() - dragX) * bpp();
 			viewZ -= (event.y() - dragY) * bpp();
@@ -1190,15 +1484,14 @@ public final class PetaScreen extends Screen {
 
 	@Override
 	public boolean mouseReleased(MouseButtonEvent event) {
-		if (help.release(event.x(), event.y())) {
-			return true;
+		if (subKota()) {
+			return kota.mouseReleased(event);
 		}
 		if (dragging && event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
 			dragging = false;
 			if (Math.abs(event.x() - pressX) < 3.0D && Math.abs(event.y() - pressY) < 3.0D) {
 				Mark near = markAt(event.x(), event.y());
 				if (near != null) {
-					UiSound.press();
 					openCard(near);
 				} else {
 					selected = null;
@@ -1210,57 +1503,99 @@ public final class PetaScreen extends Screen {
 	}
 
 	@Override
-	public boolean mouseScrolled(double x, double y, double scrollX, double scrollY) {
-		if (side && x >= mx1 + 8 && x < mx1 + 8 + SIDE_W && y >= my0 + 52 && y < my1) {
-			listScroll -= (float) scrollY;
+	public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+		if (subKota()) {
+			return kota.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+		}
+		if (overMap(mouseX, mouseY) && scrollY != 0.0D) {
+			setZoom(zoomIndex + (scrollY > 0.0D ? -1 : 1), mouseX, mouseY);
 			return true;
 		}
-		if (overMap(x, y) && scrollY != 0.0D) {
-			setZoom(zoomIndex + (scrollY > 0.0D ? -1 : 1), x, y);
-			return true;
-		}
-		return super.mouseScrolled(x, y, scrollX, scrollY);
+		return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
 	}
 
 	@Override
 	public boolean keyPressed(KeyEvent event) {
-		if (searchBox != null && searchBox.isFocused()) {
-			if (event.key() == InputConstants.KEY_ESCAPE) {
-				searchBox.setFocused(false);
-				return true;
-			}
+		if (subKota()) {
+			return kota.keyPressed(event);
+		}
+		if (mauTombol()) {
 			return super.keyPressed(event);
 		}
-		if (PetaClient.PETA.matches(event)) {
-			onClose();
+		int key = event.key();
+		if (!daftarTampil && (key == InputConstants.KEY_EQUALS || key == InputConstants.KEY_ADD || key == InputConstants.KEY_MINUS)) {
+			boolean in = key == InputConstants.KEY_EQUALS || key == InputConstants.KEY_ADD;
+			setZoom(zoomIndex + (in ? -1 : 1), (mx0 + mx1) / 2.0D, (my0 + my1) / 2.0D);
 			return true;
 		}
-		double step = 24.0D * bpp();
-		switch (event.key()) {
-			case InputConstants.KEY_LEFT -> viewX -= step;
-			case InputConstants.KEY_RIGHT -> viewX += step;
-			case InputConstants.KEY_UP -> viewZ -= step;
-			case InputConstants.KEY_DOWN -> viewZ += step;
-			case InputConstants.KEY_HOME -> centre();
-			case InputConstants.KEY_EQUALS, InputConstants.KEY_ADD -> setZoom(zoomIndex - 1, (mx0 + mx1) / 2.0D, (my0 + my1) / 2.0D);
-			case InputConstants.KEY_MINUS -> setZoom(zoomIndex + 1, (mx0 + mx1) / 2.0D, (my0 + my1) / 2.0D);
-			default -> {
-				return super.keyPressed(event);
+		if (!daftarTampil && "peta".equals(fokusRing.kunci())) {
+			double step = 24.0D * bpp();
+			switch (key) {
+				case InputConstants.KEY_LEFT -> viewX -= step;
+				case InputConstants.KEY_RIGHT -> viewX += step;
+				case InputConstants.KEY_UP -> viewZ -= step;
+				case InputConstants.KEY_DOWN -> viewZ += step;
+				case InputConstants.KEY_HOME -> centre();
+				case InputConstants.KEY_RETURN, InputConstants.KEY_NUMPADENTER, InputConstants.KEY_SPACE -> {
+					// Enter on the focused map: the card of the marker nearest its centre
+					Mark near = markAt((mx0 + mx1) / 2.0D, (my0 + my1) / 2.0D);
+					if (near == null) {
+						return super.keyPressed(event);
+					}
+					openCard(near);
+				}
+				default -> {
+					return super.keyPressed(event);
+				}
 			}
+			return true;
 		}
-		return true;
+		return super.keyPressed(event);
 	}
 
 	@Override
-	public void removed() {
-		PetaClient.request(PetaNet.OP_CLOSE, 0, 0, "", new long[0]);
-		UiSound.close();
-		super.removed();
+	public boolean keyReleased(KeyEvent event) {
+		return subKota() ? kota.keyReleased(event) : super.keyReleased(event);
 	}
 
 	@Override
-	public boolean isPauseScreen() {
+	public boolean charTyped(CharacterEvent event) {
+		return subKota() ? kota.charTyped(event) : super.charTyped(event);
+	}
+
+	@Override
+	public boolean mauTombol() {
+		return subKota() ? kota.mauTombol() : super.mauTombol();
+	}
+
+	@Override
+	public boolean modal() {
+		return subKota() ? kota.modal() : super.modal();
+	}
+
+	@Override
+	public boolean fokusTab(boolean back) {
+		return subKota() ? kota.fokusTab(back) : super.fokusTab(back);
+	}
+
+	/** Esc: the card, then the list view, then sail mode (back to the helm); else the Gulungan's own step back. */
+	@Override
+	public boolean mundur() {
+		if (subKota()) {
+			return kota.mundur();
+		}
+		if (selected != null) {
+			selected = null;
+			return true;
+		}
+		if (daftarTampil) {
+			daftarTampil = false;
+			return true;
+		}
+		if (modeBerlayar() != null) {
+			kembaliKeKemudi();
+			return true;
+		}
 		return false;
 	}
-
 }

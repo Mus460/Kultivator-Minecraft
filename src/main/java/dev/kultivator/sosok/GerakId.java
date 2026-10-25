@@ -13,8 +13,10 @@ import org.jetbrains.annotations.Nullable;
  * Ranges (C40.I2): 1-107 DESIGN 38 (38.N.5 1-78 and 38.T.8.1 79-107, names exactly as written there), 108-199
  * DESIGN 40 (108-121 idle stances, 122-149 and 165-176 disciples and cultivators, 150-164 the existing function
  * poses), 200-299 DESIGN 39 (39E {@link #MANDIRI_E_FIRST}-{@link #MANDIRI_E_LAST}, 39F
- * {@link #MANDIRI_F_FIRST}-{@link #MANDIRI_F_LAST}, registered from their client init), 300-399 later DESIGN 38
- * additions, 400-499 reserved. Id 19 does not exist in 38.N.5 and stays unused ({@link #ada(int)} is false).
+ * {@link #MANDIRI_F_FIRST}-{@link #MANDIRI_F_LAST}, registered from their client init), 300-349 later DESIGN 38
+ * additions and DESIGN 41 ({@code GabungGerakId} 300-319), 350-469 DESIGN 42 ({@code KotaGerakId}: 350-449 town life,
+ * 450-459 the 42S spread clips, 460-469 reserved), 470-499 reserved.
+ * Id 19 does not exist in 38.N.5 and stays unused ({@link #ada(int)} is false).
  * <p>
  * Synced form ({@code DATA_GERAK}, 40.2.4): {@code klip << 8 | varian}; {@link #pack}, {@link #klip(int)},
  * {@link #varian(int)}. Variant 0 is always the plain clip; the named variants below are part of the contract (40G
@@ -51,11 +53,14 @@ public final class GerakId {
 	public static final int MANDIRI_F_FIRST = 250;
 	public static final int MANDIRI_F_LAST = 299;
 	public static final int MANDIRI_LAST = 299;
-	/** Later DESIGN 38 clips (after 107). */
+	/** Later DESIGN 38 clips (after 107) and DESIGN 41 ({@code GabungGerakId} 300-349). */
 	public static final int TEMPAT_TAMBAHAN_FIRST = 300;
-	public static final int TEMPAT_TAMBAHAN_LAST = 399;
+	public static final int TEMPAT_TAMBAHAN_LAST = 349;
+	/** DESIGN 42 "Kota yang Hidup" ({@code dunia/kota42/api/KotaGerakId}, 42.12.5): 350-449, 450-459 42S, 460-469 reserved. */
+	public static final int KOTA_HIDUP_FIRST = 350;
+	public static final int KOTA_HIDUP_LAST = 469;
 	/** Reserved. */
-	public static final int CADANGAN_FIRST = 400;
+	public static final int CADANGAN_FIRST = 470;
 	public static final int CADANGAN_LAST = 499;
 	/** Largest id the synced int can carry (12 bits above the 8 variant bits). */
 	public static final int MAKS = 4095;
@@ -64,7 +69,7 @@ public final class GerakId {
 
 	/** Catalog groups (the {@code klip kelompok} test command, 40.6.4). */
 	public enum Kelompok {
-		/** 1-107 and 300-399: town and place life (DESIGN 38). */
+		/** 1-107 and 300-349: town and place life (DESIGN 38), sect joining (DESIGN 41). */
 		TEMPAT,
 		/** 108-121: idle stances. */
 		SIKAP,
@@ -74,6 +79,8 @@ public final class GerakId {
 		FUNGSI,
 		/** 200-299: autonomous disciples (DESIGN 39). */
 		MANDIRI,
+		/** 350-469: living towns (DESIGN 42). */
+		KOTA_HIDUP,
 		/** Anything else (reserved, unknown). */
 		LAIN
 	}
@@ -874,7 +881,7 @@ public final class GerakId {
 		BY_NAME.put(nama, id);
 	}
 
-	/** True for an id defined here (1-176 except 19). Ids 200-399 are defined by their owners' client catalogs. */
+	/** True for an id defined here (1-176 except 19). Ids 200-469 are defined by their owners' client catalogs. */
 	public static boolean ada(int id) {
 		return id > 0 && id < NAMA.length && NAMA[id] != null;
 	}
@@ -930,6 +937,9 @@ public final class GerakId {
 		}
 		if (id >= MANDIRI_FIRST && id <= MANDIRI_LAST) {
 			return Kelompok.MANDIRI;
+		}
+		if (id >= KOTA_HIDUP_FIRST && id <= KOTA_HIDUP_LAST) {
+			return Kelompok.KOTA_HIDUP;
 		}
 		return Kelompok.LAIN;
 	}

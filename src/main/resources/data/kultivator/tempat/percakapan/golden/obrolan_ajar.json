@@ -1,0 +1,117 @@
+{
+  "id": "obrolan_ajar",
+  "jenis": "realisasi",
+  "_catatan": "NPC-NPC AJAR: advice, a pupil's question, praise, a scolding.",
+  "benih_dunia": 42,
+  "masukan": {
+    "niat": "NASIHAT",
+    "pembicara": 640,
+    "hari": 120,
+    "now": 2880000,
+    "cuaca": "cerah",
+    "musim": "semi",
+    "situasi": {
+      "jam": "pagi",
+      "cuaca": "cerah",
+      "musim": "semi",
+      "kelompok": "tetua",
+      "watak": "ramah",
+      "kebiasaan": [],
+      "sifat": {
+        "H": 10,
+        "E": 0,
+        "X": 20,
+        "A": 30,
+        "C": 10,
+        "O": 0
+      },
+      "wajah": "netral",
+      "tempat": "kota_besar"
+    },
+    "pendengar": null,
+    "kesan": "kenal",
+    "tahu_nama": false,
+    "register": "biasa",
+    "dialek": "gunung",
+    "tahap": "tua",
+    "nilai": {
+      "lawan": {
+        "orang": {
+          "nama": "Xiao Hu",
+          "kelamin": "l",
+          "tahap": "anak"
+        }
+      }
+    }
+  },
+  "langkah": [
+    {
+      "ubah": {},
+      "harap": {
+        "k": "kultivator.cakap.ajar.nasihat.0",
+        "a": [
+          {
+            "t": "Xiao Hu"
+          }
+        ]
+      },
+      "aturan": "ajar.nasihat",
+      "gestur": "mengajar",
+      "seru": null,
+      "tik": null,
+      "id_id": "Dengar, Xiao Hu. Pekerjaan yang dikerjakan pelan tapi benar lebih baik dari cepat tapi salah.",
+      "en_us": "Listen, Xiao Hu. Work done slow but right beats work done fast but wrong."
+    },
+    {
+      "ubah": {
+        "niat": "TANYA_MURID",
+        "pembicara": 641,
+        "tahap": "anak"
+      },
+      "harap": {
+        "k": "kultivator.cakap.ajar.tanya.2",
+        "a": []
+      },
+      "aturan": "ajar.tanya",
+      "gestur": "garuk_kepala",
+      "seru": null,
+      "tik": null,
+      "id_id": "Boleh aku coba sendiri sekarang?",
+      "en_us": "May I try it myself now?"
+    },
+    {
+      "ubah": {
+        "niat": "PUJI"
+      },
+      "harap": {
+        "k": "kultivator.cakap.sekte.dilindungi.3",
+        "a": []
+      },
+      "aturan": "sekte.dilindungi",
+      "gestur": "hormat",
+      "seru": null,
+      "tik": null,
+      "id_id": "Upeti untuk sekte memang berat, tapi lebih ringan dari diserang binatang roh.",
+      "en_us": "The sect tribute is heavy, but lighter than being attacked by spirit beasts."
+    },
+    {
+      "ubah": {
+        "niat": "TEGUR"
+      },
+      "harap": {
+        "k": "kultivator.cakap.ajar.tegur.0",
+        "a": [
+          {
+            "t": "Xiao Hu"
+          }
+        ]
+      },
+      "aturan": "ajar.tegur",
+      "gestur": "marah_tunjuk",
+      "seru": null,
+      "tik": null,
+      "id_id": "Salah lagi, Xiao Hu! Perhatikan baik-baik!",
+      "en_us": "Wrong again, Xiao Hu! Pay attention!"
+    }
+  ]
+}

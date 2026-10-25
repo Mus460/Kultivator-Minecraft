@@ -1,0 +1,1166 @@
+{
+  "_dibuat": "tools/gen_kota_hidup_cakap.py dari tools/kota_cakap_sumber (jangan disunting tangan)",
+  "kelompok": "kerja",
+  "isi": [
+    {
+      "aturan": "kerja.pekerja",
+      "niat": "BASA_BASI",
+      "topik": "kerja",
+      "syarat": {
+        "kelompok": [
+          "pekerja"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "kerja.pekerja.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "kampung",
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "kerja.pekerja.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "kerja.pekerja.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "kerja.pekerja.3",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "kerja.pekerja.4",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "lanjut": [
+        "harga",
+        "keluarga"
+      ],
+      "gestur": "seka_keringat"
+    },
+    {
+      "aturan": "kerja.pedagang",
+      "niat": "BASA_BASI",
+      "topik": "kerja",
+      "syarat": {
+        "kelompok": [
+          "pedagang"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "kerja.pedagang.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "kerja.pedagang.1",
+          "slot": [
+            "$barang_murah"
+          ],
+          "bobot": 2,
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "kerja.pedagang.2",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "kerja.pedagang.3",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "kerja.pedagang.4",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        },
+        "$barang_murah": {
+          "tipe": "barang",
+          "dari": "konteks.barang_murah"
+        }
+      },
+      "lanjut": [
+        "dagang",
+        "harga"
+      ],
+      "gestur": "hitung_koin"
+    },
+    {
+      "aturan": "kerja.penjaga",
+      "niat": "BASA_BASI",
+      "topik": "kerja",
+      "syarat": {
+        "kelompok": [
+          "penjaga"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "kerja.penjaga.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "ibukota"
+          ]
+        },
+        {
+          "kunci": "kerja.penjaga.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "kerja.penjaga.2",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "kerja.penjaga.3",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "kerja.penjaga.4",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "lanjut": [
+        "bahaya",
+        "kejahatan"
+      ],
+      "gestur": "sikap_tombak"
+    },
+    {
+      "aturan": "kerja.tetua",
+      "niat": "BASA_BASI",
+      "topik": "kerja",
+      "syarat": {
+        "kelompok": [
+          "tetua"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "kerja.tetua.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "kerja.tetua.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "gunung"
+          ]
+        },
+        {
+          "kunci": "kerja.tetua.2",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "kerja.tetua.3",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "lanjut": [
+        "kota",
+        "keluarga"
+      ],
+      "gestur": "sikap_tua"
+    },
+    {
+      "aturan": "kerja.kultivator",
+      "niat": "BASA_BASI",
+      "topik": "kerja",
+      "syarat": {
+        "kelompok": [
+          "kultivator"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "kerja.kultivator.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "kerja.kultivator.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "gunung"
+          ]
+        },
+        {
+          "kunci": "kerja.kultivator.2",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "kerja.kultivator.3",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "lanjut": [
+        "sekte",
+        "dunia"
+      ],
+      "gestur": "napas_meditasi"
+    },
+    {
+      "aturan": "kerja.cendekia",
+      "niat": "BASA_BASI",
+      "topik": "kerja",
+      "syarat": {
+        "kelompok": [
+          "cendekia"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "kerja.cendekia.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "ibukota"
+          ]
+        },
+        {
+          "kunci": "kerja.cendekia.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "varian": [
+            "gunung"
+          ]
+        },
+        {
+          "kunci": "kerja.cendekia.2",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "kerja.cendekia.3",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "lanjut": [
+        "kota",
+        "dunia"
+      ],
+      "gestur": "membaca"
+    },
+    {
+      "aturan": "kerja.rahib",
+      "niat": "BASA_BASI",
+      "topik": "kerja",
+      "syarat": {
+        "kelompok": [
+          "rahib"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "kerja.rahib.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "gunung"
+          ]
+        },
+        {
+          "kunci": "kerja.rahib.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "kerja.rahib.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1
+        },
+        {
+          "kunci": "kerja.rahib.3",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "lanjut": [
+        "kota",
+        "duka"
+      ],
+      "gestur": "sikap_doa"
+    },
+    {
+      "aturan": "kerja.pejabat",
+      "niat": "BASA_BASI",
+      "topik": "kerja",
+      "syarat": {
+        "kelompok": [
+          "pejabat"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "kerja.pejabat.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "ibukota"
+          ]
+        },
+        {
+          "kunci": "kerja.pejabat.1",
+          "slot": [],
+          "bobot": 2
+        },
+        {
+          "kunci": "kerja.pejabat.2",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "kerja.pejabat.3",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "lanjut": [
+        "pejabat",
+        "kota"
+      ],
+      "gestur": "sikap_tangan_belakang"
+    },
+    {
+      "aturan": "kerja.anak",
+      "niat": "BASA_BASI",
+      "topik": "kerja",
+      "syarat": {
+        "kelompok": [
+          "anak"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "kerja.anak.0",
+          "slot": [],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "kerja.anak.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "kerja.anak.2",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "kerja.anak.3",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {},
+      "lanjut": [
+        "cita"
+      ],
+      "gestur": "main_lompat"
+    },
+    {
+      "aturan": "kerja.khusus",
+      "niat": "BASA_BASI",
+      "topik": "kerja",
+      "syarat": {
+        "kelompok": [
+          "khusus"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "kerja.khusus.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "kerja.khusus.1",
+          "slot": [],
+          "bobot": 2
+        },
+        {
+          "kunci": "kerja.khusus.2",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "kerja.khusus.3",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "lanjut": [
+        "kota",
+        "dunia"
+      ],
+      "gestur": "bicara_tangan"
+    },
+    {
+      "aturan": "kerja.pandai",
+      "niat": "BASA_BASI",
+      "topik": "kerja",
+      "syarat": {
+        "peran": [
+          "pandai_pusaka",
+          "empu",
+          "pandai_desa",
+          "pedagang_senjata"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "kerja.pandai.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "kerja.pandai.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "kerja.pandai.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1
+        },
+        {
+          "kunci": "kerja.pandai.3",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "lanjut": [
+        "dagang"
+      ],
+      "gestur": "palu_landasan"
+    },
+    {
+      "aturan": "kerja.petani",
+      "niat": "BASA_BASI",
+      "topik": "kerja",
+      "syarat": {
+        "peran": [
+          "petani",
+          "pemetik_teh",
+          "pemetik_herba",
+          "penjaga_kebun"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "kerja.petani.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "kerja.petani.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "gunung"
+          ]
+        },
+        {
+          "kunci": "kerja.petani.2",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "kerja.petani.3",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "lanjut": [
+        "musim",
+        "harga"
+      ],
+      "gestur": "mencangkul"
+    },
+    {
+      "aturan": "kerja.nelayan",
+      "niat": "BASA_BASI",
+      "topik": "kerja",
+      "syarat": {
+        "peran": [
+          "nelayan",
+          "pelaut",
+          "nakhoda",
+          "nakhoda_laut",
+          "penjual_ikan",
+          "pendayung",
+          "tukang_kapal"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "kerja.nelayan.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "pelabuhan",
+            "air"
+          ]
+        },
+        {
+          "kunci": "kerja.nelayan.1",
+          "slot": [],
+          "bobot": 2
+        },
+        {
+          "kunci": "kerja.nelayan.2",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "kerja.nelayan.3",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "lanjut": [
+        "cuaca",
+        "dagang"
+      ],
+      "gestur": "tarik_jala"
+    },
+    {
+      "aturan": "kerja.koki",
+      "niat": "BASA_BASI",
+      "topik": "kerja",
+      "syarat": {
+        "peran": [
+          "koki",
+          "pemilik_penginapan",
+          "pelayan",
+          "pemilik_teh",
+          "ahli_teh"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "kerja.koki.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "kerja.koki.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "kerja.koki.2",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "kerja.koki.3",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "lanjut": [
+        "dagang",
+        "tetangga"
+      ],
+      "gestur": "masak"
+    },
+    {
+      "aturan": "kerja.tabib",
+      "niat": "BASA_BASI",
+      "topik": "kerja",
+      "syarat": {
+        "peran": [
+          "tabib",
+          "alkemis",
+          "pedagang_pil",
+          "penjual_obat"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "kerja.tabib.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "gunung"
+          ]
+        },
+        {
+          "kunci": "kerja.tabib.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "kerja.tabib.2",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "kerja.tabib.3",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "lanjut": [
+        "kesehatan",
+        "dagang"
+      ],
+      "gestur": "racik_herba"
+    },
+    {
+      "aturan": "kerja.kuli",
+      "niat": "BASA_BASI",
+      "topik": "kerja",
+      "syarat": {
+        "peran": [
+          "kuli",
+          "kuli_gunung",
+          "penjaga_gudang",
+          "penuntun_unta",
+          "penjaga_lift"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "kerja.kuli.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "gunung",
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "kerja.kuli.1",
+          "slot": [],
+          "bobot": 2
+        },
+        {
+          "kunci": "kerja.kuli.2",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "kerja.kuli.3",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "lanjut": [
+        "harga"
+      ],
+      "gestur": "angkat_bawa"
+    },
+    {
+      "aturan": "kerja.hiburan",
+      "niat": "BASA_BASI",
+      "topik": "kerja",
+      "syarat": {
+        "peran": [
+          "pendongeng",
+          "pengamen",
+          "akrobat",
+          "penari",
+          "pemusik",
+          "penari_gurun",
+          "sastrawan"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "kerja.hiburan.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "kerja.hiburan.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "kerja.hiburan.2",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "kerja.hiburan.3",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "lanjut": [
+        "acara",
+        "kota"
+      ],
+      "gestur": "tepuk_tangan"
+    },
+    {
+      "aturan": "kerja.malam",
+      "niat": "BASA_BASI",
+      "topik": "kerja",
+      "syarat": {
+        "peran": [
+          "penjaga_malam",
+          "penjaga_suar",
+          "penjaga_formasi"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "kerja.malam.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "kerja.malam.1",
+          "slot": [],
+          "bobot": 2
+        },
+        {
+          "kunci": "kerja.malam.2",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "kerja.malam.3",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "lanjut": [
+        "bahaya"
+      ],
+      "gestur": "pukul_kentongan"
+    },
+    {
+      "aturan": "kerja.comblang",
+      "niat": "BASA_BASI",
+      "topik": "kerja",
+      "syarat": {
+        "peran": [
+          "mak_comblang",
+          "pengurus_duka"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "kerja.comblang.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "kerja.comblang.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "kerja.comblang.2",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "kerja.comblang.3",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "lanjut": [
+        "asmara",
+        "keluarga"
+      ],
+      "gestur": "bicara_tangan"
+    },
+    {
+      "aturan": "kerja.pengemis",
+      "niat": "BASA_BASI",
+      "topik": "kerja",
+      "syarat": {
+        "peran": [
+          "pengemis",
+          "pencopet",
+          "tawanan"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "kerja.pengemis.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "kerja.pengemis.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "kerja.pengemis.2",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "kerja.pengemis.3",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "lanjut": [
+        "kota",
+        "kejahatan"
+      ],
+      "gestur": "sikap_tunduk"
+    },
+    {
+      "aturan": "kerja.guru_sekolah",
+      "niat": "BASA_BASI",
+      "topik": "kerja",
+      "syarat": {
+        "peran": [
+          "guru_sekolah",
+          "pustakawan",
+          "penguji"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "kerja.guru_sekolah.0",
+          "slot": [],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "kerja.guru_sekolah.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2
+        },
+        {
+          "kunci": "kerja.guru_sekolah.2",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "kerja.guru_sekolah.3",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "lanjut": [
+        "cita",
+        "kota"
+      ],
+      "gestur": "mengajar"
+    }
+  ]
+}

@@ -1,0 +1,298 @@
+# kabar_pemain: corpus of the conversation engine (42K-C, DESIGN 42.5A.8). Source format: gen_kota_hidup_cakap.py.
+# BERI_KABAR about a player (predicates of golongan "pemain"). {$subjek} = the player the fact is about (the realiser
+# names him, or uses the listener's address when he is the listener); {$objek} = the warga involved.
+@kelompok kabar_pemain
+
+== kabar.menolong
+niat: BERI_KABAR
+topik: pemain
+syarat: fakta=MENOLONG
+lanjut: kota tetangga
+gestur: bicara_tangan
+$katanya: aturan=frag.katanya
+$subjek: tipe=nama_warga dari=fakta.subjek
+$objek: tipe=nama_warga dari=fakta.objek
+$waktu_lalu: tipe=waktu_lalu dari=fakta.hariKejadian
+$senang: aturan=seru.senang opsional=0.5
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] {$katanya} {$subjek} menolong {$objek} {$waktu_lalu}. Orang baik masih ada rupanya. || {$katanya} {$subjek} helped {$objek} {$waktu_lalu}. So good people still exist.
+  ~ kasar: {$subjek} menolong {$objek}? Hah. Pasti ada maunya. || {$subjek} helped {$objek}? Hah. Must want something.
+  ~ kuno: {$subjek} mengulurkan tangan kepada {$objek} {$waktu_lalu}. Budi semacam itu jarang di dunia fana. || {$subjek} extended a hand to {$objek} {$waktu_lalu}. Such kindness is rare in the mortal world.
+  ~ kampung: Si {$subjek} itu bantu {$objek} {$waktu_lalu}, lho. Orangnya ringan tangan. || That {$subjek} helped {$objek} {$waktu_lalu}, you know. Quick to lend a hand.
+- [2] Sudah dengar? {$objek} ditolong {$subjek}. Kalau tidak, entah apa jadinya. {$senang} || Heard? {$objek} was helped by {$subjek}. Otherwise who knows what would've happened. {$senang}
+  ~ pelabuhan: Dengar, Bung? {$objek} hampir tenggelam urusannya, untung {$subjek} datang menarik. || Heard, mate? {$objek} was nearly sunk, lucky {$subjek} came and hauled them out.
+  ~ oasis: Demi mata air, {$subjek} menolong {$objek}. Kebaikan seperti air di gurun. || By the spring, {$subjek} helped {$objek}. Kindness like water in the desert.
+- {$objek} tidak berhenti memuji {$subjek} sejak {$waktu_lalu}. Telingaku sampai panas. || {$objek} hasn't stopped praising {$subjek} since {$waktu_lalu}. My ears are burning.
+  ~ p: {$objek} memuji {$subjek} terus sejak {$waktu_lalu}. Aku jadi ikut penasaran orangnya. || {$objek} keeps praising {$subjek} since {$waktu_lalu}. Now I'm curious about this person too.
+- Di sumur orang membicarakan {$subjek}. Katanya {$objek} dibantu tanpa minta imbalan. || At the well folk talk of {$subjek}. They say {$objek} was helped without asking any reward.
+  ~ iblis: Di kota ini menolong tanpa bayaran itu bodoh. Tapi {$subjek} melakukannya untuk {$objek}. Aneh. || In this city helping for free is foolish. Yet {$subjek} did it for {$objek}. Strange.
+- [sopan] Mohon maaf menyela, {$sebutan}. Kebaikan {$subjek} kepada {$objek} sudah tersebar sampai ujung pasar. || Pardon me, {$sebutan}. The kindness of {$subjek} to {$objek} has spread to the end of the market.
+  ~ ibukota: Kebajikan {$subjek} kepada {$objek} menjadi buah bibir di distrik ini, {$sebutan}. || The virtue of {$subjek} towards {$objek} is on every lip in this district, {$sebutan}.
+
+== kabar.mencuri
+niat: BERI_KABAR
+topik: pemain
+syarat: fakta=MENCURI
+lanjut: kejahatan pejabat
+gestur: bisik
+$katanya: aturan=frag.katanya
+$subjek: tipe=nama_warga dari=fakta.subjek
+$objek: tipe=nama_warga dari=fakta.objek
+$waktu_lalu: tipe=waktu_lalu dari=fakta.hariKejadian
+$ragu: aturan=seru.ragu opsional=0.5
+$keluh: aturan=seru.keluh opsional=0.5
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] {$katanya} {$subjek} mengambil barang {$objek} {$waktu_lalu}. Hati-hati dompetmu. || {$katanya} {$subjek} took {$objek}'s things {$waktu_lalu}. Mind your purse.
+  ~ kasar: {$subjek} itu maling. {$objek} sendiri yang bilang. Kalau lewat sini, kupukul. || {$subjek} is a thief. {$objek} said so. Comes by here, I'll thrash them.
+  ~ kuno: Konon {$subjek} mencuri dari {$objek}. Hati yang serakah merusak fondasi Dao. || Rumour holds {$subjek} stole from {$objek}. A greedy heart rots the foundation of the Dao.
+- [2] Sst. {$objek} kehilangan barang {$waktu_lalu}, dan semua mata tertuju ke {$subjek}. || Shh. {$objek} lost something {$waktu_lalu}, and every eye turns to {$subjek}.
+  ~ air: Sst, Kakak... {$objek} kehilangan barang, ya... dan orang-orang menunjuk {$subjek}... || Shh, dear... {$objek} lost something... and people point at {$subjek}...
+  ~ kampung: Sst. Barang {$objek} raib {$waktu_lalu}. Orang sekampung curiga sama {$subjek}. || Shh. {$objek}'s things vanished {$waktu_lalu}. The whole village suspects {$subjek}.
+- Aku tidak menuduh, ya. Tapi sejak {$subjek} datang, {$objek} kehilangan barang. {$ragu} || I'm not accusing, mind. But since {$subjek} came, {$objek} has been losing things. {$ragu}
+  ~ iblis: Mencuri itu biasa. Ketahuan mencuri, itu yang bodoh. {$subjek} ketahuan oleh {$objek}. || Stealing is normal. Getting caught is stupid. {$subjek} got caught by {$objek}.
+- {$objek} menangis di depan lapaknya. Katanya {$subjek} pelakunya. {$keluh} || {$objek} was weeping in front of the stall. Says {$subjek} did it. {$keluh}
+  ~ pelabuhan: Di dermaga orang bilang {$subjek} mencopet dari {$objek}. Di laut, maling dilempar ke hiu, Bung. || At the docks they say {$subjek} picked {$objek}'s pocket. At sea, thieves go to the sharks, mate.
+- [sopan] Maaf, {$sebutan}, ada kabar kurang enak: {$subjek} dituduh mencuri dari {$objek}. || Forgive me, {$sebutan}, there's unpleasant news: {$subjek} is accused of stealing from {$objek}.
+
+== kabar.membeli
+niat: BERI_KABAR
+topik: dagang
+syarat: fakta=MEMBELI
+lanjut: harga kafilah
+gestur: hitung_koin
+$subjek: tipe=nama_warga dari=fakta.subjek
+$barang: tipe=barang dari=fakta.objek fitur=jamak
+$waktu_lalu: tipe=waktu_lalu dari=fakta.hariKejadian
+$angka: tipe=angka dari=fakta.nilai
+$kaget: aturan=seru.kaget opsional=0.5
+$keluh: aturan=seru.keluh opsional=0.5
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] {$subjek} memborong {$barang} {$waktu_lalu}! Pedagang sampai tersenyum sepanjang hari. || {$subjek} bought up {$barang} {$waktu_lalu}! The merchants smiled all day.
+  ~ kasar: {$subjek} beli {$barang} banyak sekali. Uangnya dari mana, coba? || {$subjek} bought heaps of {$barang}. Where's that money from, eh?
+  ~ kuno: {$subjek} menukar banyak batu roh dengan {$barang}. Pasti untuk persiapan menembus ranah. || {$subjek} traded many spirit stones for {$barang}. Surely preparing for a breakthrough.
+- [2] Tahu tidak? {$subjek} membeli {$angka} {$barang} sekaligus. Sekaligus! {$kaget} || Know what? {$subjek} bought {$angka} {$barang} at once. At once! {$kaget}
+  ~ pelabuhan: {$subjek} beli {$angka} {$barang} sekali angkut, Bung. Kapal kecil pun penuh. || {$subjek} bought {$angka} {$barang} in one haul, mate. Would fill a small boat.
+  ~ oasis: {$subjek} membeli {$angka} {$barang}. Kafilah pun jarang membawa sebanyak itu, Saudara. || {$subjek} bought {$angka} {$barang}. Even caravans rarely carry that much, friend.
+- Gara-gara {$subjek} memborong, {$barang} sekarang langka. {$keluh} || Because {$subjek} bought it all, {$barang} is scarce now. {$keluh}
+  ~ kampung: Lho, {$barang} habis gara-gara {$subjek} borong semua. Kami mau beli dari mana? || Well, {$barang} is gone because {$subjek} bought it all. Where are we to buy now?
+- Pedagang {$barang} di pasar menyebut {$subjek} pelanggan terbaiknya musim ini. || The {$barang} seller at the market calls {$subjek} the best customer this season.
+- [sopan] Kabarnya {$sebutan} juga berminat pada {$barang}? {$subjek} sudah membeli banyak, persediaan menipis. || Are you also after {$barang}, {$sebutan}? {$subjek} has bought a lot; stocks are thinning.
+
+== kabar.menawar_keras
+niat: BERI_KABAR
+topik: dagang
+syarat: fakta=MENAWAR_KERAS
+lanjut: harga
+gestur: geleng
+$subjek: tipe=nama_warga dari=fakta.subjek
+$objek: tipe=nama_warga dari=fakta.objek
+$tik: tipe=tik dari=pembicara
+- [3] {$subjek} menawar dagangan {$objek} sampai separuh harga. {$objek} hampir menangis. || {$subjek} haggled {$objek}'s goods down to half price. {$objek} nearly cried.
+  ~ kasar: {$subjek} itu pelit sekali. Menawar {$objek} sampai tulang. || {$subjek} is a miser. Haggled {$objek} down to the bone.
+  ~ kuno: {$subjek} tawar-menawar dengan {$objek} seperti dua pendekar beradu jurus. || {$subjek} bargained with {$objek} like two masters trading strikes.
+- [2] Kalau {$subjek} mampir ke lapakmu, naikkan harganya dulu. Dia menawar habis-habisan. || If {$subjek} stops at your stall, raise the price first. They haggle to the last coin.
+  ~ pelabuhan: Kalau {$subjek} naik ke kapalmu, Bung, sembunyikan timbangan. Tawarnya ganas. || If {$subjek} boards your boat, mate, hide the scales. Fierce haggler.
+  ~ iblis: {$subjek} menawar sambil memegang gagang pedang. Itu bukan tawar, itu rampok sopan. || {$subjek} haggles hand on sword hilt. That is not haggling, that is polite robbery.
+- {$objek} bilang {$subjek} pandai menawar. Aku sendiri harus belajar darinya. {$tik} || {$objek} says {$subjek} bargains well. I should learn from them myself. {$tik}
+  ~ oasis: Di bazar, menawar itu seni, Saudara. {$subjek} seniman sejati, kata {$objek}. || At the bazaar, haggling is an art, friend. {$subjek} is a true artist, says {$objek}.
+- Gara-gara {$subjek}, {$objek} kini menulis harga pas di papan. Tidak bisa ditawar lagi. || Because of {$subjek}, {$objek} now writes fixed prices on a board. No more haggling.
+
+== kabar.berjanji
+niat: BERI_KABAR
+topik: janji
+syarat: fakta=BERJANJI
+lanjut: janji
+gestur: angguk
+$subjek: tipe=nama_warga dari=fakta.subjek
+$objek: tipe=nama_warga dari=fakta.objek
+$waktu_depan: tipe=waktu_depan dari=fakta.nilai
+$doa: aturan=frag.doa opsional=0.4
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] {$subjek} berjanji pada {$objek}... sebelum {$waktu_depan}, katanya. Kita lihat saja. || {$subjek} made {$objek} a promise... before {$waktu_depan}, they say. We'll see.
+  ~ kasar: Janji, janji. {$subjek} berjanji pada {$objek}. Mulut tidak bayar pajak. || Promises, promises. {$subjek} promised {$objek} something. Talk is free.
+  ~ kuno: Sebuah janji telah diucapkan {$subjek}. Janji seorang kultivator berat seperti gunung. || A vow was spoken by {$subjek}. A cultivator's word weighs like a mountain.
+- [2] {$objek} menunggu-nunggu. {$subjek} sudah berjanji, batasnya {$waktu_depan}. || {$objek} keeps waiting. {$subjek} promised; the deadline is {$waktu_depan}.
+  ~ air: {$objek} menunggu di tepi kanal setiap sore... {$subjek} berjanji, katanya... || {$objek} waits by the canal every evening... {$subjek} promised, they say...
+  ~ kampung: {$objek} sudah cerita ke semua orang: {$subjek} janji datang {$waktu_depan}. Jangan bikin malu. || {$objek} told everyone: {$subjek} promised to come {$waktu_depan}. Don't shame them.
+- Semoga {$subjek} menepati janjinya pada {$objek}. Hatinya sudah berharap sekali. {$doa} || I hope {$subjek} keeps that promise to {$objek}. Their heart is set on it. {$doa}
+- [sopan] Bukan maksudku ikut campur, {$sebutan}, tapi {$objek} masih menunggu janji {$subjek}. || Not that I mean to meddle, {$sebutan}, but {$objek} still awaits {$subjek}'s promise.
+
+== kabar.ingkar
+niat: BERI_KABAR
+topik: janji
+syarat: fakta=INGKAR
+lanjut: tetangga
+gestur: geleng
+$subjek: tipe=nama_warga dari=fakta.subjek
+$objek: tipe=nama_warga dari=fakta.objek
+$keluh: aturan=seru.keluh opsional=0.5
+$pepatah: aturan=frag.pepatah opsional=0.25
+- [3] {$subjek} ingkar janji pada {$objek}. Sejak itu {$objek} murung terus. {$keluh} || {$subjek} broke a promise to {$objek}. {$objek} has been gloomy since. {$keluh}
+  ~ kasar: Pembohong. {$subjek} itu pembohong. Tanya saja {$objek}. || A liar. {$subjek} is a liar. Ask {$objek}.
+  ~ kuno: Ingkar janji menodai hati Dao. {$subjek} kini menanggung karma terhadap {$objek}. || A broken vow stains the Dao heart. {$subjek} now carries karma towards {$objek}.
+- [2] Jangan percaya janji {$subjek}. {$objek} sudah menunggu sampai lewat batas. || Don't trust {$subjek}'s promises. {$objek} waited past the deadline.
+  ~ iblis: Di kota ini janji dibayar dengan darah. {$subjek} beruntung {$objek} cuma pedagang. || In this city promises are paid in blood. {$subjek} is lucky {$objek} is only a trader.
+  ~ pelabuhan: Janji di darat, lupa di laut. Begitulah {$subjek} pada {$objek}, Bung. || Promised on land, forgotten at sea. That's {$subjek} with {$objek}, mate.
+- {$objek} bilang tidak marah, tapi matanya bicara lain. {$subjek} lupa janjinya. || {$objek} says they aren't angry, but their eyes say otherwise. {$subjek} forgot the promise.
+- {$pepatah} {$subjek} harus belajar dari ingkarnya pada {$objek}. || {$pepatah} {$subjek} should learn from failing {$objek}.
+
+== kabar.ranah
+niat: BERI_KABAR
+topik: pemain
+syarat: fakta=RANAH
+lanjut: sekte dunia
+gestur: kagum
+$katanya: aturan=frag.katanya
+$subjek: tipe=nama_warga dari=fakta.subjek
+$waktu_lalu: tipe=waktu_lalu dari=fakta.hariKejadian
+$kaget: aturan=seru.kaget opsional=0.5
+$angka: tipe=angka dari=fakta.nilai
+- [3] {$katanya} {$subjek} baru menembus ranah baru! Langit di atas kota sampai bergetar. || {$katanya} {$subjek} just broke through to a new realm! The sky over town shook.
+  ~ kasar: {$subjek} naik ranah. Bagus untuknya. Harga beras tetap naik. || {$subjek} went up a realm. Good for them. Rice still costs more.
+  ~ kuno: {$subjek} telah melampaui belenggu ranah. Bahkan para tetua pun mengangguk. || {$subjek} has surpassed the shackles of the realm. Even the elders nod.
+- [2] Aku lihat cahaya dari arah rumah {$subjek} {$waktu_lalu}. Ternyata terobosan! {$kaget} || I saw light from {$subjek}'s house {$waktu_lalu}. A breakthrough, it turns out! {$kaget}
+  ~ gunung: Para biksu merasakan getaran Qi {$waktu_lalu}. Kata mereka, {$subjek} menembus ranah. Amitaba. || The monks felt a tremor of Qi {$waktu_lalu}. They say {$subjek} broke through. Amitabha.
+  ~ kampung: Anak-anak kampung lari ke bukit lihat cahaya. Kata Pak Lurah itu {$subjek} naik tingkat. || The village children ran to the hill to see the light. The headman says {$subjek} levelled up.
+- Sekarang {$subjek} sudah di ranah ke-{$angka}. Kami orang biasa hanya bisa menatap dari bawah. || Now {$subjek} is at realm {$angka}. We ordinary folk can only gaze from below.
+  ~ iblis: Ranah ke-{$angka}. {$subjek} makin berbahaya. Bagus kalau di pihak kita. || Realm {$angka}. {$subjek} grows more dangerous. Good, if on our side.
+- Murid-murid sekte membicarakan {$subjek} terus. Ranah naik secepat itu, katanya jarang sekali. || The sect disciples won't stop talking of {$subjek}. A rise that fast is very rare, they say.
+
+== kabar.sekte
+niat: BERI_KABAR
+topik: sekte
+syarat: fakta=SEKTE
+lanjut: sekte
+gestur: bicara_tangan
+$subjek: tipe=nama_warga dari=fakta.subjek
+$sekte_fakta: tipe=tempat dari=fakta.objek
+- [2] {$subjek} itu ternyata orang {$sekte_fakta}. Pantas sikapnya lain. || {$subjek} turns out to be of {$sekte_fakta}. No wonder they carry themselves differently.
+  ~ kasar: {$subjek} anak {$sekte_fakta}. Sombongnya sudah kelihatan dari jauh. || {$subjek}'s from {$sekte_fakta}. You can see the swagger a mile off.
+  ~ kuno: {$subjek} berasal dari {$sekte_fakta}. Silsilah yang patut dihormati. || {$subjek} hails from {$sekte_fakta}. A lineage worthy of respect.
+- Kabarnya {$subjek} membawa nama {$sekte_fakta}. Semoga sekte itu baik pada kota kami. || Word is {$subjek} carries the name of {$sekte_fakta}. May that sect be kind to our town.
+  ~ ibukota: {$subjek} dari {$sekte_fakta}. Para menteri pasti sudah mencatat namanya. || {$subjek} of {$sekte_fakta}. The ministers will have noted the name already.
+- Pernah dengar {$sekte_fakta}? Itu sekte {$subjek}. Aku dengar murid-muridnya rajin membantu warga. || Heard of {$sekte_fakta}? That's {$subjek}'s sect. I hear its disciples help townsfolk diligently.
+- Anak tetanggaku ingin masuk {$sekte_fakta} sejak lihat {$subjek} lewat. Semua anak sekarang begitu. || My neighbour's kid has wanted to join {$sekte_fakta} since seeing {$subjek} pass. All the kids are like that now.
+
+== kabar.pejabat
+niat: BERI_KABAR
+topik: pejabat
+syarat: fakta=PEJABAT
+lanjut: pejabat kota
+gestur: hormat
+$subjek: tipe=nama_warga dari=fakta.subjek
+$tempat_fakta: tipe=tempat dari=fakta.objek
+$ragu: aturan=seru.ragu opsional=0.5
+- [2] {$subjek} sekarang punya jabatan di {$tempat_fakta}! Hormat sedikit kalau lewat. || {$subjek} now holds office in {$tempat_fakta}! Show some respect when they pass.
+  ~ kasar: {$subjek} jadi pejabat. Satu lagi yang minta upeti. || {$subjek} became an official. One more hand out for tribute.
+  ~ kuno: {$subjek} kini memangku jabatan di {$tempat_fakta}. Semoga bijak memerintah. || {$subjek} now holds office at {$tempat_fakta}. May they govern wisely.
+- Pejabat baru di {$tempat_fakta}, kudengar namanya {$subjek}. Semoga pajaknya tidak naik. {$ragu} || A new official at {$tempat_fakta}; I heard the name is {$subjek}. Hope taxes don't rise. {$ragu}
+  ~ ibukota: {$subjek} diangkat di {$tempat_fakta}. Di istana, nama baru cepat naik dan cepat jatuh. || {$subjek} was appointed at {$tempat_fakta}. At court, new names rise fast and fall fast.
+- Sejak {$subjek} memegang {$tempat_fakta}, gerbang lebih teratur. Itu harus diakui. || Since {$subjek} took charge of {$tempat_fakta}, the gate runs better. Have to admit that.
+  ~ p: Sejak {$subjek} memegang {$tempat_fakta}, pasar lebih aman untuk kami para ibu. || Since {$subjek} took charge of {$tempat_fakta}, the market is safer for us mothers.
+
+== kabar.menang_duel
+niat: BERI_KABAR
+topik: pemain
+syarat: fakta=MENANG_DUEL
+lanjut: sekte pemain
+gestur: tunjuk
+$waktu_lalu: tipe=waktu_lalu dari=fakta.hariKejadian
+$subjek: tipe=nama_warga dari=fakta.subjek
+$objek: tipe=nama_warga dari=fakta.objek
+- [3] Kau lihat duel {$waktu_lalu}? {$subjek} mengalahkan {$objek} dalam tiga jurus! || Did you see the duel {$waktu_lalu}? {$subjek} beat {$objek} in three moves!
+  ~ kasar: {$subjek} menghajar {$objek} sampai jatuh. Rasakan, si sombong itu. || {$subjek} knocked {$objek} flat. Serves the braggart right.
+  ~ kuno: Pertarungan {$subjek} melawan {$objek} {$waktu_lalu} layak dicatat dalam sejarah kota. || The bout of {$subjek} against {$objek} {$waktu_lalu} deserves a place in the town's history.
+- [2] Seluruh pasar berhenti waktu {$subjek} melawan {$objek}. Aku sampai lupa menutup lapak! || The whole market stopped when {$subjek} fought {$objek}. I even forgot to close my stall!
+  ~ iblis: Arena ramai sekali waktu {$subjek} mematahkan {$objek}. Taruhanku menang tiga kali lipat. || The arena roared when {$subjek} broke {$objek}. My bet paid triple.
+  ~ pelabuhan: {$subjek} menjatuhkan {$objek} di dermaga, Bung. Byur, masuk air! || {$subjek} dropped {$objek} on the dock, mate. Splash, into the water!
+- {$objek} masih memegangi pinggangnya sejak kalah dari {$subjek}. Kasihan juga. || {$objek} still clutches their side since losing to {$subjek}. A bit pitiful.
+- Anak-anak sekarang main duel-duelan, pura-pura jadi {$subjek}. Tidak ada yang mau jadi {$objek}. || The kids now play at duels, pretending to be {$subjek}. Nobody wants to be {$objek}.
+
+== kabar.mengancam
+niat: BERI_KABAR
+topik: pemain
+syarat: fakta=MENGANCAM
+lanjut: kejahatan pejabat
+gestur: bisik
+$subjek: tipe=nama_warga dari=fakta.subjek
+$waktu_lalu: tipe=waktu_lalu dari=fakta.hariKejadian
+$objek: tipe=nama_warga dari=fakta.objek
+$keluh: aturan=seru.keluh opsional=0.5
+- [3] Hati-hati dengan {$subjek}. {$waktu_lalu} dia mengancam {$objek} di depan banyak orang. || Careful with {$subjek}. {$waktu_lalu} they threatened {$objek} in front of everyone.
+  ~ kasar: {$subjek} berani mengancam {$objek}? Kalau ketemu aku, lain cerita. || {$subjek} dared threaten {$objek}? Meets me, it'll be a different story.
+  ~ kuno: Menekan orang fana dengan aura... {$subjek} merendahkan dirinya sendiri di hadapan {$objek}. || Pressing a mortal with one's aura... {$subjek} demeaned themself before {$objek}.
+- [2] {$objek} gemetar sampai tidak bisa bicara setelah diancam {$subjek}. {$keluh} || {$objek} shook so hard they couldn't speak after {$subjek}'s threat. {$keluh}
+  ~ ibukota: Mengancam warga di ibu kota itu pelanggaran. {$subjek} sebaiknya berhati-hati dengan penjaga. || Threatening townsfolk in the capital is an offence. {$subjek} had best mind the guards.
+  ~ iblis: {$subjek} mengancam {$objek}? Itu sapaan biasa di sini. Yang aneh kalau tidak ada darah. || {$subjek} threatened {$objek}? That's a greeting here. Odd only if no blood was spilled.
+- Sejak diancam {$subjek}, {$objek} menutup tokonya lebih awal. Pasar jadi sepi. || Since {$subjek}'s threat, {$objek} closes the shop early. The market's gone quiet.
+
+== kabar.menyuap
+niat: BERI_KABAR
+topik: pemain
+syarat: fakta=MENYUAP
+lanjut: pejabat
+gestur: bisik
+$subjek: tipe=nama_warga dari=fakta.subjek
+$harga: tipe=harga dari=fakta.nilai
+$objek: tipe=nama_warga dari=fakta.objek
+$katanya: aturan=frag.katanya
+$ragu: aturan=seru.ragu opsional=0.5
+- [2] Sst... {$subjek} menyelipkan {$harga} ke tangan {$objek}. Aku lihat sendiri. || Shh... {$subjek} slipped {$harga} into {$objek}'s hand. I saw it myself.
+  ~ kasar: Uang bicara. {$subjek} membayar {$objek}, dan semua urusan beres. Busuk. || Money talks. {$subjek} paid {$objek}, and everything was sorted. Rotten.
+  ~ kuno: Kepingan perak berpindah tangan dari {$subjek} ke {$objek}. Hukum langit tidak bisa disuap. || Silver changed hands from {$subjek} to {$objek}. Heaven's law cannot be bribed.
+- Jangan bilang siapa-siapa. {$objek} menerima {$harga} dari {$subjek}. Sekarang urusannya lancar. || Tell no one. {$objek} took {$harga} from {$subjek}. Now their business runs smooth.
+  ~ ibukota: Di ibu kota semua orang tahu harga sebuah tanda tangan. {$subjek} membayar {$objek} {$harga}. || In the capital everyone knows the price of a signature. {$subjek} paid {$objek} {$harga}.
+- {$katanya} {$subjek} menyuap {$objek}. Kalau benar, malu sekali. {$ragu} || {$katanya} {$subjek} bribed {$objek}. If true, how shameful. {$ragu}
+
+== kabar.merayu
+niat: BERI_KABAR
+topik: asmara
+syarat: fakta=MERAYU
+lanjut: asmara
+gestur: tertawa
+$subjek: tipe=nama_warga dari=fakta.subjek
+$objek: tipe=nama_warga dari=fakta.objek
+$waktu_lalu: tipe=waktu_lalu dari=fakta.hariKejadian
+- [3] Hihi, {$subjek} merayu {$objek} di dekat sumur {$waktu_lalu}! Pipinya merah seperti lentera. || Hehe, {$subjek} was sweet-talking {$objek} by the well {$waktu_lalu}! Cheeks red as lanterns.
+  ~ kasar: {$subjek} menggoda {$objek}. Tidak tahu malu. || {$subjek} flirting with {$objek}. Shameless.
+  ~ kuno: Konon {$subjek} menaruh hati pada {$objek}. Jodoh memang tak bisa ditebak. || They say {$subjek} has set their heart on {$objek}. Fate's pairings are unguessable.
+- [2] Kau tahu? {$objek} sekarang senyum-senyum sendiri sejak dirayu {$subjek}. || You know? {$objek} keeps smiling to themself since {$subjek} sweet-talked them.
+  ~ air: {$subjek} memetikkan bunga teratai untuk {$objek}, Kakak... manis sekali, ya... || {$subjek} picked a lotus for {$objek}, dear... so sweet...
+  ~ kampung: {$subjek} godain {$objek} di sawah. Orang sekampung sudah tahu semua. || {$subjek} was teasing {$objek} in the paddies. The whole village knows.
+- Mak Comblang sudah mencatat nama {$subjek} dan {$objek}. Kalau dia mencatat, pasti jadi. || The matchmaker has written down {$subjek} and {$objek}. If she writes it, it happens.
+- Aduh, {$subjek} pandai bicara. {$objek} sampai salah menghitung kembalian. || Oh my, {$subjek} has a silver tongue. {$objek} even miscounted the change.
+
+== kabar.bercanda
+niat: BERI_KABAR
+topik: pemain
+syarat: fakta=BERCANDA
+lanjut: tetangga
+gestur: tertawa
+$subjek: tipe=nama_warga dari=fakta.subjek
+$objek: tipe=nama_warga dari=fakta.objek
+$waktu_lalu: tipe=waktu_lalu dari=fakta.hariKejadian
+- [2] {$subjek} membuat {$objek} tertawa sampai terbatuk-batuk {$waktu_lalu}. Lucu orangnya. || {$subjek} made {$objek} laugh till they coughed {$waktu_lalu}. Funny one, that.
+  ~ kasar: {$subjek} suka melucu. Lumayan, daripada cemberut. || {$subjek} likes to joke. Better than scowling.
+  ~ kuno: Bahkan kultivator pun bisa berjenaka. {$subjek} menghibur {$objek} dengan cerita lucu. || Even cultivators can jest. {$subjek} cheered {$objek} with a funny tale.
+- {$objek} mengulang lelucon {$subjek} ke semua pelanggan. Sudah sepuluh kali aku dengar. || {$objek} repeats {$subjek}'s joke to every customer. I've heard it ten times.
+  ~ pelabuhan: Lelucon {$subjek} tentang ikan buntal itu, Bung! Para pelaut masih tertawa. || That joke of {$subjek}'s about the pufferfish, mate! The sailors are still laughing.
+- Senang ada orang seperti {$subjek} di kota. {$objek} jarang tertawa sejak musim lalu. || Glad there's someone like {$subjek} in town. {$objek} rarely laughed since last season.
+
+== kabar.dermawan
+niat: BERI_KABAR
+topik: pemain
+syarat: fakta=DERMAWAN
+lanjut: kota pemain
+gestur: kagum
+$subjek: tipe=nama_warga dari=fakta.subjek
+$objek: tipe=nama_warga dari=fakta.objek
+$harga: tipe=harga dari=fakta.nilai
+$kaget: aturan=seru.kaget opsional=0.5
+- [3] {$subjek} memberi {$objek} {$harga} begitu saja! Tanpa diminta! {$kaget} || {$subjek} gave {$objek} {$harga} just like that! Without being asked! {$kaget}
+  ~ kasar: {$subjek} bagi-bagi uang. Kalau mau buang uang, buang ke arahku juga. || {$subjek} handing out money. If they're throwing it away, throw some my way.
+  ~ kuno: Kedermawanan {$subjek} menumbuhkan berkah. {$objek} akan mengingatnya seumur hidup. || The generosity of {$subjek} sows blessings. {$objek} will remember it for life.
+- [2] {$objek} bisa membayar tabib berkat {$subjek}. Orang baik, sungguh. || {$objek} could pay the physician thanks to {$subjek}. A good soul, truly.
+  ~ oasis: Seperti hujan di gurun, Saudara. {$subjek} memberi {$objek} {$harga}. || Like rain in the desert, friend. {$subjek} gave {$objek} {$harga}.
+  ~ kampung: Si {$subjek} kasih {$objek} uang {$harga}. Sekarang anaknya bisa sekolah. || {$subjek} gave {$objek} {$harga}. Now the child can go to school.
+- Kalau semua kultivator seperti {$subjek}, kota ini sudah makmur sejak dulu. || If every cultivator were like {$subjek}, this town would've prospered long ago.
+- Para pengemis di gerbang menyebut nama {$subjek} dalam doa mereka. || The beggars at the gate say {$subjek}'s name in their prayers.

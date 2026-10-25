@@ -2,11 +2,12 @@ package dev.kultivator.client.hall;
 
 import dev.kultivator.client.EffectQuality;
 import dev.kultivator.client.fx.CommonFx;
+import dev.kultivator.client.hud.Kabar;
+import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.fx.FxType;
 import dev.kultivator.network.Payloads;
 import dev.kultivator.sect.hall.HallFxIds;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.chat.Component;
 import net.minecraft.core.particles.DustParticleOptions;
@@ -34,7 +35,6 @@ public final class HallFx {
 	private static final int[] TIER = {0x6BCB4A, 0xA0A4A8, 0xE8C25A};
 	private static final int MAX_ANIMATIONS = 48;
 	/** The candidates' arrival toast (DESIGN 20.3.3), shown for 6 s. */
-	private static final SystemToast.SystemToastId ARRIVAL_TOAST = new SystemToast.SystemToastId(6000L);
 	private static final List<Animation> ANIMATIONS = new ArrayList<>();
 	private static ClientLevel lastLevel;
 
@@ -91,9 +91,9 @@ public final class HallFx {
 			case HallFxIds.RESTORE -> animate(new Animation(HallFxIds.RESTORE, pos, pos, b, f, 60));
 			case HallFxIds.DORMANT -> dormant(pos);
 			case HallFxIds.TOKEN -> animate(new Animation(HallFxIds.TOKEN, pos, pos, b, f, 30));
-			case HallFxIds.ARRIVAL_TOAST -> SystemToast.addOrUpdate(Minecraft.getInstance().gui.toastManager(), ARRIVAL_TOAST,
-					Component.translatable(f > 0.5F ? "kultivator.hall.cand.war_title" : "kultivator.hall.cand.title"),
-					Component.translatable("kultivator.hall.cand.subtitle", b));
+			// the single notice slot (DESIGN 43.9); a candidate in wartime is important
+			case HallFxIds.ARRIVAL_TOAST -> Kabar.kirim(Component.translatable(f > 0.5F ? "kultivator.hall.cand.war_title" : "kultivator.hall.cand.title"),
+					Component.translatable("kultivator.hall.cand.subtitle", b), Kabar.glyph(Glyphs.HALL), f > 0.5F);
 			default -> {
 			}
 		}

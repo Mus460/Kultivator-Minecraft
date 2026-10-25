@@ -1,0 +1,194 @@
+{
+  "id": "sapa_dialek_ibukota",
+  "jenis": "realisasi",
+  "_catatan": "SAPA in dialect ibukota across the day (register sopan); steps share the anti-repeat ring.",
+  "benih_dunia": 42,
+  "masukan": {
+    "niat": "SAPA",
+    "pembicara": 100,
+    "hari": 120,
+    "now": 2880000,
+    "cuaca": "cerah",
+    "musim": "semi",
+    "situasi": {
+      "jam": "pagi",
+      "cuaca": "cerah",
+      "musim": "semi",
+      "kelompok": "pekerja",
+      "watak": "ramah",
+      "kebiasaan": [],
+      "sifat": {
+        "H": 10,
+        "E": 0,
+        "X": 20,
+        "A": 30,
+        "C": 10,
+        "O": 0
+      },
+      "wajah": "netral",
+      "tempat": "kota_besar"
+    },
+    "pendengar": {
+      "nama": "Han",
+      "kelamin": "l",
+      "tahap": "dewasa",
+      "pemain": true
+    },
+    "kesan": "kenal",
+    "tahu_nama": false,
+    "register": "sopan",
+    "dialek": "ibukota",
+    "kelamin": "p"
+  },
+  "langkah": [
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "subuh",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar"
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.kenal.3",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.tuan.ibukota",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "sapa.kenal",
+      "gestur": "lambai",
+      "seru": null,
+      "tik": null,
+      "id_id": "Ah, kau rupanya, Tuanku. Mampir?",
+      "en_us": "Ah, it's you, My Lord. Dropping by?"
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar"
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.pagi.2",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.tuan.ibukota",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "sapa.pagi",
+      "gestur": "lambai",
+      "seru": null,
+      "tik": null,
+      "id_id": "Pagi yang cerah, Tuanku. Semoga harimu lancar.",
+      "en_us": "A bright morning, My Lord. May your day go smoothly."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "siang",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar"
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.pekerja.4",
+        "a": []
+      },
+      "aturan": "sapa.pekerja",
+      "gestur": "seka_keringat",
+      "seru": null,
+      "tik": null,
+      "id_id": "Salam! Jangan berdiri di situ, nanti kena serbuk kayu.",
+      "en_us": "Greetings! Don't stand there; you'll get sawdust on you."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "malam",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar"
+        },
+        "pendengar": {
+          "nama": "Mei",
+          "kelamin": "p",
+          "tahap": "dewasa",
+          "pemain": true
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.malam.1",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.nona.ibukota",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "sapa.malam",
+      "gestur": "lambai",
+      "seru": null,
+      "tik": null,
+      "id_id": "Malam, Nona yang mulia. Jangan lewat gang gelap, ya.",
+      "en_us": "Evening, Gracious Lady. Stay out of the dark alleys."
+    }
+  ]
+}

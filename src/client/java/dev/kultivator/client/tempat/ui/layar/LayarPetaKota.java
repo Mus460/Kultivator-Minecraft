@@ -20,7 +20,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.Util;
 
 /**
- * {@code peta_kota} (DESIGN 38.U.3.8): the capital's map and directory (hub DUNIA card "Kota Besar", the city guide).
+ * {@code peta_kota} (DESIGN 38.U.3.8): the capital's map and directory, the subs Kota / Layanan / Tokoh / Acara of Dunia ›
+ * Peta (43.5, G23, M12; the gate guard's "peta" service opens it as a context). Text at 1.0 (43.0.5).
  * "Peta": a schematic 3 x 3 of the walled districts in their token colours plus the outer districts, the player as a
  * pulsing dot, hover / click a district to list its services, "Tandai di peta dunia". "Layanan": every service with its
  * hours and whether it is open now. "Tokoh": recurring characters the player knows and where they are by their schedule.
@@ -137,7 +138,7 @@ public final class LayarPetaKota extends LayarTempatDasar {
 				IkonTempat.gambar(l.g, LembarKunci.Ikon.distrik(id), dx0 + dw / 2 - 6, dy0 + dh / 2 - 6, 12, 0xFFFFFFFF);
 			} else {
 				// outer districts are thin strips: their name in small ink (keyboard users see it without hovering)
-				Brush.fitCentered(l.g, font, d.teks(LembarKunci.NAMA), dx0 + dw / 2.0F, dy0 + 3.5F, dw - 4, 0xFFFFF8EC, 0.6F, 0.6F, true);
+				Brush.fitCentered(l.g, font, d.teks(LembarKunci.NAMA), dx0 + dw / 2.0F, dy0 + 2.0F, dw - 4, 0xFFFFF8EC, 1.0F, 1.0F, true);
 			}
 			l.zona("distrik:" + id, dx0, dy0, dx0 + dw, dy0 + dh, () -> distrikPilih = id, true, null, true);
 			if (over) {
@@ -152,7 +153,7 @@ public final class LayarPetaKota extends LayarTempatDasar {
 			Brush.disc(l.g, px, pz, pulse + 1.0F, Palette.argb(0x60, 0xFFFFFF));
 			Brush.disc(l.g, px, pz, 2.2F, TempatWarna.SEGEL);
 		} else {
-			l.keterangan(TeksTempat.k("peta.di_luar"), m.x0(), m.y1() - 9, m.w(), gaya.teksSamar);
+			l.teks(TeksTempat.k("peta.di_luar"), m.x0(), m.y1() - 9, m.w(), gaya.teksSamar);
 		}
 		// right: the selected district's services
 		Kotak d = k[1];
@@ -164,7 +165,7 @@ public final class LayarPetaKota extends LayarTempatDasar {
 		}
 		PanelTempat.kartu(l.g, gaya, d.x0(), d.y0(), d.x1(), d.y1(), 0.0F, false);
 		if (pilih == null) {
-			l.bungkus(TeksTempat.k("peta.pilih_distrik"), d.x0() + 5, d.y0() + 5, d.w() - 10, gaya.teksSamar, 0.85F, d.h() - 10);
+			l.bungkus(TeksTempat.k("peta.pilih_distrik"), d.x0() + 5, d.y0() + 5, d.w() - 10, gaya.teksSamar, 1.0F, d.h() - 10);
 			return;
 		}
 		int y = d.y0() + 4;
@@ -176,11 +177,11 @@ public final class LayarPetaKota extends LayarTempatDasar {
 				break;
 			}
 			IkonTempat.gambar(l.g, s.i(LembarKunci.IKON, -1), d.x0() + 5, y - 1, 10, 0xFFFFFFFF);
-			l.teks(s.teks(LembarKunci.NAMA), d.x0() + 18, y, d.w() - 22, gaya.teks, 0.85F);
+			l.teks(s.teks(LembarKunci.NAMA), d.x0() + 18, y, d.w() - 22, gaya.teks);
 			Component cat = s.teksAtau(LembarKunci.CATATAN);
 			if (cat != null) {
-				y += 9;
-				l.keterangan(cat, d.x0() + 18, y, d.w() - 22, gaya.teksSamar);
+				y += 10;
+				l.teks(cat, d.x0() + 18, y, d.w() - 22, gaya.teksSamar);
 			}
 			y += 11;
 		}
@@ -212,9 +213,9 @@ public final class LayarPetaKota extends LayarTempatDasar {
 			PanelTempat.kartu(lk.g, gaya, rx0, ry0, rx1, ry1, sorot ? 1.0F : 0.0F, pilih);
 			lk.g.fill(rx0, ry0, rx0 + 2, ry1, TempatWarna.distrik(e.s(LembarKunci.DISTRIK)));
 			IkonTempat.gambar(lk.g, e.i(LembarKunci.IKON, LembarKunci.Ikon.layanan(e.id())), rx0 + 5, ry0 + 3, 16, buka ? 0xFFFFFFFF : 0x90FFFFFF);
-			lk.teks(e.teks(LembarKunci.NAMA), rx0 + 25, ry0 + 2, rx1 - rx0 - 100, buka ? gaya.teks : TempatWarna.terkunci(gaya.teks), 0.9F);
-			lk.keterangan(e.teks(LembarKunci.CATATAN), rx0 + 25, ry0 + 12, rx1 - rx0 - 100, gaya.teksSamar);
-			lk.kanan(TeksTempat.k(buka ? "peta.buka" : "peta.tutup"), rx1 - 50, ry0 + 7, buka ? 0xFF2E7A4E : TempatWarna.BAHAYA, 0.75F);
+			lk.teks(e.teks(LembarKunci.NAMA), rx0 + 25, ry0 + 2, rx1 - rx0 - 100, buka ? gaya.teks : TempatWarna.terkunci(gaya.teks));
+			lk.teks(e.teks(LembarKunci.CATATAN), rx0 + 25, ry0 + 12, rx1 - rx0 - 100, gaya.teksSamar);
+			lk.kanan(TeksTempat.k(buka ? "peta.buka" : "peta.tutup"), rx1 - 50, ry0 + 7, buka ? 0xFF2E7A4E : TempatWarna.BAHAYA, 1.0F);
 			if (e.ada(LembarKunci.X)) {
 				tombolOp(lk, "tandai" + i, rx1 - 46, ry0 + 4, 42, 13, TeksTempat.k("peta.tandai_singkat"), true, null,
 						LembarKunci.op(LembarKunci.OP_TANDAI, e.i(LembarKunci.X, 0), e.i(LembarKunci.Z, 0)));
@@ -237,8 +238,8 @@ public final class LayarPetaKota extends LayarTempatDasar {
 			Component nama = kenal ? e.teks(LembarKunci.NAMA) : TeksTempat.k("peta.belum_kenal");
 			Component gelar = e.teksAtau(LembarKunci.GELAR);
 			lk.teks(gelar == null ? Brush.bold(nama) : Brush.bold(nama).copy().append(Component.literal(" · ")).append(gelar), rx0 + 24, ry0 + 3,
-					rx1 - rx0 - 28, gaya.teks, 0.9F);
-			lk.keterangan(e.teks(LembarKunci.CATATAN), rx0 + 24, ry0 + 13, rx1 - rx0 - 28, gaya.teksSamar);
+					rx1 - rx0 - 28, gaya.teks);
+			lk.teks(e.teks(LembarKunci.CATATAN), rx0 + 24, ry0 + 13, rx1 - rx0 - 28, gaya.teksSamar);
 		}, null, null);
 	}
 
@@ -255,9 +256,9 @@ public final class LayarPetaKota extends LayarTempatDasar {
 			// a calendar leaf with the day number
 			lk.g.fill(rx0 + 4, ry0 + 3, rx0 + 22, ry0 + 22, 0xFFF4ECD4);
 			lk.g.fill(rx0 + 4, ry0 + 3, rx0 + 22, ry0 + 8, TempatWarna.SEGEL);
-			Brush.centered(lk.g, font, Component.literal(Integer.toString(e.i(LembarKunci.HARI, 0))), rx0 + 13, ry0 + 11, 0xFF2A1A10, 0.9F, false);
-			lk.teks(Brush.bold(e.teks(LembarKunci.NAMA)), rx0 + 27, ry0 + 3, rx1 - rx0 - 70, gaya.teks, 0.9F);
-			lk.keterangan(aktif ? TeksTempat.k("peta.sedang_berlangsung") : e.teks(LembarKunci.CATATAN), rx0 + 27, ry0 + 14, rx1 - rx0 - 70,
+			Brush.centered(lk.g, font, Component.literal(Integer.toString(e.i(LembarKunci.HARI, 0))), rx0 + 13, ry0 + 10, 0xFF2A1A10, 1.0F, false);
+			lk.teks(Brush.bold(e.teks(LembarKunci.NAMA)), rx0 + 27, ry0 + 3, rx1 - rx0 - 70, gaya.teks);
+			lk.teks(aktif ? TeksTempat.k("peta.sedang_berlangsung") : e.teks(LembarKunci.CATATAN), rx0 + 27, ry0 + 14, rx1 - rx0 - 70,
 					aktif ? 0xFF2E7A4E : gaya.teksSamar);
 			if (e.ada(LembarKunci.SISA_TICK)) {
 				CincinWaktu.gambar(lk, rx1 - 12, ry0 + 13, 9.0F, e.l(LembarKunci.SISA_TICK, 0L), 0L, diterima, CincinWaktu.KIRI);

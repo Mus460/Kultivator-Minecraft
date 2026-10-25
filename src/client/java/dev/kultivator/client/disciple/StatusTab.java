@@ -4,6 +4,7 @@ import dev.kultivator.client.disciple.power.PhysiqueVisuals;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Eased;
 import dev.kultivator.client.screen.ui.Palette;
+import dev.kultivator.client.screen.ui.TalismanButton;
 import dev.kultivator.data.Dao;
 import dev.kultivator.data.Element;
 import dev.kultivator.data.Rank;
@@ -12,6 +13,7 @@ import dev.kultivator.disciple.DiscipleEntity;
 import dev.kultivator.disciple.path.StarTitles;
 import dev.kultivator.disciple.power.DisciplePowers;
 import dev.kultivator.disciple.power.PowerIds;
+import dev.kultivator.network.Actions;
 import dev.kultivator.util.Msg;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -30,7 +32,11 @@ import java.util.Locale;
  * with cultivation, the realm written inside) and three bars for cultivation, qi and stored qi; on the right a column
  * of bamboo slips with master, rank, root, Dao, health, kills, order and what it is doing.
  */
-final class StatusTab extends DiscipleTab {
+final class StatusTab extends MuridSub {
+
+	private static final int ORDER_H = 14;
+	/** One labelled bar: the label at 1.0, then the bar. */
+	private static final int BAR_STEP = 17;
 
 	private final Eased bar = new Eased(5.0F);
 	private final Eased qi = new Eased(5.0F);
@@ -44,13 +50,15 @@ final class StatusTab extends DiscipleTab {
 	private int leftW;
 	private int slipX;
 	private int slipW;
+	/** The height above the orders row. */
+	private int bodyH;
 
 	/** One bamboo slip: a label and its value. */
 	private record Slip(Component label, Component value, int color) {
 	}
 
-	StatusTab(DiscipleScreen screen) {
-		super(screen);
+	StatusTab(MuridPage murid) {
+		super(murid);
 	}
 
 	@Override
@@ -64,10 +72,45 @@ final class StatusTab extends DiscipleTab {
 	}
 
 	@Override
+	public String helpTopic() {
+		return "murid";
+	}
+
+	@Override
 	protected void build() {
 		leftW = Math.max(84, Math.min(150, Math.round(w * 0.4F)));
 		slipX = x + leftW + 6;
 		slipW = x + w - slipX;
+		bodyH = h - ORDER_H - 4;
+		buildOrders();
+	}
+
+	/**
+	 * The orders (was the Perintah tab): one row of talismans along the bottom (Follow, Stay &amp; guard, Meditate, Assist,
+	 * Guard the Hall), the active one stamped; its meaning and the chat commands in the tooltip.
+	 */
+	private void buildOrders() {
+		int n = DiscipleView.MODES.length;
+		int gap = 3;
+		int bw = (w - gap * (n - 1)) / n;
+		int top = y + h - ORDER_H;
+		for (int i = 0; i < n; i++) {
+			int index = i;
+			String mode = DiscipleView.MODES[i];
+			TalismanButton button = add(new TalismanButton(x + i * (bw + gap), top, i == n - 1 ? x + w - (x + i * (bw + gap)) : bw, ORDER_H,
+					() -> Component.translatable(MuridPage.K + "perintah." + mode)));
+			button.stampedWhen(() -> view().modeIndex() == index);
+			button.onPress(() -> {
+				if (view().modeIndex() != index) {
+					send(Actions.DISCIPLE_MODE, mode);
+				}
+			});
+			button.tooltip(() -> List.of(Component.translatable("kultivator.discipleui.mode." + mode).withStyle(ChatFormatting.GOLD),
+					Component.translatable("kultivator.discipleui.mode." + mode + ".desc"),
+					Component.translatable("kultivator.discipleui.orders.current",
+							Component.translatable("kultivator.discipleui.mode." + DiscipleView.MODES[view().modeIndex()])).withStyle(ChatFormatting.DARK_GREEN),
+					Component.translatable("kultivator.discipleui.orders.hint").withStyle(ChatFormatting.DARK_GRAY)));
+		}
 	}
 
 	@Override
@@ -81,7 +124,7 @@ final class StatusTab extends DiscipleTab {
 		slipsBuiltAt = Util.getMillis();
 		slips.clear();
 		DiscipleView view = view();
-		DiscipleEntity disciple = screen.entity();
+		DiscipleEntity disciple = murid.entity();
 		Rank rank = view.rank;
 		// The synced master name; only the master can open the scroll, so the viewer is the fallback.
 		Minecraft minecraft = Minecraft.getInstance();
@@ -219,27 +262,27 @@ final class StatusTab extends DiscipleTab {
 		float qiT = qi.to((float) Math.min(1.0D, view.qi / view.maxQi), seconds);
 		float storedT = stored.to((float) Math.min(1.0D, view.storedQi / view.xpRequired), seconds);
 
-		// The name, then the seal, then the bars.
+		// The seal, then the bars (the name is in the picker above).
 		float cx = x + leftW / 2.0F;
-		Component name = Brush.bold(screen.discipleName());
-		Brush.fitCentered(g, font, name, cx, y + 1.0F, leftW - 4.0F, Palette.INK, 1.0F, 0.6F, false);
-		int barsH = 3 * 15;
-		float size = Math.max(36.0F, Math.min(leftW - 18.0F, h - 14.0F - barsH - 8.0F));
-		float sealTop = y + 13.0F;
+		int barsH = 3 * BAR_STEP;
+		float size = Math.max(36.0F, Math.min(leftW - 18.0F, bodyH - 2.0F - barsH - 8.0F));
+		float sealTop = y + 1.0F;
 		drawSeal(g, view, cx, sealTop, size, barT, mouseX, mouseY);
 		g.nextStratum();
 		float barsTop = sealTop + size + 8.0F;
+		// A bar that would reach the orders row is left out (very short windows); its numbers stay on the slips.
+		float limit = y + bodyH - 14.0F;
 		float bx0 = x + 4.0F;
 		float bx1 = x + leftW - 4.0F;
-		drawBar(g, label("cultivation"), Msg.number(view.xp) + " / " + Msg.number(view.xpRequired), barT, Palette.GOLD, Palette.GOLD_LIGHT,
+		if (barsTop <= limit) drawBar(g, label("cultivation"), Msg.number(view.xp) + " / " + Msg.number(view.xpRequired), barT, Palette.GOLD, Palette.GOLD_LIGHT,
 				bx0, barsTop, bx1, mouseX, mouseY, List.of(label("cultivation"),
 						Component.literal(Msg.number(view.xp) + " / " + Msg.number(view.xpRequired)).withColor(Palette.GOLD_LIGHT),
 						Component.translatable(view.barFull() && !rank.isMax() ? "kultivator.discipleui.status.ready"
 								: "kultivator.discipleui.status.cultivation.tip"), guidanceLine(rank)));
-		drawBar(g, label("qi"), Msg.number(view.qi) + " / " + Msg.number(view.maxQi), qiT, Palette.QI, Palette.QI_LIGHT, bx0, barsTop + 15.0F, bx1,
+		if (barsTop + BAR_STEP <= limit) drawBar(g, label("qi"), Msg.number(view.qi) + " / " + Msg.number(view.maxQi), qiT, Palette.QI, Palette.QI_LIGHT, bx0, barsTop + BAR_STEP, bx1,
 				mouseX, mouseY, List.of(label("qi"), Component.literal(Msg.number(view.qi) + " / " + Msg.number(view.maxQi)).withColor(Palette.QI_LIGHT),
 						Component.translatable("kultivator.discipleui.status.qi.tip")));
-		drawBar(g, label("stored"), Msg.number(view.storedQi), storedT, Palette.STORED, Palette.STORED_LIGHT, bx0, barsTop + 30.0F, bx1, mouseX, mouseY,
+		if (barsTop + 2 * BAR_STEP <= limit) drawBar(g, label("stored"), Msg.number(view.storedQi), storedT, Palette.STORED, Palette.STORED_LIGHT, bx0, barsTop + 2 * BAR_STEP, bx1, mouseX, mouseY,
 				List.of(label("stored"), Component.literal(Msg.number(view.storedQi)).withColor(Palette.STORED_LIGHT),
 						Component.translatable("kultivator.discipleui.status.stored.tip")));
 		g.nextStratum();
@@ -293,7 +336,7 @@ final class StatusTab extends DiscipleTab {
 		if (space < 0) {
 			space = plain.lastIndexOf(' ');
 		}
-		if (scale < 0.8F && space > 0) {
+		if (font.width(whole) > room && space > 0) {
 			Component first = Brush.bold(Component.literal(plain.substring(0, space)));
 			Component second = Brush.bold(Component.literal(plain.substring(space + 1)));
 			lines.add(first);
@@ -305,15 +348,15 @@ final class StatusTab extends DiscipleTab {
 		Component stage = rank.realm().isMortal() ? Component.translatable("kultivator.discipleui.status.mortal_hint")
 				: rank.realm().layers() > 1 ? Component.translatable("kultivator.discipleui.status.layer_stage", rank.layer() + 1, rank.stageName())
 				: Component.translatable("kultivator.discipleui.status.stage", rank.stageName());
-		float stageScale = Math.min(0.75F, Brush.fitScale(font, stage, room, 0.75F, 0.45F));
+		float stageScale = 1.0F;
 		float textH = lines.size() * 9.0F * scale + 2.0F + 9.0F * stageScale;
 		float ty = y0 + (size - textH) / 2.0F - 2.0F;
 		for (Component line : lines) {
-			Brush.fitCentered(g, font, line, cx, ty, room, Palette.lighten(realmColor, 0.35F), scale, 0.5F, true);
+			Brush.fitCentered(g, font, line, cx, ty, room, Palette.lighten(realmColor, 0.35F), Math.max(1.0F, scale), 1.0F, true);
 			ty += 9.0F * scale;
 		}
 		ty += 2.0F;
-		Brush.fitCentered(g, font, stage, cx, ty, room, Palette.TALISMAN, stageScale, 0.45F, false);
+		Brush.fitCentered(g, font, stage, cx, ty, room, Palette.TALISMAN, 1.0F, 1.0F, false);
 		float beadY = y1 - 9.0F;
 		int root = Palette.opaque(Element.mainColor(view.rootKnown ? view.rootMask : 0));
 		Brush.disc(g, cx, beadY, 2.6F, Palette.GOLD_DARK);
@@ -328,7 +371,7 @@ final class StatusTab extends DiscipleTab {
 				Realm next = view.nextRank.realm();
 				tip.add(Component.translatable("kultivator.discipleui.bt.next", view.nextRank.displayName().withColor(next.color())));
 			}
-			screen.showTooltip(tip);
+			tooltip(tip);
 		}
 	}
 
@@ -361,12 +404,12 @@ final class StatusTab extends DiscipleTab {
 	/** A labelled thin bar with its numbers on the right. */
 	private void drawBar(GuiGraphicsExtractor g, Component name, String numbers, float fraction, int color, int light, float x0, float top, float x1,
 						 int mouseX, int mouseY, List<Component> tip) {
-		float scale = 0.6F;
+		float scale = 1.0F;
 		Component value = Component.literal(numbers);
 		float valueW = Math.min((x1 - x0) * 0.55F, font.width(value) * scale);
 		Brush.fit(g, font, name, x0, top, x1 - x0 - valueW - 3.0F, Palette.INK_SOFT, scale, 0.45F, false);
 		Brush.fit(g, font, value, x1 - valueW, top, valueW, Palette.onPaper(color), scale, 0.45F, false);
-		float by = top + 7.0F;
+		float by = top + 10.0F;
 		Brush.rect(g, x0, by, x1, by + 4.0F, Palette.mix(Palette.PAPER_BOTTOM, Palette.INK, 0.25F));
 		Brush.rect(g, x0 + 0.5F, by + 0.5F, x1 - 0.5F, by + 3.5F, Palette.mix(Palette.PAPER_BOTTOM, color, 0.15F));
 		float fill = x0 + 0.5F + (x1 - x0 - 1.0F) * Math.max(0.0F, Math.min(1.0F, fraction));
@@ -375,7 +418,7 @@ final class StatusTab extends DiscipleTab {
 			Brush.rect(g, x0 + 0.5F, by + 0.5F, fill, by + 1.3F, light);
 		}
 		if (mouseX >= x0 && mouseX < x1 && mouseY >= top && mouseY < by + 5.0F) {
-			screen.showTooltip(tip);
+			tooltip(tip);
 		}
 	}
 
@@ -384,9 +427,9 @@ final class StatusTab extends DiscipleTab {
 			return;
 		}
 		int slipY = y;
-		int slipH = h;
-		float slatH = Math.max(10.0F, Math.min(12.5F, slipH / (float) slips.size()));
-		float scale = slatH >= 11.5F ? 0.8F : 0.68F;
+		int slipH = bodyH;
+		float slatH = 12.0F;
+		float scale = 1.0F;
 		float total = slips.size() * slatH;
 		float maxScroll = Math.max(0.0F, total - slipH);
 		scroll = Math.max(0.0F, Math.min(maxScroll, scroll));
@@ -427,11 +470,11 @@ final class StatusTab extends DiscipleTab {
 	}
 
 	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-		if (mouseX >= slipX && mouseX < slipX + slipW && mouseY >= y && mouseY < y + h) {
+	public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double amount) {
+		if (mouseX >= slipX && mouseX < slipX + slipW && mouseY >= y && mouseY < y + bodyH) {
 			scroll -= (float) amount * 12.0F;
 			return true;
 		}
-		return false;
+		return super.mouseScrolled(mouseX, mouseY, scrollX, amount);
 	}
 }

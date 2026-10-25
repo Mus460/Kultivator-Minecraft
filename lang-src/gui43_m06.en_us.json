@@ -1,0 +1,23 @@
+{
+  "kultivator.gui43.hal.sekte.anggota": "Members",
+  "kultivator.gui43.sub.anggota.calon": "Candidates",
+  "kultivator.gui43.sub.anggota.pangkat": "Ranks",
+  "kultivator.gui43.sub.anggota.tetua": "Elders",
+  "kultivator.gui43.sub.anggota.penerus": "Heir",
+  "kultivator.gui43.m06.sumber.aula": "My Hall",
+  "kultivator.gui43.m06.sumber.perguruan": "My Sect",
+  "kultivator.gui43.m06.kosong": "Pick a sub above.",
+  "kultivator.gui43.m06.tetua.mati": "The Hall of Elders is not active on this server.",
+  "kultivator.gui43.m06.calon.perang_jalan": "Today's war has already begun.",
+  "kultivator.gui43.m06.calon.sudah_uji": "This candidate has been tested.",
+  "kultivator.gui43.m06.calon.usir": "Send %s away? This candidate will not come back.",
+  "kultivator.gui43.m06.jenjang.lagi": "+%s more requirements (hover to see all)",
+  "kultivator.gui43.m06.jenjang.turun": "Demote %s to %s?",
+  "kultivator.gui43.m06.jenjang.kolam": "Hall Contribution Point pool: %s CP",
+  "kultivator.gui43.m06.tetua.kolom.pangkat": "Rank",
+  "kultivator.gui43.m06.tetua.kolom.ranah": "Realm",
+  "kultivator.gui43.m06.tetua.copot": "Relieve %s of the office %s?",
+  "kultivator.gui43.m06.tetua.wakil": "deputy only",
+  "kultivator.gui43.m06.penerus.belum": "The ceremony's requirements are not met yet.",
+  "kultivator.gui43.m06.penerus.takhta": "Begin the Succession Ceremony? The heir becomes the second-generation Sect Master and you become the Founding Patriarch. Permanent."
+}

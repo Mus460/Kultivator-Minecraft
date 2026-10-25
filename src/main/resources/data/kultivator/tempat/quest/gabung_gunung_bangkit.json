@@ -1,0 +1,65 @@
+{
+  "pemberi": "peran:tetua_sekte",
+  "tempat": "gabung_sekte",
+  "tahap": [
+    {
+      "id": "kumpul",
+      "tujuan": [
+        "pergi kota x2"
+      ],
+      "akibat_masuk": [
+        "gabung.cerita gunung_bangkit kumpul kakak corak"
+      ]
+    },
+    {
+      "id": "paviliun",
+      "tujuan": [
+        "racik * x3"
+      ],
+      "akibat_masuk": [
+        "gabung.cerita gunung_bangkit paviliun ajar"
+      ]
+    },
+    {
+      "id": "penghina",
+      "tujuan": [
+        "gabung tanding:penghina"
+      ],
+      "akibat_masuk": [
+        "gabung.cerita gunung_bangkit penghina penghina",
+        "gabung.tanding penghina"
+      ],
+      "cabang": [
+        {
+          "syarat": [
+            "bendera gabung.tanding.penghina.menang"
+          ],
+          "ke": "bangkit"
+        }
+      ],
+      "ke": "ulang"
+    },
+    {
+      "id": "ulang",
+      "tujuan": [
+        "tunggu 1"
+      ],
+      "akibat": [
+        "gabung.cerita gunung_bangkit ulang kakak"
+      ],
+      "ke": "penghina"
+    },
+    {
+      "id": "bangkit",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "gabung.cerita gunung_bangkit bangkit ketua",
+        "gabung.bangkit",
+        "gabung.pk 200"
+      ],
+      "ke": "selesai"
+    }
+  ]
+}

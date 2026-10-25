@@ -41,6 +41,7 @@
   "kultivator.sekte.turnamen.ui.judul": "Turnamen Sekte",
   "kultivator.sekte.turnamen.ui.judul_musim": "Turnamen Sekte — Musim %s",
   "kultivator.sekte.turnamen.ui.memuat": "Membuka gulungan",
+  "kultivator.sekte.turnamen.ui.mati": "Turnamen sekte dimatikan di server ini.",
   "kultivator.sekte.turnamen.ui.papan": "Papan Musim (Elo)",
   "kultivator.sekte.turnamen.ui.elo_baris": "%s · %s-%s",
   "kultivator.sekte.turnamen.ui.berjalan": "Sedang berjalan: %s",

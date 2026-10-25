@@ -1,0 +1,23 @@
+{
+  "kultivator.gui43.hal.sekte.anggota": "Anggota",
+  "kultivator.gui43.sub.anggota.calon": "Calon",
+  "kultivator.gui43.sub.anggota.pangkat": "Pangkat",
+  "kultivator.gui43.sub.anggota.tetua": "Tetua",
+  "kultivator.gui43.sub.anggota.penerus": "Penerus",
+  "kultivator.gui43.m06.sumber.aula": "Aulaku",
+  "kultivator.gui43.m06.sumber.perguruan": "Perguruanku",
+  "kultivator.gui43.m06.kosong": "Pilih sub di atas.",
+  "kultivator.gui43.m06.tetua.mati": "Balai Tetua tidak aktif di server ini.",
+  "kultivator.gui43.m06.calon.perang_jalan": "Perang hari ini sudah dimulai.",
+  "kultivator.gui43.m06.calon.sudah_uji": "Calon ini sudah diuji.",
+  "kultivator.gui43.m06.calon.usir": "Undang %s pergi? Calon ini tidak akan kembali.",
+  "kultivator.gui43.m06.jenjang.lagi": "+%s syarat lagi (arahkan untuk melihat semua)",
+  "kultivator.gui43.m06.jenjang.turun": "Turunkan %s menjadi %s?",
+  "kultivator.gui43.m06.jenjang.kolam": "Kolam Poin Kontribusi aula: %s PK",
+  "kultivator.gui43.m06.tetua.kolom.pangkat": "Pangkat",
+  "kultivator.gui43.m06.tetua.kolom.ranah": "Ranah",
+  "kultivator.gui43.m06.tetua.copot": "Copot %s dari jabatan %s?",
+  "kultivator.gui43.m06.tetua.wakil": "hanya wakil",
+  "kultivator.gui43.m06.penerus.belum": "Syarat upacara belum terpenuhi.",
+  "kultivator.gui43.m06.penerus.takhta": "Mulai Upacara Penyerahan Takhta? Pewaris menjadi Ketua Generasi Kedua dan kamu menjadi Leluhur Pendiri. Permanen."
+}

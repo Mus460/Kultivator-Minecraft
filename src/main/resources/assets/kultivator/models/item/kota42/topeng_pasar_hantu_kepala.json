@@ -1,0 +1,299 @@
+{
+ "textures": {
+  "wajah": "kultivator:item/kota42/topeng_wajah",
+  "particle": "kultivator:item/kota42/topeng_wajah"
+ },
+ "elements": [
+  {
+   "from": [
+    4,
+    4,
+    3.4
+   ],
+   "to": [
+    12,
+    12,
+    4
+   ],
+   "faces": {
+    "north": {
+     "uv": [
+      4,
+      4,
+      12,
+      12
+     ],
+     "texture": "#wajah"
+    },
+    "south": {
+     "uv": [
+      4,
+      4,
+      12,
+      12
+     ],
+     "texture": "#wajah"
+    },
+    "east": {
+     "uv": [
+      0,
+      0,
+      1,
+      1
+     ],
+     "texture": "#wajah"
+    },
+    "west": {
+     "uv": [
+      0,
+      0,
+      1,
+      1
+     ],
+     "texture": "#wajah"
+    },
+    "up": {
+     "uv": [
+      0,
+      0,
+      1,
+      1
+     ],
+     "texture": "#wajah"
+    },
+    "down": {
+     "uv": [
+      0,
+      0,
+      1,
+      1
+     ],
+     "texture": "#wajah"
+    }
+   }
+  },
+  {
+   "from": [
+    3,
+    5,
+    3.8
+   ],
+   "to": [
+    4,
+    11,
+    6
+   ],
+   "faces": {
+    "north": {
+     "uv": [
+      3,
+      5,
+      4,
+      11
+     ],
+     "texture": "#wajah"
+    },
+    "south": {
+     "uv": [
+      3,
+      5,
+      4,
+      11
+     ],
+     "texture": "#wajah"
+    },
+    "east": {
+     "uv": [
+      0,
+      0,
+      1,
+      1
+     ],
+     "texture": "#wajah"
+    },
+    "west": {
+     "uv": [
+      0,
+      0,
+      1,
+      1
+     ],
+     "texture": "#wajah"
+    },
+    "up": {
+     "uv": [
+      0,
+      0,
+      1,
+      1
+     ],
+     "texture": "#wajah"
+    },
+    "down": {
+     "uv": [
+      0,
+      0,
+      1,
+      1
+     ],
+     "texture": "#wajah"
+    }
+   }
+  },
+  {
+   "from": [
+    12,
+    5,
+    3.8
+   ],
+   "to": [
+    13,
+    11,
+    6
+   ],
+   "faces": {
+    "north": {
+     "uv": [
+      12,
+      5,
+      13,
+      11
+     ],
+     "texture": "#wajah"
+    },
+    "south": {
+     "uv": [
+      12,
+      5,
+      13,
+      11
+     ],
+     "texture": "#wajah"
+    },
+    "east": {
+     "uv": [
+      0,
+      0,
+      1,
+      1
+     ],
+     "texture": "#wajah"
+    },
+    "west": {
+     "uv": [
+      0,
+      0,
+      1,
+      1
+     ],
+     "texture": "#wajah"
+    },
+    "up": {
+     "uv": [
+      0,
+      0,
+      1,
+      1
+     ],
+     "texture": "#wajah"
+    },
+    "down": {
+     "uv": [
+      0,
+      0,
+      1,
+      1
+     ],
+     "texture": "#wajah"
+    }
+   }
+  },
+  {
+   "from": [
+    4,
+    12,
+    3.6
+   ],
+   "to": [
+    12,
+    13,
+    5
+   ],
+   "faces": {
+    "north": {
+     "uv": [
+      4,
+      3,
+      12,
+      4
+     ],
+     "texture": "#wajah"
+    },
+    "south": {
+     "uv": [
+      4,
+      3,
+      12,
+      4
+     ],
+     "texture": "#wajah"
+    },
+    "east": {
+     "uv": [
+      0,
+      0,
+      1,
+      1
+     ],
+     "texture": "#wajah"
+    },
+    "west": {
+     "uv": [
+      0,
+      0,
+      1,
+      1
+     ],
+     "texture": "#wajah"
+    },
+    "up": {
+     "uv": [
+      0,
+      0,
+      1,
+      1
+     ],
+     "texture": "#wajah"
+    },
+    "down": {
+     "uv": [
+      0,
+      0,
+      1,
+      1
+     ],
+     "texture": "#wajah"
+    }
+   }
+  }
+ ],
+ "display": {
+  "head": {
+   "rotation": [
+    0,
+    0,
+    0
+   ],
+   "translation": [
+    0,
+    -3.2,
+    -4.2
+   ],
+   "scale": [
+    1.02,
+    1.02,
+    1.02
+   ]
+  }
+ }
+}

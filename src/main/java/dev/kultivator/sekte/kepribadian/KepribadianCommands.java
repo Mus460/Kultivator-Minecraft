@@ -393,6 +393,11 @@ public final class KepribadianCommands {
 			if (e.role() != DiscipleEntity.Role.DISCIPLE) {
 				continue;
 			}
+			// Hati.clear wipes the pre-sulk mode: give it back first.
+			DiscipleEntity.Mode old = e.activity() == SekteIds.ACT_SULK ? Kepribadian.modeBeforeSulk(e.data()) : null;
+			if (old != null) {
+				e.setMode(old);
+			}
 			if (e.activity() == SekteIds.ACT_SULK || e.activity() == SekteIds.ACT_LEAVING) {
 				e.setActivity(DiscipleEntity.ACTIVITY_NONE, null);
 			}

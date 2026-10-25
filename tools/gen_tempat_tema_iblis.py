@@ -34,6 +34,7 @@ import structgen  # noqa: E402
 import tempat_lib as tl  # noqa: E402
 import kota_besar_kit as K  # noqa: E402
 import tempat_tema_lib as ttl  # noqa: E402
+import tema_hidup_kit as thk  # noqa: E402  (DESIGN 42 lots outside the wall, 42W-T)
 from kota_besar_kit import LY, FACE, OPP  # noqa: E402
 import hias_tema_oi as HO  # noqa: E402  (registers the demon-city room styles into hias_tema)
 
@@ -3312,11 +3313,50 @@ def tulis_json():
     ttl.tulis_processor_tema("iblis")
 
 
+# ===================================================================================================== DESIGN 42 (42W-T)
+# 42.12.1 row tema for Kota Iblis: its night district is the pasar iblis (no jalan_malam lot), and 42.9.4 has no
+# kavling gaya and 42.12.1 no cemetery for it, so the town gets the recruitment office (2 booths) beside the Zona
+# Perjanjian of the Kedai Racun and the Lorong Hantu (pawnshop, talisman and poison shops, five rentable stalls, the
+# four Ghost Market spots) on free lots OUTSIDE the wall (tools/tema_hidup_kit.py; off the 48-grid, no side code).
+# Blackstone and basalt, spiked hip roofs, soul lanterns; no fire, lava or lightning rod.
+GAYA42 = {
+    "tema": "iblis", "pal": PAL, "pondasi": "minecraft:blackstone",
+    "tanah": ["minecraft:blackstone", "minecraft:soul_soil", "minecraft:coarse_dirt", "minecraft:blackstone",
+              "minecraft:gravel", "minecraft:soul_soil"],
+    "jalan": ["minecraft:polished_blackstone_bricks", "minecraft:cracked_polished_blackstone_bricks",
+              "minecraft:polished_blackstone", "minecraft:polished_blackstone_bricks"],
+    "alas": "minecraft:polished_blackstone_bricks", "alas_tangga": "minecraft:polished_blackstone_brick_stairs",
+    "lantai": ["minecraft:dark_oak_planks", "minecraft:crimson_planks"],
+    "dinding": ["minecraft:polished_blackstone_bricks", "minecraft:blackstone", "minecraft:polished_blackstone_bricks",
+                "minecraft:cracked_polished_blackstone_bricks"],
+    "tiang": "minecraft:polished_basalt", "balok": "minecraft:stripped_crimson_hyphae",
+    "jendela": "minecraft:iron_bars", "pintu": "minecraft:crimson_door", "plafon": "minecraft:dark_oak_planks",
+    "atap": "runcing", "atap_tangga": "minecraft:polished_blackstone_brick_stairs",
+    "atap_slab": "minecraft:polished_blackstone_brick_slab", "atap_penuh": "minecraft:polished_blackstone_bricks",
+    "parapet": "minecraft:polished_blackstone_wall", "kubah": "minecraft:blackstone",
+    "kain": ("minecraft:red_wool", "minecraft:black_wool"), "warna": "red", "lampu": "minecraft:soul_lantern",
+    "pohon": "dark_oak", "bilik_warna": ("black", "red"),
+}
+# (district, dx, dz, lot): south band west of the Gerbang Tengkorak (Lorong Hantu) and east of it (office)
+LOT42 = (("kumuh_iblis", 0, 60, "hidup42/lorong_hantu"), ("kedai_racun", -48, 60, "hidup42/kantor_rekrut"))
+
+
+def lot42_buat(dry=False):
+    """Writes the DESIGN 42 lots and registers them (lapak_sewa 0-4 in the alley, pasar_hantu 0-3)."""
+    out = [thk.lot_lorong_hantu(F, GAYA42, lapak0=0, hantu0=0),
+           thk.lot_kantor_rekrut(F, GAYA42, lapak0=5)]
+    if not dry:
+        for distrik, dx, dz, name in LOT42:
+            daftar_bebas(distrik, dx, dz, name, 0, utuh=False)
+    return out
+
+
 def main(argv):
     build_walls()
     for _name, fn in BUILDERS:
         fn()
     wall_lots()
+    lot42_buat()
     tulis_json()
     tl.cek_semua()
     total = sum(os.path.getsize(p) for p, _ in structgen._SAVED)

@@ -65,6 +65,24 @@
       "dz": 48,
       "pool": "kultivator:kota_tema/air/tembok/hunian_kanal_sudut",
       "putar": 0
+    },
+    {
+      "dx": -48,
+      "dz": 58,
+      "pool": "kultivator:kota_tema/air/hidup42/kavling_barat",
+      "putar": 0
+    },
+    {
+      "dx": 0,
+      "dz": 58,
+      "pool": "kultivator:kota_tema/air/hidup42/jalan_malam",
+      "putar": 0
+    },
+    {
+      "dx": -108,
+      "dz": -16,
+      "pool": "kultivator:kota_tema/air/hidup42/makam",
+      "putar": 0
     }
   ],
   "gaya": [

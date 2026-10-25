@@ -41,6 +41,7 @@ import structgen  # noqa: E402
 import tempat_lib as tl  # noqa: E402
 import tempat_tema_lib as ttl  # noqa: E402
 import kota_besar_kit as K  # noqa: E402
+import tema_hidup_kit as thk  # noqa: E402  (DESIGN 42 lots outside the wall, 42W-T)
 import hias_tema as HT  # noqa: E402
 from kota_besar_kit import FACE, OPP  # noqa: E402
 
@@ -4063,6 +4064,51 @@ def tulis_cerita():
           % (len(QUEST), len(DIALOG), len(KABAR), len(ADV), len(LOOT), len(LANG)))
 
 
+# ===================================================================================================== DESIGN 42 (42W-T)
+# 42.12.1 row tema: the night street, the recruitment office (2 booths), 10 kavling of gaya "gunung", the terraced
+# cemetery (teras makam) and the Ghost Market / rentable stall points, all on free lots OUTSIDE the wall of the bottom
+# row (district dy 0) inside the keep-out zone of their district (tools/tema_hidup_kit.py; off the 48-grid, no side
+# code). Stone plinths and lower walls, spruce boards and posts, dark shingle gables - the terrace town's houses.
+GAYA42 = {
+    "tema": "gunung", "pal": GP, "pondasi": "minecraft:stone",
+    "tanah": ["minecraft:grass_block", "minecraft:grass_block", "minecraft:podzol", "minecraft:coarse_dirt",
+              "minecraft:grass_block", "minecraft:stone"],
+    "jalan": ["minecraft:stone_bricks", "minecraft:cobblestone", "minecraft:stone_bricks",
+              "minecraft:mossy_stone_bricks"],
+    "alas": "minecraft:stone_bricks", "alas_tangga": "minecraft:stone_brick_stairs",
+    "lantai": ["minecraft:spruce_planks", "minecraft:dark_oak_planks", "minecraft:spruce_planks"],
+    "dinding": ["minecraft:stone_bricks", "minecraft:spruce_planks", "minecraft:spruce_planks"],
+    "tiang": "minecraft:spruce_log", "balok": "minecraft:stripped_dark_oak_log",
+    "jendela": "minecraft:spruce_trapdoor", "pintu": "minecraft:spruce_door", "plafon": "minecraft:spruce_planks",
+    "atap": "pelana", "atap_tangga": "minecraft:dark_oak_stairs", "atap_slab": "minecraft:dark_oak_slab",
+    "atap_penuh": "minecraft:dark_oak_planks", "parapet": "minecraft:stone_brick_wall", "kubah": "minecraft:stone_bricks",
+    "kain": ("minecraft:yellow_wool", "minecraft:orange_wool"), "warna": "yellow", "lampu": "minecraft:lantern",
+    "pohon": "spruce", "kavling": "gunung", "makam": ("teras", "teras"),
+    "rencana": (("rumah_besar", "kedai_teh", "rumah_toko", "bengkel", "gudang", "sekolah", "kedai_arak"),
+                ("rumah_kecil", "kuil_kecil", "menara_jaga", "taman", "rumah_kecil")),
+    "bilik_warna": ("yellow", "brown"),
+}
+# (district, dx, dz, lot): below the south wall of the bottom row, west of the Gerbang Kaki (night street, kavling) and
+# east of it (office, kavling); the terraced cemetery on the slope west of the Penginapan Peziarah wall
+LOT42 = (("penginapan_peziarah", -48, 58, "hidup42/kavling_barat"), ("penginapan_peziarah", 0, 58, "hidup42/jalan_malam"),
+         ("pasar_kaki", -48, 58, "hidup42/kantor_rekrut"), ("pasar_kaki", 0, 58, "hidup42/kavling_timur"),
+         ("penginapan_peziarah", -108, 0, "hidup42/makam"))
+
+
+def lot42_buat(dry=False):
+    """Writes the DESIGN 42 lots and registers them (lapak_sewa 0-4, pasar_hantu 0-3, nisan 0-31)."""
+    out = [thk.lot_jalan_malam(F, GAYA42, lapak0=0, hantu0=0),
+           thk.lot_kantor_rekrut(F, GAYA42, lapak0=2),
+           thk.lot_kavling(F, GAYA42, "hidup42/kavling_barat", 0),
+           thk.lot_kavling(F, GAYA42, "hidup42/kavling_timur", 1, hantu=3),
+           thk.lot_makam(F, GAYA42, nisan0=0, hantu0=1)]
+    if not dry:
+        for distrik, dx, dz, name in LOT42:
+            POOLS[name] = ([tid(name)], False)
+            LOTS[distrik].append({"dx": dx, "dz": dz, "dy": 0, "pool": name})
+    return out
+
+
 def main(argv):
     if "--cerita" in argv:          # story data and lang only (no NBT)
         tulis_cerita()
@@ -4074,6 +4120,8 @@ def main(argv):
     for name, fn in BUILDERS:
         if not only or name in only:
             fn()
+    if not only:
+        lot42_buat()
     write_processors()
     write_pools()
     write_structures()

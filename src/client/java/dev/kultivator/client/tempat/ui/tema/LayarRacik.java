@@ -1,15 +1,17 @@
 package dev.kultivator.client.tempat.ui.tema;
 
 import dev.kultivator.client.screen.ui.Brush;
+import dev.kultivator.client.screen.ui.DaftarPilihan;
+import dev.kultivator.client.screen.ui.Glyphs;
+import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
-import dev.kultivator.client.tempat.ui.kit.IkonTempat;
+import dev.kultivator.client.screen.ui.SegelKonfirmasi;
 import dev.kultivator.client.tempat.ui.kit.Lembar;
-import dev.kultivator.client.tempat.ui.kit.Lukis;
-import dev.kultivator.client.tempat.ui.kit.PanelTempat;
 import dev.kultivator.client.tempat.ui.kit.TabLentera;
 import dev.kultivator.client.tempat.ui.kit.TempatWarna;
 import dev.kultivator.dunia.tempat.tema.bersama.TemaLayar.Racik;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
+import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -19,10 +21,12 @@ import net.minecraft.util.Util;
  * {@code tema_racik} (DESIGN 38.T.3, quest {@code tema_pelabuhan_pelita} chapter 3): grinding the lighthouse lens from
  * sea-salt glass in three steps (melt, grind, polish). Left the lens workshop: the furnace with its live heat gauge and
  * flame, and the lens itself as it is at this step (a glowing glass gob, a rough disc on the wheel, the polished lens
- * throwing a beam). Under it the step track and the materials (had / needed). Right the choices of this step as numbered
- * buttons (keys 1-3), the grade so far in stars and "Ulang" to start over.
+ * throwing a beam). Under it the step track and the materials (had / needed). Right the choices of this step in the kit's
+ * {@link DaftarPilihan} (G59: ↑↓ Enter, a click, or keys 1-3 under Di Sini), the grade so far in stars and "Ulang" to
+ * start over (the one confirm seal, light). A Di Sini page on the single kit (43.8.3); in the narrow layout workshop and
+ * choices sit side by side.
  */
-public final class LayarRacik extends LayarTemaDasar {
+public final class LayarRacik extends TemaHalaman {
 
 	/** Entry keys of {@code bahan} (C38.T3: punya I, perlu I). */
 	private static final String PUNYA = "punya";
@@ -54,16 +58,6 @@ public final class LayarRacik extends LayarTemaDasar {
 		}
 	}
 
-	@Override
-	protected boolean angka(int n) {
-		List<Lembar> p = lembar.daftar(Racik.PILIHAN);
-		if (n >= 1 && n <= p.size() && bahanCukup() && tulisBoleh()) {
-			kirim(LembarKunci.op(Racik.OP_PILIH, p.get(n - 1).id()));
-			return true;
-		}
-		return false;
-	}
-
 	private boolean bahanCukup() {
 		for (Lembar b : lembar.daftar(Racik.BAHAN)) {
 			if (b.i(PUNYA, 0) < b.i(PERLU, 1)) {
@@ -74,9 +68,16 @@ public final class LayarRacik extends LayarTemaDasar {
 	}
 
 	@Override
-	protected void gambar(Lukis l, int x0, int y0, int x1, int y1) {
-		int y = y0 + strip(l, TemaUi.k("racik.ucap." + Math.max(1, Math.min(3, lembar.i(Racik.LANGKAH, 1)))), x0, y0, x1, 34);
-		Kotak[] k = bagi(x0, y, x1, y1);
+	protected void lukisTema(Lukis l, int x0, int y0, int x1, int y1) {
+		boolean sempit = tata == Tata.SEMPIT;
+		int y = y0 + strip(l, TemaUi.k("racik.ucap." + Math.max(1, Math.min(3, lembar.i(Racik.LANGKAH, 1)))), x0, y0, x1, sempit ? 30 : 34);
+		Kotak[] k;
+		if (sempit) {
+			int mid = x0 + (x1 - x0) * 9 / 20;
+			k = new Kotak[] {new Kotak(x0, y, mid - 2, y1), new Kotak(mid + 2, y, x1, y1)};
+		} else {
+			k = bagi(x0, y, x1, y1);
+		}
 		bengkel(l, k[0]);
 		pilihan(l, k[1]);
 	}
@@ -84,7 +85,7 @@ public final class LayarRacik extends LayarTemaDasar {
 	// ------------------------------------------------------------------------------------------------ workshop
 
 	private void bengkel(Lukis l, Kotak k) {
-		PanelTempat.kartu(l.g, gaya, k.x0(), k.y0(), k.x1(), k.y1(), 0.0F, false);
+		l.kartu(k.x0(), k.y0(), k.x1(), k.y1(), 0.0F, false);
 		int x0 = k.x0() + 5;
 		int x1 = k.x1() - 5;
 		int y = k.y0() + 4;
@@ -92,14 +93,15 @@ public final class LayarRacik extends LayarTemaDasar {
 		int langkah = Math.max(1, Math.min(total, lembar.i(Racik.LANGKAH, 1)));
 		float panas = Math.max(0.0F, Math.min(1.0F, lembar.f(Racik.PANAS, 0.0F)));
 		List<Lembar> bahan = lembar.daftar(Racik.BAHAN);
-		int bahanH = bahan.isEmpty() ? 0 : 12 + Math.min(4, bahan.size()) * 11;
-		int adeganH = Math.max(46, k.y1() - y - bahanH - 34);
+		int bahanH = bahan.isEmpty() ? 0 : 11 + Math.min(4, bahan.size()) * 11;
+		int adeganH = Math.max(30, k.h() - 8 - 32 - bahanH);
 		adegan(l, x0, y, x1, y + adeganH, langkah, panas);
 		y += adeganH + 4;
 		// heat gauge (with the sweet band 0.6-0.8 marked)
 		TemaUi.ikon(l.g, TemaUi.I_TUNGKU, x0, y - 1, 10);
+		Component persen = Component.literal(Math.round(panas * 100) + "%");
 		int gx0 = x0 + 12;
-		int gx1 = x1 - 26;
+		int gx1 = x1 - font.width(persen) - 4;
 		l.g.fillGradient(gx0, y + 1, gx1, y + 7, 0xFF3A2A60, 0xFF201838);
 		int mx0 = gx0 + Math.round((gx1 - gx0) * 0.6F);
 		int mx1 = gx0 + Math.round((gx1 - gx0) * 0.8F);
@@ -109,9 +111,9 @@ public final class LayarRacik extends LayarTemaDasar {
 			float t = (px - gx0) / (float) Math.max(1, gx1 - gx0);
 			l.g.fill(px, y + 2, px + 1, y + 6, Palette.mix(0xFFE0A040, 0xFFFF4020, t));
 		}
-		l.g.fill(fx - 1, y - 1, fx + 1, y + 9, TempatWarna.EMAS_TERANG);
-		Brush.frame(l.g, gx0 - 1, y, gx1 + 1, y + 8, Palette.argb(0x90, TempatWarna.EMAS_GELAP & 0xFFFFFF));
-		l.kanan(Component.literal(Math.round(panas * 100) + "%"), x1, y, panas > 0.8F ? 0xFFFF8A6A : gaya.teks, 0.75F);
+		l.g.fill(fx - 1, y - 1, fx + 1, y + 9, Palette.GOLD_LIGHT);
+		Brush.frame(l.g, gx0 - 1, y, gx1 + 1, y + 8, Palette.argb(0x90, Palette.GOLD_DARK));
+		l.kanan(persen, x1, y, panas > 0.8F ? 0xFFFF8A6A : gaya.teks);
 		if (l.di(gx0, y, gx1, y + 8)) {
 			l.tip(List.of(TemaUi.k("racik.panas"), TemaUi.k("racik.panas_tip")));
 		}
@@ -122,15 +124,18 @@ public final class LayarRacik extends LayarTemaDasar {
 			int sx = x0 + i * sw;
 			boolean lewat = i + 1 < langkah;
 			boolean kini = i + 1 == langkah;
-			int warna = lewat ? TempatWarna.OK : kini ? TempatWarna.EMAS : Palette.argb(0x50, 0x000000);
-			Brush.chamfer(l.g, sx + 1, y, sx + sw - 2, y + 12, 2, Palette.argb(kini ? 0xD0 : 0x80, warna & 0xFFFFFF));
-			Brush.fitCentered(l.g, font, TemaUi.k("racik.langkah." + Math.min(i + 1, 3)), sx + sw / 2.0F, y + 2.5F, sw - 6,
-					kini ? 0xFF2A1808 : 0xFFF6E8C8, 0.7F, 0.5F, false);
+			int warna = lewat ? Palette.OK : kini ? Palette.GOLD : Palette.argb(0x50, 0x000000);
+			Brush.chamfer(l.g, sx + 1, y, sx + sw - 2, y + 13, 2, Palette.argb(kini ? 0xD0 : 0x80, warna & 0xFFFFFF));
+			Component nama = TemaUi.k("racik.langkah." + Math.min(i + 1, 3));
+			l.tengah(nama, sx + sw / 2.0F, y + 3, sw - 6, kini ? 0xFF2A1808 : 0xFFF6E8C8);
+			if (l.di(sx, y, sx + sw, y + 13)) {
+				l.tip(nama);
+			}
 		}
-		y += 16;
+		y += 17;
 		// materials
-		if (!bahan.isEmpty()) {
-			l.keterangan(TemaUi.k("racik.bahan"), x0, y, x1 - x0, gaya.teksLemah);
+		if (!bahan.isEmpty() && y + 20 <= k.y1()) {
+			l.teks(TemaUi.k("racik.bahan"), x0, y, x1 - x0, gaya.teksLemah);
 			y += 10;
 			for (int i = 0; i < bahan.size() && i < 4 && y + 10 <= k.y1(); i++) {
 				Lembar b = bahan.get(i);
@@ -138,14 +143,16 @@ public final class LayarRacik extends LayarTemaDasar {
 				int perlu = b.i(PERLU, 1);
 				boolean cukup = punya >= perlu;
 				if (!b.barang().isEmpty()) {
+					// the item icon at 10 px beside the line (a picture, not text)
 					l.g.pose().pushMatrix();
 					l.g.pose().translate(x0, y - 1);
 					l.g.pose().scale(0.625F, 0.625F);
 					l.g.item(b.barang(), 0, 0);
 					l.g.pose().popMatrix();
 				}
-				l.teks(b.teks(LembarKunci.NAMA), x0 + 13, y, x1 - x0 - 50, gaya.teks, 0.75F);
-				l.kanan(Component.literal(punya + " / " + perlu), x1, y, cukup ? 0xFF9AE0B0 : 0xFFFF8A7A, 0.75F);
+				Component jumlah = Component.literal(punya + " / " + perlu);
+				l.teks(b.teks(LembarKunci.NAMA), x0 + 13, y, x1 - x0 - 17 - font.width(jumlah), gaya.teks);
+				l.kanan(jumlah, x1, y, cukup ? l.gaya.naik() : l.gaya.turun());
 				y += 11;
 			}
 		}
@@ -157,7 +164,7 @@ public final class LayarRacik extends LayarTemaDasar {
 	 */
 	private void adegan(Lukis l, int x0, int y0, int x1, int y1, int langkah, float panas) {
 		l.g.fillGradient(x0, y0, x1, y1, 0xFF2A1A12, 0xFF140C08);
-		Brush.frame(l.g, x0, y0, x1, y1, Palette.argb(0x90, TempatWarna.EMAS_GELAP & 0xFFFFFF));
+		Brush.frame(l.g, x0, y0, x1, y1, Palette.argb(0x90, Palette.GOLD_DARK));
 		l.klip(x0 + 1, y0 + 1, x1 - 1, y1 - 1);
 		float cx = (x0 + x1) / 2.0F;
 		float cy = (y0 + y1) / 2.0F + 4.0F;
@@ -227,44 +234,59 @@ public final class LayarRacik extends LayarTemaDasar {
 			}
 		}
 		l.lepasKlip();
-		Brush.text(l.g, font, TemaUi.k("racik.langkah_ke", langkah, Math.max(1, lembar.i(LembarKunci.TAHAP_TOTAL, 3))), x0 + 4, y0 + 3, 0xC0F6E8C8,
-				0.65F, false);
+		l.teks(TemaUi.k("racik.langkah_ke", langkah, Math.max(1, lembar.i(LembarKunci.TAHAP_TOTAL, 3))), x0 + 4, y0 + 3, x1 - x0 - 8, 0xC0F6E8C8);
 	}
 
 	// ------------------------------------------------------------------------------------------------ choices
 
 	private void pilihan(Lukis l, Kotak k) {
-		PanelTempat.kartu(l.g, gaya, k.x0(), k.y0(), k.x1(), k.y1(), 0.0F, false);
+		l.kartu(k.x0(), k.y0(), k.x1(), k.y1(), 0.0F, false);
 		int x0 = k.x0() + 5;
 		int x1 = k.x1() - 5;
 		int y = k.y0() + 4;
+		int gy = k.y1() - 35;
 		int langkah = Math.max(1, Math.min(3, lembar.i(Racik.LANGKAH, 1)));
-		y += subjudul(l, TemaUi.k("racik.judul." + langkah), x0, y, x1);
-		y += Math.round(l.bungkus(TemaUi.k("racik.jelas." + langkah), x0, y, x1 - x0, gaya.teksLemah, 0.7F)) + 4;
 		List<Lembar> p = lembar.daftar(Racik.PILIHAN);
 		boolean cukup = bahanCukup();
-		Component alasan = !cukup ? TemaUi.k("racik.bahan_kurang") : null;
-		int bh = 17;
-		for (int i = 0; i < p.size() && y + bh <= k.y1() - 40; i++) {
-			Lembar e = p.get(i);
-			Component label = Component.literal((i + 1) + ". ").append(e.teks(LembarKunci.TEKS));
-			tombolOp(l, "pilih" + i, x0, y, x1 - x0, bh - 2, label, cukup, alasan, LembarKunci.op(Racik.OP_PILIH, e.id()));
-			y += bh;
+		y += subjudul(l, TemaUi.k("racik.judul." + langkah), x0, y, x1 - (cukup ? 0 : 14));
+		if (!cukup) {
+			Glyphs.Atlas.ikon(l.g, LembarKunci.Ikon.GEMBOK, x1 - 12, k.y0() + 4, 10, 0xFFFFFFFF);
 		}
+		int pilihH = DaftarPilihan.tinggi(Math.min(3, p.size()), 1, 15);
+		int ruangJelas = gy - 4 - y - pilihH - 3;
+		if (ruangJelas >= 9) {
+			y += Math.round(l.bungkus(TemaUi.k("racik.jelas." + langkah), x0, y, x1 - x0, gaya.teksLemah, Math.min(36, ruangJelas))) + 3;
+		} else if (l.di(x0, k.y0(), x1, y)) {
+			l.tip(TemaUi.k("racik.jelas." + langkah));
+		}
+		// the step's choices (G59); a lack of materials or a read-only view locks them with the reason
+		Component kunci = !cukup ? TemaUi.k("racik.bahan_kurang") : !tulisBoleh() ? alasanBaca() : null;
+		List<DaftarPilihan.Pilihan> pilihan = new ArrayList<>(p.size());
+		for (int i = 0; i < p.size(); i++) {
+			pilihan.add(new DaftarPilihan.Pilihan(i + 1, p.get(i).teks(LembarKunci.TEKS), kunci, false));
+		}
+		DaftarPilihan.gambar(l, "pilih", pilihan, x0, y, x1, gy - 4, false, c -> kirim(LembarKunci.op(Racik.OP_PILIH, p.get(c.no() - 1).id())));
 		// grade so far
 		int mutu = lembar.i(LembarKunci.MUTU, -1);
-		int gy = k.y1() - 36;
-		PanelTempat.garis(l.g, gaya, x0, x1, gy - 3);
-		l.keterangan(TemaUi.k("racik.mutu"), x0, gy + 2, 60, gaya.teksLemah);
+		l.garis(x0, x1, gy - 3);
+		Component mutuT = TemaUi.k("racik.mutu");
+		int mw = Math.min(70, font.width(mutuT) + 4);
+		l.teks(mutuT, x0, gy + 2, mw, gaya.teksLemah);
 		if (mutu < 0) {
-			l.keterangan(TemaUi.k("racik.mutu_belum"), x0 + 62, gy + 2, x1 - x0 - 62, gaya.teksSamar);
+			l.samar(TemaUi.k("racik.mutu_belum"), x0 + mw, gy + 2, x1 - x0 - mw);
 		} else {
-			TemaUi.bintang(l, Math.min(5, mutu + 1), 5, x0 + 62, gy, 11);
-			l.keterangan(TemaUi.k("racik.mutu." + Math.max(0, Math.min(4, mutu))), x0 + 62 + 56, gy + 2, x1 - x0 - 118, aksen());
+			int bw = TemaUi.bintang(l, Math.min(5, mutu + 1), 5, x0 + mw, gy + 1, 11);
+			Component nama = TemaUi.k("racik.mutu." + Math.max(0, Math.min(4, mutu)));
+			if (x1 - (x0 + mw + bw + 4) >= 20) {
+				l.teks(nama, x0 + mw + bw + 4, gy + 2, x1 - x0 - mw - bw - 4, aksen());
+			} else if (l.di(x0, gy, x1, gy + 12)) {
+				l.tip(nama);
+			}
 		}
-		tombolOp(l, "ulang", x0, k.y1() - 19, x1 - x0, 15, TemaUi.k("racik.ulang"), true, null, Racik.OP_ULANG);
-		if (!cukup) {
-			IkonTempat.gambar(l.g, LembarKunci.Ikon.GEMBOK, x1 - 12, k.y0() + 4, 10, 0xFFFFFFFF);
-		}
+		Component ulang = TemaUi.k("racik.ulang");
+		boolean baca = !tulisBoleh();
+		tombol(l, "ulang", x0, k.y1() - 19, x1 - x0, 15, ulang, !baca, baca ? alasanBaca() : null,
+				() -> konfirmasi(SegelKonfirmasi.Tingkat.RINGAN, Component.translatable("kultivator.gui43.konteks.yakin", ulang),
+						() -> kirim(Racik.OP_ULANG)));
 	}
 }

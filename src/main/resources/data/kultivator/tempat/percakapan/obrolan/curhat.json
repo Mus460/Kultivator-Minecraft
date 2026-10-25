@@ -1,0 +1,147 @@
+{
+  "_catatan": "CURHAT 42.5A.9: keluhan > hiburan > (permintaan tolong bila masalah nyata). 42K-C.",
+  "jenis": "curhat",
+  "syarat": {},
+  "mulai": {
+    "dasar": 0.3,
+    "X": 300,
+    "hubungan": 400
+  },
+  "jeda_tick": [
+    60,
+    100
+  ],
+  "langkah": [
+    {
+      "id": "sapa",
+      "oleh": "A",
+      "niat": "SAPA",
+      "lanjut": [
+        "keluh_a",
+        "keluh_b"
+      ]
+    },
+    {
+      "id": "keluh_a",
+      "oleh": "A",
+      "niat": "KELUH",
+      "syarat": {
+        "P_maks": -0.2
+      },
+      "lanjut": [
+        "sambung_b",
+        "hibur_b"
+      ]
+    },
+    {
+      "id": "sambung_b",
+      "oleh": "B",
+      "niat": "SAMBUNG_RASA",
+      "lanjut": [
+        "keluh_a2",
+        "hibur_b"
+      ]
+    },
+    {
+      "id": "keluh_a2",
+      "oleh": "A",
+      "niat": "KELUH",
+      "syarat": {
+        "ronde_maks": 1
+      },
+      "lanjut": [
+        "hibur_b"
+      ]
+    },
+    {
+      "id": "hibur_b",
+      "oleh": "B",
+      "niat": "HIBUR",
+      "lanjut": [
+        "minta_a",
+        "terima_a"
+      ]
+    },
+    {
+      "id": "minta_a",
+      "oleh": "A",
+      "niat": "MINTA_TOLONG",
+      "lanjut": [
+        "sepakat_b"
+      ]
+    },
+    {
+      "id": "sepakat_b",
+      "oleh": "B",
+      "niat": "SEPAKAT"
+    },
+    {
+      "id": "terima_a",
+      "oleh": "A",
+      "niat": "TERIMA_KASIH"
+    },
+    {
+      "id": "keluh_b",
+      "oleh": "B",
+      "niat": "KELUH",
+      "syarat": {
+        "P_maks": -0.2
+      },
+      "lanjut": [
+        "sambung_a",
+        "hibur_a"
+      ]
+    },
+    {
+      "id": "sambung_a",
+      "oleh": "A",
+      "niat": "SAMBUNG_RASA",
+      "lanjut": [
+        "keluh_b2",
+        "hibur_a"
+      ]
+    },
+    {
+      "id": "keluh_b2",
+      "oleh": "B",
+      "niat": "KELUH",
+      "syarat": {
+        "ronde_maks": 1
+      },
+      "lanjut": [
+        "hibur_a"
+      ]
+    },
+    {
+      "id": "hibur_a",
+      "oleh": "A",
+      "niat": "HIBUR",
+      "lanjut": [
+        "minta_b",
+        "terima_b"
+      ]
+    },
+    {
+      "id": "minta_b",
+      "oleh": "B",
+      "niat": "MINTA_TOLONG",
+      "lanjut": [
+        "sepakat_a"
+      ]
+    },
+    {
+      "id": "sepakat_a",
+      "oleh": "A",
+      "niat": "SEPAKAT"
+    },
+    {
+      "id": "terima_b",
+      "oleh": "B",
+      "niat": "TERIMA_KASIH"
+    }
+  ],
+  "efek": {
+    "emosi": "dihibur",
+    "permintaan": true
+  }
+}

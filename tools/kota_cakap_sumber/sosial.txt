@@ -1,0 +1,75 @@
+# sosial: corpus of the conversation engine (42K-C, DESIGN 42.5A.8). Source format: gen_kota_hidup_cakap.py.
+# Social acts towards the player: PUJI (compliment), HINA (insult), SELAMAT (congratulations), PERINGATAN (friendly warning).
+@kelompok sosial
+
+== puji.pemain
+niat: PUJI
+topik: pemain
+gestur: kagum
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] {$sebutan} selalu sopan pada orang kecil seperti kami. Itu jarang, lho. || You're always courteous to small folk like us, {$sebutan}. That's rare, you know.
+  ~ kasar: Kau tidak seburuk kultivator lain. Itu pujian. || You're not as bad as other cultivators. That's a compliment.
+  ~ kuno: Budi pekerti {$sebutan} seharum bunga plum di musim dingin. || Your character is fragrant as plum blossom in winter, {$sebutan}.
+  ~ pelabuhan: Kau orang baik, Bung. Di laut, orang sepertimu kami angkat jadi nakhoda. || You're a good sort, mate. At sea we'd make your kind captain.
+  ~ oasis: Hatimu jernih seperti mata air ini, Saudara. || Your heart is clear as this spring, friend.
+  ~ air: Kakak baik sekali... seperti air hangat di musim dingin... || You're so kind, dear... like warm water in winter...
+  ~ kampung: Kowe apik atine, Nak. Eh, hatimu baik, maksudku. || You've a good heart, child. That's what I mean.
+- [2] Pedangmu bagus, tapi senyummu lebih tajam. Hehe. || Your sword is fine, but your smile is sharper. Hehe.
+  ~ p: Bajumu rapi sekali hari ini. Siapa yang menjahit? || Your clothes are so neat today. Who sewed them?
+- Sejak kau sering lewat sini, gang kami terasa lebih aman. || Since you started passing by, our lane feels safer.
+  ~ iblis: Kau masih hidup selama ini di kota kami. Itu bukti kau pintar. || You've stayed alive in our city this long. That proves you're clever.
+- Anak-anak di sini menganggapmu pahlawan. Jangan kecewakan mereka. || The children here think you're a hero. Don't let them down.
+  ~ kuno: Anak-anak memandang {$sebutan} sebagai teladan. Beban yang mulia. || The children look to you as a model, {$sebutan}. A noble burden.
+- Kau pandai sekali bicara. Aku sampai lupa sedang berjualan. || You talk so well. I quite forgot I was selling.
+
+== hina.pemain
+niat: HINA
+topik: pemain
+gestur: marah_tunjuk
+seru: cih
+- [3] Pergi sana, kultivator gadungan. Bau keringatmu sampai ke sini. || Get lost, fake cultivator. I can smell your sweat from here.
+  ~ kuno: Pakaianmu mewah, tapi hatimu lebih kotor dari selokan. || Your robes are fine, but your heart is fouler than a gutter.
+  ~ pelabuhan: Kau seperti teritip, Bung. Menempel, tidak berguna, susah dibuang. || You're like a barnacle, mate. Clinging, useless, hard to scrape off.
+  ~ iblis: Kalau aku punya sekeping untuk setiap kebodohanmu, aku sudah membeli kota ini. || If I had a coin for each of your follies, I'd own this city.
+  ~ kampung: Wong kok ora tahu isin. Eh, orang kok tidak tahu malu. || Have you no shame at all.
+- [2] Hmph. Ranah tinggi, budi rendah. Pantas tidak ada yang suka padamu. || Hmph. High realm, low manners. No wonder no one likes you.
+  ~ oasis: Unta pun lebih tahu sopan santun daripada kau, Saudara. || Even a camel has better manners than you, friend.
+- Jalanmu angkuh seperti merak, padahal bulumu kusam. || You strut like a peacock, yet your feathers are dull.
+  ~ air: Kakak... maaf, tapi kau seperti lumpur di dasar kanal... || Dear... sorry, but you're like the mud at the canal's bottom...
+- Kalau semua kultivator sepertimu, lebih baik dunia tanpa kultivator. || If all cultivators were like you, the world would be better without them.
+
+== selamat.pemain
+niat: SELAMAT
+gestur: ucap_selamat
+seru: oh
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Selamat, {$sebutan}! Kabar baik tentangmu sudah sampai ke sini. || Congratulations, {$sebutan}! The good news about you has reached us.
+  ~ kasar: Selamat. Jangan jadi sombong. || Congrats. Don't get big-headed.
+  ~ kuno: Hamba turut bersuka cita, {$sebutan}. Semoga langit terus melimpahkan berkah. || This one shares your joy, {$sebutan}. May heaven keep pouring blessings.
+  ~ pelabuhan: Selamat, Bung! Malam ini aku minum untukmu! || Congrats, mate! I'll drink to you tonight!
+  ~ oasis: Selamat, Saudara! Semoga kafilah keberuntunganmu tidak pernah berhenti! || Congratulations, friend! May your caravan of luck never stop!
+  ~ kampung: Selamat, Nak! Sekampung ikut bangga! || Congratulations, child! The whole village is proud!
+  ~ gunung: Amitaba. Semoga keberhasilan ini tidak mengeruhkan hatimu, {$sebutan}. || Amitabha. May this success not cloud your heart, {$sebutan}.
+- [2] Wah! Benarkah? Selamat, selamat! Ini harus dirayakan! || Oh! Truly? Congratulations! This must be celebrated!
+  ~ p: Wah! Selamat! Nanti kubuatkan kue merah untukmu! || Oh! Congratulations! I'll bake you red cakes!
+- Aku sudah tahu kau bisa. Dari pertama kali melihatmu, aku tahu. || I knew you could. From the first time I saw you, I knew.
+  ~ iblis: Selamat. Sekarang lebih banyak orang ingin membunuhmu. Itu tanda hormat di sini. || Congrats. Now more people want you dead. That's respect here.
+- Kabar baikmu membuat hari kami cerah juga. Terima kasih. || Your good news brightens our day too. Thank you.
+
+== peringat.pemain
+niat: PERINGATAN
+topik: bahaya
+gestur: bisik
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+$arah: tipe=arah dari=konteks.arah
+- [3] Hati-hati, {$sebutan}. Ada orang-orang asing menanyakan namamu di kedai. || Careful, {$sebutan}. Strangers were asking your name at the tavern.
+  ~ kasar: Jaga punggungmu. Ada yang mencarimu. || Watch your back. Someone's looking for you.
+  ~ kuno: Waspadalah, {$sebutan}. Ada niat jahat yang mengintai di balik senyum. || Beware, {$sebutan}. Ill intent lurks behind smiles.
+  ~ pelabuhan: Ada kapal tanpa bendera berlabuh semalam, Bung. Awaknya bertanya soal kau. || A flagless ship docked last night, mate. Its crew asked about you.
+  ~ iblis: Seseorang membayar untuk mengetahui jadwalmu. Aku tidak menjualnya. Kali ini. || Someone paid to learn your routine. I didn't sell it. This time.
+  ~ kampung: Nak, hati-hati. Ada orang aneh mondar-mandir di batas kampung. || Child, be careful. Strange folk keep pacing at the village edge.
+- [2] Jangan lewat jalan {$arah} malam ini. Penjaga bilang ada begal. || Don't take the {$arah} road tonight. The guards say there are bandits.
+  ~ oasis: Jangan berjalan ke {$arah} tanpa air cukup, Saudara. Gurun tidak memaafkan. || Don't head {$arah} without enough water, friend. The desert doesn't forgive.
+  ~ gunung: Jalan setapak ke {$arah} rawan longsor setelah hujan. Amitaba, hati-hati. || The path {$arah} is prone to slides after rain. Amitabha, take care.
+- Kalau kau ke Pasar Hantu, jangan makan apa pun yang ditawarkan. Apa pun. || If you go to the Ghost Market, eat nothing offered. Nothing.
+- Pedagang di ujung pasar itu curang. Timbangannya diberi magnet. || That merchant at the market's end cheats. His scales have a lodestone.

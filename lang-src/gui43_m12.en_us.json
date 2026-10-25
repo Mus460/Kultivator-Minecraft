@@ -1,0 +1,21 @@
+{
+  "kultivator.gui43.hal.dunia.peta": "Map",
+  "kultivator.gui43.hal.dunia.perjalanan": "Journeys",
+  "kultivator.gui43.sub.peta.dunia": "World",
+  "kultivator.gui43.sub.peta.kota": "Capital",
+  "kultivator.gui43.sub.peta.layanan": "Services",
+  "kultivator.gui43.sub.peta.tokoh": "People",
+  "kultivator.gui43.sub.peta.acara": "Events",
+  "kultivator.gui43.m12.daftar": "List",
+  "kultivator.gui43.m12.peta": "Map",
+  "kultivator.gui43.m12.berlayar.judul": "Choose a destination: marker card › Sail, or a route in the list",
+  "kultivator.gui43.m12.berlayar.kembali": "‹ Helm",
+  "kultivator.gui43.m12.berlayar.rute": "Voyage routes",
+  "kultivator.gui43.m12.berlayar.ulang": "Click once more or press Enter to sail.",
+  "kultivator.gui43.m12.berlayar_ke": "The ship sails to %s.",
+  "kultivator.gui43.m12.keadaan": "Ship's state",
+  "kultivator.gui43.m12.lambung": "Hull",
+  "kultivator.gui43.m12.aksi": "Actions",
+  "kultivator.gui43.m12.pilih_peta": "Choose a destination on the Map",
+  "kultivator.gui43.m12.tak_berlayar": "The ship is not sailing."
+}

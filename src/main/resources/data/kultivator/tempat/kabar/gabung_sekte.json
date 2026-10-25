@@ -1,0 +1,215 @@
+{
+  "templat": [
+    {
+      "id": "gabung_diterima",
+      "pemicu": "gabung_diterima",
+      "bobot": 10,
+      "umur_hari": 4,
+      "teks": "kultivator.gabung.kabar.gabung_diterima"
+    },
+    {
+      "id": "gabung_naik_inti",
+      "pemicu": "gabung_naik_inti",
+      "bobot": 10,
+      "umur_hari": 6,
+      "teks": "kultivator.gabung.kabar.gabung_naik_inti"
+    },
+    {
+      "id": "gabung_naik_pewaris",
+      "pemicu": "gabung_naik_pewaris",
+      "bobot": 10,
+      "umur_hari": 10,
+      "teks": "kultivator.gabung.kabar.gabung_naik_pewaris"
+    },
+    {
+      "id": "gabung_naik_tetua",
+      "pemicu": "gabung_naik_tetua",
+      "bobot": 10,
+      "umur_hari": 8,
+      "teks": "kultivator.gabung.kabar.gabung_naik_tetua"
+    },
+    {
+      "id": "gabung_naik_wakil",
+      "pemicu": "gabung_naik_wakil",
+      "bobot": 10,
+      "umur_hari": 10,
+      "teks": "kultivator.gabung.kabar.gabung_naik_wakil"
+    },
+    {
+      "id": "gabung_naik_ketua",
+      "pemicu": "gabung_naik_ketua",
+      "bobot": 10,
+      "umur_hari": 14,
+      "teks": "kultivator.gabung.kabar.gabung_naik_ketua"
+    },
+    {
+      "id": "gabung_diusir",
+      "pemicu": "gabung_diusir",
+      "bobot": 10,
+      "umur_hari": 7,
+      "teks": "kultivator.gabung.kabar.gabung_diusir"
+    },
+    {
+      "id": "gabung_pembelot",
+      "pemicu": "gabung_pembelot",
+      "bobot": 10,
+      "umur_hari": 10,
+      "teks": "kultivator.gabung.kabar.gabung_pembelot"
+    },
+    {
+      "id": "gabung_pamit",
+      "pemicu": "gabung_pamit",
+      "bobot": 6,
+      "umur_hari": 4,
+      "teks": "kultivator.gabung.kabar.gabung_pamit"
+    },
+    {
+      "id": "gabung_perang",
+      "pemicu": "gabung_perang",
+      "bobot": 10,
+      "umur_hari": 8,
+      "teks": "kultivator.gabung.kabar.gabung_perang"
+    },
+    {
+      "id": "gabung_perang_menang",
+      "pemicu": "gabung_perang_menang",
+      "bobot": 10,
+      "umur_hari": 8,
+      "teks": "kultivator.gabung.kabar.gabung_perang_menang"
+    },
+    {
+      "id": "gabung_ketua_baru",
+      "pemicu": "gabung_ketua_baru",
+      "bobot": 10,
+      "umur_hari": 10,
+      "teks": "kultivator.gabung.kabar.gabung_ketua_baru"
+    },
+    {
+      "id": "gabung_bangkit",
+      "pemicu": "gabung_bangkit",
+      "bobot": 10,
+      "umur_hari": 10,
+      "teks": "kultivator.gabung.kabar.gabung_bangkit"
+    },
+    {
+      "id": "gabung_turnamen",
+      "pemicu": "gabung_turnamen",
+      "bobot": 8,
+      "umur_hari": 6,
+      "teks": "kultivator.gabung.kabar.gabung_turnamen"
+    },
+    {
+      "id": "gabung_hari_ujian",
+      "pemicu": "gabung_hari_ujian",
+      "bobot": 8,
+      "umur_hari": 4,
+      "teks": "kultivator.gabung.kabar.gabung_hari_ujian"
+    },
+    {
+      "id": "gabung_kelas_naik_menengah",
+      "pemicu": "gabung_kelas_naik_menengah",
+      "bobot": 10,
+      "umur_hari": 10,
+      "teks": "kultivator.gabung.kabar.gabung_kelas_naik_menengah"
+    },
+    {
+      "id": "gabung_kelas_naik_besar",
+      "pemicu": "gabung_kelas_naik_besar",
+      "bobot": 10,
+      "umur_hari": 10,
+      "teks": "kultivator.gabung.kabar.gabung_kelas_naik_besar"
+    },
+    {
+      "id": "gabung_kelas_naik_agung",
+      "pemicu": "gabung_kelas_naik_agung",
+      "bobot": 10,
+      "umur_hari": 10,
+      "teks": "kultivator.gabung.kabar.gabung_kelas_naik_agung"
+    },
+    {
+      "id": "gabung_kelas_naik_abadi",
+      "pemicu": "gabung_kelas_naik_abadi",
+      "bobot": 10,
+      "umur_hari": 10,
+      "teks": "kultivator.gabung.kabar.gabung_kelas_naik_abadi"
+    },
+    {
+      "id": "gabung_kelas_turun_kecil",
+      "pemicu": "gabung_kelas_turun_kecil",
+      "bobot": 10,
+      "umur_hari": 10,
+      "teks": "kultivator.gabung.kabar.gabung_kelas_turun_kecil"
+    },
+    {
+      "id": "gabung_kelas_turun_menengah",
+      "pemicu": "gabung_kelas_turun_menengah",
+      "bobot": 10,
+      "umur_hari": 10,
+      "teks": "kultivator.gabung.kabar.gabung_kelas_turun_menengah"
+    },
+    {
+      "id": "gabung_kelas_turun_besar",
+      "pemicu": "gabung_kelas_turun_besar",
+      "bobot": 10,
+      "umur_hari": 10,
+      "teks": "kultivator.gabung.kabar.gabung_kelas_turun_besar"
+    },
+    {
+      "id": "gabung_kelas_turun_agung",
+      "pemicu": "gabung_kelas_turun_agung",
+      "bobot": 10,
+      "umur_hari": 10,
+      "teks": "kultivator.gabung.kabar.gabung_kelas_turun_agung"
+    },
+    {
+      "id": "gabung_umum_gerbang",
+      "pemicu": "umum",
+      "bobot": 3,
+      "umur_hari": 3,
+      "teks": "kultivator.gabung.kabar.gabung_umum_gerbang",
+      "isian": [
+        "sekte_terdekat"
+      ]
+    },
+    {
+      "id": "gabung_umum_tangga",
+      "pemicu": "umum",
+      "bobot": 3,
+      "umur_hari": 3,
+      "teks": "kultivator.gabung.kabar.gabung_umum_tangga",
+      "isian": [
+        "sekte_terdekat"
+      ]
+    },
+    {
+      "id": "gabung_umum_paviliun",
+      "pemicu": "umum",
+      "bobot": 3,
+      "umur_hari": 3,
+      "teks": "kultivator.gabung.kabar.gabung_umum_paviliun",
+      "isian": [
+        "sekte_terdekat"
+      ]
+    },
+    {
+      "id": "gabung_umum_tetua",
+      "pemicu": "umum",
+      "bobot": 3,
+      "umur_hari": 3,
+      "teks": "kultivator.gabung.kabar.gabung_umum_tetua",
+      "isian": [
+        "sekte_terdekat"
+      ]
+    },
+    {
+      "id": "gabung_umum_shifu",
+      "pemicu": "umum",
+      "bobot": 3,
+      "umur_hari": 3,
+      "teks": "kultivator.gabung.kabar.gabung_umum_shifu",
+      "isian": [
+        "sekte_terdekat"
+      ]
+    }
+  ]
+}

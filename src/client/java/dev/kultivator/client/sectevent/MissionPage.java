@@ -1,72 +1,85 @@
 package dev.kultivator.client.sectevent;
 
-import dev.kultivator.client.hall.HallScreen;
+import dev.kultivator.client.hub.HubNav;
+import dev.kultivator.client.hub.Tujuan;
+import dev.kultivator.client.hub.Urutan;
 import dev.kultivator.client.screen.ui.Brush;
+import dev.kultivator.client.screen.ui.DaftarGulir;
 import dev.kultivator.client.screen.ui.Glyphs;
+import dev.kultivator.client.screen.ui.KartuHasil;
+import dev.kultivator.client.screen.ui.KeadaanKosong;
+import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
+import dev.kultivator.client.screen.ui.PemilihOrang;
 import dev.kultivator.client.screen.ui.TalismanButton;
 import dev.kultivator.client.screen.ui.UiSound;
 import dev.kultivator.client.sekte.misi.MisiClient;
 import dev.kultivator.client.sekte.misi.MisiTab;
-import dev.kultivator.disciple.DiscipleEntity;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
 /**
- * The Misi tablet (DESIGN 20.3.10, 20.3.11): sub-tabs Papan (the day's mission board, a team of 1-3 and its success
- * chance), Tim (teams away with their time left and "Panggil Pulang"), Utusan (the envoy), Terlarang (the Blood-Colored
- * Forbidden Ground and its last report) and Bahtera (the Primordial Ark and the six Kunpeng bone pieces).
- * <p>
- * Sekte yang Hidup (DESIGN 36.2.7, module X) adds two sections after them: Misi Cerita (the story board, a stance and a
- * team of 1-4 with the server's stage chances) and Kabar Misi (the running story missions with their stage beads,
- * "Tarik Pulang" with or without the wounded, and the reports to read again). Their data comes from module X's own
- * payloads ({@code client.sekte.misi.MisiClient}); the pictures are drawn by {@code MisiTab}.
+ * Kegiatan › Misi of the hall owner (DESIGN 20.3.10, 20.3.11, 36.2.7, 43.5). Section chips: Harian (the day's board, a
+ * team of 1-3 and its success chance), Tim (teams away with their time left and "Panggil Pulang"), Pencari Bakat (the
+ * recruiting envoy; envoys to NPC sects go from Sekte › Luar as story missions), Terlarang (the Blood-Colored Forbidden
+ * Ground and its last report), Bahtera (the Primordial Ark and the six Kunpeng bone pieces), Cerita (module X's story
+ * board: a stance and a team of 1-4 with the server's stage chances) and Kabar (the running story missions with their
+ * stage beads, "Tarik Pulang" with or without the wounded, and the reports). A report (from "Baca", or the Gulungan
+ * Laporan item: R14) opens here as a detail ({@link KartuHasil}); Esc / the back control returns to the list.
  */
 public class MissionPage extends SectEventPage {
 
-	// T13: one tablet, two kinds of missions: "Harian" (the old daily board) and "Cerita" (module X's story missions);
-	// the old recruiting envoy is the "Pencari Bakat" (envoys to NPC sects go from the Diplomacy screen as story missions).
-	private static final String[] TABS = {"kultivator.sekte_sambung.misi.tab.harian", "kultivator.sectevent.ui.tab.teams",
+	private static final String[] SEKSI = {"kultivator.sekte_sambung.misi.tab.harian", "kultivator.sectevent.ui.tab.teams",
 			"kultivator.sekte_sambung.misi.tab.bakat", "kultivator.sectevent.ui.tab.forbidden", "kultivator.sectevent.ui.tab.ark",
 			"kultivator.sekte_sambung.misi.tab.cerita", "kultivator.sekte_sambung.misi.tab.kabar"};
-	/** This tablet's index in the hall screen's page list ({@code Halls.OP_OPEN} argument, the hub card of module X). */
-	public static final int PAGE = 6;
-	private static final int TAB_STORY = 5;
-	private static final int TAB_NEWS = 6;
+	private static final int HARIAN = 0;
+	private static final int TIM = 1;
+	private static final int BAKAT = 2;
+	private static final int TERLARANG = 3;
+	private static final int BAHTERA = 4;
+	private static final int CERITA = 5;
+	private static final int KABAR = 6;
 	private static final String[] TYPES = {"patrol", "herbs", "caravan", "hunt", "secret_realm"};
 	private static final long[] DURATION = {12000L, 12000L, 24000L, 24000L, 48000L};
-	private static final int BUTTON_H = 13;
 	private static final int CARD_H = 22;
 
-	private static int tab;
-	private static int offer = -1;
-	private static final Set<String> PARTY = new HashSet<>();
-	private static final Set<String> ENVOY = new HashSet<>();
-	private static final Set<String> FORBIDDEN = new HashSet<>();
-	private static final Set<String> ARK = new HashSet<>();
-	private static final Set<String> STORY = new HashSet<>();
-	private static int storyOffer = -1;
-	private static String stance = MisiTab.STANCES[0];
+	/** A report that arrived and waits to be shown (the Laporan payload). */
+	private static @Nullable CompoundTag laporanBaru;
+
+	private int seksi;
+	private int offer = -1;
+	private int storyOffer = -1;
+	private String stance = MisiTab.STANCES[0];
 	private String previewKey = "";
-	private long seenMisi = -1L;
-	private int storyBottom;
+	private @Nullable CompoundTag laporan;
+	private final PemilihOrang party = new PemilihOrang(3);
+	private final PemilihOrang envoy = new PemilihOrang(0);
+	private final PemilihOrang ark = new PemilihOrang(0);
+	private final PemilihOrang story = new PemilihOrang(4);
+	private PemilihOrang forbidden = new PemilihOrang(3);
+	private final DaftarGulir papan = new DaftarGulir();
+	private final DaftarGulir tim = new DaftarGulir();
+	private final DaftarGulir teks = new DaftarGulir();
+	private final DaftarGulir cerita = new DaftarGulir();
+	private final DaftarGulir kabar = new DaftarGulir();
+	private final DaftarGulir riwayat = new DaftarGulir();
+	private final KartuHasil kartu = new KartuHasil();
 
-	private RosterView roster;
-	private int top;
-	private int colW;
-
-	public MissionPage(HallScreen screen) {
-		super(screen);
+	/**
+	 * A report arrived ({@code MisiPayloads.Laporan}: "Baca" or the Gulungan Laporan item): it opens as the detail of
+	 * Kegiatan › Misi, in the Gulungan when it is open, else as soon as no other screen is open (R14).
+	 */
+	public static void laporan(CompoundTag report) {
+		laporanBaru = report == null ? new CompoundTag() : report.copy();
+		HubNav.antre(Tujuan.of(HubNav.SEKTE, Urutan.ID_KEGIATAN).sub(KegiatanPage.MISI));
 	}
 
 	@Override
@@ -75,387 +88,148 @@ public class MissionPage extends SectEventPage {
 	}
 
 	@Override
-	public Component shortName() {
-		return Component.translatable("kultivator.spine6.page.mission.short");
-	}
-
-	@Override
-	public int icon() {
+	public int glyph() {
 		return Glyphs.PATH;
 	}
 
-	/** Opens the tablet on the Misi Cerita section next time (module X's hub card). */
-	public static void selectStory() {
-		tab = TAB_STORY;
-	}
-
-	private static boolean busy(CompoundTag entry) {
-		int act = entry.getIntOr("act", 0);
-		return act == DiscipleEntity.ACTIVITY_FORMATION_GUARD || act >= DiscipleEntity.ACTIVITY_VOID_BODY;
-	}
-
-	private static boolean ready(CompoundTag entry) {
-		return entry.getBooleanOr("near", false) && entry.getBooleanOr("free", false) && !busy(entry);
+	@Override
+	public String helpTopic() {
+		return "misi";
 	}
 
 	@Override
-	protected void build() {
-		roster = null;
-		if (!data().getBooleanOr("hall", false)) {
-			return;
-		}
-		top = tabs(TABS, () -> tab, index -> tab = index);
-		colW = Math.max(120, Math.round(w * 0.54F));
-		int rightX = x + colW + 4;
-		int rightW = x + w - rightX;
-		int bottom = y + h;
-		switch (tab) {
-			case 0 -> {
-				roster = new RosterView(font, 3, entry -> true, entry -> ready(entry) && entry.getIntOr("rank", 1) >= 1,
-						entry -> sectRank(entry.getIntOr("rank", 1)), PARTY);
-				roster.layout(rightX, top + 11, rightW, bottom - top - 11);
-				TalismanButton send = new TalismanButton(x + 2, bottom - BUTTON_H, colW - 4, BUTTON_H,
-						() -> Component.translatable("kultivator.sectevent.ui.send"));
-				send.enabledWhen(() -> currentOffer() != null && !roster.chosen().isEmpty());
-				send.onPress(() -> act(0, "mission:" + offer + ":" + roster.ids()));
-				add(send);
-			}
-			case 1 -> {
-				int ty = top + 12;
-				for (CompoundTag team : teams()) {
-					if (ty + 24 > bottom) {
-						break;
-					}
-					int id = team.getIntOr("id", 0);
-					TalismanButton recall = new TalismanButton(x + w - 74, ty + 5, 72, BUTTON_H,
-							() -> Component.translatable("kultivator.sectevent.ui.recall"));
-					recall.enabledWhen(() -> !team.getBooleanOr("resolved", false));
-					recall.tooltip(() -> List.of(Component.translatable("kultivator.sectevent.ui.recall.tip")));
-					recall.onPress(() -> act(0, "recall:" + id));
-					add(recall);
-					ty += 26;
-				}
-			}
-			case 2 -> {
-				roster = new RosterView(font, 1, entry -> true, entry -> ready(entry) && entry.getBooleanOr("envoy_ok", false),
-						entry -> sectRank(entry.getIntOr("rank", 1)), ENVOY);
-				roster.layout(rightX, top + 11, rightW, bottom - top - 11);
-				int half = (colW - 6) / 2;
-				TalismanButton send = new TalismanButton(x + 2, bottom - BUTTON_H, half, BUTTON_H,
-						() -> Component.translatable("kultivator.sekte_sambung.bakat.kirim"));
-				send.enabledWhen(() -> envoyReady() && roster.first() != null);
-				send.onPress(() -> {
-					CompoundTag chosen = roster.first();
-					if (chosen != null) {
-						act(chosen.getIntOr("id", 0), "envoy");
-					}
-				});
-				add(send);
-				TalismanButton reset = new TalismanButton(x + 4 + half, bottom - BUTTON_H, half, BUTTON_H,
-						() -> Component.translatable("kultivator.sectevent.ui.envoy.reset", 300));
-				reset.enabledWhen(() -> !envoyReady());
-				reset.tooltip(() -> List.of(Component.translatable("kultivator.sekte_sambung.bakat.percepat.tip")));
-				reset.onPress(() -> act(0, "envoy_reset"));
-				add(reset);
-			}
-			case 3 -> {
-				roster = new RosterView(font, Math.max(1, forbidden().getIntOr("slots", 3)), entry -> true,
-						entry -> ready(entry) && entry.getBooleanOr("qr", false),
-						entry -> entry.getBooleanOr("qr", false) ? Component.literal(percent(entry.getDoubleOr("fg", 0.0D)))
-								: Component.translatable("kultivator.sectevent.ui.forbidden.sealed"), FORBIDDEN);
-				roster.layout(rightX, top + 11, rightW, bottom - top - 11);
-				TalismanButton enter = new TalismanButton(x + 2, bottom - BUTTON_H, colW - 4, BUTTON_H,
-						() -> Component.translatable("kultivator.sectevent.ui.forbidden.enter"));
-				enter.enabledWhen(() -> forbidden().getBooleanOr("open", false) && !roster.chosen().isEmpty());
-				enter.onPress(() -> act(0, "forbidden:" + roster.ids()));
-				add(enter);
-			}
-			case TAB_STORY -> buildStory(rightX, rightW, bottom);
-			case TAB_NEWS -> buildNews(bottom);
-			default -> {
-				roster = new RosterView(font, 1, entry -> true,
-						entry -> ready(entry) && (entry.getBooleanOr("ark_ok", false) || entry.getIntOr("rank", 1) >= 3),
-						entry -> entry.getBooleanOr("ark_ok", false) ? Component.translatable("kultivator.sectevent.ui.ark.may")
-								: sectRank(entry.getIntOr("rank", 1)), ARK);
-				roster.layout(rightX, top + 11, rightW, bottom - top - 11);
-				int half = (colW - 6) / 2;
-				TalismanButton board = new TalismanButton(x + 2, bottom - BUTTON_H, half, BUTTON_H,
-						() -> Component.translatable("kultivator.sectevent.ui.ark.board"));
-				board.enabledWhen(() -> {
-					CompoundTag chosen = roster.first();
-					return chosen != null && chosen.getBooleanOr("ark_ok", false);
-				});
-				board.onPress(() -> {
-					CompoundTag chosen = roster.first();
-					if (chosen != null) {
-						act(chosen.getIntOr("id", 0), "ark");
-					}
-				});
-				add(board);
-				TalismanButton unite = new TalismanButton(x + 4 + half, bottom - BUTTON_H, half, BUTTON_H,
-						() -> Component.translatable("kultivator.sectevent.ui.kunpeng.unite"));
-				unite.enabledWhen(() -> {
-					CompoundTag chosen = roster.first();
-					return chosen != null && chosen.getIntOr("rank", 1) >= 3 && data().getIntOr("kunpeng", 0) == 0x3F;
-				});
-				unite.tooltip(() -> List.of(Component.translatable("kultivator.sectevent.ui.kunpeng.tip"),
-						Component.translatable("kultivator.sectevent.item.kunpeng_bone_fragment.source").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC)));
-				unite.onPress(() -> {
-					CompoundTag chosen = roster.first();
-					if (chosen != null) {
-						act(chosen.getIntOr("id", 0), "kunpeng");
-					}
-				});
-				add(unite);
-			}
-		}
-	}
-
-	// ================================================================== module X: Misi Cerita and Kabar Misi
-
-	private void buildStory(int rightX, int rightW, int bottom) {
-		MisiClient.request(true);
-		int teamMax = Math.max(1, Math.min(4, MisiClient.state().getIntOr("tim", 4)));
-		roster = new RosterView(font, teamMax, entry -> true, entry -> ready(entry) && entry.getIntOr("rank", 1) >= 1,
-				entry -> sectRank(entry.getIntOr("rank", 1)), STORY);
-		roster.layout(rightX, top + 11, rightW, bottom - top - 11);
-		int stanceY = bottom - BUTTON_H * 2 - 13;
-		storyBottom = stanceY - 12;
-		int third = (colW - 8) / 3;
-		for (int i = 0; i < MisiTab.STANCES.length; i++) {
-			String id = MisiTab.STANCES[i];
-			TalismanButton pick = new TalismanButton(x + 2 + i * (third + 2), stanceY, third, BUTTON_H,
-					() -> Component.translatable("kultivator.sekte.misi.sikap." + id));
-			pick.stampedWhen(() -> stance.equals(id));
-			pick.tooltip(() -> List.of(Component.translatable("kultivator.sekte.misi.sikap." + id + ".desc")));
-			pick.onPress(() -> {
-				stance = id;
-				UiSound.toggle(true);
-			});
-			add(pick);
-		}
-		TalismanButton send = new TalismanButton(x + 2, bottom - BUTTON_H, colW - 4, BUTTON_H, () -> Component.translatable("kultivator.sekte.misi.ui.kirim"));
-		send.enabledWhen(() -> !readonly() && storyReady());
-		send.tooltip(() -> List.of(Component.translatable("kultivator.sekte.misi.ui.kirim.tip")));
-		send.onPress(() -> {
-			if (readonly()) {
-				UiSound.denied();
-				return;
-			}
-			MisiClient.send("kirim", storyOffer, stance + "|" + storySouls());
-			storyOffer = -1;
-			STORY.clear();
-		});
-		add(send);
-	}
-
-	private boolean storyReady() {
-		CompoundTag offer = MisiTab.offer(storyOffer);
-		if (offer == null || offer.getBooleanOr("taken", false) || roster == null || roster.chosen().isEmpty() || MisiTab.full()) {
-			return false;
-		}
-		CompoundTag preview = MisiClient.state().getCompoundOrEmpty("pratinjau");
-		return preview.getIntOr("offer", -1) != storyOffer || preview.getStringOr("blocker", "").isEmpty() && preview.getBooleanOr("rank_ok", true);
-	}
-
-	private String storySouls() {
-		StringBuilder souls = new StringBuilder();
-		if (roster != null) {
-			for (CompoundTag entry : roster.chosen()) {
-				souls.append(souls.isEmpty() ? "" : ",").append(entry.getStringOr("soul", ""));
-			}
-		}
-		return souls.toString();
-	}
-
-	private void buildNews(int bottom) {
-		MisiClient.request(true);
-		int cy = top + 12;
-		int buttonW = 74;
-		for (CompoundTag mission : MisiTab.missions()) {
-			if (cy + MisiTab.MISSION_H > bottom) {
-				break;
-			}
-			int id = mission.getIntOr("id", 0);
-			boolean open = !mission.getBooleanOr("finished", false) && !mission.getBooleanOr("ditarik", false);
-			TalismanButton recall = new TalismanButton(x + w - buttonW - 2, cy + 3, buttonW, BUTTON_H,
-					() -> Component.translatable("kultivator.sekte.misi.ui.tarik"));
-			recall.enabledWhen(() -> open && !readonly());
-			recall.tooltip(() -> List.of(Component.translatable(MisiTab.hurt(mission) ? "kultivator.sekte.misi.ui.tarik.tip_luka"
-					: "kultivator.sekte.misi.ui.tarik.tip")));
-			recall.onPress(() -> MisiClient.send("tarik", id, ""));
-			add(recall);
-			if (open && MisiTab.hurt(mission)) {
-				TalismanButton leave = new TalismanButton(x + w - buttonW - 2, cy + 4 + BUTTON_H, buttonW, BUTTON_H,
-						() -> Component.translatable("kultivator.sekte.misi.ui.tinggal"));
-				leave.urgentWhen(() -> true);
-				leave.enabledWhen(() -> !readonly());
-				leave.tooltip(() -> List.of(Component.translatable("kultivator.sekte.misi.ui.tinggal.tip").withStyle(ChatFormatting.RED)));
-				leave.onPress(() -> MisiClient.send("tinggal", id, ""));
-				add(leave);
-			}
-			cy += MisiTab.MISSION_H;
-		}
-		if (MisiTab.missions().isEmpty()) {
-			cy += 14;
-		}
-		int rowsTop = cy + 12;
-		int rows = Math.max(0, (bottom - rowsTop) / MisiTab.ROW_H);
-		List<CompoundTag> history = MisiTab.history();
-		for (int i = 0; i < Math.min(rows, history.size()); i++) {
-			int index = history.get(i).getIntOr("i", 0);
-			TalismanButton read = new TalismanButton(x + w - 40, rowsTop + i * MisiTab.ROW_H, 38, MisiTab.ROW_H - 1,
-					() -> Component.translatable("kultivator.sekte.misi.ui.baca"));
-			read.onPress(() -> MisiClient.send("baca", index, ""));
-			add(read);
-		}
-		storyBottom = rowsTop;
-	}
-
-	private void drawStory(GuiGraphicsExtractor g, int mouseX, int mouseY, int rightX, int rightW) {
-		MisiClient.request(false);
-		heading(g, Component.translatable("kultivator.sekte.misi.ui.papan", MisiClient.state().getIntOr("selesai", 0)), x + 2.0F, top, colW - 4.0F, 0.8F);
-		heading(g, Component.translatable("kultivator.sekte.misi.ui.tim", Math.max(1, MisiClient.state().getIntOr("tim", 4))), rightX + 2.0F, top,
-				rightW - 4.0F, 0.8F);
-		MisiTab.drawBoard(g, font, x + 2, top + 12, x + colW - 2, storyBottom, mouseX, mouseY, storyOffer, screen::showTooltip);
-		String souls = storySouls();
-		String key = storyOffer + "|" + stance + "|" + souls;
-		if (!key.equals(previewKey)) {
-			previewKey = key;
-			if (storyOffer >= 0 && !souls.isEmpty()) {
-				MisiClient.send("cek", storyOffer, stance + "|" + souls);
-			}
-		}
-		MisiTab.drawPreview(g, font, x + 4.0F, storyBottom + 2.0F, colW - 8.0F, storyOffer, stance, souls, !souls.isEmpty(), screen::showTooltip,
-				mouseX, mouseY);
-	}
-
-	private void drawNews(GuiGraphicsExtractor g, int mouseX, int mouseY) {
-		MisiClient.request(false);
-		heading(g, Component.translatable("kultivator.sekte.misi.ui.kabar", MisiTab.missions().size(), Math.max(1, MisiClient.state().getIntOr("maks", 2))),
-				x + 2.0F, top, w - 4.0F, 0.8F);
-		MisiTab.drawMissions(g, font, x + 2, top + 12, x + w - 2, 78, mouseX, mouseY, screen::showTooltip);
-		heading(g, Component.translatable("kultivator.sekte.misi.ui.laporan"), x + 2.0F, storyBottom - 11.0F, w - 4.0F, 0.7F);
-		MisiTab.drawHistory(g, font, x + 2, storyBottom, x + w - 2, y + h, 40);
-	}
-
-	private List<CompoundTag> teams() {
-		List<CompoundTag> list = new ArrayList<>();
-		for (Tag tag : data().getListOrEmpty("teams")) {
-			if (tag instanceof CompoundTag team) {
-				list.add(team);
-			}
-		}
-		return list;
-	}
-
-	private CompoundTag forbidden() {
-		return data().getCompoundOrEmpty("forbidden");
-	}
-
-	private boolean envoyReady() {
-		return data().getLongOr("day", 0L) >= data().getLongOr("envoy_ready", Long.MIN_VALUE);
-	}
-
-	private CompoundTag currentOffer() {
-		ListTag board = data().getListOrEmpty("board");
-		if (offer < 0 || offer >= board.size() || !(board.get(offer) instanceof CompoundTag tag) || tag.getBooleanOr("taken", false)) {
-			return null;
-		}
-		return tag;
+	public boolean rinci() {
+		return laporan != null;
 	}
 
 	@Override
-	protected String shape() {
-		StringBuilder builder = new StringBuilder(data().getBooleanOr("hall", false) ? "h" : "n");
-		if (tab == 1) {
-			for (CompoundTag team : teams()) {
-				builder.append(',').append(team.getIntOr("id", 0)).append(team.getBooleanOr("resolved", false) ? 'r' : 'a');
-			}
+	public boolean mundur() {
+		if (laporan != null) {
+			laporan = null;
+			UiSound.press();
+			return true;
 		}
-		if (tab == 3) {
-			builder.append(':').append(forbidden().getIntOr("slots", 3));
+		return false;
+	}
+
+	@Override
+	public void onShow(@Nullable CompoundTag fokus) {
+		if (seksi >= CERITA) {
+			MisiClient.request(true);
 		}
-		if (tab == TAB_STORY || tab == TAB_NEWS) {
-			builder.append(':').append(MisiTab.shape());
-		}
-		return builder.toString();
+		super.onShow(fokus);
+	}
+
+	private static boolean siap(CompoundTag e) {
+		return halangan(e) == null;
 	}
 
 	// ================================================================== drawing
 
 	@Override
-	protected void draw(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
-		int rightX = x + colW + 4;
-		int rightW = x + w - rightX;
-		if ((tab == TAB_STORY || tab == TAB_NEWS) && MisiClient.version() != seenMisi) {
-			// module X's own payload arrived: rebuild the buttons when what exists changed
-			seenMisi = MisiClient.version();
-			if (needsRebuild()) {
-				layout(x, y, w, h);
+	protected void isi(Lukis l) {
+		if (laporanBaru != null) {
+			laporan = laporanBaru;
+			laporanBaru = null;
+			kartu.mulaiUlang(l.kini);
+			seksi = KABAR;
+		}
+		if (laporan != null) {
+			kartu.gambar(l, "laporan", -1, MisiTab.reportTitle(laporan), MisiTab.reportSub(laporan), MisiTab.reportGrade(laporan),
+					MisiTab.reportTeam(laporan), MisiTab.reportBody(laporan), x, y, x + w, y + h);
+			return;
+		}
+		int top = seksi(l, SEKSI, seksi, i -> {
+			seksi = i;
+			if (i >= CERITA) {
+				MisiClient.request(true);
 			}
-		}
-		switch (tab) {
-			case 0 -> drawBoard(g, mouseX, mouseY, rightX, rightW);
-			case 1 -> drawTeams(g);
-			case 2 -> drawEnvoy(g, rightX, rightW);
-			case 3 -> drawForbidden(g, rightX, rightW);
-			case TAB_STORY -> drawStory(g, mouseX, mouseY, rightX, rightW);
-			case TAB_NEWS -> drawNews(g, mouseX, mouseY);
-			default -> drawArk(g, rightX, rightW);
-		}
-		if (roster != null) {
-			roster.draw(g, mouseX, mouseY, screen);
+		});
+		int colW = Math.max(120, Math.round(w * 0.55F));
+		int left1 = x + colW - 2;
+		int rx = x + colW + 2;
+		int bottom = y + h;
+		switch (seksi) {
+			case HARIAN -> harian(l, top, left1, rx, bottom);
+			case TIM -> tim(l, top, bottom);
+			case BAKAT -> bakat(l, top, left1, rx, bottom);
+			case TERLARANG -> terlarang(l, top, left1, rx, bottom);
+			case BAHTERA -> bahtera(l, top, left1, rx, bottom);
+			case CERITA -> cerita(l, top, left1, rx, bottom);
+			default -> kabar(l, top, bottom);
 		}
 	}
 
-	private void drawBoard(GuiGraphicsExtractor g, int mouseX, int mouseY, int rightX, int rightW) {
-		CompoundTag data = data();
-		heading(g, Component.translatable("kultivator.sectevent.ui.board", data.getIntOr("strongest", 1)), x + 2.0F, top, colW - 4.0F, 0.8F);
-		heading(g, Component.translatable("kultivator.sectevent.ui.party"), rightX + 2.0F, top, rightW - 4.0F, 0.8F);
+	// ---------------------------------------------------------------- Harian
+
+	private void harian(Lukis l, int top, int left1, int rx, int bottom) {
+		CompoundTag data = sekte();
+		int ly = kepala(l, Component.translatable("kultivator.sectevent.ui.board", data.getIntOr("strongest", 1)), x, top, left1);
+		int ry = kepala(l, Component.translatable("kultivator.sectevent.ui.party"), rx, top, x + w);
+		List<PemilihOrang.Orang> semua = orang(e -> true, e -> {
+			Component why = halangan(e);
+			return why != null ? why : e.getIntOr("rank", 1) < 1 ? Component.translatable("kultivator.sectevent.ui.not_allowed") : null;
+		}, e -> sectRank(e.getIntOr("rank", 1)));
+		party.gambar(l, "regu", semua, rx, ry, x + w, bottom);
 		ListTag board = data.getListOrEmpty("board");
-		int cy = top + 12;
-		int bottom = y + h - BUTTON_H - 14;
-		for (int i = 0; i < board.size(); i++) {
-			if (!(board.get(i) instanceof CompoundTag tag) || cy + CARD_H > bottom) {
-				break;
-			}
-			int type = Math.max(0, Math.min(TYPES.length - 1, tag.getIntOr("type", 0)));
-			int tier = tag.getIntOr("tier", 1);
-			boolean taken = tag.getBooleanOr("taken", false);
-			boolean chosen = i == offer && !taken;
-			boolean over = mouseX >= x + 2 && mouseX < x + colW - 2 && mouseY >= cy && mouseY < cy + CARD_H - 2;
-			int x0 = x + 2;
-			int x1 = x + colW - 2;
-			g.fill(x0, cy, x1, cy + CARD_H - 2, taken ? Palette.argb(0x40, Palette.LOCKED_PAPER) : chosen ? Palette.argb(0xA0, Palette.JADE_PALE)
-					: over ? Palette.argb(0x60, Palette.TALISMAN) : Palette.argb(0x48, Palette.PAPER_DEEP));
-			Brush.frame(g, x0, cy, x1, cy + CARD_H - 2, chosen ? Palette.GOLD : Palette.argb(0xA0, Palette.GOLD_DARK));
-			g.fill(x0 + 2, cy + 2, x0 + 6, cy + 6, taken ? Palette.LOCKED : Palette.SEAL);
-			Component name = Brush.bold(Component.translatable("kultivator.sectevent.mission." + TYPES[type]));
-			Brush.fit(g, font, name, x0 + 9.0F, cy + 2.0F, x1 - x0 - 12.0F, taken ? Palette.INK_FAINT : Palette.INK, 0.7F, 0.45F, false);
-			Component detail = taken ? Component.translatable("kultivator.sectevent.ui.taken")
-					: Component.translatable("kultivator.sectevent.ui.offer_line", tier, String.format(Locale.ROOT, "%.1f", DURATION[type] / 24000.0D),
-					Component.translatable("kultivator.sectevent.mission." + TYPES[type] + ".need"));
-			Brush.fit(g, font, detail, x0 + 9.0F, cy + 11.0F, x1 - x0 - 12.0F, Palette.INK_SOFT, 0.55F, 0.4F, false);
-			if (over && !taken) {
-				screen.showTooltip(List.of(name, Component.translatable("kultivator.sectevent.mission." + TYPES[type] + ".desc"),
-						Component.translatable("kultivator.sectevent.mission.source").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC)));
-			}
-			cy += CARD_H;
-		}
+		int listBottom = bottom - BTN_H - 14;
 		if (board.isEmpty()) {
-			Brush.wrap(g, font, Component.translatable("kultivator.sectevent.ui.board_empty"), x + 4.0F, top + 14.0F, colW - 8.0F, Palette.INK_FAINT, 0.6F, false);
+			KeadaanKosong.gambar(l, KeadaanKosong.Gambar.PAPAN, Component.translatable("kultivator.sectevent.ui.board_empty"), null, null, x, ly,
+					left1, listBottom);
+		} else {
+			papan.gambar(l, "papan", x, ly, left1, listBottom, board.size(), CARD_H, (lk, i, rx0, ry0, rx1, ry1, sorot, pilih) -> {
+				CompoundTag tag = board.get(i) instanceof CompoundTag t ? t : new CompoundTag();
+				offerRow(lk, tag, rx0, ry0, rx1, ry1, sorot, i == offer);
+			}, () -> pilihOffer(board, papan.pilihan()), i -> pilihOffer(board, i));
 		}
 		CompoundTag current = currentOffer();
+		List<CompoundTag> regu = dipilih(party, semua);
 		Component line;
 		if (current == null) {
 			line = Component.translatable("kultivator.sectevent.ui.pick_offer");
-		} else if (roster == null || roster.chosen().isEmpty()) {
+		} else if (regu.isEmpty()) {
 			line = Component.translatable("kultivator.sectevent.ui.pick_party");
 		} else {
-			line = Component.translatable("kultivator.sectevent.ui.chance", percent(chance(roster.chosen(), current.getIntOr("tier", 1))));
+			line = Component.translatable("kultivator.sectevent.ui.chance", percent(chance(regu, current.getIntOr("tier", 1))));
 		}
-		Brush.fit(g, font, line, x + 4.0F, y + h - BUTTON_H - 11.0F, colW - 8.0F, Palette.JADE_DARK, 0.65F, 0.45F, false);
+		l.teks(line, x + 2, listBottom + 2, left1 - x - 4, Palette.JADE_DARK);
+		Component why = current == null ? Component.translatable("kultivator.sectevent.ui.pick_offer")
+				: regu.isEmpty() ? Component.translatable("kultivator.sectevent.ui.pick_party") : alasanBaca();
+		TalismanButton.gambar(l, "kirim", x, bottom - BTN_H, left1 - x, BTN_H, Component.translatable("kultivator.sectevent.ui.send"), why == null, why,
+				() -> act(0, "mission:" + offer + ":" + ids(party, semua)));
+	}
+
+	private void pilihOffer(ListTag board, int index) {
+		if (index >= 0 && index < board.size() && board.get(index) instanceof CompoundTag tag && !tag.getBooleanOr("taken", false)) {
+			offer = offer == index ? -1 : index;
+			UiSound.toggle(offer == index);
+		}
+	}
+
+	/** One offer of the daily board; its description is the tooltip. */
+	private void offerRow(Lukis l, CompoundTag tag, int x0, int y0, int x1, int y1, boolean over, boolean chosen) {
+		int type = Math.max(0, Math.min(TYPES.length - 1, tag.getIntOr("type", 0)));
+		boolean taken = tag.getBooleanOr("taken", false);
+		l.kartu(x0, y0, x1, y1, over && !taken ? 1.0F : 0.0F, chosen && !taken);
+		l.g.fill(x0 + 3, y0 + 3, x0 + 7, y0 + 7, taken ? Palette.LOCKED : Palette.SEAL);
+		Component name = Brush.bold(Component.translatable("kultivator.sectevent.mission." + TYPES[type]));
+		l.teks(name, x0 + 10, y0 + 2, x1 - x0 - 12, taken ? Palette.INK_FAINT : l.gaya.teks);
+		Component detail = taken ? Component.translatable("kultivator.sectevent.ui.taken")
+				: Component.translatable("kultivator.sectevent.ui.offer_line", tag.getIntOr("tier", 1),
+				String.format(Locale.ROOT, "%.1f", DURATION[type] / 24000.0D), Component.translatable("kultivator.sectevent.mission." + TYPES[type] + ".need"));
+		l.teks(detail, x0 + 10, y0 + 11, x1 - x0 - 12, l.gaya.teksLemah);
+		if (over && !taken) {
+			l.tip(List.of(name, Component.translatable("kultivator.sectevent.mission." + TYPES[type] + ".desc"),
+					Component.translatable("kultivator.sectevent.mission.source").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC)));
+		}
+	}
+
+	private @Nullable CompoundTag currentOffer() {
+		ListTag board = sekte().getListOrEmpty("board");
+		if (offer < 0 || offer >= board.size() || !(board.get(offer) instanceof CompoundTag tag) || tag.getBooleanOr("taken", false)) {
+			return null;
+		}
+		return tag;
 	}
 
 	/** The success chance of DESIGN 20.3.10 from the roster's numbers (the server rolls with the same formula). */
@@ -479,24 +253,27 @@ public class MissionPage extends SectEventPage {
 		return Math.max(0.10D, Math.min(0.95D, 0.45D + 0.12D * (party - (difficulty - 1.0D)) + (core ? 0.05D : 0.0D)));
 	}
 
-	private static String percent(double value) {
-		return Math.round(value * 100.0D) + "%";
-	}
+	// ---------------------------------------------------------------- Tim
 
-	private void drawTeams(GuiGraphicsExtractor g) {
-		heading(g, Component.translatable("kultivator.sectevent.ui.teams"), x + 2.0F, top, w - 4.0F, 0.8F);
-		List<CompoundTag> teams = teams();
+	private void tim(Lukis l, int top, int bottom) {
+		int ly = kepala(l, Component.translatable("kultivator.sectevent.ui.teams"), x, top, x + w);
+		List<CompoundTag> teams = new ArrayList<>();
+		for (Tag tag : sekte().getListOrEmpty("teams")) {
+			if (tag instanceof CompoundTag team) {
+				teams.add(team);
+			}
+		}
 		if (teams.isEmpty()) {
-			Brush.wrap(g, font, Component.translatable("kultivator.sectevent.ui.teams_none"), x + 4.0F, top + 14.0F, w - 8.0F, Palette.INK_FAINT, 0.65F, false);
+			KeadaanKosong.gambar(l, KeadaanKosong.Gambar.GULUNGAN, Component.translatable("kultivator.sectevent.ui.teams_none"), null, null, x, ly, x + w,
+					bottom);
 			return;
 		}
-		int ty = top + 12;
 		long now = now();
-		for (CompoundTag team : teams) {
-			if (ty + 24 > y + h) {
-				break;
-			}
-			panel(g, x + 2, ty, x + w - 2, ty + 24);
+		tim.gambar(l, "tim", x, ly, x + w, bottom, teams.size(), 32, (lk, i, rx0, ry0, rx1, ry1, sorot, pilih) -> {
+			CompoundTag team = teams.get(i);
+			lk.kartu(rx0, ry0, rx1, ry1, 0.0F, false);
+			int bw = Math.min(90, TalismanButton.lebar(lk.font, Component.translatable("kultivator.sectevent.ui.recall"), 60, 90));
+			int tx1 = rx1 - bw - 6;
 			String kind = team.getStringOr("kind", "");
 			Component what = switch (kind) {
 				case "expedition" -> Component.translatable("kultivator.sectevent.ui.team.expedition",
@@ -506,7 +283,7 @@ public class MissionPage extends SectEventPage {
 				case "forbidden" -> Component.translatable("kultivator.sectevent.ui.team.forbidden");
 				default -> Component.translatable("kultivator.sectevent.ui.team.ark");
 			};
-			Brush.fit(g, font, Brush.bold(what), x + 6.0F, ty + 3.0F, w - 86.0F, Palette.INK, 0.65F, 0.45F, false);
+			lk.teks(Brush.bold(what), rx0 + 4, ry0 + 2, tx1 - rx0 - 4, lk.gaya.teks);
 			Component names = Component.empty();
 			boolean firstName = true;
 			for (Tag each : team.getListOrEmpty("names")) {
@@ -518,134 +295,337 @@ public class MissionPage extends SectEventPage {
 			long left = team.getLongOr("return_at", 0L) - now;
 			Component state = team.getBooleanOr("resolved", false) || left <= 0L ? Component.translatable("kultivator.sectevent.ui.team.returning")
 					: Component.translatable("kultivator.sectevent.ui.team.left", String.format(Locale.ROOT, "%.1f", left / 24000.0D), clock(left));
-			Brush.fit(g, font, names, x + 6.0F, ty + 11.0F, w - 86.0F, Palette.INK_SOFT, 0.55F, 0.4F, false);
-			Brush.fit(g, font, state, x + 6.0F, ty + 17.0F, w - 86.0F, Palette.JADE_DARK, 0.5F, 0.4F, false);
-			ty += 26;
-		}
+			lk.teks(names, rx0 + 4, ry0 + 11, tx1 - rx0 - 4, lk.gaya.teksLemah);
+			lk.teks(state, rx0 + 4, ry0 + 20, tx1 - rx0 - 4, Palette.JADE_DARK);
+			int id = team.getIntOr("id", 0);
+			boolean open = !team.getBooleanOr("resolved", false);
+			boolean over = TalismanButton.gambar(lk, "pulang" + id, rx1 - bw - 3, ry0 + (ry1 - ry0 - BTN_H) / 2, bw, BTN_H,
+					Component.translatable("kultivator.sectevent.ui.recall"), open && !readonly(), open ? alasanBaca()
+							: Component.translatable("kultivator.sectevent.ui.team.returning"), () -> act(0, "recall:" + id));
+			if (over && open) {
+				lk.tip(Component.translatable("kultivator.sectevent.ui.recall.tip"));
+			}
+		}, null, null);
 	}
 
-	private void drawEnvoy(GuiGraphicsExtractor g, int rightX, int rightW) {
-		CompoundTag data = data();
-		heading(g, Component.translatable("kultivator.sekte_sambung.bakat.judul"), x + 2.0F, top, colW - 4.0F, 0.8F);
-		heading(g, Component.translatable("kultivator.sekte_sambung.bakat.pilih"), rightX + 2.0F, top, rightW - 4.0F, 0.8F);
-		List<Component> list = new ArrayList<>();
-		list.add(Component.translatable("kultivator.sekte_sambung.bakat.desc"));
+	// ---------------------------------------------------------------- Pencari Bakat
+
+	private boolean envoyReady() {
+		return sekte().getLongOr("day", 0L) >= sekte().getLongOr("envoy_ready", Long.MIN_VALUE);
+	}
+
+	private void bakat(Lukis l, int top, int left1, int rx, int bottom) {
+		CompoundTag data = sekte();
+		int ly = kepala(l, Component.translatable("kultivator.sekte_sambung.bakat.judul"), x, top, left1);
+		int ry = kepala(l, Component.translatable("kultivator.sekte_sambung.bakat.pilih"), rx, top, x + w);
+		List<PemilihOrang.Orang> semua = orang(e -> true, e -> {
+			Component why = halangan(e);
+			return why != null ? why : e.getBooleanOr("envoy_ok", false) ? null : Component.translatable("kultivator.sectevent.ui.not_allowed");
+		}, e -> sectRank(e.getIntOr("rank", 1)));
+		envoy.gambar(l, "utusan", semua, rx, ry, x + w, bottom);
+		List<Garis> list = new ArrayList<>();
+		list.add(Garis.teks(Component.translatable("kultivator.sekte_sambung.bakat.desc"), Palette.INK_SOFT));
 		long ready = data.getLongOr("envoy_ready", Long.MIN_VALUE);
-		list.add(envoyReady() ? Component.translatable("kultivator.sekte_sambung.bakat.siap").withColor(Palette.JADE_DARK)
-				: Component.translatable("kultivator.sekte_sambung.bakat.tunggu_ui", ready).withColor(Palette.DANGER));
-		list.add(Component.translatable("kultivator.sectevent.ui.envoy.source").withColor(Palette.INK_FAINT));
-		lines(g, list, x + 4.0F, top + 13.0F, colW - 8.0F, y + h - BUTTON_H - 3.0F, Palette.INK_SOFT, 0.6F);
+		list.add(envoyReady() ? Garis.teks(Component.translatable("kultivator.sekte_sambung.bakat.siap"), Palette.JADE_DARK)
+				: Garis.teks(Component.translatable("kultivator.sekte_sambung.bakat.tunggu_ui", ready), Palette.DANGER));
+		list.add(Garis.teks(Component.translatable("kultivator.sectevent.ui.envoy.source"), Palette.INK_FAINT));
+		gulungan(l, "bakat", teks, list, x, ly, left1, bottom - BTN_H - 3);
+		int half = (left1 - x - 2) / 2;
+		CompoundTag chosen = satu(envoy);
+		Component why = !envoyReady() ? Component.translatable("kultivator.sekte_sambung.bakat.tunggu_ui", ready)
+				: chosen == null ? Component.translatable("kultivator.gui43.m09.pilih_murid") : alasanBaca();
+		TalismanButton.gambar(l, "utus", x, bottom - BTN_H, half, BTN_H, Component.translatable("kultivator.sekte_sambung.bakat.kirim"), why == null, why,
+				() -> {
+					CompoundTag c = satu(envoy);
+					if (c != null) {
+						act(c.getIntOr("id", 0), "envoy");
+					}
+				});
+		Component resetWhy = envoyReady() ? Component.translatable("kultivator.sekte_sambung.bakat.siap") : alasanBaca();
+		boolean over = TalismanButton.gambar(l, "percepat", x + half + 2, bottom - BTN_H, half, BTN_H,
+				Component.translatable("kultivator.sectevent.ui.envoy.reset", 300), resetWhy == null, resetWhy, () -> act(0, "envoy_reset"));
+		if (over && resetWhy == null) {
+			l.tip(Component.translatable("kultivator.sekte_sambung.bakat.percepat.tip"));
+		}
 	}
 
-	private void drawForbidden(GuiGraphicsExtractor g, int rightX, int rightW) {
-		CompoundTag info = forbidden();
-		heading(g, Component.translatable("kultivator.sectevent.ui.forbidden"), x + 2.0F, top, colW - 4.0F, 0.8F);
-		heading(g, Component.translatable("kultivator.sectevent.ui.forbidden.pick", info.getIntOr("slots", 3)), rightX + 2.0F, top, rightW - 4.0F, 0.8F);
-		List<Component> list = new ArrayList<>();
-		if (info.getBooleanOr("open", false)) {
-			list.add(Component.translatable("kultivator.sectevent.ui.forbidden.open", clock(info.getLongOr("until", 0L) - now())).withColor(Palette.DANGER));
-		} else {
-			list.add(Component.translatable("kultivator.sectevent.ui.forbidden.closed", info.getLongOr("next", 0L)).withColor(Palette.INK_SOFT));
-		}
-		list.add(Component.translatable("kultivator.sectevent.ui.forbidden.desc"));
-		if (roster != null && !roster.chosen().isEmpty()) {
-			boolean company = roster.chosen().size() > 1;
-			for (CompoundTag entry : roster.chosen()) {
-				double chance = Math.min(0.85D, entry.getDoubleOr("fg", 0.0D) + (company ? 0.10D : 0.0D));
-				list.add(Component.translatable("kultivator.sectevent.ui.forbidden.chance", SectEventClient.name(entry, "name"), percent(chance))
-						.withColor(Palette.JADE_DARK));
-			}
-		}
-		float ty = lines(g, list, x + 4.0F, top + 13.0F, colW - 8.0F, y + h - BUTTON_H - 3.0F, Palette.INK_SOFT, 0.6F);
-		ListTag report = info.getListOrEmpty("report");
-		if (!report.isEmpty() && ty + 10.0F < y + h - BUTTON_H - 4) {
-			Brush.fit(g, font, Component.translatable("kultivator.sectevent.ui.forbidden.report"), x + 4.0F, ty, colW - 8.0F, Palette.SEAL_DARK, 0.6F, 0.45F, false);
-			int sy = Math.round(ty) + 8;
-			for (Tag each : report) {
-				if (!(each instanceof CompoundTag line) || sy + 9 > y + h - BUTTON_H - 3) {
-					break;
+	// ---------------------------------------------------------------- Terlarang
+
+	private void terlarang(Lukis l, int top, int left1, int rx, int bottom) {
+		CompoundTag info = sekte().getCompoundOrEmpty("forbidden");
+		int slots = Math.max(1, info.getIntOr("slots", 3));
+		int ly = kepala(l, Component.translatable("kultivator.sectevent.ui.forbidden"), x, top, left1);
+		int ry = kepala(l, Component.translatable("kultivator.sectevent.ui.forbidden.pick", slots), rx, top, x + w);
+		if (forbidden.terpilih().size() > slots || forbiddenSlots != slots) {
+			// the number of places changed: a picker for the new count keeps the first ticks
+			PemilihOrang next = new PemilihOrang(slots);
+			for (String id : forbidden.terpilih()) {
+				if (next.terpilih().size() < slots) {
+					next.terpilih().add(id);
 				}
-				boolean ok = line.getBooleanOr("ok", false);
-				Component text = Component.translatable(ok ? "kultivator.sectevent.ui.forbidden.slip_ok" : line.getBooleanOr("tablet", false)
-						? "kultivator.sectevent.ui.forbidden.slip_tablet" : "kultivator.sectevent.ui.forbidden.slip_hurt",
-						SectEventClient.name(line, "name"), line.getIntOr("herbs", 0));
-				slip(g, x + 4, sy, x + colW - 4, sy + 9, text, ok ? Palette.JADE_DARK : Palette.SEAL_DARK, ok);
-				sy += 10;
 			}
+			forbidden = next;
+			forbiddenSlots = slots;
 		}
-	}
-
-	private void drawArk(GuiGraphicsExtractor g, int rightX, int rightW) {
-		CompoundTag data = data();
-		CompoundTag ark = data.getCompoundOrEmpty("ark");
-		heading(g, Component.translatable("kultivator.sectevent.ui.ark"), x + 2.0F, top, colW - 4.0F, 0.8F);
-		heading(g, Component.translatable("kultivator.sectevent.ui.ark.pick"), rightX + 2.0F, top, rightW - 4.0F, 0.8F);
-		List<Component> list = new ArrayList<>();
-		if (ark.getBooleanOr("open", false)) {
-			list.add(Component.translatable("kultivator.sectevent.ui.ark.open", clock(ark.getLongOr("until", 0L) - now())).withColor(Palette.onPaper(0x9F6BFF)));
+		List<PemilihOrang.Orang> semua = orang(e -> true, e -> {
+			Component why = halangan(e);
+			return why != null ? why : e.getBooleanOr("qr", false) ? null : Component.translatable("kultivator.sectevent.ui.forbidden.sealed");
+		}, e -> e.getBooleanOr("qr", false) ? Component.literal(percent(e.getDoubleOr("fg", 0.0D))) : null);
+		forbidden.gambar(l, "terlarang", semua, rx, ry, x + w, bottom);
+		List<CompoundTag> chosen = dipilih(forbidden, semua);
+		List<Garis> list = new ArrayList<>();
+		boolean open = info.getBooleanOr("open", false);
+		if (open) {
+			list.add(Garis.teks(Component.translatable("kultivator.sectevent.ui.forbidden.open", clock(info.getLongOr("until", 0L) - now())), Palette.DANGER));
 		} else {
-			list.add(Component.translatable("kultivator.sectevent.ui.ark.closed").withColor(Palette.INK_SOFT));
+			list.add(Garis.teks(Component.translatable("kultivator.sectevent.ui.forbidden.closed", info.getLongOr("next", 0L)), Palette.INK_SOFT));
 		}
-		list.add(Component.translatable("kultivator.sectevent.ui.ark.desc"));
-		float ty = lines(g, list, x + 4.0F, top + 13.0F, colW - 8.0F, y + h - BUTTON_H - 40.0F, Palette.INK_SOFT, 0.6F);
-		// The six bone pieces.
+		list.add(Garis.teks(Component.translatable("kultivator.sectevent.ui.forbidden.desc"), Palette.INK_SOFT));
+		boolean company = chosen.size() > 1;
+		for (CompoundTag entry : chosen) {
+			double c = Math.min(0.85D, entry.getDoubleOr("fg", 0.0D) + (company ? 0.10D : 0.0D));
+			list.add(Garis.teks(Component.translatable("kultivator.sectevent.ui.forbidden.chance", SectEventClient.name(entry, "name"), percent(c)),
+					Palette.JADE_DARK));
+		}
+		ListTag report = info.getListOrEmpty("report");
+		if (!report.isEmpty()) {
+			list.add(Garis.judul(Component.translatable("kultivator.sectevent.ui.forbidden.report")));
+			for (Tag each : report) {
+				if (each instanceof CompoundTag line) {
+					boolean ok = line.getBooleanOr("ok", false);
+					list.add(Garis.bilah(Component.translatable(ok ? "kultivator.sectevent.ui.forbidden.slip_ok" : line.getBooleanOr("tablet", false)
+							? "kultivator.sectevent.ui.forbidden.slip_tablet" : "kultivator.sectevent.ui.forbidden.slip_hurt",
+							SectEventClient.name(line, "name"), line.getIntOr("herbs", 0)), ok ? Palette.JADE_DARK : Palette.SEAL_DARK));
+				}
+			}
+		}
+		gulungan(l, "terlarang.teks", teks, list, x, ly, left1, bottom - BTN_H - 3);
+		Component why = !open ? Component.translatable("kultivator.gui43.m09.terlarang_tutup")
+				: chosen.isEmpty() ? Component.translatable("kultivator.gui43.m09.pilih_murid") : alasanBaca();
+		TalismanButton.gambar(l, "masuk", x, bottom - BTN_H, left1 - x, BTN_H, Component.translatable("kultivator.sectevent.ui.forbidden.enter"),
+				why == null, why, () -> act(0, "forbidden:" + ids(forbidden, semua)));
+	}
+
+	private int forbiddenSlots = 3;
+
+	// ---------------------------------------------------------------- Bahtera
+
+	private void bahtera(Lukis l, int top, int left1, int rx, int bottom) {
+		CompoundTag data = sekte();
+		CompoundTag info = data.getCompoundOrEmpty("ark");
+		int ly = kepala(l, Component.translatable("kultivator.sectevent.ui.ark"), x, top, left1);
+		int ry = kepala(l, Component.translatable("kultivator.sectevent.ui.ark.pick"), rx, top, x + w);
+		List<PemilihOrang.Orang> semua = orang(e -> true, e -> {
+			Component why = halangan(e);
+			return why != null ? why : e.getBooleanOr("ark_ok", false) || e.getIntOr("rank", 1) >= 3 ? null
+					: Component.translatable("kultivator.sectevent.ui.not_allowed");
+		}, e -> e.getBooleanOr("ark_ok", false) ? Component.translatable("kultivator.sectevent.ui.ark.may") : sectRank(e.getIntOr("rank", 1)));
+		ark.gambar(l, "bahtera", semua, rx, ry, x + w, bottom);
+		List<Garis> list = new ArrayList<>();
+		if (info.getBooleanOr("open", false)) {
+			list.add(Garis.teks(Component.translatable("kultivator.sectevent.ui.ark.open", clock(info.getLongOr("until", 0L) - now())), Palette.onPaper(0x9F6BFF)));
+		} else {
+			list.add(Garis.teks(Component.translatable("kultivator.sectevent.ui.ark.closed"), Palette.INK_SOFT));
+		}
+		list.add(Garis.teks(Component.translatable("kultivator.sectevent.ui.ark.desc"), Palette.INK_SOFT));
+		int bonesY = bottom - BTN_H - 3 - 26;
+		gulungan(l, "bahtera.teks", teks, list, x, ly, left1, bonesY - 2);
+		// the six bone pieces
 		int mask = data.getIntOr("kunpeng", 0);
-		float py = Math.max(ty + 2.0F, y + h - BUTTON_H - 36.0F);
-		Brush.fit(g, font, Component.translatable("kultivator.sectevent.ui.kunpeng", Integer.bitCount(mask & 0x3F)), x + 4.0F, py, colW - 8.0F,
-				Palette.SEAL_DARK, 0.6F, 0.45F, false);
-		float size = Math.min(14.0F, (colW - 12.0F) / 6.0F - 3.0F);
+		l.teks(Component.translatable("kultivator.sectevent.ui.kunpeng", Integer.bitCount(mask & 0x3F)), x + 2, bonesY, left1 - x - 4, Palette.SEAL_DARK);
+		int size = 14;
 		for (int i = 0; i < 6; i++) {
-			float bx = x + 4.0F + i * (size + 3.0F);
-			float by = py + 9.0F;
+			int bx = x + 2 + i * (size + 4);
+			int by = bonesY + 10;
 			boolean have = (mask & 1 << i) != 0;
-			Brush.rect(g, bx, by, bx + size, by + size, have ? Palette.argb(0xFF, 0xF2EAD0) : Palette.argb(0x50, Palette.LOCKED));
-			Brush.frame(g, Math.round(bx), Math.round(by), Math.round(bx + size), Math.round(by + size), have ? Palette.GOLD : Palette.argb(0x80, Palette.INK_FAINT));
-			// A bone: a bar with knobs at both ends.
+			l.g.fill(bx, by, bx + size, by + size, have ? Palette.argb(0xFF, 0xF2EAD0) : Palette.argb(0x50, Palette.LOCKED));
+			Brush.frame(l.g, bx, by, bx + size, by + size, have ? Palette.GOLD : Palette.argb(0x80, Palette.INK_FAINT));
 			int bone = have ? Palette.INK_SOFT : Palette.argb(0x80, Palette.INK_FAINT);
-			Brush.line(g, bx + size * 0.25F, by + size * 0.75F, bx + size * 0.75F, by + size * 0.25F, 1.4F, bone);
-			Brush.disc(g, bx + size * 0.22F, by + size * 0.78F, size * 0.12F, bone);
-			Brush.disc(g, bx + size * 0.78F, by + size * 0.22F, size * 0.12F, bone);
-			Brush.centered(g, font, Component.literal(String.valueOf(i + 1)), bx + size / 2.0F, by + size + 1.0F, Palette.INK_FAINT, 0.45F, false);
+			Brush.line(l.g, bx + size * 0.25F, by + size * 0.75F, bx + size * 0.75F, by + size * 0.25F, 1.4F, bone);
+			Brush.disc(l.g, bx + size * 0.22F, by + size * 0.78F, size * 0.12F, bone);
+			Brush.disc(l.g, bx + size * 0.78F, by + size * 0.22F, size * 0.12F, bone);
+			if (l.di(bx, by, bx + size, by + size)) {
+				l.tip(Component.translatable("kultivator.gui43.m09.tulang", i + 1, Component.translatable(have ? "kultivator.gui43.m09.ada"
+						: "kultivator.gui43.m09.belum")));
+			}
+		}
+		CompoundTag chosen = satu(ark);
+		int half = (left1 - x - 2) / 2;
+		Component naikWhy = chosen == null ? Component.translatable("kultivator.gui43.m09.pilih_murid")
+				: !chosen.getBooleanOr("ark_ok", false) ? Component.translatable("kultivator.sectevent.ui.not_allowed") : alasanBaca();
+		TalismanButton.gambar(l, "naik", x, bottom - BTN_H, half, BTN_H, Component.translatable("kultivator.sectevent.ui.ark.board"), naikWhy == null,
+				naikWhy, () -> {
+					CompoundTag c = satu(ark);
+					if (c != null) {
+						act(c.getIntOr("id", 0), "ark");
+					}
+				});
+		Component satuWhy = chosen == null ? Component.translatable("kultivator.gui43.m09.pilih_murid")
+				: chosen.getIntOr("rank", 1) < 3 || mask != 0x3F ? Component.translatable("kultivator.sectevent.ui.kunpeng.tip") : alasanBaca();
+		boolean over = TalismanButton.gambar(l, "satukan", x + half + 2, bottom - BTN_H, half, BTN_H,
+				Component.translatable("kultivator.sectevent.ui.kunpeng.unite"), satuWhy == null, satuWhy, () -> {
+					CompoundTag c = satu(ark);
+					if (c != null) {
+						act(c.getIntOr("id", 0), "kunpeng");
+					}
+				});
+		if (over && satuWhy == null) {
+			l.tip(List.of(Component.translatable("kultivator.sectevent.ui.kunpeng.tip"),
+					Component.translatable("kultivator.sectevent.item.kunpeng_bone_fragment.source").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC)));
 		}
 	}
 
-	// ================================================================== input
+	// ---------------------------------------------------------------- Misi Cerita (module X)
 
-	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button) {
-		if (super.mouseClicked(mouseX, mouseY, button)) {
-			return true;
+	private void cerita(Lukis l, int top, int left1, int rx, int bottom) {
+		MisiClient.request(false);
+		int teamMax = Math.max(1, Math.min(4, MisiClient.state().getIntOr("tim", 4)));
+		int ly = kepala(l, Component.translatable("kultivator.sekte.misi.ui.papan", MisiClient.state().getIntOr("selesai", 0)), x, top, left1);
+		int ry = kepala(l, Component.translatable("kultivator.sekte.misi.ui.tim", teamMax), rx, top, x + w);
+		List<PemilihOrang.Orang> semua = orang(e -> true, e -> {
+			Component why = halangan(e);
+			return why != null ? why : e.getIntOr("rank", 1) < 1 ? Component.translatable("kultivator.sectevent.ui.not_allowed") : null;
+		}, e -> sectRank(e.getIntOr("rank", 1)));
+		if (story.terpilih().size() > teamMax) {
+			story.terpilih().retainAll(new ArrayList<>(story.terpilih()).subList(0, teamMax));
 		}
-		if (button != 0 || !data().getBooleanOr("hall", false)) {
-			return false;
+		story.gambar(l, "cerita.tim", semua, rx, ry, x + w, bottom);
+		int stanceY = bottom - 2 * BTN_H - 3;
+		int previewY = stanceY - 11;
+		List<CompoundTag> offers = MisiTab.offers();
+		if (!MisiTab.on()) {
+			KeadaanKosong.gambar(l, KeadaanKosong.Gambar.PAPAN, Component.translatable("kultivator.sekte.misi.ui.mati"), null, null, x, ly, left1, previewY);
+		} else if (offers.isEmpty()) {
+			KeadaanKosong.gambar(l, KeadaanKosong.Gambar.PAPAN, Component.translatable("kultivator.sekte.misi.ui.papan_kosong"), null, null, x, ly, left1,
+					previewY);
+		} else {
+			cerita.gambar(l, "cerita", x, ly, left1, previewY - 2, offers.size(), MisiTab.CARD_H,
+					(lk, i, rx0, ry0, rx1, ry1, sorot, pilih) -> MisiTab.offerRow(lk, offers.get(i), rx0, ry0, rx1, ry1, sorot, i == storyOffer),
+					() -> pilihCerita(cerita.pilihan()), this::pilihCerita);
 		}
-		if (roster != null && roster.click(mouseX, mouseY)) {
-			return true;
-		}
-		if (tab == 0 && mouseX >= x + 2 && mouseX < x + colW - 2 && mouseY >= top + 12) {
-			int index = (int) ((mouseY - top - 12) / CARD_H);
-			ListTag board = data().getListOrEmpty("board");
-			if (index >= 0 && index < board.size() && board.get(index) instanceof CompoundTag tag && !tag.getBooleanOr("taken", false)
-					&& mouseY < y + h - BUTTON_H - 14) {
-				offer = offer == index ? -1 : index;
-				UiSound.toggle(offer == index);
-				return true;
+		String souls = storySouls(semua);
+		String key = storyOffer + "|" + stance + "|" + souls;
+		if (!key.equals(previewKey)) {
+			previewKey = key;
+			if (storyOffer >= 0 && !souls.isEmpty()) {
+				MisiClient.send("cek", storyOffer, stance + "|" + souls);
 			}
 		}
-		if (tab == TAB_STORY && mouseX >= x + 2 && mouseX < x + colW - 2 && mouseY >= top + 12 && mouseY < storyBottom) {
-			int index = (int) ((mouseY - top - 12) / MisiTab.CARD_H);
-			CompoundTag tag = MisiTab.offer(index);
-			if (tag != null && !tag.getBooleanOr("taken", false)) {
-				storyOffer = storyOffer == index ? -1 : index;
-				UiSound.toggle(storyOffer == index);
-				return true;
+		MisiTab.preview(l, x + 2, previewY, left1 - x - 4, storyOffer, stance, souls, !souls.isEmpty());
+		int third = (left1 - x - 4) / 3;
+		for (int i = 0; i < MisiTab.STANCES.length; i++) {
+			String id = MisiTab.STANCES[i];
+			boolean over = TalismanButton.gambar(l, "sikap." + id, x + i * (third + 2), stanceY, third, BTN_H,
+					Component.translatable("kultivator.sekte.misi.sikap." + id), true, null, () -> {
+						stance = id;
+						UiSound.toggle(true);
+					}, false, stance.equals(id));
+			if (over) {
+				l.tip(Component.translatable("kultivator.sekte.misi.sikap." + id + ".desc"));
 			}
 		}
-		return false;
+		Component why = storyBlock(semua);
+		boolean over = TalismanButton.gambar(l, "cerita.kirim", x, bottom - BTN_H, left1 - x, BTN_H, Component.translatable("kultivator.sekte.misi.ui.kirim"),
+				why == null, why, () -> {
+					if (readonly()) {
+						UiSound.denied();
+						return;
+					}
+					MisiClient.send("kirim", storyOffer, stance + "|" + storySouls(semua));
+					storyOffer = -1;
+					story.terpilih().clear();
+				});
+		if (over && why == null) {
+			l.tip(Component.translatable("kultivator.sekte.misi.ui.kirim.tip"));
+		}
 	}
 
-	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-		return roster != null && roster.scroll(mouseX, mouseY, amount);
+	private void pilihCerita(int index) {
+		CompoundTag tag = MisiTab.offer(index);
+		if (tag != null && !tag.getBooleanOr("taken", false)) {
+			storyOffer = storyOffer == index ? -1 : index;
+			UiSound.toggle(storyOffer == index);
+		}
+	}
+
+	/** Why the story mission cannot be sent now (null = it can). */
+	private @Nullable Component storyBlock(List<PemilihOrang.Orang> semua) {
+		CompoundTag offer = MisiTab.offer(storyOffer);
+		if (offer == null || offer.getBooleanOr("taken", false)) {
+			return Component.translatable("kultivator.sekte.misi.ui.pilih_misi");
+		}
+		if (MisiTab.full()) {
+			return Component.translatable("kultivator.sekte.misi.ui.penuh", MisiClient.state().getIntOr("maks", 2));
+		}
+		if (story.pilihan(semua).isEmpty()) {
+			return Component.translatable("kultivator.sekte.misi.ui.pilih_tim");
+		}
+		CompoundTag preview = MisiClient.state().getCompoundOrEmpty("pratinjau");
+		if (preview.getIntOr("offer", -1) == storyOffer && (!preview.getStringOr("blocker", "").isEmpty() || !preview.getBooleanOr("rank_ok", true))) {
+			return Component.translatable("kultivator.sekte.misi.ui.jenjang_kurang");
+		}
+		return alasanBaca();
+	}
+
+	private String storySouls(List<PemilihOrang.Orang> semua) {
+		StringBuilder souls = new StringBuilder();
+		for (PemilihOrang.Orang o : story.pilihan(semua)) {
+			souls.append(souls.isEmpty() ? "" : ",").append(o.id());
+		}
+		return souls.toString();
+	}
+
+	// ---------------------------------------------------------------- Kabar Misi (module X)
+
+	private void kabar(Lukis l, int top, int bottom) {
+		MisiClient.request(false);
+		List<CompoundTag> missions = MisiTab.missions();
+		List<CompoundTag> history = MisiTab.history();
+		int ly = kepala(l, Component.translatable("kultivator.sekte.misi.ui.kabar", missions.size(), Math.max(1, MisiClient.state().getIntOr("maks", 2))),
+				x, top, x + w);
+		int split = history.isEmpty() ? bottom - 30 : ly + Math.min(Math.max(1, missions.size()) * MisiTab.MISSION_H, (bottom - ly) * 55 / 100);
+		if (missions.isEmpty()) {
+			l.samar(Component.translatable("kultivator.sekte.misi.ui.tidak_ada"), x + 2, ly + 2, w - 4);
+		} else {
+			int bw = Math.min(90, TalismanButton.lebar(font, Component.translatable("kultivator.sekte.misi.ui.tinggal"), 60, 90));
+			kabar.gambar(l, "kabar", x, ly, x + w, split, missions.size(), MisiTab.MISSION_H, (lk, i, rx0, ry0, rx1, ry1, sorot, pilih) -> {
+				CompoundTag mission = missions.get(i);
+				MisiTab.missionRow(lk, mission, rx0, ry0, rx1, rx1 - bw - 6);
+				int id = mission.getIntOr("id", 0);
+				boolean open = !mission.getBooleanOr("finished", false) && !mission.getBooleanOr("ditarik", false);
+				boolean hurt = MisiTab.hurt(mission);
+				Component why = open ? alasanBaca() : Component.translatable("kultivator.sekte.misi.ui.pulang_jalan");
+				boolean over = TalismanButton.gambar(lk, "tarik" + id, rx1 - bw - 3, ry0 + 1, bw, BTN_H, Component.translatable("kultivator.sekte.misi.ui.tarik"),
+						why == null, why, () -> MisiClient.send("tarik", id, ""));
+				if (over && why == null) {
+					lk.tip(Component.translatable(hurt ? "kultivator.sekte.misi.ui.tarik.tip_luka" : "kultivator.sekte.misi.ui.tarik.tip"));
+				}
+				if (open && hurt) {
+					boolean overT = TalismanButton.gambar(lk, "tinggal" + id, rx1 - bw - 3, ry0 + 2 + BTN_H, bw, BTN_H,
+							Component.translatable("kultivator.sekte.misi.ui.tinggal"), why == null, why, () -> MisiClient.send("tinggal", id, ""), true, false);
+					if (overT && why == null) {
+						lk.tip(Component.translatable("kultivator.sekte.misi.ui.tinggal.tip").withStyle(ChatFormatting.RED));
+					}
+				}
+			}, null, null);
+		}
+		int hy = kepala(l, Component.translatable("kultivator.sekte.misi.ui.laporan"), x, split + 2, x + w);
+		if (history.isEmpty()) {
+			l.samar(Component.translatable("kultivator.sekte.misi.ui.riwayat_kosong"), x + 2, hy + 2, w - 4);
+			return;
+		}
+		int bw = Math.min(70, TalismanButton.lebar(font, Component.translatable("kultivator.sekte.misi.ui.baca"), 40, 70));
+		riwayat.gambar(l, "riwayat", x, hy, x + w, bottom, history.size(), MisiTab.ROW_H, (lk, i, rx0, ry0, rx1, ry1, sorot, pilih) -> {
+			CompoundTag row = history.get(i);
+			MisiTab.historyRow(lk, row, i, rx0, ry0, rx1, ry1, rx1 - bw - 4);
+			int index = row.getIntOr("i", 0);
+			TalismanButton.gambar(lk, "baca" + i, rx1 - bw - 1, ry0 + 1, bw, ry1 - ry0 - 2, Component.translatable("kultivator.sekte.misi.ui.baca"), true,
+					null, () -> MisiClient.send("baca", index, ""));
+		}, () -> {
+			int i = riwayat.pilihan();
+			if (i >= 0 && i < history.size()) {
+				MisiClient.send("baca", history.get(i).getIntOr("i", 0), "");
+			}
+		}, null);
 	}
 }

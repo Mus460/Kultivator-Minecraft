@@ -1,0 +1,262 @@
+{
+  "id": "kilas_balik",
+  "jenis": "realisasi",
+  "_catatan": "Flashbacks by memory: helped, gifted, rescued, wedding attended, house damaged.",
+  "benih_dunia": 42,
+  "masukan": {
+    "niat": "KILAS_BALIK",
+    "pembicara": 500,
+    "hari": 120,
+    "now": 2880000,
+    "cuaca": "cerah",
+    "musim": "semi",
+    "situasi": {
+      "jam": "pagi",
+      "cuaca": "cerah",
+      "musim": "semi",
+      "kelompok": "pekerja",
+      "watak": "ramah",
+      "kebiasaan": [],
+      "sifat": {
+        "H": 10,
+        "E": 0,
+        "X": 20,
+        "A": 30,
+        "C": 10,
+        "O": 0
+      },
+      "wajah": "netral",
+      "tempat": "kota_besar"
+    },
+    "pendengar": {
+      "nama": "Han",
+      "kelamin": "l",
+      "tahap": "dewasa",
+      "pemain": true
+    },
+    "kesan": "akrab",
+    "tahu_nama": true,
+    "register": "sopan",
+    "dialek": "ibukota",
+    "kelamin": "p",
+    "nilai": {
+      "konteks.terakhir_jumpa": 104
+    }
+  },
+  "langkah": [
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar",
+          "kenangan": [
+            "DIBANTU"
+          ]
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.kilas.dibantu.1",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.sebutan_nama",
+            "a": [
+              {
+                "k": "kultivator.cakap.lex.tuan.ibukota",
+                "a": []
+              },
+              {
+                "t": "Han"
+              }
+            ]
+          }
+        ]
+      },
+      "aturan": "kilas.dibantu",
+      "gestur": "hormat",
+      "seru": null,
+      "tik": null,
+      "id_id": "Berkat Tuanku Han, urusanku waktu itu beres. Mampir, kuberi teh.",
+      "en_us": "Thanks to you, My Lord Han, my trouble back then was sorted. Come, have tea."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar",
+          "kenangan": [
+            "DIBERI_HADIAH"
+          ]
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.kilas.hadiah.0.p",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.sebutan_nama",
+            "a": [
+              {
+                "k": "kultivator.cakap.lex.tuan.ibukota",
+                "a": []
+              },
+              {
+                "t": "Han"
+              }
+            ]
+          }
+        ]
+      },
+      "aturan": "kilas.hadiah",
+      "gestur": "tertawa",
+      "seru": null,
+      "tik": null,
+      "id_id": "Lihat, jepit yang Tuanku Han berikan. Kupakai setiap hari pasar.",
+      "en_us": "Look, the pin you gave me, My Lord Han. I wear it every market day."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar",
+          "kenangan": [
+            "DISELAMATKAN"
+          ]
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.kilas.diselamatkan.0",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.sebutan_nama",
+            "a": [
+              {
+                "k": "kultivator.cakap.lex.tuan.ibukota",
+                "a": []
+              },
+              {
+                "t": "Han"
+              }
+            ]
+          }
+        ]
+      },
+      "aturan": "kilas.diselamatkan",
+      "gestur": "hormat_dalam",
+      "seru": null,
+      "tik": null,
+      "id_id": "Setiap lihat api tungku aku ingat Tuanku Han. Kalau bukan karena Tuanku Han, rumah kami sudah jadi abu.",
+      "en_us": "Every time I see the stove fire I think of you, My Lord Han. If not for you, our house would be ash."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar",
+          "kenangan": [
+            "HADIR_NIKAH"
+          ]
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.kilas.nikah.2",
+        "a": []
+      },
+      "aturan": "kilas.nikah",
+      "gestur": "tertawa",
+      "seru": null,
+      "tik": null,
+      "id_id": "Rumah tangga kami baik-baik saja. Terima kasih atas doamu waktu itu.",
+      "en_us": "Our household is fine. Thank you for your blessing back then."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar",
+          "kenangan": [
+            "RUMAH_RUSAK"
+          ]
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.kilas.rumah_rusak.0",
+        "a": []
+      },
+      "aturan": "kilas.rumah_rusak",
+      "gestur": "marah_hentak",
+      "seru": null,
+      "tik": null,
+      "id_id": "Atapku masih bocor sejak pertarunganmu di sini. Siapa yang mau memperbaiki?",
+      "en_us": "My roof still leaks since your fight here. Who's going to fix it?"
+    }
+  ]
+}

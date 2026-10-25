@@ -1,7 +1,8 @@
 package dev.kultivator.client.dunia.langit;
 
-import dev.kultivator.Kultivator;
 import dev.kultivator.client.EffectQuality;
+import dev.kultivator.client.codex.CodexHud;
+import dev.kultivator.client.fx.spec.ScreenFlash;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.dunia.api.SkyKind;
@@ -16,9 +17,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
 import net.minecraft.world.entity.player.Player;
@@ -30,11 +29,11 @@ import net.minecraft.world.phys.Vec3;
  * ("Malam ini: Gerhana Darah", the running event with its time left, the spirit weather, the nearest rainbow pillar with
  * its distance and an arrow, "dijaga" while guardians live; a Meteor Agung falling or just fallen with its arrow), the
  * short bolide flash, and the claim ring around the crosshair while the player channels a treasure. Hidden with
- * F1 and the debug screen; fills and one vignette blit only (no shader).
+ * F1 and the debug screen; fills only (no shader). The vignettes go through the one edge painter {@link ScreenFlash#tepi}
+ * and the claim ring is {@link CodexHud#cincin} (DESIGN 43.9).
  */
 final class LangitHud implements HudElement {
 
-	private static final Identifier VIGNETTE = Kultivator.id("textures/gui/epic/vignette.png");
 	private static final float[] ECLIPSE_ALPHA = {0.03F, 0.05F, 0.07F};
 	private static final float[] MIST_ALPHA = {0.04F, 0.08F, 0.12F};
 	private static final String[] ARROWS = {"↑", "↗", "→", "↘", "↓", "↙", "←", "↖"};
@@ -57,20 +56,20 @@ final class LangitHud implements HudElement {
 		if (LangitState.shown() == SkyKind.BLOOD_ECLIPSE) {
 			float beat = 0.8F + 0.2F * Mth.sin(now / 900.0F);
 			float a = ECLIPSE_ALPHA[quality] * LangitState.skyWeight(partial) * beat;
-			// the faint red fill of the design, deeper at the edges through the 7b vignette mask
+			// the faint red fill of the design, deeper at the edges (the one edge painter, DESIGN 43.9)
 			g.fill(0, 0, width, height, Palette.argb(Math.round(a * 255.0F), 0x8A0F0A));
-			vignette(g, width, height, a * 4.0F, 0xB01810);
+			ScreenFlash.tepi(0xB01810, a * 4.0F);
 		}
 		float omen = LangitState.sealOmen(partial);
 		if (omen > 0.01F) {
 			// a weak demon prison seal nearby: an ash-red edge that breathes slowly (same budget as the eclipse)
 			float beat = 0.75F + 0.25F * Mth.sin(now / 1400.0F);
-			vignette(g, width, height, ECLIPSE_ALPHA[quality] * 4.0F * omen * beat, 0x6A1020);
+			ScreenFlash.tepi(0x6A1020, ECLIPSE_ALPHA[quality] * 4.0F * omen * beat);
 		}
 		float mist = LangitState.mist(partial);
 		if (mist > 0.01F) {
 			int rgb = LangitRenderer.lerpRgb(0xC8E8DC, 0xC8A8F0, LangitState.dawn);
-			vignette(g, width, height, MIST_ALPHA[quality] * 3.0F * mist, rgb);
+			ScreenFlash.tepi(rgb, MIST_ALPHA[quality] * 3.0F * mist);
 			g.fillGradient(0, Math.round(height * 0.72F), width, height, Palette.argb(0, rgb),
 					Palette.argb(Math.round(255.0F * MIST_ALPHA[quality] * mist), rgb));
 		}
@@ -153,27 +152,18 @@ final class LangitHud implements HudElement {
 		return (int) Math.floorMod(Math.round(relative / 45.0D), 8L);
 	}
 
-	private static void vignette(GuiGraphicsExtractor g, int width, int height, float alpha, int rgb) {
-		int a = Mth.clamp(Math.round(alpha * 255.0F), 0, 255);
-		if (a <= 0) {
-			return;
-		}
-		g.blit(RenderPipelines.GUI_TEXTURED, VIGNETTE, 0, 0, 0.0F, 0.0F, width, height, 256, 256, 256, 256, Palette.argb(a, rgb));
-	}
-
 	/** A small jade-ink chip with a seal glyph; returns the y of the next chip. */
 	private static float chip(GuiGraphicsExtractor g, Font font, Component text, float y, int rgb, String seal) {
-		float scale = 0.85F;
-		int textWidth = Math.round(font.width(text) * scale);
+		int textWidth = font.width(text);
 		int x0 = 6;
 		int y0 = Math.round(y);
-		int x1 = x0 + 14 + textWidth + 6;
+		int x1 = x0 + 16 + textWidth + 5;
 		int y1 = y0 + 13;
 		Brush.chamferGradient(g, x0, y0, x1, y1, 2, Palette.argb(0xB8, 0x10161A), Palette.argb(0xB8, 0x1A2428));
 		Brush.frame(g, x0, y0, x1, y1, Palette.argb(0x90, rgb));
-		Brush.rect(g, x0 + 2.0F, y0 + 2.0F, x0 + 11.0F, y1 - 2.0F, Palette.argb(0xD0, Palette.darken(Palette.opaque(rgb), 0.45F)));
-		Brush.centered(g, font, Component.literal(seal), x0 + 6.5F, y0 + 2.5F, 0xFFF4EAD0, 0.75F, false);
-		Brush.text(g, font, text, x0 + 14.0F, y0 + 3.0F, Palette.opaque(rgb), scale, true);
+		Brush.rect(g, x0 + 2.0F, y0 + 2.0F, x0 + 13.0F, y1 - 2.0F, Palette.argb(0xD0, Palette.darken(Palette.opaque(rgb), 0.45F)));
+		Brush.centered(g, font, Component.literal(seal), x0 + 7.5F, y0 + 2.5F, 0xFFF4EAD0, 1.0F, false);
+		Brush.text(g, font, text, x0 + 16.0F, y0 + 2.5F, Palette.opaque(rgb), 1.0F, true);
 		return y1 + 3.0F;
 	}
 
@@ -190,10 +180,7 @@ final class LangitHud implements HudElement {
 			float cx = width / 2.0F;
 			float cy = height / 2.0F;
 			int rgb = TreasureRewards.tierColor(treasure.tier());
-			Brush.arc(g, cx, cy, 11.0F, 13.5F, 0.0F, 1.0F, Palette.argb(0x60, 0x101418));
-			Brush.arc(g, cx, cy, 11.0F, 13.5F, 0.0F, progress, Palette.opaque(rgb));
-			Brush.centered(g, minecraft.font, Component.translatable("kultivator.langit.hud.channel", Math.round(progress * 100.0F)), cx, cy + 17.0F,
-					Palette.opaque(rgb), 0.8F, true);
+			CodexHud.cincin(g, cx, cy, progress, rgb, Component.translatable("kultivator.langit.hud.channel", Math.round(progress * 100.0F)));
 			return;
 		}
 	}

@@ -1,11 +1,12 @@
 package dev.kultivator.client.tempat.ui.tema;
 
 import dev.kultivator.Kultivator;
+import dev.kultivator.client.screen.ui.Bilah;
 import dev.kultivator.client.screen.ui.Brush;
+import dev.kultivator.client.screen.ui.Glyphs;
+import dev.kultivator.client.screen.ui.LencanaPangkat;
+import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
-import dev.kultivator.client.tempat.ui.kit.IkonTempat;
-import dev.kultivator.client.tempat.ui.kit.Lukis;
-import dev.kultivator.client.tempat.ui.kit.PanelTempat;
 import dev.kultivator.client.tempat.ui.kit.TempatWarna;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -17,7 +18,8 @@ import net.minecraft.resources.Identifier;
  * Shared drawing of the themed-town screens (DESIGN 38.T.13.3, 38TV-U): the textures of {@code tools/gen_tempat_tema_ui.py}
  * ({@code textures/gui/tempat/tema/*}), the icon slots of {@code ikon_tema.png}, the theme colour tokens, the lang
  * helper {@link #k} ({@code kultivator.tempat_tema_ui.*}) and a few small blocks (meter, chip, mural, robe, tower) that
- * several screens use. Pure blits and fills, cheap enough for weak laptops; no shader, nothing in the world.
+ * several screens use. Pure blits and fills, cheap enough for weak laptops; no shader, nothing in the world. The small
+ * blocks draw with the single kit ({@code screen/ui}, DESIGN 43.7): the meter is a {@link Bilah} (G61), text is 1.0.
  */
 public final class TemaUi {
 
@@ -105,7 +107,7 @@ public final class TemaUi {
 	public static final int AIR = 0xFF7FC8B0;
 	public static final int GUNUNG = 0xFFA0A8B8;
 	public static final int IBLIS = 0xFF8A1020;
-	public static final int IBU_KOTA = TempatWarna.ISTANA;
+	public static final int IBU_KOTA = 0xFFC9A24A;
 	public static final int DARAH = 0xFFB0202A;
 	public static final int DARAH_TERANG = 0xFFFF6A6A;
 	public static final int PASIR = 0xFFC8A060;
@@ -280,19 +282,47 @@ public final class TemaUi {
 
 	/** Cargo manifest paper (nine-slice of {@code surat.png}). */
 	public static void surat(GuiGraphicsExtractor g, int x0, int y0, int x1, int y1) {
-		PanelTempat.bingkai(g, SURAT, x0, y0, x1, y1);
+		bingkai(g, SURAT, x0, y0, x1, y1);
 	}
 
 	/** Iron cell bars (nine-slice of {@code kandang.png}). */
 	public static void kandang(GuiGraphicsExtractor g, int x0, int y0, int x1, int y1) {
-		PanelTempat.bingkai(g, KANDANG, x0, y0, x1, y1);
+		bingkai(g, KANDANG, x0, y0, x1, y1);
+	}
+
+	/** A nine-slice of a 32 x 32 texture: corners 8, edges and centre tiled in 16 px runs. */
+	private static void bingkai(GuiGraphicsExtractor g, Identifier tex, int x0, int y0, int x1, int y1) {
+		final int c = 8;
+		final int t = 16;
+		if (x1 - x0 < c * 2 || y1 - y0 < c * 2) {
+			g.fill(x0, y0, x1, y1, 0xFF808080);
+			return;
+		}
+		blit(g, tex, x0, y0, c, c, 0, 0, c, c, 32, 32, 0xFFFFFFFF);
+		blit(g, tex, x1 - c, y0, c, c, 32 - c, 0, c, c, 32, 32, 0xFFFFFFFF);
+		blit(g, tex, x0, y1 - c, c, c, 0, 32 - c, c, c, 32, 32, 0xFFFFFFFF);
+		blit(g, tex, x1 - c, y1 - c, c, c, 32 - c, 32 - c, c, c, 32, 32, 0xFFFFFFFF);
+		for (int x = x0 + c; x < x1 - c; x += t) {
+			int run = Math.min(t, x1 - c - x);
+			blit(g, tex, x, y0, run, c, c, 0, run, c, 32, 32, 0xFFFFFFFF);
+			blit(g, tex, x, y1 - c, run, c, c, 32 - c, run, c, 32, 32, 0xFFFFFFFF);
+		}
+		for (int y = y0 + c; y < y1 - c; y += t) {
+			int run = Math.min(t, y1 - c - y);
+			blit(g, tex, x0, y, c, run, 0, c, c, run, 32, 32, 0xFFFFFFFF);
+			blit(g, tex, x1 - c, y, c, run, 32 - c, c, c, run, 32, 32, 0xFFFFFFFF);
+			for (int x = x0 + c; x < x1 - c; x += t) {
+				int rw = Math.min(t, x1 - c - x);
+				blit(g, tex, x, y, rw, run, c, c, rw, run, 32, 32, 0xFFFFFFFF);
+			}
+		}
 	}
 
 	// ------------------------------------------------------------------------------------------------ small blocks
 
 	/**
-	 * A horizontal meter: track, fill {@code frac} 0..1 in {@code warna}, a 1 px shine, an optional tick at {@code tanda}
-	 * (0..1, -1 none) and the icon at the left. Returns the height (8).
+	 * A horizontal meter (G61: the kit's {@link Bilah}): the icon at the left, then the bar with fill {@code frac} 0..1 in
+	 * {@code warna} and an optional tick at {@code tanda} (0..1, -1 none). Returns the height (8).
 	 */
 	public static int meter(Lukis l, int ikon, int x0, int y, int x1, float frac, int warna, float tanda) {
 		int bx0 = x0;
@@ -300,55 +330,83 @@ public final class TemaUi {
 			ikon(l.g, ikon, x0, y - 1, 10);
 			bx0 = x0 + 12;
 		}
-		float f = Math.max(0.0F, Math.min(1.0F, frac));
-		l.g.fill(bx0, y + 1, x1, y + 7, Palette.argb(0x60, 0x000000));
-		int fx = bx0 + Math.round((x1 - bx0) * f);
-		if (fx > bx0) {
-			l.g.fillGradient(bx0, y + 1, fx, y + 7, Palette.lighten(warna, 0.25F), Palette.darken(warna, 0.2F));
-			l.g.fill(bx0, y + 1, fx, y + 2, Palette.argb(0x80, 0xFFFFFF));
+		Bilah.gambar(l, bx0, y + 2, x1, frac, warna, tanda >= 0.0F ? new float[] {tanda} : null);
+		return 8;
+	}
+
+	/** {@link #meter(Lukis, int, int, int, int, float, int, float)} for kit-38 sheets: the same 4 px bar as {@link Bilah}. */
+	public static int meter(dev.kultivator.client.tempat.ui.kit.Lukis l, int ikon, int x0, int y, int x1, float frac, int warna, float tanda) {
+		int bx0 = x0;
+		if (ikon >= 0) {
+			ikon(l.g, ikon, x0, y - 1, 10);
+			bx0 = x0 + 12;
 		}
-		Brush.frame(l.g, bx0 - 1, y, x1 + 1, y + 8, Palette.argb(0x90, TempatWarna.EMAS_GELAP & 0xFFFFFF));
+		if (x1 - bx0 < 4) {
+			return 8;
+		}
+		l.g.fill(bx0, y + 2, x1, y + 6, Palette.argb(0x50, 0x000000));
+		int fill = bx0 + Math.round((x1 - bx0) * Math.max(0.0F, Math.min(1.0F, frac)));
+		l.g.fillGradient(bx0, y + 2, fill, y + 6, Palette.lighten(warna, 0.25F), Palette.darken(warna, 0.2F));
 		if (tanda >= 0.0F) {
 			int tx = bx0 + Math.round((x1 - bx0) * Math.min(1.0F, tanda));
-			l.g.fill(tx, y - 1, tx + 1, y + 9, TempatWarna.EMAS_TERANG);
+			l.g.fill(tx, y + 1, tx + 1, y + 7, Palette.argb(0xC0, 0xFFF6E8));
 		}
 		return 8;
 	}
 
 	/** A small rounded chip with an icon and a caption (status chips: badai, macet, malam ...). Returns its width. */
 	public static int chip(Lukis l, int ikon, Component teks, int x, int y, int warna) {
-		int w = Math.round(l.font.width(teks) * 0.75F) + (ikon >= 0 ? 15 : 6);
-		Brush.chamfer(l.g, x, y, x + w, y + 11, 2, Palette.argb(0xD8, warna & 0xFFFFFF));
-		Brush.frame(l.g, x, y, x + w, y + 11, Palette.argb(0x70, 0x000000));
+		return chip(l.g, l.font, ikon, teks, x, y, warna);
+	}
+
+	// shortcut: kit-38 overloads (chip, lambang, meter) for LayarTemaDasar and LayarBukuDagang (M15); drop them once P1 moves those to the single kit.
+	public static int chip(dev.kultivator.client.tempat.ui.kit.Lukis l, int ikon, Component teks, int x, int y, int warna) {
+		return chip(l.g, l.font, ikon, teks, x, y, warna);
+	}
+
+	private static int chip(GuiGraphicsExtractor g, net.minecraft.client.gui.Font font, int ikon, Component teks, int x, int y, int warna) {
+		int w = font.width(teks) + (ikon >= 0 ? 15 : 6);
+		Brush.chamfer(g, x, y, x + w, y + 12, 2, Palette.argb(0xD8, warna & 0xFFFFFF));
+		Brush.frame(g, x, y, x + w, y + 12, Palette.argb(0x70, 0x000000));
 		int tx = x + 3;
 		if (ikon >= 0) {
-			ikon(l.g, ikon, x + 2, y + 1, 9);
-			tx = x + 12;
+			ikon(g, ikon, x + 2, y + 1, 10);
+			tx = x + 13;
 		}
-		Brush.text(l.g, l.font, teks, tx, y + 2.5F, Palette.luminance(warna) > 0.55F ? 0xFF201410 : 0xFFFFF6E8, 0.75F, false);
+		Brush.text(g, font, teks, tx, y + 2, Palette.luminance(warna) > 0.55F ? 0xFF201410 : 0xFFFFF6E8, 1.0F, false);
 		return w;
 	}
 
 	/** Theme emblem in a coloured roundel (city columns, contract targets). */
 	public static void lambang(Lukis l, String tema, int cx, int cy, int r) {
+		lambang(l.g, tema, cx, cy, r);
+	}
+
+	public static void lambang(dev.kultivator.client.tempat.ui.kit.Lukis l, String tema, int cx, int cy, int r) {
+		lambang(l.g, tema, cx, cy, r);
+	}
+
+	private static void lambang(GuiGraphicsExtractor g, String tema, int cx, int cy, int r) {
 		int warna = warnaTema(tema);
-		Brush.disc(l.g, cx, cy, r, Palette.argb(0xC0, Palette.darken(warna, 0.35F) & 0xFFFFFF));
-		Brush.ring(l.g, cx, cy, r - 1.0F, r, Palette.argb(0xE0, warna & 0xFFFFFF));
+		Brush.disc(g, cx, cy, r, Palette.argb(0xC0, Palette.darken(warna, 0.35F) & 0xFFFFFF));
+		Brush.ring(g, cx, cy, r - 1.0F, r, Palette.argb(0xE0, warna & 0xFFFFFF));
 		int s = Math.max(8, r * 2 - 4);
-		ikon(l.g, ikonTema(tema), cx - s / 2, cy - s / 2, s);
+		ikon(g, ikonTema(tema), cx - s / 2, cy - s / 2, s);
 	}
 
 	/** Stars for a count {@code isi} of {@code total} using the kit icons. Returns the width. */
 	public static int bintang(Lukis l, int isi, int total, int x, int y, int size) {
-		for (int i = 0; i < total; i++) {
-			IkonTempat.gambar(l.g, i < isi ? IkonTempat.BINTANG_PENUH : IkonTempat.BINTANG_KOSONG, x + i * (size - 1), y, size, 0xFFFFFFFF);
-		}
-		return total * (size - 1) + 1;
+		return LencanaPangkat.bintang(l, isi, total, x, y, size);
+	}
+
+	/** The kit's lantern tablet (24 x 28 cells of {@code lentera.png}): state 0 unlit, 1 hover, 2 lit, 3 locked. */
+	public static void lentera(GuiGraphicsExtractor g, int state, int x, int y, int w, int h, int warna) {
+		g.blit(RenderPipelines.GUI_TEXTURED, Glyphs.Atlas.LENTERA, x, y, state * 24.0F, 0.0F, w, h, 24, 32, 128, 32, warna);
 	}
 
 	/** A soft glow behind something precious (kit lantern glow). */
 	public static void cahaya(Lukis l, int cx, int cy, int r, int warna) {
-		IkonTempat.cahaya(l.g, cx - r, cy - r, r * 2, r * 2, warna);
+		Glyphs.Atlas.cahaya(l.g, cx - r, cy - r, r * 2, r * 2, warna);
 	}
 
 	/** Text colour that reads on the style's well (wells are light on every style). */

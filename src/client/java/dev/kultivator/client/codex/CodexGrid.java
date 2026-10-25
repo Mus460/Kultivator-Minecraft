@@ -1,5 +1,6 @@
 package dev.kultivator.client.codex;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Eased;
 import dev.kultivator.client.screen.ui.Palette;
@@ -18,7 +19,8 @@ import java.util.List;
  * The virtualized seal-card grid of the Kitab Teknik (DESIGN 22.12.2), also used by the Cincin Segel picker and the
  * disciple's teach view: cards of 28-40 px wrap to the width, only the visible rows are drawn, the wheel scrolls with a
  * soft ease, and when sorted by grade the cards are grouped under headers "Tingkat Bumi · 18". It owns no widgets; the
- * page asks it which card is under the mouse.
+ * page asks it which card is under the mouse, and passes it the arrow keys while the grid has the focus ring
+ * ({@link #tombol}: the selection is the keyboard cursor, 43.4.2).
  */
 public final class CodexGrid {
 
@@ -31,7 +33,7 @@ public final class CodexGrid {
 	}
 
 	public static final int GAP = 3;
-	public static final int HEADER = 11;
+	public static final int HEADER = 12;
 
 	private int x;
 	private int y;
@@ -157,7 +159,7 @@ public final class CodexGrid {
 				int ribbon = SpecInfo.ribbon(grade);
 				Brush.rect(g, cell.x() + 1.0F, cy + 2.0F, cell.x() + 5.0F, cy + 6.0F, ribbon);
 				Component text = Component.translatable("kultivator.codex.group", grade.displayName(), cell.count());
-				Brush.fit(g, font, Brush.bold(text), cell.x() + 7.0F, cy + 1.0F, w - 12.0F, Palette.SEAL_DARK, 0.65F, 0.45F, false);
+				Brush.fit(g, font, Brush.bold(text), cell.x() + 7.0F, cy + 1.0F, w - 12.0F, Palette.SEAL_DARK, 1.0F, 1.0F, false);
 				Brush.rect(g, cell.x() + 1.0F, cy + HEADER - 2.0F, cell.x() + w - 6.0F, cy + HEADER - 1.4F, Palette.argb(0x80, Palette.GOLD));
 				continue;
 			}
@@ -196,6 +198,91 @@ public final class CodexGrid {
 			float cy = cell.y() - offset;
 			if (mouseX >= cell.x() && mouseX < cell.x() + size && mouseY >= cy && mouseY < cy + size) {
 				return cell.spec();
+			}
+		}
+		return null;
+	}
+
+	// ================================================================== keyboard (43.4.2)
+
+	/**
+	 * Moves the selection (the keyboard cursor) with {@code key}: ←/→ the previous/next card, ↑/↓ the card above/below
+	 * (nearest column, over group headers), PgUp/PgDn a screenful of rows, Home/End the ends. With no selection any of them
+	 * selects the first card. Scrolls the new card into view; true when the key was one of these and a card exists.
+	 */
+	public boolean tombol(int key) {
+		List<Cell> cards = new ArrayList<>();
+		int at = -1;
+		for (Cell cell : cells) {
+			if (cell.spec() != null) {
+				if (cell.spec() == selected) {
+					at = cards.size();
+				}
+				cards.add(cell);
+			}
+		}
+		int rows = Math.max(1, h / (size + GAP));
+		int next = switch (key) {
+			case InputConstants.KEY_LEFT -> at - 1;
+			case InputConstants.KEY_RIGHT -> at + 1;
+			case InputConstants.KEY_UP -> baris(cards, at, -1, 1);
+			case InputConstants.KEY_DOWN -> baris(cards, at, 1, 1);
+			case InputConstants.KEY_PAGEUP -> baris(cards, at, -1, rows);
+			case InputConstants.KEY_PAGEDOWN -> baris(cards, at, 1, rows);
+			case InputConstants.KEY_HOME -> 0;
+			case InputConstants.KEY_END -> cards.size() - 1;
+			default -> Integer.MIN_VALUE;
+		};
+		if (next == Integer.MIN_VALUE || cards.isEmpty()) {
+			return false;
+		}
+		TechniqueSpec spec = cards.get(at < 0 ? 0 : Math.max(0, Math.min(cards.size() - 1, next))).spec();
+		selected = spec;
+		reveal(spec);
+		return true;
+	}
+
+	/** The index {@code steps} rows above ({@code dir} -1) or below (+1) card {@code at}, in the nearest column. */
+	private static int baris(List<Cell> cards, int at, int dir, int steps) {
+		if (at < 0) {
+			return 0;
+		}
+		int i = at;
+		for (int s = 0; s < steps; s++) {
+			Cell cur = cards.get(i);
+			int rowY = Integer.MIN_VALUE;
+			for (Cell c : cards) {
+				boolean beyond = dir < 0 ? c.y() < cur.y() : c.y() > cur.y();
+				if (beyond && (rowY == Integer.MIN_VALUE || (dir < 0 ? c.y() > rowY : c.y() < rowY))) {
+					rowY = c.y();
+				}
+			}
+			if (rowY == Integer.MIN_VALUE) {
+				break;
+			}
+			int best = i;
+			int bestDx = Integer.MAX_VALUE;
+			for (int j = 0; j < cards.size(); j++) {
+				Cell c = cards.get(j);
+				int dx = Math.abs(c.x() - cur.x());
+				if (c.y() == rowY && dx < bestDx) {
+					best = j;
+					bestDx = dx;
+				}
+			}
+			i = best;
+		}
+		return i;
+	}
+
+	/** The on-screen box of the selected card {@code {x0, y0, x1, y1}} clipped to the grid, or null when out of view. */
+	public int[] kotakTerpilih() {
+		for (Cell cell : cells) {
+			if (cell.spec() != null && cell.spec() == selected) {
+				int cy = Math.round(cell.y() - scrollShown.get());
+				int y0 = Math.max(y, cy);
+				int y1 = Math.min(y + h, cy + size);
+				return y1 - y0 < 4 ? null : new int[] {cell.x(), y0, cell.x() + size, y1};
 			}
 		}
 		return null;

@@ -1,0 +1,14 @@
+{
+  "kultivator.gui43.hal.diri.jalan": "Path",
+  "kultivator.gui43.hal.panduan.kitab": "Book",
+  "kultivator.gui43.sub.kitab.jalan_kultivasi": "Cultivation Path",
+  "kultivator.gui43.sub.kitab.bab": "Guide Chapters",
+  "kultivator.gui43.m17.buku.1": "First Steps · Chapters 1-5",
+  "kultivator.gui43.m17.buku.2": "World Path · Chapters 6-10",
+  "kultivator.gui43.m17.buku.3": "Immortal Path · Chapters 11-15",
+  "kultivator.gui43.m17.langkah.belum": "Finish all four steps of this chapter first.",
+  "kultivator.gui43.m17.bab.ringkas": "Now: chapter %s · %s/%s steps",
+  "kultivator.gui43.m17.ensiklopedia.cari": "Search topics...",
+  "kultivator.gui43.m17.ensiklopedia.hasil": "%s matching topics",
+  "kultivator.gui43.m17.ensiklopedia.kosong": "No topic matches. Try another word, or clear the search (×)."
+}

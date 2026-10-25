@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:tempat/kota42_pejabat",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.tempat.kota42_hakim_jujur.description"
+    },
+    "icon": {
+      "id": "minecraft:anvil"
+    },
+    "title": {
+      "translate": "advancement.kultivator.tempat.kota42_hakim_jujur.title"
+    },
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

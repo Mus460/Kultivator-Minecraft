@@ -22,6 +22,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import tempat_lib as tl  # noqa: E402
 import structgen  # noqa: E402
+import kota_hidup_kit as khk  # noqa: E402  (registers the DESIGN 42 titik types in tempat_lib)
 
 LY = tl.LANTAI_Y
 KELAS = ("kekaisaran", "desa", "setapak")
@@ -1383,9 +1384,10 @@ def dagang():
                 t.put(x, yy, z, "minecraft:spruce_planks")
     for z in range(o0 + 2, o1 - 1, 4):
         barrel(t, o0 + 1, y, z)
-        barrel(t, o1 - 1, y, z)
         chest(t, o0 + 2, y, z, "east")
-        chest(t, o1 - 2, y, z, "west")
+        if not 27 < z < 35:          # the east bay z 28..34 is the wine room (DESIGN 42.9.6)
+            barrel(t, o1 - 1, y, z)
+            chest(t, o1 - 2, y, z, "west")
     # merchant stalls in the court (striped awnings)
     stalls = ((14, 14), (25, 14), (14, 25), (25, 25))
     colours = ("red", "yellow", "cyan", "orange")
@@ -1464,6 +1466,8 @@ def dagang():
     t.titik("jaga", 18, y, 42, "south")
     t.titik("jaga", 25, y, 42, "south")
     t.titik("obrol", 21, y, 26, "north")
+    kedai_arak_kecil(t, y)
+    hidup42_dagang(t, y)
     t.kotak("bangunan", o0, LY, o0, o1, LY + 12, o1, nama="karavanserai")
     t.jangkar(21.5, y, 30.5, "pos/dagang", protect="32", situs="pos/dagang")
     t.jangkar(16.5, y, 15.5, "kotabesar/layanan", layanan="dagang_wilayah", peran="PEDAGANG_KELILING", tokoh="lao_qiao")
@@ -1471,6 +1475,88 @@ def dagang():
     t.jangkar(37.5, y, 22.5, "kotabesar/layanan", layanan="papan_gilda", peran="PETUGAS_GILDA")
     t.simpan()
     return t.id
+
+
+def _bebas(t, x, y, z):
+    """A standing cell: free (air or nothing), free above, a solid block below."""
+    kosong = (None, "minecraft:air")
+    return t.get(x, y, z) in kosong and t.get(x, y + 1, z) in kosong and t.get(x, y - 1, z) not in kosong + ("minecraft:water",)
+
+
+def _titik_di(t, jenis, calon, hadap, **data):
+    """Writes point `jenis` at the first standing cell of calon [(x, z)] at standing level LY + 1."""
+    used = {tuple(e["pos"]) for e in t.titik_list}
+    for x, z in calon:
+        if (x, LY + 1, z) not in used and _bebas(t, x, LY + 1, z):
+            return khk.tulis_titik(t, jenis, x, LY + 1, z, hadap, data or None)
+    return None
+
+
+def kedai_arak_kecil(t, y):
+    """DESIGN 42.12.1 / 42.9.6 (42W-K): the caravanserai's small wine room in the east ring bay (x 34..40, z 28..34,
+    open to the arcade): a counter of barrels with a board top, the keeper's wall of wine jars and casks behind it
+    (kerja:guci), two low tables with stools for the drovers (kursi), the dice table spot (meja_dadu), red lanterns and
+    banners, the triangular wine flag and two paper lanterns on the arcade."""
+    # floor of the bay: worn planks
+    for x in range(34, 41):
+        for z in range(28, 35):
+            if (x + z) % 3:
+                t.put(x, LY, z, "minecraft:spruce_planks")
+            else:
+                t.put(x, LY, z, "minecraft:stripped_spruce_wood", {"axis": "y"})
+    # the keeper's wall (x 40): casks and jars two high, a shelf of cups
+    for z in range(28, 35):
+        if z % 2 == 0:
+            barrel(t, 40, y, z, "west")
+            t.put(40, y + 1, z, "minecraft:decorated_pot", {"facing": "west", "cracked": "false", "waterlogged": "false"})
+        else:
+            t.put(40, y, z, "minecraft:decorated_pot", {"facing": "west", "cracked": "true" if z == 31 else "false",
+                                                        "waterlogged": "false"})
+            t.put(40, y + 1, z, "minecraft:spruce_shelf", {"facing": "west", "powered": "false", "side_chain": "unconnected",
+                                                           "waterlogged": "false"})
+    # the counter (x 38, z 29..33) with an opening at z 28 for the keeper
+    for z in range(29, 34):
+        barrel(t, 38, y, z, "west")
+        t.put(38, y + 1, z, "minecraft:spruce_trapdoor", {"facing": "west", "half": "top", "open": "false",
+                                                          "powered": "false", "waterlogged": "false"})
+    t.put(38, y + 2, 30, "minecraft:candle", {"candles": "2", "lit": "true", "waterlogged": "false"})
+    t.put(38, y + 2, 32, "minecraft:flower_pot")
+    t.titik("kerja:guci", 39, y, 31, "west")
+    t.titik("pajangan:guci_arak", 38, y + 2, 31, "west")
+    # the drovers' tables
+    for tz in (29, 33):
+        table(t, 35, y, tz)
+        for sx_, hd in ((34, "east"), (36, "west")):
+            slab(t, sx_, y, tz, "minecraft:spruce_slab")
+            t.titik("kursi", sx_, y, tz, hd)
+    t.titik("meja_dadu", 36, y, 31, "west")
+    # lanterns and banners
+    for z in (29, 33):
+        hanging_lantern(t, 37, y + 5, z, chain=1)
+    t.put(37, y + 2, 28, "minecraft:red_wall_banner", {"facing": "south"})
+    t.put(37, y + 2, 34, "minecraft:red_wall_banner", {"facing": "north"})
+    # on the arcade (x 33, under the eave stairs at y + 5): the wine flag on a short arm, two paper lanterns
+    t.put(33, y + 4, 30, "minecraft:spruce_fence")
+    khk.panji_dinding(t, 33, y + 3, 30, "west", "bendera_arak", "jiu")
+    for z in (29, 33):
+        if _bebas(t, 33, y + 3, z) or t.get(33, y + 3, z) in (None, "minecraft:air"):
+            khk.lentera_gantung(t, 33, y + 3, z, "west", "merah", kait=True)
+
+
+def hidup42_dagang(t, y):
+    """DESIGN 42.12.1 pos: four horse spots at the tie posts (tambat, looking at the post), two Ghost Market corners
+    (an empty storeroom of the west ring, the dead end behind the north wall), the court well (sumur) and red lanterns
+    under the gate arch."""
+    for (px, pz) in ((12, 19), (12, 24), (31, 19), (31, 24)):
+        step = 1 if px < 20 else -1
+        _titik_di(t, "tambat", [(px + 2 * step, pz), (px + step, pz), (px + 2 * step, pz + (1 if pz < 22 else -1))],
+                  "west" if step > 0 else "east")
+    _titik_di(t, "pasar_hantu_0", [(6, 31), (6, 30), (5, 31)], "east", tempat="gudang_kosong")
+    _titik_di(t, "pasar_hantu_1", [(21, 1), (20, 1), (22, 1)], "south", tempat="gang_buntu")
+    _titik_di(t, "sumur", [(21, 23), (21, 19)], "north")
+    for x in (19, 24):         # under the gate arch, hanging from its lintel band (y + 4)
+        if t.get(x, y + 2, 41) in (None, "minecraft:air") and t.get(x, y + 3, 41) in (None, "minecraft:air"):
+            khk.lentera_gantung(t, x, y + 2, 41, "south", "merah", kait=True)
 
 
 def kemah_begal(v):

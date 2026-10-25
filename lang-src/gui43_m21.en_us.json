@@ -1,0 +1,8 @@
+{
+  "kultivator.gui43.tempa.sibuk": "The forge is working: stop it first to switch tabs.",
+  "kultivator.gui43.tempa.bentuk": "Embryo form: %s",
+  "kultivator.gui43.tempa.bentuk.tip": "Click: next form, right click: previous (← → while focused).",
+  "kultivator.gui43.tempa.tanpa_natal": "No natal treasure is bound to you yet.",
+  "kultivator.gui43.tempa.runtuh.tanya": "Collapse the space of the ring in the slots? %s Mid stones are used, its imprint is erased and all its contents are lost.",
+  "kultivator.gui43.tempa.hapus_jejak.tanya": "Erase your imprint from %s? Anyone could then claim this ring."
+}

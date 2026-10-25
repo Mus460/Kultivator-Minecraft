@@ -1,0 +1,387 @@
+{
+  "_catatan": "42K-T (DESIGN 42.5A.8): 36 tik; teks kultivator.cakap.tik.<id> (gagap: kultivator.cakap.lex.gagap.0-5). Syarat jam/cuaca/wajah/label_emosi/acara/musim dinilai saat bicara, sisanya saat memilih tik warga.",
+  "peluang": 0.25,
+  "pengali_A": 1.5,
+  "ambang_A": 0.4,
+  "maks_per_warga": 2,
+  "tik": [
+    {
+      "id": "hehe",
+      "posisi": "akhir",
+      "bobot": 2,
+      "syarat": {
+        "sifat": {
+          "X": ">20"
+        }
+      }
+    },
+    {
+      "id": "astaga",
+      "posisi": "awal",
+      "bobot": 2,
+      "syarat": {
+        "sifat": {
+          "E": ">10"
+        }
+      }
+    },
+    {
+      "id": "aduh_biyung",
+      "posisi": "awal",
+      "bobot": 2,
+      "syarat": {
+        "tahap": [
+          "dewasa",
+          "tua"
+        ],
+        "kelamin": "p"
+      }
+    },
+    {
+      "id": "kata_orang_tua",
+      "posisi": "awal",
+      "bobot": 1,
+      "syarat": {
+        "sifat": {
+          "O": "<0"
+        }
+      }
+    },
+    {
+      "id": "untung_rugi",
+      "posisi": "sisip",
+      "bobot": 3,
+      "syarat": {
+        "kelompok": [
+          "pedagang"
+        ]
+      }
+    },
+    {
+      "id": "uhuk",
+      "posisi": "awal",
+      "bobot": 3,
+      "syarat": {
+        "tahap": [
+          "tua"
+        ]
+      }
+    },
+    {
+      "id": "hik",
+      "posisi": "awal",
+      "bobot": 4,
+      "syarat": {
+        "kebiasaan": [
+          "pemabuk"
+        ],
+        "jam": [
+          "malam",
+          "larut"
+        ]
+      }
+    },
+    {
+      "id": "gagap",
+      "posisi": "gagap",
+      "bobot": 2,
+      "syarat": {
+        "sifat": {
+          "E": ">60"
+        }
+      }
+    },
+    {
+      "id": "begitulah_dunia",
+      "posisi": "akhir",
+      "bobot": 1,
+      "syarat": {
+        "sifat": {
+          "O": ">20"
+        }
+      }
+    },
+    {
+      "id": "demi_langit",
+      "posisi": "awal",
+      "bobot": 1,
+      "syarat": {
+        "sifat": {
+          "H": ">30"
+        }
+      }
+    },
+    {
+      "id": "anu",
+      "posisi": "awal",
+      "bobot": 2,
+      "syarat": {
+        "sifat": {
+          "X": "<-20"
+        }
+      }
+    },
+    {
+      "id": "ya_kan",
+      "posisi": "akhir",
+      "bobot": 2,
+      "syarat": {
+        "sifat": {
+          "X": ">30"
+        }
+      }
+    },
+    {
+      "id": "lho",
+      "posisi": "awal",
+      "bobot": 2,
+      "syarat": {
+        "dialek": [
+          "kampung"
+        ]
+      }
+    },
+    {
+      "id": "hmm_hmm",
+      "posisi": "awal",
+      "bobot": 2,
+      "syarat": {
+        "watak": [
+          "bijak"
+        ]
+      }
+    },
+    {
+      "id": "sumpah",
+      "posisi": "akhir",
+      "bobot": 2,
+      "syarat": {
+        "sifat": {
+          "H": "<-20"
+        }
+      }
+    },
+    {
+      "id": "omong_omong",
+      "posisi": "awal",
+      "bobot": 1,
+      "syarat": {
+        "sifat": {
+          "X": ">0"
+        }
+      }
+    },
+    {
+      "id": "pokoknya",
+      "posisi": "awal",
+      "bobot": 1,
+      "syarat": {
+        "sifat": {
+          "C": ">20",
+          "A": "<0"
+        }
+      }
+    },
+    {
+      "id": "nah",
+      "posisi": "awal",
+      "bobot": 1,
+      "syarat": {
+        "sifat": {
+          "X": ">10"
+        }
+      }
+    },
+    {
+      "id": "haiya",
+      "posisi": "awal",
+      "bobot": 2,
+      "syarat": {
+        "kelompok": [
+          "pedagang",
+          "pekerja"
+        ]
+      }
+    },
+    {
+      "id": "amitaba",
+      "posisi": "awal",
+      "bobot": 3,
+      "syarat": {
+        "kelompok": [
+          "rahib"
+        ]
+      }
+    },
+    {
+      "id": "hahaha",
+      "posisi": "akhir",
+      "bobot": 2,
+      "syarat": {
+        "sifat": {
+          "X": ">40",
+          "A": ">0"
+        }
+      }
+    },
+    {
+      "id": "cih",
+      "posisi": "awal",
+      "bobot": 2,
+      "syarat": {
+        "sifat": {
+          "A": "<-30"
+        }
+      }
+    },
+    {
+      "id": "tahu_kan",
+      "posisi": "akhir",
+      "bobot": 3,
+      "syarat": {
+        "kebiasaan": [
+          "gosip_sumur"
+        ]
+      }
+    },
+    {
+      "id": "kata_guru",
+      "posisi": "akhir",
+      "bobot": 2,
+      "syarat": {
+        "kelompok": [
+          "kultivator",
+          "cendekia"
+        ]
+      }
+    },
+    {
+      "id": "syukurlah",
+      "posisi": "awal",
+      "bobot": 1,
+      "syarat": {
+        "sifat": {
+          "E": ">30"
+        }
+      }
+    },
+    {
+      "id": "aiyo",
+      "posisi": "awal",
+      "bobot": 2,
+      "syarat": {
+        "tahap": [
+          "tua"
+        ],
+        "kelamin": "p"
+      }
+    },
+    {
+      "id": "kalau_tidak_salah",
+      "posisi": "sisip",
+      "bobot": 1,
+      "syarat": {
+        "sifat": {
+          "C": "<0"
+        }
+      }
+    },
+    {
+      "id": "begitu_lho",
+      "posisi": "akhir",
+      "bobot": 2,
+      "syarat": {
+        "dialek": [
+          "air"
+        ]
+      }
+    },
+    {
+      "id": "oi",
+      "posisi": "awal",
+      "bobot": 2,
+      "syarat": {
+        "dialek": [
+          "pelabuhan"
+        ]
+      }
+    },
+    {
+      "id": "demi_mata_air",
+      "posisi": "awal",
+      "bobot": 2,
+      "syarat": {
+        "dialek": [
+          "oasis"
+        ]
+      }
+    },
+    {
+      "id": "heh",
+      "posisi": "awal",
+      "bobot": 2,
+      "syarat": {
+        "watak": [
+          "sombong",
+          "licik"
+        ]
+      }
+    },
+    {
+      "id": "tentu_saja",
+      "posisi": "akhir",
+      "bobot": 2,
+      "syarat": {
+        "watak": [
+          "sombong"
+        ]
+      }
+    },
+    {
+      "id": "hoahm",
+      "posisi": "awal",
+      "bobot": 3,
+      "syarat": {
+        "kebiasaan": [
+          "tidur_siang",
+          "pemalas"
+        ],
+        "jam": [
+          "siang",
+          "sore"
+        ]
+      }
+    },
+    {
+      "id": "eh_sebentar",
+      "posisi": "awal",
+      "bobot": 1,
+      "syarat": {
+        "sifat": {
+          "O": ">30"
+        }
+      }
+    },
+    {
+      "id": "syair",
+      "posisi": "sisip",
+      "bobot": 3,
+      "syarat": {
+        "kebiasaan": [
+          "penyair"
+        ]
+      }
+    },
+    {
+      "id": "hitung_untung",
+      "posisi": "sisip",
+      "bobot": 3,
+      "syarat": {
+        "kebiasaan": [
+          "pelit",
+          "penabung"
+        ]
+      }
+    }
+  ]
+}

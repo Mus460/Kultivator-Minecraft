@@ -14,7 +14,8 @@ import org.jetbrains.annotations.Nullable;
  * {@code kultivator:fx/tempat/tema/<name>}, 38TV), 63-99 DESIGN 40 (63-88 in use, models
  * {@code kultivator:fx/sosok/<name>}, 40K), 100-149 DESIGN 39 (39E
  * {@link #MANDIRI_E_FIRST}-{@link #MANDIRI_E_LAST}, 39F {@link #MANDIRI_F_FIRST}-{@link #MANDIRI_F_LAST}, registered
- * with {@code PropKatalog.daftar}), 150-199 later DESIGN 38. Indexes 1-62 and their names are exactly the ones of
+ * with {@code PropKatalog.daftar}), 150-169 later DESIGN 38 and DESIGN 41 ({@code GabungGerakId}), 170-239 DESIGN 42
+ * ({@code KotaGerakId}, models {@code kultivator:fx/kota42/<name>}). Indexes 1-62 and their names are exactly the ones of
  * DESIGN 38; never renumbered.
  * <p>
  * Synced form ({@code DATA_PROP}, 40.2.4): {@code kanan | kiri << 10 | punggung << 20}, each slot 0-1023, 0 = the
@@ -39,7 +40,10 @@ public final class PropId {
 	public static final int MANDIRI_F_LAST = 149;
 	public static final int MANDIRI_LAST = 149;
 	public static final int TEMPAT_TAMBAHAN_FIRST = 150;
-	public static final int TEMPAT_TAMBAHAN_LAST = 199;
+	public static final int TEMPAT_TAMBAHAN_LAST = 169;
+	/** DESIGN 42 hand props (42.12.4, {@code KotaGerakId}). */
+	public static final int KOTA_HIDUP_FIRST = 170;
+	public static final int KOTA_HIDUP_LAST = 239;
 	/** Largest index one slot of {@code DATA_PROP} carries. */
 	public static final int MAKS = 1023;
 
@@ -412,7 +416,7 @@ public final class PropId {
 		BY_NAME.put(nama, id);
 	}
 
-	/** True for an index defined here (1-88). 100-199 are defined by their owners' client catalogs. */
+	/** True for an index defined here (1-88). 100-239 are defined by their owners' client catalogs. */
 	public static boolean ada(int id) {
 		return id > 0 && id < NAMA.length;
 	}

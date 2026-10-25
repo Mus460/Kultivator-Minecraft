@@ -1,0 +1,41 @@
+{
+  "_catatan": "Kebiasaan #30 pemuja_kultivator (DESIGN 42.4.12)",
+  "nomor": 30,
+  "siapa": {
+    "umur": [
+      6,
+      17
+    ],
+    "kelompok": [
+      "anak"
+    ],
+    "tahap": [
+      "anak"
+    ]
+  },
+  "sesi": [
+    {
+      "jam": [
+        7,
+        19
+      ],
+      "tujuan": [
+        "@pemain"
+      ],
+      "klip": "kota42:kagum",
+      "pemain": 3,
+      "ganti": [
+        {
+          "klip": "kota42:kagum"
+        },
+        {
+          "klip": "kota42:kagum"
+        },
+        {
+          "klip": "tepuk_tangan"
+        }
+      ],
+      "ganti_menit": 2
+    }
+  ]
+}

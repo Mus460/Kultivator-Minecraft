@@ -1,0 +1,184 @@
+{
+  "id": "obrolan_gosip",
+  "jenis": "realisasi",
+  "_catatan": "NPC-NPC GOSIP: bait, the news, a reaction, a correction.",
+  "benih_dunia": 42,
+  "masukan": {
+    "niat": "UMPAN_GOSIP",
+    "pembicara": 600,
+    "hari": 120,
+    "now": 2880000,
+    "cuaca": "cerah",
+    "musim": "semi",
+    "situasi": {
+      "jam": "pagi",
+      "cuaca": "cerah",
+      "musim": "semi",
+      "kelompok": "pekerja",
+      "watak": "ramah",
+      "kebiasaan": [
+        "gosip_sumur"
+      ],
+      "sifat": {
+        "H": 10,
+        "E": 0,
+        "X": 20,
+        "A": 30,
+        "C": 10,
+        "O": 0
+      },
+      "wajah": "netral",
+      "tempat": "kota_besar"
+    },
+    "pendengar": null,
+    "kesan": "kenal",
+    "tahu_nama": false,
+    "register": "biasa",
+    "dialek": "kampung",
+    "kelamin": "p",
+    "nilai": {
+      "lawan": {
+        "orang": {
+          "nama": "Ah Ling",
+          "kelamin": "p",
+          "tahap": "dewasa"
+        }
+      },
+      "fakta.subjek": {
+        "orang": {
+          "nama": "Paman Li",
+          "kelamin": "l",
+          "tahap": "dewasa"
+        }
+      },
+      "fakta.hariKejadian": 118
+    }
+  },
+  "langkah": [
+    {
+      "ubah": {},
+      "harap": {
+        "k": "kultivator.cakap.umpan.gosip.4",
+        "a": [
+          {
+            "k": "kultivator.cakap.frag.katanya.3",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "umpan.gosip",
+      "gestur": "bisik",
+      "seru": "kota42.seru.bisik_p",
+      "tik": null,
+      "id_id": "kabarnya... ah, tapi ini rahasia. Ya sudah, kuceritakan. Tapi sedikit saja.",
+      "en_us": "word is... ah, but it's a secret. Fine, I'll tell. Only a little."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar",
+          "fakta": "BERKELAHI"
+        },
+        "nilai": {
+          "fakta.subjek": {
+            "orang": {
+              "nama": "Paman Li",
+              "kelamin": "l",
+              "tahap": "dewasa"
+            }
+          },
+          "fakta.objek": {
+            "orang": {
+              "nama": "Tukang Ma",
+              "kelamin": "l",
+              "tahap": "dewasa"
+            }
+          },
+          "fakta.hariKejadian": 118,
+          "lawan": {
+            "orang": {
+              "nama": "Ah Ling",
+              "kelamin": "p",
+              "tahap": "dewasa"
+            }
+          }
+        },
+        "topik": "tetangga",
+        "niat": "BERI_KABAR"
+      },
+      "harap": {
+        "k": "kultivator.cakap.kabar.berkelahi.0",
+        "a": [
+          {
+            "t": "Paman Li"
+          },
+          {
+            "t": "Tukang Ma"
+          },
+          {
+            "k": "kultivator.cakap.lex.kemarin_lusa.kampung",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "kabar.berkelahi",
+      "gestur": "berdebat",
+      "seru": null,
+      "tik": null,
+      "id_id": "Paman Li dan Tukang Ma baku hantam di depan kedai wingi uni! Meja pecah dua.",
+      "en_us": "Paman Li and Tukang Ma came to blows outside the eatery day before yesterday! A table split in two."
+    },
+    {
+      "ubah": {
+        "niat": "REAKSI",
+        "label": "kagum",
+        "pembicara": 601
+      },
+      "harap": {
+        "k": "kultivator.cakap.reaksi.kagum.2",
+        "a": []
+      },
+      "aturan": "reaksi.kagum",
+      "gestur": "kagum",
+      "seru": "kota42.seru.oh_p",
+      "tik": null,
+      "id_id": "Aku sampai merinding. Sungguh.",
+      "en_us": "I've got goosebumps. Truly."
+    },
+    {
+      "ubah": {
+        "niat": "KOREKSI",
+        "pembicara": 601
+      },
+      "harap": {
+        "k": "kultivator.cakap.koreksi.saksi.1",
+        "a": [
+          {
+            "t": "Paman Li"
+          }
+        ]
+      },
+      "aturan": "koreksi.saksi",
+      "gestur": "geleng",
+      "seru": null,
+      "tik": null,
+      "id_id": "Tunggu, tunggu. Paman Li tidak bersalah. Yang sebenarnya lain.",
+      "en_us": "Wait, wait. Paman Li isn't to blame. The truth is different."
+    }
+  ]
+}

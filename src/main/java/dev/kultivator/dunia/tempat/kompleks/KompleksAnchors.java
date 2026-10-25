@@ -7,6 +7,7 @@ import dev.kultivator.dunia.kota.KultivatorNpc;
 import dev.kultivator.dunia.kota.NpcRole;
 import dev.kultivator.dunia.tempat.hidup.HidupApi;
 import dev.kultivator.sekte.api.SekteApi;
+import dev.kultivator.sekte.gabung.dunia.TitikGabung;
 import dev.kultivator.sosok.RupaKunci;
 import dev.kultivator.sosok.SosokApi;
 import net.minecraft.ChatFormatting;
@@ -17,6 +18,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,11 +38,24 @@ import java.util.UUID;
  * ({@link KompleksSikap}), the training ground and the market, and every 5 seconds dresses the compound's resident
  * bodies (38NL) in the sect's uniform: {@code murid.<rank>|sekte=npc:<sect>} through {@link SosokApi#setRupa}.
  * Anchors outside a born compound (a template preview) stay idle.
+ * <p>
+ * DESIGN 41.11.2: the lots also carry the named titik of joining a sect ({@link TitikGabung#TITIK_BARU}: Merit Pavilion,
+ * oath dais, test spots, dwellings, the climb of the Tangga Ujian); they are only remembered as spots. An Iblis compound
+ * swears on its blood altar (the {@code altar_sumpah} anchor with data {@code aliran=iblis}), not in the shared main hall.
  */
 final class KompleksAnchors implements AnchorHandler {
 
-	/** Spot names an anchor of this kind stores (the anchor's {@code what}). */
-	static final Set<String> TITIK = Set.of("gerbang", "aula", "arena", "pasar", "dalam", "puncak", "tetua", "dermaga_awan");
+	/** Spot names an anchor of this kind stores (the anchor's {@code what}): 38.C.3.3 plus the titik of DESIGN 41. */
+	static final Set<String> TITIK;
+	/** The DESIGN 41 titik alone: remembered on load, nothing to do while players are near. */
+	private static final Set<String> TITIK_41 = Set.copyOf(TitikGabung.TITIK_BARU);
+
+	static {
+		Set<String> all = new HashSet<>(List.of("gerbang", "aula", "arena", "pasar", "dalam", "puncak", "tetua", "dermaga_awan"));
+		all.addAll(TitikGabung.TITIK_BARU);
+		TITIK = Set.copyOf(all);
+	}
+
 	/** Uniforms are checked this often per anchor (ticks). */
 	static final long RUPA_JEDA = 100L;
 
@@ -105,13 +120,17 @@ final class KompleksAnchors implements AnchorHandler {
 			return;
 		}
 		if (TITIK.contains(what)) {
+			if (TitikGabung.ALTAR_SUMPAH.equals(what) && "iblis".equals(k.aliran())
+					&& !"iblis".equals(anchor.data().getStringOr("aliran", ""))) {
+				return;
+			}
 			data.spot(k.sekte(), what, pos);
 		}
 	}
 
 	@Override
 	public void nearby(ServerLevel level, DuniaAnchorEntity anchor, List<ServerPlayer> within) {
-		if (!Kompleks.hidup() || level.dimension() != Level.OVERWORLD) {
+		if (!Kompleks.hidup() || level.dimension() != Level.OVERWORLD || TITIK_41.contains(anchor.what())) {
 			return;
 		}
 		RencanaKompleks.Kompleks k = Kompleks.dari(level, anchor);

@@ -1,0 +1,297 @@
+{
+  "id": "kabar_pemain",
+  "jenis": "realisasi",
+  "_catatan": "News about the player told back to the player: helped, won a duel, bargained hard, broke a promise.",
+  "benih_dunia": 42,
+  "masukan": {
+    "niat": "BERI_KABAR",
+    "pembicara": 402,
+    "hari": 120,
+    "now": 2880000,
+    "cuaca": "cerah",
+    "musim": "semi",
+    "situasi": {
+      "jam": "pagi",
+      "cuaca": "cerah",
+      "musim": "semi",
+      "kelompok": "pekerja",
+      "watak": "ramah",
+      "kebiasaan": [],
+      "sifat": {
+        "H": 10,
+        "E": 0,
+        "X": 20,
+        "A": 30,
+        "C": 10,
+        "O": 0
+      },
+      "wajah": "netral",
+      "tempat": "kota_besar"
+    },
+    "pendengar": {
+      "nama": "Han",
+      "kelamin": "l",
+      "tahap": "dewasa",
+      "pemain": true
+    },
+    "kesan": "akrab",
+    "tahu_nama": true,
+    "register": "sopan",
+    "dialek": "ibukota"
+  },
+  "langkah": [
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar",
+          "fakta": "MENOLONG"
+        },
+        "nilai": {
+          "fakta.subjek": {
+            "orang": {
+              "nama": "Han",
+              "kelamin": "l",
+              "tahap": "dewasa",
+              "pemain": true
+            }
+          },
+          "fakta.objek": {
+            "orang": {
+              "nama": "Tuan Gao",
+              "kelamin": "l",
+              "tahap": "dewasa"
+            }
+          },
+          "fakta.hariKejadian": 119
+        },
+        "topik": "pemain"
+      },
+      "harap": {
+        "k": "kultivator.cakap.kabar.menolong.0",
+        "a": [
+          {
+            "k": "kultivator.cakap.frag.katanya.2",
+            "a": []
+          },
+          {
+            "t": "Han"
+          },
+          {
+            "t": "Tuan Gao"
+          },
+          {
+            "k": "kultivator.cakap.lex.kemarin.ibukota",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "kabar.menolong",
+      "gestur": "bicara_tangan",
+      "seru": null,
+      "tik": null,
+      "id_id": "kudengar Han menolong Tuan Gao baru kemarin. Orang baik masih ada rupanya.",
+      "en_us": "I heard Han helped Tuan Gao only yesterday. So good people still exist."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar",
+          "fakta": "MENANG_DUEL"
+        },
+        "nilai": {
+          "fakta.subjek": {
+            "orang": {
+              "nama": "Han",
+              "kelamin": "l",
+              "tahap": "dewasa",
+              "pemain": true
+            }
+          },
+          "fakta.objek": {
+            "orang": {
+              "nama": "Tuan Gao",
+              "kelamin": "l",
+              "tahap": "dewasa"
+            }
+          },
+          "fakta.hariKejadian": 116
+        },
+        "topik": "pemain"
+      },
+      "harap": {
+        "k": "kultivator.cakap.kabar.menang_duel.0",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.hari_lalu",
+            "a": [
+              {
+                "k": "kultivator.cakap.lex.angka.4",
+                "a": []
+              }
+            ]
+          },
+          {
+            "t": "Han"
+          },
+          {
+            "t": "Tuan Gao"
+          }
+        ]
+      },
+      "aturan": "kabar.menang_duel",
+      "gestur": "tunjuk",
+      "seru": null,
+      "tik": null,
+      "id_id": "Kau lihat duel empat hari lalu? Han mengalahkan Tuan Gao dalam tiga jurus!",
+      "en_us": "Did you see the duel four days ago? Han beat Tuan Gao in three moves!"
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar",
+          "fakta": "MENAWAR_KERAS"
+        },
+        "nilai": {
+          "fakta.subjek": {
+            "orang": {
+              "nama": "Han",
+              "kelamin": "l",
+              "tahap": "dewasa",
+              "pemain": true
+            }
+          },
+          "fakta.objek": {
+            "orang": {
+              "nama": "Tuan Gao",
+              "kelamin": "l",
+              "tahap": "dewasa"
+            }
+          },
+          "fakta.hariKejadian": 120
+        },
+        "topik": "dagang"
+      },
+      "harap": {
+        "k": "kultivator.cakap.kabar.menawar_keras.1",
+        "a": [
+          {
+            "t": "Han"
+          }
+        ]
+      },
+      "aturan": "kabar.menawar_keras",
+      "gestur": "geleng",
+      "seru": null,
+      "tik": null,
+      "id_id": "Kalau Han mampir ke lapakmu, naikkan harganya dulu. Dia menawar habis-habisan.",
+      "en_us": "If Han stops at your stall, raise the price first. They haggle to the last coin."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar",
+          "fakta": "INGKAR"
+        },
+        "nilai": {
+          "fakta.subjek": {
+            "orang": {
+              "nama": "Han",
+              "kelamin": "l",
+              "tahap": "dewasa",
+              "pemain": true
+            }
+          },
+          "fakta.objek": {
+            "orang": {
+              "nama": "Tuan Gao",
+              "kelamin": "l",
+              "tahap": "dewasa"
+            }
+          },
+          "fakta.hariKejadian": 105
+        },
+        "topik": "janji"
+      },
+      "harap": {
+        "k": "kultivator.cakap.kabar.ingkar.3",
+        "a": [
+          {
+            "t": ""
+          },
+          {
+            "t": "Han"
+          },
+          {
+            "t": "Tuan Gao"
+          }
+        ]
+      },
+      "aturan": "kabar.ingkar",
+      "gestur": "geleng",
+      "seru": null,
+      "tik": null,
+      "id_id": " Han harus belajar dari ingkarnya pada Tuan Gao.",
+      "en_us": " Han should learn from failing Tuan Gao."
+    }
+  ]
+}

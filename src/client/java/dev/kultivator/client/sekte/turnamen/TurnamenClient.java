@@ -4,9 +4,6 @@ import dev.kultivator.Kultivator;
 import dev.kultivator.client.epic.SekteScenes;
 import dev.kultivator.client.epic.sky.SkyDirector;
 import dev.kultivator.client.epic.sound.MusicCue;
-import dev.kultivator.client.hub.HubCards;
-import dev.kultivator.client.hub.HubNav;
-import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.sekte.turnamen.Turnamen;
 import dev.kultivator.sekte.turnamen.TurnamenEntities;
 import dev.kultivator.sekte.turnamen.TurnamenPayloads;
@@ -15,17 +12,21 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.minecraft.client.renderer.entity.EntityRenderers;
+import net.minecraft.nbt.CompoundTag;
+import org.jetbrains.annotations.Nullable;
 
 /**
- * Module T on the client (DESIGN 36.2.3): the Lingkar Lei Tai ({@link LeiTaiRenderer}) and its HUD scroll
+ * Module T on the client (DESIGN 36.2.3, 43.5): the Lingkar Lei Tai ({@link LeiTaiRenderer}) and its HUD scroll
  * ({@link LeiTaiHud}), the visiting spectators' renderer and head pieces ({@link PenontonRenderer},
- * {@link PenontonModels}), the hub card "Turnamen" in the Sekte section ({@link TurnamenScreen}) and the three scene
- * recipes of beats 120-122 (through {@code SekteScenes}, every 7b camera guard applies). Reads only its own payloads and
- * the shared entity type. One line in {@code SekteContentClient}.
+ * {@link PenontonModels}), the season board shown on Sekte › Kegiatan › Arena › Turnamen ({@link #data()}, asked with
+ * {@link #ask}; the old "Turnamen" card and screen are gone, G40) and the three scene recipes of beats 120-122 (through
+ * {@code SekteScenes}, every 7b camera guard applies). Reads only its own payloads and the shared entity type. One line in
+ * {@code SekteContentClient}.
  */
 public final class TurnamenClient {
 
 	private static boolean initialised;
+	private static @Nullable CompoundTag data;
 
 	public static void init() {
 		if (initialised || TurnamenEntities.PENONTON == null) {
@@ -38,10 +39,30 @@ public final class TurnamenClient {
 		LeiTaiRenderer.init();
 		HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, Kultivator.id("sekte_turnamen_lingkar"), new LeiTaiHud());
 		ClientPlayNetworking.registerGlobalReceiver(TurnamenPayloads.Lingkar.TYPE, (payload, context) -> LeiTaiRenderer.onLingkar(payload));
-		ClientPlayNetworking.registerGlobalReceiver(TurnamenPayloads.Papan.TYPE, (payload, context) -> TurnamenScreen.onData(payload.data()));
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> LeiTaiRenderer.clear());
-		HubCards.register(HubNav.SEKTE, "sekte_turnamen_papan", Glyphs.SEAL, null, () -> HubNav.openChild(new TurnamenScreen(), HubNav.SEKTE));
+		ClientPlayNetworking.registerGlobalReceiver(TurnamenPayloads.Papan.TYPE, (payload, context) -> data = payload.data() == null ? null
+				: payload.data().copy());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+			LeiTaiRenderer.clear();
+			data = null;
+		});
 		scenes();
+	}
+
+	/** The last season board from the server (Sekte › Kegiatan › Arena › Turnamen), or null before the first answer. */
+	public static @Nullable CompoundTag data() {
+		return data;
+	}
+
+	/** False while the module is off on the server (no answer will ever come). */
+	public static boolean aktif() {
+		return ClientPlayNetworking.canSend(TurnamenPayloads.Minta.TYPE);
+	}
+
+	/** Asks for the board ({@code Minta.ASK}) or answers the waiting inter-sect challenge ({@code ACCEPT} / {@code REFUSE}). */
+	public static void ask(int action) {
+		if (aktif()) {
+			ClientPlayNetworking.send(new TurnamenPayloads.Minta(action));
+		}
 	}
 
 	private static void scenes() {

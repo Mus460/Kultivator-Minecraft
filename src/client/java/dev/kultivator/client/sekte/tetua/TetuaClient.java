@@ -6,9 +6,12 @@ import dev.kultivator.client.epic.SekteScenes;
 import dev.kultivator.client.epic.sky.SkyDirector;
 import dev.kultivator.client.epic.sound.MusicCue;
 import dev.kultivator.client.fx.qi.Qi;
-import dev.kultivator.client.hub.HubCards;
+import dev.kultivator.client.hall.AnggotaPage;
+import dev.kultivator.sekte.gabung.ui.GabungLembar;
 import dev.kultivator.client.hub.HubNav;
-import dev.kultivator.client.screen.ui.Glyphs;
+import dev.kultivator.client.hub.HubPages;
+import dev.kultivator.client.hub.Tujuan;
+import dev.kultivator.client.hub.Urutan;
 import dev.kultivator.disciple.DiscipleEntity;
 import dev.kultivator.sekte.SekteIds;
 import dev.kultivator.sekte.tetua.Tetua;
@@ -21,12 +24,14 @@ import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.Util;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.AABB;
 
 /**
  * The client of module E (DESIGN 36.2.6, 36.4): the receivers of E's payloads (the Balai Tetua screen, the morning
- * report card, the ceremony poses), the hub card SEKTE "Balai Tetua", the poses of activities 17 and 23
+ * report card, the ceremony poses), the page Sekte › Anggota of the Gulungan Utama, the poses of activities 17 and 23
  * ({@link TetuaPoses}), the three scenes of beats 150-152 (through the lead's {@code SekteScenes}, so every 7b camera
  * guard applies), the report card as a HUD element, and the small light ring at the feet of an elder on duty (a few
  * {@code kultivator:qi} ground rings every second, only for elders within 32 blocks, none on Efek Minimal).
@@ -34,8 +39,13 @@ import net.minecraft.world.phys.AABB;
 public final class TetuaClient {
 
 	private static final double RING_RANGE = 32.0D;
+	/** An "open" view within this long after the page asked is the page's answer, not a world opener. */
+	private static final long MINTA_MS = 3000L;
 	private static boolean initialised;
 	private static long ticks;
+	private static CompoundTag view = new CompoundTag();
+	private static long versi;
+	private static long mintaAt = Long.MIN_VALUE / 2;
 
 	public static void init() {
 		if (initialised) {
@@ -49,29 +59,57 @@ public final class TetuaClient {
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
 			LaporanCard.clear();
 			TetuaPoses.clear();
+			view = new CompoundTag();
 		});
 		HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, Kultivator.id("sekte_tetua_laporan"), new LaporanCard());
 		TetuaPoses.init();
 		scenes();
-		// Hub › Sekte › "Balai Tetua": the offices, the morning report, the heir and the lineage.
-		HubCards.register(HubNav.SEKTE, "sekte_tetua_balai", Glyphs.HALL, null, () -> {
-			HubNav.expectChild(BalaiTetuaScreen.class, HubNav.SEKTE);
-			send(TetuaPayloads.OP_OPEN, "");
-		});
+		// Gulungan Utama › Sekte › Anggota (DESIGN 43.5, 43.16.2 M06): candidates, ranks, the Balai Tetua and the heir in one
+		// page (replaces the hub card "Balai Tetua" and the Calon/Jenjang tablets of the old Aula scroll).
+		HubPages.daftar(HubNav.SEKTE, Urutan.ID_ANGGOTA, Urutan.ANGGOTA, AnggotaPage::new);
+		// 41 sheets from the world land on their Anggota sub, Perguruanku source (43.12.4)
+		HubPages.daftarRumah(GabungLembar.PohonPangkat.LAYAR, java.util.Set.of(), HubNav.SEKTE, Urutan.ID_ANGGOTA, AnggotaPage.PANGKAT,
+				AnggotaPage::sumberPerguruan);
+		HubPages.daftarRumah(GabungLembar.Politik.LAYAR, java.util.Set.of(GabungLembar.Politik.TAB_MAJELIS), HubNav.SEKTE, Urutan.ID_ANGGOTA,
+				AnggotaPage.TETUA, AnggotaPage::sumberPerguruan);
+		HubPages.daftarRumah(GabungLembar.Politik.LAYAR, java.util.Set.of(GabungLembar.Politik.TAB_SUKSESI), HubNav.SEKTE, Urutan.ID_ANGGOTA,
+				AnggotaPage.PENERUS, AnggotaPage::sumberPerguruan);
 	}
 
 	static void send(String op, String arg) {
-		if (ClientPlayNetworking.canSend(TetuaPayloads.Act.TYPE)) {
+		if (tersedia()) {
 			ClientPlayNetworking.send(new TetuaPayloads.Act(op, arg == null ? "" : arg));
 		}
 	}
 
+	/** True while the server runs module E (its action payload can be sent). */
+	public static boolean tersedia() {
+		return ClientPlayNetworking.canSend(TetuaPayloads.Act.TYPE);
+	}
+
+	/** The last Balai Tetua view from the server (empty until one came). */
+	public static CompoundTag view() {
+		return view;
+	}
+
+	/** Grows with every view. */
+	public static long versi() {
+		return versi;
+	}
+
+	/** Asks for a fresh view (the page came on screen); the answer is data only, it does not move the Gulungan. */
+	public static void minta() {
+		mintaAt = Util.getMillis();
+		send(TetuaPayloads.OP_OPEN, "");
+	}
+
 	private static void onBalai(TetuaPayloads.Balai p) {
-		Minecraft minecraft = Minecraft.getInstance();
-		if (minecraft.gui.screen() instanceof BalaiTetuaScreen screen) {
-			screen.update(p.data());
-		} else if (p.open()) {
-			minecraft.gui.setScreen(new BalaiTetuaScreen(p.data()));
+		view = p.data() == null ? new CompoundTag() : p.data();
+		versi++;
+		if (p.open() && Util.getMillis() - mintaAt > MINTA_MS) {
+			// opened from the world (or a command): Sekte › Anggota › Tetua of the own hall
+			AnggotaPage.sumberAula();
+			HubNav.buka(Tujuan.of(HubNav.SEKTE, Urutan.ID_ANGGOTA).sub(AnggotaPage.TETUA));
 		}
 	}
 

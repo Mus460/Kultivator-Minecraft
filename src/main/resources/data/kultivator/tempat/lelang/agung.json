@@ -32,6 +32,7 @@
     {"jenis": "harta", "kelas": "tinggi", "bobot": 6, "pita_min": 3},
     {"jenis": "inti", "kelas": "tinggi", "bobot": 4, "tingkat_min": 3, "tingkat_maks": 4},
     {"jenis": "item", "kelas": "tinggi", "bobot": 3, "id": "inheritance_crystal", "pita_min": 3},
+    {"jenis": "item", "kelas": "tinggi", "bobot": 4, "id": "token_naik"},
     {"jenis": "item", "kelas": "tinggi", "bobot": 2, "id": "soul_nurturing_wood", "pita_min": 4},
     {"jenis": "item", "kelas": "tinggi", "bobot": 2, "id": "soul_seal_jade", "pita_min": 5},
     {"jenis": "item", "kelas": "tinggi", "bobot": 1, "id": "heavenly_flame_seed", "pita_min": 6},

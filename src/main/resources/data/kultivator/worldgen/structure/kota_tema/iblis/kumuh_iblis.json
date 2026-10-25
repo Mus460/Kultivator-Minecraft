@@ -65,6 +65,12 @@
       "dz": 47,
       "pool": "kultivator:kota_tema/iblis/tembok/sudut",
       "putar": 3
+    },
+    {
+      "dx": 0,
+      "dz": 60,
+      "pool": "kultivator:kota_tema/iblis/hidup42/lorong_hantu",
+      "putar": 0
     }
   ],
   "gaya": [

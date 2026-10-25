@@ -24,7 +24,9 @@ import net.minecraft.sounds.SoundSource;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -67,6 +69,8 @@ final class DuelSeteru {
 	}
 
 	private static final List<Tonton> TONTON = new ArrayList<>();
+	/** Feuds whose live duel is in its 45-tick opening (not yet in TONTON): the 40-tick check must not start it again. */
+	private static final Set<String> MULAI = new HashSet<>();
 
 	/** T2: the duel is set for the next half day at the feud's place (our real disciple salutes now if it is home). */
 	static void jadwalkan(MinecraftServer server, Perseteruan f) {
@@ -83,6 +87,9 @@ final class DuelSeteru {
 
 	/** True while this feud's duel is being fought. */
 	static boolean berlangsung(String seteru) {
+		if (MULAI.contains(seteru)) {
+			return true;
+		}
 		for (Tonton t : TONTON) {
 			if (t.seteru.equals(seteru)) {
 				return true;
@@ -97,7 +104,7 @@ final class DuelSeteru {
 			return Teks.t("alasan.tanpa_duel");
 		}
 		f.adegan.putBoolean("dukung", true);
-		Adegan.Pemeran p = Adegan.pemeran(server, f, true, 3600);
+		Adegan.Pemeran p = berlangsung(f.id) || Adegan.asliSibuk(f) ? null : Adegan.pemeran(server, f, true, 3600);
 		if (p != null && p.kita() != null && p.mereka() != null && master.level() == p.level()
 				&& master.blockPosition().distSqr(p.pos()) <= 64.0D * 64.0D) {
 			mulai(server, f, p, master);
@@ -111,7 +118,7 @@ final class DuelSeteru {
 			return;
 		}
 		long now = server.overworld().getGameTime();
-		if (DuelSessions.room()) {
+		if (DuelSessions.room() && !Adegan.asliSibuk(f)) {
 			Adegan.Pemeran p = Adegan.pemeran(server, f, true, 3600);
 			if (p != null && p.kita() != null && p.mereka() != null) {
 				ServerPlayer master = server.getPlayerList().getPlayer(f.owner);
@@ -159,6 +166,7 @@ final class DuelSeteru {
 			return;
 		}
 		f.adegan.putBoolean("hidup", true);
+		MULAI.add(f.id);
 		Adegan.hadap(kita, mereka);
 		Adegan.tandaiSibuk(kita, MAX_TICKS);
 		if (p.kitaAsli()) {
@@ -183,6 +191,7 @@ final class DuelSeteru {
 		}
 		long crowd = situs;
 		Adegan.nanti(server, 45, () -> {
+			MULAI.remove(f.id);
 			if (kita.isRemoved() || mereka.isRemoved()) {
 				undian(server, f);
 				return;
@@ -263,6 +272,7 @@ final class DuelSeteru {
 
 	static void bersihkan() {
 		TONTON.clear();
+		MULAI.clear();
 	}
 
 	/** The duel between the master and their Young Elder or Eldest Senior (39.F.4 "Tantang tetua mereka"). */

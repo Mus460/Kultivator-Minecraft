@@ -1,0 +1,33 @@
+{
+  "_catatan": "Kebiasaan #13 tidur_siang (DESIGN 42.4.12)",
+  "nomor": 13,
+  "siapa": {
+    "umur": [
+      30,
+      200
+    ],
+    "tahap": [
+      "dewasa",
+      "tua"
+    ]
+  },
+  "bobot": 1.2,
+  "sesi": [
+    {
+      "jam": [
+        12.5,
+        14
+      ],
+      "peluang": 0.7,
+      "syarat": [
+        "tidak_hujan"
+      ],
+      "tujuan": [
+        "kursi",
+        "kursi_lantai",
+        "obrol"
+      ],
+      "klip": "tidur_duduk"
+    }
+  ]
+}

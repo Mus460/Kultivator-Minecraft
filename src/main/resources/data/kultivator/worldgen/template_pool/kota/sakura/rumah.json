@@ -138,6 +138,24 @@
     {
       "element": {
         "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/sakura/rumah_toko_3",
+        "processors": "kultivator:kota/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/sakura/rumah_toko_4",
+        "processors": "kultivator:kota/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
         "location": "kultivator:kota/sakura/hias_kios",
         "processors": "kultivator:kota/utuh",
         "projection": "rigid"
@@ -203,6 +221,69 @@
         "element_type": "minecraft:single_pool_element",
         "location": "kultivator:kota/sakura/hias_pohon",
         "processors": "kultivator:kota/utuh",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/sakura/hias_kandang",
+        "processors": "kultivator:kota/utuh",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/sakura/kavling_kecil",
+        "processors": "kultivator:kota/utuh",
+        "projection": "rigid"
+      },
+      "weight": 2
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/sakura/kavling_kecil_2",
+        "processors": "kultivator:kota/utuh",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/sakura/kavling_besar",
+        "processors": "kultivator:kota/utuh",
+        "projection": "rigid"
+      },
+      "weight": 2
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/sakura/kavling_besar_2",
+        "processors": "kultivator:kota/utuh",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/sakura/kedai_arak",
+        "processors": "kultivator:kota/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/sakura/gudang",
+        "processors": "kultivator:kota/lapuk",
         "projection": "rigid"
       },
       "weight": 1

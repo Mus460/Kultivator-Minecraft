@@ -1,0 +1,946 @@
+{
+  "_catatan": "62 niat 42.5A.1/42.5A.7/42.5A.9 (42K): 10 milik pemain (pelaku pemain/keduanya), sisanya tindak NPC (pembuka, alur, potongan, kilas balik, penutup, langkah 8 jenis obrolan NPC-NPC).",
+  "niat": [
+    {
+      "id": "TANYA",
+      "pelaku": "keduanya",
+      "topik": true,
+      "tahap": [
+        "BASA_BASI",
+        "TOPIK",
+        "LANJUTAN"
+      ],
+      "jawab": [
+        "BERI_KABAR",
+        "TOLAK",
+        "RAGU"
+      ],
+      "seru": null,
+      "gestur": "bicara_tangan"
+    },
+    {
+      "id": "BERI_KABAR",
+      "pelaku": "keduanya",
+      "topik": true,
+      "tahap": [
+        "TOPIK",
+        "LANJUTAN",
+        "REAKSI"
+      ],
+      "jawab": [
+        "REAKSI",
+        "KAGET",
+        "RAGU",
+        "KOREKSI"
+      ],
+      "seru": null,
+      "gestur": "bicara_tangan"
+    },
+    {
+      "id": "MINTA",
+      "pelaku": "keduanya",
+      "topik": true,
+      "tahap": [
+        "TOPIK",
+        "LANJUTAN",
+        "PERMINTAAN"
+      ],
+      "jawab": [
+        "SEPAKAT",
+        "TOLAK",
+        "TAWAR"
+      ],
+      "seru": null,
+      "gestur": "bicara_tangan"
+    },
+    {
+      "id": "TAWAR",
+      "pelaku": "keduanya",
+      "topik": true,
+      "tahap": [
+        "PERMINTAAN"
+      ],
+      "jawab": [
+        "TAWAR",
+        "SEPAKAT",
+        "BATAL"
+      ],
+      "seru": "hmm",
+      "gestur": "tawar"
+    },
+    {
+      "id": "JANJI",
+      "pelaku": "pemain",
+      "topik": true,
+      "tahap": [
+        "PERMINTAAN",
+        "REAKSI",
+        "KILAS_BALIK"
+      ],
+      "jawab": [
+        "TERIMA_KASIH",
+        "RAGU"
+      ],
+      "seru": null,
+      "gestur": "angguk"
+    },
+    {
+      "id": "TOLAK",
+      "pelaku": "keduanya",
+      "topik": false,
+      "tahap": [
+        "TOPIK",
+        "LANJUTAN",
+        "PERMINTAAN",
+        "REAKSI",
+        "KILAS_BALIK"
+      ],
+      "jawab": [
+        "REAKSI",
+        "KECEWA"
+      ],
+      "seru": null,
+      "gestur": "geleng"
+    },
+    {
+      "id": "PUJI",
+      "pelaku": "keduanya",
+      "topik": false,
+      "tahap": [
+        "BASA_BASI",
+        "TOPIK",
+        "LANJUTAN",
+        "REAKSI"
+      ],
+      "jawab": [
+        "TERIMA_KASIH",
+        "MALU_MALU"
+      ],
+      "seru": null,
+      "gestur": "bicara_tangan"
+    },
+    {
+      "id": "HINA",
+      "pelaku": "keduanya",
+      "topik": false,
+      "tahap": [
+        "BASA_BASI",
+        "TOPIK",
+        "LANJUTAN",
+        "REAKSI"
+      ],
+      "jawab": [
+        "MARAH",
+        "TAKUT",
+        "TUTUP"
+      ],
+      "seru": null,
+      "gestur": "marah_tunjuk"
+    },
+    {
+      "id": "PAMIT",
+      "pelaku": "pemain",
+      "topik": false,
+      "tahap": [
+        "PEMBUKA",
+        "BASA_BASI",
+        "TOPIK",
+        "LANJUTAN",
+        "PERMINTAAN",
+        "REAKSI",
+        "KILAS_BALIK",
+        "PENUTUP"
+      ],
+      "jawab": [
+        "TUTUP"
+      ],
+      "seru": null,
+      "gestur": "lambai"
+    },
+    {
+      "id": "PERKENALAN",
+      "pelaku": "keduanya",
+      "topik": false,
+      "tahap": [
+        "PEMBUKA",
+        "BASA_BASI",
+        "TOPIK"
+      ],
+      "jawab": [
+        "REAKSI",
+        "PERKENALAN"
+      ],
+      "seru": null,
+      "gestur": "hormat"
+    },
+    {
+      "id": "SAPA",
+      "pelaku": "npc",
+      "topik": true,
+      "tahap": [
+        "PEMBUKA"
+      ],
+      "jawab": [
+        "SAPA",
+        "BASA_BASI"
+      ],
+      "seru": null,
+      "gestur": "lambai"
+    },
+    {
+      "id": "BASA_BASI",
+      "pelaku": "npc",
+      "topik": true,
+      "tahap": [
+        "PEMBUKA",
+        "BASA_BASI"
+      ],
+      "jawab": [
+        "SAMBUNG_RASA",
+        "BASA_BASI",
+        "TANYA"
+      ],
+      "seru": null,
+      "gestur": "bicara_tangan"
+    },
+    {
+      "id": "KILAS_BALIK",
+      "pelaku": "npc",
+      "topik": true,
+      "tahap": [
+        "PEMBUKA",
+        "KILAS_BALIK"
+      ],
+      "jawab": [
+        "JANJI",
+        "TOLAK",
+        "MAAF"
+      ],
+      "seru": null,
+      "gestur": "tangan_dada"
+    },
+    {
+      "id": "SAMBUNG_RASA",
+      "pelaku": "npc",
+      "topik": false,
+      "tahap": [
+        "BASA_BASI",
+        "TOPIK",
+        "LANJUTAN",
+        "REAKSI"
+      ],
+      "jawab": [],
+      "seru": "hmm",
+      "gestur": "angguk"
+    },
+    {
+      "id": "POTONG",
+      "pelaku": "npc",
+      "topik": true,
+      "tahap": [
+        "PEMBUKA",
+        "BASA_BASI",
+        "TOPIK",
+        "LANJUTAN",
+        "PERMINTAAN",
+        "REAKSI",
+        "KILAS_BALIK",
+        "POTONG"
+      ],
+      "jawab": [
+        "KEMBALI",
+        "TUTUP"
+      ],
+      "seru": "eh",
+      "gestur": "tunjuk"
+    },
+    {
+      "id": "KEMBALI",
+      "pelaku": "npc",
+      "topik": true,
+      "tahap": [
+        "TOPIK",
+        "LANJUTAN"
+      ],
+      "jawab": [
+        "SAMBUNG_RASA"
+      ],
+      "seru": null,
+      "gestur": "bicara_tangan"
+    },
+    {
+      "id": "REAKSI",
+      "pelaku": "npc",
+      "topik": true,
+      "tahap": [
+        "TOPIK",
+        "LANJUTAN",
+        "REAKSI"
+      ],
+      "jawab": [
+        "SAMBUNG_RASA",
+        "BERI_KABAR"
+      ],
+      "seru": null,
+      "gestur": null
+    },
+    {
+      "id": "TERIMA_KASIH",
+      "pelaku": "npc",
+      "topik": false,
+      "tahap": [
+        "REAKSI"
+      ],
+      "jawab": [],
+      "seru": "terima_kasih",
+      "gestur": "hormat"
+    },
+    {
+      "id": "KOREKSI",
+      "pelaku": "npc",
+      "topik": true,
+      "tahap": [
+        "LANJUTAN",
+        "REAKSI"
+      ],
+      "jawab": [
+        "RAGU",
+        "SEPAKAT",
+        "BANTAH"
+      ],
+      "seru": null,
+      "gestur": "geleng"
+    },
+    {
+      "id": "TUTUP",
+      "pelaku": "npc",
+      "topik": false,
+      "tahap": [
+        "PENUTUP"
+      ],
+      "jawab": [],
+      "seru": null,
+      "gestur": "lambai"
+    },
+    {
+      "id": "SEPAKAT",
+      "pelaku": "keduanya",
+      "topik": false,
+      "tahap": [
+        "PERMINTAAN",
+        "REAKSI"
+      ],
+      "jawab": [
+        "TERIMA_KASIH"
+      ],
+      "seru": "ya",
+      "gestur": "angguk"
+    },
+    {
+      "id": "MAAF",
+      "pelaku": "keduanya",
+      "topik": false,
+      "tahap": [
+        "REAKSI",
+        "KILAS_BALIK"
+      ],
+      "jawab": [
+        "REAKSI",
+        "TERIMA_KASIH"
+      ],
+      "seru": "maaf",
+      "gestur": "sikap_tunduk"
+    },
+    {
+      "id": "TANYA_BALIK",
+      "pelaku": "npc",
+      "topik": true,
+      "tahap": [
+        "BASA_BASI",
+        "TOPIK",
+        "LANJUTAN"
+      ],
+      "jawab": [
+        "BERI_KABAR",
+        "TOLAK"
+      ],
+      "seru": "oh",
+      "gestur": "bicara_tangan"
+    },
+    {
+      "id": "TAWARAN",
+      "pelaku": "npc",
+      "topik": true,
+      "tahap": [
+        "LANJUTAN",
+        "PERMINTAAN"
+      ],
+      "jawab": [
+        "SEPAKAT",
+        "TOLAK",
+        "TAWAR"
+      ],
+      "seru": null,
+      "gestur": "bicara_tangan"
+    },
+    {
+      "id": "PERMINTAAN_NPC",
+      "pelaku": "npc",
+      "topik": true,
+      "tahap": [
+        "PERMINTAAN",
+        "REAKSI",
+        "KILAS_BALIK"
+      ],
+      "jawab": [
+        "JANJI",
+        "TOLAK"
+      ],
+      "seru": null,
+      "gestur": "tangan_dada"
+    },
+    {
+      "id": "KECEWA",
+      "pelaku": "npc",
+      "topik": false,
+      "tahap": [
+        "REAKSI",
+        "KILAS_BALIK"
+      ],
+      "jawab": [
+        "MAAF"
+      ],
+      "seru": "aduh",
+      "gestur": "sikap_tunduk"
+    },
+    {
+      "id": "SELAMAT",
+      "pelaku": "npc",
+      "topik": true,
+      "tahap": [
+        "TOPIK",
+        "LANJUTAN",
+        "REAKSI"
+      ],
+      "jawab": [
+        "TERIMA_KASIH"
+      ],
+      "seru": "oh",
+      "gestur": "tepuk_tangan"
+    },
+    {
+      "id": "BELASUNGKAWA",
+      "pelaku": "npc",
+      "topik": true,
+      "tahap": [
+        "TOPIK",
+        "LANJUTAN",
+        "REAKSI"
+      ],
+      "jawab": [
+        "TERIMA_KASIH",
+        "SAMBUNG_RASA"
+      ],
+      "seru": null,
+      "gestur": "sikap_tunduk"
+    },
+    {
+      "id": "PERINGATAN",
+      "pelaku": "npc",
+      "topik": true,
+      "tahap": [
+        "TOPIK",
+        "LANJUTAN",
+        "POTONG"
+      ],
+      "jawab": [
+        "TERIMA_KASIH",
+        "RAGU"
+      ],
+      "seru": "eh",
+      "gestur": "tunjuk"
+    },
+    {
+      "id": "SARAN",
+      "pelaku": "npc",
+      "topik": true,
+      "tahap": [
+        "TOPIK",
+        "LANJUTAN",
+        "REAKSI"
+      ],
+      "jawab": [
+        "TERIMA_KASIH",
+        "TOLAK"
+      ],
+      "seru": "hmm",
+      "gestur": "bicara_tangan"
+    },
+    {
+      "id": "CERITA",
+      "pelaku": "npc",
+      "topik": true,
+      "tahap": [
+        "TOPIK",
+        "LANJUTAN"
+      ],
+      "jawab": [
+        "SAMBUNG_RASA",
+        "KAGET",
+        "TAWA"
+      ],
+      "seru": null,
+      "gestur": "cerita"
+    },
+    {
+      "id": "PAMER",
+      "pelaku": "npc",
+      "topik": true,
+      "tahap": [
+        "TOPIK",
+        "LANJUTAN"
+      ],
+      "jawab": [
+        "PUJI",
+        "SINDIR"
+      ],
+      "seru": "tawa",
+      "gestur": "sikap_berkacak"
+    },
+    {
+      "id": "KHAWATIR",
+      "pelaku": "npc",
+      "topik": true,
+      "tahap": [
+        "TOPIK",
+        "LANJUTAN",
+        "KILAS_BALIK"
+      ],
+      "jawab": [
+        "HIBUR",
+        "SARAN"
+      ],
+      "seru": "aduh",
+      "gestur": "tangan_dada"
+    },
+    {
+      "id": "BISIK",
+      "pelaku": "npc",
+      "topik": true,
+      "tahap": [
+        "TOPIK",
+        "LANJUTAN"
+      ],
+      "jawab": [
+        "KAGET",
+        "RAGU"
+      ],
+      "seru": "bisik",
+      "gestur": "bisik"
+    },
+    {
+      "id": "TAKUT",
+      "pelaku": "npc",
+      "topik": false,
+      "tahap": [
+        "REAKSI",
+        "POTONG"
+      ],
+      "jawab": [
+        "HIBUR"
+      ],
+      "seru": "takut",
+      "gestur": "takut"
+    },
+    {
+      "id": "MARAH",
+      "pelaku": "npc",
+      "topik": false,
+      "tahap": [
+        "REAKSI"
+      ],
+      "jawab": [
+        "MAAF",
+        "TUTUP"
+      ],
+      "seru": "cih",
+      "gestur": "marah_hentak"
+    },
+    {
+      "id": "SINDIR",
+      "pelaku": "keduanya",
+      "topik": true,
+      "tahap": [
+        "LANJUTAN",
+        "REAKSI"
+      ],
+      "jawab": [
+        "BANTAH",
+        "TAWA"
+      ],
+      "seru": null,
+      "gestur": "sikap_lipat_tangan"
+    },
+    {
+      "id": "UMPAN_GOSIP",
+      "pelaku": "npc",
+      "topik": true,
+      "tahap": [
+        "TOPIK"
+      ],
+      "jawab": [
+        "TANYA",
+        "SAMBUNG_RASA"
+      ],
+      "seru": "bisik",
+      "gestur": "bisik"
+    },
+    {
+      "id": "KAGET",
+      "pelaku": "npc",
+      "topik": true,
+      "tahap": [
+        "REAKSI"
+      ],
+      "jawab": [
+        "BERI_KABAR",
+        "KOMENTAR"
+      ],
+      "seru": "eh",
+      "gestur": "kaget"
+    },
+    {
+      "id": "RAGU",
+      "pelaku": "npc",
+      "topik": true,
+      "tahap": [
+        "REAKSI"
+      ],
+      "jawab": [
+        "KOREKSI",
+        "BERI_KABAR"
+      ],
+      "seru": "hmm",
+      "gestur": "sikap_lipat_tangan"
+    },
+    {
+      "id": "KOMENTAR",
+      "pelaku": "npc",
+      "topik": true,
+      "tahap": [
+        "LANJUTAN",
+        "REAKSI"
+      ],
+      "jawab": [
+        "SAMBUNG_RASA",
+        "SEPAKAT"
+      ],
+      "seru": null,
+      "gestur": "bicara_tangan"
+    },
+    {
+      "id": "TUDUH",
+      "pelaku": "npc",
+      "topik": true,
+      "tahap": [
+        "TOPIK",
+        "REAKSI"
+      ],
+      "jawab": [
+        "BANTAH",
+        "MARAH"
+      ],
+      "seru": "cih",
+      "gestur": "marah_tunjuk"
+    },
+    {
+      "id": "BANTAH",
+      "pelaku": "npc",
+      "topik": true,
+      "tahap": [
+        "REAKSI"
+      ],
+      "jawab": [
+        "ESKALASI",
+        "SEPAKAT"
+      ],
+      "seru": null,
+      "gestur": "berdebat"
+    },
+    {
+      "id": "ESKALASI",
+      "pelaku": "npc",
+      "topik": true,
+      "tahap": [
+        "REAKSI"
+      ],
+      "jawab": [
+        "LERAI",
+        "PERGI_MARAH",
+        "MARAH"
+      ],
+      "seru": "cih",
+      "gestur": "berdebat"
+    },
+    {
+      "id": "LERAI",
+      "pelaku": "npc",
+      "topik": false,
+      "tahap": [
+        "REAKSI",
+        "POTONG"
+      ],
+      "jawab": [
+        "MAAF",
+        "PERGI_MARAH"
+      ],
+      "seru": null,
+      "gestur": "tunjuk"
+    },
+    {
+      "id": "PERGI_MARAH",
+      "pelaku": "npc",
+      "topik": false,
+      "tahap": [
+        "PENUTUP"
+      ],
+      "jawab": [],
+      "seru": "cih",
+      "gestur": "marah_hentak"
+    },
+    {
+      "id": "PUJI_RAYU",
+      "pelaku": "npc",
+      "topik": true,
+      "tahap": [
+        "TOPIK",
+        "LANJUTAN"
+      ],
+      "jawab": [
+        "MALU_MALU",
+        "CANDA_RAYU"
+      ],
+      "seru": null,
+      "gestur": "bicara_tangan"
+    },
+    {
+      "id": "MALU_MALU",
+      "pelaku": "npc",
+      "topik": false,
+      "tahap": [
+        "REAKSI"
+      ],
+      "jawab": [
+        "CANDA_RAYU",
+        "JANJI_TEMU"
+      ],
+      "seru": null,
+      "gestur": "malu"
+    },
+    {
+      "id": "CANDA_RAYU",
+      "pelaku": "npc",
+      "topik": true,
+      "tahap": [
+        "LANJUTAN",
+        "REAKSI"
+      ],
+      "jawab": [
+        "TAWA",
+        "MALU_MALU",
+        "JANJI_TEMU"
+      ],
+      "seru": "tawa",
+      "gestur": "tertawa"
+    },
+    {
+      "id": "JANJI_TEMU",
+      "pelaku": "npc",
+      "topik": true,
+      "tahap": [
+        "PERMINTAAN",
+        "REAKSI"
+      ],
+      "jawab": [
+        "SEPAKAT",
+        "MALU_MALU"
+      ],
+      "seru": null,
+      "gestur": "angguk"
+    },
+    {
+      "id": "TAWAR_BALIK",
+      "pelaku": "npc",
+      "topik": true,
+      "tahap": [
+        "PERMINTAAN"
+      ],
+      "jawab": [
+        "TAWAR",
+        "SEPAKAT",
+        "BATAL"
+      ],
+      "seru": "hmm",
+      "gestur": "tawar"
+    },
+    {
+      "id": "BATAL",
+      "pelaku": "keduanya",
+      "topik": false,
+      "tahap": [
+        "PERMINTAAN",
+        "PENUTUP"
+      ],
+      "jawab": [
+        "TUTUP"
+      ],
+      "seru": null,
+      "gestur": "geleng"
+    },
+    {
+      "id": "NASIHAT",
+      "pelaku": "npc",
+      "topik": true,
+      "tahap": [
+        "TOPIK",
+        "LANJUTAN"
+      ],
+      "jawab": [
+        "TANYA_MURID",
+        "TERIMA_KASIH"
+      ],
+      "seru": "tetua_hmm",
+      "gestur": "bicara_tangan"
+    },
+    {
+      "id": "PERAGA",
+      "pelaku": "npc",
+      "topik": true,
+      "tahap": [
+        "TOPIK",
+        "LANJUTAN"
+      ],
+      "jawab": [
+        "TANYA_MURID",
+        "PUJI_MURID"
+      ],
+      "seru": null,
+      "gestur": "mengajar"
+    },
+    {
+      "id": "TANYA_MURID",
+      "pelaku": "npc",
+      "topik": true,
+      "tahap": [
+        "LANJUTAN",
+        "REAKSI"
+      ],
+      "jawab": [
+        "NASIHAT",
+        "PUJI_MURID",
+        "TEGUR"
+      ],
+      "seru": null,
+      "gestur": "bicara_tangan"
+    },
+    {
+      "id": "PUJI_MURID",
+      "pelaku": "npc",
+      "topik": false,
+      "tahap": [
+        "REAKSI"
+      ],
+      "jawab": [
+        "TERIMA_KASIH"
+      ],
+      "seru": "tetua_hmm",
+      "gestur": "angguk"
+    },
+    {
+      "id": "TEGUR",
+      "pelaku": "npc",
+      "topik": true,
+      "tahap": [
+        "REAKSI"
+      ],
+      "jawab": [
+        "MAAF"
+      ],
+      "seru": "tetua_marah",
+      "gestur": "marah_tunjuk"
+    },
+    {
+      "id": "KELUH",
+      "pelaku": "npc",
+      "topik": true,
+      "tahap": [
+        "TOPIK",
+        "LANJUTAN"
+      ],
+      "jawab": [
+        "HIBUR",
+        "SAMBUNG_RASA"
+      ],
+      "seru": "aduh",
+      "gestur": "sikap_tunduk"
+    },
+    {
+      "id": "HIBUR",
+      "pelaku": "npc",
+      "topik": true,
+      "tahap": [
+        "LANJUTAN",
+        "REAKSI"
+      ],
+      "jawab": [
+        "TERIMA_KASIH",
+        "MINTA_TOLONG"
+      ],
+      "seru": null,
+      "gestur": "tepuk_bahu"
+    },
+    {
+      "id": "MINTA_TOLONG",
+      "pelaku": "npc",
+      "topik": true,
+      "tahap": [
+        "PERMINTAAN"
+      ],
+      "jawab": [
+        "SEPAKAT",
+        "TOLAK"
+      ],
+      "seru": null,
+      "gestur": "tangan_dada"
+    },
+    {
+      "id": "OLOK",
+      "pelaku": "npc",
+      "topik": true,
+      "tahap": [
+        "TOPIK",
+        "LANJUTAN"
+      ],
+      "jawab": [
+        "TAWA",
+        "SINDIR"
+      ],
+      "seru": "tawa",
+      "gestur": "tunjuk"
+    },
+    {
+      "id": "TAWA",
+      "pelaku": "npc",
+      "topik": false,
+      "tahap": [
+        "REAKSI"
+      ],
+      "jawab": [
+        "OLOK",
+        "SAMBUNG_RASA"
+      ],
+      "seru": "tawa",
+      "gestur": "tertawa"
+    }
+  ]
+}

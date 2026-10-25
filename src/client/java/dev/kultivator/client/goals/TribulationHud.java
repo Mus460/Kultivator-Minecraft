@@ -1,6 +1,7 @@
 package dev.kultivator.client.goals;
 
 import dev.kultivator.client.ClientCultivation;
+import dev.kultivator.client.hud.Kabar;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.cultivation.Tribulation;
@@ -22,8 +23,9 @@ import java.util.Locale;
 /**
  * The live tribulation HUD (DESIGN 19.3.10), read from {@code sessionExtra.trib} (written by P7-tempur), on the left
  * edge, vertically centred (clear of the boss bars of the heart demon, the duel arena and the Raja Siluman, of the red
- * sky and of the toasts): bolt pips "Petir 4/9" and a ring emptying toward the next strike; "Berikutnya −5.4 ❤" in white,
- * yellow when the strike takes more than half the current health, and flashing red with a heartbeat and a warning when
+ * sky and of the notices; a jade slip like every HUD slip, text at 1.0, DESIGN 43.9; never queued in the right-side slot):
+ * bolt pips "Petir 4/9" and a ring emptying toward the next strike; "Berikutnya −5.4 ❤" in ink, amber
+ * when the strike takes more than half the current health, and flashing red with a heartbeat and a warning when
  * it would make the tribulation fail; "Keluar dari lingkar!" while a lightning ring is under the player; a small
  * top-down map of the 6-block limit (amber above 4.5, red above 5.5, an arrow back to the centre); "Dikawal: 2".
  * <p>
@@ -31,7 +33,7 @@ import java.util.Locale;
  */
 public final class TribulationHud implements HudElement {
 
-	public static final int WIDTH = 104;
+	public static final int WIDTH = 120;
 	/** Radius of a lightning ring (DESIGN 19.3.8). */
 	public static final double RING_RADIUS = 1.5D;
 	private static final double AMBER_DISTANCE = 4.5D;
@@ -52,9 +54,7 @@ public final class TribulationHud implements HudElement {
 			return;
 		}
 		Font font = minecraft.font;
-		int width = g.guiWidth();
 		int height = g.guiHeight();
-		float scale = Math.max(0.65F, Math.min(1.0F, (width - 180.0F) / 300.0F));
 		long now = ClientCultivation.serverGameTime();
 		long millis = Util.getMillis();
 		float pulse = 0.5F + 0.5F * (float) Math.sin(millis / 160.0D);
@@ -72,21 +72,21 @@ public final class TribulationHud implements HudElement {
 		boolean map = trib.contains("cx");
 		int guards = trib.getIntOr("guards", 0);
 
-		int lines = 3 + (deadly ? 2 : 0) + (ring ? 1 : 0) + (guards > 0 ? 1 : 0);
-		float h = 8.0F + lines * 7.0F + (map ? 34.0F : 0.0F) + (total > 9 ? 6.0F : 0.0F);
-		g.pose().pushMatrix();
-		g.pose().translate(4.0F, height / 2.0F - h * scale / 2.0F);
-		g.pose().scale(scale, scale);
 		int w = WIDTH;
-		int border = deadly ? Palette.mix(Palette.DANGER, 0xFFFF9A8A, pulse) : Palette.argb(0xFF, 0x9A7CFF);
-		g.fill(1, 1, w + 1, Math.round(h) + 1, 0x50000000);
-		g.fill(0, 0, w, Math.round(h), 0xE6101828);
-		Brush.frame(g, 0, 0, w, Math.round(h), border);
-		Brush.frame(g, 1, 1, w - 1, Math.round(h) - 1, Palette.argb(0x70, 0x5A4AA0));
+		Component warn = Component.translatable("kultivator.goals.trib.deadly");
+		int warnH = deadly ? Math.round(Brush.wrapHeight(font, warn, w - 12.0F, 1.0F)) : 0;
+		int h = 5 + 10 + (total > 9 ? 13 : 7) + (phase != 3 ? 10 : 0) + warnH + (ring ? 10 : 0) + (guards > 0 ? 10 : 0) + (map ? 44 : 0) + 3;
+		int x0 = 4;
+		int y0 = Math.max(4, Math.round(height / 2.0F - h / 2.0F));
+		int border = deadly ? Palette.mix(Palette.DANGER, 0xFFFF9A8A, pulse) : 0xFF7A5CE0;
+		Kabar.slip(g, x0, y0, x0 + w, y0 + h, border);
+		if (deadly) {
+			Brush.frame(g, x0, y0, x0 + w, y0 + h, border);
+		}
 
 		// Header: bolt, "Petir 4/9" (omen: the countdown, settling: a quiet line) and the ring emptying toward the next strike.
-		float y = 4.0F;
-		bolt(g, 7.0F, y + 3.5F, 0xFFE8DCFF);
+		float y = y0 + 5.0F;
+		bolt(g, x0 + 9.0F, y + 4.0F, 0xFF5A4AA0);
 		MutableComponent header;
 		float share;
 		if (phase == 1) {
@@ -100,39 +100,38 @@ public final class TribulationHud implements HudElement {
 			header = Component.translatable("kultivator.goals.trib.strikes", Math.min(done + 1, total), total);
 			share = Math.min(1.0F, Math.max(0.0F, (next - now) / (float) Tribulation.STRIKE_INTERVAL));
 		}
-		Brush.fit(g, font, Brush.bold(header), 13.0F, y, w - 32.0F, 0xFFE8DCFF, 0.7F, 0.5F, true);
-		float rcx = w - 9.0F;
-		float rcy = y + 3.5F;
-		Brush.arc(g, rcx, rcy, 3.0F, 5.0F, 0.0F, 1.0F, 0xFF2A2440);
+		Brush.fit(g, font, Brush.bold(header), x0 + 15.0F, y, w - 32.0F, Palette.INK, 1.0F, 1.0F, false);
+		float rcx = x0 + w - 10.0F;
+		float rcy = y + 4.0F;
+		Brush.arc(g, rcx, rcy, 3.0F, 5.0F, 0.0F, 1.0F, Palette.argb(0x90, Palette.PAPER_DEEP));
 		if (share > 0.0F) {
-			Brush.arc(g, rcx, rcy, 3.0F, 5.0F, 1.0F - share, 1.0F, deadly ? Palette.mix(Palette.DANGER, 0xFFFFE0E0, pulse) : 0xFFB9A4FF);
+			Brush.arc(g, rcx, rcy, 3.0F, 5.0F, 1.0F - share, 1.0F, deadly ? Palette.mix(Palette.DANGER, 0xFF6E160F, pulse) : 0xFF5A4AA0);
 		}
-		y += 9.0F;
+		y += 11.0F;
 
 		// Bolt pips, nine per row.
 		int perRow = 9;
 		float pipStep = (w - 12.0F) / perRow;
 		for (int i = 0; i < Math.min(total, 18); i++) {
-			float px = 6.0F + (i % perRow) * pipStep + pipStep / 2.0F;
+			float px = x0 + 6.0F + (i % perRow) * pipStep + pipStep / 2.0F;
 			float py = y + 2.5F + (i / perRow) * 6.0F;
-			int color = i < done ? 0xFF4A4460 : i == done && phase == 2 ? Palette.mix(0xFFB9A4FF, 0xFFFFFFFF, pulse) : 0xFFB9A4FF;
+			int color = i < done ? 0xFFA8A0B8 : i == done && phase == 2 ? Palette.mix(0xFF5A4AA0, 0xFFB9A4FF, pulse) : 0xFF5A4AA0;
 			if (i == total - 1) {
-				color = i < done ? 0xFF4A4460 : Palette.mix(color, Palette.GOLD_LIGHT, 0.5F);
+				color = i < done ? 0xFFA8A0B8 : Palette.mix(color, Palette.GOLD_DARK, 0.5F);
 			}
 			bolt(g, px, py, color);
 		}
 		y += total > 9 ? 13.0F : 7.0F;
 
 		// "Berikutnya −5.4 ❤".
-		int nextColor = deadly ? Palette.mix(0xFFFF4A3A, 0xFFFFD0C8, pulse) : heavy ? 0xFFFFE066 : 0xFFFFFFFF;
-		Component nextLine = Component.translatable("kultivator.goals.trib.next", String.format(Locale.ROOT, "%.1f", damage / 2.0D));
 		if (phase != 3) {
-			Brush.fit(g, font, nextLine, 6.0F, y, w - 12.0F, nextColor, 0.65F, 0.45F, true);
+			int nextColor = deadly ? Palette.mix(Palette.SEAL, Palette.SEAL_GLOW, pulse) : heavy ? 0xFFA86A00 : Palette.INK;
+			Component nextLine = Component.translatable("kultivator.goals.trib.next", String.format(Locale.ROOT, "%.1f", damage / 2.0D));
+			Brush.fit(g, font, nextLine, x0 + 6.0F, y, w - 12.0F, nextColor, 1.0F, 1.0F, false);
+			y += 10.0F;
 		}
-		y += 7.0F;
 		if (deadly) {
-			Component warn = Component.translatable("kultivator.goals.trib.deadly");
-			y += Brush.wrap(g, font, warn, 6.0F, y, w - 12.0F, Palette.mix(0xFFFF6A5A, 0xFFFFFFFF, pulse * 0.4F), 0.55F, true);
+			y += Brush.wrap(g, font, warn, x0 + 6.0F, y, w - 12.0F, Palette.mix(Palette.SEAL_DARK, Palette.SEAL, pulse), 1.0F, false);
 			if (millis - lastBeat > 900L) {
 				lastBeat = millis;
 				minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.WARDEN_HEARTBEAT, 1.0F, 0.7F));
@@ -140,17 +139,16 @@ public final class TribulationHud implements HudElement {
 		}
 		if (ring) {
 			Component text = Component.translatable(inRing ? "kultivator.goals.trib.ring_in" : "kultivator.goals.trib.ring_out");
-			Brush.fit(g, font, text, 6.0F, y, w - 12.0F, inRing ? Palette.mix(0xFFFFB347, 0xFFFFFFFF, pulse * 0.5F) : 0xFF8FE3C8, 0.62F, 0.45F, true);
-			y += 7.0F;
+			Brush.fit(g, font, text, x0 + 6.0F, y, w - 12.0F, inRing ? Palette.mix(0xFFA86A00, Palette.SEAL, pulse * 0.5F) : Palette.JADE_DARK, 1.0F, 1.0F, false);
+			y += 10.0F;
 		}
 		if (guards > 0) {
-			Brush.fit(g, font, Component.translatable("kultivator.goals.trib.guards", guards), 6.0F, y, w - 12.0F, Palette.GOLD_LIGHT, 0.62F, 0.45F, true);
-			y += 7.0F;
+			Brush.fit(g, font, Component.translatable("kultivator.goals.trib.guards", guards), x0 + 6.0F, y, w - 12.0F, Palette.GOLD_DARK, 1.0F, 1.0F, false);
+			y += 10.0F;
 		}
 		if (map) {
-			drawMap(g, font, player, trib, w / 2.0F, y + 16.0F, ring, millis);
+			drawMap(g, font, player, trib, x0 + w / 2.0F, y + 16.0F, ring, millis);
 		}
-		g.pose().popMatrix();
 	}
 
 	private static boolean inside(LocalPlayer player, CompoundTag trib, String xKey, String zKey) {
@@ -216,7 +214,7 @@ public final class TribulationHud implements HudElement {
 		}
 		Brush.dot(g, clampX, clampY, 1.6F, 0xFFFFFFFF);
 		Component text = Component.literal(String.format(Locale.ROOT, "%.1f / %d", distance, (int) limit));
-		Brush.centered(g, font, text, cx, cy + radius + 2.5F, limitColor | 0xFF000000, 0.5F, true);
+		Brush.centered(g, font, text, cx, cy + radius + 2.5F, limitColor | 0xFF000000, 1.0F, true);
 	}
 
 	private static void ringOnMap(GuiGraphicsExtractor g, CompoundTag trib, String xKey, String zKey, double centreX, double centreZ, float cx, float cy,

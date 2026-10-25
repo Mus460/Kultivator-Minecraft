@@ -152,6 +152,16 @@ public final class Halls {
 		}
 	}
 
+	/**
+	 * Asked before a placed stele founds a NEW hall (not a move, not a wake-up; DESIGN 41.3.3). Non-null = the hall is
+	 * created dormant with this reason (the existing dormant mechanism); the vetoing module then offers its own choices and
+	 * wakes the hall with {@link Halls#relocateHall}, or the stele stays dormant until removed.
+	 */
+	@FunctionalInterface
+	public interface FoundVeto {
+		@Nullable Component veto(ServerPlayer founder, ServerLevel level, BlockPos pos);
+	}
+
 	// ---- screen pages (OpenScreen.HALL arg; the Bangun tablet of phase 6b is second, DESIGN 21.24) and hall action sub-ops
 	public static final int PAGE_AULA = 0;
 	public static final int PAGE_BANGUN = 1;
@@ -210,6 +220,7 @@ public final class Halls {
 	private static final List<Predicate<UUID>> RECRUIT_PAUSE_PROVIDERS = new java.util.concurrent.CopyOnWriteArrayList<>();
 	private static final List<StatusLineProvider> STATUS_LINE_PROVIDERS = new ArrayList<>();
 	private static final List<SteleMoveListener> STELE_MOVE_LISTENERS = new ArrayList<>();
+	private static final List<FoundVeto> FOUND_VETOES = new java.util.concurrent.CopyOnWriteArrayList<>();
 	private static final Map<UUID, HallView> VIEW_CACHE = new HashMap<>();
 	/** Players with the hall scroll open -> whose hall. */
 	private static final Map<UUID, UUID> VIEWERS = new HashMap<>();
@@ -530,8 +541,16 @@ public final class Halls {
 		core.putInt("bflags", 0);
 		core.putInt("level_seen", 1);
 		core.putInt("next_id", 1);
-		core.putBoolean("dormant", false);
+		Component veto = foundVeto(player, level, pos);
+		core.putBoolean("dormant", veto != null);
 		changed();
+		if (veto != null) {
+			// DESIGN 41.3.3: founded dormant; the vetoing module offers the choices and wakes it through relocateHall.
+			log(owner, Component.translatable("kultivator.hall.log.dormant"));
+			Fx.send(level, Vec3.atBottomCenterOf(pos).add(0.0D, 0.5D, 0.0D), FxType.HALL, HallFxIds.DORMANT, 0x8C9C94, 2.0F);
+			Msg.chat(player, veto.copy().withStyle(ChatFormatting.YELLOW));
+			return;
+		}
 		Vec3 top = Vec3.atBottomCenterOf(pos).add(0.0D, 1.0D, 0.0D);
 		Fx.send(level, top, FxType.HALL, HallFxIds.FOUNDED, HALL_COLOR, 6.0F);
 		level.playSound(null, top.x, top.y, top.z, SoundEvents.BELL_BLOCK, SoundSource.BLOCKS, 1.5F, 0.8F);
@@ -1051,6 +1070,19 @@ public final class Halls {
 		info.store("name_shown", ComponentSerialization.CODEC, hallName(core));
 		Sect sect = server == null ? null : SectData.get(server).sectOf(owner);
 		info.putString("sect", sect == null ? "" : sect.name());
+		// DESIGN 43.14 S3: the master's /sect group ("Saudara Sekte") as a list on the Aula page instead of a chat command.
+		ListTag saudara = new ListTag();
+		if (sect != null) {
+			for (Sect.Member member : sect.members()) {
+				CompoundTag entry = new CompoundTag();
+				entry.putString("name", member.name());
+				entry.putBoolean("master", member.isMaster());
+				entry.putBoolean("online", server.getPlayerList().getPlayer(member.id()) != null);
+				entry.putLong("joined", member.joined());
+				saudara.add(entry);
+			}
+		}
+		info.put("saudara", saudara);
 		boolean dormant = dormant(core);
 		info.putBoolean("dormant", dormant);
 		BlockPos pos = posOf(core);
@@ -1734,6 +1766,28 @@ public final class Halls {
 		if (provider != null) {
 			STATUS_LINE_PROVIDERS.add(provider);
 		}
+	}
+
+	/** Adds a founding veto (DESIGN 41.3.3, see {@link FoundVeto}). */
+	public static void addFoundVeto(FoundVeto veto) {
+		if (veto != null) {
+			FOUND_VETOES.add(veto);
+		}
+	}
+
+	/** The first founding veto's reason, or null when nobody vetoes. */
+	private static @Nullable Component foundVeto(ServerPlayer founder, ServerLevel level, BlockPos pos) {
+		for (FoundVeto veto : FOUND_VETOES) {
+			try {
+				Component reason = veto.veto(founder, level, pos);
+				if (reason != null) {
+					return reason;
+				}
+			} catch (RuntimeException exception) {
+				Kultivator.LOGGER.error("A Sect Hall founding veto failed", exception);
+			}
+		}
+		return null;
 	}
 
 	/** Hears the stele being moved, woken or removed (see {@link SteleMoveListener}). */

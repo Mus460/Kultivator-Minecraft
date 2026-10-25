@@ -44,10 +44,13 @@ public class TanduRenderer extends TemaBendaRenderer<TanduEntity, TanduRenderer.
 		public float naik;
 		public float tirai;
 		public boolean pikul;
+		/** Synced cloth colour (42D weddings); non-zero draws the red bridal look. */
+		public int warna;
 	}
 
 	public TanduRenderer(EntityRendererProvider.Context context) {
-		super(context, new Model(context.bakeLayer(LAYER)), new Identifier[] {tex("dewi_laut"), tex("pasir"), tex("hitam")}, null, 0.8F);
+		super(context, new Model(context.bakeLayer(LAYER)), new Identifier[] {tex("dewi_laut"), tex("pasir"), tex("hitam"),
+				Kultivator.id("textures/entity/kota42/tandu_pengantin.png")}, null, 0.8F);
 	}
 
 	private static Identifier tex(String look) {
@@ -70,12 +73,14 @@ public class TanduRenderer extends TemaBendaRenderer<TanduEntity, TanduRenderer.
 
 	@Override
 	protected int tekstur(State state) {
-		return Mth.clamp(state.varian, 0, 2);
+		// DESIGN 42.7.7: the bridal sedan chair is the red look (42V-M's tandu_pengantin.png, same band layout)
+		return state.warna != TanduEntity.WARNA_ASLI ? 3 : Mth.clamp(state.varian, 0, 2);
 	}
 
 	@Override
 	public void extractRenderState(TanduEntity entity, State state, float partialTicks) {
 		super.extractRenderState(entity, state, partialTicks);
+		state.warna = entity.warna();
 		state.pikul = state.keadaan == TanduEntity.KEADAAN_PIKUL;
 		if (state.pikul && !state.jauh) {
 			float ph = (state.umur % 30.0F) / 30.0F * Mth.TWO_PI;

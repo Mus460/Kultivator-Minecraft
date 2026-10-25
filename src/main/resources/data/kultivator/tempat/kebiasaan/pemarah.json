@@ -1,0 +1,42 @@
+{
+  "_catatan": "Kebiasaan #17 pemarah (DESIGN 42.4.12)",
+  "nomor": 17,
+  "siapa": {
+    "umur": [
+      18,
+      200
+    ],
+    "tahap": [
+      "dewasa",
+      "tua"
+    ]
+  },
+  "bobot": 0.8,
+  "sesi": [
+    {
+      "jam": [
+        8,
+        18
+      ],
+      "per_jam": true,
+      "peluang": 0.15,
+      "tujuan": [
+        "@depan_lapak:7",
+        "obrol"
+      ],
+      "klip": "marah_tunjuk",
+      "ganti": [
+        {
+          "klip": "marah_tunjuk"
+        },
+        {
+          "klip": "marah_hentak"
+        },
+        {
+          "klip": "berdebat"
+        }
+      ],
+      "ganti_menit": 4
+    }
+  ]
+}

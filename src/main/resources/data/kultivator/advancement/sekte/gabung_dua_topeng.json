@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:sekte/gabung_pangkat_dalam",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "kultivator.gabung.adv.dua_topeng.desc"
+    },
+    "icon": {
+      "id": "minecraft:carved_pumpkin"
+    },
+    "title": {
+      "translate": "kultivator.gabung.adv.dua_topeng.title"
+    },
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

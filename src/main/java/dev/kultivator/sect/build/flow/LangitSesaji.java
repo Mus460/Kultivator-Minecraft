@@ -164,6 +164,32 @@ public final class LangitSesaji {
 		}
 		data.remove("sesaji");
 		FlowData.dirty();
+		giveBack(player, paid);
+	}
+
+	/** The sky template the held offering paid for (0 when none). */
+	static int heldSky(UUID owner) {
+		return LangitApiImpl.data(owner).getCompoundOrEmpty("sesaji").getIntOr("sky", 0);
+	}
+
+	/** Removes and returns the held offering record (empty when none); {@link #restore} puts it back. */
+	static CompoundTag detach(UUID owner) {
+		CompoundTag data = LangitApiImpl.data(owner);
+		CompoundTag paid = data.getCompoundOrEmpty("sesaji");
+		data.remove("sesaji");
+		FlowData.dirty();
+		return paid;
+	}
+
+	static void restore(UUID owner, CompoundTag paid) {
+		if (!paid.isEmpty()) {
+			LangitApiImpl.data(owner).put("sesaji", paid);
+			FlowData.dirty();
+		}
+	}
+
+	/** Gives a paid offering record back to the player. */
+	static void giveBack(ServerPlayer player, CompoundTag paid) {
 		NilaiBatu.give(player, paid.getLongOr("nb", 0L));
 		CompoundTag items = paid.getCompoundOrEmpty("items");
 		for (String key : items.keySet()) {

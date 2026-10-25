@@ -1,0 +1,181 @@
+{
+  "id": "obrolan_dagang",
+  "jenis": "realisasi",
+  "_catatan": "NPC-NPC DAGANG: offer, two haggling rounds, deal or walk away.",
+  "benih_dunia": 42,
+  "masukan": {
+    "niat": "TAWAR",
+    "pembicara": 630,
+    "hari": 120,
+    "now": 2880000,
+    "cuaca": "cerah",
+    "musim": "semi",
+    "situasi": {
+      "jam": "pagi",
+      "cuaca": "cerah",
+      "musim": "semi",
+      "kelompok": "pedagang",
+      "watak": "ramah",
+      "kebiasaan": [],
+      "sifat": {
+        "H": 10,
+        "E": 0,
+        "X": 20,
+        "A": 30,
+        "C": 10,
+        "O": 0
+      },
+      "wajah": "netral",
+      "tempat": "kota_besar"
+    },
+    "pendengar": null,
+    "kesan": "kenal",
+    "tahu_nama": false,
+    "register": "sopan",
+    "dialek": "pelabuhan",
+    "nilai": {
+      "konteks.barang": "minecraft:cod",
+      "konteks.harga": 18,
+      "konteks.harga_tawar": 12,
+      "lawan": {
+        "orang": {
+          "nama": "Lao Wu",
+          "kelamin": "l",
+          "tahap": "dewasa"
+        }
+      }
+    },
+    "topik": "dagang"
+  },
+  "langkah": [
+    {
+      "ubah": {},
+      "harap": {
+        "k": "kultivator.cakap.dagang.tawar_pembeli.0",
+        "a": [
+          {
+            "k": "kultivator.kota.nb",
+            "a": [
+              {
+                "t": "18"
+              }
+            ]
+          },
+          {
+            "k": "kultivator.kota.nb",
+            "a": [
+              {
+                "t": "12"
+              }
+            ]
+          }
+        ]
+      },
+      "aturan": "dagang.tawar_pembeli",
+      "gestur": "tawar",
+      "seru": null,
+      "tik": null,
+      "id_id": "%s NB? Mahal sekali! %s NB saja, ya?",
+      "en_us": "%s SV? Too dear! Just %s SV, all right?"
+    },
+    {
+      "ubah": {
+        "niat": "TAWAR",
+        "pembicara": 631,
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar"
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.dagang.tawar_pembeli.0",
+        "a": [
+          {
+            "k": "kultivator.kota.nb",
+            "a": [
+              {
+                "t": "18"
+              }
+            ]
+          },
+          {
+            "k": "kultivator.kota.nb",
+            "a": [
+              {
+                "t": "12"
+              }
+            ]
+          }
+        ]
+      },
+      "aturan": "dagang.tawar_pembeli",
+      "gestur": "tawar",
+      "seru": null,
+      "tik": null,
+      "id_id": "%s NB? Mahal sekali! %s NB saja, ya?",
+      "en_us": "%s SV? Too dear! Just %s SV, all right?"
+    },
+    {
+      "ubah": {
+        "niat": "TAWAR"
+      },
+      "harap": {
+        "k": "kultivator.cakap.dagang.tawar.obrol.1.pelabuhan",
+        "a": []
+      },
+      "aturan": "dagang.tawar.obrol",
+      "gestur": "tawar",
+      "seru": null,
+      "tik": null,
+      "id_id": "Di dermaga sebelah lebih murah, Bung. Jangan kira aku orang baru.",
+      "en_us": "Cheaper at the next dock, mate. Don't take me for a newcomer."
+    },
+    {
+      "ubah": {
+        "niat": "SEPAKAT",
+        "nilai": {
+          "konteks.harga": 15
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.dagang.sepakat.1",
+        "a": []
+      },
+      "aturan": "dagang.sepakat",
+      "gestur": "angguk",
+      "seru": "kota42.seru.terima_kasih_l",
+      "tik": null,
+      "id_id": "Terima kasih! Kubungkus yang rapi, ya.",
+      "en_us": "Thank you! I'll wrap it neatly."
+    },
+    {
+      "ubah": {
+        "niat": "BATAL"
+      },
+      "harap": {
+        "k": "kultivator.cakap.dagang.batal.1",
+        "a": []
+      },
+      "aturan": "dagang.batal",
+      "gestur": "geleng",
+      "seru": null,
+      "tik": null,
+      "id_id": "Ya sudah, kalau tidak bisa kurang. Aku lihat-lihat dulu di tempat lain.",
+      "en_us": "Well, if it can't go lower. I'll look elsewhere first."
+    }
+  ]
+}

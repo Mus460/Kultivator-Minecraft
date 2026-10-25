@@ -65,6 +65,18 @@
       "dz": 48,
       "pool": "kultivator:kota_tema/oasis/tembok/sudut",
       "putar": 0
+    },
+    {
+      "dx": -48,
+      "dz": 62,
+      "pool": "kultivator:kota_tema/oasis/hidup42/kavling_barat",
+      "putar": 0
+    },
+    {
+      "dx": 0,
+      "dz": 62,
+      "pool": "kultivator:kota_tema/oasis/hidup42/jalan_malam",
+      "putar": 0
     }
   ],
   "gaya": [

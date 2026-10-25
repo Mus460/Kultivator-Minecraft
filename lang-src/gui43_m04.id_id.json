@@ -1,0 +1,13 @@
+{
+  "kultivator.gui43.hal.murid.daftar": "Daftar",
+  "kultivator.gui43.hal.murid.jaring": "Jaring",
+  "kultivator.gui43.sub.daftar.ringkas": "Ringkas",
+  "kultivator.gui43.sub.daftar.suasana": "Suasana Hati",
+  "kultivator.gui43.sub.daftar.tangga": "Tangga",
+  "kultivator.gui43.m04.daftar.judul": "Daftar Murid",
+  "kultivator.gui43.m04.klik_murid": "Klik: buka murid ini di Murid › Murid.",
+  "kultivator.gui43.m04.hanya_pemilik": "Hanya pemilik aula yang bisa mengubah kebijakan.",
+  "kultivator.gui43.m04.jaring.klik": "Klik: pilih · klik lagi atau Enter: buka murid (tab Hubungan).",
+  "kultivator.gui43.m04.jaring.petunjuk": "Arahkan tetikus atau Tab ke seorang murid untuk melihat ikatannya. Klik untuk menahannya, klik lagi untuk membuka gulungannya. Esc melepas.",
+  "kultivator.gui43.m04.jaring.buka": "Buka murid"
+}

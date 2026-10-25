@@ -1,0 +1,199 @@
+{
+  "id": "sapa_dialek_gunung",
+  "jenis": "realisasi",
+  "_catatan": "SAPA in dialect gunung across the day (register kuno); steps share the anti-repeat ring.",
+  "benih_dunia": 42,
+  "masukan": {
+    "niat": "SAPA",
+    "pembicara": 104,
+    "hari": 120,
+    "now": 2880000,
+    "cuaca": "cerah",
+    "musim": "semi",
+    "situasi": {
+      "jam": "pagi",
+      "cuaca": "cerah",
+      "musim": "semi",
+      "kelompok": "rahib",
+      "watak": "ramah",
+      "kebiasaan": [],
+      "sifat": {
+        "H": 10,
+        "E": 0,
+        "X": 20,
+        "A": 30,
+        "C": 10,
+        "O": 0
+      },
+      "wajah": "netral",
+      "tempat": "tema_gunung"
+    },
+    "pendengar": {
+      "nama": "Han",
+      "kelamin": "l",
+      "tahap": "dewasa",
+      "pemain": true
+    },
+    "kesan": "kenal",
+    "tahu_nama": false,
+    "register": "kuno",
+    "dialek": "gunung",
+    "kelamin": "p"
+  },
+  "langkah": [
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "subuh",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "rahib",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "tema_gunung"
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.subuh.3",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.rekan_daois.gunung",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "sapa.subuh",
+      "gestur": "lambai",
+      "seru": null,
+      "tik": null,
+      "id_id": "Pagi, Sahabat di Jalan Dao. Udara subuh paling bagus untuk napas, kata orang.",
+      "en_us": "Morning, Companion on the Way. Dawn air is best for breathing, they say."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "rahib",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "tema_gunung"
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.pagi.3",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.rekan_daois.gunung",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "sapa.pagi",
+      "gestur": "lambai",
+      "seru": null,
+      "tik": null,
+      "id_id": "Ah, Sahabat di Jalan Dao. Pagi! Jalanan masih lengang, enak berjalan.",
+      "en_us": "Ah, Companion on the Way. Morning! The streets are still empty; good for walking."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "siang",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "rahib",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "tema_gunung"
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.kenal.0.kuno",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.rekan_daois.gunung",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "sapa.kenal",
+      "gestur": "lambai",
+      "seru": null,
+      "tik": null,
+      "id_id": "Ah, Sahabat di Jalan Dao berkunjung kembali.",
+      "en_us": "Ah, Companion on the Way visits again."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "malam",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "rahib",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "tema_gunung"
+        },
+        "pendengar": {
+          "nama": "Mei",
+          "kelamin": "p",
+          "tahap": "dewasa",
+          "pemain": true
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.malam.1.kuno",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.rekan_daois.gunung",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "sapa.malam",
+      "gestur": "lambai",
+      "seru": null,
+      "tik": null,
+      "id_id": "Malam, Sahabat di Jalan Dao. Bayang-bayang menyimpan bahaya; berjalanlah di bawah lentera.",
+      "en_us": "Good night, Companion on the Way. Shadows hold danger; walk beneath the lanterns."
+    }
+  ]
+}

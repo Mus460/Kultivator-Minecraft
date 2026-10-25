@@ -1,0 +1,18 @@
+{
+  "kultivator.gui43.m18.gerak": "Motion warning: Spectacular Camera uses fast sweeps, crash zooms, rolls and slowed time. If fast motion makes you dizzy, cancel and stay on Full.",
+  "kultivator.gui43.m18.dampak": "Photosensitivity warning: Full impact frames use full-screen flashes and colour inversion. Do not enable them if you are sensitive to flashing light.",
+  "kultivator.gui43.m18.hardcore.nyala": "Turn on Hardcore Breakthroughs? A failed breakthrough will drop you a whole realm.",
+  "kultivator.gui43.m18.hardcore.mati": "Turn off Hardcore Breakthroughs? A failed breakthrough will only cause Qi Deviation again.",
+  "kultivator.gui43.m18.hardcore.how": "Turning it on needs the seal held for 1.5 seconds.",
+  "kultivator.gui43.m18.keys.petunjuk": "Click a row to change its key; right-click restores the default.",
+  "kultivator.gui43.m18.clash_note": "Red keys are also used by another key (its name is written next to it). Click the row to change it.",
+  "kultivator.gui43.m18.key.tekan": "press a key…",
+  "kultivator.gui43.m18.key.bentrok": "%s · also %s",
+  "kultivator.gui43.m18.key.ubah": "Click: change key · right-click: back to default",
+  "kultivator.gui43.m18.key.tangkap": "Press the new key for %s. Esc cancels, Backspace unbinds.",
+  "kultivator.gui43.m18.key.diikat": "%s now uses %s.",
+  "kultivator.gui43.m18.key.dilepas": "%s is no longer bound.",
+  "kultivator.gui43.m18.key.bentrok_pesan": "%s now uses %s, also used by %s.",
+  "kultivator.gui43.m18.vanilla": "All Minecraft keys…",
+  "kultivator.gui43.m18.vanilla.tip": "Opens the Minecraft Controls screen for the game's own keys. Done or Esc returns here."
+}

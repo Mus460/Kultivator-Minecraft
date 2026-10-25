@@ -1,85 +1,186 @@
 package dev.kultivator.client.alam;
 
-import dev.kultivator.client.dunia.DuniaPage;
-import dev.kultivator.client.dunia.DuniaScreen;
+import dev.kultivator.client.dunia.DuniaClient;
+import dev.kultivator.client.dunia.reruntuhan.MenaraScreen;
+import dev.kultivator.client.screen.Page;
 import dev.kultivator.client.screen.ui.Brush;
+import dev.kultivator.client.screen.ui.DaftarGulir;
 import dev.kultivator.client.screen.ui.Glyphs;
+import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.TalismanButton;
 import dev.kultivator.network.Actions;
+import dev.kultivator.network.Payloads;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The Alam tablet of the Dunia screen (DESIGN 25.10, owned by P8-alam): four realm seal cards in a 2 × 2 grid. Each shows the
- * realm's seal and name, "Siap" or the lock reason, the key count (and the heavenvoid fragments), the clears or the best Makam
- * layer, the cooldown, a reward preview and a "Buka Gerbang" talisman that needs the key. A line above names the lifetime
- * crystals, Luka Alam and Mode Ringan when it is on.
+ * Dunia › Alam (DESIGN 25.10, 43.5, 43.12.2): sub <b>Alam Rahasia</b>, the four secret realms as seal cards in one scroll
+ * (two columns on a wide box, one on a narrow one) with the realm's seal and name, "Siap" or the lock reason, the key
+ * count (and the heavenvoid fragments), the clears or the best Makam layer, the cooldown, a reward line and a "Buka
+ * Gerbang" talisman that needs the key; a line above names the lifetime crystals, Luka Alam and Mode Ringan. Sub
+ * <b>Menara</b> is the Hundred-Floor Tower card ({@link MenaraScreen}). The page asks for its data while shown (43.0.12):
+ * the Alam sync on show, the tower numbers when its sub shows. Text at 1.0 (43.0.5); a long reason is cut with "…" and
+ * shown whole in the tooltip.
  */
-public class AlamPage extends DuniaPage {
+public class AlamPage extends Page {
 
+	public static final String SUB_ALAM = "alam_rahasia";
+	public static final String SUB_MENARA = "menara";
 	private static final String[] IDS = {"blood_fire_trial", "heavenvoid_hall", "ancient_god_land", "heavenly_tomb"};
-	private static final int TOP = 14;
-	private static final int GAP = 4;
+	private static final int CARD_H = 64;
+	private static final int CARD_MIN_W = 200;
 
-	private final List<TalismanButton> buttons = new ArrayList<>();
+	private final DaftarGulir realms = new DaftarGulir();
+	private final MenaraScreen menara = new MenaraScreen();
+	private String sub = SUB_ALAM;
+	private boolean shown;
 
-	public AlamPage(DuniaScreen screen) {
-		super(screen);
+	public AlamPage() {
 	}
 
 	@Override
 	public Component title() {
-		return Component.translatable("kultivator.spine8.tab.alam");
+		return Component.translatable("kultivator.gui43.hal.dunia.alam");
 	}
 
 	@Override
-	public Component shortName() {
-		return Component.translatable("kultivator.spine8.tab.alam.short");
-	}
-
-	@Override
-	public int icon() {
+	public int glyph() {
 		return Glyphs.JALAN;
 	}
 
-	private int cardW() {
-		return (w - GAP) / 2;
+	@Override
+	public String helpTopic() {
+		return SUB_MENARA.equals(sub) ? "menara_seratus" : "alam_rahasia";
 	}
 
-	private int cardH() {
-		return (h - TOP - GAP) / 2;
+	@Override
+	public List<Sub> subs() {
+		return List.of(new Sub(SUB_ALAM, Component.translatable("kultivator.gui43.sub.alam.alam_rahasia")),
+				new Sub(SUB_MENARA, Component.translatable("kultivator.gui43.sub.alam.menara")));
 	}
 
-	private int cardX(int index) {
-		return x + (index % 2) * (cardW() + GAP);
+	@Override
+	public void showSub(String id) {
+		String next = SUB_MENARA.equals(id) ? SUB_MENARA : SUB_ALAM;
+		if (!next.equals(sub)) {
+			sub = next;
+			realms.mulaiUlang(net.minecraft.util.Util.getMillis());
+		}
+		if (shown && SUB_MENARA.equals(sub)) {
+			MenaraScreen.request();
+		}
 	}
 
-	private int cardY(int index) {
-		return y + TOP + (index / 2) * (cardH() + GAP);
+	@Override
+	public void onShow(@Nullable CompoundTag fokus) {
+		super.onShow(fokus);
+		shown = true;
+		send(Actions.ALAM, 0, "sync");
+		if (SUB_MENARA.equals(sub)) {
+			MenaraScreen.request();
+		}
+	}
+
+	@Override
+	public void onHide() {
+		shown = false;
 	}
 
 	@Override
 	protected void build() {
-		buttons.clear();
-		for (int i = 0; i < IDS.length; i++) {
-			String id = IDS[i];
-			int bw = Math.min(90, cardW() - 10);
-			TalismanButton button = new TalismanButton(cardX(i) + cardW() - bw - 4, cardY(i) + cardH() - 17, bw, 14,
-					() -> Component.translatable("kultivator.alam.page.open"));
-			button.enabledWhen(() -> realm(id).getBooleanOr("ready", false));
-			button.onPress(() -> send(Actions.ALAM, 0, "open:" + id));
-			button.tooltip(() -> {
-				Component why = why(realm(id));
-				return why == null ? List.of(Component.translatable("kultivator.alam.page.open_tip")) : List.of(why);
-			});
-			buttons.add(add(button));
+		// Immediate page: everything is drawn and hit-tested in lukis().
+	}
+
+	@Override
+	protected void drawBehind(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
+	}
+
+	@Override
+	protected void lukis(Lukis l) {
+		boolean tooBig = DuniaClient.tooBig(Payloads.DuniaSync.CH_ALAM) && SUB_ALAM.equals(sub);
+		int bottom = tooBig ? y + h - 11 : y + h;
+		if (SUB_MENARA.equals(sub)) {
+			menara.gambar(l, x, y, x + w, bottom);
+			return;
+		}
+		l.teks(notes(), x + 2, y + 1, w - 4, l.gaya.teksLemah);
+		realms.gambarKisi(l, "alam", x, y + 13, x + w, bottom, IDS.length, CARD_MIN_W, CARD_H,
+				(lk, i, x0, y0, x1, y1, sorot, pilih) -> card(lk, i, x0, y0, x1, y1, sorot), null, null);
+		if (tooBig) {
+			l.teks(Component.translatable("kultivator.sect_fix_feat.too_big"), x + 2, y + h - 9, w - 4, Palette.SEAL_DARK);
+		}
+	}
+
+	/** Crystals · Luka Alam · Mode Ringan. */
+	private static Component notes() {
+		CompoundTag data = AlamClient.data();
+		Component line = Component.translatable("kultivator.alam.page.crystals", data.getIntOr("crystals", 0), 94);
+		long luka = data.getLongOr("luka", 0L);
+		if (luka > 0L) {
+			line = Component.translatable("kultivator.alam.page.sep", line,
+					Component.translatable("kultivator.alam.page.luka", minutes(luka)).withColor(Palette.DANGER & 0xFFFFFF));
+		}
+		if (data.getBooleanOr("light", false)) {
+			line = Component.translatable("kultivator.alam.page.sep", line,
+					Component.translatable("kultivator.alam.page.light").withColor(Palette.JADE_DARK & 0xFFFFFF));
+		}
+		return line;
+	}
+
+	private void card(Lukis l, int index, int cx0, int cy0, int cx1, int cy1, boolean sorot) {
+		String id = IDS[index];
+		CompoundTag entry = realm(id);
+		boolean ready = entry.getBooleanOr("ready", false);
+		int color = Palette.opaque(RealmScenery.color(index + 1));
+		l.kartu(cx0, cy0, cx1, cy1, sorot ? 1.0F : 0.0F, false);
+		// The realm's seal: a square in its colour with the ordinal.
+		int seal = 18;
+		l.g.fill(cx0 + 4, cy0 + 4, cx0 + 4 + seal, cy0 + 4 + seal, Palette.argb(0xE0, color));
+		Brush.frame(l.g, cx0 + 5, cy0 + 5, cx0 + 3 + seal, cy0 + 3 + seal, Palette.argb(0xB0, Palette.TALISMAN));
+		Brush.centered(l.g, l.font, Component.literal(String.valueOf(index + 1)), cx0 + 4 + seal / 2.0F, cy0 + 9.0F, Palette.TALISMAN, 1.0F, false);
+		int tx = cx0 + 8 + seal;
+		int room = cx1 - tx - 4;
+		l.teks(Brush.bold(Component.translatable("kultivator.alam.realm." + id)), tx, cy0 + 3, room, Palette.darken(color, 0.35F));
+		Component status;
+		if (entry.isEmpty()) {
+			status = Component.translatable("kultivator.alam.page.loading");
+		} else if (ready) {
+			status = Component.translatable("kultivator.alam.status.ready");
+		} else {
+			Component why = why(entry);
+			status = why == null ? Component.translatable("kultivator.alam.page.locked") : why;
+		}
+		l.teks(status, tx, cy0 + 14, room, ready ? Palette.JADE_DARK : Palette.SEAL_DARK);
+		int lw = cx1 - cx0 - 8;
+		Component keys = Component.translatable("kultivator.alam.page.keys", Component.translatable("kultivator.alam.page.key." + id),
+				entry.getIntOr("have", 0), entry.getIntOr("need", 1));
+		if ("heavenvoid_hall".equals(id)) {
+			keys = Component.translatable("kultivator.alam.page.fragments", keys, entry.getIntOr("fragments", 0));
+		}
+		l.teks(keys, cx0 + 4, cy0 + 25, lw, l.gaya.teks);
+		Component record = "heavenly_tomb".equals(id) ? Component.translatable("kultivator.alam.list.best", entry.getIntOr("best", 0))
+				: Component.translatable("kultivator.alam.list.clears", entry.getIntOr("clears", 0));
+		long cd = entry.getLongOr("cd", 0L);
+		if (cd > 0L) {
+			record = Component.translatable("kultivator.alam.page.sep", record, Component.translatable("kultivator.alam.page.cooldown", minutes(cd)));
+		}
+		l.teks(record, cx0 + 4, cy0 + 35, lw, l.gaya.teksLemah);
+		Component open = Component.translatable("kultivator.alam.page.open");
+		int bw = TalismanButton.lebar(l.font, open, 64, Math.max(64, (cx1 - cx0) / 2));
+		int by = cy1 - 16;
+		l.teks(Component.translatable("kultivator.alam.realm." + id + ".reward"), cx0 + 4, by + 3, cx1 - cx0 - bw - 14, l.gaya.teksSamar);
+		Component why = ready ? null : why(entry);
+		TalismanButton.gambar(l, "alam.buka." + index, cx1 - bw - 4, by, bw, 14, open, ready,
+				why != null ? why : Component.translatable("kultivator.alam.page.locked"), () -> send(Actions.ALAM, 0, "open:" + id));
+		if (ready && l.di(cx1 - bw - 4, by, cx1 - 4, by + 14)) {
+			l.tip(Component.translatable("kultivator.alam.page.open_tip"));
 		}
 	}
 
@@ -92,7 +193,7 @@ public class AlamPage extends DuniaPage {
 		return new CompoundTag();
 	}
 
-	private static Component why(CompoundTag entry) {
+	private static @Nullable Component why(CompoundTag entry) {
 		return entry.read("why", ComponentSerialization.CODEC).orElse(null);
 	}
 
@@ -100,76 +201,5 @@ public class AlamPage extends DuniaPage {
 	private static String minutes(long ticks) {
 		long minutes = (ticks + 1199L) / 1200L;
 		return String.format(java.util.Locale.ROOT, "%d:%02d", minutes / 60L, minutes % 60L);
-	}
-
-	@Override
-	protected void drawBehind(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
-		CompoundTag data = AlamClient.data();
-		List<Component> notes = new ArrayList<>();
-		notes.add(Component.translatable("kultivator.alam.page.crystals", data.getIntOr("crystals", 0), 94));
-		long luka = data.getLongOr("luka", 0L);
-		if (luka > 0L) {
-			notes.add(Component.translatable("kultivator.alam.page.luka", minutes(luka)).withColor(Palette.DANGER & 0xFFFFFF));
-		}
-		if (data.getBooleanOr("light", false)) {
-			notes.add(Component.translatable("kultivator.alam.page.light").withColor(Palette.JADE_DARK & 0xFFFFFF));
-		}
-		Component line = notes.get(0);
-		for (int i = 1; i < notes.size(); i++) {
-			line = Component.translatable("kultivator.alam.page.sep", line, notes.get(i));
-		}
-		Brush.fit(g, font, line, x + 2.0F, y + 2.0F, w - 4.0F, Palette.INK_SOFT, 0.8F, 0.5F, false);
-		for (int i = 0; i < IDS.length; i++) {
-			drawCard(g, i, IDS[i], realm(IDS[i]));
-		}
-	}
-
-	private void drawCard(GuiGraphicsExtractor g, int index, String id, CompoundTag entry) {
-		int cx = cardX(index);
-		int cy = cardY(index);
-		int cw = cardW();
-		int ch = cardH();
-		int color = Palette.opaque(RealmScenery.color(index + 1));
-		boolean ready = entry.getBooleanOr("ready", false);
-		panel(g, cx, cy, cx + cw, cy + ch);
-		// The realm's seal: a square in its colour with the ordinal.
-		int seal = 14;
-		g.fill(cx + 4, cy + 4, cx + 4 + seal, cy + 4 + seal, Palette.argb(0xE0, color));
-		Brush.frame(g, cx + 5, cy + 5, cx + 3 + seal, cy + 3 + seal, Palette.argb(0xB0, Palette.TALISMAN));
-		Brush.centered(g, font, Component.literal(String.valueOf(index + 1)), cx + 4 + seal / 2.0F, cy + 7.0F, Palette.TALISMAN, 0.9F, false);
-		float tx = cx + 8.0F + seal;
-		float room = cw - seal - 12.0F;
-		Brush.fit(g, font, Brush.bold(Component.translatable("kultivator.alam.realm." + id)), tx, cy + 4.0F, room, Palette.darken(color, 0.35F), 0.85F, 0.5F, false);
-		Component status;
-		if (entry.isEmpty()) {
-			status = Component.translatable("kultivator.alam.page.loading");
-		} else if (ready) {
-			status = Component.translatable("kultivator.alam.status.ready");
-		} else {
-			Component why = why(entry);
-			status = why == null ? Component.translatable("kultivator.alam.page.locked") : why;
-		}
-		Brush.fit(g, font, status, tx, cy + 13.0F, room, ready ? Palette.JADE_DARK : Palette.SEAL_DARK, 0.7F, 0.45F, false);
-		float ly = cy + 23.0F;
-		float lw = cw - 8.0F;
-		Component keys = Component.translatable("kultivator.alam.page.keys", Component.translatable("kultivator.alam.page.key." + id),
-				entry.getIntOr("have", 0), entry.getIntOr("need", 1));
-		if ("heavenvoid_hall".equals(id)) {
-			keys = Component.translatable("kultivator.alam.page.fragments", keys, entry.getIntOr("fragments", 0));
-		}
-		Brush.fit(g, font, keys, cx + 4.0F, ly, lw, Palette.INK, 0.7F, 0.45F, false);
-		ly += 8.0F;
-		Component record = "heavenly_tomb".equals(id) ? Component.translatable("kultivator.alam.list.best", entry.getIntOr("best", 0))
-				: Component.translatable("kultivator.alam.list.clears", entry.getIntOr("clears", 0));
-		long cd = entry.getLongOr("cd", 0L);
-		if (cd > 0L) {
-			record = Component.translatable("kultivator.alam.page.sep", record, Component.translatable("kultivator.alam.page.cooldown", minutes(cd)));
-		}
-		Brush.fit(g, font, record, cx + 4.0F, ly, lw, Palette.INK_SOFT, 0.7F, 0.45F, false);
-		ly += 8.0F;
-		float bottom = cy + ch - 19.0F;
-		if (ly < bottom) {
-			Brush.wrap(g, font, Component.translatable("kultivator.alam.realm." + id + ".reward"), cx + 4.0F, ly, lw, Palette.INK_FAINT, 0.6F, false);
-		}
 	}
 }

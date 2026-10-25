@@ -1,45 +1,58 @@
 package dev.kultivator.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import dev.kultivator.Kultivator;
 import dev.kultivator.client.ClientCultivation;
 import dev.kultivator.client.Keys;
 import dev.kultivator.client.hub.HubNav;
+import dev.kultivator.client.hub.HubPages;
+import dev.kultivator.client.hub.Tujuan;
+import dev.kultivator.client.hub.Urutan;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Eased;
+import dev.kultivator.client.screen.ui.Fokus;
 import dev.kultivator.client.screen.ui.Glyphs;
-import dev.kultivator.client.screen.ui.JadeTablet;
+import dev.kultivator.client.screen.ui.KeyHints;
+import dev.kultivator.client.screen.ui.LabelHarga;
+import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.ScrollFrame;
 import dev.kultivator.client.screen.ui.SlipTooltip;
+import dev.kultivator.client.screen.ui.TabBar;
+import dev.kultivator.client.screen.ui.TombolKembali;
 import dev.kultivator.client.screen.ui.UiSound;
 import dev.kultivator.network.Actions;
 import dev.kultivator.network.Payloads;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
- * The Gulungan Kultivasi, since UI/UX Terpadu (DESIGN 33.3) the one hub of the mod, in the "Gulungan Giok" (jade scroll)
- * style (DESIGN 5b, 12): a scroll that unrolls in a quarter second over an ink-blue night with distant mountains, eight
- * jade tablets on its left edge as the sections in play order (number keys 1-8), the section's sub-coins in the header
- * strip ({@code Tab} / {@code Shift+Tab}) and a "?" seal at its right end (Panduan › Ensiklopedia on the page's topic).
- * <ol>
- * <li>Diri: Status · Akar &amp; Dao · Jalan · Alkimia</li>
- * <li>Teknik: the Kitab Teknik launcher</li>
- * <li>Murid, 4 Sekte, 5 Dunia, 6 Keabadian: launcher cards ({@link HubCardsPage}), locked ones greyed with the reason</li>
- * <li>Panduan: Kitab Panduan · Ensiklopedia</li>
- * <li>Pengaturan: the settings page with its own groups as sub-coins (module G)</li>
- * </ol>
- * Not a pause screen; the quick key (V), the info key or Escape closes it. Screens opened from here come back here on Esc
- * ({@link HubNav}). The legacy tab ids of {@link #CultivationScreen(int)} (server {@code OpenScreen.INFO} args) stay valid.
+ * The Gulungan Utama (DESIGN 43.3): the one screen of the mod. A jade scroll over an ink night with a rail of jade
+ * tablets on its left edge (the eight sections, keys 1-8, plus the Di Sini tablet, key 9, while a world context lives),
+ * a header with the back control, the section name, the page coins (Q / E), the purse and the "?" seal, the sub bar of
+ * the shown page (with the Sumber chip), the page's content box and a footer with the last message and the key hints.
+ * <p>
+ * The chrome is drawn with the single kit ({@link TabBar} rail / coins / sub chips, {@link TombolKembali},
+ * {@link LabelHarga}) in the host's own {@link Fokus}. Pages come from {@link HubPages} ({@link Urutan} order), are built
+ * lazily the first time they are shown and laid out into the content box; only the shown page draws, ticks and asks for
+ * data (43.0.12). The scroll unrolls once when opened from the world; moving between sections and pages never replays it
+ * (R29). Input follows 43.4.1: a page whose text field writes or whose confirm seal is open gets keys first, then the
+ * Gulungan keys (43.4.2), then the page. Every mouse event inside the content box goes to the page.
+ * <p>
+ * The legacy tab ids of {@link #CultivationScreen(int)} (server {@code OpenScreen.INFO} args) stay valid.
  */
 public class CultivationScreen extends Screen {
 
@@ -56,31 +69,77 @@ public class CultivationScreen extends Screen {
 	private static final String[] SECTION_KEYS = {"diri", "teknik", "murid", "sekte", "dunia", "keabadian", "panduan", "pengaturan"};
 	private static final int[] SECTION_GLYPHS = {Glyphs.STATUS, Glyphs.CODEX, Glyphs.TALENT, Glyphs.HALL, Glyphs.PATH, Glyphs.SEAL, Glyphs.HELP,
 			Glyphs.SETTINGS};
+	private static final String H = "kultivator.gui43.host.";
+
+	private static final String DI_SINI = "di_sini";
 
 	private static final long UNROLL_MILLIS = 250L;
-	private static final int TABLET_W = 20;
+	private static final long WIDE_MILLIS = 120L;
+	private static final long PESAN_MILLIS = 6000L;
+	private static final int RAIL_W = 20;
+	private static final int RAIL_W_SEMPIT = 18;
+	/** Rail width with names beside the glyphs (43.3.1: paper at least 230 px tall and room for the full paper). */
+	private static final int RAIL_W_NAMA = 64;
 	private static final int MAX_W = 440;
 	private static final int MAX_H = 284;
-	/** Below this much paper the tablets show their glyph only (the name moves to the tooltip, 33.3). */
+	private static final int WIDE_W = 560;
+	private static final int WIDE_H = 330;
 	private static final int NAMED_TABLETS_MIN = 230;
-	private static final int HELP_SEAL = 9;
+	/** Header and sub bar: buttons at least 14 px tall, 12 in the narrow layout (43.3.2). */
+	private static final int HEAD_H = 14;
+	private static final int HEAD_H_SEMPIT = 12;
+	private static final int SUB_H = 14;
+	private static final int SUB_H_SEMPIT = 12;
+	private static final int FOOT_H = 10;
+	/** The "?" seal: a 13 px seal in a 16 px wide click box (43.0.6). */
+	private static final int SEAL = 13;
+	private static final int SEAL_BOX = 16;
 
-	private final Page[][] sections;
-	private final HelpPage help;
-	private final List<JadeTablet> tablets = new ArrayList<>();
+	// ================================================================== the Di Sini context (43.8; it can arrive while closed)
+
+	private static @Nullable Page konteks;
+	private static Component konteksJudul = Component.empty();
+	private static int konteksGlyph = Glyphs.HALL;
+	private static long konteksSejak;
+
+	// ================================================================== state
+
+	private final Map<String, Page> pages = new HashMap<>();
+	private final Map<Page, String> laid = new HashMap<>();
 	private final Eased backdrop = new Eased(6.0F);
+	/** The chrome's focus engine (rail, coins, sub chips, back, purse, seal): its zones take clicks outside the content box. */
+	private final Fokus krom = new Fokus(alasan -> pesan(alasan, Palette.DANGER));
+	private final TabBar rel = new TabBar();
+	private final TabBar koin = new TabBar();
+	private final TabBar subBar = new TabBar();
+	private final LabelHarga.Gulir uangGulir = new LabelHarga.Gulir();
 	private int section;
-	private int sub;
+	private String pageId;
+	private String subId = "";
+	private @Nullable Page shown;
+	private @Nullable CompoundTag fokusTunda;
+	private String subTunda;
+	private List<String> ids = List.of();
 	private long openedAt;
 	private long lastFrame;
 	private long seenVersion = Long.MIN_VALUE;
 	private boolean opened;
-	private @Nullable JadeTablet pressedTablet;
-	private @Nullable List<Component> tooltip;
+	private boolean sempit;
+	private boolean bernama;
 	private int mouseX;
 	private int mouseY;
-	private @Nullable String pendingHelp;
+	private @Nullable Component pesan;
+	private int pesanWarna = Palette.INK;
+	private long pesanSampai;
+	private @Nullable KeyHints.HelpSeal helpSeal;
+	/** Where the "?" seal was pressed: the Ensiklopedia then offers one step back there (header back, Esc). */
+	private @Nullable Tujuan asalBantuan;
 
+	// geometry
+	private int railW = RAIL_W;
+	private int subH = SUB_H;
+	private int headH = HEAD_H;
+	private boolean wide;
 	private int paperX0;
 	private int paperX1;
 	private int paperTop;
@@ -89,154 +148,385 @@ public class CultivationScreen extends Screen {
 	private int contentY;
 	private int contentW;
 	private int contentH;
+	private int headY;
+	private int subY;
+	private boolean hasSubs;
+	private float animX0 = Float.NaN;
+	private float animFromX0;
+	private float animFromX1;
+	private long animAt;
 
-	/** The header strip: the title box, one box per sub-coin and the "?" seal (each its own box: nothing overlaps). */
-	private float headerY;
-	private float titleX0;
-	private float titleX1;
-	private float[] coinX0 = new float[0];
-	private float[] coinX1 = new float[0];
-	private float helpX0;
-
-	/** Opens on a legacy tab id (0 Status, 1 Akar &amp; Dao, 2 Teknik, 3 Pengaturan, 4 Bantuan, 5 Jalan, 6 Alkimia; 33.3). */
+	/** Opens on a legacy tab id (0 Status, 1 Akar &amp; Dao, 2 Teknik, 3 Pengaturan, 4 Ensiklopedia, 5 Jalan, 6 Alkimia; 43.4.4). */
 	public CultivationScreen(int legacyTab) {
-		this(sectionOf(legacyTab), subOf(legacyTab), true);
+		this(tujuanDari(legacyTab));
 	}
 
-	private CultivationScreen(int section, int sub, boolean unused) {
+	private CultivationScreen(Tujuan tujuan) {
 		super(Component.translatable("kultivator.screen.title"));
-		this.help = new HelpPage(this);
-		this.sections = new Page[][]{
-				{new StatusPage(this), new RootDaoPage(this), new JalanPage(this), new AlchemyBookPage(this)},
-				{new TechniquesPage(this)},
-				{new HubCardsPage(this, HubNav.MURID)},
-				{new HubCardsPage(this, HubNav.SEKTE)},
-				{new HubCardsPage(this, HubNav.DUNIA)},
-				{new HubCardsPage(this, HubNav.KEABADIAN)},
-				{new HubCardsPage(this, HubNav.PANDUAN), help},
-				{new SettingsPage(this)}};
-		this.section = Math.max(0, Math.min(HubNav.SECTIONS - 1, section));
-		this.sub = Math.max(0, sub);
+		this.section = Math.max(0, Math.min(HubNav.DI_SINI, tujuan.bagian()));
+		this.pageId = tujuan.halaman();
+		this.subTunda = tujuan.sub();
+		this.fokusTunda = tujuan.fokus();
 	}
 
-	/** The hub on {@code section} ({@code HubNav.DIRI} ...) and sub-coin {@code sub}. */
-	public static CultivationScreen hub(int section, int sub) {
-		return new CultivationScreen(section, sub, true);
+	/** A Gulungan opened on {@code tujuan} ({@link HubNav#buka} is the way to open it). */
+	public static CultivationScreen buka(Tujuan tujuan) {
+		return new CultivationScreen(tujuan);
 	}
 
-	private static int sectionOf(int legacyTab) {
+	/** The legacy {@code OpenScreen.INFO} tab ids as places (43.4.4). */
+	public static Tujuan tujuanDari(int legacyTab) {
 		return switch (legacyTab) {
-			case TAB_TECHNIQUES -> HubNav.TEKNIK;
-			case TAB_SETTINGS -> HubNav.PENGATURAN;
-			case TAB_HELP -> HubNav.PANDUAN;
-			default -> HubNav.DIRI;
+			case TAB_ROOT_DAO -> Tujuan.of(HubNav.DIRI, Urutan.ID_AKAR_DAO);
+			case TAB_TECHNIQUES -> Tujuan.of(HubNav.TEKNIK, Urutan.ID_KODEKS);
+			case TAB_SETTINGS -> Tujuan.bagian(HubNav.PENGATURAN);
+			case TAB_HELP -> Tujuan.of(HubNav.PANDUAN, Urutan.ID_ENSIKLOPEDIA);
+			case TAB_JALAN -> Tujuan.of(HubNav.DIRI, Urutan.ID_JALAN);
+			case TAB_ALKIMIA -> Tujuan.of(HubNav.DIRI, Urutan.ID_ALKIMIA);
+			default -> Tujuan.of(HubNav.DIRI, Urutan.ID_STATUS);
 		};
 	}
 
-	private static int subOf(int legacyTab) {
-		return switch (legacyTab) {
-			case TAB_ROOT_DAO -> 1;
-			case TAB_JALAN -> 2;
-			case TAB_ALKIMIA -> 3;
-			case TAB_SETTINGS -> HubNav.lastSub(HubNav.PENGATURAN);
-			case TAB_HELP -> HubNav.SUB_ENSIKLOPEDIA;
-			default -> 0;
-		};
+	/**
+	 * Registers the pages of this package (a module may re-register an id from its own client class: same id replaces).
+	 * Called once from {@code KultivatorClient} before the module inits; the five Pengaturan pages come from
+	 * {@code SettingsPage.daftar} (called by {@code EpicClient}).
+	 */
+	public static void daftarBawaan() {
+		HubPages.daftar(HubNav.DIRI, Urutan.ID_STATUS, Urutan.STATUS, () -> new StatusPage(null));
+		HubPages.daftar(HubNav.DIRI, Urutan.ID_AKAR_DAO, Urutan.AKAR_DAO, () -> new RootDaoPage(null));
+		HubPages.daftar(HubNav.DIRI, Urutan.ID_JALAN, Urutan.JALAN, () -> new JalanPage(null));
+		HubPages.daftar(HubNav.DIRI, Urutan.ID_ALKIMIA, Urutan.ALKIMIA, () -> new AlchemyBookPage(null));
+		HubPages.daftar(HubNav.DIRI, Urutan.ID_PUSAKA, Urutan.PUSAKA, dev.kultivator.client.tempa.PusakaPage::new);
+		HubPages.daftar(HubNav.DIRI, Urutan.ID_HARTA, Urutan.HARTA, HartaPage::new);
+		// the 41 abode sheet from the world (an NPC, /kultivasi gabung kediaman) lands on Diri › Harta, on its own tab
+		HubPages.daftarRumah(dev.kultivator.sekte.gabung.ui.GabungLembar.Kediaman.LAYAR, java.util.Set.of(), HubNav.DIRI, Urutan.ID_HARTA, "", null);
+		HubPages.daftar(HubNav.PANDUAN, Urutan.ID_ENSIKLOPEDIA, Urutan.ENSIKLOPEDIA, () -> new HelpPage(null));
 	}
 
-	// ================================================================== sections
+	// ================================================================== the Di Sini context
 
-	/** The section shown ({@code HubNav.DIRI} ...). */
+	/** Installs {@code halaman} as the Di Sini page (43.8); the old context's page is told it ended ({@link Page#onHide}). */
+	public static void konteks(Page halaman, Component judul, int glyph) {
+		Page old = konteks;
+		konteks = halaman;
+		konteksJudul = judul == null ? Component.empty() : judul;
+		konteksGlyph = glyph < 0 ? Glyphs.HALL : glyph;
+		konteksSejak = Util.getMillis();
+		if (old != null && old != halaman) {
+			old.onHide();
+			if (net.minecraft.client.Minecraft.getInstance().gui.screen() instanceof CultivationScreen hub) {
+				hub.laid.remove(old);
+				if (hub.shown == old) {
+					hub.shown = null;
+				}
+			}
+		}
+	}
+
+	/**
+	 * The context ended on the server side: the tablet goes; when Di Sini was shown the Gulungan moves to the last section
+	 * with footer {@code pesan}. The page's {@link Page#onHide} is not called (the session is already closed).
+	 */
+	public static void tutupKonteks(@Nullable Component pesan) {
+		if (konteks == null) {
+			return;
+		}
+		Page old = konteks;
+		konteks = null;
+		if (net.minecraft.client.Minecraft.getInstance().gui.screen() instanceof CultivationScreen hub) {
+			hub.laid.remove(old);
+			if (hub.section == HubNav.DI_SINI) {
+				hub.shown = null;
+				hub.tampilkan(HubNav.lastSection(), "", "", null);
+				if (pesan != null) {
+					hub.pesan(pesan, Palette.INK_SOFT);
+				}
+			}
+		}
+	}
+
+	/** True while a Di Sini context lives. */
+	public static boolean adaKonteks() {
+		return konteks != null;
+	}
+
+	// ================================================================== places
+
+	/** The section shown ({@code HubNav.DIRI} ... {@code HubNav.DI_SINI}). */
 	public int section() {
 		return section;
 	}
 
-	/** The page on screen. */
-	private Page page() {
-		Page[] pages = sections[section];
-		return pages[pages.length > 1 ? Math.min(sub, pages.length - 1) : 0];
+	/** The place shown now (section, page, sub). */
+	public Tujuan tempat() {
+		return new Tujuan(section, pageId, subId, null);
 	}
 
-	/** The sub-coins of the section: its pages when it has several, else the page's own sub-names. */
-	private List<Component> subNames() {
-		Page[] pages = sections[section];
-		if (pages.length > 1) {
-			List<Component> names = new ArrayList<>(pages.length);
-			for (Page page : pages) {
-				names.add(page.shortName());
-			}
-			return names;
+	/** Moves to {@code tujuan} (another section, page or sub; a focus tag goes to the page). */
+	public void tuju(Tujuan tujuan) {
+		if (!opened) {
+			section = Math.max(0, Math.min(HubNav.DI_SINI, tujuan.bagian()));
+			pageId = tujuan.halaman();
+			subTunda = tujuan.sub();
+			fokusTunda = tujuan.fokus();
+			return;
 		}
-		List<Component> own = pages[0].subNames();
-		return own == null ? List.of() : own;
+		tampilkan(tujuan.bagian(), tujuan.halaman(), tujuan.sub(), tujuan.fokus());
 	}
 
-	private @Nullable Component subTitle(int index) {
-		Page[] pages = sections[section];
-		if (pages.length > 1) {
-			return index >= 0 && index < pages.length ? pages[index].title() : null;
-		}
-		List<Component> names = subNames();
-		return index >= 0 && index < names.size() ? names.get(index) : null;
-	}
-
-	/** Shows {@code newSection} on sub-coin {@code newSub} (clamped). */
+	/** Legacy: shows {@code newSection} on its last page. */
 	public void showSection(int newSection, int newSub) {
-		int s = Math.max(0, Math.min(HubNav.SECTIONS - 1, newSection));
-		boolean changed = s != section;
-		section = s;
-		int count = subNames().size();
-		int wanted = count == 0 ? 0 : Math.max(0, Math.min(count - 1, newSub));
-		changed |= wanted != sub;
-		sub = wanted;
-		if (opened) {
-			applySection(changed);
-		}
+		tuju(Tujuan.bagian(newSection));
 	}
 
-	/** Panduan › Ensiklopedia on {@code topic} ({@code HelpPage.focus}, module P). */
+	/** Panduan › Ensiklopedia on {@code topic}. */
 	public void showHelp(String topic) {
-		showSection(HubNav.PANDUAN, HubNav.SUB_ENSIKLOPEDIA);
-		if (opened) {
-			help.focus(topic);
+		tuju(Tujuan.of(HubNav.PANDUAN, Urutan.ID_ENSIKLOPEDIA));
+		if (shown instanceof HelpPage help) {
+			help.focus(topic == null || topic.isEmpty() ? "jalan" : topic);
+		}
+	}
+
+	/** The visible pages of section {@code s} in order. */
+	private List<String> halaman(int s) {
+		List<String> list = new ArrayList<>();
+		if (s == HubNav.DI_SINI) {
+			if (konteks != null) {
+				list.add(DI_SINI);
+			}
+			return list;
+		}
+		for (HubPages.Entri e : HubPages.dari(s)) {
+			Page p = page(e.id());
+			if (p != null && p.tampil()) {
+				list.add(e.id());
+			}
+		}
+		return list;
+	}
+
+	/** The page of {@code id}, built and mounted the first time; null when it cannot be built (yet). */
+	private @Nullable Page page(String id) {
+		if (DI_SINI.equals(id)) {
+			if (konteks != null) {
+				konteks.pasang(this);
+			}
+			return konteks;
+		}
+		Page p = pages.get(id);
+		if (p != null) {
+			return p;
+		}
+		HubPages.Entri entri = HubPages.cari(id);
+		if (entri == null) {
+			return null;
+		}
+		try {
+			p = entri.buat().get();
+		} catch (RuntimeException e) {
+			Kultivator.LOGGER.warn("Kultivator: page {} could not be built", id, e);
+			p = null;
+		}
+		if (p == null) {
+			return null;
+		}
+		p.pasang(this);
+		pages.put(id, p);
+		return p;
+	}
+
+	/**
+	 * Shows page {@code id} ("" = the section's last) of section {@code s} on sub {@code sub} ("" = the page's last), with
+	 * focus tag {@code fokus}. A locked page is not entered (its reason goes to the footer).
+	 */
+	private void tampilkan(int s, String id, String sub, @Nullable CompoundTag fokus) {
+		int target = Math.max(0, Math.min(HubNav.DI_SINI, s));
+		if (target == HubNav.DI_SINI && konteks == null) {
+			target = section == HubNav.DI_SINI ? HubNav.lastSection() : section;
+		}
+		List<String> list = halaman(target);
+		String want = id == null || id.isEmpty() ? (target < HubNav.SECTIONS ? HubNav.halamanTerakhir(target) : DI_SINI) : id;
+		Page asked = list.contains(want) ? page(want) : null;
+		Component lock = asked == null ? null : asked.kunci();
+		if (lock != null && shown != null && !(want.equals(pageId) && target == section)) {
+			// A locked page is refused where the player stands; with nothing shown yet (first open) it falls back below.
+			UiSound.denied();
+			pesan(lock, Palette.DANGER);
+			return;
+		}
+		if (asked == null || lock != null) {
+			want = "";
+			for (String candidate : list) {
+				Page p = page(candidate);
+				if (p != null && p.kunci() == null) {
+					want = candidate;
+					break;
+				}
+			}
+			if (want.isEmpty() && !list.isEmpty()) {
+				want = list.get(0);
+			}
+			if (lock != null) {
+				pesan(lock, Palette.DANGER);
+			}
+		}
+		Page next = want.isEmpty() ? null : page(want);
+		boolean changed = next != shown;
+		if (changed && shown != null && shown != konteks) {
+			shown.onHide();
+		}
+		section = target;
+		pageId = want;
+		shown = next;
+		if (!Urutan.ID_ENSIKLOPEDIA.equals(want)) {
+			asalBantuan = null;
+		}
+		ids = list;
+		if (target < HubNav.SECTIONS) {
+			HubNav.ingat(target, want);
+		}
+		if (next != null) {
+			pilihSub(next, sub == null || sub.isEmpty() ? HubNav.subTerakhir(want) : sub);
+			geometri();
+			if (changed) {
+				next.onShow(fokus);
+			} else if (fokus != null) {
+				next.fokus(fokus);
+			}
 		} else {
-			pendingHelp = topic;
+			subId = "";
+			geometri();
 		}
 	}
 
-	/** Lays the current page out, tells it its sub-coin and remembers the place for the session. */
-	private void applySection(boolean relayout) {
-		Page page = page();
-		if (relayout) {
-			page.layout(contentX, contentY, contentW, contentH);
+	/** Shows sub {@code id} of {@code page} (first open sub when unknown or locked). */
+	private void pilihSub(Page page, String id) {
+		List<Page.Sub> subs = page.subs();
+		if (subs == null || subs.isEmpty()) {
+			subId = "";
+			return;
 		}
-		if (sections[section].length == 1 && !subNames().isEmpty()) {
-			page.showSub(sub);
+		Page.Sub chosen = null;
+		for (Page.Sub sub : subs) {
+			if (sub.id().equals(id) && sub.kunci() == null) {
+				chosen = sub;
+			}
 		}
-		if (page instanceof HubCardsPage cards) {
-			cards.shown();
+		if (chosen == null) {
+			for (Page.Sub sub : subs) {
+				if (sub.kunci() == null) {
+					chosen = sub;
+					break;
+				}
+			}
 		}
-		HubNav.remember(section, sub);
-		layoutHeader();
+		if (chosen == null) {
+			chosen = subs.get(0);
+		}
+		subId = chosen.id();
+		page.showSub(subId);
+		HubNav.ingatSub(pageId, subId);
 	}
 
-	private void stepSub(int step) {
-		int count = subNames().size();
-		if (count > 1) {
-			UiSound.tab();
-			showSection(section, Math.floorMod(sub + step, count));
+	/** A coin was picked (click, Q/E): enters page {@code id} of the shown section unless it is locked. */
+	private void pindahHalaman(String id) {
+		if (id.equals(pageId)) {
+			return;
+		}
+		Page p = page(id);
+		if (p != null && p.kunci() != null) {
+			krom.tolak(p.kunci());
+			return;
+		}
+		tampilkan(section, id, "", null);
+	}
+
+	/** A sub chip was picked (click, ←/→). */
+	private void gantiSub(String id) {
+		if (shown != null && !id.equals(subId)) {
+			pilihSub(shown, id);
+			geometri();
 		}
 	}
+
+	private void stepPage(int step) {
+		if (ids.size() < 2) {
+			return;
+		}
+		int index = Math.max(0, ids.indexOf(pageId));
+		for (int i = 1; i < ids.size(); i++) {
+			String id = ids.get(Math.floorMod(index + step * i, ids.size()));
+			Page p = page(id);
+			if (p != null && p.kunci() == null) {
+				UiSound.tab();
+				tampilkan(section, id, "", null);
+				return;
+			}
+		}
+	}
+
+	private boolean stepSub(int step) {
+		String next = subBar.tetangga(subId, step);
+		if (next == null || shown == null || shown.subs().isEmpty()) {
+			return false;
+		}
+		UiSound.tab();
+		gantiSub(next);
+		return true;
+	}
+
+	/** Esc or the back control: the page's detail view first, then back from the Ensiklopedia to where "?" was pressed. */
+	private boolean mundurHalaman() {
+		if (shown != null && shown.mundur()) {
+			return true;
+		}
+		if (balikBantuan()) {
+			Tujuan asal = asalBantuan;
+			asalBantuan = null;
+			tampilkan(asal.bagian(), asal.halaman(), asal.sub(), null);
+			return true;
+		}
+		return false;
+	}
+
+	/** True while the Ensiklopedia was reached by a "?" seal and can step back there. */
+	private boolean balikBantuan() {
+		return asalBantuan != null && Urutan.ID_ENSIKLOPEDIA.equals(pageId) && section == HubNav.PANDUAN;
+	}
+
+	/** The "?" seal: Panduan › Ensiklopedia on the shown page's topic, remembering this place for the way back. */
+	private void bukaBantuan() {
+		Tujuan asal = balikBantuan() ? asalBantuan : tempat();
+		HubNav.help(helpTopic());
+		if (!(asal.bagian() == HubNav.PANDUAN && Urutan.ID_ENSIKLOPEDIA.equals(asal.halaman()))) {
+			asalBantuan = asal;
+		}
+	}
+
+	// ================================================================== services for pages
 
 	/** Shows {@code lines} as the tooltip of this frame (drawn last, on top of everything). */
 	void showTooltip(List<Component> lines) {
-		if (tooltip == null && !lines.isEmpty()) {
-			tooltip = lines;
-		}
+		SlipTooltip.antre(lines);
+	}
+
+	/** The footer message for 6 s; {@code warna} an RGB/ARGB colour. */
+	public void pesan(Component text, int warna) {
+		pesan = text;
+		pesanWarna = Palette.opaque(warna);
+		pesanSampai = Util.getMillis() + PESAN_MILLIS;
 	}
 
 	private static Component sectionName(int index) {
+		if (index == HubNav.DI_SINI) {
+			return konteksJudul.getString().isEmpty() ? Component.translatable(H + "di_sini") : konteksJudul;
+		}
 		return Component.translatable("kultivator.hub.section." + SECTION_KEYS[index]);
+	}
+
+	private static int sectionGlyph(int index) {
+		return index == HubNav.DI_SINI ? konteksGlyph : SECTION_GLYPHS[index];
 	}
 
 	// ================================================================== layout
@@ -251,75 +541,85 @@ public class CultivationScreen extends Screen {
 			UiSound.open();
 			Keys.send(Payloads.Action.of(Actions.REQUEST_SYNC));
 		}
-		int scrollW = Math.min(MAX_W, width - TABLET_W - 26);
-		int scrollH = Math.min(MAX_H, height - 12);
-		paperX0 = (width - scrollW + TABLET_W) / 2;
-		paperX1 = paperX0 + scrollW;
-		paperTop = (height - scrollH) / 2 + 5;
-		paperBottom = paperTop + scrollH - 10;
-		contentX = paperX0 + ScrollFrame.SIDE + 7;
-		contentW = paperX1 - ScrollFrame.SIDE - 7 - contentX;
-		contentY = paperTop + ScrollFrame.END + 17;
-		contentH = paperBottom - ScrollFrame.END - 6 - contentY;
-
-		tablets.clear();
-		int count = HubNav.SECTIONS;
-		int top = paperTop + 10;
-		int gap = height < 250 ? 2 : 3;
-		int tabletH = Math.max(18, Math.min(54, (paperBottom - paperTop - 20 - gap * (count - 1)) / count));
-		boolean named = paperBottom - paperTop >= NAMED_TABLETS_MIN;
-		for (int i = 0; i < count; i++) {
-			int index = i;
-			JadeTablet tablet = new JadeTablet(paperX0 - TABLET_W + 1, top + i * (tabletH + gap), TABLET_W, tabletH, SECTION_GLYPHS[i],
-					() -> named ? sectionName(index) : Component.empty(), () -> section == index);
-			tablet.onPress(() -> showSection(index, HubNav.lastSub(index)));
-			tablet.tooltip(() -> List.of(Brush.bold(sectionName(index)),
-					Component.translatable("kultivator.hub.section." + SECTION_KEYS[index] + ".tip").withStyle(ChatFormatting.GRAY),
-					Component.translatable("kultivator.hub.number_key", index + 1).withStyle(ChatFormatting.DARK_GREEN)));
-			tablets.add(tablet);
+		sempit = width < 400 || height < 240;
+		subH = sempit ? SUB_H_SEMPIT : SUB_H;
+		headH = sempit ? HEAD_H_SEMPIT : HEAD_H;
+		int ph = Math.min(MAX_H, height - 8);
+		bernama = !sempit && ph >= NAMED_TABLETS_MIN && width - RAIL_W_NAMA - 12 >= MAX_W;
+		railW = sempit ? RAIL_W_SEMPIT : bernama ? RAIL_W_NAMA : RAIL_W;
+		laid.clear();
+		if (first) {
+			tampilkan(section, pageId, subTunda, fokusTunda);
+			fokusTunda = null;
+			subTunda = "";
+		} else {
+			geometri();
 		}
-		for (Page[] pages : sections) {
-			for (Page page : pages) {
-				page.layout(contentX, contentY, contentW, contentH);
-			}
-		}
-		int subs = subNames().size();
-		sub = subs == 0 ? 0 : Math.min(sub, subs - 1);
-		applySection(false);
-		if (pendingHelp != null) {
-			help.focus(pendingHelp);
-			pendingHelp = null;
+		if (helpSeal == null) {
+			helpSeal = new KeyHints.HelpSeal(0.0F, 0.0F, SEAL, this::helpTopic);
 		}
 		seenVersion = ClientCultivation.version();
 	}
 
-	/** Places the title, the sub-coins and the "?" seal in the header strip, each in its own box. */
-	private void layoutHeader() {
-		headerY = paperTop + ScrollFrame.END + 5.0F;
-		float left = contentX + 10.0F;
-		float right = contentX + contentW - 2.0F;
-		helpX0 = right - HELP_SEAL;
-		List<Component> names = subNames();
-		if (names.isEmpty()) {
-			titleX0 = left;
-			titleX1 = helpX0 - 4.0F;
-			coinX0 = new float[0];
-			coinX1 = new float[0];
-			return;
+	/** The paper and content box for the shown page (wide paper, sub bar), and its layout when the box changed. */
+	private void geometri() {
+		wide = shown != null && shown.lebar();
+		int maxW = wide ? WIDE_W : MAX_W;
+		int maxH = wide ? WIDE_H : MAX_H;
+		int pw = Math.max(120, Math.min(maxW, width - railW - 12));
+		int ph = Math.max(100, Math.min(maxH, height - 8));
+		int x0 = (width - pw + railW) / 2;
+		int top = (height - ph) / 2;
+		if (!Float.isNaN(animX0) && (x0 != paperX0 || x0 + pw != paperX1)) {
+			animFromX0 = currentX0();
+			animFromX1 = currentX1();
+			animAt = Util.getMillis();
 		}
-		Component title = Brush.bold(sectionName(section));
-		float titleW = Math.min(font.width(title) * 0.85F, (helpX0 - left) * 0.28F);
-		titleX0 = left;
-		titleX1 = left + Math.max(20.0F, titleW);
-		float from = titleX1 + 6.0F;
-		float to = helpX0 - 5.0F;
-		float each = Math.max(8.0F, (to - from) / names.size());
-		coinX0 = new float[names.size()];
-		coinX1 = new float[names.size()];
-		for (int i = 0; i < names.size(); i++) {
-			coinX0[i] = from + each * i;
-			coinX1[i] = from + each * (i + 1) - 2.0F;
+		paperX0 = x0;
+		paperX1 = x0 + pw;
+		paperTop = top;
+		paperBottom = top + ph;
+		if (Float.isNaN(animX0)) {
+			animFromX0 = paperX0;
+			animFromX1 = paperX1;
+			animAt = 0L;
 		}
+		animX0 = paperX0;
+		List<Page.Sub> subs = shown == null ? null : shown.subs();
+		hasSubs = subs != null && !subs.isEmpty();
+		headY = paperTop + ScrollFrame.END + 2;
+		subY = headY + headH + 1;
+		contentX = paperX0 + ScrollFrame.SIDE + 6;
+		contentW = paperX1 - ScrollFrame.SIDE - 6 - contentX;
+		contentY = headY + headH + (hasSubs ? subH + 2 : 1) + 2;
+		contentH = paperBottom - ScrollFrame.END - FOOT_H - 2 - contentY;
+		if (shown != null) {
+			String box = contentX + "," + contentY + "," + contentW + "," + contentH;
+			if (!box.equals(laid.get(shown))) {
+				laid.put(shown, box);
+				shown.layout(contentX, contentY, contentW, contentH);
+			}
+		}
+	}
+
+	private float currentX0() {
+		float t = animAt == 0L ? 1.0F : Math.min(1.0F, (Util.getMillis() - animAt) / (float) WIDE_MILLIS);
+		return animFromX0 + (paperX0 - animFromX0) * Eased.out(t);
+	}
+
+	private float currentX1() {
+		float t = animAt == 0L ? 1.0F : Math.min(1.0F, (Util.getMillis() - animAt) / (float) WIDE_MILLIS);
+		return animFromX1 + (paperX1 - animFromX1) * Eased.out(t);
+	}
+
+	private String helpTopic() {
+		String topic = shown == null ? null : shown.helpTopic();
+		return topic == null || topic.isEmpty() ? "jalan" : topic;
+	}
+
+	private static Component sumberLabel(Page.Sumber sumber) {
+		int index = Math.max(0, Math.min(sumber.pilihan().size() - 1, sumber.aktif().getAsInt()));
+		return Component.translatable(H + "sumber", sumber.pilihan().get(index));
 	}
 
 	private float unroll() {
@@ -356,222 +656,286 @@ public class CultivationScreen extends Screen {
 		minecraft.gui.hud.extractDeferredSubtitles();
 	}
 
+	/** Once per frame: registry or context changes refresh the coins; sub bar / wide paper changes relayout; new data reaches the page. */
+	private void segarkan() {
+		if (konteks == null && section == HubNav.DI_SINI) {
+			shown = null;
+			tampilkan(HubNav.lastSection(), "", "", null);
+		}
+		List<String> now = halaman(section);
+		if (!now.equals(ids)) {
+			ids = now;
+			if (!ids.contains(pageId)) {
+				tampilkan(section, "", "", null);
+			}
+		}
+		if (shown != null) {
+			List<Page.Sub> subs = shown.subs();
+			boolean adaSub = subs != null && !subs.isEmpty();
+			if (adaSub != hasSubs || shown.lebar() != wide) {
+				geometri();
+			}
+		}
+		long version = ClientCultivation.version();
+		if (version != seenVersion) {
+			seenVersion = version;
+			if (shown != null) {
+				if (shown.needsRebuild()) {
+					laid.remove(shown);
+					geometri();
+				} else {
+					shown.onData();
+				}
+			}
+		}
+	}
+
 	@Override
 	public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float a) {
+		SlipTooltip.mulaiBingkai();
 		super.extractRenderState(g, mouseX, mouseY, a);
 		long now = Util.getMillis();
 		float seconds = Math.max(0.0F, Math.min(0.1F, (now - lastFrame) / 1000.0F));
 		lastFrame = now;
 		this.mouseX = mouseX;
 		this.mouseY = mouseY;
-		tooltip = null;
-
-		long version = ClientCultivation.version();
-		Page current = page();
-		if (version != seenVersion) {
-			seenVersion = version;
-			if (current.needsRebuild()) {
-				current.layout(contentX, contentY, contentW, contentH);
-			} else {
-				current.onData();
-			}
-		}
+		segarkan();
 
 		float open = unroll();
 		int mid = (paperTop + paperBottom) / 2;
 		int half = Math.round((paperBottom - paperTop) / 2.0F * open);
 		int top = mid - half;
 		int bottom = mid + half;
+		int x0 = Math.round(currentX0());
+		int x1 = Math.round(currentX1());
 
-		// Tablets hang behind the paper and slide out once it has opened.
+		Lukis l = krom.mulai(g, font, mouseX, mouseY, 1.0F, Palette.Gaya.KERTAS, 0, 0, width, height);
+		// Tablets hang behind the paper and slide out once it has opened (zones follow the drawn place).
 		float tabletsOut = Eased.out(Math.min(1.0F, Math.max(0.0F, (now - openedAt - 150L) / 220.0F)));
-		g.pose().pushMatrix();
-		g.pose().translate((1.0F - tabletsOut) * (TABLET_W - 2), 0.0F);
-		for (JadeTablet tablet : tablets) {
-			if (tablet.y + tablet.h <= bottom && tablet.y >= top) {
-				tablet.render(g, font, mouseX, mouseY, seconds);
-			}
-		}
-		g.pose().popMatrix();
+		drawRail(l, x0 - railW + 1 + Math.round((1.0F - tabletsOut) * (railW - 2)), now);
 		g.nextStratum();
 
-		ScrollFrame.paper(g, paperX0, paperX1, top, bottom, paperTop, paperBottom);
-		ScrollFrame.rod(g, paperX0, paperX1, top);
-		ScrollFrame.rod(g, paperX0, paperX1, bottom);
+		ScrollFrame.paper(g, x0, x1, top, bottom, paperTop, paperBottom);
+		ScrollFrame.rod(g, x0, x1, top);
+		ScrollFrame.rod(g, x0, x1, bottom);
 		g.nextStratum();
 
 		if (bottom - top > 24) {
-			g.enableScissor(paperX0 + ScrollFrame.SIDE + 1, top + ScrollFrame.END + 1, paperX1 - ScrollFrame.SIDE - 1, bottom - ScrollFrame.END - 1);
-			drawHeader(g);
-			current.render(g, mouseX, mouseY, seconds);
+			g.enableScissor(x0 + ScrollFrame.SIDE + 1, top + ScrollFrame.END + 1, x1 - ScrollFrame.SIDE - 1, bottom - ScrollFrame.END - 1);
+			drawHeader(l, seconds);
+			if (hasSubs) {
+				drawSubs(l);
+			}
+			if (shown != null) {
+				shown.render(g, mouseX, mouseY, seconds);
+			} else {
+				Brush.fitCentered(g, font, Component.translatable(H + "kosong"), contentX + contentW / 2.0F, contentY + contentH / 2.0F - 4.0F,
+						contentW - 8.0F, Palette.INK_FAINT, 1.0F, 1.0F, false);
+			}
+			drawFooter(g);
 			g.disableScissor();
 		}
-
-		for (JadeTablet tablet : tablets) {
-			if (tabletsOut > 0.9F && tablet.contains(mouseX, mouseY)) {
-				showTooltip(tablet.tooltipLines());
-			}
-		}
-		headerTooltip();
-		if (tooltip != null && open >= 1.0F) {
+		krom.selesai(l, mouseX, mouseY);
+		if (open >= 1.0F) {
 			g.nextStratum();
-			SlipTooltip.draw(g, font, tooltip, mouseX, mouseY, width, height);
-		}
-	}
-
-	/**
-	 * The header strip. Without sub-coins: "Kultivasi · Status" centred between two gold rules (as before). With them:
-	 * the section name on the left, then one small jade coin per sub-page (the shown one in gold), then the "?" seal.
-	 */
-	private void drawHeader(GuiGraphicsExtractor g) {
-		float y = headerY;
-		float lineY = y + 4.0F;
-		int glyph = SECTION_GLYPHS[section];
-		Glyphs.tab(g, glyph, contentX + 4.0F, lineY, 6.0F, Palette.GOLD_DARK);
-		List<Component> names = subNames();
-		if (names.isEmpty() || coinX0.length != names.size()) {
-			Component text = Brush.bold(Component.translatable("kultivator.screen.header", title, page().title()));
-			float cx = (titleX0 + titleX1) / 2.0F;
-			float room = titleX1 - titleX0 - 30.0F;
-			float scale = Brush.fitScale(font, text, room, 1.0F, 0.6F);
-			float textW = Math.min(room, font.width(text) * scale);
-			Brush.fitCentered(g, font, text, cx, y, room, Palette.INK, 1.0F, 0.6F, false);
-			float rule = y + 4.0F * scale;
-			float left = cx - textW / 2.0F - 6.0F;
-			float right = cx + textW / 2.0F + 6.0F;
-			Brush.rect(g, titleX0, rule - 0.5F, left - 4.0F, rule + 0.5F, Palette.GOLD);
-			Brush.rect(g, right + 4.0F, rule - 0.5F, titleX1, rule + 0.5F, Palette.GOLD);
-			Brush.rect(g, left - 3.0F, rule - 2.0F, left + 1.0F, rule + 2.0F, Palette.SEAL);
-			Brush.rect(g, right - 1.0F, rule - 2.0F, right + 3.0F, rule + 2.0F, Palette.SEAL);
+			SlipTooltip.gambarAntrean(g, font, mouseX, mouseY, width, height);
 		} else {
-			Brush.fit(g, font, Brush.bold(sectionName(section)), titleX0, y, titleX1 - titleX0, Palette.SEAL_DARK, 0.85F, 0.6F, false);
-			Brush.rect(g, titleX0, y + 10.0F, helpX0 - 4.0F, y + 10.6F, Palette.argb(0xB0, Palette.GOLD));
-			for (int i = 0; i < names.size(); i++) {
-				drawCoin(g, names.get(i), coinX0[i], coinX1[i], y, i == sub);
+			SlipTooltip.mulaiBingkai();
+		}
+	}
+
+	/** The rail: Di Sini on top while a context lives (it glows once when it appears), then the eight sections. */
+	private void drawRail(Lukis l, int railX0, long now) {
+		List<TabBar.Tab> tabs = new ArrayList<>(HubNav.SECTIONS + 1);
+		List<Integer> order = new ArrayList<>(HubNav.SECTIONS + 1);
+		if (konteks != null) {
+			order.add(HubNav.DI_SINI);
+		}
+		for (int i = 0; i < HubNav.SECTIONS; i++) {
+			order.add(i);
+		}
+		for (int index : order) {
+			tabs.add(TabBar.Tab.of(String.valueOf(index), sectionName(index), sectionGlyph(index)));
+		}
+		rel.setTabs(tabs);
+		int y0 = paperTop + 2;
+		int y1 = paperBottom - 2;
+		int railX1 = railX0 + railW;
+		int per = TabBar.tinggiTablet(y1 - y0, order.size());
+		boolean muat = per * order.size() <= y1 - y0;
+		if (konteks != null && now - konteksSejak < 900L && muat) {
+			float pulse = (float) Math.sin((now - konteksSejak) / 900.0F * Math.PI);
+			Brush.halo(l.g, (railX0 + railX1) / 2.0F, y0 + per / 2.0F, railW / 2.0F, 4.0F, 0xFFE07A, pulse);
+		}
+		rel.gambar(l, "rel", railX0, y0, railX1, y1, true, TabBar.Rupa.TABLET, bernama, String.valueOf(section),
+				id -> tampilkan(Integer.parseInt(id), "", "", null));
+		// The richer tooltip of a tablet: its name, what lives there and its number key.
+		if (muat && l.di(railX0, y0, railX1, y0 + per * order.size())) {
+			int index = order.get(Math.max(0, Math.min(order.size() - 1, (l.my - y0) / per)));
+			String key = index == HubNav.DI_SINI ? "9" : String.valueOf(index + 1);
+			Component tip = index == HubNav.DI_SINI ? Component.translatable(H + "di_sini.tip")
+					: Component.translatable("kultivator.hub.section." + SECTION_KEYS[index] + ".tip");
+			l.tip(List.of(Brush.bold(sectionName(index)), tip.copy().withStyle(ChatFormatting.GRAY),
+					Component.translatable(H + "tombol_angka", key).withStyle(ChatFormatting.DARK_GREEN)));
+		}
+	}
+
+	/** The header row: back control, section name, page coins (the shown one in gold), purse, "?" seal. */
+	private void drawHeader(Lukis l, float seconds) {
+		int y0 = headY;
+		int y1 = headY + headH;
+		float textY = y0 + (headH - 8) / 2.0F;
+		int left = contentX;
+		int right = contentX + contentW;
+		// "?" seal at the right end: Panduan › Ensiklopedia on the page's topic.
+		int sealX0 = right - SEAL_BOX;
+		if (helpSeal != null) {
+			helpSeal.moveTo(sealX0 + SEAL_BOX / 2.0F, y0 + headH / 2.0F);
+			helpSeal.render(l.g, font, mouseX, mouseY, seconds);
+			l.zona("bantuan", sealX0, y0, right, y1, this::bukaBantuan, true, null, false);
+			if (l.di(sealX0, y0, right, y1)) {
+				l.tip(helpSeal.tooltipLines());
 			}
 		}
-		drawHelpSeal(g, y);
-	}
-
-	private void drawCoin(GuiGraphicsExtractor g, Component name, float x0, float x1, float y, boolean active) {
-		boolean over = mouseX >= x0 && mouseX < x1 && mouseY >= y - 2 && mouseY < y + 10;
-		float r = 3.2F;
-		float cx = x0 + r + 0.5F;
-		float cy = y + 3.5F;
-		if (over && !active) {
-			Brush.halo(g, cx, cy, r, 2.0F, 0x9CFFD0, 0.6F);
+		int end = sealX0 - 3;
+		long uang = shown == null ? -1L : shown.uang();
+		if (uang >= 0L) {
+			end -= LabelHarga.gulir(l, uangGulir, uang, end, textY, true) + 4;
 		}
-		Brush.disc(g, cx, cy, r, active ? Palette.GOLD : Palette.JADE_DULL);
-		Brush.disc(g, cx, cy, r - 0.8F, active ? Palette.JADE_LIGHT : Palette.mix(Palette.JADE_DULL, Palette.JADE, over ? 0.6F : 0.2F));
-		Brush.rect(g, cx - 0.9F, cy - 0.9F, cx + 0.9F, cy + 0.9F, active ? Palette.GOLD_LIGHT : Palette.PAPER_SHADE);
-		float tx = x0 + r * 2.0F + 3.0F;
-		float room = x1 - tx;
-		if (room < 6.0F) {
-			return;
-		}
-		Component label = active ? Brush.bold(name) : name;
-		if (font.width(label) * 0.6F > room) {
-			// Still too wide at the smallest scale: the first letters, the full name in the tooltip (33.3).
-			String plain = name.getString();
-			label = Component.literal(plain.substring(0, Math.min(4, plain.length())));
-			if (active) {
-				label = Brush.bold(label);
+		if (shown != null && shown.rinci() || balikBantuan()) {
+			int bw = TombolKembali.gambar(l, "kembali", left, y0 + (headH - 12) / 2, Component.empty(), this::mundurHalaman);
+			if (l.di(left, y0, left + bw, y1)) {
+				l.tip(Component.translatable(H + "kembali"));
 			}
+			left += bw + 3;
 		}
-		Brush.fit(g, font, label, tx, y, room, active ? Palette.SEAL_DARK : Palette.INK_SOFT, 0.75F, 0.6F, false);
+		if (ids.size() <= 1) {
+			Component text = shown == null ? sectionName(section) : Component.translatable(H + "judul", sectionName(section), shown.title());
+			l.teks(Brush.bold(text), left + 2, textY, end - left - 2, Palette.SEAL_DARK);
+		} else {
+			List<TabBar.Tab> tabs = new ArrayList<>(ids.size());
+			int want = 0;
+			for (String id : ids) {
+				Page p = page(id);
+				Component name = p == null ? Component.literal(id) : p.shortName();
+				int glyph = p == null ? -1 : p.glyph();
+				tabs.add(new TabBar.Tab(id, name, glyph, p == null ? null : p.kunci(), true));
+				want += font.width(Brush.bold(name)) + 14;
+			}
+			Component sec = Brush.bold(sectionName(section));
+			int secW = font.width(sec) + 8;
+			if (!sempit && end - left - secW >= want) {
+				l.teks(sec, left + 2, textY, secW - 4, Palette.SEAL_DARK);
+				left += secW;
+			}
+			koin.setTabs(tabs);
+			koin.gambar(l, "koin", left, y0, end, y1, false, TabBar.Rupa.KOIN, !sempit, pageId, this::pindahHalaman);
+		}
+		Brush.rect(l.g, contentX, y1, contentX + contentW, y1 + 0.6F, Palette.argb(0xB0, Palette.GOLD));
 	}
 
-	private void drawHelpSeal(GuiGraphicsExtractor g, float y) {
-		float x0 = helpX0;
-		float y0 = y - 1.0F;
-		boolean over = mouseX >= x0 && mouseX < x0 + HELP_SEAL && mouseY >= y0 && mouseY < y0 + HELP_SEAL;
-		Brush.rect(g, x0, y0, x0 + HELP_SEAL, y0 + HELP_SEAL, over ? Palette.SEAL_GLOW : Palette.SEAL);
-		Brush.rect(g, x0 + 0.8F, y0 + 0.8F, x0 + HELP_SEAL - 0.8F, y0 + HELP_SEAL - 0.8F, Palette.argb(0x30, 0xFFFFFF));
-		Brush.centered(g, font, Brush.bold(Component.literal("?")), x0 + HELP_SEAL / 2.0F + 0.3F, y0 + 1.6F, 0xFFFFF4E0, 0.75F, false);
-	}
-
-	private void headerTooltip() {
-		float y = headerY;
-		if (mouseY < y - 2 || mouseY >= y + 10) {
+	/** The sub bar: one chip per sub (the shown one underlined), the Sumber chip at its right. */
+	private void drawSubs(Lukis l) {
+		if (shown == null) {
 			return;
 		}
-		if (mouseX >= helpX0 && mouseX < helpX0 + HELP_SEAL) {
-			showTooltip(List.of(Brush.bold(Component.translatable("kultivator.hub.help")),
-					Component.translatable("kultivator.hub.help.tip").withStyle(ChatFormatting.GRAY)));
-			return;
-		}
-		for (int i = 0; i < coinX0.length; i++) {
-			if (mouseX >= coinX0[i] && mouseX < coinX1[i]) {
-				Component name = subTitle(i);
-				if (name != null) {
-					showTooltip(List.of(Brush.bold(name), Component.translatable("kultivator.hub.sub.tip").withStyle(ChatFormatting.GRAY)));
+		int y0 = subY;
+		int y1 = subY + subH;
+		int sx1 = contentX + contentW;
+		Page.Sumber sumber = shown.sumber();
+		if (sumber != null && sumber.pilihan() != null && !sumber.pilihan().isEmpty()) {
+			Component label = sumberLabel(sumber);
+			int x1 = sx1;
+			int x0 = Math.max(contentX + contentW / 2, x1 - font.width(label) - 10);
+			boolean over = l.di(x0, y0, x1, y1);
+			Brush.rect(l.g, x0, y0, x1, y1, over ? Palette.argb(0x70, Palette.TALISMAN) : Palette.argb(0x48, Palette.TALISMAN));
+			l.teks(label, x0 + 4, y0 + (subH - 8) / 2.0F, x1 - x0 - 6, Palette.INK);
+			int size = sumber.pilihan().size();
+			l.zona("sumber", x0, y0, x1, y1, () -> {
+				if (size > 1) {
+					UiSound.tab();
+					sumber.pilih().accept(Math.floorMod(sumber.aktif().getAsInt() + 1, size));
 				}
-				return;
+			}, true, null, false);
+			if (over) {
+				l.tip(Component.translatable(H + "sumber.tip"));
 			}
+			sx1 = x0 - 4;
 		}
+		List<TabBar.Tab> tabs = new ArrayList<>();
+		for (Page.Sub sub : shown.subs()) {
+			tabs.add(new TabBar.Tab(sub.id(), sub.nama(), -1, sub.kunci(), true));
+		}
+		subBar.setTabs(tabs);
+		subBar.gambar(l, "sub", contentX, y0, sx1, y1, false, TabBar.Rupa.SUB, true, subId, this::gantiSub);
+		Brush.rect(l.g, contentX, y1 + 0.5F, contentX + contentW, y1 + 1.0F, Palette.argb(0x60, Palette.JADE_DULL));
+	}
+
+	/** The footer: the last message for 6 s, else the key hints (not in the narrow layout). */
+	private void drawFooter(GuiGraphicsExtractor g) {
+		float y = paperBottom - ScrollFrame.END - FOOT_H + 1.0F;
+		Brush.rect(g, contentX, y - 1.5F, contentX + contentW, y - 1.0F, Palette.argb(0x60, Palette.JADE_DULL));
+		if (pesan != null && Util.getMillis() < pesanSampai) {
+			Brush.fit(g, font, pesan, contentX + 2.0F, y, contentW - 4.0F, pesanWarna, 1.0F, 1.0F, false);
+		} else if (!sempit) {
+			Brush.fit(g, font, KeyHints.fill(Component.translatable(H + "petunjuk")), contentX + 2.0F, y, contentW - 4.0F, Palette.INK_FAINT, 1.0F,
+					1.0F, false);
+		}
+	}
+
+	private boolean inContent(double x, double y) {
+		return x >= contentX && x < contentX + contentW && y >= contentY && y < contentY + contentH;
 	}
 
 	// ================================================================== input
 
+	/** True while the shown page's confirm seal takes every input (43.4.1 step 1). */
+	private boolean modal() {
+		return shown != null && shown.modal();
+	}
+
 	@Override
 	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-		if (event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
-			for (JadeTablet tablet : tablets) {
-				if (tablet.contains(event.x(), event.y())) {
-					tablet.press();
-					pressedTablet = tablet;
-					return true;
-				}
-			}
-			if (headerClicked(event.x(), event.y())) {
+		if (modal()) {
+			return shown.mouseClicked(event, doubleClick);
+		}
+		if (shown != null && inContent(event.x(), event.y())) {
+			if (shown.mouseClicked(event, doubleClick)) {
 				return true;
 			}
-		}
-		if (page().mouseClicked(event.x(), event.y(), event.button())) {
+		} else if (krom.klik(event.x(), event.y(), event.button())) {
+			// The chrome is driven by the Gulungan keys (1-9, Q/E, ←/→), not by a Tab ring: no focus ring stays on it.
+			krom.set(null);
 			return true;
 		}
 		return super.mouseClicked(event, doubleClick);
 	}
 
-	private boolean headerClicked(double x, double y) {
-		if (y < headerY - 2 || y >= headerY + 10) {
-			return false;
-		}
-		if (x >= helpX0 && x < helpX0 + HELP_SEAL) {
-			UiSound.press();
-			String topic = page().helpTopic();
-			HubNav.help(topic == null || topic.isEmpty() ? "jalan" : topic);
-			return true;
-		}
-		for (int i = 0; i < coinX0.length; i++) {
-			if (x >= coinX0[i] && x < coinX1[i]) {
-				if (i != sub) {
-					UiSound.tab();
-					showSection(section, i);
-				}
-				return true;
-			}
-		}
-		return false;
-	}
-
 	@Override
 	public boolean mouseReleased(MouseButtonEvent event) {
-		if (pressedTablet != null) {
-			JadeTablet tablet = pressedTablet;
-			pressedTablet = null;
-			tablet.release(event.x(), event.y());
+		if (!modal() && krom.lepas(event.x(), event.y())) {
 			return true;
 		}
-		if (page().mouseReleased(event.x(), event.y(), event.button())) {
+		if (shown != null && shown.mouseReleased(event)) {
 			return true;
 		}
 		return super.mouseReleased(event);
 	}
 
 	@Override
+	public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
+		if (!modal() && krom.seret(event.x(), event.y(), dx)) {
+			return true;
+		}
+		if (shown != null && shown.mouseDragged(event, dx, dy)) {
+			return true;
+		}
+		return super.mouseDragged(event, dx, dy);
+	}
+
+	@Override
 	public boolean mouseScrolled(double x, double y, double scrollX, double scrollY) {
-		if (page().mouseScrolled(x, y, scrollY)) {
+		if (shown != null && (modal() || inContent(x, y)) && shown.mouseScrolled(x, y, scrollX, scrollY)) {
 			return true;
 		}
 		return super.mouseScrolled(x, y, scrollX, scrollY);
@@ -579,52 +943,136 @@ public class CultivationScreen extends Screen {
 
 	@Override
 	public boolean keyPressed(KeyEvent event) {
-		if (Keys.QUICK.matches(event) || Keys.INFO.matches(event)) {
+		Page page = shown;
+		// 1-2. A modal seal or a writing text field gets every key first (43.4.1). While a field writes only Esc reaches the
+		// Gulungan: letter and number keys (V, Q, E, 1-9, K, M ...) are text there, their character follows in charTyped.
+		if (page != null && page.mauTombol()) {
+			if (page.keyPressed(event) || modal()) {
+				return true;
+			}
+			if (!event.isEscape()) {
+				return false;
+			}
+		}
+		// 3. The Gulungan keys (43.4.2).
+		if (event.isEscape()) {
+			if (mundurHalaman()) {
+				UiSound.press();
+				return true;
+			}
 			onClose();
 			return true;
 		}
-		// A screen's own key opens it from here too (it comes back here on Esc).
-		if (Keys.CODEX.matches(event)) {
-			dev.kultivator.client.codex.Codex.open(-1);
-			return true;
-		}
-		if (Keys.GUIDE.matches(event)) {
-			dev.kultivator.client.guide.GuideClient.open(this);
-			return true;
-		}
-		if (Keys.DUNIA.matches(event)) {
-			dev.kultivator.client.dunia.DuniaClient.open(Payloads.OpenScreen.DUNIA_ALAM);
-			return true;
-		}
-		if (Keys.ABADI.matches(event)) {
-			dev.kultivator.client.dunia.DuniaClient.openAbadi(Payloads.OpenScreen.ABADI_ALAM);
-			return true;
-		}
-		if (Keys.MURID.matches(event)) {
-			Keys.send(new Payloads.Action(Actions.DISCIPLE_OPEN, -1, ""));
+		if (Keys.QUICK.matches(event) || Keys.INFO.matches(event)) {
+			HubNav.tutupSemua();
 			return true;
 		}
 		int key = event.key();
-		if (key >= InputConstants.KEY_1 && key < InputConstants.KEY_1 + HubNav.SECTIONS) {
+		if (key >= InputConstants.KEY_1 && key <= InputConstants.KEY_9 && !event.hasControlDown() && !event.hasAltDown()) {
 			int number = key - InputConstants.KEY_1;
-			if (number != section) {
+			// K3 (43.17): under Di Sini a numbered choice the page drew takes the number.
+			if (section == HubNav.DI_SINI && page != null && page.angka(number + 1)) {
+				return true;
+			}
+			int target = number == HubNav.DI_SINI ? HubNav.DI_SINI : number;
+			if (target == HubNav.DI_SINI && konteks == null) {
+				return true;
+			}
+			if (target != section) {
 				UiSound.tab();
-				showSection(number, HubNav.lastSub(number));
+				tampilkan(target, "", "", null);
 			}
 			return true;
 		}
-		if (key == InputConstants.KEY_TAB) {
-			stepSub(event.hasShiftDown() ? -1 : 1);
+		if (key == InputConstants.KEY_Q && !event.hasControlDown()) {
+			stepPage(-1);
 			return true;
 		}
+		if (key == InputConstants.KEY_E && !event.hasControlDown()) {
+			stepPage(1);
+			return true;
+		}
+		if (key == InputConstants.KEY_TAB) {
+			if (page != null) {
+				page.fokusTab(event.hasShiftDown());
+			}
+			return true;
+		}
+		if (sectionKey(event)) {
+			return true;
+		}
+		// 43.8.5: the ring key opens the bound ring from the Gulungan too (RingScreen returns here itself).
+		if (Keys.CINCIN.matches(event)) {
+			Keys.send(new Payloads.Action(Actions.TEMPA, 0, "ring:open"));
+			return true;
+		}
+		// 4. The page (focus, Enter/Space, arrows, "/", its own keys); ←/→ it does not use switch the sub.
+		if (page != null && page.keyPressed(event)) {
+			return true;
+		}
+		if (event.isLeft() || event.isRight()) {
+			return stepSub(event.isLeft() ? -1 : 1);
+		}
 		return super.keyPressed(event);
+	}
+
+	/** A section key (K Kodeks, M Murid, Dunia, Abadi, J Panduan, N Peta): go there; pressed where it already is: close. */
+	private boolean sectionKey(KeyEvent event) {
+		Tujuan place = HubNav.tombolBagian(event);
+		if (place == null) {
+			return false;
+		}
+		boolean here = place.bagian() == section && (place.halaman().isEmpty() || place.halaman().equals(pageId));
+		if (here) {
+			onClose();
+		} else {
+			HubNav.bukaTombol(event);
+		}
+		return true;
+	}
+
+	@Override
+	public boolean keyReleased(KeyEvent event) {
+		if (shown != null && shown.keyReleased(event)) {
+			return true;
+		}
+		return super.keyReleased(event);
+	}
+
+	@Override
+	public boolean charTyped(CharacterEvent event) {
+		if (shown != null && shown.charTyped(event)) {
+			return true;
+		}
+		return super.charTyped(event);
+	}
+
+	@Override
+	public void tick() {
+		if (shown != null) {
+			shown.tick();
+		}
 	}
 
 	@Override
 	public void removed() {
 		UiSound.close();
-		HubNav.hubRemoved(section);
+		if (shown != null && shown != konteks) {
+			shown.onHide();
+		}
+		// The Gulungan closed: a world context ends with it (43.8.1.4, OP_TUTUP from the page).
+		Page ctx = konteks;
+		konteks = null;
+		if (ctx != null) {
+			ctx.onHide();
+		}
+		shown = null;
 		super.removed();
+	}
+
+	@Override
+	public boolean shouldCloseOnEsc() {
+		return false;
 	}
 
 	@Override

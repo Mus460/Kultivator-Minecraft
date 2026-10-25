@@ -1,0 +1,266 @@
+{
+  "id": "sapa_kelompok",
+  "jenis": "realisasi",
+  "_catatan": "SAPA by role group: trader in rain, worker in the morning, guard, elder, cultivator, official.",
+  "benih_dunia": 42,
+  "masukan": {
+    "niat": "SAPA",
+    "pembicara": 212,
+    "hari": 120,
+    "now": 2880000,
+    "cuaca": "cerah",
+    "musim": "semi",
+    "situasi": {
+      "jam": "pagi",
+      "cuaca": "cerah",
+      "musim": "semi",
+      "kelompok": "pekerja",
+      "watak": "ramah",
+      "kebiasaan": [],
+      "sifat": {
+        "H": 10,
+        "E": 0,
+        "X": 20,
+        "A": 30,
+        "C": 10,
+        "O": 0
+      },
+      "wajah": "netral",
+      "tempat": "kota_besar"
+    },
+    "pendengar": {
+      "nama": "Han",
+      "kelamin": "l",
+      "tahap": "dewasa",
+      "pemain": true
+    },
+    "kesan": "kenal",
+    "tahu_nama": false,
+    "register": "sopan",
+    "dialek": "ibukota"
+  },
+  "langkah": [
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "hujan",
+          "musim": "semi",
+          "kelompok": "pedagang",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar"
+        },
+        "cuaca": "hujan",
+        "peran": "pedagang_keliling"
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.pagi.5",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.tuan.ibukota",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "sapa.pagi",
+      "gestur": "lambai",
+      "seru": null,
+      "tik": null,
+      "id_id": "Pagi, Tuanku. Mau ke mana sepagi ini?",
+      "en_us": "Morning, My Lord. Where are you off to so early?"
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar"
+        },
+        "peran": "petani"
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.kenal.0",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.tuan.ibukota",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "sapa.kenal",
+      "gestur": "lambai",
+      "seru": null,
+      "tik": null,
+      "id_id": "Oh, Tuanku, datang lagi.",
+      "en_us": "Oh, My Lord, back again."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "penjaga",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar"
+        },
+        "register": "biasa",
+        "peran": "penjaga"
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.obrol.ajar.2",
+        "a": []
+      },
+      "aturan": "sapa.obrol.ajar",
+      "gestur": "hormat",
+      "seru": null,
+      "tik": null,
+      "id_id": "Guru, kemarin aku berlatih sampai malam! Lihat, tanganku lecet.",
+      "en_us": "Master, I practised till night yesterday! Look, my hands are blistered."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "tetua",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar"
+        },
+        "tahap": "tua",
+        "peran": "tetua_desa"
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.tetua.0",
+        "a": []
+      },
+      "aturan": "sapa.tetua",
+      "gestur": "sikap_tua",
+      "seru": "kota42.seru.tetua_hmm",
+      "tik": null,
+      "id_id": "Ho ho. Anak muda, datang menjenguk orang tua ini?",
+      "en_us": "Ho ho. Young one, come to visit this old man?"
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "kultivator",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar"
+        },
+        "register": "kuno",
+        "ranah_selisih": 3
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.kultivator.2",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.senior.ibukota",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "sapa.kultivator",
+      "gestur": "hormat",
+      "seru": null,
+      "tik": null,
+      "id_id": "Ah, sesama penempuh jalan. Semoga Dao-mu lancar, Senior yang mulia.",
+      "en_us": "Ah, a fellow walker of the path. May your Dao go smoothly, Honoured Senior."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pejabat",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar"
+        },
+        "peran": "menteri"
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.kenal.1",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.tuan.ibukota",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "sapa.kenal",
+      "gestur": "lambai",
+      "seru": null,
+      "tik": null,
+      "id_id": "Tuanku! Apa kabar?",
+      "en_us": "My Lord! How are you?"
+    }
+  ]
+}

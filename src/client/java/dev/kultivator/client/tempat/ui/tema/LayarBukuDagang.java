@@ -47,6 +47,8 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 
 	private static final int KOL = 46;
 	private static final int NAMA_KOL = 92;
+	/** Paging arrow size (43.0.6: every click target at least 16 x 12). */
+	private static final int PANAH = 16;
 
 	private final DaftarGulir daftar = new DaftarGulir();
 	private final DaftarGulir daftarKontrak = new DaftarGulir();
@@ -148,8 +150,10 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 
 	// ------------------------------------------------------------------------------------------------ prices
 
+	/** Columns that fit; when they do not all fit, room is kept at the right for the two 16 px paging arrows. */
 	private int kolomMuat(int x0, int x1) {
-		return Math.max(1, (x1 - x0 - NAMA_KOL - 6) / KOL);
+		int muat = Math.max(1, (x1 - x0 - NAMA_KOL - 6) / KOL);
+		return kota.size() > muat ? Math.max(1, (x1 - x0 - NAMA_KOL - 6 - PANAH * 2 - 4) / KOL) : muat;
 	}
 
 	private void geserKolom(int arah, int muat) {
@@ -168,13 +172,14 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 		int akhir = Math.min(kota.size(), kolomAwal + muat);
 		// header row: city emblems and names
 		int hy = y0;
-		l.keterangan(TemaUi.k("dagang.barang"), x0 + 2, hy + 6, NAMA_KOL - 4, gaya.teksLemah);
+		l.teks(TemaUi.k("dagang.barang"), x0 + 2, hy + 8, NAMA_KOL - 4, gaya.teksLemah);
 		for (int c = kolomAwal; c < akhir; c++) {
 			Lembar k = kota.get(c);
 			int cx = x0 + NAMA_KOL + (c - kolomAwal) * KOL + KOL / 2;
 			TemaUi.lambang(l, k.s(Dagang.TEMA), cx, hy + 6, 6);
-			Brush.fitCentered(l.g, font, k.teks(LembarKunci.NAMA), cx, hy + 14, KOL - 4, gaya.teks, 0.6F, 0.45F, false);
-			if (l.di(cx - KOL / 2, hy, cx + KOL / 2, hy + 20)) {
+			// 43.0.5: names at 1.0, cut with "…"; the full name is in the tooltip below
+			Brush.fitCentered(l.g, font, k.teks(LembarKunci.NAMA), cx, hy + 14, KOL - 4, gaya.teks, 1.0F, 1.0F, false);
+			if (l.di(cx - KOL / 2, hy, cx + KOL / 2, hy + 23)) {
 				List<Component> tip = new ArrayList<>();
 				tip.add(k.teks(LembarKunci.NAMA));
 				tip.add(TemaUi.k("tema." + k.s(Dagang.TEMA)));
@@ -186,12 +191,13 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 		}
 		// paging arrows when the columns do not fit
 		if (kota.size() > muat) {
-			panah(l, "kiri", x1 - 24, hy, IkonTempat.PANAH_KIRI, kolomAwal > 0, () -> geserKolom(-1, muat));
-			panah(l, "kanan", x1 - 11, hy, IkonTempat.PANAH_KANAN, akhir < kota.size(), () -> geserKolom(1, muat));
+			panah(l, "kiri", x1 - PANAH * 2 - 2, hy + 4, IkonTempat.PANAH_KIRI, kolomAwal > 0, () -> geserKolom(-1, muat));
+			panah(l, "kanan", x1 - PANAH, hy + 4, IkonTempat.PANAH_KANAN, akhir < kota.size(), () -> geserKolom(1, muat));
 		}
-		PanelTempat.garis(l.g, gaya, x0, x1, hy + 21);
-		int ty0 = hy + 24;
-		int ty1 = y1 - 34;
+		PanelTempat.garis(l.g, gaya, x0, x1, hy + 24);
+		int ty0 = hy + 27;
+		// legend line (3 + 9) and route line (2 + 9) under the table
+		int ty1 = y1 - 25;
 		if (harga.isEmpty()) {
 			kosong(l, TemaUi.k("dagang.harga_kosong"), x0, ty0, x1, y1);
 			return;
@@ -205,7 +211,7 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 		}
 		// legend and the selected row's best route
 		int ly = ty1 + 3;
-		legenda(l, x0, ly);
+		legenda(l, x0, ly, x1);
 		int sel = daftar.pilihan();
 		if (sel >= 0 && sel < harga.size()) {
 			rute(l, harga.get(sel), x0, ly + 11, x1);
@@ -213,26 +219,19 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 	}
 
 	private void panah(Lukis l, String kunci, int x, int y, int ikon, boolean on, Runnable aksi) {
-		boolean over = l.di(x, y, x + 11, y + 11);
-		l.g.fill(x, y, x + 11, y + 11, Palette.argb(on ? (over ? 0x70 : 0x40) : 0x18, 0x000000));
-		IkonTempat.gambar(l.g, ikon, x + 1, y + 1, 9, on ? 0xFFFFFFFF : 0x60FFFFFF);
-		l.zona(kunci, x, y, x + 11, y + 11, aksi, on, null, true);
-		l.fokusCincin(kunci, x, y, x + 11, y + 11);
+		int x1 = x + PANAH;
+		int y1 = y + 12;
+		boolean over = l.di(x, y, x1, y1);
+		l.g.fill(x, y, x1, y1, Palette.argb(on ? (over ? 0x70 : 0x40) : 0x18, 0x000000));
+		IkonTempat.gambar(l.g, ikon, x + (PANAH - 10) / 2, y + 1, 10, on ? 0xFFFFFFFF : 0x60FFFFFF);
+		l.zona(kunci, x, y, x1, y1, aksi, on, null, true);
+		l.fokusCincin(kunci, x, y, x1, y1);
 	}
 
 	private void baris(Lukis l, Lembar e, int rx0, int ry0, int rx1, int ry1, boolean sorot, boolean pilih, int akhir) {
 		PanelTempat.kartu(l.g, gaya, rx0, ry0, rx1, ry1, sorot ? 1.0F : 0.0F, pilih);
-		ItemStack item = e.barang();
-		if (!item.isEmpty()) {
-			l.g.pose().pushMatrix();
-			l.g.pose().translate(rx0 + 2, ry0);
-			l.g.pose().scale(0.9F, 0.9F);
-			l.g.item(item, 0, 0);
-			l.g.pose().popMatrix();
-		} else {
-			TemaUi.ikon(l.g, TemaUi.ikonBarang(e.id()), rx0 + 2, ry0 + 1, 14);
-		}
-		l.teks(e.teks(LembarKunci.NAMA), rx0 + 19, ry0 + 4, NAMA_KOL - 21, gaya.teks, 0.8F);
+		ikonBarang(l, e, rx0 + 1, ry0);
+		l.teks(e.teks(LembarKunci.NAMA), rx0 + 19, ry0 + 4, NAMA_KOL - 21, gaya.teks);
 		Map<Integer, Lembar> sel = new HashMap<>();
 		for (Lembar s : e.daftar(Dagang.SEL)) {
 			Integer idx = urutKota.get(s.s(Dagang.KOTA));
@@ -244,7 +243,7 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 			int cx0 = rx0 + NAMA_KOL + (c - kolomAwal) * KOL;
 			Lembar s = sel.get(c);
 			if (s == null) {
-				Brush.centered(l.g, font, Component.literal("—"), cx0 + KOL / 2.0F, ry0 + 4, TempatWarna.terkunci(gaya.teksSamar), 0.8F, false);
+				Brush.centered(l.g, font, Component.literal("—"), cx0 + KOL / 2.0F, ry0 + 4, TempatWarna.terkunci(gaya.teksSamar), 1.0F, false);
 				continue;
 			}
 			sel(l, s, kota.get(c), cx0, ry0, cx0 + KOL, ry1);
@@ -259,9 +258,9 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 		}
 		int warna = tua ? TempatWarna.terkunci(gaya.teks) : s.b(Dagang.TERBAIK) ? 0xFF2E7A4E : gaya.teks;
 		Component nb = Component.literal(TeksTempat.desimal1(s.f(LembarKunci.NB, 0.0F)));
-		float w = font.width(nb) * 0.8F;
-		float tx = (cx0 + cx1) / 2.0F - w / 2.0F - 3;
-		Brush.text(l.g, font, nb, tx, ry0 + 4.5F, warna, 0.8F, false);
+		float w = font.width(nb);
+		float tx = (cx0 + cx1) / 2.0F - w / 2.0F - 4;
+		Brush.text(l.g, font, nb, tx, ry0 + 4, warna, 1.0F, false);
 		int ix = Math.round(tx + w + 1);
 		if (s.b(Dagang.TERBAIK)) {
 			TemaUi.ikon(l.g, TemaUi.I_TERBAIK, ix, ry0 + 3, 8, tua ? 0x80FFFFFF : 0xFFFFFFFF);
@@ -287,20 +286,34 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 		}
 	}
 
-	private void legenda(Lukis l, int x0, int y) {
+	/** One legend line at 1.0; items that do not fit are left out and the whole legend is the line's tooltip. */
+	private void legenda(Lukis l, int x0, int y, int x1) {
+		Component asal = TemaUi.k("dagang.lg_asal");
+		Component terbaik = TemaUi.k("dagang.lg_terbaik");
+		Component tua = TemaUi.k("dagang.lg_tua");
+		Component jenuh = TemaUi.k("dagang.lg_jenuh");
 		int x = x0;
-		TemaUi.ikon(l.g, TemaUi.I_ASAL, x, y, 8);
-		x += 10;
-		l.keterangan(TemaUi.k("dagang.lg_asal"), x, y + 1, 50, gaya.teksSamar);
-		x += Math.round(font.width(TemaUi.k("dagang.lg_asal")) * 0.75F) + 8;
-		TemaUi.ikon(l.g, TemaUi.I_TERBAIK, x, y, 8);
-		x += 10;
-		l.keterangan(TemaUi.k("dagang.lg_terbaik"), x, y + 1, 60, gaya.teksSamar);
-		x += Math.round(font.width(TemaUi.k("dagang.lg_terbaik")) * 0.75F) + 8;
-		l.keterangan(TemaUi.k("dagang.lg_tua"), x, y + 1, 90, TempatWarna.terkunci(gaya.teks));
-		x += Math.round(font.width(TemaUi.k("dagang.lg_tua")) * 0.75F) + 8;
-		l.g.fill(x, y + 1, x + 8, y + 8, Palette.argb(0x60, 0xB03030));
-		l.keterangan(TemaUi.k("dagang.lg_jenuh"), x + 10, y + 1, 60, gaya.teksSamar);
+		if (x + 10 + font.width(asal) <= x1) {
+			TemaUi.ikon(l.g, TemaUi.I_ASAL, x, y, 8);
+			Brush.text(l.g, font, asal, x + 10, y, gaya.teksSamar, 1.0F, false);
+			x += 10 + font.width(asal) + 8;
+		}
+		if (x + 10 + font.width(terbaik) <= x1) {
+			TemaUi.ikon(l.g, TemaUi.I_TERBAIK, x, y, 8);
+			Brush.text(l.g, font, terbaik, x + 10, y, gaya.teksSamar, 1.0F, false);
+			x += 10 + font.width(terbaik) + 8;
+		}
+		if (x + 10 + font.width(jenuh) <= x1) {
+			l.g.fill(x, y, x + 8, y + 7, Palette.argb(0x60, 0xB03030));
+			Brush.text(l.g, font, jenuh, x + 10, y, gaya.teksSamar, 1.0F, false);
+			x += 10 + font.width(jenuh) + 8;
+		}
+		if (x + font.width(tua) <= x1) {
+			Brush.text(l.g, font, tua, x, y, TempatWarna.terkunci(gaya.teks), 1.0F, false);
+		}
+		if (l.di(x0, y - 1, x1, y + 9)) {
+			l.tip(List.of(asal, terbaik, jenuh, tua));
+		}
 	}
 
 	/** "Buy at A for 36, sell at B for 48.6 (+12.6 a unit)" from the fresh cells of a row. */
@@ -320,7 +333,7 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 			}
 		}
 		if (murah == null || mahal == null || murah == mahal) {
-			l.keterangan(TemaUi.k("dagang.rute_kurang"), x0, y, x1 - x0, gaya.teksSamar);
+			l.teks(TemaUi.k("dagang.rute_kurang"), x0, y, x1 - x0, gaya.teksSamar);
 			return;
 		}
 		float beda = mahal.f(LembarKunci.NB, 0.0F) - murah.f(LembarKunci.NB, 0.0F);
@@ -328,7 +341,7 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 		Component b = namaKota(mahal.s(Dagang.KOTA));
 		Component t = TemaUi.k("dagang.rute", e.teks(LembarKunci.NAMA), a, TeksTempat.desimal1(murah.f(LembarKunci.NB, 0.0F)), b,
 				TeksTempat.desimal1(mahal.f(LembarKunci.NB, 0.0F)), TeksTempat.desimal1(beda));
-		l.teks(t, x0, y, x1 - x0, beda > 0.0F ? 0xFF2E7A4E : gaya.teksLemah, 0.8F);
+		l.teks(t, x0, y, x1 - x0, beda > 0.0F ? 0xFF2E7A4E : gaya.teksLemah);
 	}
 
 	private Component namaKota(String id) {
@@ -348,7 +361,7 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 		long minggu = laba.l(Dagang.MINGGU, 0L);
 		long batas = Math.max(1L, laba.l(Dagang.BATAS, 150L));
 		LabelHarga.gambar(l, minggu, -1L, x, y + 2, false, 1.5F, false);
-		l.kanan(TemaUi.k("dagang.dari_batas", TeksTempat.angka(batas)), kiri.x1(), y + 6, gaya.teksLemah, 0.8F);
+		l.kanan(TemaUi.k("dagang.dari_batas", TeksTempat.angka(batas)), kiri.x1(), y + 5, gaya.teksLemah, 1.0F);
 		y += 18;
 		float frac = minggu / (float) batas;
 		int warna = frac >= 1.0F ? TempatWarna.BAHAYA : frac > 0.8F ? TempatWarna.PERINGATAN : TempatWarna.OK;
@@ -356,18 +369,21 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 		if (laba.b(Dagang.LEWAT)) {
 			y += pita(l, LembarKunci.Ikon.TIMBANGAN, TemaUi.k("dagang.lewat"), x, y, kiri.x1(), TempatWarna.BAHAYA);
 		}
-		l.bungkus(TemaUi.k("dagang.batas_jelas"), x, y, kiri.w(), gaya.teksSamar, 0.7F);
-		y += 26;
+		// at most two lines (the rest on hover) so the lifetime row below always has room
+		y += Math.round(l.bungkus(TemaUi.k("dagang.batas_jelas"), x, y, kiri.w(), gaya.teksSamar, 1.0F, Math.min(18, kiri.y1() - y - 24))) + 3;
 		// lifetime profit toward the "Saudagar Lima Kota" advancement
 		long total = laba.l(Dagang.TOTAL, 0L);
-		y += barisNilai(l, TemaUi.k("dagang.laba_total"), TeksTempat.nb(total, false), x, y, kiri.x1());
-		if (total < SAUDAGAR) {
+		if (y + 24 > kiri.y1()) {
+			// narrow layout (GUI scale 4): no room under the weekly block; the right card follows below
+		} else if (total < SAUDAGAR) {
+			y += barisNilai(l, TemaUi.k("dagang.laba_total"), TeksTempat.nb(total, false), x, y, kiri.x1());
 			TemaUi.meter(l, TemaUi.I_TERBAIK, x, y, kiri.x1(), total / (float) SAUDAGAR, TempatWarna.EMAS_TERANG, -1.0F);
 			if (l.di(x, y - 1, kiri.x1(), y + 9)) {
 				l.tip(TemaUi.k("dagang.saudagar_tip", TeksTempat.angka(SAUDAGAR - Math.max(0L, total))));
 			}
 			y += 12;
 		} else {
+			y += barisNilai(l, TemaUi.k("dagang.laba_total"), TeksTempat.nb(total, false), x, y, kiri.x1());
 			TemaUi.chip(l, TemaUi.I_TERBAIK, TemaUi.k("dagang.saudagar"), x, y, TempatWarna.EMAS_TERANG);
 			y += 14;
 		}
@@ -379,7 +395,7 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 			for (int h : hari) {
 				maks = Math.max(maks, Math.abs(h));
 			}
-			int bh = Math.min(48, kiri.y1() - y - 12);
+			int bh = Math.min(48, kiri.y1() - y - 11);
 			int n = hari.length;
 			int bw = Math.max(4, (kiri.w() - (n - 1) * 3) / n);
 			int dasar = y + bh;
@@ -389,10 +405,13 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 				int tinggi = Math.round(bh * Math.abs(hari[i]) / (float) maks);
 				int c = hari[i] >= 0 ? 0xFF4F9A6A : TempatWarna.BAHAYA;
 				l.g.fillGradient(bx, dasar - tinggi, bx + bw, dasar, Palette.lighten(c, 0.2F), c);
-				Brush.centered(l.g, font, Component.literal(i == n - 1 ? TemaUi.k("dagang.hari_ini").getString() : "−" + (n - 1 - i)), bx + bw / 2.0F,
-						dasar + 2, gaya.teksSamar, 0.55F, false);
-				if (l.di(bx, dasar - bh, bx + bw, dasar)) {
-					l.tip(TemaUi.k("dagang.bar_tip", TeksTempat.bertanda(hari[i])));
+				Component hariLabel = Component.literal(i == n - 1 ? TemaUi.k("dagang.hari_ini").getString() : "−" + (n - 1 - i));
+				// day labels at 1.0 only where a bar is wide enough; the tooltip always names the day
+				if (font.width(hariLabel) <= bw + 2) {
+					Brush.centered(l.g, font, hariLabel, bx + bw / 2.0F, dasar + 2, gaya.teksSamar, 1.0F, false);
+				}
+				if (l.di(bx, dasar - bh, bx + bw, dasar + 10)) {
+					l.tip(List.of(hariLabel, TemaUi.k("dagang.bar_tip", TeksTempat.bertanda(hari[i]))));
 				}
 			}
 		}
@@ -404,21 +423,22 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 		int ry = kanan.y0() + 4;
 		ry += subjudul(l, TemaUi.k("dagang.nama_gelap"), rx0, ry, rx1);
 		int infami = lembar.i(Dagang.INFAMI, 0);
-		l.keterangan(TemaUi.k("dagang.infami", infami), rx0, ry, rx1 - rx0, gaya.teksLemah);
-		ry += 9;
+		l.teks(TemaUi.k("dagang.infami", infami), rx0, ry, rx1 - rx0, gaya.teksLemah);
+		ry += 10;
 		ry += TemaUi.meter(l, TemaUi.I_INFAMI, rx0, ry, rx1, infami / 100.0F, TemaUi.DARAH, 0.3F) + 3;
-		l.bungkus(TemaUi.k(infami >= 60 ? "dagang.infami_tinggi" : infami >= 30 ? "dagang.infami_sedang" : "dagang.infami_rendah"), rx0, ry, rx1 - rx0,
-				gaya.teksSamar, 0.7F);
-		ry += 24;
 		List<Lembar> gentar = lembar.daftar(Dagang.GENTAR);
-		if (!gentar.isEmpty()) {
+		// the standing note gets what the Gentar rows leave (two lines at most; the rest on hover)
+		float maksJelas = Math.min(27, kanan.y1() - ry - 4 - (gentar.isEmpty() ? 0 : 24));
+		ry += Math.round(l.bungkus(TemaUi.k(infami >= 60 ? "dagang.infami_tinggi" : infami >= 30 ? "dagang.infami_sedang" : "dagang.infami_rendah"), rx0,
+				ry, rx1 - rx0, gaya.teksSamar, 1.0F, maksJelas)) + 4;
+		if (!gentar.isEmpty() && ry + 24 <= kanan.y1()) {
 			ry += subjudul(l, TemaUi.k("dagang.gentar"), rx0, ry, rx1);
 			for (Lembar g : gentar) {
-				if (ry + 12 > kanan.y1()) {
+				if (ry + 10 > kanan.y1()) {
 					break;
 				}
 				int n = g.i(LembarKunci.NILAI, 0);
-				l.teks(g.teks(Dagang.KOTA), rx0, ry, (rx1 - rx0) / 2, gaya.teks, 0.75F);
+				l.teks(g.teks(Dagang.KOTA), rx0, ry, (rx1 - rx0) / 2 - 2, gaya.teks);
 				TemaUi.meter(l, TemaUi.I_GENTAR, rx0 + (rx1 - rx0) / 2, ry, rx1, n / 100.0F, 0xFF6A3A8A, 0.3F);
 				ry += 11;
 			}
@@ -439,12 +459,15 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 			Lembar e = daftarK.get(i);
 			PanelTempat.kartu(lk.g, gaya, rx0, ry0, rx1, ry1, sorot ? 1.0F : 0.0F, pilih);
 			TemaUi.ikon(lk.g, e.b(Dagang.KAPAL) ? TemaUi.I_KAPAL : TemaUi.I_KARUNG, rx0 + 3, ry0 + 5, 16);
-			lk.teks(e.teks(LembarKunci.NAMA), rx0 + 23, ry0 + 3, rx1 - rx0 - 70, gaya.teks, 0.85F);
-			lk.keterangan(TemaUi.k("dagang.kontrak_ke", e.teks(LembarKunci.TUJUAN), e.i(Dagang.PETI, 0)), rx0 + 23, ry0 + 14, rx1 - rx0 - 70,
-					gaya.teksSamar);
 			int sisa = e.i(LembarKunci.SISA_HARI, 0);
-			lk.kanan(TeksTempat.hari(sisa), rx1 - 4, ry0 + 4, sisa <= 1 ? TempatWarna.BAHAYA : gaya.teksLemah, 0.75F);
-			LabelHarga.gambar(lk, e.l(Dagang.BAYAR, 0L), -1L, rx1 - 4, ry0 + 14, true, 0.75F, false);
+			Component hari = TeksTempat.hari(sisa);
+			Component bayar = Component.literal(TeksTempat.angka(e.l(Dagang.BAYAR, 0L)));
+			int kananW = Math.max(font.width(hari), font.width(bayar) + 12) + 8;
+			lk.teks(e.teks(LembarKunci.NAMA), rx0 + 23, ry0 + 3, rx1 - rx0 - 23 - kananW, gaya.teks);
+			lk.teks(TemaUi.k("dagang.kontrak_ke", e.teks(LembarKunci.TUJUAN), e.i(Dagang.PETI, 0)), rx0 + 23, ry0 + 14, rx1 - rx0 - 23 - kananW,
+					gaya.teksSamar);
+			lk.kanan(hari, rx1 - 4, ry0 + 3, sisa <= 1 ? TempatWarna.BAHAYA : gaya.teksLemah, 1.0F);
+			LabelHarga.gambar(lk, e.l(Dagang.BAYAR, 0L), -1L, rx1 - 4, ry0 + 14, true, 1.0F, false);
 		}, null, i -> {
 		});
 		int sel = daftarKontrak.pilihan();
@@ -463,12 +486,12 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 		ry += barisNilai(l, TemaUi.k("dagang.k_sisa"), TeksTempat.hari(e.i(LembarKunci.SISA_HARI, 0)), rx0, ry, rx1);
 		ry += barisNilai(l, TemaUi.k("dagang.k_deposit"), TeksTempat.nb(e.l(Dagang.DEPOSIT, 0L), false), rx0, ry, rx1);
 		ry += barisNilai(l, TemaUi.k("dagang.k_bayar"), TeksTempat.nb(e.l(Dagang.BAYAR, 0L), false), rx0, ry, rx1);
-		if (e.b(Dagang.KAPAL)) {
+		if (e.b(Dagang.KAPAL) && ry + 16 <= kanan.y1()) {
 			ry += 2;
 			TemaUi.chip(l, TemaUi.I_KAPAL, TemaUi.k("dagang.k_kapal"), rx0, ry, 0xFF6FA8C8);
 			ry += 14;
 		}
-		l.bungkus(TemaUi.k("dagang.k_jelas"), rx0, ry + 2, rx1 - rx0, gaya.teksSamar, 0.7F);
+		l.bungkus(TemaUi.k("dagang.k_jelas"), rx0, ry + 2, rx1 - rx0, gaya.teksSamar, 1.0F, kanan.y1() - ry - 6);
 	}
 
 	// ------------------------------------------------------------------------------------------------ market
@@ -493,15 +516,21 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 
 	private void pasar(Lukis l, int x0, int y0, int x1, int y1) {
 		Lembar p = lembar.sub(Dagang.PASAR);
-		// the stall: an awning over a name plaque
-		TemaUi.tenda(l.g, x0, x1, y0);
 		Component nama = TemaUi.k("dagang.pasar.judul", p.teks(LembarKunci.NAMA));
-		int pw = Math.min(x1 - x0 - 20, Math.round(font.width(nama) * 0.9F) + 16);
-		int cx = (x0 + x1) / 2;
-		l.g.fill(cx - pw / 2, y0 + 9, cx + pw / 2, y0 + 22, Palette.argb(0xE8, 0x3A2414));
-		Brush.frame(l.g, cx - pw / 2, y0 + 9, cx + pw / 2, y0 + 22, TempatWarna.EMAS_GELAP);
-		Brush.fitCentered(l.g, font, nama, cx, y0 + 12, pw - 8, 0xFFFFE6B0, 0.9F, 0.55F, false);
-		int y = y0 + 25;
+		int y = y0;
+		if (tata != Tata.SEMPIT) {
+			// the stall: an awning over a name plaque (narrow: left out, the Di Sini title already names the stall)
+			TemaUi.tenda(l.g, x0, x1, y0);
+			int pw = Math.min(x1 - x0 - 20, font.width(nama) + 16);
+			int cx = (x0 + x1) / 2;
+			l.g.fill(cx - pw / 2, y0 + 9, cx + pw / 2, y0 + 22, Palette.argb(0xE8, 0x3A2414));
+			Brush.frame(l.g, cx - pw / 2, y0 + 9, cx + pw / 2, y0 + 22, TempatWarna.EMAS_GELAP);
+			Brush.fitCentered(l.g, font, nama, cx, y0 + 12, pw - 8, 0xFFFFE6B0, 1.0F, 1.0F, false);
+			if (l.di(cx - pw / 2, y0 + 9, cx + pw / 2, y0 + 22)) {
+				l.tip(nama);
+			}
+			y = y0 + 25;
+		}
 		if (p.b(Dagang.LEWAT)) {
 			y += pita(l, TemaUi.I_JENUH, TemaUi.k("dagang.pasar.lewat"), x0, y, x1, TempatWarna.PERINGATAN);
 		}
@@ -520,7 +549,7 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 			TemaUi.ikon(l.g, IKON_SEGMEN[i], bx0 + 3, y + 2, 10);
 			int n = pasar.get(i).size();
 			Component label = TemaUi.k("dagang.pasar." + KUNCI_SEGMEN[i], n);
-			l.teks(label, bx0 + 16, y + 3.5F, sw - 19, on ? 0xFFFFF6E8 : n == 0 ? TempatWarna.terkunci(gaya.teks) : gaya.teks, 0.8F);
+			l.teks(label, bx0 + 16, y + 3, sw - 19, on ? 0xFFFFF6E8 : n == 0 ? TempatWarna.terkunci(gaya.teks) : gaya.teks);
 			String kunci = "segmen_" + i;
 			final int s = i;
 			l.zona(kunci, bx0, y, bx1, y + 14, () -> gantiSegmen(s), true, null, true);
@@ -537,7 +566,7 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 			kosong(l, TemaUi.k("dagang.pasar.kosong_" + KUNCI_SEGMEN[segmen]), kiri.x0(), kiri.y0(), kiri.x1(), kiri.y1());
 		} else {
 			long u = uang();
-			daftarPasar.gambar(l, "pasar", kiri.x0(), kiri.y0(), kiri.x1(), kiri.y1(), rows.size(), 21,
+			daftarPasar.gambar(l, "pasar", kiri.x0(), kiri.y0(), kiri.x1(), kiri.y1(), rows.size(), 22,
 					(lk, i, rx0, ry0, rx1, ry1, sorot, pilih) -> barisPasar(lk, rows.get(i), rx0, ry0, rx1, ry1, sorot, pilih, u),
 					() -> {
 						String op = opPasar(rows);
@@ -554,11 +583,7 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 	private void ikonBarang(Lukis l, Lembar e, int x, int y) {
 		ItemStack item = e.barang();
 		if (!item.isEmpty()) {
-			l.g.pose().pushMatrix();
-			l.g.pose().translate(x, y);
-			l.g.pose().scale(0.9F, 0.9F);
-			l.g.item(item, 0, 0);
-			l.g.pose().popMatrix();
+			l.g.item(item, x, y);
 		} else {
 			TemaUi.ikon(l.g, TemaUi.ikonBarang(e.id()), x, y + 1, 14);
 		}
@@ -569,16 +594,16 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 		boolean kunci = !e.bisa();
 		ikonBarang(l, e, rx0 + 2, ry0 + 2);
 		int namaW = rx1 - rx0 - 76;
-		l.teks(e.teks(LembarKunci.NAMA), rx0 + 20, ry0 + 3, namaW, kunci ? TempatWarna.terkunci(gaya.teks) : gaya.teks, 0.8F);
+		l.teks(e.teks(LembarKunci.NAMA), rx0 + 20, ry0 + 2, namaW, kunci ? TempatWarna.terkunci(gaya.teks) : gaya.teks);
 		switch (segmen) {
 			case BELI -> {
 				int stok = e.i(Dagang.STOK, 0);
-				l.keterangan(stok <= 0 ? TeksTempat.k("kartu.habis") : TemaUi.k("dagang.pasar.stok", stok, STOK_HARIAN), rx0 + 20, ry0 + 12,
-						namaW, stok <= 0 ? TempatWarna.BAHAYA : gaya.teksSamar);
-				LabelHarga.gambar(l, e.l(LembarKunci.NB, 0L), u, rx1 - 4, ry0 + 6, true, 0.85F, false);
+				l.teks(stok <= 0 ? TeksTempat.k("kartu.habis") : TemaUi.k("dagang.pasar.stok", stok, STOK_HARIAN), rx0 + 20, ry0 + 12, namaW,
+						stok <= 0 ? TempatWarna.BAHAYA : gaya.teksSamar);
+				LabelHarga.gambar(l, e.l(LembarKunci.NB, 0L), u, rx1 - 4, ry0 + 7, true, 1.0F, false);
 			}
 			case JUAL -> {
-				l.keterangan(TemaUi.k("dagang.pasar.bawa", e.i(LembarKunci.JUMLAH, 0)), rx0 + 20, ry0 + 12, namaW, gaya.teksSamar);
+				l.teks(TemaUi.k("dagang.pasar.bawa", e.i(LembarKunci.JUMLAH, 0)), rx0 + 20, ry0 + 12, namaW, gaya.teksSamar);
 				if (kunci) {
 					IkonTempat.gambar(l.g, IkonTempat.KUNCI, rx1 - 14, ry0 + 5, 10, 0xC0FFFFFF);
 					Component a = alasanKeadaan(e);
@@ -588,14 +613,14 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 				} else {
 					float j = e.f(Dagang.JENUH, 1.0F);
 					Component nb = TemaUi.k("dagang.pasar.nb_kira", TeksTempat.desimal1(e.f(LembarKunci.NB, 0.0F)));
-					l.kanan(nb, rx1 - 4, ry0 + 3, warnaJenuh(j), 0.8F);
-					TemaUi.meter(l, -1, rx1 - 46, ry0 + 11, rx1 - 4, (j - 0.6F) / 0.4F, warnaJenuh(j), -1.0F);
+					l.kanan(nb, rx1 - 4, ry0 + 2, warnaJenuh(j), 1.0F);
+					TemaUi.meter(l, -1, rx1 - 46, ry0 + 12, rx1 - 4, (j - 0.6F) / 0.4F, warnaJenuh(j), -1.0F);
 				}
 			}
 			default -> {
-				l.keterangan(TemaUi.k("dagang.pasar.segel_baris", ISI_PETI), rx0 + 20, ry0 + 12, namaW, gaya.teksSamar);
-				TemaUi.ikon(l.g, TemaUi.I_CAP, rx1 - 34, ry0 + 4, 12);
-				LabelHarga.gambar(l, e.l(LembarKunci.NB, 1L), u, rx1 - 4, ry0 + 6, true, 0.85F, false);
+				l.teks(TemaUi.k("dagang.pasar.segel_baris", ISI_PETI), rx0 + 20, ry0 + 12, namaW, gaya.teksSamar);
+				TemaUi.ikon(l.g, TemaUi.I_CAP, rx1 - 40, ry0 + 5, 12);
+				LabelHarga.gambar(l, e.l(LembarKunci.NB, 1L), u, rx1 - 4, ry0 + 7, true, 1.0F, false);
 			}
 		}
 	}
@@ -641,25 +666,37 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 		int x0 = k.x0() + 5;
 		int x1 = k.x1() - 5;
 		int y = k.y0() + 4;
-		int pv = tata == Tata.SEMPIT ? 28 : tata == Tata.LEBAR ? 64 : 44;
-		int slot = TemaUi.ikonBarang(e.id());
-		pratinjau.gambar(l, "pasar_3d", x0, y, x0 + pv, y + pv, e.barang(), null, e.barang().isEmpty() && slot < 0 ? LembarKunci.Ikon.KAFILAH : -1);
-		if (e.barang().isEmpty() && slot >= 0) {
-			TemaUi.ikon(l.g, slot, x0 + pv / 2 - 12, y + pv / 2 - 12, 24);
+		// a low detail box (GUI scale 4, list over detail) drops the turning preview and keeps name, main rows and button
+		boolean rendah = k.h() < 84;
+		int pv = rendah ? 0 : tata == Tata.SEMPIT ? 28 : tata == Tata.LEBAR ? 64 : 44;
+		if (pv > 0) {
+			int slot = TemaUi.ikonBarang(e.id());
+			pratinjau.gambar(l, "pasar_3d", x0, y, x0 + pv, y + pv, e.barang(), null, e.barang().isEmpty() && slot < 0 ? LembarKunci.Ikon.KAFILAH : -1);
+			if (e.barang().isEmpty() && slot >= 0) {
+				TemaUi.ikon(l.g, slot, x0 + pv / 2 - 12, y + pv / 2 - 12, 24);
+			}
 		}
-		int tx = x0 + pv + 6;
+		int tx = pv > 0 ? x0 + pv + 6 : x0;
 		l.teks(Brush.bold(e.teks(LembarKunci.NAMA)), tx, y, x1 - tx, gaya.teks);
 		int ty = y + 12;
 		int by = k.y1() - 19;
+		// rows below are drawn only while they stay above the button row (no overlap at any GUI scale)
+		int batas = by - 2;
 		switch (segmen) {
 			case BELI -> {
 				long nb = e.l(LembarKunci.NB, 0L);
 				int stok = e.i(Dagang.STOK, 0);
-				ty += barisNilai(l, TemaUi.k("dagang.pasar.satuan"), TeksTempat.nb(nb, false), tx, ty, x1);
-				ty += barisNilai(l, TemaUi.k("dagang.pasar.sisa"), Component.literal(stok + " / " + STOK_HARIAN), tx, ty, x1);
-				TemaUi.meter(l, -1, tx, ty, x1, stok / (float) STOK_HARIAN, stok > 4 ? TempatWarna.OK : TempatWarna.PERINGATAN, -1.0F);
+				if (ty + 10 <= batas) {
+					ty += barisNilai(l, TemaUi.k("dagang.pasar.satuan"), TeksTempat.nb(nb, false), tx, ty, x1);
+				}
+				if (ty + 10 <= batas) {
+					ty += barisNilai(l, TemaUi.k("dagang.pasar.sisa"), Component.literal(stok + " / " + STOK_HARIAN), tx, ty, x1);
+				}
+				if (ty + 8 <= batas) {
+					TemaUi.meter(l, -1, tx, ty, x1, stok / (float) STOK_HARIAN, stok > 4 ? TempatWarna.OK : TempatWarna.PERINGATAN, -1.0F);
+				}
 				ty = Math.max(ty + 12, y + pv + 4);
-				l.bungkus(TemaUi.k("dagang.pasar.beli_jelas"), x0, ty, x1 - x0, gaya.teksSamar, 0.7F, by - ty - 12);
+				l.bungkus(TemaUi.k("dagang.pasar.beli_jelas"), x0, ty, x1 - x0, gaya.teksSamar, 1.0F, by - ty - 12);
 				int pw = jumlah.gambar(l, "pasar_n", x1 - 50, by + 1, Math.max(1, stok)) + 6;
 				int n = jumlah.nilai();
 				long total = nb * n;
@@ -669,27 +706,36 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 			}
 			case JUAL -> {
 				int bawa = e.i(LembarKunci.JUMLAH, 0);
-				ty += barisNilai(l, TemaUi.k("dagang.pasar.dibawa"), Component.literal(Integer.toString(bawa)), tx, ty, x1);
+				if (ty + 10 <= batas) {
+					ty += barisNilai(l, TemaUi.k("dagang.pasar.dibawa"), Component.literal(Integer.toString(bawa)), tx, ty, x1);
+				}
 				if (!e.bisa()) {
 					Component a = alasanKeadaan(e);
 					ty = Math.max(ty + 2, y + pv + 4);
-					if (a != null) {
+					// the reason also rides on the disabled button's tooltip, so the band may be left out when low
+					if (a != null && ty + 15 <= batas) {
 						ty += pita(l, TemaUi.I_TOPENG, a, x0, ty, x1, TempatWarna.BAHAYA);
 					}
-					l.bungkus(TemaUi.k("dagang.pasar.jual_tolak"), x0, ty + 2, x1 - x0, gaya.teksSamar, 0.7F, by - ty - 14);
+					l.bungkus(TemaUi.k("dagang.pasar.jual_tolak"), x0, ty + 2, x1 - x0, gaya.teksSamar, 1.0F, by - ty - 14);
 					tombolOp(l, "pasar_jual", x0, by, x1 - x0, 15, TemaUi.k("dagang.pasar.tombol_jual", "—"), false, a,
 							LembarKunci.op(Dagang.OP_JUAL, e.id(), 1));
 					break;
 				}
 				float nb = e.f(LembarKunci.NB, 0.0F);
 				float j = e.f(Dagang.JENUH, 1.0F);
-				ty += barisNilai(l, TemaUi.k("dagang.pasar.unit_berikut"), Component.literal(TeksTempat.desimal1(nb) + " NB"), tx, ty, x1);
-				l.keterangan(TemaUi.k("dagang.pasar.jenuh", Math.round((1.0F - j) * 100.0F)), tx, ty, x1 - tx, warnaJenuh(j));
-				ty += 9;
-				TemaUi.meter(l, TemaUi.I_JENUH, tx, ty, x1, (j - 0.6F) / 0.4F, warnaJenuh(j), -1.0F);
+				if (ty + 10 <= batas) {
+					ty += barisNilai(l, TemaUi.k("dagang.pasar.unit_berikut"), Component.literal(TeksTempat.desimal1(nb) + " NB"), tx, ty, x1);
+				}
+				if (ty + 10 <= batas) {
+					l.teks(TemaUi.k("dagang.pasar.jenuh", Math.round((1.0F - j) * 100.0F)), tx, ty, x1 - tx, warnaJenuh(j));
+					ty += 10;
+				}
+				if (ty + 8 <= batas) {
+					TemaUi.meter(l, TemaUi.I_JENUH, tx, ty, x1, (j - 0.6F) / 0.4F, warnaJenuh(j), -1.0F);
+				}
 				ty = Math.max(ty + 12, y + pv + 4);
 				Component jelas = TemaUi.k(lembar.sub(Dagang.PASAR).b(Dagang.LEWAT) ? "dagang.pasar.jual_lewat" : "dagang.pasar.jual_jelas");
-				l.bungkus(jelas, x0, ty, x1 - x0, gaya.teksSamar, 0.7F, by - ty - 12);
+				l.bungkus(jelas, x0, ty, x1 - x0, gaya.teksSamar, 1.0F, by - ty - 12);
 				int pw = jumlah.gambar(l, "pasar_n", x1 - 50, by + 1, Math.max(1, Math.min(64, bawa))) + 6;
 				int n = jumlah.nilai();
 				// shortcut: the client does not know jenuhPerUnit, so the total shown is next-unit price x n (an upper bound)
@@ -700,27 +746,33 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 			default -> {
 				long nb = e.l(LembarKunci.NB, 1L);
 				int bawa = dibawa(e.id());
-				ty += barisNilai(l, TemaUi.k("dagang.pasar.dibawa"), Component.literal(Integer.toString(bawa)), tx, ty, x1);
-				ty += barisNilai(l, TemaUi.k("dagang.pasar.jadi_peti"), Component.literal(Integer.toString(bawa / ISI_PETI)), tx, ty, x1);
-				ty = Math.max(ty + 2, y + pv + 4);
-				// eight goods flowing into the seal
-				int gx = x0;
-				for (int i = 0; i < ISI_PETI && gx + 12 < x1 - 30; i++) {
-					ikonBarang(l, e, gx, ty);
-					gx += 11;
+				if (ty + 10 <= batas) {
+					ty += barisNilai(l, TemaUi.k("dagang.pasar.dibawa"), Component.literal(Integer.toString(bawa)), tx, ty, x1);
 				}
-				IkonTempat.gambar(l.g, IkonTempat.PANAH_KANAN, gx + 2, ty + 3, 9, 0xC0FFFFFF);
-				TemaUi.ikon(l.g, TemaUi.I_CAP, gx + 14, ty, 14);
-				ty += 18;
-				l.bungkus(TemaUi.k("dagang.pasar.segel_jelas", ISI_PETI), x0, ty, x1 - x0, gaya.teksSamar, 0.7F, by - ty - 12);
+				if (ty + 10 <= batas) {
+					ty += barisNilai(l, TemaUi.k("dagang.pasar.jadi_peti"), Component.literal(Integer.toString(bawa / ISI_PETI)), tx, ty, x1);
+				}
+				ty = Math.max(ty + 2, y + pv + 4);
+				if (ty + 16 <= batas) {
+					// eight goods flowing into the seal
+					int gx = x0;
+					for (int i = 0; i < ISI_PETI && gx + 12 < x1 - 30; i++) {
+						ikonBarang(l, e, gx, ty);
+						gx += 11;
+					}
+					IkonTempat.gambar(l.g, IkonTempat.PANAH_KANAN, gx + 6, ty + 3, 9, 0xC0FFFFFF);
+					TemaUi.ikon(l.g, TemaUi.I_CAP, gx + 18, ty, 14);
+					ty += 18;
+				}
+				l.bungkus(TemaUi.k("dagang.pasar.segel_jelas", ISI_PETI), x0, ty, x1 - x0, gaya.teksSamar, 1.0F, by - ty - 12);
 				Component alasan = bawa < ISI_PETI ? TemaUi.k("dagang.pasar.segel_kurang", ISI_PETI) : !mampu(nb) ? kurang(nb) : null;
 				tombolOp(l, "pasar_segel", x0, by, x1 - x0, 15, TemaUi.k("dagang.pasar.tombol_segel", TeksTempat.angka(nb)), alasan == null, alasan,
 						LembarKunci.op(Dagang.OP_SEGEL, e.id()));
 			}
 		}
 		long u = uang();
-		if (u >= 0L) {
-			l.kanan(TemaUi.k("dagang.pasar.uang", TeksTempat.angka(u)), x1, by - 10, gaya.teksSamar, 0.7F);
+		if (u >= 0L && by - 10 >= ty) {
+			l.kanan(TemaUi.k("dagang.pasar.uang", TeksTempat.angka(u)), x1, by - 10, gaya.teksSamar, 1.0F);
 		}
 	}
 }

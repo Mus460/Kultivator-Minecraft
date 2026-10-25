@@ -99,6 +99,7 @@ public final class Harga {
 		BASE.put("heavenvoid_fragment", 120L);
 		BASE.put("heavenvoid_map", 300L);
 		BASE.put("token_darah_api", 250L);
+		BASE.put("token_naik", 1200L); // DESIGN 41.5.2 Token Naik Sekte (Grand Auction lot)
 		BASE.put("soul_nurturing_wood", 1500L);
 		BASE.put("soul_seal_jade", 2000L);
 		BASE.put("heavenly_flame_seed", 20000L);

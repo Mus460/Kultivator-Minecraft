@@ -5,9 +5,10 @@ import dev.kultivator.client.epic.SekteScenes;
 import dev.kultivator.client.epic.sky.SkyDirector;
 import dev.kultivator.client.epic.sound.MusicCue;
 import dev.kultivator.client.fx.qi.Qi;
-import dev.kultivator.client.hub.HubCards;
 import dev.kultivator.client.hub.HubNav;
-import dev.kultivator.client.screen.ui.Glyphs;
+import dev.kultivator.client.hub.Tujuan;
+import dev.kultivator.client.hub.Urutan;
+import dev.kultivator.client.sekte.wilayah.WilayahPage;
 import dev.kultivator.disciple.DiscipleEntity;
 import dev.kultivator.sekte.SekteIds;
 import dev.kultivator.sekte.kebun.Kebun;
@@ -28,8 +29,8 @@ import net.minecraft.world.phys.Vec3;
 
 /**
  * The client of module W (DESIGN 36.2.10, 36.4 W; one line in {@code SekteContentClient}): the receivers of W's payloads
- * (the board {@link KebunScreen}, the world picture for {@link TanamanRenderer}, the moments of {@link KebunFx}), the hub
- * card SEKTE "Kebun &amp; Tambang", the poses of activities 15 and 16 ({@link KebunPoses}), the two scenes of beats 190-191
+ * (the page {@link KebunScreen}, the world picture for {@link TanamanRenderer}, the moments of {@link KebunFx}), the page
+ * Sekte › Wilayah ({@link WilayahPage}, DESIGN 43.5), the poses of activities 15 and 16 ({@link KebunPoses}), the two scenes of beats 190-191
  * (through the lead's {@code SekteScenes}, so every 7b camera guard applies), and two small ambient touches:
  * <ul>
  * <li>the miners at work: the ring of a pick from inside the mountain every 6 s (a second, deeper strike with two or
@@ -58,11 +59,8 @@ public final class KebunClient {
 		TanamanRenderer.init();
 		KebunPoses.init();
 		scenes();
-		// Hub › Sekte › "Kebun & Tambang": the spirit beds, the gardeners, the mine's depth, shifts and finds.
-		HubCards.register(HubNav.SEKTE, "sekte_kebun_tambang", Glyphs.ALKIMIA, null, () -> {
-			HubNav.expectChild(KebunScreen.class, HubNav.SEKTE);
-			send("buka", Kebun.PAGE_GARDEN, "");
-		});
+		// Sekte › Wilayah (DESIGN 43.5): Pertahanan, Desa & Pakta, Cabang, Kebun & Tambang, Langit.
+		WilayahPage.daftar();
 	}
 
 	/** A button of the board (the server checks the owner and everything else). */
@@ -72,12 +70,12 @@ public final class KebunClient {
 		}
 	}
 
+	/** A fresh state: the shown page picks it up; from the world (soil, mine mouth, command) the Gulungan opens on it. */
 	private static void onOpen(KebunPayloads.Open p) {
-		Minecraft minecraft = Minecraft.getInstance();
-		if (minecraft.gui.screen() instanceof KebunScreen screen) {
-			screen.update(p.page(), p.data());
-		} else {
-			minecraft.gui.setScreen(new KebunScreen(p.page(), p.data()));
+		boolean diminta = KebunScreen.dimintaBaru();
+		KebunScreen.terima(p.page(), p.data());
+		if (!KebunScreen.ditampilkan() && !diminta) {
+			HubNav.buka(Tujuan.of(HubNav.SEKTE, Urutan.ID_WILAYAH).sub(WilayahPage.SUB_KEBUN));
 		}
 	}
 

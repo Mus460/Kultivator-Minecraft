@@ -5,9 +5,6 @@ import dev.kultivator.client.disciple.DiscipleRenderState;
 import dev.kultivator.client.epic.SekteScenes;
 import dev.kultivator.client.epic.sky.SkyDirector;
 import dev.kultivator.client.epic.sound.MusicCue;
-import dev.kultivator.client.hub.HubCards;
-import dev.kultivator.client.hub.HubNav;
-import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.client.sekte.SektePoses;
 import dev.kultivator.sekte.SekteIds;
 import dev.kultivator.sekte.tangga.Tangga;
@@ -30,8 +27,8 @@ import java.util.List;
  * pose of activity 21 ({@code SekteIds.ACT_CLIMB}: the cupped-fist salute in the line, bowed and trembling under the
  * stair's pressure, kneeling before an illusion, both arms raised on the summit, head hung when it turned back), the
  * scene recipes of beats 130 "Puncak!" and 131 (a disciple's Ujian Hati on the peak) through {@code SekteScenes} (every
- * 7b camera guard applies: Penuh/Singkat/Mati, Backspace, danger), and the hub card "Catatan Tangga" in the Murid
- * section. Reads only its own payload. One line in {@code SekteContentClient}.
+ * 7b camera guard applies: Penuh/Singkat/Mati, Backspace, danger), and the records of the sub Murid › Daftar › tangga
+ * ({@link TanggaCatatanScreen}, DESIGN 43.5). Reads only its own payload. One line in {@code SekteContentClient}.
  */
 public final class TanggaClient {
 
@@ -45,14 +42,21 @@ public final class TanggaClient {
 		initialised = true;
 		ClientPlayNetworking.registerGlobalReceiver(TanggaPayloads.State.TYPE, (payload, context) -> TanggaIlusi.onState(payload));
 		ClientTickEvents.END_CLIENT_TICK.register(minecraft -> TanggaIlusi.tick());
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> TanggaIlusi.clear());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+			TanggaIlusi.clear();
+			TanggaCatatanScreen.bersih();
+		});
 		LevelRenderEvents.COLLECT_SUBMITS.register(TanggaIlusiRenderer::collect);
 		HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, Kultivator.id("sekte_tangga_gulungan"), new TanggaHud());
 		SektePoses.register(SekteIds.ACT_CLIMB, TanggaClient::pose, List.of());
-		// R23: the card opens the records scroll (it used to close the hub and print to chat).
+		// R23 / 43.5: the records shown in Murid › Daftar › tangga (asked for when that sub shows).
 		ClientPlayNetworking.registerGlobalReceiver(TanggaPayloads.Catatan.TYPE, (payload, context) -> TanggaCatatanScreen.onRecords(payload));
-		HubCards.register(HubNav.MURID, "sekte_tangga_catatan", Glyphs.TALENT, null, TanggaCatatanScreen::open);
 		scenes();
+	}
+
+	/** True when the module runs on this client (its payloads are registered). */
+	public static boolean aktif() {
+		return initialised;
 	}
 
 	private static void scenes() {

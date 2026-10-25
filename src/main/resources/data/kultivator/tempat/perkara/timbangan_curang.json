@@ -1,0 +1,72 @@
+{
+  "nama": "kultivator.kota42.perkara.t.timbangan_curang.nama",
+  "teks": "kultivator.kota42.perkara.t.timbangan_curang.teks",
+  "penggugat": {
+    "klaim": "kultivator.kota42.perkara.t.timbangan_curang.klaim_a"
+  },
+  "tergugat": {
+    "klaim": "kultivator.kota42.perkara.t.timbangan_curang.klaim_b",
+    "peran": [
+      "koki",
+      "pemilik_teh",
+      "pedagang_pil",
+      "penjual_ikan",
+      "pedagang_bazar"
+    ]
+  },
+  "benar": "acak",
+  "saksi": 3,
+  "kesaksian": {
+    "penggugat": [
+      "kultivator.kota42.perkara.t.timbangan_curang.saksi_a1",
+      "kultivator.kota42.perkara.t.timbangan_curang.saksi_a2"
+    ],
+    "tergugat": [
+      "kultivator.kota42.perkara.t.timbangan_curang.saksi_b1",
+      "kultivator.kota42.perkara.t.timbangan_curang.saksi_b2"
+    ]
+  },
+  "dusta": "kultivator.kota42.perkara.t.timbangan_curang.dusta",
+  "bukti": [
+    {
+      "jenis": "barang",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.timbangan_curang.bukti1_a",
+        "tergugat": "kultivator.kota42.perkara.t.timbangan_curang.bukti1_b"
+      },
+      "barang": "minecraft:iron_nugget"
+    },
+    {
+      "jenis": "catatan",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.timbangan_curang.bukti2_a",
+        "tergugat": "kultivator.kota42.perkara.t.timbangan_curang.bukti2_b"
+      }
+    },
+    {
+      "jenis": "gosip",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.timbangan_curang.bukti3_a",
+        "tergugat": "kultivator.kota42.perkara.t.timbangan_curang.bukti3_b"
+      }
+    }
+  ],
+  "putusan": [
+    {
+      "untuk": "penggugat",
+      "teks": "kultivator.kota42.perkara.t.timbangan_curang.putusan1",
+      "akibat": "kultivator.kota42.perkara.t.timbangan_curang.putusan1_akibat"
+    },
+    {
+      "untuk": "tergugat",
+      "teks": "kultivator.kota42.perkara.t.timbangan_curang.putusan2",
+      "akibat": "kultivator.kota42.perkara.t.timbangan_curang.putusan2_akibat"
+    },
+    {
+      "untuk": "damai",
+      "teks": "kultivator.kota42.perkara.t.timbangan_curang.putusan3",
+      "akibat": "kultivator.kota42.perkara.t.timbangan_curang.putusan3_akibat"
+    }
+  ],
+  "suap": 0.6
+}

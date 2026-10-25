@@ -28,6 +28,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -104,6 +105,92 @@ public final class TubuhPenduduk {
 	private static final String[] TOPIK = {"harga", "gosip", "makanan", "anak", "sekte", "latihan", "pil", "pengembara", "lelang"};
 
 	private TubuhPenduduk() {
+	}
+
+	// ================================================================== hooks (DESIGN 42.4.14, 42.4A.5, 42.5A.9; none registered = as built)
+
+	/**
+	 * Micro interludes during an activity at its spot (42S {@code Selingan}: wiping sweat, looking round, a word to a
+	 * neighbour). Asked every pass (20 ticks) of a body that has arrived, is not indoors and not chatting; keep its own timer
+	 * per body (in {@link KultivatorNpc#memory}, keys not starting {@code hd_}).
+	 */
+	@FunctionalInterface
+	public interface PenyediaSelingan {
+		/** @return true when it played an interlude or wants the built-in once clips held back this pass */
+		boolean selingan(ServerLevel level, TempatHuni huni, KultivatorNpc npc, Penduduk p, Kegiatan k, long now);
+	}
+
+	/**
+	 * The lines of a chat between two resident bodies (42K {@code ObrolanWarga}: a speech bubble instead of the plain line).
+	 * Asked for each of the four turns; the gestures stay the built-in ones.
+	 */
+	@FunctionalInterface
+	public interface PenyediaUjaran {
+		/**
+		 * @param topik   the built-in topic of the chat ({@code harga}, {@code musim_2}, {@code langit_twin_moons}...)
+		 * @param langkah the turn, 0-3
+		 * @return true when it showed the line itself (the built-in {@code say} is skipped)
+		 */
+		boolean ujar(ServerLevel level, KultivatorNpc pembicara, KultivatorNpc pendengar, String topik, int langkah, long now);
+	}
+
+	/** The walking companion of a body (42A {@code WargaApi.mitraJalan}: lovers, grandparent and grandchild), or null. */
+	@FunctionalInterface
+	public interface MitraJalan {
+		@Nullable KultivatorNpc mitra(KultivatorNpc npc);
+	}
+
+	/** An enemy body a walking body passes (42A: residents bound as {@code MUSUH}), or null. */
+	@FunctionalInterface
+	public interface MusuhJalan {
+		@Nullable KultivatorNpc musuh(KultivatorNpc npc);
+	}
+
+	private static final List<PenyediaSelingan> SELINGAN = new ArrayList<>();
+	private static final List<PenyediaUjaran> UJARAN = new ArrayList<>();
+	private static @Nullable MitraJalan mitraJalan;
+	private static @Nullable MusuhJalan musuhJalan;
+	/** Memory key: game time a body may glare at an enemy again. */
+	private static final String MUSUH_T = "hd_musuh";
+
+	/** Registers an interlude provider (asked in order of registration; the first that returns true ends the round). */
+	public static synchronized void addSelingan(PenyediaSelingan penyedia) {
+		SELINGAN.add(penyedia);
+	}
+
+	/** Registers a chat-line provider (asked in order of registration; the first that returns true shows the line). */
+	public static synchronized void addUjaran(PenyediaUjaran penyedia) {
+		UJARAN.add(penyedia);
+	}
+
+	/** Sets the enemy lookup (one owner, 42A); null clears it. */
+	public static void setMusuhJalan(@Nullable MusuhJalan lookup) {
+		musuhJalan = lookup;
+	}
+
+	/** Sets the walking-companion lookup (one owner, 42A); null clears it. */
+	public static void setMitraJalan(@Nullable MitraJalan lookup) {
+		mitraJalan = lookup;
+	}
+
+	/**
+	 * The companion walking with {@code npc} now: the lookup's answer while it is a live resident body of the same place
+	 * within 6 blocks that is on its way too; else null (always null without a lookup).
+	 */
+	public static @Nullable KultivatorNpc mitraJalan(KultivatorNpc npc) {
+		MitraJalan lookup = mitraJalan;
+		KultivatorNpc other = lookup == null ? null : lookup.mitra(npc);
+		if (other == null || other == npc || other.isRemoved() || !adalah(other) || other.situsPenduduk() != npc.situsPenduduk()
+				|| other.distanceToSqr(npc) > 36.0D || !dalamPerjalanan(other)) {
+			return null;
+		}
+		return other;
+	}
+
+	/** {@code laju} slowed to the companion's pace, so a pair walks side by side ({@link #mitraJalan}). */
+	private static double lajuBerdua(KultivatorNpc npc, double laju) {
+		KultivatorNpc other = mitraJalan == null ? null : mitraJalan(npc);
+		return other == null ? laju : Math.min(laju, laju(other.memory().getIntOr(JALAN, GerakId.JALAN_SANTAI)));
 	}
 
 	// ================================================================== identity
@@ -319,6 +406,19 @@ public final class TubuhPenduduk {
 	 */
 	private static void cekPerjalanan(ServerLevel level, TempatHuni huni, KultivatorNpc npc, Penduduk p, BlockPos goal, long now) {
 		CompoundTag m = npc.memory();
+		MusuhJalan enemies = musuhJalan;
+		if (enemies != null && now >= m.getLongOr(MUSUH_T, 0L)) {
+			// passing an enemy (42.4.5 MUSUH): a hard glare and an angry face, at most once in 30 s; the walk goes on
+			KultivatorNpc foe = enemies.musuh(npc);
+			if (foe != null && foe.distanceToSqr(npc) < 25.0D) {
+				m.putLong(MUSUH_T, now + 600L);
+				SosokApi.tatap(npc, foe);
+				m.putLong(TATAP_T, now + 60L);
+				suasana(npc, Gaya.SUASANA_MARAH, 100);
+			} else {
+				m.putLong(MUSUH_T, now + 100L);
+			}
+		}
 		Vec3 g = Vec3.atBottomCenterOf(goal);
 		double dx = g.x - npc.getX();
 		double dz = g.z - npc.getZ();
@@ -375,7 +475,7 @@ public final class TubuhPenduduk {
 			tiba(level, huni, npc, p, kegiatanSekarang(level, huni, p, now), now);
 			return;
 		}
-		double laju = laju(m.getIntOr(JALAN, GerakId.JALAN_SANTAI));
+		double laju = lajuBerdua(npc, laju(m.getIntOr(JALAN, GerakId.JALAN_SANTAI)));
 		Player near = level.getNearestPlayer(npc.getX(), npc.getY(), npc.getZ(), 48.0D, each -> !each.isSpectator());
 		double pd = near == null ? Double.MAX_VALUE : near.distanceTo(npc);
 		if (pd <= 24.0D) {
@@ -428,7 +528,7 @@ public final class TubuhPenduduk {
 
 	/** Speed modifier of the walk under way. */
 	static double lajuJalan(KultivatorNpc npc) {
-		return laju(npc.memory().getIntOr(JALAN, GerakId.JALAN_SANTAI));
+		return lajuBerdua(npc, laju(npc.memory().getIntOr(JALAN, GerakId.JALAN_SANTAI)));
 	}
 
 	/** The walk was interrupted (a fight, a sit-down): the plan is dropped, the next start plans again. */
@@ -731,6 +831,13 @@ public final class TubuhPenduduk {
 			obrol(level, npc, now);
 			return;
 		}
+		boolean selinganLuar = false;
+		for (PenyediaSelingan each : SELINGAN) {
+			if (each.selingan(level, huni, npc, p, k, now)) {
+				selinganLuar = true;
+				break;
+			}
+		}
 		if (k.klip() == GerakId.MAIN_KEJAR && now >= m.getLongOr(SELA_T, 0L)) {
 			// the chase: off to another play spot, laughing
 			List<Titik> spots = huni.titik("main");
@@ -747,7 +854,7 @@ public final class TubuhPenduduk {
 				return;
 			}
 		}
-		if (now >= m.getLongOr(SELA_T, 0L) && KUNCI_KERJA.contains(k.kunci())) {
+		if (!selinganLuar && now >= m.getLongOr(SELA_T, 0L) && KUNCI_KERJA.contains(k.kunci())) {
 			m.putLong(SELA_T, now + 300L + npc.getRandom().nextInt(500));
 			KerjaPeran.Kerja kerja = KerjaPeran.untuk(p.peran(), p.benih());
 			int sela = kerja.sela();
@@ -762,7 +869,7 @@ public final class TubuhPenduduk {
 				SosokApi.gerak(npc, sela, 0, 0, 0, 0, 0);
 			}
 		}
-		if (now >= m.getLongOr(SELA_T, 0L) && !KUNCI_KERJA.contains(k.kunci())) {
+		if (!selinganLuar && now >= m.getLongOr(SELA_T, 0L) && !KUNCI_KERJA.contains(k.kunci())) {
 			m.putLong(SELA_T, now + 300L + npc.getRandom().nextInt(600));
 			int sela = selaKegiatan(k.kunci());
 			if (sela != 0 && npc.getRandom().nextInt(3) != 0) {
@@ -961,8 +1068,17 @@ public final class TubuhPenduduk {
 		};
 		SosokApi.gerak(speaker, gesture, 0, BARIS, 0, 0, 0);
 		SosokApi.gerak(listener, GerakId.ANGGUK_DENGAR, 0, BARIS, 0, 0, 0);
-		String prefix = TOPIK_SENDIRI.contains(topic) ? "kultivator.hidup.obrol." : "kultivator.kota.obrol.";
-		speaker.say(Component.translatable(prefix + topic + "." + step), BARIS);
+		boolean diucap = false;
+		for (PenyediaUjaran each : UJARAN) {
+			if (each.ujar(level, speaker, listener, topic, step, now)) {
+				diucap = true;
+				break;
+			}
+		}
+		if (!diucap) {
+			String prefix = TOPIK_SENDIRI.contains(topic) ? "kultivator.hidup.obrol." : "kultivator.kota.obrol.";
+			speaker.say(Component.translatable(prefix + topic + "." + step), BARIS);
+		}
 		m.putInt(OBROL_STEP, step + 1);
 		m.putLong(OBROL_NEXT, now + BARIS + 10L);
 	}
@@ -1170,12 +1286,19 @@ public final class TubuhPenduduk {
 			String which = switch (state) {
 				case PendudukData.DATANG -> "datang";
 				case PendudukData.PULIH -> "pulih";
+				case PendudukData.SAKIT -> "sakit";
+				case PendudukData.MABUK -> "mabuk";
+				case PendudukData.PENGANTIN -> "pengantin";
+				case PendudukData.BERKABUNG -> "berkabung";
 				default -> "duka";
 			};
 			if (state == PendudukData.DATANG) {
 				SosokApi.gerak(npc, GerakId.LAMBAI, 0, 0, 0, 0, 0);
-			} else if (state == PendudukData.DUKA) {
+			} else if (state == PendudukData.DUKA || state == PendudukData.BERKABUNG) {
 				SosokApi.gerak(npc, GerakId.SIKAP_TUNDUK, 0, 60, 0, 0, 0);
+			} else if (state == PendudukData.PENGANTIN) {
+				SosokApi.gerak(npc, GerakId.HORMAT, 0, 0, 0, 0, 0);
+				suasana(npc, Gaya.SUASANA_SENANG, 200);
 			}
 			npc.say(Component.translatable("kultivator.hidup.keadaan." + which + "." + npc.getRandom().nextInt(4)), BARIS + 20);
 			return;

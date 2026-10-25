@@ -1,0 +1,24 @@
+{
+  "pembicara": [
+    "peran:penjaga_gerbang"
+  ],
+  "prioritas": 65,
+  "syarat": [
+    "gabung.lulus_sini"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "304",
+      "pilihan": [
+        {
+          "akibat": [
+            "gabung.sumpah"
+          ]
+        },
+        {}
+      ]
+    }
+  ]
+}

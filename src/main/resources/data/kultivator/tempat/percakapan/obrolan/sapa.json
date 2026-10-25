@@ -1,0 +1,57 @@
+{
+  "_catatan": "SAPA 42.5A.9: salam + satu basa-basi. 42K-C.",
+  "jenis": "sapa",
+  "syarat": {},
+  "mulai": {
+    "dasar": 0.3,
+    "X": 300,
+    "hubungan": 400
+  },
+  "jeda_tick": [
+    40,
+    70
+  ],
+  "langkah": [
+    {
+      "id": "sapa",
+      "oleh": "A",
+      "niat": "SAPA",
+      "lanjut": [
+        "balas"
+      ]
+    },
+    {
+      "id": "balas",
+      "oleh": "B",
+      "niat": "SAPA",
+      "lanjut": [
+        "basa"
+      ]
+    },
+    {
+      "id": "basa",
+      "oleh": "A",
+      "niat": "BASA_BASI",
+      "lanjut": [
+        "sambung",
+        "basa_b"
+      ]
+    },
+    {
+      "id": "sambung",
+      "oleh": "B",
+      "niat": "SAMBUNG_RASA"
+    },
+    {
+      "id": "basa_b",
+      "oleh": "B",
+      "niat": "BASA_BASI",
+      "syarat": {
+        "sifat": {
+          "X": ">10"
+        }
+      }
+    }
+  ],
+  "efek": {}
+}

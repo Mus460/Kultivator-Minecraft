@@ -1,0 +1,19 @@
+{
+ "variants": {
+  "facing=north": {
+   "model": "kultivator:block/kota42/papan_nama_toko"
+  },
+  "facing=east": {
+   "model": "kultivator:block/kota42/papan_nama_toko",
+   "y": 90
+  },
+  "facing=south": {
+   "model": "kultivator:block/kota42/papan_nama_toko",
+   "y": 180
+  },
+  "facing=west": {
+   "model": "kultivator:block/kota42/papan_nama_toko",
+   "y": 270
+  }
+ }
+}

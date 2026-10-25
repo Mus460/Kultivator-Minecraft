@@ -1,0 +1,31 @@
+{
+  "_catatan": "Kebiasaan #10 pendoa_kuil (DESIGN 42.4.12)",
+  "nomor": 10,
+  "siapa": {
+    "umur": [
+      10,
+      200
+    ],
+    "tahap": [
+      "dewasa",
+      "tua"
+    ]
+  },
+  "bobot": 1.2,
+  "sesi": [
+    {
+      "jam": [
+        6,
+        7
+      ],
+      "peluang": 0.9,
+      "tujuan": [
+        "dupa",
+        "kerja:dupa",
+        "obrol"
+      ],
+      "klip": "sujud_dupa",
+      "kanan": "dupa"
+    }
+  ]
+}

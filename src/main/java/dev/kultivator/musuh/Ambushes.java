@@ -39,8 +39,11 @@ import java.util.UUID;
  * (staggered by player), chance {@code (0.06 + 0.01 × realm) × scale} capped at 15%, a day of cooldown afterwards. Three
  * seconds of killing intent come first, then a band of 1-3 masked rogues steps out 12-18 blocks ahead. It ends when the
  * band is beaten (or driven off), or when the player stays more than 96 blocks away for 30 s.
+ * <p>
+ * Other systems scale the roll chance through {@link #addChanceFactor} (DESIGN 41.4.5: the name protection of an NPC
+ * sect's members near its gate); with none registered nothing changes.
  */
-final class Ambushes {
+public final class Ambushes {
 
 	public static final int ROLL_TICKS = 6000;
 	public static final double BASE_CHANCE = 0.06D;
@@ -65,6 +68,13 @@ final class Ambushes {
 		}
 	}
 
+	/** A multiplier of a player's ambush chance (1.0 = unchanged; values are clamped to 0..2). */
+	@FunctionalInterface
+	public interface ChanceFactor {
+		double factor(ServerPlayer player);
+	}
+
+	private static final List<ChanceFactor> CHANCE_FACTORS = new java.util.concurrent.CopyOnWriteArrayList<>();
 	private static final Map<UUID, Pending> PENDING = new HashMap<>();
 	private static final Map<UUID, Live> LIVE = new HashMap<>();
 	/** Player -> game time of the postponed roll (the player was busy at the roll: asked again, never dropped). */
@@ -175,7 +185,8 @@ final class Ambushes {
 			if (pressure != null) {
 				return pressure;
 			}
-			double chance = Math.min(CHANCE_CAP, (BASE_CHANCE + CHANCE_PER_REALM * realm.ordinal()) * KultivatorConfig.get().rogueAmbushChanceScale);
+			double chance = Math.min(CHANCE_CAP, (BASE_CHANCE + CHANCE_PER_REALM * realm.ordinal()) * KultivatorConfig.get().rogueAmbushChanceScale)
+					* chanceFactor(player);
 			if (level.getRandom().nextDouble() >= chance) {
 				return "kultivator.musuh.ambush.refuse.chance";
 			}
@@ -192,6 +203,26 @@ final class Ambushes {
 		Fx.sendTo(player, player.position(), player.position(), FxType.MUSUH, MusuhFxIds.AMBUSH_ALERT, tiers.length, 0.0F);
 		level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.WARDEN_HEARTBEAT, SoundSource.HOSTILE, 1.0F, 0.8F);
 		return null;
+	}
+
+	/** Adds a chance multiplier (DESIGN 41.4.5); every registered factor is applied (product). */
+	public static void addChanceFactor(ChanceFactor factor) {
+		if (factor != null) {
+			CHANCE_FACTORS.add(factor);
+		}
+	}
+
+	/** The product of the registered chance factors for {@code player} (1.0 with none). */
+	static double chanceFactor(ServerPlayer player) {
+		double product = 1.0D;
+		for (ChanceFactor factor : CHANCE_FACTORS) {
+			try {
+				product *= Math.max(0.0D, Math.min(2.0D, factor.factor(player)));
+			} catch (RuntimeException exception) {
+				dev.kultivator.Kultivator.LOGGER.error("An ambush chance factor failed", exception);
+			}
+		}
+		return product;
 	}
 
 	/** True for a refusal that only means "not now" (busy): the roll is asked again. */

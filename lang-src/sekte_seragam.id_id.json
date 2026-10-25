@@ -29,6 +29,7 @@
   "kultivator.sekte.seragam.cmd.reset": "Rancangan sekte dikembalikan ke bawaan.",
   "kultivator.sekte.seragam.cmd.set": "Lambang uji disimpan: bentuk %s, simbol %s, warna %s/%s/%s.",
   "kultivator.sekte.seragam.ui.title": "Lambang & Seragam Sekte",
+  "kultivator.sekte.seragam.ui.mati": "Lambang dan seragam sekte dimatikan di server ini.",
   "kultivator.sekte.seragam.ui.tab.lambang": "Lambang",
   "kultivator.sekte.seragam.ui.tab.lambang.tip": "Bentuk, simbol, tiga warna dan semboyan sekte.",
   "kultivator.sekte.seragam.ui.tab.seragam": "Seragam",

@@ -1,0 +1,189 @@
+{
+  "id": "sapa_dialek_pelabuhan",
+  "jenis": "realisasi",
+  "_catatan": "SAPA in dialect pelabuhan across the day (register biasa); steps share the anti-repeat ring.",
+  "benih_dunia": 42,
+  "masukan": {
+    "niat": "SAPA",
+    "pembicara": 101,
+    "hari": 120,
+    "now": 2880000,
+    "cuaca": "cerah",
+    "musim": "semi",
+    "situasi": {
+      "jam": "pagi",
+      "cuaca": "cerah",
+      "musim": "semi",
+      "kelompok": "pekerja",
+      "watak": "ramah",
+      "kebiasaan": [],
+      "sifat": {
+        "H": 10,
+        "E": 0,
+        "X": 20,
+        "A": 30,
+        "C": 10,
+        "O": 0
+      },
+      "wajah": "netral",
+      "tempat": "tema_pelabuhan"
+    },
+    "pendengar": {
+      "nama": "Han",
+      "kelamin": "l",
+      "tahap": "dewasa",
+      "pemain": true
+    },
+    "kesan": "kenal",
+    "tahu_nama": false,
+    "register": "biasa",
+    "dialek": "pelabuhan",
+    "kelamin": "l"
+  },
+  "langkah": [
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "subuh",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "tema_pelabuhan"
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.kenal.4",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.kakak.pelabuhan",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "sapa.kenal",
+      "gestur": "lambai",
+      "seru": null,
+      "tik": null,
+      "id_id": "Bang. Sudah lama juga, ya.",
+      "en_us": "Big Man. It's been a while, hasn't it."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "tema_pelabuhan"
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.pekerja.pagi.1",
+        "a": []
+      },
+      "aturan": "sapa.pekerja.pagi",
+      "gestur": "lambai",
+      "seru": null,
+      "tik": null,
+      "id_id": "Pagi! Tungku sudah panas sejak subuh.",
+      "en_us": "Morning! The forge has been hot since dawn."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "siang",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "tema_pelabuhan"
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.siang.0",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.kakak.pelabuhan",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "sapa.siang",
+      "gestur": "lambai",
+      "seru": null,
+      "tik": null,
+      "id_id": "Selamat siang, Bang.",
+      "en_us": "Good afternoon, Big Man."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "malam",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "tema_pelabuhan"
+        },
+        "pendengar": {
+          "nama": "Mei",
+          "kelamin": "p",
+          "tahap": "dewasa",
+          "pemain": true
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.dialek.pelabuhan.0",
+        "a": []
+      },
+      "aturan": "sapa.dialek.pelabuhan",
+      "gestur": "lambai",
+      "seru": null,
+      "tik": null,
+      "id_id": "Ahoy, Bung! Kakimu masih goyang dari kapal?",
+      "en_us": "Ahoy, mate! Legs still wobbly from the ship?"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:sekte/gabung_pangkat_inti",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "kultivator.gabung.adv.cabang.desc"
+    },
+    "icon": {
+      "id": "minecraft:white_banner"
+    },
+    "title": {
+      "translate": "kultivator.gabung.adv.cabang.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

@@ -70,6 +70,9 @@ public final class SekteContent {
 		dev.kultivator.sekte.diplomasi.Diplomasi.registerContent();
 		dev.kultivator.sekte.kebun.Kebun.registerContent();
 		dev.kultivator.sekte.mandiri.Mandiri.registerContent();
+		// Gabung Sekte, DESIGN 41 (41A): always called; it registers its content first and checks umum.aktif and
+		// gabungSekte.aktif itself before any runtime wiring.
+		dev.kultivator.sekte.gabung.Gabung.init();
 		if (!umum.aktif) {
 			return;
 		}

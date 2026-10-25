@@ -156,6 +156,17 @@ public final class KontribusiMurid {
 		if (spec != null) {
 			SectRanks.ensure(data);
 			data.extraSection(SectRanks.EXTRA).putLong(SLIP_DAY, Halls.dayIndex());
+			// A disciple's slip counts toward the hall's daily limit too (as in Contribution.buy).
+			CompoundTag core = Halls.coreOf(owner);
+			if (core != null) {
+				long day = Halls.dayIndex();
+				if (core.getLongOr("slip_day", -1L) != day) {
+					core.putLong("slip_day", day);
+					core.putInt("slips_today", 0);
+				}
+				core.putInt("slips_today", core.getIntOr("slips_today", 0) + 1);
+				Halls.setDirty();
+			}
 		}
 		Component what = spec != null ? spec.displayName() : stack.getHoverName();
 		Halls.log(owner, Component.translatable("kultivator.sekte.mandiri.tumbuh.beli.log", entity.getName(), what, price));

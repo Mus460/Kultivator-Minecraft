@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:tempat/kota42_tolong",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.tempat.kota42_dua_keluarga.description"
+    },
+    "icon": {
+      "id": "minecraft:pink_petals"
+    },
+    "title": {
+      "translate": "advancement.kultivator.tempat.kota42_dua_keluarga.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

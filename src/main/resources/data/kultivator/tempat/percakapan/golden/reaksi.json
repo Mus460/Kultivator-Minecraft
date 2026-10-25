@@ -1,0 +1,143 @@
+{
+  "id": "reaksi",
+  "jenis": "realisasi",
+  "_catatan": "Reactions to a told fact by emotion label.",
+  "benih_dunia": 42,
+  "masukan": {
+    "niat": "REAKSI",
+    "pembicara": 502,
+    "hari": 120,
+    "now": 2880000,
+    "cuaca": "cerah",
+    "musim": "semi",
+    "situasi": {
+      "jam": "pagi",
+      "cuaca": "cerah",
+      "musim": "semi",
+      "kelompok": "pekerja",
+      "watak": "ramah",
+      "kebiasaan": [],
+      "sifat": {
+        "H": 10,
+        "E": 0,
+        "X": 20,
+        "A": 30,
+        "C": 10,
+        "O": 0
+      },
+      "wajah": "netral",
+      "tempat": "kota_besar"
+    },
+    "pendengar": {
+      "nama": "Han",
+      "kelamin": "l",
+      "tahap": "dewasa",
+      "pemain": true
+    },
+    "kesan": "kenal",
+    "tahu_nama": false,
+    "register": "biasa",
+    "dialek": "kampung",
+    "nilai": {
+      "fakta.subjek": {
+        "orang": {
+          "nama": "Bibi Zhang",
+          "kelamin": "p",
+          "tahap": "dewasa"
+        }
+      }
+    }
+  },
+  "langkah": [
+    {
+      "ubah": {
+        "label": "kagum"
+      },
+      "harap": {
+        "k": "kultivator.cakap.reaksi.ditolak.0.kampung",
+        "a": []
+      },
+      "aturan": "reaksi.ditolak",
+      "gestur": "geleng",
+      "seru": "kota42.seru.aduh_l",
+      "tik": null,
+      "id_id": "Yo wis, Nak. Mungkin lain kali.",
+      "en_us": "All right, child. Maybe another time."
+    },
+    {
+      "ubah": {
+        "label": "marah"
+      },
+      "harap": {
+        "k": "kultivator.cakap.reaksi.marah.0",
+        "a": []
+      },
+      "aturan": "reaksi.marah",
+      "gestur": "marah_hentak",
+      "seru": "kota42.seru.cih",
+      "tik": null,
+      "id_id": "Keterlaluan! Siapa yang berani begitu?",
+      "en_us": "Outrageous! Who dares do that?"
+    },
+    {
+      "ubah": {
+        "label": "cemas"
+      },
+      "harap": {
+        "k": "kultivator.cakap.reaksi.cemas.1.kampung",
+        "a": []
+      },
+      "aturan": "reaksi.cemas",
+      "gestur": "lihat_sekeliling",
+      "seru": "kota42.seru.takut_p",
+      "tik": null,
+      "id_id": "Hus! Jangan ngomong begitu, Nak. Pamali.",
+      "en_us": "Hush! Don't say that, child. It's bad luck."
+    },
+    {
+      "ubah": {
+        "label": "sedih"
+      },
+      "harap": {
+        "k": "kultivator.cakap.reaksi.hina.1",
+        "a": []
+      },
+      "aturan": "reaksi.hina",
+      "gestur": "marah_tunjuk",
+      "seru": "kota42.seru.cih",
+      "tik": null,
+      "id_id": "Kau pikir karena kau kultivator, kau boleh menghina orang kecil?",
+      "en_us": "You think being a cultivator lets you insult small folk?"
+    },
+    {
+      "ubah": {
+        "label": "gembira"
+      },
+      "harap": {
+        "k": "kultivator.cakap.reaksi.gembira.4",
+        "a": []
+      },
+      "aturan": "reaksi.gembira",
+      "gestur": "tertawa",
+      "seru": "kota42.seru.oh_l",
+      "tik": null,
+      "id_id": "Ini harus dirayakan! Siapa yang traktir?",
+      "en_us": "This calls for a celebration! Who's buying?"
+    },
+    {
+      "ubah": {
+        "label": "netral"
+      },
+      "harap": {
+        "k": "kultivator.cakap.reaksi.puji_ragu.1.kampung",
+        "a": []
+      },
+      "aturan": "reaksi.puji_ragu",
+      "gestur": "sikap_lipat_tangan",
+      "seru": "kota42.seru.hmm_l",
+      "tik": null,
+      "id_id": "Halah, Nak. Jangan ngegombal. Mau pinjam uang, ya?",
+      "en_us": "Oh come on, child. Don't sweet-talk me. Want to borrow money?"
+    }
+  ]
+}

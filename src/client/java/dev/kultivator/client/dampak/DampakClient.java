@@ -18,7 +18,6 @@ import dev.kultivator.client.epic.camera.CinematicDirector;
 import dev.kultivator.client.epic.camera.ShotGuard;
 import dev.kultivator.client.epic.screen.CloudWipe;
 import dev.kultivator.client.epic.screen.ImpactFrame;
-import dev.kultivator.client.epic.screen.PhotosensitivityScreen;
 import dev.kultivator.client.fx.spec.ScreenFlash;
 import dev.kultivator.data.TechniqueGrade;
 import dev.kultivator.data.TechniqueRegistry;
@@ -88,10 +87,7 @@ public final class DampakClient {
 		ClientTickEvents.END_CLIENT_TICK.register(DampakClient::tick);
 		ClientLifecycleEvents.CLIENT_STARTED.register(client -> registerHud());
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> clearAll());
-		EpicSettings.impactWarning(() -> {
-			Minecraft minecraft = Minecraft.getInstance();
-			minecraft.gui.setScreen(new PhotosensitivityScreen(minecraft.gui.screen()));
-		});
+		// the photosensitivity warning is a seal on Pengaturan › Kamera & Film (43.10.1), hooked by SettingsPage.daftar
 		try {
 			DampakWorld.init();
 		} catch (RuntimeException | LinkageError exception) {
@@ -358,8 +354,8 @@ public final class DampakClient {
 		for (EpicSettings.ImpactFrames mode : EpicSettings.ImpactFrames.values()) {
 			frames.then(ClientCommands.literal(mode.id()).executes(context -> {
 				if (mode == EpicSettings.ImpactFrames.PENUH && !EpicSettings.impactFramesConfirmed()) {
-					// the warning first (opened next tick, once the chat is closed)
-					later(1, () -> Minecraft.getInstance().gui.setScreen(new PhotosensitivityScreen(null)));
+					// the warning first: the seal on Pengaturan › Kamera & Film, opened once the chat is closed
+					dev.kultivator.client.screen.SettingsPage.peringatanDampak();
 					return ok(context, Component.translatable(K + "frames_warning"));
 				}
 				EpicSettings.setImpactFrames(mode);

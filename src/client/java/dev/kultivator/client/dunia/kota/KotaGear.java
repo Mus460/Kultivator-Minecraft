@@ -44,15 +44,24 @@ import java.util.function.ToIntFunction;
  * <li>Penjaga Kebun: a crown of peach blossoms and a basket of peaches.</li>
  * </ul>
  * Each outfit has a fixed-colour mesh and a cloth mesh tinted per NPC ({@link #tint}). The sheathed sword's hilt is a part
- * named {@link #HILT} that the layer hides while the blade is drawn. One texture serves all ({@link #TEXTURE}, 64 × 1536):
- * forty-eight material bands of 32 px; every cube's unwrap fits inside its band. Bands 0-15 come from
- * {@code tools/gen_dunia_kota_gear.py}; bands 16-47 (DESIGN 38.O.1 and 38.T.8.2) from {@code tools/gen_tempat_gear.py},
- * which copies bands 0-15 pixel for pixel.
+ * named {@link #HILT} that the layer hides while the blade is drawn. One texture serves all ({@link #TEXTURE}, 64 × 2048):
+ * sixty-four material bands of 32 px; every cube's unwrap fits inside its band. Bands 0-15 come from
+ * {@code tools/gen_dunia_kota_gear.py}; bands 16-47 (DESIGN 38.O.1 and 38.T.8.2) and 48-63 (DESIGN 42.12.4) from
+ * {@code tools/gen_tempat_gear.py}, which copies the bands already in the atlas pixel for pixel.
  *
  * <p>Kinds 21-60 dress the DESIGN 38 roles: one fixed headwear/accessory outfit per role (headwear column of DESIGN
  * 40.4.1). Body garments and hair of those roles are Sosok's (DESIGN 40.7.4), so these kinds carry no robe, apron or
  * hair parts; each is registered with {@code SosokGear.daftarTopi} (C40.K2) so a covering hat hides the Sosok hair under
  * it. Other client modules may choose a role's outfit with {@link #timpa}.
+ *
+ * <p>Kinds 61-79 (DESIGN 42.12.4, Kota yang Hidup, 42V-B): the thirteen new town roles' headwear and tools, and the
+ * outfits of a state the server sets as a look key ({@code SosokApi.setRupa}, synced on the NPC): {@code <key>.pengantin}
+ * (the groom's red official hat and silk flower, the bride's phoenix crown with pearl tassels and red veil),
+ * {@code <key>.berkabung} (the white mourning cap and hemp belt), {@code <key>.dingin} (the winter fur hat and padded
+ * scarf), {@code akrobat} / {@code akrobat.egrang} (the troupe's headband, on stilts), {@code penari} (water sleeves),
+ * {@code topeng_kertas} (the Ghost Market's paper mask), {@code penjaga_malam} and {@code pencopet} ({@link #kindOf}).
+ * The garments themselves are Sosok styles ({@code PENGANTIN_L/P}, {@code BERKABUNG}, {@code MANTEL_KAPAS},
+ * {@code AKROBAT}, {@code PENARI}, {@code PENCOPET} in {@code resep.json}).
  */
 public final class KotaGear {
 
@@ -168,7 +177,48 @@ public final class KotaGear {
 	/** {@code tudung_pembunuh}: deep charcoal hood, mouth mask, shoulder cape, crossed knife sheaths (Pembunuh Bayaran). */
 	public static final int TUDUNG = 60;
 
-	public static final int KINDS = 61;
+	// ---------------------------------------------------------------- DESIGN 42.12.4 (Kota yang Hidup, 42V-B)
+
+	/** {@code pengantin_pria}: red official's hat with gold flower and paddle wings, the red silk ball flower on a sash. */
+	public static final int TOPI_PENGANTIN = 61;
+	/** {@code pengantin_wanita}: the phoenix crown (fengguan) of kingfisher enamel, three gold phoenixes, pearl tassels, red veil. */
+	public static final int MAHKOTA_FENGGUAN = 62;
+	/** {@code berkabung}: white mourning cap with a hemp band and tails, hemp rope belt, hemp armband. */
+	public static final int TOPI_KABUNG = 63;
+	/** {@code topi_bulu_dingin}: winter rabbit-fur hat with ear flaps, fur collar, quilted scarf and cuffs (mantel kapas). */
+	public static final int TOPI_DINGIN = 64;
+	/** {@code kostum_akrobat}: red-yellow headband with flying tails, sash, wrist and ankle wraps (Akrobat). */
+	public static final int IKAT_AKROBAT = 65;
+	/** {@code penari}: long water sleeves, the pibo shawl, a silk flower hairpin and a sash with tails (Penari). */
+	public static final int SELENDANG_PENARI = 66;
+	/** {@code topeng_kertas}: a painted paper opera mask on a cord, a green-jade charm (Ghost Market sellers). */
+	public static final int TOPENG_KERTAS = 67;
+	/** {@code topi_penjaga_malam}: oiled-cloth hat with a neck curtain, padded collar, belt with a bamboo whistle (Penjaga Malam). */
+	public static final int CAPING_RONDA = 68;
+	/** {@code egrang}: red-lacquered stilts 2 × 16 × 2 strapped under both legs, plus the acrobat's headband and sash. */
+	public static final int EGRANG = 69;
+	/** {@code pencopet}: dark patched headband, a cross strap with a small bag, a patched shoulder cloth (Pencopet). */
+	public static final int IKAT_COPET = 70;
+	/** A big red silk flower over the ear with a gold pin, a red fan at a brocade belt (Mak Comblang). */
+	public static final int BUNGA_COMBLANG = 71;
+	/** A tall black scholar's soft cap, a folding fan and the wooden clapper (xingmu) at the belt (Pendongeng). */
+	public static final int TOPI_DONGENG = 72;
+	/** A worn straw hat with a broken brim and an erhu slung across the back (Pengamen). */
+	public static final int TOPI_PENGAMEN = 73;
+	/** The medicine banner (药) carried on a pole over the back, a gourd and a plaster pouch (Penjual Obat). */
+	public static final int PANJI_OBAT = 74;
+	/** A square scholar's cap with ribbons, the teacher's ruler and a scroll at the belt (Guru Sekolah). */
+	public static final int TOPI_GURU = 75;
+	/** The funeral master's tall white cap, hemp sash, hand bell and paper money pouch (Pengurus Duka). */
+	public static final int TOPI_DUKA = 76;
+	/** A key ring and a bound ledger at a leather belt, sleeve guards (Penjaga Gudang). */
+	public static final int KUNCI_GUDANG = 77;
+	/** A black melon-rind skullcap with a red knot, an abacus and a coin purse at the belt (Pialang). */
+	public static final int TOPI_PIALANG = 78;
+	/** A red musician's cap with a gold band, a red sash and a small drum at the hip (Pemusik). */
+	public static final int TOPI_PEMUSIK = 79;
+
+	public static final int KINDS = 80;
 
 	/** Debug/command names of the kinds ({@link #nama}), index = kind. */
 	private static final String[] NAMA = {"none", "futou", "futou_gold", "tea", "broker", "merchant", "merchant_gold", "smith", "guard",
@@ -178,12 +228,16 @@ public final class KotaGear {
 			"sabuk_alat", "topi_koki", "tasbih", "caping", "keranjang_punggung", "topi_bulu", "kipas_lipat_pinggang", "lencana_ketua",
 			"lencana_petugas", "pedang_punggung", "topi_syahbandar", "kalung_gigi_hiu", "serban_seberang", "mahkota_laut", "serban_emas",
 			"kerudung_pasir", "topi_bulu_lebar", "helm_runcing", "caping_biru", "ikat_kepala_kuning", "tali_melingkar", "topeng_besi",
-			"rantai_bahu", "mahkota_tanduk", "cadar_ular", "penutup_mata", "tudung_pembunuh"};
+			"rantai_bahu", "mahkota_tanduk", "cadar_ular", "penutup_mata", "tudung_pembunuh", "topi_pengantin", "mahkota_fengguan",
+			"topi_kabung", "topi_bulu_dingin", "ikat_akrobat", "selendang_penari", "topeng_kertas", "topi_penjaga_malam", "egrang",
+			"ikat_pencopet", "bunga_comblang", "topi_pendongeng", "topi_pengamen", "panji_obat", "topi_guru", "topi_pengurus_duka",
+			"kunci_gudang", "topi_pialang", "topi_pemusik"};
 
 	/** Kinds that cover the head (Sosok hides its hair cubes under them, C40.K2). */
 	private static final int[] MENUTUP = {PEJABAT, HELM_BERUMBAI, HELM_PERISAI, HELM_KAPTEN, TOPI_BULAT, KACAMATA, TOPI_ALKEMIS, TOPI_SARJANA,
 			SARJANA_KIPAS, TOPI_NAKHODA, KAIN_KEPALA, TUKANG, TOPI_KOKI, CAPING, TOPI_BULU, TOPI_SYAHBANDAR, SERBAN, SERBAN_EMAS, KERUDUNG_PASIR,
-			TOPI_BULU_LEBAR, HELM_RUNCING, CAPING_BIRU, MAHKOTA_TANDUK, TUDUNG};
+			TOPI_BULU_LEBAR, HELM_RUNCING, CAPING_BIRU, MAHKOTA_TANDUK, TUDUNG, TOPI_PENGANTIN, MAHKOTA_FENGGUAN, TOPI_KABUNG, TOPI_DINGIN,
+			CAPING_RONDA, TOPI_DONGENG, TOPI_PENGAMEN, TOPI_GURU, TOPI_DUKA, TOPI_PIALANG, TOPI_PEMUSIK};
 
 	/** Per-role overrides registered by other client modules ({@link #timpa}); empty by default. */
 	private static final Map<NpcRole, ToIntFunction<KultivatorNpc>> TIMPA = new EnumMap<>(NpcRole.class);
@@ -237,8 +291,28 @@ public final class KotaGear {
 	public static final int BAND_CHARCOAL = 45;
 	public static final int BAND_RUNE_CLOTH = 46;
 	public static final int BAND_BLOOD_LACQUER = 47;
-	/** Atlas height: 48 bands of 32 px. */
-	public static final int TEXTURE_HEIGHT = 48 * 32;
+	// bands 48-63 (DESIGN 42.12.4), tools/gen_tempat_gear.py
+	public static final int BAND_PHOENIX_SILK = 48;
+	public static final int BAND_DIANCUI = 49;
+	public static final int BAND_PEARLS = 50;
+	/** Red silk gauze with open mesh holes (drawn cutout: the face shows through the veil). */
+	public static final int BAND_RED_GAUZE = 51;
+	public static final int BAND_HEMP = 52;
+	public static final int BAND_MOURNING = 53;
+	public static final int BAND_WINTER_FUR = 54;
+	public static final int BAND_QUILTED = 55;
+	public static final int BAND_ACROBAT = 56;
+	/** Paper; the painted mask face fills x 1-8, y 1-6: the north face of an 8 × 6 × 1 cube at texOffs(0, band * 32). */
+	public static final int BAND_PAPER_MASK = 57;
+	public static final int BAND_OILED = 58;
+	public static final int BAND_PATCHED = 59;
+	public static final int BAND_STILT = 60;
+	public static final int BAND_SILK_FLOWER = 61;
+	/** White banner cloth; each 16 × 16 cell holds 药 in x 1-14, y 1-14 (the north face of a 14 × 14 × 1 cube). */
+	public static final int BAND_MEDICINE = 62;
+	public static final int BAND_DANCER = 63;
+	/** Atlas height: 64 bands of 32 px. */
+	public static final int TEXTURE_HEIGHT = 64 * 32;
 
 	private static final ModelLayerLocation[] SOLID = new ModelLayerLocation[KINDS];
 	private static final ModelLayerLocation[] CLOTH = new ModelLayerLocation[KINDS];
@@ -313,7 +387,37 @@ public final class KotaGear {
 				return kind;
 			}
 		}
-		return kindDefault(npc);
+		int state = kindRupa(npc);
+		return state > NONE ? state : kindDefault(npc);
+	}
+
+	/**
+	 * The outfit of a look key the server set for a moment of town life (DESIGN 42.12.4): {@code <key>.pengantin} or
+	 * {@code pengantin} (groom or bride by the body's sex), {@code .berkabung}, {@code .dingin}, {@code akrobat},
+	 * {@code akrobat.egrang}, {@code penari}, {@code topeng_kertas}, {@code penjaga_malam}, {@code pencopet}; NONE otherwise.
+	 */
+	static int kindRupa(KultivatorNpc npc) {
+		String rupa = npc.syncedRupa();
+		if (rupa.isEmpty()) {
+			return NONE;
+		}
+		int bar = rupa.indexOf('|');
+		String key = bar < 0 ? rupa : rupa.substring(0, bar);
+		if (key.equals("akrobat.egrang")) {
+			return EGRANG;
+		}
+		String last = key.substring(key.lastIndexOf('.') + 1);
+		return switch (last) {
+			case "pengantin" -> npc.female() ? MAHKOTA_FENGGUAN : TOPI_PENGANTIN;
+			case "berkabung" -> npc.role() == NpcRole.PENGURUS_DUKA ? TOPI_DUKA : TOPI_KABUNG;
+			case "dingin" -> TOPI_DINGIN;
+			case "akrobat" -> IKAT_AKROBAT;
+			case "penari" -> SELENDANG_PENARI;
+			case "topeng_kertas" -> TOPENG_KERTAS;
+			case "penjaga_malam" -> CAPING_RONDA;
+			case "pencopet" -> IKAT_COPET;
+			default -> NONE;
+		};
 	}
 
 	private static int kindDefault(KultivatorNpc npc) {
@@ -377,6 +481,20 @@ public final class KotaGear {
 			case PENGUASA_IBLIS -> MAHKOTA_TANDUK;
 			case PENJAGA_KITAB_TERLARANG -> PENUTUP_MATA;
 			case PEMBUNUH_BAYARAN -> TUDUNG;
+			// DESIGN 42.12.2 Kota yang Hidup roles (42.12.4 headwear and tools)
+			case PENCOPET -> IKAT_COPET;
+			case PENJAGA_MALAM -> CAPING_RONDA;
+			case MAK_COMBLANG -> BUNGA_COMBLANG;
+			case PENDONGENG -> TOPI_DONGENG;
+			case PENGAMEN -> TOPI_PENGAMEN;
+			case AKROBAT -> IKAT_AKROBAT;
+			case PENJUAL_OBAT -> PANJI_OBAT;
+			case GURU_SEKOLAH -> TOPI_GURU;
+			case PENGURUS_DUKA -> TOPI_DUKA;
+			case PENJAGA_GUDANG -> KUNCI_GUDANG;
+			case PIALANG -> TOPI_PIALANG;
+			case PENARI -> SELENDANG_PENARI;
+			case PEMUSIK -> TOPI_PEMUSIK;
 			// roles whose look is all Sosok (garments, hair, props): no fixed headwear
 			default -> NONE;
 		};
@@ -653,7 +771,13 @@ public final class KotaGear {
 				p.solid(basket, "peaches", BAND_PEACH, zero, -1.3F, -0.8F, -1.4F, 1.4F, 1.2F, 1.4F, -0.1F, -0.7F, 0.1F, 1.3F, 1.1F, 1.3F);
 				p.tinted(body, "sash", zero, -4.35F, 6.6F, -2.35F, 8.7F, 1.4F, 4.7F);
 			}
-			default -> mesh38(kind, p, head, body, rightArm, leftArm);
+			default -> {
+				if (kind >= TOPI_PENGANTIN) {
+					mesh42(kind, p, root);
+				} else {
+					mesh38(kind, p, head, body, rightArm, leftArm);
+				}
+			}
 		}
 		return LayerDefinition.create(mesh, 64, TEXTURE_HEIGHT);
 	}
@@ -1081,6 +1205,336 @@ public final class KotaGear {
 			default -> {
 			}
 		}
+	}
+
+	// ================================================================== DESIGN 42 kinds (42.12.4, 42V-B)
+
+	/**
+	 * The Kota yang Hidup outfits (kinds 61-79). Coordinates in model pixels on the player skeleton; front = -z; the head
+	 * spans y -8..0, the body y 0..12, an arm y -2..10 from its shoulder pivot, a leg y 0..12 from its hip pivot.
+	 */
+	private static void mesh42(int kind, Pass p, PartDefinition root) {
+		PartPose zero = PartPose.ZERO;
+		PartDefinition head = root.getChild("head");
+		PartDefinition body = root.getChild("body");
+		PartDefinition rightArm = root.getChild("right_arm");
+		PartDefinition leftArm = root.getChild("left_arm");
+		PartDefinition rightLeg = root.getChild("right_leg");
+		PartDefinition leftLeg = root.getChild("left_leg");
+		switch (kind) {
+			case TOPI_PENGANTIN -> {
+				// the groom: a red official's hat with a back hump, gold flower and two paddle wings; the great red silk ball
+				// flower on the chest with its sash over the shoulder; a red belt with jade plaques
+				p.solid(head, "crown", BAND_CRIMSON, zero, -4.3F, -10.6F, -4.3F, 8.6F, 2.8F, 8.6F, -3.4F, -12.4F, 0.4F, 6.8F, 2.0F, 3.8F);
+				p.solid(head, "brim", BAND_PHOENIX_SILK, zero, -4.5F, -8.3F, -4.5F, 9.0F, 0.7F, 9.0F);
+				p.solid(head, "hat_flower", BAND_GOLD, zero, -0.9F, -10.2F, -4.75F, 1.8F, 1.8F, 0.4F, -0.5F, -11.0F, -4.7F, 1.0F, 0.8F, 0.3F);
+				p.solid(head, "wing_l", BAND_CRIMSON, PartPose.offsetAndRotation(3.4F, -11.4F, 2.8F, 0.0F, 0.0F, rad(-8.0F)),
+						0.0F, -0.25F, -0.3F, 2.8F, 0.5F, 0.6F, 2.8F, -0.3F, -1.1F, 3.2F, 0.6F, 2.2F);
+				p.solid(head, "wing_r", BAND_CRIMSON, PartPose.offsetAndRotation(-3.4F, -11.4F, 2.8F, 0.0F, 0.0F, rad(8.0F)),
+						-2.8F, -0.25F, -0.3F, 2.8F, 0.5F, 0.6F, -6.0F, -0.3F, -1.1F, 3.2F, 0.6F, 2.2F);
+				p.solid(head, "wing_gold", BAND_GOLD, zero, 6.1F, -11.8F, 1.6F, 0.4F, 0.8F, 2.4F, -6.5F, -11.8F, 1.6F, 0.4F, 0.8F, 2.4F);
+				p.solid(body, "sash_front", BAND_SILK_FLOWER, PartPose.offsetAndRotation(0.0F, 5.6F, -2.45F, 0.0F, 0.0F, rad(-38.0F)),
+						-0.9F, -7.6F, -0.2F, 1.8F, 15.2F, 0.4F);
+				p.solid(body, "sash_back", BAND_SILK_FLOWER, PartPose.offsetAndRotation(0.0F, 5.6F, 2.45F, 0.0F, 0.0F, rad(38.0F)),
+						-0.9F, -7.6F, -0.2F, 1.8F, 15.2F, 0.4F);
+				PartDefinition flower = p.solid(body, "ball_flower", BAND_SILK_FLOWER, PartPose.offset(0.0F, 2.6F, -3.0F),
+						-1.8F, -1.6F, -1.0F, 3.6F, 3.2F, 1.6F, -2.4F, -1.0F, -0.6F, 4.8F, 2.0F, 1.0F, -1.2F, -2.2F, -0.6F, 2.4F, 4.4F, 1.0F);
+				p.solid(flower, "flower_heart", BAND_GOLD, zero, -0.6F, -0.6F, -1.3F, 1.2F, 1.2F, 0.4F);
+				p.solid(flower, "flower_tails", BAND_SILK_FLOWER, zero, -1.6F, 1.4F, -0.4F, 0.8F, 4.0F, 0.3F, 0.8F, 1.4F, -0.4F, 0.8F, 3.4F, 0.3F);
+				p.solid(body, "belt", BAND_PHOENIX_SILK, zero, -4.4F, 6.8F, -2.4F, 8.8F, 1.4F, 4.8F);
+				p.solid(body, "plaques", BAND_JADE, zero, -3.3F, 6.95F, -2.6F, 1.3F, 1.1F, 0.3F, -0.65F, 6.95F, -2.6F, 1.3F, 1.1F, 0.3F,
+						2.0F, 6.95F, -2.6F, 1.3F, 1.1F, 0.3F);
+			}
+			case MAHKOTA_FENGGUAN -> {
+				// the bride: the phoenix crown (8 x 4 x 8 of kingfisher enamel on a gold rim), three gold phoenixes with
+				// silk tails, pearl tassels at the temples and a fringe over the brow, the red gauze veil over the face, a
+				// phoenix-silk cloud collar on the shoulders
+				p.solid(head, "crown", BAND_DIANCUI, zero, -4.0F, -11.6F, -4.0F, 8.0F, 4.0F, 8.0F);
+				p.solid(head, "crown_rim", BAND_GOLD, zero, -4.4F, -8.2F, -4.4F, 8.8F, 0.8F, 8.8F, -4.2F, -11.9F, -4.2F, 8.4F, 0.5F, 8.4F);
+				p.solid(head, "crown_points", BAND_GOLD, zero, -3.9F, -12.9F, -4.3F, 1.0F, 1.2F, 0.4F, -0.5F, -13.3F, -4.3F, 1.0F, 1.6F, 0.4F,
+						2.9F, -12.9F, -4.3F, 1.0F, 1.2F, 0.4F, -4.3F, -12.9F, -0.5F, 0.4F, 1.2F, 1.0F, 3.9F, -12.9F, -0.5F, 0.4F, 1.2F, 1.0F);
+				phoenix(p, head, "phoenix_c", 0.0F, -12.4F, -0.6F, 1.0F);
+				phoenix(p, head, "phoenix_l", 3.2F, -11.8F, 0.8F, 0.75F);
+				phoenix(p, head, "phoenix_r", -3.2F, -11.8F, 0.8F, 0.75F);
+				p.solid(head, "fringe", BAND_PEARLS, zero, -4.0F, -8.0F, -4.6F, 8.0F, 1.8F, 0.3F);
+				for (int side = -1; side <= 1; side += 2) {
+					String s = side > 0 ? "_l" : "_r";
+					float x = side * 4.5F;
+					p.solid(head, "tassel_a" + s, BAND_PEARLS, PartPose.offset(x, -8.0F, -1.6F), -0.4F, 0.0F, -0.4F, 0.8F, 7.0F, 0.8F);
+					p.solid(head, "tassel_b" + s, BAND_PEARLS, PartPose.offset(x, -8.0F, 0.2F), -0.4F, 0.0F, -0.4F, 0.8F, 8.5F, 0.8F);
+					p.solid(head, "tassel_c" + s, BAND_PEARLS, PartPose.offset(x, -8.0F, 2.0F), -0.4F, 0.0F, -0.4F, 0.8F, 6.0F, 0.8F);
+					p.solid(head, "tassel_end" + s, BAND_SILK_FLOWER, zero, x - 0.5F, -1.0F, -0.1F, 1.0F, 1.0F, 1.0F);
+				}
+				p.solid(head, "veil", BAND_RED_GAUZE, zero, -4.4F, -7.8F, -4.9F, 8.8F, 9.0F, 0.1F);
+				p.solid(head, "veil_hem", BAND_GOLD, zero, -4.45F, 1.1F, -4.95F, 8.9F, 0.4F, 0.2F);
+				p.solid(body, "cloud_collar", BAND_PHOENIX_SILK, zero, -4.9F, -0.4F, -2.9F, 9.8F, 2.2F, 5.8F, -2.6F, 1.6F, -2.95F, 5.2F, 1.8F, 0.4F);
+				p.solid(body, "collar_tassels", BAND_GOLD, zero, -2.4F, 3.4F, -3.0F, 0.4F, 1.6F, 0.3F, -0.2F, 3.4F, -3.0F, 0.4F, 2.0F, 0.3F,
+						2.0F, 3.4F, -3.0F, 0.4F, 1.6F, 0.3F);
+				p.solid(body, "belt", BAND_PHOENIX_SILK, zero, -4.4F, 6.6F, -2.4F, 8.8F, 1.4F, 4.8F);
+				p.solid(body, "belt_jade", BAND_JADE, zero, -0.8F, 7.6F, -2.7F, 1.6F, 2.0F, 0.4F);
+			}
+			case TOPI_KABUNG -> kabung(p, head, body, leftArm, false);
+			case TOPI_DUKA -> {
+				// the funeral master: the tall mourning cap, a hemp sash over the shoulder, a bronze hand bell and the pouch
+				// of paper money he scatters before the coffin
+				kabung(p, head, body, leftArm, true);
+				p.solid(body, "hemp_sash", BAND_HEMP, PartPose.offsetAndRotation(0.0F, 5.6F, -2.5F, 0.0F, 0.0F, rad(36.0F)), -0.8F, -7.4F, -0.2F,
+						1.6F, 14.8F, 0.4F);
+				PartDefinition bell = p.solid(body, "bell", BAND_BRONZE, PartPose.offset(-4.7F, 8.4F, -0.6F), -0.9F, 0.0F, -0.9F, 1.8F, 2.0F, 1.8F,
+						-0.6F, 2.0F, -0.6F, 1.2F, 0.4F, 1.2F);
+				p.solid(bell, "bell_handle", BAND_WOOD, zero, -0.3F, -1.6F, -0.3F, 0.6F, 1.6F, 0.6F);
+				p.solid(body, "money_pouch", BAND_PAPER, zero, 2.6F, 7.8F, -2.9F, 1.8F, 2.4F, 0.8F);
+				p.solid(body, "money_tie", BAND_HEMP, zero, 2.5F, 7.6F, -3.0F, 2.0F, 0.4F, 1.0F);
+			}
+			case TOPI_DINGIN -> {
+				// winter: a rabbit-fur hat with a rolled brim and ear flaps, a red button, the fur collar of the padded coat, a
+				// quilted indigo scarf with one hanging end, padded cuffs
+				p.solid(head, "fur_crown", BAND_WINTER_FUR, zero, -4.5F, -10.2F, -4.5F, 9.0F, 3.0F, 9.0F);
+				p.solid(head, "fur_brim", BAND_WINTER_FUR, zero, -4.9F, -7.8F, -4.9F, 9.8F, 1.4F, 9.8F);
+				p.solid(head, "flap_l", BAND_WINTER_FUR, zero, 4.2F, -7.0F, -2.2F, 0.8F, 4.8F, 4.4F);
+				p.solid(head, "flap_r", BAND_WINTER_FUR, zero, -5.0F, -7.0F, -2.2F, 0.8F, 4.8F, 4.4F);
+				p.solid(head, "flap_ties", BAND_ROPE, zero, 4.4F, -2.2F, -0.3F, 0.4F, 1.8F, 0.4F, -4.8F, -2.2F, -0.3F, 0.4F, 1.8F, 0.4F);
+				p.solid(head, "button", BAND_CRIMSON, zero, -0.7F, -10.9F, -0.7F, 1.4F, 0.8F, 1.4F);
+				p.solid(body, "fur_collar", BAND_WINTER_FUR, zero, -5.0F, -0.8F, -3.0F, 10.0F, 2.2F, 6.0F);
+				p.solid(body, "scarf", BAND_QUILTED, zero, -4.6F, 0.6F, -2.8F, 9.2F, 1.4F, 5.6F);
+				p.solid(body, "scarf_end", BAND_QUILTED, PartPose.offsetAndRotation(-2.0F, 1.6F, -2.9F, 0.0F, 0.0F, rad(6.0F)), -0.9F, 0.0F, -0.3F,
+						1.8F, 6.2F, 0.6F);
+				p.solid(rightArm, "cuff", BAND_QUILTED, zero, -3.4F, 7.0F, -2.4F, 4.8F, 2.2F, 4.8F);
+				p.solid(leftArm, "cuff", BAND_QUILTED, zero, -1.4F, 7.0F, -2.4F, 4.8F, 2.2F, 4.8F);
+			}
+			case IKAT_AKROBAT -> akrobat(p, head, body, rightArm, leftArm, rightLeg, leftLeg);
+			case EGRANG -> {
+				// on stilts: red-lacquered poles 2 x 16 x 2 strapped to the shins with two rope bindings, a footrest under each
+				// sole; the pole reaches 12 px below the foot (the clip egrang_jalan lifts the body by 0.75 block)
+				akrobat(p, head, body, rightArm, leftArm, rightLeg, leftLeg);
+				for (PartDefinition leg : new PartDefinition[] {rightLeg, leftLeg}) {
+					p.solid(leg, "stilt", BAND_STILT, zero, -1.0F, 8.0F, -1.0F, 2.0F, 16.0F, 2.0F);
+					p.solid(leg, "footrest", BAND_WOOD, zero, -2.2F, 12.0F, -2.6F, 4.4F, 0.8F, 4.8F);
+					p.solid(leg, "bindings", BAND_ROPE, zero, -2.3F, 7.4F, -2.3F, 4.6F, 1.0F, 4.6F, -2.3F, 10.0F, -2.3F, 4.6F, 1.0F, 4.6F);
+					p.solid(leg, "stilt_foot", BAND_BLACK_IRON, zero, -1.2F, 23.2F, -1.2F, 2.4F, 0.8F, 2.4F);
+				}
+			}
+			case SELENDANG_PENARI -> {
+				// the dancer: long water sleeves flowing from the wrists, the pibo shawl over the shoulder blades and down both
+				// arms, a silk flower hairpin with a pearl dangle, a sash with two long tails
+				p.solid(rightArm, "water_sleeve", BAND_DANCER, PartPose.offsetAndRotation(-1.0F, 9.0F, 0.0F, rad(6.0F), 0.0F, 0.0F),
+						-2.2F, 0.0F, -0.4F, 4.4F, 13.0F, 0.8F);
+				p.solid(leftArm, "water_sleeve", BAND_DANCER, PartPose.offsetAndRotation(1.0F, 9.0F, 0.0F, rad(6.0F), 0.0F, 0.0F),
+						-2.2F, 0.0F, -0.4F, 4.4F, 13.0F, 0.8F);
+				p.solid(rightArm, "sleeve_cuff", BAND_DANCER, zero, -3.3F, 8.0F, -2.3F, 4.6F, 1.6F, 4.6F);
+				p.solid(leftArm, "sleeve_cuff", BAND_DANCER, zero, -1.3F, 8.0F, -2.3F, 4.6F, 1.6F, 4.6F);
+				p.solid(body, "pibo_back", BAND_DANCER, PartPose.offsetAndRotation(0.0F, 2.6F, 2.6F, rad(18.0F), 0.0F, 0.0F),
+						-6.4F, 0.0F, -0.2F, 12.8F, 1.6F, 0.4F);
+				p.solid(rightArm, "pibo", BAND_DANCER, PartPose.offsetAndRotation(-3.2F, 1.6F, 1.6F, rad(10.0F), 0.0F, rad(4.0F)),
+						-0.3F, 0.0F, -0.8F, 0.6F, 15.0F, 1.6F);
+				p.solid(leftArm, "pibo", BAND_DANCER, PartPose.offsetAndRotation(3.2F, 1.6F, 1.6F, rad(10.0F), 0.0F, rad(-4.0F)),
+						-0.3F, 0.0F, -0.8F, 0.6F, 15.0F, 1.6F);
+				p.solid(head, "hair_flower", BAND_SILK_FLOWER, zero, 3.0F, -8.6F, -1.4F, 1.8F, 1.8F, 1.8F);
+				p.solid(head, "flower_dangle", BAND_PEARLS, zero, 3.6F, -6.8F, -0.8F, 0.6F, 3.0F, 0.6F);
+				p.solid(body, "sash", BAND_DANCER, zero, -4.4F, 5.6F, -2.4F, 8.8F, 1.8F, 4.8F);
+				p.solid(body, "sash_tails", BAND_DANCER, PartPose.offsetAndRotation(1.4F, 7.4F, -2.6F, 0.0F, 0.0F, rad(-6.0F)), -0.6F, 0.0F, -0.2F,
+						1.2F, 9.0F, 0.4F, 0.9F, 0.0F, -0.2F, 1.0F, 7.5F, 0.4F);
+			}
+			case TOPENG_KERTAS -> {
+				// the Ghost Market seller: an 8 x 6 painted paper mask (its north face is the painted field of the band), tied
+				// with a hemp cord, and a green jade charm at the belt that glints under the green lanterns
+				p.solid(head, "mask", BAND_PAPER_MASK, zero, -4.0F, -7.0F, -4.9F, 8.0F, 6.0F, 1.0F);
+				p.solid(head, "mask_cord", BAND_ROPE, zero, -4.3F, -5.6F, -3.9F, 0.3F, 0.4F, 8.2F, 4.0F, -5.6F, -3.9F, 0.3F, 0.4F, 8.2F,
+						-4.3F, -5.6F, 4.0F, 8.6F, 0.4F, 0.3F);
+				p.solid(head, "cord_knot", BAND_ROPE, zero, -0.6F, -6.0F, 4.2F, 1.2F, 1.2F, 0.6F, -0.3F, -4.8F, 4.4F, 0.6F, 2.4F, 0.3F);
+				p.solid(body, "belt", BAND_CHARCOAL, zero, -4.35F, 7.0F, -2.35F, 8.7F, 1.0F, 4.7F);
+				p.solid(body, "charm", BAND_JADE, zero, 1.8F, 8.0F, -2.75F, 1.4F, 1.8F, 0.4F);
+				p.solid(body, "charm_cord", BAND_SNAKE, zero, 2.3F, 9.8F, -2.7F, 0.4F, 1.6F, 0.3F);
+			}
+			case CAPING_RONDA -> {
+				// the night watchman: a three-tier oiled-cloth hat with a neck curtain against the dew, a padded collar, a belt
+				// with a bamboo whistle and the tally of watches (five notched sticks)
+				p.solid(head, "hat", BAND_OILED, zero, -6.2F, -8.9F, -6.2F, 12.4F, 0.9F, 12.4F, -4.2F, -10.2F, -4.2F, 8.4F, 1.3F, 8.4F,
+						-2.0F, -11.4F, -2.0F, 4.0F, 1.2F, 4.0F);
+				p.solid(head, "hat_tip", BAND_BRONZE, zero, -0.5F, -12.0F, -0.5F, 1.0F, 0.6F, 1.0F);
+				p.solid(head, "curtain", BAND_OILED, zero, -4.6F, -8.0F, 3.8F, 9.2F, 7.0F, 0.4F, -4.8F, -8.0F, -1.0F, 0.4F, 6.0F, 4.8F,
+						4.4F, -8.0F, -1.0F, 0.4F, 6.0F, 4.8F);
+				p.solid(head, "chin_cord", BAND_ROPE, zero, -4.3F, -0.4F, -4.3F, 8.6F, 0.3F, 0.4F);
+				p.solid(body, "padded_collar", BAND_QUILTED, zero, -4.8F, -0.6F, -2.8F, 9.6F, 2.0F, 5.6F);
+				p.solid(body, "belt", BAND_LEATHER, zero, -4.35F, 7.0F, -2.35F, 8.7F, 1.2F, 4.7F);
+				p.solid(body, "whistle", BAND_WOOD, PartPose.offsetAndRotation(2.8F, 7.6F, -2.6F, 0.0F, 0.0F, rad(-20.0F)), -0.3F, 0.0F, -0.3F,
+						0.6F, 3.0F, 0.6F);
+				p.solid(body, "tally", BAND_BONE, zero, -3.4F, 8.2F, -2.7F, 0.4F, 2.0F, 0.3F, -2.8F, 8.2F, -2.7F, 0.4F, 2.0F, 0.3F, -2.2F, 8.2F,
+						-2.7F, 0.4F, 2.0F, 0.3F, -1.6F, 8.2F, -2.7F, 0.4F, 2.0F, 0.3F, -1.0F, 8.2F, -2.7F, 0.4F, 2.0F, 0.3F);
+			}
+			case IKAT_COPET -> {
+				// the pickpocket: a dark patched headband knotted at the back, a cross strap with a small bag at the right hip,
+				// a patched cloth over the left shoulder
+				p.solid(head, "headband", BAND_PATCHED, zero, -4.35F, -7.4F, -4.35F, 8.7F, 1.4F, 8.7F);
+				p.solid(head, "knot", BAND_PATCHED, PartPose.offsetAndRotation(0.0F, -6.8F, 4.3F, rad(20.0F), 0.0F, 0.0F), -1.0F, 0.0F, -0.2F,
+						0.8F, 2.6F, 0.4F, 0.3F, 0.0F, -0.2F, 0.8F, 2.0F, 0.4F);
+				p.solid(body, "strap", BAND_LEATHER, PartPose.offsetAndRotation(0.0F, 5.0F, -2.45F, 0.0F, 0.0F, rad(36.0F)), -0.4F, -7.0F, -0.2F,
+						0.8F, 14.0F, 0.4F);
+				p.solid(body, "strap_back", BAND_LEATHER, PartPose.offsetAndRotation(0.0F, 5.0F, 2.45F, 0.0F, 0.0F, rad(-36.0F)), -0.4F, -7.0F,
+						-0.2F, 0.8F, 14.0F, 0.4F);
+				PartDefinition bag = p.solid(body, "bag", BAND_PATCHED, PartPose.offset(-4.9F, 8.4F, -0.2F), -0.9F, 0.0F, -1.3F, 1.8F, 2.4F, 2.6F);
+				p.solid(bag, "bag_flap", BAND_LEATHER, zero, -1.0F, -0.2F, -1.4F, 2.0F, 0.9F, 2.8F);
+				p.solid(body, "shoulder_cloth", BAND_PATCHED, zero, 0.6F, -0.4F, -2.6F, 4.0F, 3.0F, 5.2F);
+			}
+			case BUNGA_COMBLANG -> {
+				// the matchmaker: a big red silk peony over the left ear with green leaves and a gold pin, a red fan in a
+				// phoenix-brocade belt, a red handkerchief tucked at the front
+				PartDefinition peony = p.solid(head, "peony", BAND_SILK_FLOWER, PartPose.offset(4.0F, -7.6F, -1.2F), -1.2F, -1.4F, -1.4F, 2.4F, 2.8F,
+						2.8F, -1.6F, -0.8F, -0.8F, 3.2F, 1.6F, 1.6F);
+				p.solid(peony, "leaves", BAND_JADE, zero, -0.4F, 0.8F, -2.0F, 0.8F, 0.6F, 1.6F, -0.4F, 1.0F, 1.0F, 0.8F, 0.6F, 1.6F);
+				p.solid(head, "pin", BAND_GOLD, zero, -3.4F, -9.0F, 1.2F, 6.8F, 0.5F, 0.5F, 3.2F, -9.3F, 0.9F, 1.0F, 1.0F, 1.0F);
+				p.solid(body, "belt", BAND_PHOENIX_SILK, zero, -4.4F, 6.6F, -2.4F, 8.8F, 1.6F, 4.8F);
+				PartDefinition fan = p.solid(body, "fan", BAND_SILK_FLOWER, PartPose.offsetAndRotation(-3.2F, 6.4F, -2.6F, 0.0F, 0.0F, rad(14.0F)),
+						-0.5F, 0.0F, -0.25F, 1.0F, 6.0F, 0.5F);
+				p.solid(fan, "fan_rib", BAND_WOOD, zero, -0.55F, -0.6F, -0.3F, 1.1F, 0.6F, 0.6F);
+				p.solid(fan, "fan_tassel", BAND_GOLD, zero, -0.25F, 6.0F, -0.25F, 0.5F, 1.6F, 0.5F);
+				p.solid(body, "handkerchief", BAND_CRIMSON, zero, 1.6F, 8.2F, -2.75F, 2.0F, 2.8F, 0.3F);
+			}
+			case TOPI_DONGENG -> {
+				// the storyteller: a tall black soft cap (Dongpo style) with a square back panel, a folding fan and the
+				// wooden clapper he slaps on the table at the turn of every tale
+				p.solid(head, "cap", BAND_LACQUER_GAUZE, zero, -4.4F, -10.4F, -4.4F, 8.8F, 2.8F, 8.8F, -3.6F, -12.4F, -0.6F, 7.2F, 2.0F, 5.0F);
+				p.solid(head, "cap_fold", BAND_BLACK, zero, -3.7F, -12.6F, -0.7F, 7.4F, 0.4F, 5.2F);
+				p.solid(head, "ribbons", BAND_BLACK, PartPose.offsetAndRotation(0.0F, -8.2F, 4.4F, rad(14.0F), 0.0F, 0.0F), -1.6F, 0.0F, -0.15F,
+						0.8F, 5.0F, 0.3F, 0.8F, 0.0F, -0.15F, 0.8F, 4.4F, 0.3F);
+				p.tinted(body, "sash", zero, -4.35F, 6.6F, -2.35F, 8.7F, 1.4F, 4.7F);
+				waistFan(p, body, 3.3F);
+				p.solid(body, "clapper", BAND_WOOD, zero, -4.9F, 7.2F, -1.4F, 1.2F, 1.4F, 2.8F);
+				p.solid(body, "clapper_cord", BAND_CRIMSON, zero, -4.8F, 8.6F, -0.3F, 0.4F, 1.6F, 0.4F);
+			}
+			case TOPI_PENGAMEN -> {
+				// the street musician: a weathered straw hat with a broken brim, an erhu slung across the back (python-skin
+				// drum, rosewood neck, two pegs, a horsehair bow beside it) on a rope strap
+				p.solid(head, "hat", BAND_DARK_STRAW, zero, -5.6F, -8.8F, -5.6F, 9.0F, 0.8F, 11.2F, 3.4F, -8.8F, -5.6F, 2.2F, 0.8F, 6.0F,
+						-3.4F, -10.2F, -3.4F, 6.8F, 1.6F, 6.8F);
+				p.solid(head, "hat_frayed", BAND_STRAW, zero, 3.4F, -8.4F, 0.6F, 1.6F, 0.4F, 0.6F, -5.8F, -8.4F, 2.0F, 0.6F, 0.6F, 1.2F);
+				p.solid(head, "hat_band", BAND_ROPE, zero, -3.5F, -9.0F, -3.5F, 7.0F, 0.4F, 7.0F);
+				PartDefinition erhu = p.solid(body, "erhu_neck", BAND_WOOD, PartPose.offsetAndRotation(0.0F, 5.0F, 3.0F, 0.0F, 0.0F, rad(22.0F)),
+						-0.4F, -9.0F, -0.4F, 0.8F, 12.0F, 0.8F);
+				p.solid(erhu, "erhu_drum", BAND_SNAKE, zero, -1.2F, 3.0F, -1.2F, 2.4F, 2.0F, 2.4F);
+				p.solid(erhu, "erhu_pegs", BAND_WOOD, zero, -1.4F, -8.4F, -0.3F, 2.8F, 0.6F, 0.6F, -1.2F, -7.2F, -0.3F, 2.4F, 0.6F, 0.6F);
+				p.solid(erhu, "erhu_bow", BAND_HAIR, zero, 0.8F, -6.0F, -0.2F, 0.4F, 10.0F, 0.4F);
+				p.solid(body, "strap", BAND_ROPE, PartPose.offsetAndRotation(0.0F, 5.0F, -2.45F, 0.0F, 0.0F, rad(-30.0F)), -0.3F, -7.0F, -0.2F,
+						0.6F, 14.0F, 0.4F);
+			}
+			case PANJI_OBAT -> {
+				// the medicine hawker: a bamboo pole on his back carrying the white banner with 药 above his head (red frame,
+				// tassels), a pill gourd and a pouch of tiger-bone plasters at the belt
+				PartDefinition pole = p.solid(body, "pole", BAND_WOOD, PartPose.offset(3.0F, 0.0F, 3.0F), -0.4F, -30.0F, -0.4F, 0.8F, 20.0F, 0.8F,
+						-0.4F, -10.0F, -0.4F, 0.8F, 20.0F, 0.8F);
+				p.solid(pole, "crossbar", BAND_WOOD, zero, -10.0F, -28.4F, -0.4F, 14.0F, 0.6F, 0.8F);
+				p.solid(pole, "banner", BAND_MEDICINE, zero, -10.0F, -27.8F, 0.0F, 14.0F, 14.0F, 1.0F);
+				p.solid(pole, "banner_frame", BAND_CRIMSON, zero, -10.4F, -27.9F, -0.1F, 0.4F, 14.2F, 1.2F, 3.6F, -27.9F, -0.1F, 0.4F, 14.2F, 1.2F,
+						-10.4F, -13.8F, -0.1F, 14.4F, 0.6F, 1.2F);
+				p.solid(pole, "banner_tassels", BAND_CRIMSON, zero, -9.8F, -13.2F, 0.3F, 0.6F, 2.0F, 0.4F, -3.3F, -13.2F, 0.3F, 0.6F, 2.4F, 0.4F,
+						2.8F, -13.2F, 0.3F, 0.6F, 2.0F, 0.4F);
+				p.solid(pole, "pole_cap", BAND_BRONZE, zero, -0.6F, -31.0F, -0.6F, 1.2F, 1.0F, 1.2F);
+				p.solid(body, "pole_strap", BAND_ROPE, PartPose.offsetAndRotation(0.0F, 5.0F, -2.45F, 0.0F, 0.0F, rad(-32.0F)), -0.3F, -7.0F,
+						-0.2F, 0.6F, 14.0F, 0.4F);
+				p.solid(body, "belt", BAND_LEATHER, zero, -4.35F, 7.0F, -2.35F, 8.7F, 1.2F, 4.7F);
+				PartDefinition gourd = p.solid(body, "gourd", BAND_GOURD, PartPose.offset(-4.6F, 8.6F, 0.4F), -1.2F, 0.0F, -1.2F, 2.4F, 2.4F, 2.4F,
+						-0.7F, -1.4F, -0.7F, 1.4F, 1.4F, 1.4F);
+				p.solid(gourd, "cord", BAND_CRIMSON, zero, -0.25F, -2.6F, -0.25F, 0.5F, 1.2F, 0.5F);
+				p.solid(body, "plasters", BAND_PAPER, zero, 1.8F, 8.2F, -2.8F, 2.2F, 2.0F, 0.6F);
+			}
+			case TOPI_GURU -> {
+				// the schoolteacher: a square scholar's cap with a flat board and two black ribbons, the teacher's ruler (jiechi)
+				// slanting from the sash and a rolled lesson scroll
+				p.solid(head, "cap", BAND_LACQUER_GAUZE, zero, -4.4F, -10.2F, -4.4F, 8.8F, 2.6F, 8.8F);
+				p.solid(head, "board", BAND_BLACK, zero, -4.8F, -10.8F, -4.8F, 9.6F, 0.6F, 9.6F);
+				p.solid(head, "ribbons", BAND_BLACK, PartPose.offsetAndRotation(0.0F, -8.0F, 4.5F, rad(10.0F), 0.0F, 0.0F), -1.8F, 0.0F, -0.15F,
+						1.0F, 6.0F, 0.3F, 0.8F, 0.0F, -0.15F, 1.0F, 6.0F, 0.3F);
+				p.tinted(body, "sash", zero, -4.35F, 6.6F, -2.35F, 8.7F, 1.4F, 4.7F);
+				p.solid(body, "ruler", BAND_SANDALWOOD, PartPose.offsetAndRotation(-3.6F, 6.0F, -2.6F, 0.0F, 0.0F, rad(18.0F)), -0.6F, 0.0F, -0.2F,
+						1.2F, 7.0F, 0.4F);
+				PartDefinition scroll = p.solid(body, "scroll", BAND_PAPER, PartPose.offsetAndRotation(3.0F, 6.2F, -2.6F, 0.0F, 0.0F, rad(-10.0F)),
+						-0.6F, 0.0F, -0.6F, 1.2F, 4.4F, 1.2F);
+				p.solid(scroll, "scroll_ends", BAND_WOOD, zero, -0.8F, -0.4F, -0.8F, 1.6F, 0.4F, 1.6F, -0.8F, 4.4F, -0.8F, 1.6F, 0.4F, 1.6F);
+			}
+			case KUNCI_GUDANG -> {
+				// the warehouse keeper: a leather belt with a heavy ring of bronze keys and a bound ledger, cloth sleeve guards
+				p.solid(body, "belt", BAND_LEATHER, zero, -4.35F, 7.0F, -2.35F, 8.7F, 1.2F, 4.7F);
+				PartDefinition ring = p.solid(body, "key_ring", BAND_BRONZE, PartPose.offset(3.2F, 8.2F, -2.8F), -1.0F, 0.0F, -0.2F, 2.0F, 0.4F,
+						0.4F, -1.0F, 0.0F, -0.2F, 0.4F, 1.6F, 0.4F, 0.6F, 0.0F, -0.2F, 0.4F, 1.6F, 0.4F, -1.0F, 1.4F, -0.2F, 2.0F, 0.4F, 0.4F);
+				p.solid(ring, "keys", BAND_BRONZE, zero, -0.9F, 1.8F, -0.15F, 0.4F, 2.4F, 0.3F, -0.2F, 1.8F, -0.15F, 0.4F, 2.0F, 0.3F, 0.5F, 1.8F,
+						-0.15F, 0.4F, 2.6F, 0.3F);
+				PartDefinition ledger = p.solid(body, "ledger", BAND_PAPER, PartPose.offset(-4.7F, 7.8F, 0.0F), -0.6F, 0.0F, -1.6F, 1.2F, 3.4F, 3.2F);
+				p.solid(ledger, "ledger_cover", BAND_LEATHER, zero, -0.7F, -0.1F, -1.7F, 0.3F, 3.6F, 3.4F, 0.4F, -0.1F, -1.7F, 0.3F, 3.6F, 3.4F);
+				p.tinted(rightArm, "sleeve_guard", zero, -3.3F, 4.4F, -2.3F, 4.6F, 4.4F, 4.6F);
+				p.tinted(leftArm, "sleeve_guard", zero, -1.3F, 4.4F, -2.3F, 4.6F, 4.4F, 4.6F);
+			}
+			case TOPI_PIALANG -> {
+				// the broker: a black melon-rind skullcap of six panels with a red knot, a gold-beaded abacus and a coin purse
+				p.solid(head, "skullcap", BAND_LACQUER_GAUZE, zero, -4.3F, -9.0F, -4.3F, 8.6F, 1.6F, 8.6F, -3.6F, -9.6F, -3.6F, 7.2F, 0.7F, 7.2F);
+				p.solid(head, "cap_rim", BAND_BLACK, zero, -4.45F, -7.6F, -4.45F, 8.9F, 0.4F, 8.9F);
+				p.solid(head, "cap_jade", BAND_JADE, zero, -0.6F, -8.6F, -4.55F, 1.2F, 1.0F, 0.3F);
+				p.solid(head, "knot", BAND_CRIMSON, zero, -0.6F, -10.4F, -0.6F, 1.2F, 0.9F, 1.2F);
+				p.solid(body, "belt", BAND_BLACK, zero, -4.35F, 7.0F, -2.35F, 8.7F, 1.0F, 4.7F);
+				PartDefinition abacus = p.solid(body, "abacus", BAND_WOOD, PartPose.offset(-4.7F, 7.6F, 0.0F), -0.4F, 0.0F, -2.0F, 0.6F, 3.0F, 4.0F);
+				p.solid(abacus, "beads", BAND_GOLD, zero, -0.6F, 0.6F, -1.6F, 1.0F, 0.6F, 3.2F, -0.6F, 1.8F, -1.6F, 1.0F, 0.6F, 3.2F);
+				p.solid(body, "purse", BAND_COIN_BROCADE, zero, 2.4F, 8.0F, -2.9F, 1.8F, 2.2F, 1.0F);
+			}
+			case TOPI_PEMUSIK -> {
+				// the wedding and funeral musician: a red cloth cap with a turned-up brim and gold band, a red sash, a small
+				// drum on a cord at the left hip
+				p.solid(head, "cap", BAND_CRIMSON, zero, -4.3F, -9.8F, -4.3F, 8.6F, 2.2F, 8.6F);
+				p.solid(head, "brim", BAND_CRIMSON, zero, -4.7F, -7.8F, -4.7F, 9.4F, 0.8F, 9.4F);
+				p.solid(head, "cap_band", BAND_GOLD, zero, -4.4F, -8.4F, -4.4F, 8.8F, 0.5F, 8.8F);
+				p.solid(head, "pompom", BAND_PLUME, zero, -0.8F, -10.8F, -0.8F, 1.6F, 1.0F, 1.6F);
+				p.solid(body, "sash", BAND_SILK_FLOWER, PartPose.offsetAndRotation(0.0F, 5.6F, -2.45F, 0.0F, 0.0F, rad(-36.0F)), -0.8F, -7.4F,
+						-0.2F, 1.6F, 14.8F, 0.4F);
+				PartDefinition drum = p.solid(body, "drum", BAND_CRIMSON, PartPose.offset(4.9F, 8.6F, 0.0F), -0.8F, 0.0F, -1.6F, 1.6F, 2.0F, 3.2F);
+				p.solid(drum, "drum_heads", BAND_LEATHER, zero, -0.9F, -0.1F, -1.4F, 1.8F, 0.3F, 2.8F, -0.9F, 1.8F, -1.4F, 1.8F, 0.3F, 2.8F);
+				p.solid(drum, "drum_cord", BAND_ROPE, zero, -0.2F, -2.6F, -0.2F, 0.4F, 2.6F, 0.4F);
+			}
+			default -> {
+			}
+		}
+	}
+
+	/** A small gold phoenix on the bride's crown at (x, y, z), scaled by {@code s}: body, curved neck and head, raised tail. */
+	private static void phoenix(Pass p, PartDefinition head, String name, float x, float y, float z, float s) {
+		PartPose zero = PartPose.ZERO;
+		PartDefinition bird = p.solid(head, name, BAND_GOLD, PartPose.offset(x, y, z), -0.9F * s, -1.0F * s, -1.6F * s, 1.8F * s, 1.4F * s,
+				3.0F * s, -0.4F * s, -2.6F * s, -2.4F * s, 0.8F * s, 1.8F * s, 0.8F * s);
+		p.solid(bird, name + "_beak", BAND_CRIMSON, zero, -0.25F * s, -2.4F * s, -3.0F * s, 0.5F * s, 0.5F * s, 0.7F * s);
+		p.solid(bird, name + "_tail", BAND_PHOENIX_SILK, PartPose.offsetAndRotation(0.0F, -0.6F * s, 1.2F * s, rad(-40.0F), 0.0F, 0.0F),
+				-1.2F * s, -0.3F * s, 0.0F, 2.4F * s, 0.6F * s, 3.6F * s);
+		p.solid(bird, name + "_wings", BAND_DIANCUI, zero, -1.6F * s, -0.9F * s, -1.0F * s, 0.6F * s, 1.0F * s, 2.2F * s, 1.0F * s, -0.9F * s,
+				-1.0F * s, 0.6F * s, 1.0F * s, 2.2F * s);
+	}
+
+	/**
+	 * Mourning: a white cap of coarse cotton folded to a peak with two tails behind, a hemp band round it, a hemp rope belt
+	 * with a hanging knot, a hemp armband on the left arm; {@code tall} raises the funeral master's stiff cap.
+	 */
+	private static void kabung(Pass p, PartDefinition head, PartDefinition body, PartDefinition leftArm, boolean tall) {
+		PartPose zero = PartPose.ZERO;
+		p.solid(head, "mourning_cap", BAND_MOURNING, zero, -4.5F, -9.4F, -4.5F, 9.0F, 2.6F, 9.0F);
+		p.solid(head, "cap_peak", BAND_MOURNING, zero, -3.0F, tall ? -12.6F : -10.6F, -1.4F, 6.0F, tall ? 3.4F : 1.4F, 5.2F);
+		p.solid(head, "cap_tails", BAND_MOURNING, PartPose.offsetAndRotation(0.0F, -8.0F, 4.5F, rad(8.0F), 0.0F, 0.0F), -1.8F, 0.0F, -0.2F,
+				1.2F, 7.0F, 0.4F, 0.6F, 0.0F, -0.2F, 1.2F, 6.0F, 0.4F);
+		p.solid(head, "hemp_band", BAND_HEMP, zero, -4.65F, -7.4F, -4.65F, 9.3F, 0.9F, 9.3F);
+		p.solid(body, "hemp_belt", BAND_HEMP, zero, -4.45F, 6.8F, -2.45F, 8.9F, 1.1F, 4.9F);
+		p.solid(body, "belt_knot", BAND_HEMP, zero, -0.7F, 7.4F, -2.8F, 1.4F, 1.2F, 0.5F, -0.9F, 8.6F, -2.7F, 0.6F, 3.6F, 0.3F, 0.3F, 8.6F,
+				-2.7F, 0.6F, 3.0F, 0.3F);
+		p.solid(leftArm, "armband", BAND_HEMP, zero, -1.3F, 1.6F, -2.3F, 4.6F, 1.6F, 4.6F);
+	}
+
+	/** The troupe's red-yellow headband with two flying tails, a striped sash with hanging ends, wrist and ankle wraps. */
+	private static void akrobat(Pass p, PartDefinition head, PartDefinition body, PartDefinition rightArm, PartDefinition leftArm,
+			PartDefinition rightLeg, PartDefinition leftLeg) {
+		PartPose zero = PartPose.ZERO;
+		p.solid(head, "acro_band", BAND_ACROBAT, zero, -4.35F, -7.2F, -4.35F, 8.7F, 1.2F, 8.7F);
+		p.solid(head, "acro_tails", BAND_ACROBAT, PartPose.offsetAndRotation(0.0F, -6.6F, 4.3F, rad(55.0F), 0.0F, 0.0F), -1.4F, 0.0F, -0.2F,
+				1.0F, 5.0F, 0.4F, 0.4F, 0.0F, -0.2F, 1.0F, 4.2F, 0.4F);
+		p.solid(body, "acro_sash", BAND_ACROBAT, zero, -4.4F, 6.4F, -2.4F, 8.8F, 1.8F, 4.8F);
+		p.solid(body, "acro_sash_ends", BAND_ACROBAT, PartPose.offsetAndRotation(3.2F, 7.6F, -2.6F, 0.0F, 0.0F, rad(-10.0F)), -0.6F, 0.0F,
+				-0.2F, 1.2F, 5.0F, 0.4F);
+		p.solid(rightArm, "wrist_wrap", BAND_ACROBAT, zero, -3.3F, 7.6F, -2.3F, 4.6F, 1.6F, 4.6F);
+		p.solid(leftArm, "wrist_wrap", BAND_ACROBAT, zero, -1.3F, 7.6F, -2.3F, 4.6F, 1.6F, 4.6F);
+		p.solid(rightLeg, "ankle_wrap", BAND_ACROBAT, zero, -2.3F, 9.6F, -2.3F, 4.6F, 1.4F, 4.6F);
+		p.solid(leftLeg, "ankle_wrap", BAND_ACROBAT, zero, -2.3F, 9.6F, -2.3F, 4.6F, 1.4F, 4.6F);
 	}
 
 	/** The palace helm: red-laced lamellar dome, steel cap, gold brow band, cheek and neck guards, a horsehair plume. */

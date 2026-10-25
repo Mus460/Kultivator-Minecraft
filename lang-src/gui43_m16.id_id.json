@@ -1,0 +1,12 @@
+{
+  "kultivator.gui43.hal.keabadian.purba": "Purba",
+  "kultivator.gui43.hal.keabadian.titah": "Titah",
+  "kultivator.gui43.sub.purba.binatang": "Binatang Purba",
+  "kultivator.gui43.sub.purba.bencana": "Bencana Bintang",
+  "kultivator.gui43.m16.alam.esensi": "Esensi Abadi",
+  "kultivator.gui43.m16.ciptaan.timpa": "Timpa jurus %s di slot %s dengan ciptaan baru?",
+  "kultivator.gui43.m16.ciptaan.hapus": "Hapus jurus %s dari slot %s? Jurus ciptaan yang dihapus tidak kembali.",
+  "kultivator.gui43.m16.lelang.batu": "Harga dalam Batu Asal · di tas: %s",
+  "kultivator.gui43.m16.lelang.baris": "%s. %s — %s",
+  "kultivator.gui43.m16.lelang.tutup": "Tidak ada sesi lelang sekarang."
+}

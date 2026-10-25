@@ -1,6 +1,5 @@
 package dev.kultivator.client.tempat.ui.kit;
 
-import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.UiSound;
 import net.minecraft.util.Mth;
@@ -126,12 +125,12 @@ public final class DaftarGulir {
 			l.g.fillGradient(bx, batangY0, x1, batangY1, overBatang ? Palette.JADE_LIGHT : Palette.JADE, Palette.JADE_DARK);
 			l.g.fill(bx, batangY0, x1, batangY0 + 1, Palette.JADE_PALE);
 			l.zona(kunci + "#batang", bx - 1, y0, x1 + 1, y1, null, true, null, false);
+			// "6 dari 9" as the rail's tooltip (the old 0.6 caption under the list broke 43.0.5 and overlapped what follows)
+			if (l.di(bx - 1, y0, x1 + 1, y1)) {
+				l.tip(TeksTempat.k("daftar.posisi", pilihan() + 1, jumlah));
+			}
 		} else {
 			batangY0 = batangY1 = 0;
-		}
-		// "6 dari 9" style footer hint when not everything fits
-		if (adaBatang && l.difokus(kunci)) {
-			Brush.text(l.g, l.font, TeksTempat.k("daftar.posisi", pilihan() + 1, jumlah), x0 + 2, y1 + 1, l.gaya.teksSamar, 0.6F, false);
 		}
 		l.fokusCincin(kunci, x0, y0, x1, y1);
 	}

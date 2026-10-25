@@ -1,0 +1,1274 @@
+{
+  "_dibuat": "tools/gen_kota_hidup_cakap.py dari tools/kota_cakap_sumber (jangan disunting tangan)",
+  "kelompok": "topik_lain",
+  "isi": [
+    {
+      "aturan": "bisik.pemain",
+      "niat": "BISIK",
+      "topik": "pemain",
+      "bingkai": [
+        {
+          "kunci": "bisik.pemain.0",
+          "slot": [
+            "$subjek",
+            "$katanya",
+            "$sebutan",
+            "$waktu_lalu"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "pelabuhan",
+            "air"
+          ]
+        },
+        {
+          "kunci": "bisik.pemain.1",
+          "slot": [
+            "$subjek",
+            "$waktu_lalu"
+          ],
+          "bobot": 2,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "bisik.pemain.2",
+          "slot": [
+            "$subjek"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$subjek": {
+          "tipe": "nama_warga",
+          "dari": "fakta.subjek"
+        },
+        "$katanya": {
+          "aturan": "frag.katanya"
+        },
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        },
+        "$waktu_lalu": {
+          "tipe": "waktu_lalu",
+          "dari": "fakta.hariKejadian"
+        }
+      },
+      "gestur": "bisik",
+      "seru": "bisik"
+    },
+    {
+      "aturan": "bisik.tetangga",
+      "niat": "BISIK",
+      "topik": "tetangga",
+      "bingkai": [
+        {
+          "kunci": "bisik.tetangga.0",
+          "slot": [
+            "$subjek",
+            "$objek"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "bisik.tetangga.1",
+          "slot": [
+            "$objek",
+            "$subjek"
+          ],
+          "bobot": 2,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "bisik.tetangga.2",
+          "slot": [
+            "$penutup_kecil"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$subjek": {
+          "tipe": "nama_warga",
+          "dari": "fakta.subjek"
+        },
+        "$objek": {
+          "tipe": "nama_warga",
+          "dari": "fakta.objek"
+        },
+        "$penutup_kecil": {
+          "aturan": "frag.penutup_kecil",
+          "opsional": 0.4
+        }
+      },
+      "gestur": "bisik",
+      "seru": "bisik"
+    },
+    {
+      "aturan": "bisik.asmara",
+      "niat": "BISIK",
+      "topik": "asmara",
+      "bingkai": [
+        {
+          "kunci": "bisik.asmara.0",
+          "slot": [
+            "$subjek",
+            "$objek"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "air"
+          ]
+        },
+        {
+          "kunci": "bisik.asmara.1",
+          "slot": [
+            "$subjek",
+            "$objek"
+          ],
+          "bobot": 2,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "bisik.asmara.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$subjek": {
+          "tipe": "nama_warga",
+          "dari": "fakta.subjek"
+        },
+        "$objek": {
+          "tipe": "nama_warga",
+          "dari": "fakta.objek"
+        }
+      },
+      "gestur": "bisik",
+      "seru": "bisik"
+    },
+    {
+      "aturan": "bisik.pejabat",
+      "niat": "BISIK",
+      "topik": "pejabat",
+      "bingkai": [
+        {
+          "kunci": "bisik.pejabat.0",
+          "slot": [
+            "$tempat_fakta",
+            "$subjek"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "ibukota"
+          ]
+        },
+        {
+          "kunci": "bisik.pejabat.1",
+          "slot": [
+            "$tempat_fakta",
+            "$subjek"
+          ],
+          "bobot": 2
+        },
+        {
+          "kunci": "bisik.pejabat.2",
+          "slot": [
+            "$subjek"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$tempat_fakta": {
+          "tipe": "tempat",
+          "dari": "fakta.objek"
+        },
+        "$subjek": {
+          "tipe": "nama_warga",
+          "dari": "fakta.subjek"
+        }
+      },
+      "gestur": "bisik",
+      "seru": "bisik"
+    },
+    {
+      "aturan": "bisik.pasar_hantu",
+      "niat": "BISIK",
+      "topik": "pasar_hantu",
+      "bingkai": [
+        {
+          "kunci": "bisik.pasar_hantu.0",
+          "slot": [
+            "$tempat_fakta"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "bisik.pasar_hantu.1",
+          "slot": [
+            "$tempat_fakta"
+          ],
+          "bobot": 2
+        },
+        {
+          "kunci": "bisik.pasar_hantu.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$tempat_fakta": {
+          "tipe": "tempat",
+          "dari": "fakta.objek"
+        }
+      },
+      "gestur": "bisik",
+      "seru": "bisik"
+    },
+    {
+      "aturan": "sindir.pemain",
+      "niat": "SINDIR",
+      "topik": "pemain",
+      "bingkai": [
+        {
+          "kunci": "sindir.pemain.0",
+          "slot": [
+            "$subjek"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "sindir.pemain.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "sindir.pemain.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$subjek": {
+          "tipe": "nama_warga",
+          "dari": "fakta.subjek"
+        }
+      },
+      "gestur": "sikap_lipat_tangan"
+    },
+    {
+      "aturan": "sindir.tetangga",
+      "niat": "SINDIR",
+      "topik": "tetangga",
+      "bingkai": [
+        {
+          "kunci": "sindir.tetangga.0",
+          "slot": [
+            "$subjek"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "sindir.tetangga.1",
+          "slot": [
+            "$subjek"
+          ],
+          "bobot": 2,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "sindir.tetangga.2",
+          "slot": [
+            "$subjek"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$subjek": {
+          "tipe": "nama_warga",
+          "dari": "fakta.subjek"
+        }
+      },
+      "gestur": "sikap_lipat_tangan"
+    },
+    {
+      "aturan": "sindir.opini",
+      "niat": "SINDIR",
+      "topik": "opini",
+      "bingkai": [
+        {
+          "kunci": "sindir.opini.0",
+          "slot": [
+            "$subjek"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "sindir.opini.1",
+          "slot": [
+            "$subjek"
+          ],
+          "bobot": 2
+        },
+        {
+          "kunci": "sindir.opini.2",
+          "slot": [
+            "$subjek"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$subjek": {
+          "tipe": "nama_warga",
+          "dari": "fakta.subjek"
+        }
+      },
+      "gestur": "sikap_lipat_tangan"
+    },
+    {
+      "aturan": "khawatir.kesehatan",
+      "niat": "KHAWATIR",
+      "topik": "kesehatan",
+      "bingkai": [
+        {
+          "kunci": "khawatir.kesehatan.0",
+          "slot": [
+            "$subjek",
+            "$waktu_lalu"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "khawatir.kesehatan.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "khawatir.kesehatan.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$subjek": {
+          "tipe": "nama_warga",
+          "dari": "fakta.subjek"
+        },
+        "$waktu_lalu": {
+          "tipe": "waktu_lalu",
+          "dari": "fakta.hariKejadian"
+        }
+      },
+      "gestur": "sikap_tangan_depan",
+      "seru": "aduh"
+    },
+    {
+      "aturan": "khawatir.anak",
+      "niat": "KHAWATIR",
+      "topik": "anak",
+      "bingkai": [
+        {
+          "kunci": "khawatir.anak.0",
+          "slot": [
+            "$anak"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "khawatir.anak.1",
+          "slot": [
+            "$anak"
+          ],
+          "bobot": 2,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "khawatir.anak.2",
+          "slot": [
+            "$anak"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$anak": {
+          "tipe": "nama_warga",
+          "dari": "konteks.anak"
+        }
+      },
+      "gestur": "sikap_tangan_depan",
+      "seru": "aduh"
+    },
+    {
+      "aturan": "khawatir.cita",
+      "niat": "KHAWATIR",
+      "topik": "cita",
+      "bingkai": [
+        {
+          "kunci": "khawatir.cita.0",
+          "slot": [],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "khawatir.cita.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "khawatir.cita.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {},
+      "gestur": "tatap_langit"
+    },
+    {
+      "aturan": "khawatir.sekte",
+      "niat": "KHAWATIR",
+      "topik": "sekte",
+      "bingkai": [
+        {
+          "kunci": "khawatir.sekte.0",
+          "slot": [],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "khawatir.sekte.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "khawatir.sekte.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {},
+      "gestur": "lihat_sekeliling"
+    },
+    {
+      "aturan": "khawatir.keluarga",
+      "niat": "KHAWATIR",
+      "topik": "keluarga",
+      "bingkai": [
+        {
+          "kunci": "khawatir.keluarga.0",
+          "slot": [
+            "$pasangan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "khawatir.keluarga.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "khawatir.keluarga.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$pasangan": {
+          "tipe": "nama_warga",
+          "dari": "konteks.pasangan"
+        }
+      },
+      "gestur": "sikap_tangan_depan",
+      "seru": "aduh"
+    },
+    {
+      "aturan": "khawatir.bahaya",
+      "niat": "KHAWATIR",
+      "topik": "bahaya",
+      "bingkai": [
+        {
+          "kunci": "khawatir.bahaya.0",
+          "slot": [
+            "$arah"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "air"
+          ]
+        },
+        {
+          "kunci": "khawatir.bahaya.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "khawatir.bahaya.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$arah": {
+          "tipe": "arah",
+          "dari": "konteks.arah"
+        }
+      },
+      "gestur": "lihat_sekeliling",
+      "seru": "takut"
+    },
+    {
+      "aturan": "keluh.cuaca",
+      "niat": "KELUH",
+      "topik": "cuaca",
+      "bingkai": [
+        {
+          "kunci": "keluh.cuaca.0",
+          "slot": [
+            "$cuaca",
+            "$keluh"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "keluh.cuaca.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "keluh.cuaca.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$cuaca": {
+          "tipe": "cuaca",
+          "dari": "konteks.cuaca"
+        },
+        "$keluh": {
+          "aturan": "seru.keluh",
+          "opsional": 0.5
+        }
+      },
+      "gestur": "geleng",
+      "seru": "aduh"
+    },
+    {
+      "aturan": "keluh.kerja",
+      "niat": "KELUH",
+      "topik": "kerja",
+      "bingkai": [
+        {
+          "kunci": "keluh.kerja.0",
+          "slot": [
+            "$keluh"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "keluh.kerja.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "keluh.kerja.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$keluh": {
+          "aturan": "seru.keluh",
+          "opsional": 0.5
+        }
+      },
+      "gestur": "seka_keringat",
+      "seru": "aduh"
+    },
+    {
+      "aturan": "keluh.pejabat",
+      "niat": "KELUH",
+      "topik": "pejabat",
+      "bingkai": [
+        {
+          "kunci": "keluh.pejabat.0",
+          "slot": [],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "ibukota"
+          ]
+        },
+        {
+          "kunci": "keluh.pejabat.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "keluh.pejabat.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {},
+      "gestur": "geleng"
+    },
+    {
+      "aturan": "keluh.uang",
+      "niat": "KELUH",
+      "topik": "uang",
+      "bingkai": [
+        {
+          "kunci": "keluh.uang.0",
+          "slot": [
+            "$keluh"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "keluh.uang.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "keluh.uang.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$keluh": {
+          "aturan": "seru.keluh",
+          "opsional": 0.5
+        }
+      },
+      "gestur": "hitung_koin",
+      "seru": "aduh"
+    },
+    {
+      "aturan": "keluh.harga",
+      "niat": "KELUH",
+      "topik": "harga",
+      "bingkai": [
+        {
+          "kunci": "keluh.harga.0",
+          "slot": [
+            "$barang_mahal",
+            "$keluh"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "keluh.harga.1",
+          "slot": [
+            "$barang_mahal"
+          ],
+          "bobot": 2,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "keluh.harga.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$barang_mahal": {
+          "tipe": "barang",
+          "dari": "konteks.barang_mahal",
+          "fitur": [
+            "jamak"
+          ]
+        },
+        "$keluh": {
+          "aturan": "seru.keluh",
+          "opsional": 0.5
+        }
+      },
+      "gestur": "geleng",
+      "seru": "aduh"
+    },
+    {
+      "aturan": "keluh.kejahatan",
+      "niat": "KELUH",
+      "topik": "kejahatan",
+      "bingkai": [
+        {
+          "kunci": "keluh.kejahatan.0",
+          "slot": [],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "keluh.kejahatan.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "keluh.kejahatan.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {},
+      "gestur": "geleng"
+    },
+    {
+      "aturan": "begal.peringat",
+      "niat": "PERINGATAN",
+      "topik": "begal",
+      "bingkai": [
+        {
+          "kunci": "begal.peringat.0",
+          "slot": [
+            "$arah",
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "begal.peringat.1",
+          "slot": [
+            "$arah"
+          ],
+          "bobot": 2,
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "begal.peringat.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$arah": {
+          "tipe": "arah",
+          "dari": "konteks.arah"
+        },
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "tunjuk",
+      "seru": "eh"
+    },
+    {
+      "aturan": "begal.keluh",
+      "niat": "KELUH",
+      "topik": "begal",
+      "bingkai": [
+        {
+          "kunci": "begal.keluh.0",
+          "slot": [
+            "$arah",
+            "$keluh"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "begal.keluh.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "begal.keluh.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$arah": {
+          "tipe": "arah",
+          "dari": "konteks.arah"
+        },
+        "$keluh": {
+          "aturan": "seru.keluh",
+          "opsional": 0.5
+        }
+      },
+      "gestur": "geleng",
+      "seru": "aduh"
+    },
+    {
+      "aturan": "makanan.basa",
+      "niat": "BASA_BASI",
+      "topik": "makanan",
+      "bingkai": [
+        {
+          "kunci": "makanan.basa.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "kampung",
+            "pelabuhan",
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "makanan.basa.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "air"
+          ]
+        },
+        {
+          "kunci": "makanan.basa.2",
+          "slot": [
+            "$musim"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        },
+        "$musim": {
+          "tipe": "musim",
+          "dari": "konteks.musim"
+        }
+      },
+      "gestur": "makan"
+    },
+    {
+      "aturan": "makanan.tawar",
+      "niat": "TAWARAN",
+      "topik": "makanan",
+      "bingkai": [
+        {
+          "kunci": "makanan.tawar.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "makanan.tawar.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "makanan.tawar.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "bicara_tangan"
+    },
+    {
+      "aturan": "makanan.cerita",
+      "niat": "CERITA",
+      "topik": "makanan",
+      "bingkai": [
+        {
+          "kunci": "makanan.cerita.0",
+          "slot": [],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "makanan.cerita.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "makanan.cerita.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {},
+      "gestur": "cerita"
+    },
+    {
+      "aturan": "panen.kabar",
+      "niat": "BERI_KABAR",
+      "topik": "panen",
+      "bingkai": [
+        {
+          "kunci": "panen.kabar.0",
+          "slot": [
+            "$senang"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "panen.kabar.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "gunung"
+          ]
+        },
+        {
+          "kunci": "panen.kabar.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$senang": {
+          "aturan": "seru.senang",
+          "opsional": 0.5
+        }
+      },
+      "gestur": "memanen"
+    },
+    {
+      "aturan": "panen.keluh",
+      "niat": "KELUH",
+      "topik": "panen",
+      "bingkai": [
+        {
+          "kunci": "panen.keluh.0",
+          "slot": [
+            "$keluh"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "panen.keluh.1",
+          "slot": [],
+          "bobot": 2
+        },
+        {
+          "kunci": "panen.keluh.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$keluh": {
+          "aturan": "seru.keluh",
+          "opsional": 0.5
+        }
+      },
+      "gestur": "geleng",
+      "seru": "aduh"
+    },
+    {
+      "aturan": "kenangan.cerita",
+      "niat": "CERITA",
+      "topik": "kenangan",
+      "bingkai": [
+        {
+          "kunci": "kenangan.cerita.0",
+          "slot": [],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "kampung",
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "kenangan.cerita.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "kenangan.cerita.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {},
+      "gestur": "tatap_langit"
+    },
+    {
+      "aturan": "kabar.umum",
+      "niat": "BERI_KABAR",
+      "topik": "kabar",
+      "bingkai": [
+        {
+          "kunci": "kabar.umum.0",
+          "slot": [
+            "$katanya",
+            "$subjek",
+            "$waktu_lalu",
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "kabar.umum.1",
+          "slot": [
+            "$subjek"
+          ],
+          "bobot": 2,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "kabar.umum.2",
+          "slot": [
+            "$subjek",
+            "$penutup_kecil"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$katanya": {
+          "aturan": "frag.katanya"
+        },
+        "$subjek": {
+          "tipe": "nama_warga",
+          "dari": "fakta.subjek"
+        },
+        "$waktu_lalu": {
+          "tipe": "waktu_lalu",
+          "dari": "fakta.hariKejadian"
+        },
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        },
+        "$penutup_kecil": {
+          "aturan": "frag.penutup_kecil",
+          "opsional": 0.4
+        }
+      },
+      "gestur": "bicara_tangan"
+    },
+    {
+      "aturan": "kilas.utang_warga",
+      "niat": "KILAS_BALIK",
+      "topik": "kilas.utang_warga",
+      "bingkai": [
+        {
+          "kunci": "kilas.utang_warga.0",
+          "slot": [
+            "$sebutan",
+            "$jumlah",
+            "$batas"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "kilas.utang_warga.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "kilas.utang_warga.2",
+          "slot": [
+            "$batas"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        },
+        "$jumlah": {
+          "tipe": "harga",
+          "dari": "konteks.jumlah"
+        },
+        "$batas": {
+          "tipe": "waktu_depan",
+          "dari": "konteks.batas"
+        }
+      },
+      "gestur": "sikap_tunduk"
+    }
+  ]
+}

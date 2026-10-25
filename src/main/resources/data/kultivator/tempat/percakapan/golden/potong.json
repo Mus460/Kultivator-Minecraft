@@ -1,0 +1,173 @@
+{
+  "id": "potong",
+  "jenis": "realisasi",
+  "_catatan": "Interruptions: a customer comes, the speaker is called, a child tugs, too busy; then coming back.",
+  "benih_dunia": 42,
+  "masukan": {
+    "niat": "POTONG",
+    "pembicara": 505,
+    "hari": 120,
+    "now": 2880000,
+    "cuaca": "cerah",
+    "musim": "semi",
+    "situasi": {
+      "jam": "pagi",
+      "cuaca": "cerah",
+      "musim": "semi",
+      "kelompok": "pedagang",
+      "watak": "ramah",
+      "kebiasaan": [],
+      "sifat": {
+        "H": 10,
+        "E": 0,
+        "X": 20,
+        "A": 30,
+        "C": 10,
+        "O": 0
+      },
+      "wajah": "netral",
+      "tempat": "kota_besar"
+    },
+    "pendengar": {
+      "nama": "Han",
+      "kelamin": "l",
+      "tahap": "dewasa",
+      "pemain": true
+    },
+    "kesan": "kenal",
+    "tahu_nama": false,
+    "register": "sopan",
+    "dialek": "ibukota",
+    "nilai": {
+      "konteks.pasangan": {
+        "orang": {
+          "nama": "Nyonya Lin",
+          "kelamin": "p",
+          "tahap": "dewasa"
+        }
+      },
+      "konteks.anak": {
+        "orang": {
+          "nama": "Xiao Hu",
+          "kelamin": "l",
+          "tahap": "anak"
+        }
+      }
+    }
+  },
+  "langkah": [
+    {
+      "ubah": {},
+      "harap": {
+        "k": "kultivator.cakap.potong.anak.1",
+        "a": [
+          {
+            "t": "Xiao Hu"
+          }
+        ]
+      },
+      "aturan": "potong.anak",
+      "gestur": "lari_lambai",
+      "seru": null,
+      "tik": null,
+      "id_id": "Xiao Hu! Jangan main dekat sumur! ...Maaf, anak-anak zaman sekarang.",
+      "en_us": "Xiao Hu! Don't play near the well! ...Sorry, children these days."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar"
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.potong.sibuk.2",
+        "a": []
+      },
+      "aturan": "potong.sibuk",
+      "gestur": "berdiri_jaga",
+      "seru": null,
+      "tik": null,
+      "id_id": "Mandor melihat ke sini. Aku harus pura-pura sibuk. Hehe.",
+      "en_us": "The foreman's looking this way. I'd better look busy. Hehe."
+    },
+    {
+      "ubah": {
+        "tahap": "dewasa",
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar",
+          "tahap": "dewasa"
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.potong.anak.2",
+        "a": []
+      },
+      "aturan": "potong.anak",
+      "gestur": "lari_lambai",
+      "seru": null,
+      "tik": null,
+      "id_id": "Cucuku jatuh. Sebentar, aku lihat dulu.",
+      "en_us": "My grandchild fell. Wait, let me look."
+    },
+    {
+      "ubah": {
+        "niat": "KEMBALI"
+      },
+      "harap": {
+        "k": "kultivator.cakap.kembali.3",
+        "a": []
+      },
+      "aturan": "kembali",
+      "gestur": "bicara_tangan",
+      "seru": null,
+      "tik": null,
+      "id_id": "Hah, akhirnya tenang lagi. Lanjut, ya.",
+      "en_us": "Hah, calm again at last. Let's go on."
+    },
+    {
+      "ubah": {
+        "niat": "SAMBUNG_RASA"
+      },
+      "harap": {
+        "k": "kultivator.cakap.sambung.rasa.8",
+        "a": []
+      },
+      "aturan": "sambung.rasa",
+      "gestur": "angguk_dengar",
+      "seru": null,
+      "tik": null,
+      "id_id": "Sungguh?",
+      "en_us": "Really?"
+    }
+  ]
+}

@@ -63,7 +63,7 @@ public final class Upgrade {
 		if (oldTier > 0) {
 			FlowData.setGuarantee(owner, oldTier, FlowData.UNTIL_REACHED, "upgrade");
 		}
-		FlowData.openHistory(owner, template);
+		// The history line is opened by Ceremonies.onConfirmed (beginUpgrade fires it).
 		Halls.log(owner, Component.translatable("kultivator.sectbuild.log.upgrade", SectTemplates.name(template)));
 		Halls.refreshBuildings(owner);
 		Msg.chat(player, Component.translatable("kultivator.sectbuild.upgrade.started", SectTemplates.name(template), oldTier)

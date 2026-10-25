@@ -340,6 +340,11 @@ public final class Deposits {
 	 */
 	public static Result depositSlot(ServerPlayer depositor, UUID owner, int slot, int max, @Nullable List<Component> why) {
 		Inventory inventory = depositor.getInventory();
+		if (!FlowData.hasHall(owner)) {
+			// No hall = the Gudang would write into a throwaway tag and the items would vanish.
+			add(why, Component.translatable("kultivator.sectbuild.no_hall"));
+			return Result.EMPTY;
+		}
 		if (slot < 0 || slot >= Inventory.INVENTORY_SIZE) {
 			return Result.EMPTY;
 		}

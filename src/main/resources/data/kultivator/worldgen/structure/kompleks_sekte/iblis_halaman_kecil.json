@@ -51,7 +51,7 @@
     {
       "dx": -72,
       "dz": 24,
-      "pool": "kultivator:kompleks_sekte/iblis/halaman_asrama_luar",
+      "pool": "kultivator:kompleks_sekte/iblis/halaman_asrama_dapur",
       "putar": 0
     },
     {
@@ -63,7 +63,7 @@
     {
       "dx": 24,
       "dz": 24,
-      "pool": "kultivator:kompleks_sekte/iblis/halaman_dapur",
+      "pool": "kultivator:kompleks_sekte/iblis/halaman_paviliun_jasa_kecil",
       "putar": 0
     },
     {

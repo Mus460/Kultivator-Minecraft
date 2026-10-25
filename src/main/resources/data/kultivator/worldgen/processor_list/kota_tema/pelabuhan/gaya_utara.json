@@ -7,6 +7,230 @@
           "input_predicate": {
             "predicate_type": "minecraft:blockstate_match",
             "block_state": {
+              "id": "minecraft:acacia_door",
+              "properties": {
+                "facing": "east",
+                "half": "lower",
+                "hinge": "left",
+                "open": "false",
+                "powered": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:spruce_door",
+            "properties": {
+              "facing": "east",
+              "half": "lower",
+              "hinge": "left",
+              "open": "false",
+              "powered": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:acacia_door",
+              "properties": {
+                "facing": "east",
+                "half": "upper",
+                "hinge": "left",
+                "open": "false",
+                "powered": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:spruce_door",
+            "properties": {
+              "facing": "east",
+              "half": "upper",
+              "hinge": "left",
+              "open": "false",
+              "powered": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:acacia_door",
+              "properties": {
+                "facing": "north",
+                "half": "lower",
+                "hinge": "left",
+                "open": "false",
+                "powered": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:spruce_door",
+            "properties": {
+              "facing": "north",
+              "half": "lower",
+              "hinge": "left",
+              "open": "false",
+              "powered": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:acacia_door",
+              "properties": {
+                "facing": "north",
+                "half": "upper",
+                "hinge": "left",
+                "open": "false",
+                "powered": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:spruce_door",
+            "properties": {
+              "facing": "north",
+              "half": "upper",
+              "hinge": "left",
+              "open": "false",
+              "powered": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:acacia_door",
+              "properties": {
+                "facing": "south",
+                "half": "lower",
+                "hinge": "left",
+                "open": "false",
+                "powered": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:spruce_door",
+            "properties": {
+              "facing": "south",
+              "half": "lower",
+              "hinge": "left",
+              "open": "false",
+              "powered": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:acacia_door",
+              "properties": {
+                "facing": "south",
+                "half": "upper",
+                "hinge": "left",
+                "open": "false",
+                "powered": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:spruce_door",
+            "properties": {
+              "facing": "south",
+              "half": "upper",
+              "hinge": "left",
+              "open": "false",
+              "powered": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:acacia_door",
+              "properties": {
+                "facing": "west",
+                "half": "lower",
+                "hinge": "left",
+                "open": "false",
+                "powered": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:spruce_door",
+            "properties": {
+              "facing": "west",
+              "half": "lower",
+              "hinge": "left",
+              "open": "false",
+              "powered": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:acacia_door",
+              "properties": {
+                "facing": "west",
+                "half": "upper",
+                "hinge": "left",
+                "open": "false",
+                "powered": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:spruce_door",
+            "properties": {
+              "facing": "west",
+              "half": "upper",
+              "hinge": "left",
+              "open": "false",
+              "powered": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
               "id": "minecraft:acacia_fence"
             }
           },
@@ -447,6 +671,118 @@
           "input_predicate": {
             "predicate_type": "minecraft:blockstate_match",
             "block_state": {
+              "id": "minecraft:acacia_trapdoor",
+              "properties": {
+                "facing": "east",
+                "half": "bottom",
+                "open": "true",
+                "powered": "false",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:spruce_trapdoor",
+            "properties": {
+              "facing": "east",
+              "half": "bottom",
+              "open": "true",
+              "powered": "false",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:acacia_trapdoor",
+              "properties": {
+                "facing": "north",
+                "half": "bottom",
+                "open": "true",
+                "powered": "false",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:spruce_trapdoor",
+            "properties": {
+              "facing": "north",
+              "half": "bottom",
+              "open": "true",
+              "powered": "false",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:acacia_trapdoor",
+              "properties": {
+                "facing": "south",
+                "half": "bottom",
+                "open": "true",
+                "powered": "false",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:spruce_trapdoor",
+            "properties": {
+              "facing": "south",
+              "half": "bottom",
+              "open": "true",
+              "powered": "false",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:acacia_trapdoor",
+              "properties": {
+                "facing": "west",
+                "half": "bottom",
+                "open": "true",
+                "powered": "false",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:spruce_trapdoor",
+            "properties": {
+              "facing": "west",
+              "half": "bottom",
+              "open": "true",
+              "powered": "false",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
               "id": "minecraft:blue_bed",
               "properties": {
                 "facing": "north",
@@ -605,6 +941,36 @@
           "input_predicate": {
             "predicate_type": "minecraft:blockstate_match",
             "block_state": {
+              "id": "minecraft:brick_wall",
+              "properties": {
+                "east": "none",
+                "north": "none",
+                "south": "none",
+                "up": "true",
+                "waterlogged": "false",
+                "west": "none"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:stone_brick_wall",
+            "properties": {
+              "east": "none",
+              "north": "none",
+              "south": "none",
+              "up": "true",
+              "waterlogged": "false",
+              "west": "none"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
               "id": "minecraft:bricks"
             }
           },
@@ -647,6 +1013,54 @@
           "input_predicate": {
             "predicate_type": "minecraft:blockstate_match",
             "block_state": {
+              "id": "minecraft:polished_diorite_slab",
+              "properties": {
+                "type": "bottom",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:stone_brick_slab",
+            "properties": {
+              "type": "bottom",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:polished_diorite_stairs",
+              "properties": {
+                "facing": "east",
+                "half": "bottom",
+                "shape": "straight",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:stone_brick_stairs",
+            "properties": {
+              "facing": "east",
+              "half": "bottom",
+              "shape": "straight",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
               "id": "minecraft:polished_diorite_stairs",
               "properties": {
                 "facing": "east",
@@ -664,6 +1078,84 @@
             "properties": {
               "facing": "east",
               "half": "top",
+              "shape": "straight",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:polished_diorite_stairs",
+              "properties": {
+                "facing": "north",
+                "half": "bottom",
+                "shape": "straight",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:stone_brick_stairs",
+            "properties": {
+              "facing": "north",
+              "half": "bottom",
+              "shape": "straight",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:polished_diorite_stairs",
+              "properties": {
+                "facing": "south",
+                "half": "bottom",
+                "shape": "straight",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:stone_brick_stairs",
+            "properties": {
+              "facing": "south",
+              "half": "bottom",
+              "shape": "straight",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:polished_diorite_stairs",
+              "properties": {
+                "facing": "west",
+                "half": "bottom",
+                "shape": "straight",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:stone_brick_stairs",
+            "properties": {
+              "facing": "west",
+              "half": "bottom",
               "shape": "straight",
               "waterlogged": "false"
             }
@@ -1074,6 +1566,26 @@
             "id": "minecraft:stripped_spruce_log",
             "properties": {
               "axis": "x"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:stripped_acacia_log",
+              "properties": {
+                "axis": "y"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:stripped_spruce_log",
+            "properties": {
+              "axis": "y"
             }
           }
         },

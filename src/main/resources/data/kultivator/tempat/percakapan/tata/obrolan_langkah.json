@@ -1,0 +1,459 @@
+{
+  "_dibuat": "tools/gen_kota_hidup_cakap.py dari tools/kota_cakap_sumber (jangan disunting tangan)",
+  "kelompok": "obrolan_langkah",
+  "isi": [
+    {
+      "aturan": "sapa.obrol.gosip",
+      "niat": "SAPA",
+      "topik": "gosip",
+      "bingkai": [
+        {
+          "kunci": "sapa.obrol.gosip.0",
+          "slot": [
+            "$lawan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "kampung",
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "sapa.obrol.gosip.1",
+          "slot": [
+            "$lawan"
+          ],
+          "bobot": 2,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "sapa.obrol.gosip.2",
+          "slot": [
+            "$lawan"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$lawan": {
+          "tipe": "nama_warga",
+          "dari": "lawan"
+        }
+      },
+      "gestur": "lambai"
+    },
+    {
+      "aturan": "sapa.obrol.merayu",
+      "niat": "SAPA",
+      "topik": "merayu",
+      "bingkai": [
+        {
+          "kunci": "sapa.obrol.merayu.0",
+          "slot": [
+            "$lawan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "air"
+          ]
+        },
+        {
+          "kunci": "sapa.obrol.merayu.1",
+          "slot": [
+            "$lawan"
+          ],
+          "bobot": 2,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "sapa.obrol.merayu.2",
+          "slot": [
+            "$lawan"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$lawan": {
+          "tipe": "nama_warga",
+          "dari": "lawan"
+        }
+      },
+      "gestur": "lambai"
+    },
+    {
+      "aturan": "sapa.obrol.dagang",
+      "niat": "SAPA",
+      "topik": "dagang",
+      "bingkai": [
+        {
+          "kunci": "sapa.obrol.dagang.0",
+          "slot": [
+            "$lawan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "pelabuhan",
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "sapa.obrol.dagang.1",
+          "slot": [
+            "$lawan"
+          ],
+          "bobot": 2,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "sapa.obrol.dagang.2",
+          "slot": [
+            "$lawan"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$lawan": {
+          "tipe": "nama_warga",
+          "dari": "lawan"
+        }
+      },
+      "gestur": "seru_dagang"
+    },
+    {
+      "aturan": "sapa.obrol.ajar",
+      "niat": "SAPA",
+      "topik": "ajar",
+      "bingkai": [
+        {
+          "kunci": "sapa.obrol.ajar.0",
+          "slot": [],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "sapa.obrol.ajar.1",
+          "slot": [
+            "$lawan"
+          ],
+          "bobot": 2,
+          "varian": [
+            "gunung"
+          ]
+        },
+        {
+          "kunci": "sapa.obrol.ajar.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$lawan": {
+          "tipe": "nama_warga",
+          "dari": "lawan"
+        }
+      },
+      "gestur": "hormat"
+    },
+    {
+      "aturan": "sapa.obrol.curhat",
+      "niat": "SAPA",
+      "topik": "curhat",
+      "bingkai": [
+        {
+          "kunci": "sapa.obrol.curhat.0",
+          "slot": [
+            "$lawan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "sapa.obrol.curhat.1",
+          "slot": [
+            "$lawan"
+          ],
+          "bobot": 2,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "sapa.obrol.curhat.2",
+          "slot": [
+            "$lawan"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$lawan": {
+          "tipe": "nama_warga",
+          "dari": "lawan"
+        }
+      },
+      "gestur": "tepuk_bahu"
+    },
+    {
+      "aturan": "sapa.obrol.canda",
+      "niat": "SAPA",
+      "topik": "canda",
+      "bingkai": [
+        {
+          "kunci": "sapa.obrol.canda.0",
+          "slot": [
+            "$lawan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "pelabuhan",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "sapa.obrol.canda.1",
+          "slot": [
+            "$lawan"
+          ],
+          "bobot": 2
+        },
+        {
+          "kunci": "sapa.obrol.canda.2",
+          "slot": [
+            "$lawan"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$lawan": {
+          "tipe": "nama_warga",
+          "dari": "lawan"
+        }
+      },
+      "gestur": "tertawa"
+    },
+    {
+      "aturan": "rayu.sepakat",
+      "niat": "SEPAKAT",
+      "topik": "merayu",
+      "bingkai": [
+        {
+          "kunci": "rayu.sepakat.0",
+          "slot": [
+            "$lawan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "air"
+          ]
+        },
+        {
+          "kunci": "rayu.sepakat.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "rayu.sepakat.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$lawan": {
+          "tipe": "nama_warga",
+          "dari": "lawan"
+        }
+      },
+      "gestur": "sikap_tunduk"
+    },
+    {
+      "aturan": "curhat.sepakat",
+      "niat": "SEPAKAT",
+      "topik": "curhat",
+      "bingkai": [
+        {
+          "kunci": "curhat.sepakat.0",
+          "slot": [
+            "$lawan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "curhat.sepakat.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "curhat.sepakat.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$lawan": {
+          "tipe": "nama_warga",
+          "dari": "lawan"
+        }
+      },
+      "gestur": "tepuk_bahu"
+    },
+    {
+      "aturan": "canda.cerita",
+      "niat": "CERITA",
+      "topik": "canda",
+      "bingkai": [
+        {
+          "kunci": "canda.cerita.0",
+          "slot": [
+            "$lawan",
+            "$tetangga"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "canda.cerita.1",
+          "slot": [
+            "$lawan"
+          ],
+          "bobot": 2,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "canda.cerita.2",
+          "slot": [
+            "$lawan"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$lawan": {
+          "tipe": "nama_warga",
+          "dari": "lawan"
+        },
+        "$tetangga": {
+          "tipe": "nama_warga",
+          "dari": "konteks.tetangga"
+        }
+      },
+      "gestur": "tertawa",
+      "seru": "tawa"
+    },
+    {
+      "aturan": "dagang.tawar.obrol",
+      "niat": "TAWAR",
+      "topik": "dagang",
+      "bingkai": [
+        {
+          "kunci": "dagang.tawar.obrol.0",
+          "slot": [],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "kampung",
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "dagang.tawar.obrol.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "dagang.tawar.obrol.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {},
+      "gestur": "tawar"
+    },
+    {
+      "aturan": "dagang.tawar_balik.obrol",
+      "niat": "TAWAR_BALIK",
+      "topik": "dagang",
+      "bingkai": [
+        {
+          "kunci": "dagang.tawar_balik.obrol.0",
+          "slot": [],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "dagang.tawar_balik.obrol.1",
+          "slot": [
+            "$lawan"
+          ],
+          "bobot": 2,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "dagang.tawar_balik.obrol.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$lawan": {
+          "tipe": "nama_warga",
+          "dari": "lawan"
+        }
+      },
+      "gestur": "hitung_koin"
+    }
+  ]
+}

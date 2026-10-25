@@ -1,0 +1,51 @@
+{
+  "_catatan": "Kebiasaan #16 dermawan (DESIGN 42.4.12)",
+  "nomor": 16,
+  "siapa": {
+    "umur": [
+      18,
+      200
+    ],
+    "tahap": [
+      "dewasa",
+      "tua"
+    ]
+  },
+  "sesi": [
+    {
+      "jam": [
+        12,
+        13
+      ],
+      "peluang": 0.6,
+      "tujuan": [
+        "obrol",
+        "@jalan:9"
+      ],
+      "klip": "kota42:beri_koin",
+      "kanan": "kantong_uang",
+      "ganti": [
+        {
+          "klip": "kota42:beri_koin"
+        },
+        {
+          "klip": "lambai",
+          "kanan": ""
+        },
+        {
+          "klip": "kota42:beri_koin",
+          "kanan": "kota42:permen_gula"
+        }
+      ],
+      "ganti_menit": 6,
+      "undang": {
+        "umur": [
+          4,
+          11
+        ],
+        "maks": 3,
+        "klip": "hormat"
+      }
+    }
+  ]
+}

@@ -1,0 +1,143 @@
+# umum: corpus of the conversation engine (42K-C, DESIGN 42.5A.8). Source format: gen_kota_hidup_cakap.py.
+# Unconditioned rules so every (niat, topic) pair the planner can choose has something to say for anyone: the
+# realiser keeps only rules of the asked topic, so a topic whose rules all carry syarat could fall silent.
+@kelompok umum
+
+== basa.cuaca.langit
+niat: BASA_BASI
+topik: cuaca
+syarat: cuaca=gerhana,meteor
+gestur: tatap_langit
+- [3] Langit aneh sekali hari ini. Ibuku sudah membakar dupa tiga batang. || The sky is so strange today. My mother has burned three incense sticks.
+  ~ kasar: Langit gila. Jangan tanya aku kenapa. || Mad sky. Don't ask me why.
+  ~ kuno: Langit menunjukkan pertanda. Para tetua sekte pasti sedang menghitung bintang. || Heaven shows an omen. The sect elders must be counting the stars.
+  ~ kampung: Langit kayak gitu, Nak, kata simbah tanda ada raja baru lahir. || A sky like that, child, granny says, means a new king is born.
+  ~ pelabuhan: Langit begini, Bung, para nakhoda tidak mau berlayar. Takut dewa laut marah. || A sky like this, mate, the captains won't sail. Afraid the sea god's angry.
+- [2] Kau lihat bintang jatuh semalam? Aku sempat membuat tiga permohonan! || Did you see the falling stars last night? I made three wishes!
+  ~ p: Bintang jatuh semalam! Aku memohon jodoh yang baik untuk anakku. || Falling stars last night! I wished for a good match for my child.
+- Anak-anak takut sekali waktu matahari menghilang. Aku juga, sebenarnya. || The children were terrified when the sun vanished. So was I, honestly.
+  ~ gunung: Para biksu memukul lonceng terus waktu matahari tertutup. Amitaba. || The monks rang the bell nonstop while the sun was covered. Amitabha.
+
+== kerja.kabar
+niat: BERI_KABAR
+topik: kerja
+gestur: bicara_tangan
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Hari ini pekerjaanku selesai lebih cepat. Langka sekali, jadi aku mau menikmatinya. || My work finished early today. So rare, I mean to enjoy it.
+  ~ kasar: Kerja selesai. Upah belum. Seperti biasa. || Work done. Pay not. As usual.
+  ~ kuno: Pekerjaan hari ini telah tuntas, {$sebutan}. Hamba bersyukur. || Today's labour is complete, {$sebutan}. This one is grateful.
+  ~ kampung: Kerjaan beres, Nak. Nanti sore bisa leyeh-leyeh di serambi. || Work's done, child. This afternoon I can lounge on the porch.
+- [2] Majikanku menaikkan upahku sedikit. Sedikit sekali, tapi tetap naik! || My master raised my pay a little. Very little, but still a raise!
+  ~ pelabuhan: Kapten bilang aku boleh pegang kemudi minggu depan, Bung! || The captain says I can take the helm next week, mate!
+  ~ p: Pesanan jahitanku bertambah. Semoga mataku masih kuat. || My sewing orders are growing. I hope my eyes hold out.
+- Kami mendapat pesanan besar dari kafilah. Sebulan ke depan pasti sibuk. || We got a big order from a caravan. Busy month ahead for sure.
+- Ada pekerja baru di tempatku. Masih kikuk, tapi rajin. || There's a new hand where I work. Still clumsy, but hardworking.
+
+== kerja.pamer
+niat: PAMER
+topik: kerja
+gestur: sikap_berkacak
+seru: tawa
+$tempat: tipe=tempat dari=konteks.tempat
+- [3] Lihat ini? Aku yang membuatnya. Tidak ada yang lebih rapi di seluruh {$tempat}. || See this? I made it. Nothing neater in all {$tempat}.
+  ~ kasar: Aku yang terbaik di sini. Tanya siapa saja. || I'm the best here. Ask anyone.
+  ~ kuno: Tanpa bermaksud menyombong, hasil kerja hamba diakui sampai ke kota sebelah. || Without meaning to boast, this one's work is recognised as far as the next town.
+  ~ pelabuhan: Simpulku tidak pernah lepas, Bung, bahkan di badai terbesar! || My knots never slip, mate, not even in the worst storm!
+  ~ kampung: Sawahku paling hijau se-kampung, Nak. Lihat saja sendiri. || My paddy's the greenest in the village, child. See for yourself.
+- [2] Majikanku bilang tanpa aku, tempat itu sudah tutup sejak lama. Hehe. || My master says without me the place would've shut long ago. Heh.
+  ~ p: Kue buatanku dipesan sampai ke rumah pejabat, lho. || My cakes are ordered all the way to the officials' houses, you know.
+- Sepuluh tahun aku bekerja, belum pernah sekali pun terlambat. Sekali pun! || Ten years working, never once late. Not once!
+
+== musim.kabar
+niat: BERI_KABAR
+topik: musim
+gestur: tatap_langit
+$musim: tipe=musim dari=konteks.musim
+- [3] Musim {$musim} tahun ini datang lebih cepat. Lihat saja pepohonan. || {$musim} came early this year. Just look at the trees.
+  ~ kasar: Musim {$musim}. Sama seperti tahun lalu. Membosankan. || {$musim}. Same as last year. Dull.
+  ~ kuno: Musim {$musim} telah tiba; langit dan bumi berganti rupa. || {$musim} has arrived; heaven and earth change their face.
+  ~ kampung: Musim {$musim}, Nak. Waktunya ganti tanaman di kebun. || {$musim}, child. Time to change what's in the garden.
+- [2] Kata almanak, musim {$musim} ini akan panjang. Siapkan persediaan. || The almanac says this {$musim} will be long. Lay in supplies.
+  ~ pelabuhan: Musim {$musim}, Bung. Angin berubah arah, ikan juga. || {$musim}, mate. The wind changes direction, and so do the fish.
+  ~ oasis: Di gurun, musim {$musim} hanya berarti panasnya beda sedikit, Saudara. || In the desert {$musim} only means slightly different heat, friend.
+- Setiap musim {$musim} aku membuat manisan buah. Mau coba nanti? || Every {$musim} I make candied fruit. Want to try some later?
+
+== keluarga.umum
+niat: BERI_KABAR
+topik: keluarga
+gestur: bicara_tangan
+$arah: tipe=arah dari=konteks.arah
+- [3] Orang tuaku masih sehat di kampung. Setiap musim aku mengirim uang. || My parents are still well back home. Every season I send money.
+  ~ kasar: Keluarga? Ada. Merepotkan. Tapi ada. || Family? Got some. Troublesome. But there.
+  ~ kuno: Leluhur keluarga hamba berasal dari {$arah}. Abu mereka masih di sana. || My family's forebears came from the {$arah}. Their ashes are still there.
+  ~ kampung: Adikku baru nikah bulan lalu, Nak. Sekarang tinggal aku yang belum. Hehe. || My little sister wed last month, child. Now only I'm left. Heh.
+- [2] Kakakku merantau ke ibu kota. Suratnya datang setiap bulan purnama. || My elder brother went to the capital. His letters come every full moon.
+  ~ pelabuhan: Ayahku nelayan, kakekku nelayan. Aku? Tentu saja nelayan, Bung. || My father was a fisher, my grandfather too. Me? A fisher, of course, mate.
+- Rumah kami kecil, tapi selalu ramai. Tujuh orang di bawah satu atap. || Our house is small but always lively. Seven under one roof.
+- Ibuku masih memasak untuk semua orang walau sudah tua. Tidak bisa dilarang. || My mother still cooks for everyone though she's old. Can't stop her.
+
+== tetangga.umum
+niat: BERI_KABAR
+topik: tetangga
+gestur: tunjuk
+- [3] Tetangga sebelahku baru memasang lentera baru. Merah, besar, terang sekali. || My next-door neighbour just hung a new lantern. Red, big, very bright.
+  ~ kasar: Tetanggaku berisik. Setiap malam. || My neighbours are noisy. Every night.
+  ~ kuno: Tetangga yang baik lebih berharga dari kerabat yang jauh, kata leluhur. || A good neighbour is worth more than distant kin, say the ancestors.
+  ~ kampung: Tetangga sebelah baru beli kambing, Nak. Sekarang tiap pagi kebangun gara-gara mengembik. || The neighbour bought a goat, child. Now I wake every morning to bleating.
+- [2] Keluarga baru pindah ke ujung gang. Anaknya tiga, semuanya ribut. || A new family moved to the end of the lane. Three kids, all noisy.
+  ~ p: Ibu sebelah membagikan kue lapis kemarin. Baik sekali orangnya. || The lady next door handed out layer cake yesterday. So kind.
+- Kucing tetangga tidur di atap rumahku setiap siang. Sudah kuanggap kucingku sendiri. || The neighbour's cat sleeps on my roof every afternoon. I count it as mine now.
+
+== kebiasaan.umum
+niat: CERITA
+topik: kebiasaan
+gestur: bicara_tangan
+- [3] Kalau senggang, aku suka duduk di tepi sungai melihat perahu lewat. Itu saja, tapi menyenangkan. || When I'm free, I like sitting by the river watching boats pass. That's all, but it's lovely.
+  ~ kasar: Senggang? Aku tidur. Itu hobiku. || Free time? I sleep. That's my hobby.
+  ~ kuno: Di waktu luang, hamba menyalin puisi lama. Menenangkan pikiran. || In idle hours, this one copies old poems. It calms the mind.
+  ~ kampung: Kalau sore, aku suka ngobrol di pos ronda, Nak. Bapak-bapak cerita macam-macam. || Evenings I like chatting at the watch post, child. The men tell all sorts.
+- [2] Aku belajar main suling. Tetangga bilang suaranya seperti kucing terjepit. Hehe. || I'm learning the flute. The neighbours say it sounds like a trapped cat. Heh.
+  ~ p: Aku suka menanam bunga di pot. Sekarang ada dua puluh pot di jendela. || I love planting flowers in pots. Twenty pots on my windowsill now.
+- Setiap hari pasar, aku melihat-lihat barang aneh dari kafilah, walau tidak membeli. || Every market day I browse the caravans' odd goods, even if I don't buy.
+
+== anak.pamer
+niat: PAMER
+topik: anak
+syarat: tahap=dewasa
+gestur: sikap_berkacak
+seru: tawa
+$anak: tipe=nama_warga dari=konteks.anak
+- [3] {$anak} sudah bisa menghitung sampai seratus! Umurnya baru lima tahun! || {$anak} can count to a hundred! Only five years old!
+  ~ kasar: {$anak} paling kuat di antara anak-anak gang. Mirip aku. || {$anak} is the strongest of the lane's kids. Takes after me.
+  ~ kuno: Buah hatiku {$anak} hafal kitab klasik tiga bab. Guru sekolah pun terheran-heran. || My child {$anak} knows three chapters of the classics by heart. Even the teacher is amazed.
+  ~ kampung: {$anak} sudah bisa naik kerbau sendiri, Nak! Berani sekali anak itu. || {$anak} rides the buffalo alone now, child! Such a brave one.
+- [2] Guru bilang {$anak} murid paling pintar di kelas. Aku tidak heran, tentu saja. || The teacher says {$anak} is the brightest in class. I'm not surprised, of course.
+  ~ p: {$anak} membuatkan aku jepit rambut dari bambu. Lihat, bagus, kan? || {$anak} made me a bamboo hairpin. Look, lovely, isn't it?
+  ~ pelabuhan: {$anak} sudah bisa menangkap ikan dengan tangan kosong, Bung! || {$anak} can catch fish bare-handed, mate!
+- Kalau akar roh {$anak} diuji, pasti bagus. Aku yakin sekali. || If {$anak}'s spirit roots were tested, they'd be good. I'm sure of it.
+
+== ranah.tanya
+niat: TANYA_BALIK
+topik: ranah
+gestur: garuk_kepala
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Ranah {$sebutan} sekarang tingkat berapa? Aku tidak bisa merasakan Qi, jadi tebak-tebak saja. || What realm are you at now, {$sebutan}? I can't sense Qi, so I'm only guessing.
+  ~ kasar: Kau sudah kuat belum? Atau cuma gaya? || Are you strong yet? Or just for show?
+  ~ kuno: Bolehkah hamba mengetahui sampai ranah mana {$sebutan} telah menapak? || May this one know which realm you have reached, {$sebutan}?
+  ~ kampung: Kak, kultivator itu kalau sudah tinggi bisa hidup seribu tahun, ya? || Mister, can cultivators live a thousand years once they're high enough?
+- [2] Bagaimana rasanya menembus ranah? Katanya seperti lahir kembali. || What's a breakthrough like? They say it's like being reborn.
+  ~ pelabuhan: Kultivator bisa mengendalikan ombak, Bung? Sungguh? || Can cultivators command the waves, mate? Truly?
+- Berapa lama {$sebutan} bersemedi setiap hari? Aku duduk diam lima menit saja sudah gelisah. || How long do you meditate each day, {$sebutan}? I can't sit still five minutes.
+
+== sekte.tanya
+niat: TANYA_BALIK
+topik: sekte_pemain
+gestur: bicara_tangan
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Sektemu di mana, {$sebutan}? Apa menerima murid dari kota kecil seperti ini? || Where's your sect, {$sebutan}? Does it take disciples from little towns like this?
+  ~ kasar: Sektemu. Apa bayarannya bagus? Untuk murid, maksudku. || Your sect. Pay well? For disciples, I mean.
+  ~ kuno: Sekte {$sebutan} menempuh jalan apa? Pedang, alkimia, atau formasi? || What path does your sect walk, {$sebutan}? Sword, alchemy or formations?
+  ~ kampung: Sekte Kakak jauh, ya? Anakku pengin ikut, Nak. Boleh? || Is your sect far, mister? My child wants to join. May they?
+- [2] Benarkah murid sektemu boleh pulang setiap tahun baru? || Is it true your sect's disciples can come home every new year?
+  ~ p: Di sektemu, murid-muridnya diberi makan cukup, kan? Aku khawatir pada anak-anak di sana. || In your sect, the disciples get enough to eat, right? I worry for the children there.
+- Kalau sektemu butuh pekerja, aku pandai memasak dan memperbaiki atap. || If your sect needs workers, I'm good at cooking and fixing roofs.

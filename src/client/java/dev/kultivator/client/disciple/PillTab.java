@@ -5,6 +5,7 @@ import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.SealCard;
+import dev.kultivator.client.screen.ui.SegelKonfirmasi;
 import dev.kultivator.client.screen.ui.TalismanButton;
 import dev.kultivator.client.screen.ui.UiSound;
 import dev.kultivator.cultivation.VanillaPills;
@@ -19,7 +20,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.Util;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,14 +30,12 @@ import java.util.Locale;
 /**
  * Pills &amp; Breakthrough. Left: the item in the master's main hand with the "Give the pill in hand" talisman, then
  * the next rank, the kind of breakthrough and the "Breakthrough" talisman (or why it cannot start yet). Right: the eight
- * Daos as trigram tiles (chosen once from Golden Core: click, then click again within 3 s to swear the disciple to it)
- * and the "Release disciple" talisman, which also asks for a second click.
+ * Daos as trigram tiles (chosen once from Golden Core: the oath asks with a held seal) and the "Release disciple"
+ * talisman (a heavy seal: tick and hold).
  */
-final class PillTab extends DiscipleTab {
+final class PillTab extends MuridSub {
 
 	private static final int BUTTON_H = 18;
-	private static final long CONFIRM_MILLIS = 3000L;
-	private static final long RELEASE_MILLIS = 4000L;
 
 	private int columnW;
 	private int rightX;
@@ -46,12 +44,20 @@ final class PillTab extends DiscipleTab {
 	private int btTextY;
 	private int btButtonY;
 	private int tilesBottom;
-	private int pendingDao = -1;
-	private long pendingUntil;
-	private long releaseArmedUntil;
 
-	PillTab(DiscipleScreen screen) {
-		super(screen);
+	PillTab(MuridPage murid) {
+		super(murid);
+	}
+
+	@Override
+	public String helpTopic() {
+		return "murid";
+	}
+
+	/** Its own scroll when the box is shorter (GUI scale 4): pill, breakthrough lines, the eight tiles and release. */
+	@Override
+	public int tinggiMin() {
+		return 164;
 	}
 
 	@Override
@@ -68,8 +74,6 @@ final class PillTab extends DiscipleTab {
 	protected void build() {
 		columnW = (w - 8) / 2;
 		rightX = x + columnW + 8;
-		pendingDao = -1;
-		releaseArmedUntil = 0L;
 
 		// ---- left: pill, then breakthrough
 		slotX = x + 2;
@@ -77,7 +81,7 @@ final class PillTab extends DiscipleTab {
 		TalismanButton feed = new TalismanButton(x + 2, slotY + 22, columnW - 4, BUTTON_H, () -> Component.translatable("kultivator.discipleui.pill.give"));
 		feed.enabledWhen(() -> !held().isEmpty());
 		feed.urgentWhen(() -> isPill(held()));
-		feed.onPress(() -> screen.send(Actions.DISCIPLE_FEED, ""));
+		feed.onPress(() -> send(Actions.DISCIPLE_FEED, ""));
 		feed.tooltip(this::feedTip);
 		add(feed);
 
@@ -89,8 +93,8 @@ final class PillTab extends DiscipleTab {
 		breakthrough.urgentWhen(() -> view().canBreakthrough);
 		breakthrough.onPress(() -> {
 			// The mini tribulation plays around the disciple in the world: close the scroll so it can be watched.
-			screen.send(Actions.DISCIPLE_BREAKTHROUGH, "");
-			screen.onClose();
+			send(Actions.DISCIPLE_BREAKTHROUGH, "");
+			murid.tutup();
 		});
 		breakthrough.tooltip(this::breakthroughTip);
 		add(breakthrough);
@@ -104,7 +108,7 @@ final class PillTab extends DiscipleTab {
 			int index = i;
 			Dao dao = Glyphs.BAGUA[i];
 			TrigramTile tile = new TrigramTile(tileX + (i % 4) * (size + 4), tileY + (i / 4) * (size + 4), size, dao,
-					() -> view().dao == dao, () -> pendingDao == index && Util.getMillis() <= pendingUntil);
+					() -> view().dao == dao, () -> false);
 			tile.enabledWhen(() -> view().canChooseDao && view().dao == null);
 			tile.onPress(() -> chooseDao(index));
 			tile.tooltip(() -> daoTip(dao));
@@ -113,38 +117,24 @@ final class PillTab extends DiscipleTab {
 		tilesBottom = tileY + 2 * size + 4;
 
 		TalismanButton release = new TalismanButton(rightX + 2, y + h - BUTTON_H, columnW - 4, BUTTON_H,
-				() -> Component.translatable(releaseArmed() ? "kultivator.discipleui.release.confirm" : "kultivator.discipleui.release.button"));
-		release.urgentWhen(this::releaseArmed);
-		release.onPress(() -> {
-			if (releaseArmed()) {
-				releaseArmedUntil = 0L;
-				screen.send(Actions.DISCIPLE_RELEASE, "confirm");
-				screen.onClose();
-			} else {
-				releaseArmedUntil = Util.getMillis() + RELEASE_MILLIS;
-				UiSound.ask();
-			}
-		});
+				() -> Component.translatable("kultivator.discipleui.release.button"));
+		// Letting a disciple go cannot be undone: the heavy seal (tick, then hold), then the scroll closes so the bow is seen.
+		release.onPress(() -> konfirmasi(SegelKonfirmasi.Tingkat.BERAT,
+				Component.translatable(MuridPage.K + "lepas.tanya", murid.discipleName()), () -> {
+					send(Actions.DISCIPLE_RELEASE, "confirm");
+					murid.tutup();
+				}));
 		release.tooltip(() -> List.of(Component.translatable("kultivator.discipleui.release.button"),
-				Component.translatable("kultivator.discipleui.release.tip"),
-				Component.translatable("kultivator.discipleui.release.twice").withStyle(ChatFormatting.RED)));
+				Component.translatable("kultivator.discipleui.release.tip")));
 		add(release);
 	}
 
-	private boolean releaseArmed() {
-		return Util.getMillis() <= releaseArmedUntil;
-	}
-
+	/** The Dao oath binds the disciple for good: a held seal (43.7 sedang) instead of the old second click. */
 	private void chooseDao(int index) {
-		long now = Util.getMillis();
-		if (pendingDao == index && now <= pendingUntil) {
-			pendingDao = -1;
-			screen.send(Actions.DISCIPLE_CHOOSE_DAO, Glyphs.BAGUA[index].id());
-		} else {
-			pendingDao = index;
-			pendingUntil = now + CONFIRM_MILLIS;
-			UiSound.ask();
-		}
+		Dao dao = Glyphs.BAGUA[index];
+		UiSound.ask();
+		konfirmasi(SegelKonfirmasi.Tingkat.SEDANG, Component.translatable(MuridPage.K + "dao.tanya", murid.discipleName(),
+				dao.displayName().copy().withColor(Palette.onPaper(dao.color()) & 0xFFFFFF)), () -> send(Actions.DISCIPLE_CHOOSE_DAO, dao.id()));
 	}
 
 	private static ItemStack held() {
@@ -273,54 +263,55 @@ final class PillTab extends DiscipleTab {
 		float room = columnW - 4.0F;
 
 		// ---- the pill in hand
-		heading(g, Component.translatable("kultivator.discipleui.pill.heading"), x + 2.0F, y, room, 0.8F);
+		heading(g, Component.translatable("kultivator.discipleui.pill.heading"), x + 2.0F, y, room, 1.0F);
 		ItemStack stack = held();
 		g.fill(slotX, slotY, slotX + 18, slotY + 18, Palette.argb(0x60, Palette.PAPER_DEEP));
 		Brush.frame(g, slotX, slotY, slotX + 18, slotY + 18, isPill(stack) ? Palette.GOLD : Palette.argb(0xA0, Palette.INK_FAINT));
 		float textX = slotX + 22.0F;
 		float textRoom = x + columnW - 2.0F - textX;
 		if (stack.isEmpty()) {
-			Brush.wrap(g, font, Component.translatable("kultivator.discipleui.pill.empty_hand"), textX, slotY + 1.0F, textRoom, Palette.INK_FAINT, 0.6F, false);
+			Brush.wrap(g, font, Component.translatable("kultivator.discipleui.pill.empty_hand"), textX, slotY, textRoom, Palette.INK_FAINT, 1.0F, false);
 		} else {
-			Brush.fit(g, font, Component.translatable("kultivator.discipleui.pill.hand"), textX, slotY, textRoom, Palette.INK_SOFT, 0.6F, 0.45F, false);
-			Brush.fit(g, font, stack.getHoverName(), textX, slotY + 7.0F, textRoom, isPill(stack) ? Palette.INK : Palette.WARN, 0.75F, 0.45F, false);
+			Brush.fit(g, font, Component.translatable("kultivator.discipleui.pill.hand"), textX, slotY - 1.0F, textRoom, Palette.INK_SOFT, 1.0F, 1.0F, false);
+			Brush.fit(g, font, stack.getHoverName(), textX, slotY + 9.0F, textRoom, isPill(stack) ? Palette.INK : Palette.WARN, 1.0F, 1.0F, false);
 		}
 		if (mouseX >= slotX && mouseX < slotX + 18 && mouseY >= slotY && mouseY < slotY + 18) {
-			screen.showTooltip(feedTip());
+			tooltip(feedTip());
 		}
 
 		// ---- breakthrough
-		heading(g, Component.translatable("kultivator.discipleui.bt.heading"), x + 2.0F, btTextY - 14.0F, room, 0.8F);
+		heading(g, Component.translatable("kultivator.discipleui.bt.heading"), x + 2.0F, btTextY - 14.0F, room, 1.0F);
 		float ty = btTextY;
 		for (Component line : breakthroughLines()) {
-			if (ty + 6.0F > btButtonY - 1.0F) {
+			if (ty + 9.0F > btButtonY - 1.0F) {
 				break;
 			}
-			ty += Brush.wrap(g, font, line, x + 4.0F, ty, room - 2.0F, Palette.INK_SOFT, 0.6F, false);
+			ty += Brush.wrap(g, font, line, x + 4.0F, ty, room - 2.0F, Palette.INK_SOFT, 1.0F, false);
 		}
 		Component state = breakthroughState();
 		if (state != null) {
-			Brush.wrap(g, font, state, x + 4.0F, btButtonY + BUTTON_H + 3.0F, room - 2.0F, Palette.INK, 0.6F, false);
+			g.enableScissor(x, btButtonY + BUTTON_H, x + columnW, y + h);
+			Brush.wrap(g, font, state, x + 4.0F, btButtonY + BUTTON_H + 3.0F, room - 2.0F, Palette.INK, 1.0F, false);
+			g.disableScissor();
 		}
 
 		// ---- Dao
-		heading(g, Component.translatable("kultivator.discipleui.dao.heading"), rightX + 2.0F, y, room, 0.8F);
+		heading(g, Component.translatable("kultivator.discipleui.dao.heading"), rightX + 2.0F, y, room, 1.0F);
 		Component daoLine;
 		if (view.dao != null) {
 			daoLine = Component.translatable("kultivator.discipleui.dao.chosen", view.dao.displayName().copy().withColor(Palette.onPaper(view.dao.color())));
-		} else if (pendingDao >= 0 && Util.getMillis() <= pendingUntil) {
-			Dao pending = Glyphs.BAGUA[pendingDao];
-			daoLine = Component.translatable("kultivator.discipleui.dao.confirm", pending.displayName().copy().withColor(Palette.onPaper(pending.color())))
-					.withColor(Palette.SEAL_DARK);
 		} else if (view.canChooseDao) {
 			daoLine = Component.translatable("kultivator.discipleui.dao.pick");
 		} else {
 			daoLine = daoLocked();
 		}
-		Brush.wrap(g, font, daoLine, rightX + 4.0F, tilesBottom + 4.0F, room - 2.0F, Palette.INK_SOFT, 0.6F, false);
+		int releaseTop = y + h - BUTTON_H - 15;
+		g.enableScissor(rightX, tilesBottom, x + w, releaseTop - 1);
+		Brush.wrap(g, font, daoLine, rightX + 4.0F, tilesBottom + 4.0F, room - 2.0F, Palette.INK_SOFT, 1.0F, false);
+		g.disableScissor();
 
 		// ---- release
-		heading(g, Component.translatable("kultivator.discipleui.release.heading"), rightX + 2.0F, y + h - BUTTON_H - 15.0F, room, 0.8F);
+		heading(g, Component.translatable("kultivator.discipleui.release.heading"), rightX + 2.0F, releaseTop, room, 1.0F);
 		// The held item goes on its own layer so it sits on top of the slot.
 		g.nextStratum();
 		if (!stack.isEmpty()) {

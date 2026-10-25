@@ -1,7 +1,8 @@
 package dev.kultivator.client.tempat.ui.kit;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import dev.kultivator.client.hub.HubNav;
+import dev.kultivator.client.hub.DiSini;
+import dev.kultivator.client.screen.Page;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.SlipTooltip;
@@ -10,8 +11,8 @@ import dev.kultivator.client.tempat.ui.UiTempatClient;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
@@ -21,63 +22,59 @@ import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * The base of every "Pasar Giok" screen (DESIGN 38.U): one class owns the frame so all 38 screens behave the same.
+ * The base of every "Pasar Giok" sheet (DESIGN 38.U), now a page of the Gulungan Utama (DESIGN 43.6): the Gulungan draws
+ * the frame (title, purse, "?" seal, footer) and this class the sheet's content in the page box. One class owns the sheet
+ * so all sheets behave the same.
  * <ul>
  * <li><b>Sheet</b>: {@link #perbarui} takes the server's sheet ({@link LembarKunci}); a live refresh keeps tab, scroll,
  * selection and focus; an open jumps to the sheet's {@code tab}. Countdowns run from the moment the sheet arrived
- * ({@link #diterima}).</li>
- * <li><b>Layout</b> from the scaled width (38.U.2): below 320 one column ({@link Tata#SEMPIT}), 320-479 list + detail
- * ({@link Tata#SEDANG}), from 480 three columns with lantern labels and a big preview ({@link Tata#LEBAR}). The panel never
- * exceeds the window; nothing is drawn below 0.6 scale.</li>
- * <li><b>Frame</b>: {@link PanelTempat} in the sheet's {@code gaya}, the title ×1.5 with the place and the district
- * colour, money on hand rolling when it changes, the place's Nama Baik seal, the lantern tablets ({@link TabLentera}) from
- * the screen's tabs minus {@code tab_sembunyi} with {@code tab_kunci} locks, the one-line result {@code pesan} in the
- * footer, key hints, {@code kunci_layar} (whole screen locked) and the "lantern opens" animation (200 ms, Y 0.92 → 1).</li>
- * <li><b>Input</b>: mouse through the zones of the last frame, Tab / Shift+Tab focus with a gold ring, Enter, Esc, 1-9
- * tabs, {@code /} search, ←/→ amounts, ↑↓ PgUp PgDn Home End lists, Space for the screen's quick action. Everything
- * can be done without the mouse.</li>
- * <li><b>Hub screens</b> ({@code npcId -1} opened from a hub card) only read: write buttons are drawn disabled with the
- * reason ({@link #hanyaBaca}).</li>
- * <li><b>{@code uji ui skala N}</b>: a sheet with {@code uji_skala} N lays the screen out in the GUI size that scale N
- * would give on this window and scales it to fit, so 2 / 3 / 4 can be checked on one machine (38.U.2).</li>
+ * ({@link #diterima}). The first sheet is applied on first use, when every subclass field exists (F2).</li>
+ * <li><b>Tabs</b> are the page's subs ({@link #subs}): the screen's tabs minus {@code tab_sembunyi}, with {@code tab_kunci}
+ * locks, and, on a home page, only the mounted tabs ({@link #batasTab}).</li>
+ * <li><b>Layout</b> from the box width (38.U.2): below 320 one column ({@link Tata#SEMPIT}), 320-479 list + detail
+ * ({@link Tata#SEDANG}), from 480 three columns ({@link Tata#LEBAR}). A strip over the content carries what the old
+ * header did besides the title and money: district, subtitle/place, Nama Baik, discount, the test ribbon and "only
+ * viewing".</li>
+ * <li><b>Input</b>: mouse through the zones of the last frame, Tab / Shift+Tab focus with a gold ring, Enter, {@code /}
+ * search, ←/→ amounts, ↑↓ PgUp PgDn Home End lists, Space for the screen's quick action; digits are the Gulungan's except
+ * under Di Sini, where {@link #angka} picks numbered choices first (43.17 K3).</li>
+ * <li><b>Read-only views</b> (a home page's hub view, {@code OP_LIHAT}): write buttons are drawn disabled with the reason
+ * ({@link #hanyaBaca}).</li>
+ * <li><b>{@code uji ui skala N}</b>: a sheet with {@code uji_skala} N lays the content out in the size GUI scale N would
+ * give and scales it to the box (38.U.2).</li>
  * </ul>
- * Subclasses draw the content area in {@link #isi} with the kit and send ops with {@link #kirim}.
+ The old {@code Screen} size, purse and tab-label bridge is gone (43.16.4 P1); {@code minecraft} and {@code font} come
+ * from {@link Page}. Subclasses draw the content area in {@link #isi} and send ops with {@link #kirim}. The kit-38
+ * {@link Lukis} engine of {@link #isi} stays while sheets still draw with it ({@code LayarGabungDasar} and its sheets,
+ * {@code LayarBukuKas}, {@code LayarJurnal}, {@code LayarPetaKota}, {@code LayarBukuDagang}, the 42 sheets); the helper
+ * bases {@code LayarInti} and {@code TemaHalaman} draw with the single kit {@code screen/ui} instead.
  */
-public abstract class LayarTempatDasar extends Screen implements UiTempatClient.LayarTempat {
-
-	/** Layout width classes of 38.U.2. */
-	public enum Tata {
-		SEMPIT, SEDANG, LEBAR
-	}
+public abstract class LayarTempatDasar extends Page implements UiTempatClient.LayarTempat {
 
 	/** Key of the {@code uji ui skala} test (38UI's test sheets only). */
 	public static final String UJI_SKALA = "uji_skala";
-	/** Key marking a test sheet (a ribbon "UJI" in the header). */
+	/** Key marking a test sheet (a ribbon "UJI" in the strip). */
 	public static final String UJI = "uji";
 
-	private static final long BUKA_MS = 200L;
-	private static final long PESAN_MS = 6000L;
-	private static final int KEPALA = 26;
-	private static final int KAKI = 13;
+	/** Height of the info strip over the content. */
+	private static final int STRIP = 12;
 
 	protected final String layar;
 	protected final int npcId;
 	protected Lembar lembar;
-	/** The first sheet, applied in the first {@link #init()} so subclass fields exist before the hooks run. */
-	private CompoundTag tertunda;
+	/** The first sheet, applied on first use ({@link #siapkan}) so subclass fields exist before the hooks run. */
+	private @Nullable CompoundTag tertunda;
 	protected long diterima;
 	protected TempatWarna.Gaya gaya;
+	/** The screen's tab list (drawn by the Gulungan as subs). */
 	protected final TabLentera tablet = new TabLentera();
 	protected String tab = "";
 	protected final TombolAksi tombol = new TombolAksi();
-	protected final AngkaGulir uangGulir = new AngkaGulir();
 	protected @Nullable KotakCari cari;
-	private final long dibuka = Util.getMillis();
+	/** The screen's own name (the fallback of {@link #judulBawaan} when the sheet has no {@code judul}). */
+	protected final Component title;
 	private long frameTerakhir = Util.getMillis();
 	private long terkunciSejak = -1L;
-	private @Nullable Component pesan;
-	private int pesanWarna;
-	private long pesanSejak;
 	private @Nullable String fokus;
 	private List<Lukis.Zona> zonaTerakhir = new ArrayList<>();
 	private List<DaftarGulir> daftarTerakhir = new ArrayList<>();
@@ -88,7 +85,12 @@ public abstract class LayarTempatDasar extends Screen implements UiTempatClient.
 	private @Nullable Pratinjau3D diputar;
 	private String opTerakhir = "";
 	private long opSejak;
-	// layout (layout coordinates)
+	private boolean lihatSaja;
+	private Set<String> batas = Set.of();
+	private boolean strip;
+	private @Nullable Component pesanTunda;
+	private int pesanTundaWarna;
+	// layout (layout coordinates; equal to the page box unless uji_skala)
 	protected int lebarV;
 	protected int tinggiV;
 	protected float skala = 1.0F;
@@ -103,12 +105,12 @@ public abstract class LayarTempatDasar extends Screen implements UiTempatClient.
 	protected int iy1;
 
 	protected LayarTempatDasar(String layar, int npcId, CompoundTag lembar, Component judul, TempatWarna.Gaya gayaBawaan) {
-		super(judul);
+		this.title = judul;
 		this.layar = layar;
 		this.npcId = npcId;
 		this.gaya = gayaBawaan;
-		// F2: the hooks (tabs, setelahLembar, tabBerubah) run from the first init(), not from this constructor, where a
-		// subclass's own field initialisers have not run yet (LayarTokoSenjata.tabBerubah -> daftar.mulaiUlang crashed).
+		// F2: the hooks (tabs, setelahLembar, tabBerubah) run on first use, not from this constructor, where a subclass's
+		// own field initialisers have not run yet (LayarTokoSenjata.tabBerubah -> daftar.mulaiUlang crashed).
 		this.lembar = new Lembar(lembar);
 		this.tertunda = lembar;
 	}
@@ -135,6 +137,16 @@ public abstract class LayarTempatDasar extends Screen implements UiTempatClient.
 		terima(baru, buka);
 	}
 
+	/** Applies the first sheet once the object is fully built (any first use: the router, the Gulungan). */
+	private void siapkan() {
+		if (tertunda != null) {
+			CompoundTag pertama = tertunda;
+			tertunda = null;
+			lembar = null;
+			terima(pertama, true);
+		}
+	}
+
 	private void terima(CompoundTag tag, boolean buka) {
 		Lembar lama = lembar;
 		lembar = new Lembar(tag);
@@ -151,10 +163,7 @@ public abstract class LayarTempatDasar extends Screen implements UiTempatClient.
 				gantiTab(hub, false);
 			}
 		}
-		if (tab.isEmpty() || tablet.cari(tab) == null) {
-			TabLentera.Tab pertama = tablet.tab(0);
-			gantiTab(pertama == null ? "" : pertama.id(), false);
-		}
+		pastikanTab();
 		Component p = lembar.teksAtau(LembarKunci.PESAN);
 		if (p != null && (lama == null || !p.getString().equals(lama.teks(LembarKunci.PESAN).getString()) || buka)) {
 			tampilPesan(p, TempatWarna.status(lembar.s(LembarKunci.PESAN_JENIS, LembarKunci.PESAN_OK)));
@@ -170,14 +179,47 @@ public abstract class LayarTempatDasar extends Screen implements UiTempatClient.
 			terkunciSejak = -1L;
 		}
 		setelahLembar(buka);
-		if (minecraft != null) {
-			tataUlang();
+		tataUlang();
+	}
+
+	/** The shown tab exists and is open, else the first tab. */
+	private void pastikanTab() {
+		if (tab.isEmpty() || tablet.cari(tab) == null) {
+			TabLentera.Tab pertama = tablet.tab(0);
+			gantiTab(pertama == null ? "" : pertama.id(), false);
 		}
+	}
+
+	// =================================================================== for the router and home pages (43.12.4)
+
+	/** Shows only tabs {@code ids} (a home page's mounted tabs; empty = all). */
+	public void batasTab(Set<String> ids) {
+		batas = ids == null ? Set.of() : Set.copyOf(ids);
+		if (tertunda == null) {
+			tablet.setTabs(saringTab(tabs()));
+			pastikanTab();
+		}
+	}
+
+	/** Marks this page a read-only hub view ({@code OP_LIHAT} answer): write buttons are disabled with the reason. */
+	public void lihatSaja(boolean baca) {
+		lihatSaja = baca;
+		tataUlang();
+	}
+
+	public boolean lihatSaja() {
+		return lihatSaja;
+	}
+
+	/** The tab shown now (after the first sheet is applied). */
+	public String tabSekarang() {
+		siapkan();
+		return tab;
 	}
 
 	// =================================================================== for subclasses
 
-	/** The screen's tabs in order (ids of the screen's {@code TABS}); empty = no tablet column. */
+	/** The screen's tabs in order (ids of the screen's {@code TABS}); empty = no tabs. */
 	protected abstract List<TabLentera.Tab> tabs();
 
 	/** Draws the content of tab {@link #tab} into the box. */
@@ -196,8 +238,12 @@ public abstract class LayarTempatDasar extends Screen implements UiTempatClient.
 		return false;
 	}
 
-	/** Digit 1-9 before it switches tabs (the dialog picks its numbered choices). True when used. */
-	protected boolean angka(int n) {
+	/**
+	 * Digit 1-9 under the Di Sini tablet (43.17 K3): the screen picks its numbered choice {@code n} (the dialog). True when
+	 * used; false lets the Gulungan switch section.
+	 */
+	@Override
+	public boolean angka(int n) {
 		return false;
 	}
 
@@ -206,18 +252,9 @@ public abstract class LayarTempatDasar extends Screen implements UiTempatClient.
 		return false;
 	}
 
-	/** Largest panel width for this screen per layout (narrow screens like the bill override it). */
+	/** Largest content width for this screen per layout (narrow screens like the bill override it). */
 	protected int panelMaks(Tata t) {
 		return t == Tata.LEBAR ? 600 : 470;
-	}
-
-	protected int panelTinggiMaks(Tata t) {
-		return t == Tata.LEBAR ? 330 : 262;
-	}
-
-	/** True when lantern labels are written beside the lanterns in the wide layout. */
-	protected boolean labelTab() {
-		return true;
 	}
 
 	/** Illustration of the empty state. */
@@ -230,9 +267,118 @@ public abstract class LayarTempatDasar extends Screen implements UiTempatClient.
 		return title;
 	}
 
-	/** Hint fragment of the screen for the footer (e.g. "Spasi tawar"); null = none. */
+	/** Hint fragment of the screen (e.g. "Spasi tawar"); shown as the tooltip of the strip. Null = none. */
 	protected @Nullable Component petunjuk() {
 		return null;
+	}
+
+	// =================================================================== page identity (43.6)
+
+	@Override
+	public Component title() {
+		siapkan();
+		return lembar.ada(LembarKunci.JUDUL) ? lembar.teks(LembarKunci.JUDUL) : judulBawaan();
+	}
+
+	/** R26: every sheet page has its Ensiklopedia topic ({@code kultivator.help.<layar>}). */
+	@Override
+	public String helpTopic() {
+		return layar;
+	}
+
+	@Override
+	public List<Sub> subs() {
+		siapkan();
+		List<TabLentera.Tab> tabs = tablet.tabs();
+		if (tabs.size() < 2) {
+			return List.of();
+		}
+		List<Sub> subs = new ArrayList<>(tabs.size());
+		for (TabLentera.Tab t : tabs) {
+			subs.add(new Sub(t.id(), t.label(), t.kunci()));
+		}
+		return subs;
+	}
+
+	@Override
+	public void showSub(String id) {
+		siapkan();
+		if (id != null && tabBoleh(id)) {
+			gantiTab(id, true);
+		}
+	}
+
+	/** Sheets drawn for the 600 px panel take the wide paper (43.3.2: Di Sini in the wide layout). */
+	@Override
+	public boolean lebar() {
+		return panelMaks(Tata.LEBAR) > 470;
+	}
+
+	/** Money on hand from the sheet (-1 = none); the Gulungan shows it rolling in its header. */
+	@Override
+	public long uang() {
+		return lembar.l(LembarKunci.UANG, -1L);
+	}
+
+	@Override
+	public Palette.Gaya gaya() {
+		return Palette.Gaya.dari(gaya.id, Palette.Gaya.KERTAS);
+	}
+
+	/** A service opened from a talk keeps the talk one step back (43.8.1.3). */
+	@Override
+	public boolean rinci() {
+		return DiSini.bisaKembali(this);
+	}
+
+	@Override
+	public boolean mundur() {
+		if (cari != null && cari.aktif()) {
+			cari.berhenti();
+			return true;
+		}
+		return DiSini.kembali(this);
+	}
+
+	@Override
+	public boolean mauTombol() {
+		return cari != null && cari.aktif() || super.mauTombol();
+	}
+
+	// =================================================================== life
+
+	@Override
+	protected void build() {
+		siapkan();
+		tataUlang();
+		if (pesanTunda != null && screen != null) {
+			pesan(pesanTunda, pesanTundaWarna);
+			pesanTunda = null;
+		}
+	}
+
+	/**
+	 * Shown: a live context whose server session another sheet took over (a home page's hub view) asks the server again
+	 * (an NPC), or ends (an anchor cannot be reopened from here).
+	 */
+	@Override
+	public void onShow(@Nullable CompoundTag fokusTag) {
+		siapkan();
+		if (!lihatSaja && !UiTempatClient.sesiAktif(layar, npcId)) {
+			if (npcId >= 0) {
+				kirim(LembarKunci.OP_LIHAT);
+			} else if (DiSini.halaman() == this) {
+				DiSini.selesai(Component.translatable("kultivator.gui43.konteks.berakhir"));
+			}
+		}
+		super.onShow(fokusTag);
+	}
+
+	/** Left the screen for good (Gulungan closed, context replaced, home page hidden): the server ends the session. */
+	@Override
+	public void onHide() {
+		UiTempatClient.ditutup(this);
+		DiSini.lepas(this);
 	}
 
 	// =================================================================== helpers
@@ -247,7 +393,7 @@ public abstract class LayarTempatDasar extends Screen implements UiTempatClient.
 		Lembar kunci = lembar.sub(LembarKunci.TAB_KUNCI);
 		List<TabLentera.Tab> out = new ArrayList<>(semua.size());
 		for (TabLentera.Tab t : semua) {
-			if (sembunyi.contains(t.id()) || !tabAda(t.id())) {
+			if (sembunyi.contains(t.id()) || !tabAda(t.id()) || !batas.isEmpty() && !batas.contains(t.id())) {
 				continue;
 			}
 			Component alasan = kunci.teksAtau(t.id());
@@ -278,12 +424,12 @@ public abstract class LayarTempatDasar extends Screen implements UiTempatClient.
 		}
 	}
 
-	/** True when this screen may only read (hub card without NPC or anchor). */
+	/** True when this page may only read (a home page's hub view without NPC or anchor). */
 	public boolean hanyaBaca() {
-		return npcId < 0 && HubNav.fromHub(this);
+		return lihatSaja;
 	}
 
-	/** Reason shown on write buttons of a read-only screen. */
+	/** Reason shown on write buttons of a read-only page. */
 	protected Component alasanBaca() {
 		return TeksTempat.k("hanya_baca");
 	}
@@ -299,19 +445,19 @@ public abstract class LayarTempatDasar extends Screen implements UiTempatClient.
 		UiTempatClient.kirim(layar, npcId, op);
 	}
 
-	/** A write action: disabled with the reason on read-only screens. */
+	/** A write action: disabled with the reason on read-only pages. */
 	protected boolean tulisBoleh() {
 		return !hanyaBaca();
 	}
 
+	/** The result line in the Gulungan's footer (6 s); kept until the page is mounted when it comes earlier. */
 	public void tampilPesan(Component teks, int warna) {
-		pesan = teks;
-		pesanWarna = warna;
-		pesanSejak = Util.getMillis();
-	}
-
-	protected long uang() {
-		return lembar.l(LembarKunci.UANG, -1L);
+		if (screen == null) {
+			pesanTunda = teks;
+			pesanTundaWarna = warna;
+			return;
+		}
+		pesan(teks, warna);
 	}
 
 	/** A button that sends {@code op} when allowed (also checks read-only). */
@@ -321,81 +467,67 @@ public abstract class LayarTempatDasar extends Screen implements UiTempatClient.
 		return tombol.gambar(l, kunci, x, y, w, h, label, aktif && !baca, baca ? alasanBaca() : alasan, () -> kirim(op));
 	}
 
-	// =================================================================== layout
-
-	@Override
-	protected void init() {
-		if (tertunda != null) {
-			CompoundTag pertama = tertunda;
-			tertunda = null;
-			lembar = null;
-			terima(pertama, true);
-			return;
-		}
-		tataUlang();
+	/** Closes the Gulungan (the session ends with it): a sheet's own "Tutup" button. */
+	public void onClose() {
+		dev.kultivator.client.hub.HubNav.tutupSemua();
 	}
 
+	// =================================================================== layout
+
 	private void tataUlang() {
-		int ujiSkala = lembar.i(UJI_SKALA, 0);
-		if (ujiSkala > 0 && minecraft != null) {
-			int pxW = minecraft.getWindow().getWidth();
-			int pxH = minecraft.getWindow().getHeight();
-			lebarV = Math.max(160, pxW / ujiSkala);
-			tinggiV = Math.max(120, pxH / ujiSkala);
-			skala = Math.min(width / (float) lebarV, height / (float) tinggiV);
+		if (w <= 0 || h <= 0) {
+			return;
+		}
+		int ujiSkala = lembar == null ? 0 : lembar.i(UJI_SKALA, 0);
+		int gs = minecraft.getWindow().getGuiScale();
+		if (ujiSkala > 0 && gs > 0) {
+			skala = ujiSkala / (float) gs;
+			lebarV = Math.max(160, Math.round(w / skala));
+			tinggiV = Math.max(120, Math.round(h / skala));
+			skala = Math.min(w / (float) lebarV, h / (float) tinggiV);
 		} else {
-			lebarV = width;
-			tinggiV = height;
+			lebarV = w;
+			tinggiV = h;
 			skala = 1.0F;
 		}
 		tata = lebarV < 320 ? Tata.SEMPIT : lebarV < 480 ? Tata.SEDANG : Tata.LEBAR;
-		int pw = Math.min(lebarV - 8, panelMaks(tata));
-		int ph = Math.min(tinggiV - 8, panelTinggiMaks(tata));
-		px0 = (lebarV - pw) / 2;
-		py0 = (tinggiV - ph) / 2;
-		px1 = px0 + pw;
-		py1 = py0 + ph;
-		int kiri = px0 + 7;
-		boolean adaTab = !tablet.tabs().isEmpty();
-		int tabLebar = adaTab ? TabLentera.LEBAR + (tata == Tata.LEBAR && labelTab() ? TabLentera.LEBAR_LABEL : 0) : 0;
-		ix0 = kiri + tabLebar + (adaTab ? 4 : 1);
-		iy0 = py0 + KEPALA + 4;
-		ix1 = px1 - 8;
-		iy1 = py1 - KAKI - 3;
+		px0 = x;
+		py0 = y;
+		px1 = x + lebarV;
+		py1 = y + tinggiV;
+		strip = adaStrip();
+		ix0 = px0;
+		iy0 = py0 + (strip ? STRIP + 3 : 0);
+		ix1 = px1;
+		iy1 = py1;
+	}
+
+	private boolean adaStrip() {
+		return lembar != null && (!lembar.s(LembarKunci.DISTRIK).isEmpty() || lembar.ada(LembarKunci.SUBJUDUL) || lembar.ada(LembarKunci.TEMPAT)
+				|| lembar.ada(LembarKunci.NAMA_BAIK) || lembar.f(LembarKunci.DISKON, 0.0F) > 0.001F || lembar.b(UJI) || hanyaBaca());
 	}
 
 	// =================================================================== drawing
 
 	@Override
-	public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float a) {
-		g.fillGradient(0, 0, width, height, 0x70101418, 0x90080A0C);
-	}
-
-	@Override
-	public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float a) {
-		super.extractRenderState(g, mouseX, mouseY, a);
+	protected void drawBehind(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
+		siapkan();
 		long now = Util.getMillis();
 		float detik = Math.min(0.1F, (now - frameTerakhir) / 1000.0F);
 		frameTerakhir = now;
-		int mx = Math.round(mouseX / skala);
-		int my = Math.round(mouseY / skala);
-		Lukis l = new Lukis(g, font, mx, my, detik, now, skala, gaya, fokus);
+		Lukis l = new Lukis(g, font, (int) Math.round(vx(mouseX)), (int) Math.round(vy(mouseY)), detik, now, skala, gaya, fokus);
 		g.pose().pushMatrix();
-		g.pose().scale(skala, skala);
-		float t = Math.min(1.0F, (now - dibuka) / (float) BUKA_MS);
-		float e = 1.0F - (1.0F - t) * (1.0F - t);
-		float cy = (py0 + py1) / 2.0F;
-		if (t < 1.0F) {
-			float sy = 0.92F + 0.08F * e;
-			g.pose().translate(0.0F, cy);
-			g.pose().scale(1.0F, sy);
-			g.pose().translate(0.0F, -cy);
+		if (skala != 1.0F) {
+			g.pose().translate(x, y);
+			g.pose().scale(skala, skala);
+			g.pose().translate(-x, -y);
 		}
-		PanelTempat.gambar(g, gaya, px0, py0, px1, py1);
-		kepala(l);
-		if (!tablet.tabs().isEmpty()) {
-			tablet.gambar(l, px0 + 6, iy0 - 1, iy1, tata == Tata.LEBAR && labelTab(), tab, id -> gantiTab(id, true),
-					alasan -> tampilPesan(alasan, TempatWarna.BAHAYA));
+		if (gaya != TempatWarna.Gaya.KERTAS) {
+			// the sheet's own style (dark night market, red lacquer ...) under its content: its text colours are made for it
+			g.fill(px0, py0, px1, py1, gaya.dasar);
+		}
+		if (strip) {
+			gambarStrip(l);
 		}
 		if (lembar.ada(LembarKunci.KUNCI_LAYAR)) {
 			Lembar k = lembar.sub(LembarKunci.KUNCI_LAYAR);
@@ -405,13 +537,9 @@ public abstract class LayarTempatDasar extends Screen implements UiTempatClient.
 			try {
 				isi(l, ix0, iy0, ix1, iy1);
 			} catch (RuntimeException ex) {
-				dev.kultivator.Kultivator.LOGGER.warn("Tempat screen {} failed to draw", layar, ex);
+				dev.kultivator.Kultivator.LOGGER.warn("Tempat page {} failed to draw", layar, ex);
 				Brush.text(g, font, TeksTempat.k("galat"), ix0 + 4, iy0 + 4, TempatWarna.BAHAYA, 1.0F, false);
 			}
-		}
-		kaki(l);
-		if (t < 1.0F) {
-			g.fill(px0, py0, px1, py1, Palette.argb(Math.round(200 * (1.0F - e)), gaya.dasar & 0xFFFFFF));
 		}
 		g.pose().popMatrix();
 		zonaTerakhir = l.zona;
@@ -422,98 +550,64 @@ public abstract class LayarTempatDasar extends Screen implements UiTempatClient.
 			fokus = null;
 		}
 		if (l.tip != null && !l.tip.isEmpty()) {
-			SlipTooltip.draw(g, font, l.tip, mouseX, mouseY, width, height);
+			SlipTooltip.antre(l.tip);
 		}
 	}
 
-	private void kepala(Lukis l) {
-		Component judul = lembar.ada(LembarKunci.JUDUL) ? lembar.teks(LembarKunci.JUDUL) : judulBawaan();
-		int x = px0 + 10;
-		int y = py0 + 6;
+	/**
+	 * The strip over the content (what the old header carried besides title and money): district, subtitle or place,
+	 * then from the right "only viewing", the test ribbon, the discount and the place's Nama Baik.
+	 */
+	private void gambarStrip(Lukis l) {
+		int y = py0;
+		int x = px0 + 2;
+		int kanan = px1 - 2;
 		String distrik = lembar.s(LembarKunci.DISTRIK);
 		if (!distrik.isEmpty()) {
 			int warna = TempatWarna.distrik(distrik);
-			int ikon = LembarKunci.Ikon.distrik(distrik);
-			l.g.fill(x - 2, y - 1, x + 15, y + 16, Palette.argb(0xC0, warna & 0xFFFFFF));
-			IkonTempat.gambar(l.g, ikon, x - 1, y, 16, 0xFFFFFFFF);
-			x += 19;
+			l.g.fill(x - 1, y, x + 12, y + STRIP, Palette.argb(0xC0, warna & 0xFFFFFF));
+			IkonTempat.gambar(l.g, LembarKunci.Ikon.distrik(distrik), x, y + 1, 10, 0xFFFFFFFF);
+			x += 15;
 		}
-		int kananX = px1 - 10;
-		// right side: money, then Nama Baik under it
-		long uang = uang();
-		if (uang >= 0L) {
-			long shown = uangGulir.nilai(uang, l.kini);
-			int arah = uangGulir.arah(l.kini);
-			int w = LabelHarga.gambar(l, shown, -1L, kananX, y + 1, true, 1.0F, shown >= 1_000_000L);
-			if (arah != 0) {
-				IkonTempat.gambar(l.g, arah > 0 ? LembarKunci.Ikon.TREN_NAIK : LembarKunci.Ikon.TREN_TURUN, kananX - w - 11, y, 10, 0xFFFFFFFF);
+		if (hanyaBaca()) {
+			Component b = TeksTempat.k("hanya_baca.kaki");
+			int bw = Math.min(kanan - x - 20, font.width(b) + 6);
+			if (bw > 20) {
+				l.g.fill(kanan - bw, y, kanan, y + STRIP, Palette.argb(0x60, Palette.INK_FAINT & 0xFFFFFF));
+				l.teks(b, kanan - bw + 3, y + 2, bw - 6, gaya.teks);
+				kanan -= bw + 4;
 			}
-			if (lembar.ada(LembarKunci.BATU)) {
-				int[] batu = lembar.ia(LembarKunci.BATU);
-				if (l.di(kananX - w, y, kananX, y + 10)) {
-					l.tip(List.of(TeksTempat.k("uang.judul"), TeksTempat.batuDiTas(batu)));
-				}
-			}
-			kananX -= w + 14;
 		}
-		if (lembar.ada(LembarKunci.NAMA_BAIK)) {
-			LencanaPangkat.namaBaik(l, lembar.i(LembarKunci.NAMA_BAIK, 0), lembar.i(LembarKunci.PANGKAT_NB, LembarKunci.PANGKAT_ASING), px1 - 10,
-					y + 12);
+		if (lembar.b(UJI) && kanan - x > 60) {
+			IkonTempat.pita(l.g, true, kanan - 34, y, 32, STRIP, 0xFFFFFFFF);
+			Brush.centered(l.g, font, TeksTempat.k("uji.pita"), kanan - 18, y + 2, 0xFF5A3A08, 1.0F, false);
+			kanan -= 38;
 		}
 		float diskon = lembar.f(LembarKunci.DISKON, 0.0F);
 		if (diskon > 0.001F) {
 			Component d = TeksTempat.k("diskon", Math.round(diskon * 100));
-			int dw = Math.round(font.width(d) * 0.75F) + 6;
-			int dx = kananX - dw;
-			l.g.fill(dx, y, dx + dw, y + 9, TempatWarna.SEGEL);
-			Brush.text(l.g, font, d, dx + 3, y + 1, 0xFFFFF0E0, 0.75F, false);
-			kananX = dx - 4;
+			int dw = font.width(d) + 6;
+			if (kanan - dw - x > 40) {
+				l.g.fill(kanan - dw, y, kanan, y + STRIP, TempatWarna.SEGEL);
+				l.teks(d, kanan - dw + 3, y + 2, dw - 4, 0xFFFFF0E0);
+				kanan -= dw + 4;
+			}
 		}
-		if (lembar.b(UJI)) {
-			IkonTempat.pita(l.g, true, kananX - 34, y, 32, 11, 0xFFFFFFFF);
-			Brush.centered(l.g, font, TeksTempat.k("uji.pita"), kananX - 18, y + 2, 0xFF5A3A08, 0.75F, false);
-			kananX -= 38;
+		if (lembar.ada(LembarKunci.NAMA_BAIK) && kanan - x > 80) {
+			kanan -= LencanaPangkat.namaBaik(l, lembar.i(LembarKunci.NAMA_BAIK, 0), lembar.i(LembarKunci.PANGKAT_NB, LembarKunci.PANGKAT_ASING), kanan,
+					y + 2) + 4;
 		}
-		l.judul(judul, x, y, kananX - x - 4, gaya.gelap() ? TempatWarna.EMAS_TERANG : gaya.aksen);
 		Component sub = lembar.teksAtau(LembarKunci.SUBJUDUL);
 		Component tempat = lembar.teksAtau(LembarKunci.TEMPAT);
-		Component baris2 = sub != null ? sub : tempat;
-		TabLentera.Tab aktif = tablet.cari(tab);
-		if (tata != Tata.LEBAR && aktif != null) {
-			baris2 = baris2 == null ? aktif.label() : aktif.label().copy().append(Component.literal("  ·  ")).append(baris2);
+		Component baris = sub != null ? sub : tempat;
+		if (baris != null && kanan - x > 12) {
+			l.teks(baris, x, y + 2, kanan - x - 2, gaya.teksLemah);
 		}
-		if (baris2 != null) {
-			l.keterangan(baris2, x, y + 13, Math.min(px1 - 70, kananX + 30) - x, gaya.teksLemah);
+		Component hint = petunjuk();
+		if (hint != null && l.di(px0, y, px1, y + STRIP)) {
+			l.tip(hint);
 		}
-		PanelTempat.garis(l.g, gaya, px0 + 10, px1 - 10, py0 + KEPALA);
-	}
-
-	private void kaki(Lukis l) {
-		int y = py1 - KAKI;
-		long now = l.kini;
-		if (pesan != null && now - pesanSejak < PESAN_MS) {
-			float fade = Math.min(1.0F, (PESAN_MS - (now - pesanSejak)) / 600.0F);
-			int alpha = Math.round(255 * fade);
-			Component p = pesan;
-			float w = Math.min(px1 - px0 - 30, font.width(p));
-			float x = (px0 + px1) / 2.0F - w / 2.0F;
-			l.g.fill(Math.round(x - 5), y - 2, Math.round(x + w + 5), y + 9, Palette.argb(Math.round(0xC0 * fade), 0x101010));
-			l.g.fill(Math.round(x - 5), y - 2, Math.round(x - 3), y + 9, Palette.argb(alpha, pesanWarna & 0xFFFFFF));
-			Brush.fit(l.g, font, p, x, y, px1 - px0 - 30, Palette.argb(alpha, 0xFFF4EC), 1.0F, 0.6F, false);
-			return;
-		}
-		Component hint = TeksTempat.k(tablet.tabs().isEmpty() ? "kunci.dasar_tanpa_tab" : "kunci.dasar");
-		Component extra = petunjuk();
-		if (extra != null) {
-			hint = hint.copy().append(" · ").append(extra);
-		}
-		if (cari != null) {
-			hint = hint.copy().append(" · ").append(TeksTempat.k("kunci.cari"));
-		}
-		if (hanyaBaca()) {
-			hint = TeksTempat.k("hanya_baca.kaki").copy().append(" · ").append(hint);
-		}
-		Brush.fitCentered(l.g, font, hint, (px0 + px1) / 2.0F, y + 1, px1 - px0 - 24, gaya.teksSamar, 0.75F, 0.6F, false);
+		PanelTempat.garis(l.g, gaya, px0, px1, y + STRIP + 1);
 	}
 
 	/** A box of the layout. */
@@ -550,9 +644,9 @@ public abstract class LayarTempatDasar extends Screen implements UiTempatClient.
 
 	/** A label / value row (value right-aligned); returns the height used (10). */
 	protected int barisNilai(Lukis l, Component label, Component nilai, int x0, int y, int x1) {
-		int vw = Math.round(font.width(nilai) * 0.85F);
-		l.teks(label, x0, y, x1 - x0 - vw - 4, gaya.teksLemah, 0.85F);
-		l.kanan(nilai, x1, y, gaya.teks, 0.85F);
+		int vw = font.width(nilai);
+		l.teks(label, x0, y, x1 - x0 - vw - 4, gaya.teksLemah);
+		l.kanan(nilai, x1, y, gaya.teks, 1.0F);
 		return 10;
 	}
 
@@ -613,39 +707,43 @@ public abstract class LayarTempatDasar extends Screen implements UiTempatClient.
 
 	// =================================================================== input
 
-	private double vx(double x) {
-		return x / skala;
+	/** Screen x to layout x (the uji_skala scale is about the box corner). */
+	private double vx(double sx) {
+		return x + (sx - x) / skala;
 	}
 
-	private double vy(double y) {
-		return y / skala;
+	private double vy(double sy) {
+		return y + (sy - y) / skala;
 	}
 
 	@Override
 	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-		double x = vx(event.x());
-		double y = vy(event.y());
-		if (event.button() != InputConstants.MOUSE_BUTTON_LEFT) {
+		if (modal()) {
 			return super.mouseClicked(event, doubleClick);
 		}
-		Lukis.Zona z = zonaDi(x, y);
+		if (event.button() != InputConstants.MOUSE_BUTTON_LEFT) {
+			return false;
+		}
+		double mx = vx(event.x());
+		double my = vy(event.y());
+		Lukis.Zona z = zonaDi(mx, my);
 		if (cari != null && cari.aktif() && (z == null || !z.kunci.equals("cari"))) {
 			cari.berhenti();
 		}
 		for (DaftarGulir d : daftarTerakhir) {
-			if (d.tekan(x, y)) {
+			if (d.tekan(mx, my)) {
 				diseret = d;
 				return true;
 			}
 		}
 		for (Pratinjau3D p : pratinjauTerakhir) {
-			if (p.berisi(x, y)) {
+			if (p.berisi(mx, my)) {
 				diputar = p;
 				p.mulaiSeret();
 			}
 		}
 		if (z == null) {
-			return diputar != null || super.mouseClicked(event, doubleClick);
+			return diputar != null;
 		}
 		if (z.fokus) {
 			fokus = z.kunci;
@@ -671,8 +769,11 @@ public abstract class LayarTempatDasar extends Screen implements UiTempatClient.
 
 	@Override
 	public boolean mouseReleased(MouseButtonEvent event) {
-		double x = vx(event.x());
-		double y = vy(event.y());
+		if (modal()) {
+			return super.mouseReleased(event);
+		}
+		double mx = vx(event.x());
+		double my = vy(event.y());
 		if (diseret != null) {
 			diseret.lepas();
 			diseret = null;
@@ -686,18 +787,21 @@ public abstract class LayarTempatDasar extends Screen implements UiTempatClient.
 			Lukis.Zona z = ditekan;
 			ditekan = null;
 			if (z.widget != null) {
-				boolean acted = z.widget.release(x, y);
-				if (!acted && !z.aktif && z.berisi(x, y) && z.alasan != null) {
+				boolean acted = z.widget.release(mx, my);
+				if (!acted && !z.aktif && z.berisi(mx, my) && z.alasan != null) {
 					tampilPesan(z.alasan, TempatWarna.BAHAYA);
 				}
 			}
 			return true;
 		}
-		return super.mouseReleased(event);
+		return false;
 	}
 
 	@Override
 	public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
+		if (modal()) {
+			return super.mouseDragged(event, dx, dy);
+		}
 		if (diseret != null) {
 			diseret.seretKe(vy(event.y()));
 			return true;
@@ -706,31 +810,41 @@ public abstract class LayarTempatDasar extends Screen implements UiTempatClient.
 			diputar.seret(dx / skala, Util.getMillis());
 			return true;
 		}
-		return super.mouseDragged(event, dx, dy);
+		return false;
 	}
 
 	@Override
-	public boolean mouseScrolled(double x, double y, double scrollX, double scrollY) {
-		double vx = vx(x);
-		double vy = vy(y);
+	public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+		if (modal()) {
+			return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+		}
+		double mx = vx(mouseX);
+		double my = vy(mouseY);
 		for (DaftarGulir d : daftarTerakhir) {
-			if (d.berisi(vx, vy)) {
+			if (d.berisi(mx, my)) {
 				d.roda(scrollY);
 				return true;
 			}
 		}
-		return super.mouseScrolled(x, y, scrollX, scrollY);
+		return false;
 	}
 
+	/**
+	 * Keys the Gulungan passes on (43.4.1): everything while the search writes or the confirm is open; otherwise Enter,
+	 * Space, ←/→, lists, {@code /} and the screen's own keys. Esc, Tab and digits are the Gulungan's ({@link #mundur},
+	 * {@link #fokusTab}, {@link #angka}).
+	 */
 	@Override
 	public boolean keyPressed(KeyEvent event) {
+		if (modal()) {
+			return super.keyPressed(event);
+		}
 		if (cari != null && cari.tombol(event)) {
 			return true;
 		}
 		int key = event.key();
 		if (event.isEscape()) {
-			onClose();
-			return true;
+			return false;
 		}
 		if (key == InputConstants.KEY_TAB) {
 			geserFokus(event.hasShiftDown() ? -1 : 1);
@@ -791,33 +905,25 @@ public abstract class LayarTempatDasar extends Screen implements UiTempatClient.
 			fokus = "cari";
 			return true;
 		}
-		if (key >= InputConstants.KEY_1 && key <= InputConstants.KEY_9) {
-			if (angka(key - InputConstants.KEY_1 + 1)) {
-				return true;
-			}
-			TabLentera.Tab t = tablet.tab(key - InputConstants.KEY_1);
-			if (t != null) {
-				if (t.kunci() != null) {
-					UiSound.denied();
-					tampilPesan(t.kunci(), TempatWarna.BAHAYA);
-				} else {
-					gantiTab(t.id(), true);
-				}
-				return true;
-			}
-		}
-		if (tombolLain(event)) {
-			return true;
-		}
-		return super.keyPressed(event);
+		return tombolLain(event);
 	}
 
 	@Override
 	public boolean charTyped(CharacterEvent event) {
-		if (cari != null && cari.ketik(event)) {
+		if (modal()) {
+			return super.charTyped(event);
+		}
+		return cari != null && cari.ketik(event);
+	}
+
+	/** Tab / Shift+Tab over the zones of the last frame. */
+	@Override
+	public boolean fokusTab(boolean back) {
+		if (modal()) {
 			return true;
 		}
-		return super.charTyped(event);
+		geserFokus(back ? -1 : 1);
+		return true;
 	}
 
 	private void geserFokus(int arah) {
@@ -834,16 +940,5 @@ public abstract class LayarTempatDasar extends Screen implements UiTempatClient.
 		int next = i < 0 ? (arah > 0 ? 0 : urut.size() - 1) : Math.floorMod(i + arah, urut.size());
 		fokus = urut.get(next);
 		UiSound.hover();
-	}
-
-	@Override
-	public void removed() {
-		UiTempatClient.ditutup(this);
-		super.removed();
-	}
-
-	@Override
-	public boolean isPauseScreen() {
-		return false;
 	}
 }

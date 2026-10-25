@@ -1,0 +1,53 @@
+{
+  "_catatan": "Kebiasaan #7 adu_jangkrik (DESIGN 42.4.12); ilham: Jia Sidao",
+  "nomor": 7,
+  "siapa": {
+    "umur": [
+      14,
+      70
+    ],
+    "kelamin": "pria",
+    "tahap": [
+      "dewasa"
+    ]
+  },
+  "bobot": 0.7,
+  "sesi": [
+    {
+      "jam": [
+        14,
+        17
+      ],
+      "peluang": 0.6,
+      "syarat": [
+        "tidak_hujan"
+      ],
+      "tujuan": [
+        "jongkok",
+        "obrol"
+      ],
+      "klip": "duduk_lantai",
+      "kiri": "kota42:guci_jangkrik",
+      "pemain": 2,
+      "penonton": {
+        "klip": "sorak_arena",
+        "kiri": ""
+      },
+      "penonton_ganti": [
+        {
+          "klip": "sorak_arena"
+        },
+        {
+          "klip": "tepuk_tangan"
+        },
+        {
+          "klip": "kota42:menepuk_jidat"
+        },
+        {
+          "klip": "tunjuk"
+        }
+      ],
+      "ganti_menit": 3
+    }
+  ]
+}

@@ -1,0 +1,186 @@
+{
+  "id": "basa_basi_musim",
+  "jenis": "realisasi",
+  "_catatan": "Small talk on the season.",
+  "benih_dunia": 42,
+  "masukan": {
+    "niat": "BASA_BASI",
+    "pembicara": 301,
+    "hari": 120,
+    "now": 2880000,
+    "cuaca": "cerah",
+    "musim": "semi",
+    "situasi": {
+      "jam": "pagi",
+      "cuaca": "cerah",
+      "musim": "semi",
+      "kelompok": "pekerja",
+      "watak": "ramah",
+      "kebiasaan": [],
+      "sifat": {
+        "H": 10,
+        "E": 0,
+        "X": 20,
+        "A": 30,
+        "C": 10,
+        "O": 0
+      },
+      "wajah": "netral",
+      "tempat": "kota_besar"
+    },
+    "pendengar": {
+      "nama": "Han",
+      "kelamin": "l",
+      "tahap": "dewasa",
+      "pemain": true
+    },
+    "kesan": "kenal",
+    "tahu_nama": false,
+    "register": "sopan",
+    "dialek": "air",
+    "nilai": {
+      "konteks.tempat": {
+        "t": "Kota Kanal Giok"
+      }
+    }
+  },
+  "langkah": [
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar"
+        },
+        "musim": "semi"
+      },
+      "harap": {
+        "k": "kultivator.cakap.basa.musim.semi.4",
+        "a": []
+      },
+      "aturan": "basa.musim.semi",
+      "gestur": "bicara_tangan",
+      "seru": null,
+      "tik": null,
+      "id_id": "Burung walet kembali ke atap kami tahun ini. Pertanda rumah tangga rukun.",
+      "en_us": "The swallows came back to our eaves this year. A sign of a harmonious household."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "panas",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar"
+        },
+        "musim": "panas"
+      },
+      "harap": {
+        "k": "kultivator.cakap.kerja.pekerja.2",
+        "a": []
+      },
+      "aturan": "kerja.pekerja",
+      "gestur": "seka_keringat",
+      "seru": null,
+      "tik": null,
+      "id_id": "Kerja keras tidak apa-apa, asal anak-anak bisa makan.",
+      "en_us": "Hard work's fine, as long as the children eat."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "gugur",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar"
+        },
+        "musim": "gugur"
+      },
+      "harap": {
+        "k": "kultivator.cakap.basa.cuaca.cerah.0",
+        "a": []
+      },
+      "aturan": "basa.cuaca.cerah",
+      "gestur": "tatap_langit",
+      "seru": null,
+      "tik": null,
+      "id_id": "Langit bersih sekali hari ini. Pertanda baik, kata orang.",
+      "en_us": "Such a clear sky today. A good omen, they say."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "dingin",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar"
+        },
+        "musim": "dingin"
+      },
+      "harap": {
+        "k": "kultivator.cakap.basa.musim.dingin.4",
+        "a": [
+          {
+            "k": "kultivator.cakap.seru.keluh.10",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "basa.musim.dingin",
+      "gestur": "hangat_tangan",
+      "seru": null,
+      "tik": null,
+      "id_id": "Tanganku pecah-pecah kena air dingin. Yah, begitulah.",
+      "en_us": "My hands are cracked from cold water. Well, that's how it is."
+    }
+  ]
+}

@@ -64,6 +64,117 @@ public final class Palette {
 	public static final int LOCKED = 0xFF8D928E;
 	public static final int LOCKED_PAPER = 0xFFC9CDC6;
 
+	// ---- status tokens of the single kit (DESIGN 43.7; were TempatWarna OK / PERINGATAN / BAHAYA)
+	public static final int OK = 0xFF5FA88C;
+	public static final int PERINGATAN = 0xFFD0A040;
+	public static final int BAHAYA = 0xFFB03030;
+	/** "Locked" = 45 % ink. */
+	public static final float TERKUNCI_ALFA = 0.45F;
+
+	/** Quality colours by grade 0-4 (mutu) used for item names. */
+	private static final int[] MUTU = {0xFF8A8F8C, 0xFF4F9A4A, 0xFF3E78C0, 0xFF8B4FC8, 0xFFD08A2A};
+	private static final int[] MUTU_TERANG = {0xFFD8DCD8, 0xFFA6E08A, 0xFFA8D2FF, 0xFFD7B4FF, 0xFFFFD27A};
+
+	/**
+	 * One panel style of the single kit (DESIGN 43.7; the five styles of 38.U.2, ids of {@code LembarKunci.GAYA_*}): the
+	 * ink, card and accent colours drawn on that paper. The Gulungan keeps one paper; a page or a context only changes these
+	 * colours (43.3.1: no second backdrop), so a sheet's style still reads as wood, stone, cloth or jade.
+	 */
+	public enum Gaya {
+		KERTAS(dev.kultivator.dunia.tempat.ui.LembarKunci.GAYA_KERTAS, INK, INK_SOFT, INK_FAINT, 0x30A08850, 0x60C9A24A, 0xFFF4ECD4, JADE_DARK,
+				0xFFEFE4C6),
+		KAYU(dev.kultivator.dunia.tempat.ui.LembarKunci.GAYA_KAYU, 0xFFF6E8C8, 0xFFE0C89A, 0xFFB89670, 0x40000000, 0x70F7DC7E, 0xFF4A140C,
+				GOLD_LIGHT, 0xFF5E1A10),
+		BATU(dev.kultivator.dunia.tempat.ui.LembarKunci.GAYA_BATU, INK, 0xFF39403C, 0xFF5E6662, 0x28FFFFFF, 0x60E8E8DE, 0xFFD4D4CA, 0xFF7A1A1A,
+				0xFFC0C0B6),
+		KAIN(dev.kultivator.dunia.tempat.ui.LembarKunci.GAYA_KAIN, 0xFFF4E6D0, 0xFFD8C0A8, 0xFFA88AA0, 0x40000000, 0x70D4A637, 0xFF2E0E22,
+				GOLD_LIGHT, 0xFF3C1430),
+		GIOK(dev.kultivator.dunia.tempat.ui.LembarKunci.GAYA_GIOK, 0xFF10261C, 0xFF2A4A3C, 0xFF5E7E70, 0x30184B36, 0x7067C99B, 0xFFE4F2EA,
+				0xFF1E6A4A, 0xFFD2E8DC);
+
+		public final String id;
+		/** Body text. */
+		public final int teks;
+		/** Secondary text. */
+		public final int teksLemah;
+		/** Captions, hints. */
+		public final int teksSamar;
+		/** Card fill (translucent) and its hover tint. */
+		public final int kartu;
+		public final int kartuSorot;
+		/** Inset well (detail pane, input). */
+		public final int sumur;
+		/** Accent for titles and selected rows. */
+		public final int aksen;
+		/** Solid back of the content area behind translucent cards. */
+		public final int dasar;
+
+		Gaya(String id, int teks, int teksLemah, int teksSamar, int kartu, int kartuSorot, int sumur, int aksen, int dasar) {
+			this.id = id;
+			this.teks = teks;
+			this.teksLemah = teksLemah;
+			this.teksSamar = teksSamar;
+			this.kartu = kartu;
+			this.kartuSorot = kartuSorot;
+			this.sumur = sumur;
+			this.aksen = aksen;
+			this.dasar = dasar;
+		}
+
+		/** True for the dark styles (cream text). */
+		public boolean gelap() {
+			return this == KAYU || this == KAIN;
+		}
+
+		/** Text colour inside a {@link #sumur} well (wells are always light). */
+		public int teksSumur() {
+			return gelap() ? 0xFF2A1A12 : teks;
+		}
+
+		/** Green for gains on this paper. */
+		public int naik() {
+			return gelap() ? 0xFF9AE0B0 : 0xFF2E7A4E;
+		}
+
+		/** Red for losses and refusals on this paper. */
+		public int turun() {
+			return gelap() ? 0xFFFF8A7A : BAHAYA;
+		}
+
+		/** The style with id {@code id} ({@code fallback} when unknown). */
+		public static Gaya dari(String id, Gaya fallback) {
+			for (Gaya gaya : values()) {
+				if (gaya.id.equals(id)) {
+					return gaya;
+				}
+			}
+			return fallback;
+		}
+	}
+
+	/** Status colour of a {@code LembarKunci.PESAN_*} value. */
+	public static int status(String jenis) {
+		return switch (jenis) {
+			case dev.kultivator.dunia.tempat.ui.LembarKunci.PESAN_BAHAYA -> BAHAYA;
+			case dev.kultivator.dunia.tempat.ui.LembarKunci.PESAN_PERINGATAN -> PERINGATAN;
+			default -> OK;
+		};
+	}
+
+	/** Name colour of an item grade 0-4 on a light ({@code gelap} false) or dark panel; -1 = {@code polos}. */
+	public static int mutu(int mutu, boolean gelap, int polos) {
+		if (mutu < 0) {
+			return polos;
+		}
+		int k = Math.min(MUTU.length - 1, mutu);
+		return gelap ? MUTU_TERANG[k] : darken(MUTU[k], 0.1F);
+	}
+
+	/** Colour at "locked" strength (45 % of the ink over the panel). */
+	public static int terkunci(int warna) {
+		return argb(Math.round(255 * TERKUNCI_ALFA), warna & 0xFFFFFF);
+	}
+
 	/** Opaque colour from RGB. */
 	public static int opaque(int rgb) {
 		return 0xFF000000 | (rgb & 0xFFFFFF);

@@ -92,6 +92,13 @@ public final class LangitJatuh {
 			return size() > SAFE_MAX;
 		}
 	};
+	/** Where each body last stood on any ground (LRU): a hop down off a ledge under the island is no fall. */
+	private static final Map<UUID, Safe> FOOT = new LinkedHashMap<>(SAFE_MAX * 2, 0.75F, true) {
+		@Override
+		protected boolean removeEldestEntry(Map.Entry<UUID, Safe> eldest) {
+			return size() > SAFE_MAX;
+		}
+	};
 	/** The game time a body last stood inside a sky volume (for the Cloud Dive's "left the rim within 2 s"). */
 	private static final Map<UUID, Long> LAST_GROUND = new HashMap<>();
 	/** Game time of the last catch per body (fall damage grace). */
@@ -238,6 +245,7 @@ public final class LangitJatuh {
 		long now = level.getGameTime();
 		Vec3 pos = body.position();
 		if (body.onGround()) {
+			FOOT.put(id, new Safe(level.dimension(), body.blockPosition(), now));
 			if (hall.inVolume(pos) && !body.isPassenger()) {
 				LAST_GROUND.put(id, now);
 				if (Math.floorMod(tick / PERIOD + body.getId(), 4) == 0) {
@@ -273,6 +281,11 @@ public final class LangitJatuh {
 		Safe safe = AMAN.get(id);
 		int drop = safe != null && safe.dim().equals(level.dimension()) ? safe.pos().getY() - body.getBlockY() : Integer.MAX_VALUE;
 		if (drop < MIN_DROP) {
+			return;
+		}
+		// Not body.fallDistance: the net's own Slow Falling resets it every tick.
+		Safe foot = FOOT.get(id);
+		if (foot != null && foot.dim().equals(level.dimension()) && foot.pos().getY() - body.getBlockY() < MIN_DROP) {
 			return;
 		}
 		int catchLine = hall.skyFloorY() - LangitConfig.get().tangkapJarak;
@@ -440,6 +453,7 @@ public final class LangitJatuh {
 
 	static void clearAll() {
 		AMAN.clear();
+		FOOT.clear();
 		LAST_GROUND.clear();
 		CAUGHT.clear();
 		HALLS.clear();

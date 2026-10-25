@@ -3,10 +3,17 @@ package dev.kultivator.client.codex;
 import com.mojang.blaze3d.platform.InputConstants;
 import dev.kultivator.client.ClientCultivation;
 import dev.kultivator.client.Keys;
+import dev.kultivator.client.hub.HubNav;
+import dev.kultivator.client.hub.Tujuan;
+import dev.kultivator.client.hub.Urutan;
+import dev.kultivator.client.screen.Page;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Glyphs;
+import dev.kultivator.client.screen.ui.KeadaanKosong;
+import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.SealCard;
+import dev.kultivator.client.screen.ui.SegelKonfirmasi;
 import dev.kultivator.client.screen.ui.TalismanButton;
 import dev.kultivator.client.screen.ui.UiSound;
 import dev.kultivator.data.CultivationData;
@@ -16,6 +23,9 @@ import dev.kultivator.network.Actions;
 import dev.kultivator.technique.spec.run.Loadout;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
@@ -24,15 +34,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The Cincin Segel tablet (DESIGN 22.12.5): twelve sockets in a ring around a dantian, previewing the seal wheel; sockets
- * 1-4 carry a gold numeral because they are also the quick seals. Click a socket and then a card of the compact list on
- * the right, or drag a card onto a socket; right click empties a socket. "Isi otomatis" fills the strongest castable art
- * per role and "Kosongkan" clears the ring (second click within 3 s). The server keeps the ring in
- * {@code extra.teknik.slots} and checks every id.
+ * Teknik › Cincin Segel (DESIGN 22.12.5, 43.5, G48; a wide page and the one GUI that fills the ring): twelve sockets in a
+ * ring around a dantian, previewing the seal wheel; sockets 1-4 carry a gold numeral because they are also the quick
+ * seals. Click (or Tab + Enter) a socket and then a card of the compact list on the right, or drag a card onto a socket;
+ * right click empties a socket. "Pasang ke Cincin" in the Kodeks slip arrives here with its card carried: the next socket
+ * takes it. "Isi otomatis" fills the strongest castable art per role and "Kosongkan" clears the ring after a light
+ * {@code SegelKonfirmasi}. The server keeps the ring in {@code extra.teknik.slots} and checks every id.
+ * Keyboard (43.4.2): sockets are Tab stops (Enter arms, Delete/Backspace empties); the card list is one Tab stop ("kisi")
+ * whose arrows move the selected card and whose Enter puts it in the armed socket, else the first empty one.
  */
-final class LoadoutPage extends CodexPage {
+public final class LoadoutPage extends Page {
 
-	private static final long CONFIRM_MILLIS = 3000L;
+	private static final String M = "kultivator.gui43.m02.";
+	private static final String KISI = "kisi";
+	/** A card carried over from the Kodeks slip ({@link Codex#pasang}); picked up when the page shows. */
+	private static @Nullable TechniqueSpec dibawa;
 
 	private final CodexGrid grid = new CodexGrid();
 	private int ringX;
@@ -40,72 +56,92 @@ final class LoadoutPage extends CodexPage {
 	private float ringR;
 	private int socket;
 	private int listX;
+	private int hintY;
 	private int armed = -1;
+	private @Nullable TechniqueSpec carry;
 	private @Nullable TechniqueSpec dragging;
 	private double dragFromX;
 	private double dragFromY;
 	private boolean dragMoved;
-	private int mouseX;
-	private int mouseY;
-	private long clearAskUntil;
 	private long builtVersion = -1L;
 
-	LoadoutPage(CodexScreen screen) {
-		super(screen);
+	public LoadoutPage() {
+	}
+
+	/** Carries {@code spec} to the ring: the next socket clicked takes it (null clears). */
+	static void bawa(@Nullable TechniqueSpec spec) {
+		dibawa = spec;
 	}
 
 	@Override
-	Component title() {
-		return Component.translatable("kultivator.codex.tab.ring");
+	public Component title() {
+		return Component.translatable("kultivator.gui43.hal.teknik.cincin_segel");
 	}
 
 	@Override
-	Component shortName() {
-		return Component.translatable("kultivator.codex.tab.ring.short");
-	}
-
-	@Override
-	int icon() {
+	public int glyph() {
 		return Glyphs.RING;
+	}
+
+	@Override
+	public String helpTopic() {
+		return "kitab_teknik";
+	}
+
+	@Override
+	public boolean lebar() {
+		return true;
+	}
+
+	@Override
+	public void onShow(@Nullable CompoundTag fokus) {
+		ambil();
+		super.onShow(fokus);
+	}
+
+	@Override
+	public void tick() {
+		ambil();
+	}
+
+	private void ambil() {
+		if (dibawa != null) {
+			carry = dibawa;
+			dibawa = null;
+			armed = -1;
+		}
 	}
 
 	@Override
 	protected void build() {
 		int leftW = Math.max(120, Math.min(w - 90, Math.round(w * 0.56F)));
 		int buttonH = 14;
+		// The ring keeps clear of the hint line above the talismans: its slot numbers sit socket/2 + 11 outside the ring.
+		hintY = y + h - buttonH - 12;
+		int ringBox = hintY - y - 1;
+		float half = Math.min(leftW, ringBox) / 2.0F;
+		socket = Math.max(14, Math.min(20, Math.round((half - 21.0F) * 0.36F)));
+		ringR = Math.max(30.0F, half - socket / 2.0F - 11.0F);
 		ringX = x + leftW / 2;
-		ringY = y + (h - buttonH - 6) / 2 + 2;
-		ringR = Math.max(34.0F, Math.min(leftW, h - buttonH - 14) / 2.0F - 12.0F);
-		socket = Math.max(14, Math.min(20, Math.round(ringR * 0.36F)));
+		ringY = y + ringBox / 2;
 		int bw = (leftW - 6) / 2;
 		TalismanButton autofill = add(new TalismanButton(x, y + h - buttonH, bw, buttonH, () -> Component.translatable("kultivator.codex.ring.autofill")));
 		autofill.enabledWhen(Keys::connected);
+		autofill.alasanWhen(() -> Component.translatable(M + "luring"));
 		autofill.onPress(() -> send(Actions.TECHNIQUE, 0, "autofill"));
 		autofill.tooltip(() -> List.of(Component.translatable("kultivator.codex.ring.autofill"),
 				Component.translatable("kultivator.codex.ring.autofill.tip").withStyle(ChatFormatting.GRAY)));
-		TalismanButton clear = add(new TalismanButton(x + bw + 6, y + h - buttonH, bw, buttonH, () -> Component.translatable(asking()
-				? "kultivator.codex.ring.clear_confirm" : "kultivator.codex.ring.clear")));
+		TalismanButton clear = add(new TalismanButton(x + bw + 6, y + h - buttonH, bw, buttonH, () -> Component.translatable("kultivator.codex.ring.clear")));
 		clear.enabledWhen(Keys::connected);
-		clear.urgentWhen(this::asking);
-		clear.onPress(() -> {
-			if (asking()) {
-				clearAskUntil = 0L;
-				send(Actions.TECHNIQUE, 0, "clear");
-			} else {
-				clearAskUntil = Util.getMillis() + CONFIRM_MILLIS;
-				UiSound.ask();
-			}
-		});
+		clear.alasanWhen(() -> Component.translatable(M + "luring"));
+		clear.onPress(() -> konfirmasi(SegelKonfirmasi.Tingkat.RINGAN, Component.translatable(M + "kosongkan.tanya"),
+				() -> send(Actions.TECHNIQUE, 0, "clear")));
 		clear.tooltip(() -> List.of(Component.translatable("kultivator.codex.ring.clear"),
-				Component.translatable("kultivator.codex.ring.clear.tip").withStyle(ChatFormatting.GRAY)));
+				Component.translatable(M + "kosongkan.tip").withStyle(ChatFormatting.GRAY)));
 		int gx = x + leftW + 6;
 		listX = gx;
-		grid.layout(gx, y + 12, x + w - gx, h - 12, 26, 32);
+		grid.layout(gx, y + 13, x + w - gx, h - 13, 26, 32);
 		refresh();
-	}
-
-	private boolean asking() {
-		return Util.getMillis() < clearAskUntil;
 	}
 
 	private void refresh() {
@@ -114,7 +150,7 @@ final class LoadoutPage extends CodexPage {
 	}
 
 	@Override
-	void onData() {
+	public void onData() {
 		if (ClientCultivation.version() != builtVersion) {
 			refresh();
 		}
@@ -145,8 +181,11 @@ final class LoadoutPage extends CodexPage {
 
 	@Override
 	protected void drawBehind(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
-		this.mouseX = mouseX;
-		this.mouseY = mouseY;
+	}
+
+	@Override
+	protected void lukis(Lukis l) {
+		GuiGraphicsExtractor g = l.g;
 		CultivationData data = data();
 		String[] slots = TeknikSession.slots();
 		// The dantian.
@@ -156,36 +195,61 @@ final class LoadoutPage extends CodexPage {
 		Brush.disc(g, ringX, ringY, core, Palette.argb(0xB0, Palette.NIGHT_MIST));
 		Brush.ring(g, ringX, ringY, core - 1.0F, core, Palette.GOLD);
 		Brush.ring(g, ringX, ringY, core * 0.55F, core * 0.55F + 0.8F, Palette.argb(0xA0, Palette.GOLD_LIGHT));
-		Brush.fitCentered(g, font, Brush.bold(Component.translatable("kultivator.codex.ring.core")), ringX, ringY - 7.0F, core * 1.8F, Palette.GOLD_LIGHT,
-				0.6F, 0.4F, false);
+		Component coreName = Brush.bold(Component.translatable("kultivator.codex.ring.core"));
+		if (font.width(coreName) <= core * 1.8F) {
+			Brush.centered(g, font, coreName, ringX, ringY - 9.0F, Palette.GOLD_LIGHT, 1.0F, false);
+		}
 		Component used = Component.literal(filled(slots) + "/" + Loadout.SLOTS);
-		Brush.centered(g, font, used, ringX, ringY + 2.0F, Palette.JADE_PALE, 0.6F, false);
+		Brush.centered(g, font, used, ringX, ringY + 1.0F, Palette.JADE_PALE, 1.0F, false);
 
-		int hoveredSocket = socketAt(mouseX, mouseY);
+		boolean free = dragging == null;
 		for (int i = 0; i < Loadout.SLOTS; i++) {
-			drawSocket(g, data, i, slots[i], i == hoveredSocket, i == armed);
-		}
-		if (hoveredSocket >= 0 && dragging == null) {
-			screen.showTooltip(socketTip(data, hoveredSocket, slots[hoveredSocket]));
+			int index = i;
+			float cx = socketX(i);
+			float cy = socketY(i);
+			int r = socket / 2 + 1;
+			int x0 = Math.round(cx) - r;
+			int y0 = Math.round(cy) - r;
+			Lukis.Zona zona = l.zona("soket." + i, x0, y0, x0 + r * 2, y0 + r * 2, () -> pressSocket(index), true, null, true);
+			if (zona != null) {
+				zona.kanan = () -> {
+					assign(index, null);
+					armed = -1;
+				};
+			}
+			boolean over = free && socketAt(l.mx, l.my) == i;
+			drawSocket(g, data, i, slots[i], over || l.difokus("soket." + i), i == armed);
+			if (over) {
+				l.tip(socketTip(data, i, slots[i]));
+			}
 		}
 
-		heading(g, Component.translatable("kultivator.codex.ring.list"), listX, y,
-				Math.max(40.0F, x + w - listX - 2.0F), 0.7F);
-		grid.render(g, font, dragging != null ? -1 : mouseX, dragging != null ? -1 : mouseY, seconds,
-				spec -> KodeksPage.look(data, spec, slots, data.selectedId()));
+		heading(g, Component.translatable("kultivator.codex.ring.list"), listX, y, Math.max(40.0F, x + w - listX - 2.0F), 1.0F);
+		grid.render(g, font, free ? l.mx : -1, free ? l.my : -1, l.detik, spec -> KodeksPage.look(data, spec, slots, data.selectedId()));
 		if (grid.specs().isEmpty()) {
-			Brush.wrap(g, font, Component.translatable("kultivator.codex.ring.none"), listX + 4.0F, y + 18.0F, x + w - listX - 8.0F,
-					Palette.INK_SOFT, 0.65F, false);
+			KeadaanKosong.gambar(l, KeadaanKosong.Gambar.NAMPAN, Component.translatable("kultivator.codex.ring.none"),
+					Component.translatable("kultivator.gui43.p2.ke_kodeks"), () -> HubNav.buka(Tujuan.of(HubNav.TEKNIK, Urutan.ID_KODEKS)), listX, y + 13,
+					x + w, y + h);
+		} else {
+			Lukis.Zona kisi = l.zona(KISI, listX, y + 13, x + w, y + h, this::pakaiTerpilih, true, null, true);
+			if (kisi != null) {
+				kisi.geser = arah -> grid.tombol(arah > 0 ? InputConstants.KEY_RIGHT : InputConstants.KEY_LEFT);
+			}
+			int[] box = grid.kotakTerpilih();
+			if (box != null) {
+				l.fokusCincin(KISI, box[0], box[1], box[2], box[3]);
+			}
 		}
 		TechniqueSpec hovered = grid.hovered();
-		if (hovered != null && dragging == null) {
+		if (hovered != null && free) {
 			List<Component> tip = new ArrayList<>(KodeksPage.tooltip(data, hovered));
 			tip.set(tip.size() - 1, Component.translatable("kultivator.codex.ring.drag").withStyle(ChatFormatting.DARK_GRAY));
-			screen.showTooltip(tip);
+			l.tip(tip);
 		}
-		if (armed >= 0) {
-			Brush.fitCentered(g, font, Component.translatable("kultivator.codex.ring.armed", armed + 1), ringX, y + h - 26.0F, ringR * 2.0F,
-					Palette.SEAL_DARK, 0.6F, 0.4F, false);
+		Component hint = carry != null ? Component.translatable(M + "bawa", carry.displayName())
+				: armed >= 0 ? Component.translatable("kultivator.codex.ring.armed", armed + 1) : null;
+		if (hint != null) {
+			Brush.fitCentered(g, font, hint, ringX, hintY + 1.0F, listX - x - 6.0F, Palette.SEAL_DARK, 1.0F, 1.0F, false);
 		}
 	}
 
@@ -215,9 +279,9 @@ final class LoadoutPage extends CodexPage {
 		float r = socket / 2.0F;
 		TechniqueSpec spec = id.isEmpty() ? null : TechniqueRegistry.byId(id);
 		boolean castable = spec != null && SpecInfo.castable(data, spec);
-		if (isArmed) {
+		if (isArmed || carry != null) {
 			float pulse = 0.5F + 0.5F * (float) Math.sin(Util.getMillis() / 160.0D);
-			Brush.halo(g, cx, cy, r + 1.0F, 3.0F, 0xFF5B3A, pulse);
+			Brush.halo(g, cx, cy, r + 1.0F, 3.0F, 0xFF5B3A, isArmed ? pulse : pulse * 0.5F);
 		} else if (over) {
 			Brush.halo(g, cx, cy, r + 1.0F, 2.5F, 0xFFE07A, 0.8F);
 		}
@@ -235,10 +299,10 @@ final class LoadoutPage extends CodexPage {
 		}
 		// The slot number just outside the socket (gold for the quick seals 1-4).
 		double angle = -Math.PI / 2.0D + Math.PI * 2.0D * index / Loadout.SLOTS;
-		float nx = cx + (float) Math.cos(angle) * (r + 5.0F);
-		float ny = cy + (float) Math.sin(angle) * (r + 5.0F);
-		Brush.centered(g, font, Component.literal(String.valueOf(index + 1)), nx, ny - 2.5F, index < 4 ? Palette.GOLD_DARK : Palette.INK_FAINT,
-				index < 4 ? 0.6F : 0.5F, false);
+		float nx = cx + (float) Math.cos(angle) * (r + 7.0F);
+		float ny = cy + (float) Math.sin(angle) * (r + 7.0F);
+		Brush.centered(g, font, Component.literal(String.valueOf(index + 1)), nx, ny - 4.0F, index < 4 ? Palette.GOLD_DARK : Palette.INK_FAINT,
+				1.0F, false);
 	}
 
 	private List<Component> socketTip(CultivationData data, int index, String id) {
@@ -268,77 +332,145 @@ final class LoadoutPage extends CodexPage {
 		send(Actions.TECHNIQUE, 0, "slot:" + index + ":" + (spec == null ? "-" : spec.id()));
 	}
 
-	@Override
-	protected boolean clickedElsewhere(double mouseX, double mouseY, int button) {
-		int index = socketAt(mouseX, mouseY);
-		if (index >= 0) {
-			if (button == InputConstants.MOUSE_BUTTON_RIGHT) {
-				assign(index, null);
-				armed = -1;
-			} else {
-				armed = armed == index ? -1 : index;
-				UiSound.tab();
+	/** A socket clicked (or Enter on it): the carried card goes in, else the socket is armed / disarmed. */
+	private void pressSocket(int index) {
+		if (carry != null) {
+			assign(index, carry);
+			carry = null;
+			return;
+		}
+		armed = armed == index ? -1 : index;
+	}
+
+	/** Enter on the card list: the selected card into the armed socket (then the next one), else into the first empty socket. */
+	private void pakaiTerpilih() {
+		TechniqueSpec spec = grid.selected();
+		if (spec == null) {
+			grid.tombol(InputConstants.KEY_HOME);
+			return;
+		}
+		if (armed >= 0) {
+			assign(armed, spec);
+			armed = (armed + 1) % Loadout.SLOTS;
+		} else {
+			isiKosong(spec);
+		}
+	}
+
+	/** {@code spec} into the first empty socket; a full ring says so in the footer. */
+	private void isiKosong(TechniqueSpec spec) {
+		String[] slots = TeknikSession.slots();
+		for (int i = 0; i < slots.length; i++) {
+			if (slots[i].isEmpty()) {
+				assign(i, spec);
+				return;
 			}
+		}
+		UiSound.denied();
+		pesan(Component.translatable("kultivator.gui43.p2.cincin_penuh"), Palette.WARN);
+	}
+
+	private static boolean vertikal(int key) {
+		return key == InputConstants.KEY_UP || key == InputConstants.KEY_DOWN || key == InputConstants.KEY_PAGEUP || key == InputConstants.KEY_PAGEDOWN
+				|| key == InputConstants.KEY_HOME || key == InputConstants.KEY_END;
+	}
+
+	@Override
+	public boolean keyPressed(KeyEvent event) {
+		int key = event.key();
+		String focused = fokusRing.kunci();
+		if (!fokusRing.mauTombol() && focused != null && focused.startsWith("soket.")
+				&& (key == InputConstants.KEY_DELETE || key == InputConstants.KEY_BACKSPACE)) {
+			int index = Integer.parseInt(focused.substring("soket.".length()));
+			assign(index, null);
+			armed = -1;
 			return true;
 		}
-		TechniqueSpec spec = grid.at(mouseX, mouseY);
-		if (spec != null && button == InputConstants.MOUSE_BUTTON_LEFT) {
+		if (!fokusRing.mauTombol() && vertikal(key) && !grid.specs().isEmpty()) {
+			if (KISI.equals(focused)) {
+				grid.tombol(key);
+				return true;
+			}
+			if (focused == null && (key == InputConstants.KEY_UP || key == InputConstants.KEY_DOWN)) {
+				fokusRing.set(KISI);
+				if (grid.selected() == null) {
+					grid.tombol(InputConstants.KEY_HOME);
+				}
+				return true;
+			}
+		}
+		return super.keyPressed(event);
+	}
+
+	@Override
+	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+		// The card list before the focus ring: its "kisi" zone covers the cards.
+		boolean onList = !modal() && !grid.specs().isEmpty() && grid.contains(event.x(), event.y());
+		if (!onList && super.mouseClicked(event, doubleClick)) {
+			return true;
+		}
+		TechniqueSpec spec = grid.at(event.x(), event.y());
+		if (onList) {
+			fokusRing.set(KISI);
+		}
+		if (spec != null && event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
+			grid.select(spec);
 			if (armed >= 0) {
 				assign(armed, spec);
 				armed = (armed + 1) % Loadout.SLOTS;
 				return true;
 			}
 			dragging = spec;
-			dragFromX = mouseX;
-			dragFromY = mouseY;
+			dragFromX = event.x();
+			dragFromY = event.y();
 			dragMoved = false;
 			return true;
 		}
-		armed = -1;
+		if (event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
+			armed = -1;
+		}
 		return false;
 	}
 
 	@Override
-	boolean mouseDragged(double mouseX, double mouseY, int button) {
-		if (dragging != null && !dragMoved && Math.abs(mouseX - dragFromX) + Math.abs(mouseY - dragFromY) > 3.0D) {
-			dragMoved = true;
+	public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
+		if (dragging != null) {
+			if (!dragMoved && Math.abs(event.x() - dragFromX) + Math.abs(event.y() - dragFromY) > 3.0D) {
+				dragMoved = true;
+			}
+			return true;
 		}
-		return dragging != null;
+		return super.mouseDragged(event, dx, dy);
 	}
 
 	@Override
-	protected boolean releasedElsewhere(double mouseX, double mouseY, int button) {
+	public boolean mouseReleased(MouseButtonEvent event) {
 		if (dragging == null) {
-			return false;
+			return super.mouseReleased(event);
 		}
 		TechniqueSpec spec = dragging;
 		dragging = null;
-		int index = socketAt(mouseX, mouseY);
+		int index = socketAt(event.x(), event.y());
 		if (index >= 0) {
 			assign(index, spec);
 		} else if (!dragMoved) {
 			// A plain click on a card fills the first empty socket.
-			String[] slots = TeknikSession.slots();
-			for (int i = 0; i < slots.length; i++) {
-				if (slots[i].isEmpty()) {
-					assign(i, spec);
-					break;
-				}
-			}
+			isiKosong(spec);
 		}
 		return true;
 	}
 
 	@Override
-	boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-		return grid.scrolled(mouseX, mouseY, amount);
+	public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+		return grid.scrolled(mouseX, mouseY, scrollY) || super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
 	}
 
 	@Override
-	boolean escape() {
-		if (armed >= 0 || dragging != null) {
+	public boolean mundur() {
+		if (armed >= 0 || dragging != null || carry != null) {
 			armed = -1;
 			dragging = null;
+			carry = null;
 			return true;
 		}
 		return false;

@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:tempat/kota42_nikah",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.tempat.kota42_makam.description"
+    },
+    "icon": {
+      "id": "minecraft:white_banner"
+    },
+    "title": {
+      "translate": "advancement.kultivator.tempat.kota42_makam.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

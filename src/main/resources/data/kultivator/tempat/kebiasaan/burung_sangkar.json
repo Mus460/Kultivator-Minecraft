@@ -1,0 +1,64 @@
+{
+  "_catatan": "Kebiasaan #4 burung_sangkar (DESIGN 42.4.12); ilham: liu niao",
+  "nomor": 4,
+  "siapa": {
+    "umur": [
+      55,
+      200
+    ],
+    "tahap": [
+      "tua"
+    ]
+  },
+  "sesi": [
+    {
+      "jam": [
+        6,
+        6.5
+      ],
+      "peluang": 0.9,
+      "syarat": [
+        "tidak_hujan"
+      ],
+      "kegiatan": "kb_burung_sangkar_jalan",
+      "tujuan": [
+        "@jalan:7"
+      ],
+      "klip": "memandang",
+      "kanan": "kota42:sangkar_burung"
+    },
+    {
+      "jam": [
+        6.5,
+        8
+      ],
+      "butuh": 0,
+      "tujuan": [
+        "gantung_sangkar",
+        "kursi",
+        "obrol"
+      ],
+      "klip": "kota42:gantung_sangkar",
+      "kanan": "kota42:sangkar_burung",
+      "ganti": [
+        {
+          "klip": "kota42:gantung_sangkar"
+        },
+        {
+          "klip": "angguk_dengar",
+          "kanan": ""
+        },
+        {
+          "klip": "duduk_kursi",
+          "kanan": ""
+        },
+        {
+          "klip": "tatap_langit",
+          "kanan": "peluit"
+        }
+      ],
+      "ganti_menit": 10,
+      "pemain": 0
+    }
+  ]
+}

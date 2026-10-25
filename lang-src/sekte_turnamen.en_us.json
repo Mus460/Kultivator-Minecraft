@@ -41,6 +41,7 @@
   "kultivator.sekte.turnamen.ui.judul": "Sect Tournament",
   "kultivator.sekte.turnamen.ui.judul_musim": "Sect Tournament — Season %s",
   "kultivator.sekte.turnamen.ui.memuat": "Unrolling the scroll",
+  "kultivator.sekte.turnamen.ui.mati": "The sect tournament is switched off on this server.",
   "kultivator.sekte.turnamen.ui.papan": "Season Board (Elo)",
   "kultivator.sekte.turnamen.ui.elo_baris": "%s · %s-%s",
   "kultivator.sekte.turnamen.ui.berjalan": "Now running: %s",

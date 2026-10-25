@@ -1,0 +1,777 @@
+{
+  "_dibuat": "tools/gen_kota_hidup_cakap.py dari tools/kota_cakap_sumber (jangan disunting tangan)",
+  "kelompok": "acara",
+  "isi": [
+    {
+      "aturan": "acara.festival",
+      "niat": "BERI_KABAR",
+      "topik": "acara",
+      "syarat": {
+        "acara": [
+          "festival"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "acara.festival.0",
+          "slot": [],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "kampung",
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "acara.festival.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "oasis",
+            "air"
+          ]
+        },
+        {
+          "kunci": "acara.festival.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "acara.festival.3",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "acara.festival.4",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "lanjut": [
+        "acara",
+        "keluarga"
+      ],
+      "gestur": "tepuk_tangan"
+    },
+    {
+      "aturan": "acara.nikah",
+      "niat": "BERI_KABAR",
+      "topik": "acara",
+      "syarat": {
+        "acara": [
+          "nikah"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "acara.nikah.0",
+          "slot": [],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "acara.nikah.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "p",
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "acara.nikah.2",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "acara.nikah.3",
+          "slot": [
+            "$doa"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$doa": {
+          "aturan": "frag.doa",
+          "opsional": 0.4
+        }
+      },
+      "lanjut": [
+        "keluarga",
+        "asmara"
+      ],
+      "gestur": "tertawa"
+    },
+    {
+      "aturan": "acara.makam",
+      "niat": "BERI_KABAR",
+      "topik": "duka",
+      "syarat": {
+        "acara": [
+          "makam"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "acara.makam.0",
+          "slot": [],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "acara.makam.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "acara.makam.2",
+          "slot": [
+            "$keluh"
+          ],
+          "bobot": 1
+        },
+        {
+          "kunci": "acara.makam.3",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$keluh": {
+          "aturan": "seru.keluh",
+          "opsional": 0.5
+        }
+      },
+      "lanjut": [
+        "duka"
+      ],
+      "gestur": "sikap_doa"
+    },
+    {
+      "aturan": "acara.lahir",
+      "niat": "BERI_KABAR",
+      "topik": "keluarga",
+      "syarat": {
+        "acara": [
+          "lahir"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "acara.lahir.0",
+          "slot": [],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "acara.lahir.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "acara.lahir.2",
+          "slot": [
+            "$musim"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$musim": {
+          "tipe": "musim",
+          "dari": "konteks.musim"
+        }
+      },
+      "lanjut": [
+        "keluarga"
+      ],
+      "gestur": "tertawa"
+    },
+    {
+      "aturan": "acara.serangan",
+      "niat": "BERI_KABAR",
+      "topik": "bahaya",
+      "syarat": {
+        "acara": [
+          "serangan",
+          "perang"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "acara.serangan.0",
+          "slot": [],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "acara.serangan.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "varian": [
+            "pelabuhan",
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "acara.serangan.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "acara.serangan.3",
+          "slot": [
+            "$doa"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        },
+        "$doa": {
+          "aturan": "frag.doa",
+          "opsional": 0.4
+        }
+      },
+      "lanjut": [
+        "bahaya",
+        "sekte"
+      ],
+      "gestur": "lari_takut",
+      "seru": "takut"
+    },
+    {
+      "aturan": "acara.kebakaran",
+      "niat": "BERI_KABAR",
+      "topik": "bahaya",
+      "syarat": {
+        "acara": [
+          "kebakaran"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "acara.kebakaran.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "acara.kebakaran.1",
+          "slot": [
+            "$keluh"
+          ],
+          "bobot": 2,
+          "varian": [
+            "air"
+          ]
+        },
+        {
+          "kunci": "acara.kebakaran.2",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "acara.kebakaran.3",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        },
+        "$keluh": {
+          "aturan": "seru.keluh",
+          "opsional": 0.5
+        }
+      },
+      "lanjut": [
+        "bahaya",
+        "tetangga"
+      ],
+      "gestur": "oper_ember"
+    },
+    {
+      "aturan": "acara.copet",
+      "niat": "BERI_KABAR",
+      "topik": "kejahatan",
+      "syarat": {
+        "acara": [
+          "copet_tertangkap"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "acara.copet.0",
+          "slot": [],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "acara.copet.1",
+          "slot": [
+            "$senang"
+          ],
+          "bobot": 2,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "acara.copet.2",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "acara.copet.3",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$senang": {
+          "aturan": "seru.senang",
+          "opsional": 0.5
+        }
+      },
+      "lanjut": [
+        "kejahatan"
+      ],
+      "gestur": "tunjuk"
+    },
+    {
+      "aturan": "acara.pasar_hantu",
+      "niat": "BERI_KABAR",
+      "topik": "pasar_hantu",
+      "syarat": {
+        "acara": [
+          "pasar_hantu"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "acara.pasar_hantu.0",
+          "slot": [],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "acara.pasar_hantu.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "air"
+          ]
+        },
+        {
+          "kunci": "acara.pasar_hantu.2",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "acara.pasar_hantu.3",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {},
+      "lanjut": [
+        "pasar_hantu",
+        "dunia"
+      ],
+      "gestur": "bisik",
+      "seru": "bisik"
+    },
+    {
+      "aturan": "acara.rombongan",
+      "niat": "BERI_KABAR",
+      "topik": "kafilah",
+      "syarat": {
+        "acara": [
+          "rombongan"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "acara.rombongan.0",
+          "slot": [],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "acara.rombongan.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "acara.rombongan.2",
+          "slot": [
+            "$arah"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$arah": {
+          "tipe": "arah",
+          "dari": "konteks.arah"
+        }
+      },
+      "lanjut": [
+        "kafilah",
+        "dagang"
+      ],
+      "gestur": "tunjuk"
+    },
+    {
+      "aturan": "acara.harga_pangan",
+      "niat": "BERI_KABAR",
+      "topik": "harga",
+      "syarat": {
+        "acara": [
+          "harga_pangan"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "acara.harga_pangan.0",
+          "slot": [
+            "$keluh"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "acara.harga_pangan.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "ibukota"
+          ]
+        },
+        {
+          "kunci": "acara.harga_pangan.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$keluh": {
+          "aturan": "seru.keluh",
+          "opsional": 0.5
+        }
+      },
+      "lanjut": [
+        "harga",
+        "kafilah"
+      ],
+      "gestur": "geleng",
+      "seru": "aduh"
+    },
+    {
+      "aturan": "acara.bangun",
+      "niat": "BERI_KABAR",
+      "topik": "kota",
+      "syarat": {
+        "acara": [
+          "kavling_jadi",
+          "pembangunan"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "acara.bangun.0",
+          "slot": [],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "acara.bangun.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "ibukota"
+          ]
+        },
+        {
+          "kunci": "acara.bangun.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {},
+      "lanjut": [
+        "kota"
+      ],
+      "gestur": "tunjuk"
+    },
+    {
+      "aturan": "acara.pelindung",
+      "niat": "BERI_KABAR",
+      "topik": "sekte",
+      "syarat": {
+        "acara": [
+          "pelindung_baru"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "acara.pelindung.0",
+          "slot": [
+            "$sekte_pelindung"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "acara.pelindung.1",
+          "slot": [
+            "$sekte_pelindung"
+          ],
+          "bobot": 2,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "acara.pelindung.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sekte_pelindung": {
+          "tipe": "tempat",
+          "dari": "konteks.sekte_pelindung"
+        }
+      },
+      "lanjut": [
+        "sekte",
+        "kota"
+      ],
+      "gestur": "hormat"
+    },
+    {
+      "aturan": "acara.tahun_baru",
+      "niat": "BERI_KABAR",
+      "topik": "acara",
+      "syarat": {
+        "acara": [
+          "tahun_baru"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "acara.tahun_baru.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "acara.tahun_baru.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "p",
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "acara.tahun_baru.2",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "acara.tahun_baru.3",
+          "slot": [
+            "$tahun"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        },
+        "$tahun": {
+          "tipe": "angka",
+          "dari": "konteks.tahun"
+        }
+      },
+      "lanjut": [
+        "keluarga",
+        "acara"
+      ],
+      "gestur": "ucap_selamat"
+    },
+    {
+      "aturan": "acara.panen",
+      "niat": "BERI_KABAR",
+      "topik": "musim",
+      "syarat": {
+        "acara": [
+          "panen"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "acara.panen.0",
+          "slot": [],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "acara.panen.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "gunung"
+          ]
+        },
+        {
+          "kunci": "acara.panen.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {},
+      "lanjut": [
+        "harga",
+        "musim"
+      ],
+      "gestur": "menari_panen"
+    },
+    {
+      "aturan": "acara.qingming",
+      "niat": "BERI_KABAR",
+      "topik": "duka",
+      "syarat": {
+        "acara": [
+          "qingming"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "acara.qingming.0",
+          "slot": [],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "acara.qingming.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "acara.qingming.2",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "acara.qingming.3",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {},
+      "lanjut": [
+        "keluarga",
+        "duka"
+      ],
+      "gestur": "sapu_makam"
+    }
+  ]
+}

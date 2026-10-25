@@ -1,0 +1,297 @@
+# kebiasaan: corpus of the conversation engine (42K-C, DESIGN 42.5A.8). Source format: gen_kota_hidup_cakap.py.
+# Habit talk (42.4.12 kebiasaan ids): CERITA or PAMER on topik kebiasaan about the speaker's own hobby or quirk.
+@kelompok kebiasaan
+
+== kebiasaan.pemabuk
+niat: CERITA
+topik: kebiasaan
+syarat: kebiasaan=pemabuk jam=malam,larut
+gestur: minum_arak
+seru: mabuk
+- [3] Hik... bulan itu... dua? Tidak, satu... temani aku minum, Saudara! || Hic... that moon... two? No, one... drink with me, friend!
+  ~ kasar: Hik. Minggir. Jalannya goyang sendiri. || Hic. Move. The road's swaying on its own.
+  ~ kuno: Hik... arak ini... membuka meridian... katanya... || Hic... this wine... opens the meridians... they say...
+  ~ pelabuhan: Hik! Kapalnya oleng, Bung... oh, ini daratan. || Hic! The ship's rolling, mate... oh, this is land.
+- [2] Arak di kedai sebelah... hik... dicampur air. Tapi aku tetap mabuk. Hebat, kan? || The wine next door... hic... is watered. But I still got drunk. Impressive, eh?
+  ~ kampung: Tuak Pak Darmo paling mantap, hik... besok kepalaku pasti pusing... || Old Darmo's palm wine is the best, hic... tomorrow my head will pound...
+- Istriku... hik... menunggu di rumah dengan sapu. Aku pulang... nanti saja. || My wife... hic... waits at home with a broom. I'll go home... later.
+  ~ p: Suamiku tidak boleh tahu, hik... aku cuma minum... dua guci... || My husband mustn't know, hic... I only drank... two jugs...
+
+== kebiasaan.kakek_catur
+niat: PAMER
+topik: kebiasaan
+syarat: kebiasaan=kakek_catur
+gestur: catur
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Kau main catur? Tidak? Sayang sekali. Lawanku di sini curang semua. || Do you play chess? No? A pity. Every opponent here cheats.
+  ~ kasar: Jangan berdiri di belakangku. Bayanganmu menutupi papan. || Don't stand behind me. Your shadow covers the board.
+  ~ kuno: Catur mengajarkan bahwa setiap pion bisa menjadi jenderal, {$sebutan}. || Chess teaches that every pawn can become a general, {$sebutan}.
+- [2] Tiga puluh tahun aku main catur di bawah pohon ini. Kalah sekali, menang sepuluh ribu kali. || Thirty years of chess under this tree. Lost once, won ten thousand times.
+  ~ kampung: Pak Lurah kalah catur sama aku kemarin, Nak. Dia ngambek sampai sekarang. || The headman lost to me at chess yesterday, child. Still sulking.
+- Kuda ini... ke sini... tidak, ke sana. Hm. Jangan diganggu, aku berpikir. || Knight here... no, there. Hm. Don't disturb me, I'm thinking.
+
+== kebiasaan.gosip_sumur
+niat: CERITA
+topik: kebiasaan
+syarat: kebiasaan=gosip_sumur
+gestur: bisik
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Di sumur tadi ramai sekali. Kau tidak akan percaya apa yang kudengar. || The well was so busy just now. You won't believe what I heard.
+  ~ kasar: Sumur itu sumber segala kabar. Dan air, kadang-kadang. || The well's the source of all news. And water, sometimes.
+  ~ kuno: Sumur adalah balai sidang para ibu, {$sebutan}. Tidak ada rahasia yang selamat di sana. || The well is the mothers' council hall, {$sebutan}. No secret survives there.
+- [2] Aku menimba air tiga kali sehari. Bukan karena butuh air. Hihi. || I draw water three times a day. Not because I need water. Hehe.
+  ~ kampung: Pancuran itu tempat semua cerita, Nak. Ember cuma alasan. || The spring spout is where every story is, child. The bucket's just an excuse.
+- Kalau mau tahu apa pun tentang kota ini, datang ke sumur pagi-pagi. || If you want to know anything about this town, come to the well early.
+
+== kebiasaan.burung_sangkar
+niat: PAMER
+topik: kebiasaan
+syarat: kebiasaan=burung_sangkar
+gestur: gantung_sangkar
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Dengar kicaunya? Burung ini kubeli dari pedagang selatan. Suaranya seperti seruling. || Hear that song? I bought this bird from a southern trader. It sounds like a flute.
+  ~ kasar: Jangan dekat-dekat. Burungku takut orang asing. || Don't come close. My bird fears strangers.
+  ~ kuno: Burung dalam sangkar pun bernyanyi, {$sebutan}. Itu pelajaran tentang hati. || Even a caged bird sings, {$sebutan}. That's a lesson about the heart.
+- [2] Setiap pagi kubawa sangkarnya jalan-jalan. Burung juga butuh melihat dunia. || Every morning I take the cage for a walk. Birds need to see the world too.
+- Ada lomba kicau minggu depan. Burungku pasti menang. Sudah kuberi makan ulat terbaik. || There's a songbird contest next week. Mine will surely win. Fed it the best grubs.
+  ~ p: Burung ini hadiah dari almarhum suamiku. Setiap ia bernyanyi, aku ingat dia. || This bird was a gift from my late husband. Whenever it sings, I remember him.
+
+== kebiasaan.tai_chi
+niat: CERITA
+topik: kebiasaan
+syarat: kebiasaan=tai_chi jam=subuh,pagi
+gestur: tai_chi_pagi
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Ikut tai chi? Pelan-pelan saja. Napas masuk, napas keluar. || Join the tai chi? Slowly now. Breathe in, breathe out.
+  ~ kasar: Jangan tertawa. Ini bukan menari. || Don't laugh. This isn't dancing.
+  ~ kuno: Gerakan lambat menenangkan Qi, {$sebutan}. Bahkan orang fana bisa merasakannya. || Slow movement calms the Qi, {$sebutan}. Even mortals can feel it.
+- [2] Umurku tujuh puluh, tapi lututku masih kuat. Rahasianya tai chi setiap subuh. || I'm seventy, yet my knees are strong. The secret: tai chi every dawn.
+  ~ gunung: Para biksu muda belajar dariku. Tapi mereka terlalu cepat. Selalu terburu-buru. || The young monks learn from me. But they're too fast. Always rushing.
+- Gerakan ini namanya awan berarak. Coba ikuti tanganku. || This move is called drifting clouds. Follow my hands.
+
+== kebiasaan.pemancing
+niat: CERITA
+topik: kebiasaan
+syarat: kebiasaan=pemancing
+gestur: memancing
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Sst... ikannya hampir makan umpan. Jangan berisik. || Shh... the fish nearly took the bait. Don't make noise.
+  ~ kasar: Pergi sana. Ikanku kabur gara-gara kau. || Go away. My fish fled because of you.
+  ~ kuno: Memancing bukan soal ikan, {$sebutan}. Ini soal menunggu tanpa gelisah. || Fishing isn't about fish, {$sebutan}. It's about waiting without fretting.
+- [2] Seharian di sini, baru dapat satu. Kecil pula. Tapi damai. || All day here and only one catch. A small one too. But peaceful.
+  ~ air: Ikan di kanal ini pintar sekali, Kakak... umpannya dimakan, kailnya ditinggal... || The fish in this canal are so clever, dear... eat the bait, leave the hook...
+- Kemarin aku hampir menangkap ikan mas sebesar lenganku. Sungguh! Talinya putus. || Yesterday I nearly landed a carp as big as my arm. Truly! The line snapped.
+
+== kebiasaan.adu_jangkrik
+niat: PAMER
+topik: kebiasaan
+syarat: kebiasaan=adu_jangkrik,penjudi
+gestur: lempar_dadu
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Lihat jangkrikku! Si Jenderal Hitam. Belum pernah kalah! || Look at my cricket! Black General. Never lost!
+  ~ kasar: Mau taruhan? Dua keping. Jangkrikku pasti menang. || Want a bet? Two coins. My cricket's sure to win.
+  ~ kuno: Bahkan jangkrik kecil punya semangat pendekar, {$sebutan}. || Even a little cricket has a warrior's spirit, {$sebutan}.
+- [2] Semalam aku menang tiga kali di meja dadu. Malam ini pasti lagi! || Won three times at the dice last night. Tonight for sure again!
+  ~ iblis: Sarang judi di gang belakang. Bandarnya jujur. Untuk ukuran kota ini. || Gambling den in the back alley. The house is honest. By this city's standards.
+- Istriku menyembunyikan jangkrikku. Katanya aku lebih sayang jangkrik daripada dia. Hehe. || My wife hid my cricket. Says I love it more than her. Heh.
+  ~ p: Suamiku menyembunyikan jangkrikku. Katanya aku lebih sayang jangkrik daripada dia. Hihi. || My husband hid my cricket. Says I love it more than him. Hehe.
+
+== kebiasaan.penyair
+niat: CERITA
+topik: kebiasaan
+syarat: kebiasaan=penyair,penggemar_opera
+gestur: deklamasi
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+$musim: tipe=musim dari=konteks.musim
+- [3] Bulan di atas kolam, bayangnya pecah oleh angin... ah, bagaimana lanjutannya? || The moon above the pond, its image shattered by the wind... ah, how does it go on?
+  ~ kasar: Puisi? Kau tidak akan mengerti. || Poetry? You wouldn't understand.
+  ~ kuno: Kata-kata yang indah lebih abadi dari batu, {$sebutan}. || Beautiful words outlast stone, {$sebutan}.
+- [2] Opera malam ini tentang selir yang setia. Aku sudah nonton tujuh kali, tetap menangis. || Tonight's opera is about a loyal consort. I've seen it seven times and still weep.
+  ~ air: Kanal di malam hari membuatku ingin menulis puisi, Kakak... dengarlah... || The canal at night makes me want to write poems, dear... listen...
+- Aku menulis puisi untuk setiap musim. Musim {$musim} paling sulit. || I write a poem for each season. {$musim} is the hardest.
+
+== kebiasaan.pemain_erhu
+niat: CERITA
+topik: kebiasaan
+syarat: kebiasaan=pemain_erhu
+gestur: main_erhu
+- [3] Lagu ini tentang perpisahan di jembatan. Dengar, senarnya menangis. || This song is about parting on a bridge. Listen, the strings weep.
+  ~ kasar: Jangan minta lagu riang. Aku tidak tahu lagu riang. || Don't ask for a cheerful tune. I don't know any.
+  ~ kuno: Erhu hanya punya dua senar, namun mampu menyuarakan seribu duka. || The erhu has only two strings, yet it voices a thousand sorrows.
+- [2] Ayahku pemain erhu. Kakekku juga. Lagu ini turun tiga generasi. || My father played erhu. My grandfather too. This tune has come down three generations.
+- Kalau ada koin, taruh di mangkuk. Kalau tidak, dengarkan saja. Musik itu gratis untuk hati. || If you've a coin, drop it in the bowl. If not, just listen. Music's free for the heart.
+
+== kebiasaan.pendoa
+niat: CERITA
+topik: kebiasaan
+syarat: kebiasaan=pendoa_kuil,takhayul
+gestur: sujud_dupa
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Aku baru dari kuil. Ramalan hari ini bagus untukmu juga, kurasa. || I've just come from the temple. Today's fortune is good for you too, I think.
+  ~ kasar: Jangan injak bayanganku. Sial. || Don't step on my shadow. Bad luck.
+  ~ kuno: Dewa-dewa mendengar, {$sebutan}. Hanya saja jawabannya sering terlambat. || The gods hear, {$sebutan}. Only their answers are often late.
+- [2] Jangan menyapu rumah di hari pertama tahun baru. Rezekinya ikut tersapu! || Never sweep the house on new year's day. Your luck gets swept out too!
+  ~ kampung: Kalau burung gagak bunyi tiga kali, ada yang mau meninggal, Nak. Hati-hati. || When a crow caws three times, someone's going to die, child. Beware.
+- Aku membawa jimat dari kuil. Mau satu? Untuk keselamatan di jalan. || I brought charms from the temple. Want one? For safety on the road.
+
+== kebiasaan.layang
+niat: CERITA
+topik: kebiasaan
+syarat: kebiasaan=layang_layang,pencerita_anak
+gestur: main_layangan
+- [3] Angin bagus hari ini! Layanganku bisa terbang sampai menyentuh awan! || Good wind today! My kite could fly up to touch the clouds!
+  ~ kasar: Jangan tarik benangnya! Putus nanti! || Don't pull the string! It'll snap!
+  ~ kuno: Layangan terbang tinggi karena melawan angin, bukan mengikutinya. || A kite flies high by resisting the wind, not following it.
+- [2] Anak-anak menunggu ceritaku setiap sore. Hari ini cerita tentang kelinci di bulan. || The children wait for my story every afternoon. Today it's the rabbit on the moon.
+- Layangan naga ini kubuat tiga hari. Ekornya sepanjang jalan! || I made this dragon kite in three days. Its tail is as long as the street!
+
+== kebiasaan.penyulam
+niat: CERITA
+topik: kebiasaan
+syarat: kebiasaan=penyulam,tari_kipas
+gestur: menyulam
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Sulaman ini burung bangau di atas awan. Sudah sebulan, belum selesai. || This embroidery is a crane above clouds. A month in, still not done.
+  ~ kasar: Jangan sentuh. Benangnya mahal. || Don't touch. The thread is costly.
+  ~ kuno: Setiap tusukan jarum adalah kesabaran yang dirajut, {$sebutan}. || Every needle stroke is patience woven, {$sebutan}.
+- [2] Ini untuk mas kawin anakku. Harus sempurna, tidak boleh ada benang miring. || This is for my daughter's dowry. It must be perfect, not one crooked thread.
+- Tarian kipas butuh pergelangan yang luwes. Lihat. Seperti kupu-kupu. || The fan dance needs a supple wrist. Look. Like a butterfly.
+
+== kebiasaan.tidur_siang
+niat: CERITA
+topik: kebiasaan
+syarat: kebiasaan=tidur_siang,pemalas jam=siang
+gestur: menguap_peregangan
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Huaaam... siang begini paling enak tidur. Kau tidak mengantuk? || Yaaawn... midday's the best time for a nap. Aren't you sleepy?
+  ~ kasar: Jangan bangunkan aku sampai sore. || Don't wake me till evening.
+  ~ kuno: Bahkan naga pun beristirahat di siang hari, {$sebutan}. || Even dragons rest at midday, {$sebutan}.
+- [2] Kerja? Nanti saja. Matahari terlalu terik untuk bekerja. || Work? Later. The sun's too hot for working.
+  ~ kampung: Habis makan, ngantuk, Nak. Ini namanya berkah. || Full belly, sleepy eyes, child. That's what we call a blessing.
+- Bangku ini paling nyaman di kota. Aku sudah mencoba semuanya. || This bench is the comfiest in town. I've tried them all.
+
+== kebiasaan.pesolek
+niat: PAMER
+topik: kebiasaan
+syarat: kebiasaan=pesolek
+gestur: bercermin
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Rambutku rapi, kan? Sejam aku menyisirnya pagi ini. || My hair's neat, isn't it? An hour combing this morning.
+  ~ kasar: Jangan lihat aku dengan baju kotormu itu. || Don't look at me in those dirty clothes.
+  ~ kuno: Penampilan adalah cermin hati, {$sebutan}. Hatiku tentu bersih. Hehe. || Appearance mirrors the heart, {$sebutan}. Mine is spotless, naturally. Heh.
+- [2] Kain sutra ini dari penenun terbaik. Lihat kilaunya di bawah matahari. || This silk is from the finest weaver. See it shine in the sun.
+  ~ l: Topi baru ini membuat semua gadis menoleh. Lihat saja nanti. || This new hat makes every girl turn. Just watch.
+- Hujan? Tidak! Bedakku bisa luntur! || Rain? No! My powder will run!
+
+== kebiasaan.pelit
+niat: CERITA
+topik: kebiasaan
+syarat: kebiasaan=pelit,penabung
+gestur: hitung_koin
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Uang itu tidak tumbuh di pohon. Aku menyimpan setiap keping. || Money doesn't grow on trees. I keep every coin.
+  ~ kasar: Mau pinjam uang? Tidak. Jangan tanya lagi. || Want to borrow money? No. Don't ask again.
+  ~ kuno: Hemat adalah pangkal kaya, {$sebutan}. Leluhurku menyimpan batu roh selama tiga generasi. || Thrift is the root of wealth, {$sebutan}. My forebears hoarded spirit stones for three generations.
+- [2] Teh ini sudah kuseduh empat kali. Masih ada rasanya, kok. || I've brewed these leaves four times. Still some taste left.
+  ~ kampung: Bajuku ini tambalan semua, Nak. Tapi celenganku penuh. Hehe. || My clothes are all patches, child. But my piggy bank is full. Heh.
+- Kenapa membeli kalau bisa meminjam? Kenapa meminjam kalau bisa menunggu orang membuang? || Why buy when you can borrow? Why borrow when you can wait for someone to throw it out?
+
+== kebiasaan.dermawan
+niat: CERITA
+topik: kebiasaan
+syarat: kebiasaan=dermawan
+gestur: beri_koin
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Aku membagi bubur di gerbang setiap pagi. Mau ikut membantu? || I hand out porridge at the gate every morning. Want to help?
+  ~ kasar: Jangan bilang-bilang aku memberi. Nanti semua orang datang. || Don't tell anyone I give. Everyone will come.
+  ~ kuno: Apa yang kita beri akan kembali, {$sebutan}. Mungkin tidak di kehidupan ini. || What we give returns, {$sebutan}. Perhaps not in this life.
+- [2] Panen tahun ini bagus. Sebagian kubagi untuk yang kekurangan. || The harvest is good this year. I'm sharing some with those in need.
+- Orang bilang aku terlalu baik. Tapi apa gunanya kaya sendirian? || Folk say I'm too kind. But what use is being rich alone?
+
+== kebiasaan.pemarah
+niat: CERITA
+topik: kebiasaan
+syarat: kebiasaan=pemarah
+gestur: marah_hentak
+seru: cih
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Apa?! Oh, kau. Kukira anak-anak yang melempar batu lagi. || What?! Oh, you. Thought it was the kids throwing stones again.
+  ~ kasar: Jangan menghalangi jalan! Semua orang lambat hari ini! || Out of the way! Everyone's slow today!
+  ~ kuno: Kesabaranku diuji sejak subuh, {$sebutan}. Mohon jangan menambah ujiannya. || My patience has been tested since dawn, {$sebutan}. Pray don't add to it.
+- [2] Tetanggaku memotong kayu sejak subuh! Bunyinya seperti di dalam kepalaku! || My neighbour's been chopping wood since dawn! It's like it's inside my skull!
+  ~ kampung: Ayam tetangga masuk kebun lagi! Kusembelih juga nanti! || The neighbour's hens are in my garden again! I'll slaughter them one day!
+- Harga naik, pajak naik, darahku juga naik! || Prices up, taxes up, my blood pressure too!
+
+== kebiasaan.kutu_buku
+niat: CERITA
+topik: kebiasaan
+syarat: kebiasaan=kutu_buku
+gestur: jalan_baca
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Maaf, aku tidak lihat jalan. Bab ini terlalu seru. || Sorry, I wasn't looking. This chapter is too gripping.
+  ~ kasar: Sst. Aku sedang membaca. || Shh. I'm reading.
+  ~ kuno: Di dalam kitab ada rumah emas dan wajah giok, kata pepatah lama. || In books there are golden houses and jade faces, says an old saying.
+- [2] Kitab ini tentang pendekar pedang yang kehilangan ingatan. Sudah tiga kali kubaca. || This book is about a swordsman who lost his memory. I've read it three times.
+- Kalau {$sebutan} punya kitab yang belum kubaca, aku rela menukarnya dengan apa saja. || If you have a book I haven't read, {$sebutan}, I'd trade anything for it.
+
+== kebiasaan.kucing
+niat: CERITA
+topik: kebiasaan
+syarat: kebiasaan=teman_kucing
+gestur: beri_makan_kucing
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Pus, pus... Ah, itu kucing-kucingku. Tujuh ekor, semuanya punya nama. || Puss, puss... Ah, those are my cats. Seven, all named.
+  ~ kasar: Jangan tendang kucing itu. Atau aku tendang kau. || Don't kick that cat. Or I'll kick you.
+  ~ kuno: Kucing tahu siapa yang berhati baik, {$sebutan}. Lihat, dia mendekatimu. || Cats know who's kind-hearted, {$sebutan}. Look, it's coming to you.
+- [2] Si Belang melahirkan semalam. Lima anak. Mau satu? || Stripy gave birth last night. Five kittens. Want one?
+- Penjual ikan memberiku sisa ikan setiap sore. Untuk kucing-kucing, tentu. || The fishmonger gives me scraps every evening. For the cats, of course.
+
+== kebiasaan.penyapu
+niat: CERITA
+topik: kebiasaan
+syarat: kebiasaan=penyapu_jalan,pekerja_keras
+gestur: sapu
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+$musim: tipe=musim dari=konteks.musim
+- [3] Jalan ini kusapu setiap pagi. Bersih jalan, bersih hati. || I sweep this road every morning. Clean road, clean heart.
+  ~ kasar: Jangan buang sampah di sini. Aku baru menyapu. || Don't drop rubbish here. I just swept.
+  ~ kuno: Menyapu daun yang gugur adalah meditasi bagi orang fana, {$sebutan}. || Sweeping fallen leaves is a mortal's meditation, {$sebutan}.
+- [2] Daun musim {$musim} ini banyak sekali. Kusapu, angin membawanya lagi. || So many leaves this {$musim}. I sweep, the wind brings them back.
+- Kerja itu obat. Kalau diam, aku malah sakit. || Work is medicine. If I sit still, I fall ill.
+
+== kebiasaan.pelukis_gula
+niat: CERITA
+topik: kebiasaan
+syarat: kebiasaan=pelukis_gula,pecinta_teh
+gestur: lukis_gula
+- [3] Mau gambar apa dari gula? Naga? Burung hong? Satu keping saja! || What shall I draw in sugar? A dragon? A phoenix? Just one coin!
+  ~ kasar: Gula panas. Jangan pegang. || Hot sugar. Don't touch.
+  ~ kuno: Gula meleleh, tapi gambarnya tinggal di ingatan anak-anak. || The sugar melts, but the picture stays in children's memories.
+- [2] Teh ini dari lereng utara. Seduh dengan air yang hampir mendidih, jangan mendidih. || This tea's from the northern slopes. Brew it just off the boil, never boiling.
+- Anak-anak paling suka gambar kelinci. Mudah dibuat, cepat habis dijilat. Hehe. || The children love rabbits most. Easy to draw, quickly licked away. Heh.
+
+== kebiasaan.pengintip
+niat: CERITA
+topik: kebiasaan
+syarat: kebiasaan=pengintip
+gestur: intip
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Aku tidak mengintip. Aku... memperhatikan lingkungan. Itu beda. || I'm not peeping. I'm... observing the neighbourhood. That's different.
+  ~ kasar: Apa? Aku cuma lihat. Tidak dilarang, kan? || What? Just looking. Not forbidden, is it?
+  ~ kuno: Mata yang waspada melihat apa yang tersembunyi, {$sebutan}. || A watchful eye sees what is hidden, {$sebutan}.
+- [2] Tetangga sebelah menerima tamu tiap malam. Aku tahu, aku hitung. || The neighbour gets visitors every night. I know; I count.
+- Dari jendela ini aku bisa melihat seluruh gang. Tidak ada yang terlewat. || From this window I see the whole lane. Nothing slips past.
+
+== kebiasaan.pemuja_kultivator
+niat: CERITA
+topik: kebiasaan
+syarat: kebiasaan=pemuja_kultivator
+gestur: kagum
+seru: oh
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] {$sebutan} kultivator, kan? Boleh kupegang pedangnya? Sebentar saja! || You're a cultivator, aren't you, {$sebutan}? May I hold your sword? Just a moment!
+  ~ kasar: Kultivator! Ajari aku! Aku bayar! Berapa pun! || A cultivator! Teach me! I'll pay! Anything!
+  ~ kuno: Merupakan kehormatan besar bisa berbicara dengan penempuh Dao seperti {$sebutan}. || It's a great honour to speak with a Dao walker like you, {$sebutan}.
+- [2] Aku mengumpulkan cerita semua kultivator yang lewat kota ini. Ceritakan kisahmu! || I collect the tales of every cultivator who passes this town. Tell me yours!
+  ~ kampung: Kak, Kak! Tanda tangani tongkatku, dong! Biar teman-teman percaya! || Mister, mister! Sign my stick, please! So my friends believe!
+- Aku sudah berlatih napas dari kitab yang kubeli di pasar. Belum terasa apa-apa sih. || I've been practising breathing from a manual I bought at market. Haven't felt anything yet, though.

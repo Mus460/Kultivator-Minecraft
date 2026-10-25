@@ -1,0 +1,21 @@
+{
+  "kultivator.gui43.hal.dunia.peta": "Peta",
+  "kultivator.gui43.hal.dunia.perjalanan": "Perjalanan",
+  "kultivator.gui43.sub.peta.dunia": "Dunia",
+  "kultivator.gui43.sub.peta.kota": "Kota",
+  "kultivator.gui43.sub.peta.layanan": "Layanan",
+  "kultivator.gui43.sub.peta.tokoh": "Tokoh",
+  "kultivator.gui43.sub.peta.acara": "Acara",
+  "kultivator.gui43.m12.daftar": "Daftar",
+  "kultivator.gui43.m12.peta": "Peta",
+  "kultivator.gui43.m12.berlayar.judul": "Pilih tujuan: kartu penanda › Berlayar, atau rute di daftar",
+  "kultivator.gui43.m12.berlayar.kembali": "‹ Kemudi",
+  "kultivator.gui43.m12.berlayar.rute": "Rute pelayaran",
+  "kultivator.gui43.m12.berlayar.ulang": "Klik sekali lagi atau Enter untuk berlayar.",
+  "kultivator.gui43.m12.berlayar_ke": "Kapal berlayar ke %s.",
+  "kultivator.gui43.m12.keadaan": "Keadaan kapal",
+  "kultivator.gui43.m12.lambung": "Lambung",
+  "kultivator.gui43.m12.aksi": "Tindakan",
+  "kultivator.gui43.m12.pilih_peta": "Pilih tujuan di Peta",
+  "kultivator.gui43.m12.tak_berlayar": "Kapal sedang tidak berlayar."
+}

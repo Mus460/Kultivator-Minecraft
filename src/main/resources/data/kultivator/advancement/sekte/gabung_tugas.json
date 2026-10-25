@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:sekte/gabung_sumpah",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "kultivator.gabung.adv.tugas.desc"
+    },
+    "icon": {
+      "id": "minecraft:bucket"
+    },
+    "title": {
+      "translate": "kultivator.gabung.adv.tugas.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

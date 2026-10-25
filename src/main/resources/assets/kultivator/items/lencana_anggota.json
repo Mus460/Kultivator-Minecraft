@@ -1,0 +1,68 @@
+{
+ "model": {
+  "type": "minecraft:range_dispatch",
+  "property": "kultivator:pangkat_anggota",
+  "entries": [
+   {
+    "threshold": 3.0,
+    "model": {
+     "type": "minecraft:model",
+     "model": "kultivator:item/gabung/lencana_anggota_perak",
+     "tints": [
+      {
+       "type": "minecraft:constant",
+       "value": -1
+      },
+      {
+       "type": "kultivator:warna_anggota",
+       "default": 6269068
+      },
+      {
+       "type": "minecraft:constant",
+       "value": -1
+      }
+     ]
+    }
+   },
+   {
+    "threshold": 5.0,
+    "model": {
+     "type": "minecraft:model",
+     "model": "kultivator:item/gabung/lencana_anggota_emas",
+     "tints": [
+      {
+       "type": "minecraft:constant",
+       "value": -1
+      },
+      {
+       "type": "kultivator:warna_anggota",
+       "default": 6269068
+      },
+      {
+       "type": "minecraft:constant",
+       "value": -1
+      }
+     ]
+    }
+   }
+  ],
+  "fallback": {
+   "type": "minecraft:model",
+   "model": "kultivator:item/gabung/lencana_anggota_kayu",
+   "tints": [
+    {
+     "type": "minecraft:constant",
+     "value": -1
+    },
+    {
+     "type": "kultivator:warna_anggota",
+     "default": 6269068
+    },
+    {
+     "type": "minecraft:constant",
+     "value": -1
+    }
+   ]
+  }
+ }
+}

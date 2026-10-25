@@ -1,0 +1,74 @@
+{
+  "_catatan": "Kebiasaan #3 gosip_sumur (DESIGN 42.4.12); ilham: Shijing",
+  "nomor": 3,
+  "siapa": {
+    "umur": [
+      25,
+      200
+    ],
+    "kelamin": "wanita",
+    "tahap": [
+      "dewasa",
+      "tua"
+    ]
+  },
+  "bobot": 1.3,
+  "sesi": [
+    {
+      "jam": [
+        7,
+        9
+      ],
+      "peluang": 0.85,
+      "tujuan": [
+        "sumur",
+        "kerja:sumur",
+        "obrol"
+      ],
+      "klip": "basuh_pakaian",
+      "kiri": "ember",
+      "ganti": [
+        {
+          "klip": "basuh_pakaian"
+        },
+        {
+          "klip": "bisik"
+        },
+        {
+          "klip": "basuh_pakaian"
+        },
+        {
+          "klip": "tertawa"
+        }
+      ],
+      "ganti_menit": 5
+    },
+    {
+      "jam": [
+        16,
+        17
+      ],
+      "peluang": 0.7,
+      "syarat": [
+        "tidak_hujan"
+      ],
+      "tujuan": [
+        "sumur",
+        "obrol"
+      ],
+      "klip": "bisik",
+      "ganti": [
+        {
+          "klip": "bisik"
+        },
+        {
+          "klip": "tertawa"
+        },
+        {
+          "klip": "bicara_tangan"
+        }
+      ],
+      "ganti_menit": 4
+    }
+  ]
+}

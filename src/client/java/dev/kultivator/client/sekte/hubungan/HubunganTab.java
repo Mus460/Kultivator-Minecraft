@@ -1,7 +1,7 @@
 package dev.kultivator.client.sekte.hubungan;
 
-import dev.kultivator.client.disciple.DiscipleScreen;
-import dev.kultivator.client.disciple.DiscipleTab;
+import dev.kultivator.client.disciple.MuridPage;
+import dev.kultivator.client.disciple.MuridSub;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.TalismanButton;
@@ -10,7 +10,10 @@ import dev.kultivator.sekte.api.Ikatan;
 import dev.kultivator.sekte.hubungan.HubunganPayloads;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.ChatFormatting;
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.locale.Language;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -22,16 +25,16 @@ import java.util.List;
 
 /**
  * Hubungan, the ties page of the disciple scroll (DESIGN 36.2.2, contract C36.R3; added after P's "Hati" with
- * {@code DiscipleScreen.addExtraTab}). Left: every disciple this one knows, strongest tie first, each with its kind's
+ * Murid › Murid › Hubungan, DESIGN 43.5). Left: every disciple this one knows, strongest tie first, each with its kind's
  * seal, colour and a small affinity bar. Right: the chosen tie: its kind and what it does, the affinity scale from
  * grudge to Dao companions with its thresholds, how often they met, their last shared moments, and the master's talismans
  * for it (swear the oath, bless, forbid, call the honour duel). Reads {@code sekte_hubungan} of the disciple info; the
  * talismans send {@code HubunganPayloads.Aksi} (the server checks everything again).
  */
-public class HubunganTab extends DiscipleTab {
+public class HubunganTab extends MuridSub {
 
 	private static final String K = "kultivator.sekte.hubungan.";
-	private static final int ROW_H = 16;
+	private static final int ROW_H = 18;
 	private static final int BUTTON_H = 16;
 
 	/** One tie as the info sent it. */
@@ -47,8 +50,20 @@ public class HubunganTab extends DiscipleTab {
 	private TalismanButton first;
 	private TalismanButton second;
 
-	public HubunganTab(DiscipleScreen screen) {
-		super(screen);
+	public HubunganTab(MuridPage murid) {
+		super(murid);
+	}
+
+	@Override
+	public String helpTopic() {
+		// the ties between disciples are part (2) of "Sekte yang Hidup"; "ikatan" is the master's bond (Murid › Jalan)
+		return "sekte_hidup";
+	}
+
+	/** Its own scroll when the box is shorter (GUI scale 4): list, detail lines at 1.0 and the talismans. */
+	@Override
+	public int tinggiMin() {
+		return 164;
 	}
 
 	@Override
@@ -61,7 +76,7 @@ public class HubunganTab extends DiscipleTab {
 		return Component.translatable(K + "tab.short");
 	}
 
-	private CompoundTag data() {
+	private CompoundTag hub() {
 		return info().getCompoundOrEmpty("sekte_hubungan");
 	}
 
@@ -69,7 +84,7 @@ public class HubunganTab extends DiscipleTab {
 	public void onView() {
 		String keep = selected >= 0 && selected < ties.size() ? ties.get(selected).soul() : null;
 		ties.clear();
-		ListTag list = data().getListOrEmpty("ties");
+		ListTag list = hub().getListOrEmpty("ties");
 		for (int i = 0; i < list.size(); i++) {
 			CompoundTag t = list.getCompoundOrEmpty(i);
 			List<CompoundTag> history = new ArrayList<>();
@@ -101,7 +116,7 @@ public class HubunganTab extends DiscipleTab {
 	/** The two talismans show the first two actions open for the chosen tie. */
 	private int[] actions() {
 		Tie tie = chosen();
-		if (tie == null || !data().getBooleanOr("own", false)) {
+		if (tie == null || !hub().getBooleanOr("own", false)) {
 			return new int[0];
 		}
 		List<Integer> list = new ArrayList<>();
@@ -172,7 +187,7 @@ public class HubunganTab extends DiscipleTab {
 	private void press(int index) {
 		int[] acts = actions();
 		Tie tie = chosen();
-		String self = data().getStringOr("self", "");
+		String self = hub().getStringOr("self", "");
 		if (index >= acts.length || tie == null || self.isEmpty()) {
 			return;
 		}
@@ -194,8 +209,11 @@ public class HubunganTab extends DiscipleTab {
 	// ================================================================== input
 
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button) {
-		if (super.mouseClicked(mouseX, mouseY, button)) {
+	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+		double mouseX = event.x();
+		double mouseY = event.y();
+		int button = event.button();
+		if (super.mouseClicked(event, doubleClick)) {
 			return true;
 		}
 		if (button != 0 || mouseX < x || mouseX >= x + listW) {
@@ -214,10 +232,35 @@ public class HubunganTab extends DiscipleTab {
 		return false;
 	}
 
+	/** ↑↓ PgUp PgDn Home End walk the ties (←/→ stay the disciple picker). */
 	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-		if (mouseX < x || mouseX >= x + listW || ties.size() <= listRows) {
+	public boolean keyPressed(KeyEvent event) {
+		if (super.keyPressed(event)) {
+			return true;
+		}
+		if (ties.isEmpty()) {
 			return false;
+		}
+		int page = Math.max(1, listRows - 1);
+		int next = event.isUp() ? selected - 1 : event.isDown() ? selected + 1
+				: event.key() == InputConstants.KEY_PAGEUP ? selected - page : event.key() == InputConstants.KEY_PAGEDOWN ? selected + page
+				: event.key() == InputConstants.KEY_HOME ? 0 : event.key() == InputConstants.KEY_END ? ties.size() - 1 : Integer.MIN_VALUE;
+		if (next == Integer.MIN_VALUE) {
+			return false;
+		}
+		next = Math.max(0, Math.min(ties.size() - 1, next));
+		if (next != selected) {
+			selected = next;
+			dev.kultivator.client.screen.ui.UiSound.tab();
+		}
+		scroll = Math.max(0, Math.min(Math.max(0, ties.size() - listRows), Math.max(Math.min(scroll, selected), selected - listRows + 1)));
+		return true;
+	}
+
+	@Override
+	public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double amount) {
+		if (mouseX < x || mouseX >= x + listW || ties.size() <= listRows) {
+			return super.mouseScrolled(mouseX, mouseY, scrollX, amount);
 		}
 		scroll = Math.max(0, Math.min(ties.size() - listRows, scroll - (int) Math.signum(amount)));
 		return true;
@@ -227,15 +270,16 @@ public class HubunganTab extends DiscipleTab {
 
 	@Override
 	protected void drawBehind(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
-		CompoundTag data = data();
-		heading(g, title(), x + 2.0F, y, listW - 4.0F, 0.8F);
+		CompoundTag data = hub();
+		heading(g, title(), x + 2.0F, y, listW - 4.0F, 1.0F);
 		if (mouseX >= x && mouseX < x + listW && mouseY >= y && mouseY < y + 10) {
-			screen.showTooltip(List.of(title().copy().withStyle(ChatFormatting.GOLD), Component.translatable(K + "tab.tip"),
+			tooltip(List.of(title().copy().withStyle(ChatFormatting.GOLD), Component.translatable(K + "tab.tip"),
 					Component.translatable(K + "sumber").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC)));
 		}
 		Component empty = null;
 		if (data.isEmpty()) {
-			empty = Component.translatable(K + "tab.memuat");
+			// Module R off on the server: it never sends the info, so "loading" would never end.
+			empty = Component.translatable(ClientPlayNetworking.canSend(HubunganPayloads.Aksi.TYPE) ? K + "tab.memuat" : K + "tab.mati");
 		} else if (!data.getBooleanOr("on", false)) {
 			empty = Component.translatable(K + "tab.mati");
 		} else if (!data.getBooleanOr("hall", false)) {
@@ -244,16 +288,16 @@ public class HubunganTab extends DiscipleTab {
 			empty = Component.translatable(K + "tab.kosong");
 		}
 		if (empty != null) {
-			Brush.wrap(g, font, empty, x + 4.0F, y + 16.0F, w - 8.0F, Palette.INK_SOFT, 0.8F, false);
+			Brush.wrap(g, font, empty, x + 4.0F, y + 16.0F, w - 8.0F, Palette.INK_SOFT, 1.0F, false);
 			drawSeals(g, seconds);
 			return;
 		}
 		int balance = data.getIntOr("bal", 0);
 		Component mood = Component.translatable(K + "tab.suasana", (balance > 0 ? "+" : "") + balance);
 		int moodColor = balance > 5 ? Palette.JADE_DARK : balance < -5 ? Palette.SEAL_DARK : Palette.INK_SOFT;
-		Brush.fit(g, font, mood, x + listW + 6.0F, y + 1.0F, w - listW - 8.0F, moodColor, 0.7F, 0.45F, false);
+		Brush.fit(g, font, mood, x + listW + 6.0F, y + 1.0F, w - listW - 8.0F, moodColor, 1.0F, 1.0F, false);
 		if (mouseX >= x + listW + 6 && mouseY >= y && mouseY < y + 9) {
-			screen.showTooltip(List.of(mood, Component.translatable(K + "tab.suasana.tip")));
+			tooltip(List.of(mood, Component.translatable(K + "tab.suasana.tip")));
 		}
 		drawList(g, mouseX, mouseY);
 		Tie tie = chosen();
@@ -292,26 +336,20 @@ public class HubunganTab extends DiscipleTab {
 			}
 			g.fill(x + 1, ry + 1, x + 4, ry + ROW_H - 2, Palette.opaque(rgb));
 			// the kind's seal
-			float sx = x + 10.0F;
-			float sy = ry + 7.0F;
-			Brush.disc(g, sx, sy, 5.5F, Palette.argb(0xC0, Palette.darken(Palette.opaque(rgb), 0.15F)));
-			Brush.fitCentered(g, font, Component.literal(HubunganColors.seal(tie.kind())), sx, sy - 3.5F, 9.0F, 0xFFFFFFFF, 0.8F, 0.5F, false);
+			float sx = x + 11.0F;
+			float sy = ry + 8.0F;
+			PelukisIkatan.segelJenis(g, font, sx, sy, 6.0F, tie.kind());
 			float nx = x + 18.0F;
 			float nw = listW - 22.0F;
 			Component name = tie.near() ? tie.name() : tie.name().copy().withStyle(ChatFormatting.ITALIC);
-			Brush.fit(g, font, name, nx, ry + 2.0F, nw * 0.62F, Palette.INK, 0.72F, 0.45F, false);
+			Brush.fit(g, font, name, nx, ry + 1.0F, nw * 0.62F, Palette.INK, 1.0F, 1.0F, false);
 			Component kind = Component.translatable(tie.kind().key());
-			float kw = Math.min(nw * 0.38F, font.width(kind) * 0.6F);
-			Brush.fit(g, font, kind, x + listW - 3.0F - kw, ry + 2.5F, kw, Palette.onPaper(rgb), 0.6F, 0.4F, false);
+			float kw = Math.min(nw * 0.38F, font.width(kind));
+			Brush.fit(g, font, kind, x + listW - 3.0F - kw, ry + 1.0F, kw, Palette.onPaper(rgb), 1.0F, 1.0F, false);
 			// the affinity bar, zero in the middle
 			float bx0 = nx;
 			float bx1 = x + listW - 4.0F;
-			float by = ry + ROW_H - 5.0F;
-			float mid = (bx0 + bx1) / 2.0F;
-			Brush.rect(g, bx0, by, bx1, by + 2.0F, Palette.argb(0x60, Palette.PAPER_SHADE));
-			float end = mid + (bx1 - bx0) / 2.0F * tie.affinity() / 100.0F;
-			Brush.rect(g, Math.min(mid, end), by, Math.max(mid, end), by + 2.0F, Palette.opaque(HubunganColors.affinity(tie.affinity())));
-			Brush.rect(g, mid - 0.5F, by - 1.0F, mid + 0.5F, by + 3.0F, Palette.argb(0x90, Palette.INK_SOFT));
+			PelukisIkatan.bilahAfinitas(g, bx0, bx1, ry + ROW_H - 5.0F, tie.affinity());
 		}
 		if (ties.size() > listRows) {
 			// a slim scroll rail
@@ -329,7 +367,7 @@ public class HubunganTab extends DiscipleTab {
 	private void drawDetail(GuiGraphicsExtractor g, Tie tie, int mouseX, int mouseY, float seconds) {
 		float x0 = x + listW + 6.0F;
 		float width = x + w - x0 - 1.0F;
-		float cy = y + 12.0F;
+		float cy = y + 13.0F;
 		int rgb = HubunganColors.of(tie.kind());
 		panel(g, (int) x0 - 2, (int) cy - 1, (int) (x0 + width) + 1, (int) cy + 26);
 		// the big seal of the kind, softly pulsing for the close ties
@@ -344,32 +382,35 @@ public class HubunganTab extends DiscipleTab {
 		Brush.fitCentered(g, font, Brush.bold(Component.literal(HubunganColors.seal(tie.kind()))), sx, sy - 5.0F, 16.0F, 0xFFFFFFFF, 1.2F, 0.8F, true);
 		float tx = sx + 14.0F;
 		float tw = x0 + width - tx - 2.0F;
-		Brush.fit(g, font, Brush.bold(tie.name()), tx, cy + 2.0F, tw, Palette.INK, 0.9F, 0.5F, false);
+		Brush.fit(g, font, Brush.bold(tie.name()), tx, cy + 2.0F, tw, Palette.INK, 1.0F, 1.0F, false);
 		Component kind = Component.translatable(tie.kind().key()).append(Component.literal("  " + (tie.affinity() > 0 ? "+" : "") + tie.affinity()));
-		Brush.fit(g, font, kind, tx, cy + 13.0F, tw, Palette.onPaper(rgb), 0.72F, 0.45F, false);
+		Brush.fit(g, font, kind, tx, cy + 13.0F, tw, Palette.onPaper(rgb), 1.0F, 1.0F, false);
 		if (mouseX >= x0 && mouseX < x0 + width && mouseY >= cy && mouseY < cy + 26) {
-			screen.showTooltip(List.of(Component.translatable(tie.kind().key()).withColor(rgb), Component.translatable(K + "jenis." + tie.kind().id() + ".desc"),
+			tooltip(List.of(Component.translatable(tie.kind().key()).withColor(rgb), Component.translatable(K + "jenis." + tie.kind().id() + ".desc"),
 					Component.translatable(K + "sumber").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC)));
 		}
 		cy += 31.0F;
 		cy = drawScale(g, tie, x0, cy, width, mouseX, mouseY);
 		Component met = Component.translatable(K + "tab.bertemu", tie.meetings(), tie.bouts());
-		Brush.fit(g, font, met, x0, cy, width, Palette.INK_SOFT, 0.6F, 0.4F, false);
-		cy += 9.0F;
-		cy += Brush.wrap(g, font, Component.translatable(K + "efek." + tie.kind().id()), x0, cy, width, Palette.JADE_DARK, 0.6F, false) + 3.0F;
-		if (!tie.history().isEmpty() && cy < y + h - BUTTON_H - 18) {
-			Brush.fit(g, font, Brush.bold(Component.translatable(K + "tab.kenangan")), x0, cy, width, Palette.SEAL_DARK, 0.62F, 0.4F, false);
-			cy += 8.0F;
+		Brush.fit(g, font, met, x0, cy, width, Palette.INK_SOFT, 1.0F, 1.0F, false);
+		cy += 10.0F;
+		float noteY = y + h - BUTTON_H - 11.0F;
+		g.enableScissor((int) x0, (int) cy, (int) (x0 + width) + 1, (int) noteY);
+		cy += Brush.wrap(g, font, Component.translatable(K + "efek." + tie.kind().id()), x0, cy, width, Palette.JADE_DARK, 1.0F, false) + 3.0F;
+		g.disableScissor();
+		if (!tie.history().isEmpty() && cy < noteY - 20) {
+			Brush.fit(g, font, Brush.bold(Component.translatable(K + "tab.kenangan")), x0, cy, width, Palette.SEAL_DARK, 1.0F, 1.0F, false);
+			cy += 10.0F;
 			for (CompoundTag event : tie.history()) {
-				if (cy > y + h - BUTTON_H - 9) {
+				if (cy > noteY - 10) {
 					break;
 				}
 				int value = event.getIntOr("v", 0);
 				String sign = value > 0 ? "+" + value : Integer.toString(value);
 				Component line = Component.literal(sign + "  ").withColor(value >= 0 ? Palette.JADE_DARK : Palette.SEAL)
 						.append(Component.translatable(reasonKey(event.getStringOr("r", ""))).withColor(Palette.INK_SOFT));
-				Brush.fit(g, font, line, x0 + 2.0F, cy, width - 2.0F, Palette.INK_SOFT, 0.58F, 0.4F, false);
-				cy += 7.5F;
+				Brush.fit(g, font, line, x0 + 2.0F, cy, width - 2.0F, Palette.INK_SOFT, 1.0F, 1.0F, false);
+				cy += 10.0F;
 			}
 		}
 		Component note = null;
@@ -382,7 +423,7 @@ public class HubunganTab extends DiscipleTab {
 			note = Component.translatable(K + "tab.jauh");
 		}
 		if (note != null) {
-			Brush.fit(g, font, note, x0, y + h - BUTTON_H - 9.0F, width, Palette.WARN, 0.6F, 0.4F, false);
+			Brush.fit(g, font, note, x0, noteY, width, Palette.WARN, 1.0F, 1.0F, false);
 		}
 	}
 
@@ -391,24 +432,9 @@ public class HubunganTab extends DiscipleTab {
 		float bx0 = x0 + 2.0F;
 		float bx1 = x0 + width - 2.0F;
 		float by = cy + 2.0F;
-		int segments = 40;
-		for (int i = 0; i < segments; i++) {
-			float a = -100.0F + 200.0F * i / segments;
-			float sx0 = bx0 + (bx1 - bx0) * i / segments;
-			float sx1 = bx0 + (bx1 - bx0) * (i + 1) / segments;
-			Brush.rect(g, sx0, by, sx1, by + 4.0F, Palette.opaque(HubunganColors.affinity(Math.round(a))));
-		}
-		Brush.frame(g, (int) bx0 - 1, (int) by - 1, (int) bx1 + 1, (int) by + 5, Palette.argb(0xA0, Palette.INK_SOFT));
-		int[] marks = {-60, -30, 40, 75, 90};
-		for (int m : marks) {
-			float mx = bx0 + (bx1 - bx0) * (m + 100) / 200.0F;
-			Brush.rect(g, mx - 0.5F, by - 2.0F, mx + 0.5F, by + 6.0F, Palette.argb(0xC0, Palette.INK));
-		}
-		float px = bx0 + (bx1 - bx0) * (tie.affinity() + 100) / 200.0F;
-		Brush.rect(g, px - 1.0F, by - 3.0F, px + 1.0F, by + 7.0F, 0xFFFFFFFF);
-		Brush.frame(g, (int) px - 2, (int) by - 4, (int) px + 2, (int) by + 8, Palette.INK);
+		PelukisIkatan.skala(g, x0, x0 + width, cy, tie.affinity());
 		if (mouseX >= bx0 && mouseX < bx1 && mouseY >= by - 3 && mouseY < by + 8) {
-			screen.showTooltip(List.of(Component.translatable(K + "tab.afinitas", tie.affinity()).withStyle(ChatFormatting.GOLD),
+			tooltip(List.of(Component.translatable(K + "tab.afinitas", tie.affinity()).withStyle(ChatFormatting.GOLD),
 					Component.translatable(K + "tab.skala.tip")));
 		}
 		return cy + 12.0F;

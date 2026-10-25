@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:tempat/kota42_rombongan",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.tempat.kota42_wayang.description"
+    },
+    "icon": {
+      "id": "minecraft:item_frame"
+    },
+    "title": {
+      "translate": "advancement.kultivator.tempat.kota42_wayang.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

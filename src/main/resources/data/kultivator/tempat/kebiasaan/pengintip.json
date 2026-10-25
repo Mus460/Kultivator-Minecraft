@@ -1,0 +1,50 @@
+{
+  "_catatan": "Kebiasaan #28 pengintip (DESIGN 42.4.12)",
+  "nomor": 28,
+  "siapa": {
+    "umur": [
+      45,
+      200
+    ],
+    "tahap": [
+      "tua"
+    ]
+  },
+  "sesi": [
+    {
+      "jam": [
+        10,
+        12
+      ],
+      "peluang": 0.7,
+      "tujuan": [
+        "@jalan:6",
+        "pintu",
+        "obrol"
+      ],
+      "klip": "kota42:intip"
+    },
+    {
+      "jam": [
+        14,
+        15
+      ],
+      "peluang": 0.6,
+      "tujuan": [
+        "@jalan:8",
+        "pintu",
+        "obrol"
+      ],
+      "klip": "kota42:intip",
+      "ganti": [
+        {
+          "klip": "kota42:intip"
+        },
+        {
+          "klip": "bisik"
+        }
+      ],
+      "ganti_menit": 5
+    }
+  ]
+}

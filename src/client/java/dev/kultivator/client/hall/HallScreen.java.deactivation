@@ -1,0 +1,69 @@
+package dev.kultivator.client.hall;
+
+import dev.kultivator.client.hub.HubNav;
+import dev.kultivator.client.screen.ui.SlipTooltip;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
+
+import java.util.List;
+
+/**
+ * Transition shell of the old Sect Hall scroll (DESIGN 43.11 G01, 43.15). The hall's pages now live in the Gulungan Utama
+ * (Sekte › Ikhtisar, Anggota, Bangun, Formasi, Kas &amp; Toko, Kegiatan, Wilayah; {@code HubNav.tujuanAula}); nothing opens
+ * this screen any more. It keeps only what the old {@link HallPage} pages of other modules still call ({@link #info()},
+ * {@link #hallName()}, {@link #showTooltip}) so they compile until they have moved onto {@code Page}; P1 renames this file
+ * and {@link HallPage} to {@code .deactivation} once no importer is left. Should anything still open it, it hands over to
+ * the Gulungan at once.
+ */
+public class HallScreen extends Screen {
+
+	private final int page;
+
+	/** {@code initialPage}: {@code Halls.PAGE_*}. */
+	public HallScreen(int initialPage) {
+		super(Component.translatable("kultivator.spine6.hall.title"));
+		this.page = Math.max(0, initialPage);
+	}
+
+	/** The last hall details (never null). */
+	public CompoundTag info() {
+		return HallClient.info();
+	}
+
+	/** Queues {@code lines} as this frame's tooltip. */
+	public void showTooltip(List<Component> lines) {
+		SlipTooltip.antre(lines);
+	}
+
+	/** The hall's name from the details, else the hall title. */
+	public Component hallName() {
+		return hallName(HallClient.info());
+	}
+
+	/** The hall's name in {@code info} ("Sekte &lt;owner&gt;" when unnamed), else the hall title. */
+	public static Component hallName(CompoundTag info) {
+		Component shown = info.read("name_shown", ComponentSerialization.CODEC).orElse(null);
+		if (shown != null) {
+			return shown;
+		}
+		String name = info.getStringOr("name", "");
+		return name.isEmpty() ? Component.translatable("kultivator.spine6.hall.title") : Component.literal(name);
+	}
+
+	/** Old API: shows {@code index} ({@code Halls.PAGE_*}) in the Gulungan. */
+	public void showPage(int index) {
+		HubNav.buka(HubNav.tujuanAula(index));
+	}
+
+	@Override
+	protected void init() {
+		HubNav.buka(HubNav.tujuanAula(page));
+	}
+
+	@Override
+	public boolean isPauseScreen() {
+		return false;
+	}
+}

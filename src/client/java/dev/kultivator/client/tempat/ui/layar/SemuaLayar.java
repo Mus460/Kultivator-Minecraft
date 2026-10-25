@@ -26,6 +26,8 @@ public final class SemuaLayar {
 			UiTempatClient.daftar(layar, (npc, lembar) -> new LayarLayanan(layar, npc, lembar));
 		}
 		UiTempatClient.daftar(LembarKunci.Yamen.LAYAR, LayarYamen::new);
+		// G64: the Balai Hukum hearing is the court's hearing mode (one court GUI)
+		UiTempatClient.daftar(dev.kultivator.sekte.gabung.ui.GabungLembar.Hukum.LAYAR, LayarYamen::hukum);
 		UiTempatClient.daftar(LembarKunci.Acara.LAYAR, LayarAcara::new);
 		UiTempatClient.daftar(LembarKunci.LapakRekrut.LAYAR, LayarLapakRekrut::new);
 		UiTempatClient.daftar(LembarKunci.Jurnal.LAYAR, LayarJurnal::new);

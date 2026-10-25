@@ -1,54 +1,47 @@
 package dev.kultivator.client.hall;
 
+import dev.kultivator.client.screen.Page;
 import dev.kultivator.client.screen.ui.Brush;
-import dev.kultivator.client.screen.ui.Eased;
+import dev.kultivator.client.screen.ui.DaftarGulir;
 import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.client.screen.ui.JadeCoin;
+import dev.kultivator.client.screen.ui.KeadaanKosong;
+import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
+import dev.kultivator.client.screen.ui.SegelKonfirmasi;
 import dev.kultivator.client.screen.ui.TalismanButton;
-import dev.kultivator.client.screen.ui.Widget;
 import dev.kultivator.network.Actions;
 import dev.kultivator.sect.hall.Halls;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
- * The Calon tablet (DESIGN 20.3.3): one scroll card per candidate with its talismans "Uji (1 Pecahan Kecubung)",
- * "Terima" and "Undang pergi", the next acceptance day, the Hanya Monster coin and, on a war day, "Mulai Perang"
- * (module B's Perang Seratus Dinasti). The cards scroll with the wheel.
+ * Sekte › Anggota › Calon (DESIGN 20.3.3, 43.5): one card per candidate at the gate ({@link CandidateCard}) with the
+ * talismans "Uji (1 Pecahan Kecubung)", "Terima" and "Undang pergi" (confirmed with the seal, 43.7), the next acceptance
+ * day, the Hanya Monster coin and, on a war day, "Mulai Perang" (module B's Perang Seratus Dinasti). The cards sit in one
+ * kit list (wheel, drag bar, ↑↓ keys), one column when narrow, two from 400 px. A visitor of another master's hall sees the
+ * cards read-only. Data: the last {@code HallInfo} ({@link HallClient}), asked for by {@link AnggotaPage}.
  */
-public class CalonPage extends HallPage {
+public class CalonPage extends Page {
 
-	private static final int TOP = 15;
-	private static final int GAP = 4;
-	private static final int CARD_H = 96;
-	private static final long CONFIRM_MILLIS = 3000L;
+	private static final String K = "kultivator.gui43.m06.";
 
-	private final Map<Widget, Integer> baseY = new HashMap<>();
-	private final Eased scrollShown = new Eased(14.0F);
-	private List<Integer> builtFor = List.of();
-	private boolean builtReadonly;
-	private boolean builtWar;
-	private float scroll;
-	private float contentH;
-	private int listY;
-	private int listH;
-	private int dismissArmed = -1;
-	private long dismissUntil;
+	private final DaftarGulir daftar = new DaftarGulir();
+	private final JadeCoin monster;
 
-	public CalonPage(HallScreen screen) {
-		super(screen);
+	public CalonPage() {
+		monster = new JadeCoin(0, 0, 100, 14, () -> Component.translatable("kultivator.hall.ui.monster"),
+				() -> info().getBooleanOr("monster", false));
+		monster.onPress(() -> HallClient.send(Halls.OP_MONSTER, ""));
+		monster.tooltip(() -> List.of(Component.translatable("kultivator.hall.ui.monster"), Component.translatable("kultivator.hall.ui.monster.tip"),
+				Component.translatable("kultivator.hall.ui.monster.source").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC)));
 	}
 
 	@Override
@@ -62,15 +55,24 @@ public class CalonPage extends HallPage {
 	}
 
 	@Override
-	public int icon() {
+	public int glyph() {
 		return Glyphs.STATUS;
 	}
 
-	private boolean readonly() {
+	@Override
+	public String helpTopic() {
+		return "calon";
+	}
+
+	private static CompoundTag info() {
+		return HallClient.info();
+	}
+
+	private static boolean readonly() {
 		return info().getBooleanOr("readonly", false);
 	}
 
-	private List<Integer> ids() {
+	private static List<Integer> ids() {
 		List<Integer> ids = new ArrayList<>();
 		for (Tag tag : info().getListOrEmpty("candidates")) {
 			if (tag instanceof CompoundTag entry) {
@@ -80,7 +82,7 @@ public class CalonPage extends HallPage {
 		return ids;
 	}
 
-	private @Nullable CompoundTag entry(int id) {
+	private static @Nullable CompoundTag entry(int id) {
 		for (Tag tag : info().getListOrEmpty("candidates")) {
 			if (tag instanceof CompoundTag entry && entry.getIntOr("id", -1) == id) {
 				return entry;
@@ -89,104 +91,117 @@ public class CalonPage extends HallPage {
 		return null;
 	}
 
-	@Override
-	protected void build() {
-		baseY.clear();
-		builtFor = ids();
-		builtReadonly = readonly();
-		listY = y + TOP;
-		listH = h - TOP;
-		if (!builtReadonly) {
-			JadeCoin monster = new JadeCoin(x + w - 104, y, 102, 11, () -> Component.translatable("kultivator.hall.ui.monster"),
-					() -> info().getBooleanOr("monster", false));
-			monster.onPress(() -> HallClient.send(Halls.OP_MONSTER, ""));
-			monster.tooltip(() -> List.of(Component.translatable("kultivator.hall.ui.monster"), Component.translatable("kultivator.hall.ui.monster.tip"),
-					Component.translatable("kultivator.hall.ui.monster.source").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC)));
-			add(monster);
-		}
-		int cols = w >= 250 ? 2 : 1;
-		int cardW = (w - 4 - (cols - 1) * GAP) / cols;
-		for (int i = 0; i < builtFor.size(); i++) {
-			int id = builtFor.get(i);
-			int cx = x + (i % cols) * (cardW + GAP);
-			int cy = listY + 2 + (i / cols) * (CARD_H + GAP);
-			CandidateCard card = new CandidateCard(cx, cy, cardW, CARD_H, () -> entry(id));
-			track(add(card), cy);
-			if (builtReadonly) {
-				continue;
-			}
-			int by = cy + CARD_H - CandidateCard.BUTTON_ROW;
-			int third = (cardW - 8) / 3;
-			TalismanButton test = new TalismanButton(cx + 3, by, third, 11, () -> Component.translatable("kultivator.hall.ui.test"));
-			test.enabledWhen(() -> {
-				CompoundTag e = entry(id);
-				return e != null && !e.getBooleanOr("tested", false) && !e.getBooleanOr("testing", false);
-			});
-			test.onPress(() -> HallClient.send(Halls.OP_TEST, String.valueOf(id)));
-			test.tooltip(() -> List.of(Component.translatable("kultivator.hall.ui.test.full"), Component.translatable("kultivator.hall.ui.test.tip"),
-					Component.translatable("kultivator.hall.ui.test.source").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC)));
-			track(add(test), by);
-			TalismanButton accept = new TalismanButton(cx + 4 + third, by, third, 11, () -> Component.translatable("kultivator.hall.ui.accept"));
-			accept.enabledWhen(() -> {
-				CompoundTag e = entry(id);
-				return e != null && !e.getBooleanOr("testing", false);
-			});
-			accept.urgentWhen(() -> {
-				CompoundTag e = entry(id);
-				return e != null && (e.getIntOr("verdict", -1) == 2 || e.getBooleanOr("token", false) || e.getBooleanOr("champion", false));
-			});
-			accept.onPress(() -> HallClient.send(Halls.OP_ACCEPT, String.valueOf(id)));
-			accept.tooltip(() -> acceptTip(id));
-			track(add(accept), by);
-			TalismanButton dismiss = new TalismanButton(cx + 5 + third * 2, by, cardW - 8 - third * 2, 11,
-					() -> Component.translatable(dismissArmed == id && Util.getMillis() < dismissUntil ? "kultivator.hall.ui.dismiss_sure"
-							: "kultivator.hall.ui.dismiss"));
-			dismiss.urgentWhen(() -> dismissArmed == id && Util.getMillis() < dismissUntil);
-			dismiss.onPress(() -> {
-				if (dismissArmed == id && Util.getMillis() < dismissUntil) {
-					dismissArmed = -1;
-					HallClient.send(Halls.OP_DISMISS, String.valueOf(id));
-				} else {
-					dismissArmed = id;
-					dismissUntil = Util.getMillis() + CONFIRM_MILLIS;
-				}
-			});
-			dismiss.tooltip(() -> List.of(Component.translatable("kultivator.hall.ui.dismiss"), Component.translatable("kultivator.hall.ui.dismiss.tip")));
-			track(add(dismiss), by);
-		}
-		int rows = (builtFor.size() + cols - 1) / cols;
-		contentH = rows * (CARD_H + GAP) + 4;
-		builtWar = !builtReadonly && info().getBooleanOr("war_today", false);
-		if (builtWar) {
-			// "Mulai Perang" (DESIGN 20.3.13): module B runs the Hundred Dynasties War; its youths wait as data.
-			TalismanButton war = new TalismanButton(x + w - 210, y, 102, 11, () -> Component.translatable("kultivator.hall.ui.war_start"));
-			war.enabledWhen(this::warWaiting);
-			war.urgentWhen(this::warWaiting);
-			war.onPress(() -> send(Actions.SECT_EVENT, 0, "war_start"));
-			war.tooltip(() -> List.of(Component.translatable("kultivator.hall.ui.war_start"), Component.translatable("kultivator.hall.ui.war_today.tip"),
-					Component.translatable("kultivator.hall.ui.war.source").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC)));
-			add(war);
-		}
-	}
-
 	/** True while today's youths wait for the war to start (module B's part of the details, when it sent one). */
-	private boolean warWaiting() {
+	private static boolean warWaiting() {
 		CompoundTag war = info().getCompoundOrEmpty("sectevent").getCompoundOrEmpty("war");
 		return war.isEmpty() || war.getBooleanOr("today", true) && war.getIntOr("state", 0) == 0;
 	}
 
-	private void track(Widget widget, int y) {
-		baseY.put(widget, y);
+	@Override
+	protected void build() {
+		// immediate page: everything is drawn in lukis()
+	}
+
+	@Override
+	protected void drawBehind(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
+	}
+
+	@Override
+	protected void lukis(Lukis l) {
+		if (HallClient.version() == 0L) {
+			l.tengah(Component.translatable("kultivator.gui43.konteks.memuat"), x + w / 2.0F, y + h / 2.0F - 4.0F, w - 8, l.gaya.teksSamar);
+			return;
+		}
+		CompoundTag info = info();
+		boolean ro = readonly();
+		int bh = tata() == Tata.SEMPIT ? 12 : 14;
+		int top = y;
+		// the next arrival, or today's war (it replaces the arrival; started here or on the Arena)
+		boolean warToday = info.getBooleanOr("war_today", false);
+		long day = info.getLongOr("day", 0L);
+		if (warToday) {
+			l.teks(Brush.bold(Component.translatable("kultivator.hall.ui.war_today")), x + 2, top + 1, w - 4, Palette.SEAL_DARK);
+			if (l.di(x, top, x + w, top + 10)) {
+				l.tip(List.of(Component.translatable("kultivator.hall.ui.war_today"), Component.translatable("kultivator.hall.ui.war_today.tip"),
+						Component.translatable("kultivator.hall.ui.war.source").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC)));
+			}
+		} else {
+			l.teks(Component.translatable(info.getBooleanOr("war_next", false) ? "kultivator.hall.ui.next_war" : "kultivator.hall.ui.next_arrival",
+					info.getLongOr("next_arrival", day)), x + 2, top + 1, w - 4, l.gaya.teks);
+		}
+		top += 12;
+		if (!ro) {
+			Component monsterLabel = Component.translatable("kultivator.hall.ui.monster");
+			monster.x = x + 2;
+			monster.y = top;
+			monster.w = Math.min(w / 2 - 4, l.font.width(monsterLabel) + bh + 10);
+			monster.h = bh;
+			l.widget("monster", monster);
+			if (warToday) {
+				Component label = Component.translatable("kultivator.hall.ui.war_start");
+				int bw = Math.min(w / 2 - 4, TalismanButton.lebar(l.font, label, 60, 150));
+				boolean waiting = warWaiting();
+				if (TalismanButton.gambar(l, "perang", x + w - bw - 2, top, bw, bh, label, waiting, Component.translatable(K + "calon.perang_jalan"),
+						() -> send(Actions.SECT_EVENT, 0, "war_start"), waiting, false)) {
+					l.tip(List.of(label, Component.translatable("kultivator.hall.ui.war_today.tip"),
+							Component.translatable("kultivator.hall.ui.war.source").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC)));
+				}
+			}
+			top += bh + 3;
+		}
+		l.garis(x, x + w, top);
+		top += 3;
+		List<Integer> ids = ids();
+		if (ids.isEmpty()) {
+			KeadaanKosong.gambar(l, KeadaanKosong.Gambar.GULUNGAN, Component.translatable(info.getBooleanOr("dormant", false)
+					? "kultivator.hall.ui.dormant_candidates" : "kultivator.hall.ui.no_candidates", info.getLongOr("next_arrival", day)), null, null,
+					x, top, x + w, y + h);
+			return;
+		}
+		int bhKartu = bh;
+		daftar.gambarKisi(l, "calon", x, top, x + w, y + h, ids.size(), 200, CandidateCard.tinggi(ro),
+				(lk, i, rx0, ry0, rx1, ry1, sorot, pilih) -> kartu(lk, ids.get(i), rx0, ry0, rx1, ry1, sorot, pilih, ro, bhKartu), null, null);
+	}
+
+	/** One candidate: the card, then (owner only) its three talismans in the card's bottom row. */
+	private void kartu(Lukis l, int id, int x0, int y0, int x1, int y1, boolean sorot, boolean pilih, boolean ro, int bh) {
+		CompoundTag e = entry(id);
+		if (e == null) {
+			return;
+		}
+		CandidateCard.gambar(l, e, x0, y0, x1, y1, sorot, pilih);
+		if (ro) {
+			return;
+		}
+		boolean tested = e.getBooleanOr("tested", false);
+		boolean testing = e.getBooleanOr("testing", false);
+		int by = y1 - bh - 3;
+		int third = (x1 - x0 - 10) / 3;
+		Component uji = Component.translatable("kultivator.hall.ui.test");
+		if (TalismanButton.gambar(l, "uji:" + id, x0 + 3, by, third, bh, uji, !tested && !testing,
+				Component.translatable(testing ? "kultivator.hall.ui.testing" : K + "calon.sudah_uji"), () -> HallClient.send(Halls.OP_TEST,
+						String.valueOf(id)))) {
+			l.tip(List.of(Component.translatable("kultivator.hall.ui.test.full"), Component.translatable("kultivator.hall.ui.test.tip"),
+					Component.translatable("kultivator.hall.ui.test.source").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC)));
+		}
+		boolean mendesak = e.getIntOr("verdict", -1) == 2 || e.getBooleanOr("token", false) || e.getBooleanOr("champion", false);
+		if (TalismanButton.gambar(l, "terima:" + id, x0 + 5 + third, by, third, bh, Component.translatable("kultivator.hall.ui.accept"), !testing,
+				Component.translatable("kultivator.hall.ui.testing"), () -> HallClient.send(Halls.OP_ACCEPT, String.valueOf(id)), mendesak && !testing,
+				false)) {
+			l.tip(acceptTip(e));
+		}
+		Component nama = HallUi.name(e, "name");
+		if (TalismanButton.gambar(l, "pergi:" + id, x0 + 7 + third * 2, by, x1 - x0 - 10 - third * 2, bh, Component.translatable(
+				"kultivator.hall.ui.dismiss"), true, null, () -> konfirmasi(SegelKonfirmasi.Tingkat.SEDANG, Component.translatable(K + "calon.usir",
+						nama), () -> HallClient.send(Halls.OP_DISMISS, String.valueOf(id))))) {
+			l.tip(List.of(Component.translatable("kultivator.hall.ui.dismiss"), Component.translatable("kultivator.hall.ui.dismiss.tip")));
+		}
 	}
 
 	/** What accepting this candidate means: the rank it joins at, and the servant fee. */
-	private List<Component> acceptTip(int id) {
+	private static List<Component> acceptTip(CompoundTag e) {
 		List<Component> lines = new ArrayList<>();
 		lines.add(Component.translatable("kultivator.hall.ui.accept"));
-		CompoundTag e = entry(id);
-		if (e == null) {
-			return lines;
-		}
 		if (e.getBooleanOr("token", false) || e.getBooleanOr("champion", false)) {
 			lines.add(Component.translatable("kultivator.hall.ui.accept.token").withStyle(ChatFormatting.GOLD));
 		} else if (!e.getBooleanOr("tested", false)) {
@@ -205,129 +220,8 @@ public class CalonPage extends HallPage {
 			}
 		}
 		if (e.getBooleanOr("gated", false)) {
-			lines.addAll(gatedTip());
+			lines.addAll(CandidateCard.gatedTip());
 		}
 		return lines;
-	}
-
-	/** The verdict seal of a tested candidate: what it means and where the test comes from (empty before the test). */
-	private static List<Component> sealTip(@Nullable CompoundTag e) {
-		if (e == null || !e.getBooleanOr("tested", false) || e.getBooleanOr("token", false) || e.getBooleanOr("champion", false)) {
-			return List.of();
-		}
-		int verdict = e.getIntOr("verdict", 0);
-		List<Component> lines = new ArrayList<>();
-		lines.add(Component.translatable("kultivator.hall.ui.accept." + verdict, 100).withStyle(verdict == 0 ? ChatFormatting.RED
-				: verdict == 1 ? ChatFormatting.YELLOW : ChatFormatting.GREEN));
-		lines.add(Component.translatable("kultivator.hall.ui.test.source").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
-		lines.add(Component.translatable("kultivator.hall.ui.verdict.source").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
-		if (verdict == 0) {
-			lines.add(Component.translatable("kultivator.hall.ui.servant.source").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
-		}
-		return lines;
-	}
-
-	/** The Return of the Mount Hua Sect gate note and its source. */
-	private static List<Component> gatedTip() {
-		return List.of(Component.translatable("kultivator.hall.ui.gated").withStyle(ChatFormatting.GRAY),
-				Component.translatable("kultivator.hall.ui.gated.source").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
-	}
-
-	@Override
-	public boolean needsRebuild() {
-		return !ids().equals(builtFor) || readonly() != builtReadonly || (!readonly() && info().getBooleanOr("war_today", false)) != builtWar;
-	}
-
-	@Override
-	protected boolean visible(Widget widget) {
-		if (baseY.containsKey(widget)) {
-			return widget.y + widget.h > listY && widget.y < listY + listH;
-		}
-		return true;
-	}
-
-	@Override
-	protected int[] clipFor(Widget widget) {
-		return baseY.containsKey(widget) ? new int[]{x, listY, x + w, listY + listH} : null;
-	}
-
-	@Override
-	protected boolean hoverable(double mouseX, double mouseY) {
-		return inside(mouseX, mouseY);
-	}
-
-	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button) {
-		if (mouseY >= listY && mouseY < listY + listH || mouseY < listY) {
-			return super.mouseClicked(mouseX, mouseY, button);
-		}
-		return false;
-	}
-
-	@Override
-	protected void drawBehind(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
-		CompoundTag info = info();
-		float maxScroll = Math.max(0.0F, contentH - listH);
-		scroll = Math.max(0.0F, Math.min(maxScroll, scroll));
-		int offset = Math.round(scrollShown.to(scroll, seconds));
-		for (Map.Entry<Widget, Integer> entry : baseY.entrySet()) {
-			entry.getKey().y = entry.getValue() - offset;
-		}
-		long day = info.getLongOr("day", 0L);
-		Component next = Component.translatable(info.getBooleanOr("war_next", false) ? "kultivator.hall.ui.next_war" : "kultivator.hall.ui.next_arrival",
-				info.getLongOr("next_arrival", day));
-		float topW = builtReadonly ? w - 4.0F : w - 110.0F - (builtWar ? 106.0F : 0.0F);
-		if (info.getBooleanOr("war_today", false)) {
-			// Module B's Hundred Dynasties War replaces today's arrival; it is started on the Arena tablet.
-			Brush.fit(g, font, Brush.bold(Component.translatable("kultivator.hall.ui.war_today")), x + 2.0F, y + 1.0F, topW, Palette.SEAL_DARK, 0.7F,
-					0.45F, false);
-			if (inside(mouseX, mouseY) && mouseY < listY - 2 && mouseX < x + 2.0F + topW) {
-				screen.showTooltip(List.of(Component.translatable("kultivator.hall.ui.war_today"), Component.translatable("kultivator.hall.ui.war_today.tip"),
-						Component.translatable("kultivator.hall.ui.war.source").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC)));
-			}
-		} else {
-			Brush.fit(g, font, next, x + 2.0F, y + 1.0F, topW, Palette.INK, 0.7F, 0.45F, false);
-		}
-		Brush.rect(g, x, listY - 2.0F, x + w, listY - 1.4F, Palette.argb(0x90, Palette.GOLD));
-		if (builtFor.isEmpty()) {
-			Brush.wrap(g, font, Component.translatable(info.getBooleanOr("dormant", false) ? "kultivator.hall.ui.dormant_candidates"
-					: "kultivator.hall.ui.no_candidates", info.getLongOr("next_arrival", day)), x + 6.0F, listY + 8.0F, w - 12.0F, Palette.INK_SOFT, 0.75F,
-					false);
-		}
-	}
-
-	@Override
-	protected void drawAbove(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
-		if (inside(mouseX, mouseY) && mouseY >= listY && mouseY < listY + listH) {
-			// The verdict seal and the gate note explain themselves with their sources; a talisman's own tooltip (shown first) still wins.
-			for (Widget widget : baseY.keySet()) {
-				if (widget instanceof CandidateCard card && widget.contains(mouseX, mouseY)) {
-					List<Component> tip = card.overSeal(mouseX, mouseY) ? sealTip(card.entry()) : List.of();
-					if (tip.isEmpty() && card.gated()) {
-						tip = gatedTip();
-					}
-					if (!tip.isEmpty()) {
-						screen.showTooltip(tip);
-					}
-					break;
-				}
-			}
-		}
-		float maxScroll = Math.max(0.0F, contentH - listH);
-		if (maxScroll > 0.0F) {
-			float bead = listY + 3.0F + (listH - 6.0F) * (scrollShown.get() / maxScroll);
-			int rail = x + w - 1;
-			g.fill(rail, listY, rail + 1, listY + listH, Palette.CORD);
-			Brush.disc(g, rail + 0.5F, bead, 2.2F, Palette.JADE);
-		}
-	}
-
-	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-		if (inside(mouseX, mouseY) && mouseY >= listY) {
-			scroll -= (float) amount * 18.0F;
-			return true;
-		}
-		return false;
 	}
 }

@@ -1,0 +1,82 @@
+{
+  "id": "koreksi",
+  "jenis": "realisasi",
+  "_catatan": "A witness corrects an embellished gossip; then agrees.",
+  "benih_dunia": 42,
+  "masukan": {
+    "niat": "KOREKSI",
+    "pembicara": 503,
+    "hari": 120,
+    "now": 2880000,
+    "cuaca": "cerah",
+    "musim": "semi",
+    "situasi": {
+      "jam": "pagi",
+      "cuaca": "cerah",
+      "musim": "semi",
+      "kelompok": "pekerja",
+      "watak": "ramah",
+      "kebiasaan": [],
+      "sifat": {
+        "H": 10,
+        "E": 0,
+        "X": 20,
+        "A": 30,
+        "C": 10,
+        "O": 0
+      },
+      "wajah": "netral",
+      "tempat": "kota_besar"
+    },
+    "pendengar": null,
+    "kesan": "kenal",
+    "tahu_nama": false,
+    "register": "biasa",
+    "dialek": "ibukota",
+    "nilai": {
+      "fakta.subjek": {
+        "orang": {
+          "nama": "Paman Li",
+          "kelamin": "l",
+          "tahap": "dewasa"
+        }
+      },
+      "lawan": {
+        "orang": {
+          "nama": "Bibi Zhang",
+          "kelamin": "p",
+          "tahap": "dewasa"
+        }
+      }
+    }
+  },
+  "langkah": [
+    {
+      "ubah": {},
+      "harap": {
+        "k": "kultivator.cakap.koreksi.saksi.0",
+        "a": []
+      },
+      "aturan": "koreksi.saksi",
+      "gestur": "geleng",
+      "seru": null,
+      "tik": null,
+      "id_id": "Bukan begitu kejadiannya. Aku ada di sana.",
+      "en_us": "That's not how it went. I was there."
+    },
+    {
+      "ubah": {
+        "niat": "SETUJU"
+      },
+      "harap": {
+        "t": ""
+      },
+      "aturan": null,
+      "gestur": null,
+      "seru": null,
+      "tik": null,
+      "id_id": "",
+      "en_us": ""
+    }
+  ]
+}

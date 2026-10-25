@@ -1,0 +1,12 @@
+{
+  "kultivator.gui43.hal.keabadian.purba": "Primordial",
+  "kultivator.gui43.hal.keabadian.titah": "Decree",
+  "kultivator.gui43.sub.purba.binatang": "Primordial Beasts",
+  "kultivator.gui43.sub.purba.bencana": "Star Calamities",
+  "kultivator.gui43.m16.alam.esensi": "Immortal Essence",
+  "kultivator.gui43.m16.ciptaan.timpa": "Overwrite technique %s in slot %s with a new creation?",
+  "kultivator.gui43.m16.ciptaan.hapus": "Delete technique %s from slot %s? A deleted creation does not come back.",
+  "kultivator.gui43.m16.lelang.batu": "Prices in Origin Stones · in bag: %s",
+  "kultivator.gui43.m16.lelang.baris": "%s. %s — %s",
+  "kultivator.gui43.m16.lelang.tutup": "No auction session right now."
+}

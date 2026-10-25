@@ -1,0 +1,229 @@
+{
+  "id": "sapa_dialek_khusus",
+  "jenis": "realisasi",
+  "_catatan": "Dialect-only greeting rules (iblis, gunung, pelabuhan, oasis, air).",
+  "benih_dunia": 42,
+  "masukan": {
+    "niat": "SAPA",
+    "pembicara": 710,
+    "hari": 120,
+    "now": 2880000,
+    "cuaca": "cerah",
+    "musim": "semi",
+    "situasi": {
+      "jam": "pagi",
+      "cuaca": "cerah",
+      "musim": "semi",
+      "kelompok": "pekerja",
+      "watak": "ramah",
+      "kebiasaan": [],
+      "sifat": {
+        "H": 10,
+        "E": 0,
+        "X": 20,
+        "A": 30,
+        "C": 10,
+        "O": 0
+      },
+      "wajah": "netral",
+      "tempat": "kota_besar"
+    },
+    "pendengar": {
+      "nama": "Han",
+      "kelamin": "l",
+      "tahap": "dewasa",
+      "pemain": true
+    },
+    "kesan": "kenal",
+    "tahu_nama": false,
+    "register": "biasa",
+    "dialek": "iblis"
+  },
+  "langkah": [
+    {
+      "ubah": {
+        "dialek": "iblis",
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "tema_iblis"
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.pekerja.pagi.1",
+        "a": []
+      },
+      "aturan": "sapa.pekerja.pagi",
+      "gestur": "lambai",
+      "seru": null,
+      "tik": null,
+      "id_id": "Pagi! Tungku sudah panas sejak subuh.",
+      "en_us": "Morning! The forge has been hot since dawn."
+    },
+    {
+      "ubah": {
+        "dialek": "gunung",
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "tema_gunung"
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.pekerja.pagi.2",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.kakak.gunung",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "sapa.pekerja.pagi",
+      "gestur": "lambai",
+      "seru": null,
+      "tik": null,
+      "id_id": "Pagi, Saudara. Kalau mau sesuatu dibuat, pagi begini aku masih segar.",
+      "en_us": "Morning, Brother. If you want something made, I'm still fresh this early."
+    },
+    {
+      "ubah": {
+        "dialek": "pelabuhan",
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "tema_pelabuhan"
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.pagi.0.pelabuhan",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.kakak.pelabuhan",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "sapa.pagi",
+      "gestur": "lambai",
+      "seru": null,
+      "tik": null,
+      "id_id": "Pagi, Bung! Angin laut segar, ya?",
+      "en_us": "Morning, mate! Fresh sea wind, eh?"
+    },
+    {
+      "ubah": {
+        "dialek": "oasis",
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "tema_oasis"
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.pagi.1",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.kakak.oasis",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "sapa.pagi",
+      "gestur": "lambai",
+      "seru": null,
+      "tik": null,
+      "id_id": "Pagi, Saudara Tua. Sudah sarapan?",
+      "en_us": "Morning, Elder Brother. Eaten yet?"
+    },
+    {
+      "ubah": {
+        "dialek": "air",
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "tema_air"
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.pekerja.3",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.kakak.air",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "sapa.pekerja",
+      "gestur": "seka_keringat",
+      "seru": null,
+      "tik": null,
+      "id_id": "Ah, Kak. Punggungku pegal, tapi hati senang.",
+      "en_us": "Ah, Dear. My back aches but my heart is glad."
+    }
+  ]
+}

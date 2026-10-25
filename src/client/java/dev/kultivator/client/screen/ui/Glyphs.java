@@ -41,6 +41,10 @@ public final class Glyphs {
 	public static final int JALAN = 13;
 	/** A three-legged cauldron with rising qi: the Kitab Alkimia. */
 	public static final int ALKIMIA = 14;
+	/** A heart: a disciple's Hati (moods and personality). */
+	public static final int HATI = 15;
+	/** Two linked rings: a disciple's Hubungan (ties to others). */
+	public static final int HUBUNGAN = 16;
 
 	/** The Daos around the Bagua, clockwise from the top (Earlier Heaven order: opposites face each other). */
 	public static final Dao[] BAGUA = {Dao.SWORD, Dao.SHADOW, Dao.ICE, Dao.BODY, Dao.SPACE, Dao.LIGHTNING, Dao.FIRE, Dao.LIFE};
@@ -190,6 +194,21 @@ public final class Glyphs {
 				Brush.dot(g, cx - s * 0.3F, cy - s * 0.5F, Math.max(0.7F, s * 0.14F), color);
 				Brush.dot(g, cx + s * 0.25F, cy - s * 0.8F, Math.max(0.7F, s * 0.14F), color);
 			}
+			case HATI -> {
+				// Two lobes over a point narrowing downward.
+				Brush.disc(g, cx - s * 0.4F, cy - s * 0.3F, s * 0.45F, color);
+				Brush.disc(g, cx + s * 0.4F, cy - s * 0.3F, s * 0.45F, color);
+				for (int i = 0; i < 5; i++) {
+					float half = s * 0.85F * (1.0F - i / 5.0F);
+					float y = cy - s * 0.15F + i * s * 0.2F;
+					Brush.rect(g, cx - half, y, cx + half, y + s * 0.2F + 0.5F, color);
+				}
+			}
+			case HUBUNGAN -> {
+				// Two rings linked side by side.
+				Brush.ring(g, cx - s * 0.38F, cy, s * 0.36F, s * 0.62F, color);
+				Brush.ring(g, cx + s * 0.38F, cy, s * 0.36F, s * 0.62F, color);
+			}
 			default -> {
 				// A little scroll: paper between two rods.
 				Brush.rect(g, cx - s, cy - s, cx + s, cy - s + 1.5F, color);
@@ -297,6 +316,102 @@ public final class Glyphs {
 				Brush.ring(g, cx, cy, s * 0.6F, s, color);
 				Brush.dot(g, cx, cy, Math.max(0.6F, s * 0.3F), color);
 			}
+		}
+	}
+
+	/**
+	 * The painted texture icons of the single kit (DESIGN 43.7; were {@code tempat/ui/kit/IkonTempat}, drawn by
+	 * {@code tools/gen_tempat_ui.py}): the icon atlas {@code ikon.png} (slots of {@code LembarKunci.Ikon} plus the slots
+	 * listed here), the lantern, the portrait frame, the stamps and the cloud tile. Same files, same slots.
+	 */
+	public static final class Atlas {
+
+		public static final net.minecraft.resources.Identifier IKON = dev.kultivator.Kultivator.id("textures/gui/tempat/ikon.png");
+		public static final net.minecraft.resources.Identifier LENTERA = dev.kultivator.Kultivator.id("textures/gui/tempat/lentera.png");
+		public static final net.minecraft.resources.Identifier POTRET = dev.kultivator.Kultivator.id("textures/gui/tempat/potret.png");
+		public static final net.minecraft.resources.Identifier STEMPEL = dev.kultivator.Kultivator.id("textures/gui/tempat/stempel.png");
+		public static final net.minecraft.resources.Identifier AWAN = dev.kultivator.Kultivator.id("textures/gui/tempat/awan.png");
+
+		// the kit's own atlas slots (append only, generator list EXTRA)
+		public static final int CENTANG = 112;
+		public static final int SILANG = 113;
+		public static final int SURAT = 114;
+		public static final int KOMPAS = 115;
+		public static final int PIALA = 116;
+		public static final int TANYA = 117;
+		public static final int BINTANG_KOSONG = 118;
+		public static final int BINTANG_PENUH = 119;
+		public static final int DUPA = 120;
+		public static final int BUKU = 121;
+		public static final int GULUNGAN = 122;
+		public static final int KUNCI = 123;
+		public static final int PANAH_KANAN = 124;
+		public static final int PANAH_KIRI = 125;
+		public static final int TONGGAK = 126;
+		public static final int PETA = 127;
+		public static final int HATI = 128;
+		public static final int TUTUP = 129;
+		public static final int RANTAI = 130;
+		public static final int OBOR = 131;
+
+		/** Draws atlas icon {@code slot} scaled to {@code size} px with an ARGB tint; a slot outside 0-255 draws nothing. */
+		public static void ikon(GuiGraphicsExtractor g, int slot, int x, int y, int size, int warna) {
+			if (slot < 0 || slot > 255) {
+				return;
+			}
+			g.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, IKON, x, y, (slot % 16) * 16.0F, (slot / 16) * 16.0F, size, size, 16, 16,
+					256, 256, warna);
+		}
+
+		/** The soft lantern glow (32 x 32) stretched over the box. */
+		public static void cahaya(GuiGraphicsExtractor g, int x, int y, int w, int h, int warna) {
+			g.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, LENTERA, x, y, 96.0F, 0.0F, w, h, 32, 32, 128, 32, warna);
+		}
+
+		/** The portrait frame (56 x 56) scaled to {@code size}. */
+		public static void bingkaiPotret(GuiGraphicsExtractor g, int x, int y, int size) {
+			g.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, POTRET, x, y, 0.0F, 0.0F, size, size, 56, 56, 64, 64, 0xFFFFFFFF);
+		}
+
+		/** Stamps of {@code stempel.png}. */
+		public enum Stempel {
+			BULAT(0, 0, 48, 48),
+			PERSEGI(48, 0, 48, 48),
+			GEMBOK(96, 0, 32, 32),
+			BINTANG(96, 32, 32, 32),
+			PITA_ABU(0, 48, 48, 16),
+			PITA_EMAS(48, 48, 48, 16);
+
+			final int u;
+			final int v;
+			final int w;
+			final int h;
+
+			Stempel(int u, int v, int w, int h) {
+				this.u = u;
+				this.v = v;
+				this.w = w;
+				this.h = h;
+			}
+		}
+
+		public static void stempel(GuiGraphicsExtractor g, Stempel s, int x, int y, int w, int h, int warna) {
+			g.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, STEMPEL, x, y, s.u, s.v, w, h, s.w, s.h, 128, 64, warna);
+		}
+
+		/** A ribbon stretched to width {@code w} keeping its 6 px ends (3-slice). */
+		public static void pita(GuiGraphicsExtractor g, boolean emas, int x, int y, int w, int h, int warna) {
+			Stempel s = emas ? Stempel.PITA_EMAS : Stempel.PITA_ABU;
+			int end = Math.min(6, w / 2);
+			var pipe = net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED;
+			g.blit(pipe, STEMPEL, x, y, s.u, s.v, end, h, end, s.h, 128, 64, warna);
+			if (w > end * 2) {
+				g.blit(pipe, STEMPEL, x + end, y, s.u + end, s.v, w - end * 2, h, s.w - 12, s.h, 128, 64, warna);
+			}
+			g.blit(pipe, STEMPEL, x + w - end, y, s.u + s.w - end, s.v, end, h, end, s.h, 128, 64, warna);
+		}
+
+		private Atlas() {
 		}
 	}
 

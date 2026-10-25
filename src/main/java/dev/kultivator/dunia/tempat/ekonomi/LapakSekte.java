@@ -83,6 +83,14 @@ public final class LapakSekte {
 
 	/** The chance in percent that one stack sells today at relative price {@code h}. */
 	static int peluang(double h) {
+		return peluangLaku(h);
+	}
+
+	/**
+	 * The 38.M.4.1 sale chance in percent at relative price {@code h = price / value} (<= 1.0: 80, <= 1.2: 50, <= 1.5: 20,
+	 * else 0); shared with the player shops of 42.6.2 ({@code TokoPemain}).
+	 */
+	public static int peluangLaku(double h) {
 		return h <= 1.0D ? 80 : h <= 1.2D ? 50 : h <= 1.5D ? 20 : 0;
 	}
 

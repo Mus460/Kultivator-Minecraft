@@ -1,16 +1,16 @@
 package dev.kultivator.client.tempat.ui.tema;
 
+import dev.kultivator.client.screen.ui.Bilah;
 import dev.kultivator.client.screen.ui.Brush;
+import dev.kultivator.client.screen.ui.DaftarGulir;
+import dev.kultivator.client.screen.ui.Glyphs;
+import dev.kultivator.client.screen.ui.LabelHarga;
+import dev.kultivator.client.screen.ui.LencanaPangkat;
+import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
-import dev.kultivator.client.tempat.ui.kit.DaftarGulir;
-import dev.kultivator.client.tempat.ui.kit.IkonTempat;
-import dev.kultivator.client.tempat.ui.kit.LabelHarga;
+import dev.kultivator.client.screen.ui.SegelKonfirmasi;
 import dev.kultivator.client.tempat.ui.kit.Lembar;
-import dev.kultivator.client.tempat.ui.kit.LencanaPangkat;
-import dev.kultivator.client.tempat.ui.kit.Lukis;
-import dev.kultivator.client.tempat.ui.kit.PanelTempat;
 import dev.kultivator.client.tempat.ui.kit.TabLentera;
-import dev.kultivator.client.tempat.ui.kit.TeksTempat;
 import dev.kultivator.client.tempat.ui.kit.TempatWarna;
 import dev.kultivator.dunia.tempat.tema.bersama.TemaLayar.Kontrak;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
@@ -25,11 +25,13 @@ import net.minecraft.util.Util;
  * disciples or players (the board says so under its title). Left the pinned notices (kind, rank seal, reward); right the
  * chosen notice as a large poster with the target, the rank, the reward, the Infami and Gentar it brings, the distance with
  * "Tandai" and "Ambil kontrak". Along the bottom the player's running contracts with their progress, "Serahkan" once
- * done and "Batalkan".
+ * done and "Batalkan" (the one confirm seal, light). A Di Sini page on the single kit (43.8.3); in the narrow layout the
+ * board takes the area and Enter / a second click shows the poster in its place (Esc back).
  */
-public final class LayarKontrak extends LayarTemaDasar {
+public final class LayarKontrak extends TemaHalaman {
 
 	private final DaftarGulir daftar = new DaftarGulir();
+	private boolean rinciSempit;
 
 	public LayarKontrak(int npcId, CompoundTag lembar) {
 		super(Kontrak.LAYAR, npcId, lembar, "layar.kontrak", TempatWarna.Gaya.KERTAS);
@@ -44,7 +46,22 @@ public final class LayarKontrak extends LayarTemaDasar {
 	protected void lembarBaru(boolean buka) {
 		if (buka) {
 			daftar.mulaiUlang(Util.getMillis());
+			rinciSempit = false;
 		}
+	}
+
+	@Override
+	public boolean rinci() {
+		return rinciSempit && tata == Tata.SEMPIT || super.rinci();
+	}
+
+	@Override
+	public boolean mundur() {
+		if (rinciSempit && tata == Tata.SEMPIT) {
+			rinciSempit = false;
+			return true;
+		}
+		return super.mundur();
 	}
 
 	private static int ikonJenis(String jenis) {
@@ -58,17 +75,32 @@ public final class LayarKontrak extends LayarTemaDasar {
 	}
 
 	@Override
-	protected void gambar(Lukis l, int x0, int y0, int x1, int y1) {
+	protected void lukisTema(Lukis l, int x0, int y0, int x1, int y1) {
+		boolean sempit = tata == Tata.SEMPIT;
 		int y = y0;
-		Brush.fitCentered(l.g, font, TemaUi.k("kontrak.aturan"), (x0 + x1) / 2.0F, y, x1 - x0, gaya.teksSamar, 0.7F, 0.55F, false);
-		y += 11;
+		l.tengah(TemaUi.k("kontrak.aturan"), (x0 + x1) / 2.0F, y, x1 - x0, gaya.teksSamar);
+		y += 12;
+		List<Lembar> semua = lembar.daftar(Kontrak.KONTRAK);
+		int sel = daftar.pilihan();
+		boolean poster = sel >= 0 && sel < semua.size();
+		if (sempit && rinciSempit && poster) {
+			// the poster in place of the board (the running contracts come back with the board)
+			poster(l, new Kotak(x0, y, x1, y1));
+			return;
+		}
+		rinciSempit = false;
 		List<Lembar> aktif = lembar.daftar(Kontrak.AKTIF_KONTRAK);
-		int aktifH = aktif.isEmpty() ? 0 : 15 + Math.min(3, aktif.size()) * 17;
-		Kotak[] k = bagi(x0, y, x1, y1 - aktifH);
-		papan(l, k[0]);
-		poster(l, k[1]);
+		int baris = Math.min(sempit ? 2 : 3, aktif.size());
+		int aktifH = aktif.isEmpty() ? 0 : 15 + baris * 17;
+		if (sempit) {
+			papan(l, new Kotak(x0, y, x1, y1 - aktifH));
+		} else {
+			Kotak[] k = bagi(x0, y, x1, y1 - aktifH);
+			papan(l, k[0]);
+			poster(l, k[1]);
+		}
 		if (aktifH > 0) {
-			berjalan(l, aktif, x0, y1 - aktifH + 3, x1, y1);
+			berjalan(l, aktif, baris, x0, y1 - aktifH + 3, x1, y1);
 		}
 	}
 
@@ -86,6 +118,7 @@ public final class LayarKontrak extends LayarTemaDasar {
 			kosong(l, TemaUi.k("kontrak.kosong"), k.x0() + 2, k.y0() + 2, k.x1() - 2, k.y1() - 2);
 			return;
 		}
+		boolean sempit = tata == Tata.SEMPIT;
 		daftar.gambar(l, "kontrak", k.x0() + 3, k.y0() + 3, k.x1() - 3, k.y1() - 3, semua.size(), 26, (lk, i, rx0, ry0, rx1, ry1, sorot, pilih) -> {
 			Lembar e = semua.get(i);
 			float miring = ((i * 37) % 5 - 2) * 0.4F;
@@ -94,15 +127,17 @@ public final class LayarKontrak extends LayarTemaDasar {
 			lk.g.fill(px0, ry0 + 1, rx1 - 2, ry1 - 1, e.bisa() ? pilih ? 0xFFFFF4D8 : sorot ? 0xFFF8ECCC : 0xFFEEE0BC : 0xFFB8B0A0);
 			Brush.disc(lk.g, (px0 + rx1) / 2.0F, ry0 + 2.5F, 1.8F, 0xFFB3281D);
 			TemaUi.ikon(lk.g, ikonJenis(e.s(LembarKunci.JENIS)), px0 + 3, ry0 + 5, 14);
-			lk.teks(e.teks(LembarKunci.NAMA), px0 + 20, ry0 + 4, rx1 - px0 - 50, 0xFF2A1A10, 0.8F);
-			lk.keterangan(e.teks(Kontrak.SASARAN), px0 + 20, ry0 + 14, rx1 - px0 - 50, 0xFF6A5040);
-			LencanaPangkat.gambar(lk, e.s(Kontrak.PANGKAT, "B"), rx1 - 22, ry0 + 3, 12);
-			Component imb = Component.literal(TeksTempat.singkat(e.l(Kontrak.IMBALAN, 0L)));
-			lk.kanan(imb, rx1 - 5, ry0 + 16, 0xFF7A5A10, 0.65F);
+			Component imb = Component.literal(Brush.singkat(e.l(Kontrak.IMBALAN, 0L)));
+			int iw = font.width(imb);
+			int kanan = Math.max(iw, 14) + 26;
+			lk.teks(e.teks(LembarKunci.NAMA), px0 + 20, ry0 + 3, rx1 - px0 - 20 - kanan, 0xFF2A1A10);
+			lk.teks(e.teks(Kontrak.SASARAN), px0 + 20, ry0 + 13, rx1 - px0 - 20 - kanan, 0xFF6A5040);
+			LencanaPangkat.gambar(lk, e.s(Kontrak.PANGKAT, "B"), rx1 - 20, ry0 + 2, 12);
+			lk.kanan(imb, rx1 - 5, ry0 + 15, 0xFF7A5A10);
 			if (!e.bisa()) {
-				IkonTempat.gambar(lk.g, LembarKunci.Ikon.GEMBOK, rx1 - 36, ry0 + 6, 10, 0xFFFFFFFF);
+				Glyphs.Atlas.ikon(lk.g, LembarKunci.Ikon.GEMBOK, rx1 - kanan + 4, ry0 + 8, 10, 0xFFFFFFFF);
 			}
-		}, this::ambil, null);
+		}, sempit ? () -> rinciSempit = true : this::ambil, null);
 	}
 
 	private void ambil() {
@@ -117,7 +152,7 @@ public final class LayarKontrak extends LayarTemaDasar {
 		List<Lembar> semua = lembar.daftar(Kontrak.KONTRAK);
 		int sel = daftar.pilihan();
 		if (sel < 0 || sel >= semua.size()) {
-			PanelTempat.kartu(l.g, gaya, k.x0(), k.y0(), k.x1(), k.y1(), 0.0F, false);
+			l.kartu(k.x0(), k.y0(), k.x1(), k.y1(), 0.0F, false);
 			tengah(l, TemaUi.k("kontrak.pilih"), k);
 			return;
 		}
@@ -134,42 +169,47 @@ public final class LayarKontrak extends LayarTemaDasar {
 		int ink = 0xFF2A1A10;
 		int x0 = k.x0() + 6;
 		int x1 = k.x1() - 6;
-		int y = k.y0() + 5;
-		Brush.fitCentered(l.g, font, Brush.bold(TemaUi.k("kontrak.dicari")), (x0 + x1) / 2.0F, y, x1 - x0, TempatWarna.SEGEL, 1.2F, 0.8F, false);
-		y += 15;
-		int badge = 26;
+		int y = k.y0() + 4;
+		int by = k.y1() - 19;
+		Component dicari = Brush.bold(TemaUi.k("kontrak.dicari"));
+		float s = font.width(dicari) * 1.5F <= x1 - x0 ? 1.5F : 1.0F;
+		Brush.centered(l.g, font, dicari, (x0 + x1) / 2.0F, y, Palette.SEAL, s, false);
+		y += s > 1.0F ? 16 : 12;
+		int badge = 24;
 		LencanaPangkat.gambar(l, e.s(Kontrak.PANGKAT, "B"), x0, y, badge);
-		TemaUi.ikon(l.g, ikonJenis(e.s(LembarKunci.JENIS)), x1 - 22, y + 2, 22);
-		l.teks(Brush.bold(e.teks(Kontrak.SASARAN)), x0 + badge + 4, y + 2, x1 - x0 - badge - 30, ink, 0.95F);
-		l.keterangan(TemaUi.k("kontrak.jenis." + jenisAman(e.s(LembarKunci.JENIS))), x0 + badge + 4, y + 14, x1 - x0 - badge - 30, 0xFF6A5040);
-		y += badge + 4;
-		l.teks(e.teks(LembarKunci.NAMA), x0, y, x1 - x0, 0xFF4A3420, 0.8F);
-		y += 12;
-		l.keterangan(TemaUi.k("kontrak.imbalan"), x0, y + 1, 60, 0xFF6A5040);
-		LabelHarga.gambar(l, e.l(Kontrak.IMBALAN, 0L), -1L, x1, y, true, 1.0F, false);
+		TemaUi.ikon(l.g, ikonJenis(e.s(LembarKunci.JENIS)), x1 - 20, y + 2, 20);
+		l.teks(Brush.bold(e.teks(Kontrak.SASARAN)), x0 + badge + 4, y + 2, x1 - x0 - badge - 28, ink);
+		l.teks(TemaUi.k("kontrak.jenis." + jenisAman(e.s(LembarKunci.JENIS))), x0 + badge + 4, y + 13, x1 - x0 - badge - 28, 0xFF6A5040);
+		y += badge + 3;
+		l.teks(e.teks(LembarKunci.NAMA), x0, y, x1 - x0, 0xFF4A3420);
+		y += 11;
+		l.teks(TemaUi.k("kontrak.imbalan"), x0, y + 1, x1 - x0 - 70, 0xFF6A5040);
+		LabelHarga.gambar(l, e.l(Kontrak.IMBALAN, 0L), -1L, x1, y + 1, true, false);
 		y += 12;
 		int inf = e.i(Kontrak.INFAMI, 0);
 		int gen = e.i(Kontrak.GENTAR, 0);
+		int half = (x1 - x0) / 2;
 		TemaUi.ikon(l.g, TemaUi.I_INFAMI, x0, y - 1, 10);
-		l.keterangan(TemaUi.k("kontrak.infami", delta(inf)), x0 + 12, y, (x1 - x0) / 2 - 14, 0xFF4A3420);
-		TemaUi.ikon(l.g, TemaUi.I_GENTAR, x0 + (x1 - x0) / 2, y - 1, 10);
-		l.keterangan(TemaUi.k("kontrak.gentar", delta(gen)), x0 + (x1 - x0) / 2 + 12, y, (x1 - x0) / 2 - 12, 0xFF4A3420);
+		l.teks(TemaUi.k("kontrak.infami", delta(inf)), x0 + 12, y, half - 14, 0xFF4A3420);
+		TemaUi.ikon(l.g, TemaUi.I_GENTAR, x0 + half, y - 1, 10);
+		l.teks(TemaUi.k("kontrak.gentar", delta(gen)), x0 + half + 12, y, half - 12, 0xFF4A3420);
 		y += 12;
-		if (e.ada(LembarKunci.JARAK)) {
-			l.keterangan(TemaUi.k("kontrak.jarak", e.i(LembarKunci.JARAK, 0)), x0, y, x1 - x0 - 60, 0xFF6A5040);
+		if (e.ada(LembarKunci.JARAK) && y + 14 <= by - 2) {
+			l.teks(TemaUi.k("kontrak.jarak", e.i(LembarKunci.JARAK, 0)), x0, y + 2, x1 - x0 - 62, 0xFF6A5040);
 			if (e.ada(LembarKunci.X)) {
-				tombolOp(l, "tandai", x1 - 56, y - 3, 56, 13, TemaUi.k("kontrak.tandai"), true, null,
+				tombolOp(l, "tandai", x1 - 58, y - 1, 58, 14, TemaUi.k("kontrak.tandai"), true, null,
 						LembarKunci.op(LembarKunci.OP_TANDAI, e.i(LembarKunci.X, 0), e.i(LembarKunci.Z, 0)));
 			}
 		}
-		int by = k.y1() - 20;
 		boolean sudah = false;
 		for (Lembar a : lembar.daftar(Kontrak.AKTIF_KONTRAK)) {
 			sudah |= a.id().equals(e.id());
 		}
 		Component alasan = sudah ? TemaUi.k("kontrak.sudah") : !e.bisa() ? alasanKeadaan(e) : null;
+		if (by - 30 > y + 14) {
+			Glyphs.Atlas.stempel(l.g, Glyphs.Atlas.Stempel.BULAT, x1 - 30, by - 30, 28, 28, Palette.argb(0x90, 0xB3281D));
+		}
 		tombolOp(l, "ambil", x0, by, x1 - x0, 15, TemaUi.k("kontrak.ambil"), e.bisa() && !sudah, alasan, LembarKunci.op(Kontrak.OP_AMBIL, e.id()));
-		IkonTempat.stempel(l.g, IkonTempat.Stempel.BULAT, x1 - 30, by - 34, 28, 28, Palette.argb(0x90, 0xB3281D));
 	}
 
 	private static String jenisAman(String jenis) {
@@ -179,23 +219,40 @@ public final class LayarKontrak extends LayarTemaDasar {
 		};
 	}
 
-	private void berjalan(Lukis l, List<Lembar> aktif, int x0, int y0, int x1, int y1) {
-		PanelTempat.garis(l.g, gaya, x0, x1, y0 - 2);
-		l.keterangan(TemaUi.k("kontrak.berjalan", aktif.size()), x0, y0 + 1, x1 - x0, gaya.teksLemah);
-		int y = y0 + 11;
-		for (int i = 0; i < aktif.size() && i < 3; i++) {
+	private void berjalan(Lukis l, List<Lembar> aktif, int baris, int x0, int y0, int x1, int y1) {
+		l.garis(x0, x1, y0 - 2);
+		l.teks(TemaUi.k("kontrak.berjalan", aktif.size()), x0, y0 + 1, x1 - x0, gaya.teksLemah);
+		int y = y0 + 12;
+		boolean sempit = tata == Tata.SEMPIT;
+		int bw = sempit ? 52 : 64;
+		for (int i = 0; i < baris; i++) {
 			Lembar a = aktif.get(i);
 			float f = Math.max(0.0F, Math.min(1.0F, a.f(LembarKunci.KEMAJUAN, 0.0F)));
 			boolean selesai = f >= 0.999F;
-			int bw = 64;
-			l.teks(a.teks(LembarKunci.NAMA), x0, y + 1, (x1 - x0) * 0.34F, gaya.teks, 0.75F);
-			int mx0 = x0 + Math.round((x1 - x0) * 0.36F);
-			int mx1 = x1 - bw * 2 - 50;
-			TemaUi.meter(l, -1, mx0, y + 2, Math.max(mx0 + 20, mx1), f, selesai ? TempatWarna.OK : TempatWarna.PERINGATAN, -1.0F);
-			l.keterangan(TeksTempat.hari(a.i(LembarKunci.SISA_HARI, 0)), Math.max(mx0 + 22, mx1 + 3), y + 2, 44, gaya.teksSamar);
-			tombolOp(l, "serah" + i, x1 - bw * 2 - 3, y, bw, 13, TemaUi.k("kontrak.serah"), selesai, selesai ? null : TemaUi.k("kontrak.belum"),
+			int warna = selesai ? Palette.OK : Palette.PERINGATAN;
+			Component sisa = Brush.hari(a.i(LembarKunci.SISA_HARI, 0));
+			if (sempit) {
+				// name and days over a thin progress bar, the two buttons on the right
+				int tx1 = x1 - bw * 2 - 8;
+				int sw = font.width(sisa);
+				l.teks(a.teks(LembarKunci.NAMA), x0, y, tx1 - x0 - sw - 4, gaya.teks);
+				l.kanan(sisa, tx1, y, gaya.teksSamar);
+				Bilah.gambar(l, x0, y + 11, tx1, f, warna, null);
+			} else {
+				l.teks(a.teks(LembarKunci.NAMA), x0, y + 2, (x1 - x0) * 0.34F, gaya.teks);
+				int mx0 = x0 + Math.round((x1 - x0) * 0.36F);
+				int mx1 = x1 - bw * 2 - 50;
+				TemaUi.meter(l, -1, mx0, y + 2, Math.max(mx0 + 20, mx1), f, warna, -1.0F);
+				l.samar(sisa, Math.max(mx0 + 22, mx1 + 3), y + 2, 44);
+			}
+			tombolOp(l, "serah" + i, x1 - bw * 2 - 3, y, bw, 14, TemaUi.k("kontrak.serah"), selesai, selesai ? null : TemaUi.k("kontrak.belum"),
 					LembarKunci.op(Kontrak.OP_SERAH, a.id()));
-			tombolOp(l, "batal" + i, x1 - bw, y, bw, 13, TemaUi.k("kontrak.batal"), true, null, LembarKunci.op(Kontrak.OP_BATAL, a.id()));
+			Component batal = TemaUi.k("kontrak.batal");
+			String op = LembarKunci.op(Kontrak.OP_BATAL, a.id());
+			boolean baca = !tulisBoleh();
+			tombol(l, "batal" + i, x1 - bw, y, bw, 14, batal, !baca, baca ? alasanBaca() : null,
+					() -> konfirmasi(SegelKonfirmasi.Tingkat.RINGAN, Component.translatable("kultivator.gui43.konteks.yakin", batal).append(" ")
+							.append(a.teks(LembarKunci.NAMA)), () -> kirim(op)));
 			y += 17;
 		}
 	}

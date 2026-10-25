@@ -589,6 +589,34 @@
                 "north": "false",
                 "south": "true",
                 "waterlogged": "false",
+                "west": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_fence",
+            "properties": {
+              "east": "true",
+              "north": "false",
+              "south": "true",
+              "waterlogged": "false",
+              "west": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_fence",
+              "properties": {
+                "east": "true",
+                "north": "false",
+                "south": "true",
+                "waterlogged": "false",
                 "west": "true"
               }
             }
@@ -723,6 +751,84 @@
           "input_predicate": {
             "predicate_type": "minecraft:blockstate_match",
             "block_state": {
+              "id": "minecraft:jungle_fence_gate",
+              "properties": {
+                "facing": "east",
+                "in_wall": "false",
+                "open": "false",
+                "powered": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_fence_gate",
+            "properties": {
+              "facing": "east",
+              "in_wall": "false",
+              "open": "false",
+              "powered": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_fence_gate",
+              "properties": {
+                "facing": "north",
+                "in_wall": "false",
+                "open": "false",
+                "powered": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_fence_gate",
+            "properties": {
+              "facing": "north",
+              "in_wall": "false",
+              "open": "false",
+              "powered": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_fence_gate",
+              "properties": {
+                "facing": "west",
+                "in_wall": "false",
+                "open": "false",
+                "powered": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_fence_gate",
+            "properties": {
+              "facing": "west",
+              "in_wall": "false",
+              "open": "false",
+              "powered": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
               "id": "minecraft:jungle_leaves",
               "properties": {
                 "distance": "1",
@@ -821,6 +927,26 @@
           "input_predicate": {
             "predicate_type": "minecraft:blockstate_match",
             "block_state": {
+              "id": "minecraft:jungle_pressure_plate",
+              "properties": {
+                "powered": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_pressure_plate",
+            "properties": {
+              "powered": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
               "id": "minecraft:jungle_slab",
               "properties": {
                 "type": "bottom",
@@ -893,6 +1019,32 @@
             "block_state": {
               "id": "minecraft:jungle_stairs",
               "properties": {
+                "facing": "east",
+                "half": "top",
+                "shape": "straight",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_stairs",
+            "properties": {
+              "facing": "east",
+              "half": "top",
+              "shape": "straight",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_stairs",
+              "properties": {
                 "facing": "north",
                 "half": "bottom",
                 "shape": "straight",
@@ -908,6 +1060,32 @@
             "properties": {
               "facing": "north",
               "half": "bottom",
+              "shape": "straight",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_stairs",
+              "properties": {
+                "facing": "north",
+                "half": "top",
+                "shape": "straight",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_stairs",
+            "properties": {
+              "facing": "north",
+              "half": "top",
               "shape": "straight",
               "waterlogged": "false"
             }
@@ -943,6 +1121,60 @@
           "input_predicate": {
             "predicate_type": "minecraft:blockstate_match",
             "block_state": {
+              "id": "minecraft:jungle_stairs",
+              "properties": {
+                "facing": "west",
+                "half": "bottom",
+                "shape": "straight",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_stairs",
+            "properties": {
+              "facing": "west",
+              "half": "bottom",
+              "shape": "straight",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_trapdoor",
+              "properties": {
+                "facing": "east",
+                "half": "bottom",
+                "open": "true",
+                "powered": "false",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_trapdoor",
+            "properties": {
+              "facing": "east",
+              "half": "bottom",
+              "open": "true",
+              "powered": "false",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
               "id": "minecraft:jungle_trapdoor",
               "properties": {
                 "facing": "east",
@@ -989,6 +1221,34 @@
             "properties": {
               "facing": "east",
               "half": "top",
+              "open": "true",
+              "powered": "false",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_trapdoor",
+              "properties": {
+                "facing": "north",
+                "half": "bottom",
+                "open": "true",
+                "powered": "false",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_trapdoor",
+            "properties": {
+              "facing": "north",
+              "half": "bottom",
               "open": "true",
               "powered": "false",
               "waterlogged": "false"
@@ -1058,6 +1318,34 @@
               "id": "minecraft:jungle_trapdoor",
               "properties": {
                 "facing": "south",
+                "half": "bottom",
+                "open": "true",
+                "powered": "false",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_trapdoor",
+            "properties": {
+              "facing": "south",
+              "half": "bottom",
+              "open": "true",
+              "powered": "false",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_trapdoor",
+              "properties": {
+                "facing": "south",
                 "half": "top",
                 "open": "false",
                 "powered": "false",
@@ -1102,6 +1390,62 @@
               "facing": "south",
               "half": "top",
               "open": "true",
+              "powered": "false",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_trapdoor",
+              "properties": {
+                "facing": "west",
+                "half": "bottom",
+                "open": "true",
+                "powered": "false",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_trapdoor",
+            "properties": {
+              "facing": "west",
+              "half": "bottom",
+              "open": "true",
+              "powered": "false",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_trapdoor",
+              "properties": {
+                "facing": "west",
+                "half": "top",
+                "open": "false",
+                "powered": "false",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_trapdoor",
+            "properties": {
+              "facing": "west",
+              "half": "top",
+              "open": "false",
               "powered": "false",
               "waterlogged": "false"
             }
@@ -1189,6 +1533,28 @@
           },
           "output_state": {
             "id": "minecraft:red_sandstone"
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:sandstone_slab",
+              "properties": {
+                "type": "bottom",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:red_sandstone_slab",
+            "properties": {
+              "type": "bottom",
+              "waterlogged": "false"
+            }
           }
         },
         {
@@ -1867,6 +2233,50 @@
           "input_predicate": {
             "predicate_type": "minecraft:blockstate_match",
             "block_state": {
+              "id": "minecraft:smooth_sandstone_slab",
+              "properties": {
+                "type": "bottom",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:smooth_red_sandstone_slab",
+            "properties": {
+              "type": "bottom",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:smooth_sandstone_slab",
+              "properties": {
+                "type": "top",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:smooth_red_sandstone_slab",
+            "properties": {
+              "type": "top",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
               "id": "minecraft:smooth_sandstone_stairs",
               "properties": {
                 "facing": "east",
@@ -2108,6 +2518,26 @@
             "id": "minecraft:stripped_acacia_log",
             "properties": {
               "axis": "y"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:stripped_jungle_log",
+              "properties": {
+                "axis": "z"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:stripped_acacia_log",
+            "properties": {
+              "axis": "z"
             }
           }
         },

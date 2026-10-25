@@ -347,18 +347,28 @@ public final class PilihJalan {
 
 	// ================================================================== inputs from other parts
 
-	/** The master pushed {@code jalan} (+0.8 until removed; pushing the current path again clears every push). */
+	/**
+	 * The master pushed {@code jalan}: the disciple takes it at once and the push stays (+0.8 on top of the inertia, so
+	 * the ten-day check keeps it); pushing the current path again clears every push. While the IBLIS overlay holds,
+	 * only the push is stored (the redemption comes first).
+	 */
 	public static void dorong(DiscipleEntity murid, JalanHidup jalan) {
 		if (murid == null || jalan == null || !jalan.pilihanAwal()) {
 			return;
 		}
 		CompoundTag section = MandiriApi.bagianTulis(murid.data());
+		JalanHidup sekarang = MandiriApi.jalan(murid.data());
 		ListTag list = new ListTag();
-		if (jalan != MandiriApi.jalan(murid.data())) {
+		if (jalan != sekarang) {
 			list.add(StringTag.valueOf(jalan.id()));
 		}
 		section.put(MandiriIds.K_JALAN_DORONG, list);
-		periksa(murid, "guru");
+		if (jalan == sekarang || sekarang == JalanHidup.IBLIS) {
+			return;
+		}
+		// A plain +0.8 rarely beat the current path's +0.7 inertia and 0.5 margin, so the master's choice seemed to do nothing.
+		tetapkan(murid, sekarang, jalan, "guru");
+		simpanAlasan(section, nilai(murid.data(), Irama.hari((ServerLevel) murid.level())).alasan().get(jalan.ordinal()));
 	}
 
 	/** An event bonus to a path's next checks (39.3.5), e.g. {@code +0.5} pedang after a lost final. */

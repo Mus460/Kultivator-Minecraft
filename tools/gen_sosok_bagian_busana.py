@@ -1,7 +1,8 @@
 """Garment part sheets of the Sosok composer (DESIGN 40.3.7, module 40K). Called by gen_sosok_bagian.py.
 
 * ``busana/dalam_<l|p>_<w>``          underwear (fixed undyed linen, never naked under see-through cloth)
-* ``busana/<GAYA>_<w>``               base layer (inner shirt, trousers) + outer layer (robe) of one of the 22 styles
+* ``busana/<GAYA>_<w>``               base layer (inner shirt, trousers) + outer layer (robe) of one of the 29 styles
+                                     (22 of DESIGN 40 + 7 of DESIGN 42.12.4: wedding, mourning, winter, troupe, dancer, pickpocket)
 * ``busana/<GAYA>_tepi1_<w>`` / ``_tepi2_<w>``  rank trim levels 1 and 2 (40.3.8), derived from the style's TEPI pixels
 * ``busana/buzi_<kind>``              rank badge of the official robes (4 x 4 on the chest)
 * ``busana/tambahan_<id>_<w>``        extras (travel strap, work ropes, duty lamellar, sleep clothes)
@@ -25,6 +26,10 @@ WIDTHS = (("lebar", False), ("ramping", True))
 
 GAYA = ["HANFU_L", "HANFU_P", "PENDEK", "TEMPUR", "TAO", "RAHIB", "KASAYA", "IBLIS", "SAUDAGAR", "PETANI", "BANGSAWAN",
         "ABADI", "PENJAGA", "PEJABAT", "SARJANA", "COMPANG", "ANAK", "PELAYAN", "LAUT", "GURUN", "KAFAN", "HAKIM_BAWAH"]
+# the seven garment styles of 42: the groom's and the bride's red robes, coarse white mourning hemp, the padded winter
+# coat, the troupe's tight red-yellow costume, the dancer's high-waisted gown, the pickpocket's dark patched jacket
+KOTA42_GAYA = ["PENGANTIN_L", "PENGANTIN_P", "BERKABUNG", "MANTEL_KAPAS", "AKROBAT", "PENARI", "PENCOPET"]
+GAYA = GAYA + KOTA42_GAYA
 
 LINEN = 0xE4DCCB
 LINEN_D = 0xC9C0AE
@@ -674,15 +679,238 @@ def paint_style(gaya, slim):
             sleeve(b, arm, KAIN1, 130, 10, KAIN2, 1, KAIN2)
         robe_skirt_on_legs(b, KAIN1, 124, 11, KAIN2)
         belt(jw, TEPI, (7, 8))
+    elif gaya in KOTA42_GAYA:
+        paint_style_42(b, gaya, jf, jb, base_front)
     return s
+
+
+# ---------------------------------------------------------------------- DESIGN 42.12.4 styles (Kota yang Hidup, 42V-B)
+
+PHOENIX = [  # 6 x 7 phoenix in gold over the bride's chest: crest, head, spread wings, the long tail sweeping down
+    "..X...",
+    ".XX..X",
+    "XXXXX.",
+    ".XXXXX",
+    "..XX..",
+    "..X.X.",
+    ".X...X",
+]
+DRAGON_ROUNDEL = [  # 4 x 4 gold roundel on the groom's chest and back (a coiled dragon in brief)
+    ".XX.",
+    "X.oX",
+    "XX.X",
+    ".XX.",
+]
+
+
+def motif(face, pat, x0, y0, rgb=GOLD, eye=None):
+    for y, row in enumerate(pat):
+        for x, c in enumerate(row):
+            if c == "X":
+                face.fixed(x0 + x, y0 + y, tangga(rgb, 140 - 8 * (y % 2)))
+            elif c == "o" and eye is not None:
+                face.fixed(x0 + x, y0 + y, eye)
+
+
+def frayed_hem(b, part, layer, y, every=2):
+    """Unhemmed cloth: every other pixel of row y is torn away (mourning hemp is worn raw)."""
+    w = b.wrap(part, layer)
+    for s in range(w.len):
+        if s % every == 0:
+            w.clear(s, y)
+
+
+def paint_style_42(b, gaya, jf, jb, base_front):
+    if gaya == "PENGANTIN_L":
+        # the groom: a long red robe with a round collar, gold dragon roundels on chest and back, gold-cloud cuffs and hem,
+        # a red belt with jade plaques
+        inner_shirt(b, KAIN2)
+        trousers(b, KAIN1, 96)
+        jw = body_jacket(b, KAIN1, 130)
+        collar_round(jf, TEPI)
+        motif(jf, DRAGON_ROUNDEL, 2, 2, GOLD, 0x2A1A10)
+        motif(jb, DRAGON_ROUNDEL, 2, 2, GOLD, 0x2A1A10)
+        for arm in arms(b):
+            sleeve(b, arm, KAIN1, 130, 10, TEPI, 2, KAIN2)
+            clouds(b.face(arm, 1, "depan"), 6)
+        robe_skirt_on_legs(b, KAIN1, 122, 11, TEPI)
+        for leg in legs(b):
+            clouds(b.face(leg, 1, "depan"), 7)
+            clouds(b.face(leg, 1, "belakang"), 7)
+        belt(jw, TEPI, (7, 8))
+        fw = b.wrap("badan", 1)
+        s0, s1 = fw.front_range()
+        for st in range(s0, s1, 2):
+            fw.put(st, 7, GIOK, 150, 255, F_SHINE)
+    elif gaya == "PENGANTIN_P":
+        # the bride: a red cross-collared jacket with a gold phoenix over the chest, peony sprays on the back, wide sleeves
+        # with gold cuffs, a long red skirt with gold wave-and-cloud bands at the hem
+        inner_shirt(b, KAIN2)
+        inner_collar(base_front, KAIN2)
+        trousers(b, KAIN1, 110)
+        jw = body_jacket(b, KAIN1, 132)
+        collar_cross(jf, TEPI, KAIN2, False, 4, layers=2)
+        motif(jf, PHOENIX, 1, 3, GOLD)
+        for y0 in (2, 7):
+            for x in (1, 5):
+                jb.fixed(x, y0, tangga(0xE85A6A, 136))
+                jb.fixed(x + 1, y0, tangga(0xE85A6A, 120))
+                jb.fixed(x, y0 + 1, tangga(GOLD, 130))
+                jb.fixed(x + 1, y0 + 1, tangga(0x3E8A4E, 120))
+        jw.row(8, TEPI, 136, 255, F_SHINE)  # the high skirt band
+        for arm in arms(b):
+            sleeve(b, arm, KAIN1, 132, 10, TEPI, 2, KAIN2)
+            gold_embroidery(b.face(arm, 1, "depan"), 7, 8)
+        robe_skirt_on_legs(b, KAIN1, 126, 12, TEPI)
+        for leg in legs(b):
+            for face in ("depan", "belakang", "kanan", "kiri"):
+                clouds(b.face(leg, 1, face), 7)
+                f = b.face(leg, 1, face)
+                for x in range(f.w):
+                    f.fixed(x, 11, tangga(GOLD, 120 + 12 * (x % 2)))
+    elif gaya == "BERKABUNG":
+        # mourning: a loose robe of coarse undyed hemp, the collar crossed, no dye, no trim; the hem left raw and torn
+        # (the closer the kin, the coarser the cloth), a hemp rope belt
+        inner_shirt(b, KAIN2)
+        inner_collar(base_front, KAIN2)
+        trousers(b, KAIN2, 110)
+        jw = body_jacket(b, KAIN1, 132)
+        collar_cross(jf, KAIN2, KAIN2, False, 5)
+        for face in (jf, jb):
+            for y in range(12):
+                for x in range(8):
+                    if (x * 5 + y * 3) % 7 == 0:
+                        face.shade(x, y, -10)  # slubs of the coarse weave
+        for arm in arms(b):
+            wrap_cloth(b, arm, 1, KAIN1, 130, 0, 10)
+            top_face(b, arm, 1, KAIN1, 136)
+            frayed_hem(b, arm, 1, 9)
+        robe_skirt_on_legs(b, KAIN1, 124, 11, None)
+        for leg in legs(b):
+            frayed_hem(b, leg, 1, 10)
+        for y in (6, 7):
+            for st in range(jw.len):
+                jw.fixed(st, y, tangga(0xB8AA88 if (st + y) % 2 else 0x9A8C6C, 128))
+        for x in (3, 4):
+            jf.fixed(x, 8, tangga(0xB8AA88, 116))  # the knot ends of the hemp rope
+            jf.fixed(x, 9, tangga(0x9A8C6C, 110))
+    elif gaya == "MANTEL_KAPAS":
+        # winter: a knee-length cotton-padded coat quilted in rows, a round collar, frog buttons down the wearer's right,
+        # puffed sleeves with turned-back cuffs, padded trousers bound at the ankle
+        inner_shirt(b, KAIN2)
+        trousers(b, KAIN2, 104)
+        for leg in legs(b):
+            w = b.wrap(leg, 0)
+            for y in range(1, 10, 2):
+                for st in range(w.len):
+                    w.shade(st, y, -8)
+            w.row(10, SAMAK, 108)
+        jw = body_jacket(b, KAIN1, 130)
+        for y in range(1, 12, 2):
+            for x in range(8):
+                jf.shade(x, y, -11)
+                jb.shade(x, y, -11)
+        collar_round(jf, TEPI)
+        for y in range(2, 11):
+            jf.put(5, y, TEPI, 118)
+        for y in (2, 4, 6, 8):
+            jf.put(4, y, LOGAM, 150, 255, F_SHINE)
+            jf.put(5, y, LOGAM, 130)
+        for arm in arms(b):
+            sleeve(b, arm, KAIN1, 132, 10, KAIN2, 2, KAIN2)
+            w = b.wrap(arm, 1)
+            for y in range(1, 8, 2):
+                for st in range(w.len):
+                    w.shade(st, y, -9)
+        robe_skirt_on_legs(b, KAIN1, 124, 6, TEPI)
+        for leg in legs(b):
+            w = b.wrap(leg, 1)
+            for y in range(1, 5, 2):
+                for st in range(w.len):
+                    w.shade(st, y, -9)
+    elif gaya == "AKROBAT":
+        # the troupe: tight silk in diagonal bands of the two colours, narrow sleeves and leggings, a broad sash, calf wraps
+        jw = wrap_cloth(b, "badan", 1, KAIN1, 128, 0, 12)
+        top_face(b, "badan", 1, KAIN1, 136)
+        for st in range(jw.len):
+            for y in range(12):
+                if (st + y) % 6 < 3:
+                    jw.put(st, y, KAIN2, 136, 255, F_NOISE)
+        collar_round(jf, TEPI)
+        for arm in arms(b):
+            w = wrap_cloth(b, arm, 1, KAIN1, 128, 0, 10)
+            top_face(b, arm, 1, KAIN1)
+            for st in range(w.len):
+                for y in range(10):
+                    if (st + y) % 6 < 3:
+                        w.put(st, y, KAIN2, 134, 255, F_NOISE)
+            w.row(9, TEPI, 120)
+        for leg in legs(b):
+            w = wrap_cloth(b, leg, 0, KAIN1, 120, 0, 12)
+            top_face(b, leg, 0, KAIN1, 128)
+            for st in range(w.len):
+                for y in range(8):
+                    if (st - y) % 6 < 3:
+                        w.put(st, y, KAIN2, 128, 255, F_NOISE)
+        belt(jw, TEPI, (6, 8))
+        calf_wraps(b, (8, 11))
+    elif gaya == "PENARI":
+        # the dancer: a short silk jacket and a skirt tied high under the arms, flower sprays embroidered in pink, long
+        # sleeves of the second colour that fall past the wrist, a pleated skirt to the ankle
+        inner_shirt(b, KAIN2)
+        inner_collar(base_front, KAIN2)
+        trousers(b, KAIN1, 116)
+        jw = body_jacket(b, KAIN1, 130)
+        collar_cross(jf, TEPI, KAIN2, False, 2)
+        jw.row(2, TEPI, 140, 255, F_SHINE)
+        jw.row(3, TEPI, 116)
+        for y in range(4, 12):
+            for x in range(8):
+                if x % 2 == 1:
+                    jf.shade(x, y, -7)  # skirt pleats
+        for (x, y) in ((1, 6), (5, 8), (2, 10), (6, 5)):
+            jf.fixed(x, y, tangga(0xF08AA8, 140))
+            jf.fixed(x + 1, y, tangga(0xD8607E, 124))
+            jf.fixed(x, y + 1, tangga(0x5A9A5A, 116))
+        for arm in arms(b):
+            sleeve(b, arm, KAIN2, 138, 12, None, 0, KAIN2)
+        robe_skirt_on_legs(b, KAIN1, 128, 12, TEPI)
+        for leg in legs(b):
+            fr = b.face(leg, 1, "depan")
+            for y in range(12):
+                for x in range(fr.w):
+                    if x % 2 == 0:
+                        fr.shade(x, y, -6)
+    elif gaya == "PENCOPET":
+        # the pickpocket: a dark short jacket with patches and a torn hem, sleeves rolled to the forearm, dark trousers
+        # tied at the calf, a rope belt with a hidden inner pocket seam
+        inner_shirt(b, KAIN2, 6)
+        inner_collar(base_front, KAIN2)
+        trousers(b, KAIN1, 92)
+        jw = body_jacket(b, KAIN1, 112)
+        collar_cross(jf, KAIN2, KAIN2, False, 5)
+        patches(jf, 2)
+        patches(jb, 6)
+        for arm in arms(b):
+            w = wrap_cloth(b, arm, 1, KAIN1, 112, 0, 6)
+            top_face(b, arm, 1, KAIN1)
+            w.row(5, KAIN1, 132)  # the rolled cuff
+            w.row(4, KAIN1, 98)
+        robe_skirt_on_legs(b, KAIN1, 104, 5, None)
+        frayed_hem(b, "badan", 1, 11, 3)
+        belt(jw, SAMAK, (6, 7))
+        for y in range(3, 6):
+            jf.put(6, y, KAIN1, 92)  # the inner pocket seam
+        calf_wraps(b, (8, 11))
 
 
 # ---------------------------------------------------------------------- drape (detail pass)
 
 # cloth classes of the drape pass: patterned brocade, coarse homespun, smooth silk (others get light and folds only)
-BROKAT = {"SAUDAGAR", "BANGSAWAN", "PEJABAT", "HAKIM_BAWAH"}
-KASAR = {"PETANI", "COMPANG", "RAHIB", "KASAYA", "LAUT", "GURUN", "PENDEK", "PELAYAN", "ANAK", "PENJAGA"}
-SUTRA = {"HANFU_L", "HANFU_P", "TAO", "ABADI", "SARJANA", "KAFAN", "IBLIS", "TEMPUR"}
+BROKAT = {"SAUDAGAR", "BANGSAWAN", "PEJABAT", "HAKIM_BAWAH", "PENGANTIN_L"}
+KASAR = {"PETANI", "COMPANG", "RAHIB", "KASAYA", "LAUT", "GURUN", "PENDEK", "PELAYAN", "ANAK", "PENJAGA", "BERKABUNG", "MANTEL_KAPAS",
+         "PENCOPET"}
+SUTRA = {"HANFU_L", "HANFU_P", "TAO", "ABADI", "SARJANA", "KAFAN", "IBLIS", "TEMPUR", "PENGANTIN_P", "AKROBAT", "PENARI"}
 DRAPE_PARTS = ("badan", "lengan_kanan", "lengan_kiri", "kaki_kanan", "kaki_kiri")
 
 

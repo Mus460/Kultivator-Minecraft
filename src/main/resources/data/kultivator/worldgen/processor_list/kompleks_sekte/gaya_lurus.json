@@ -7,20 +7,6 @@
           "input_predicate": {
             "predicate_type": "minecraft:blockstate_match",
             "block_state": {
-              "id": "minecraft:dark_oak_pressure_plate"
-            }
-          },
-          "location_predicate": {
-            "predicate_type": "minecraft:always_true"
-          },
-          "output_state": {
-            "id": "minecraft:birch_pressure_plate"
-          }
-        },
-        {
-          "input_predicate": {
-            "predicate_type": "minecraft:blockstate_match",
-            "block_state": {
               "id": "minecraft:dark_oak_pressure_plate",
               "properties": {
                 "powered": "false"

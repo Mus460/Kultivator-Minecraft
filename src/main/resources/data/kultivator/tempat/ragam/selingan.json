@@ -1,0 +1,156 @@
+{
+  "_doc": "DESIGN 42.4A.5 micro interludes (42S-R). tick = length; sifat = weight slope per 100 trait points; lelah/panas = weight factor when tired (> 2 h of work) / in summer or heavy work; aksi klip/tatap/sapa/siul; perlu pemain/tetangga/anak.",
+  "selingan": [
+    {
+      "id": "lihat_sekeliling",
+      "klip": "kota42_lihat_sekeliling",
+      "tick": 40,
+      "bobot": 1.4,
+      "sifat": {
+        "E": 1.0
+      },
+      "aksi": "klip"
+    },
+    {
+      "id": "peregangan",
+      "klip": "kota42_peregangan_pagi",
+      "tick": 30,
+      "bobot": 0.8,
+      "lelah": 2.0,
+      "aksi": "klip"
+    },
+    {
+      "id": "seka_keringat",
+      "klip": "kota42_seka_keringat",
+      "tick": 30,
+      "bobot": 0.9,
+      "lelah": 2.0,
+      "panas": 2.0,
+      "tanda": [
+        "berat"
+      ],
+      "aksi": "klip"
+    },
+    {
+      "id": "lihat_barang",
+      "klip": "lihat_barang",
+      "tick": 40,
+      "bobot": 1.0,
+      "aksi": "klip"
+    },
+    {
+      "id": "lirik_pemain",
+      "klip": "",
+      "tick": 40,
+      "bobot": 1.2,
+      "sifat": {
+        "E": 0.6,
+        "X": 0.4
+      },
+      "aksi": "tatap",
+      "perlu": "pemain"
+    },
+    {
+      "id": "sapa_tetangga",
+      "klip": "bicara_tangan",
+      "tick": 40,
+      "bobot": 1.0,
+      "sifat": {
+        "X": 1.2
+      },
+      "aksi": "sapa",
+      "perlu": "tetangga"
+    },
+    {
+      "id": "garuk_kepala",
+      "klip": "kota42_garuk_kepala",
+      "tick": 24,
+      "bobot": 0.8,
+      "aksi": "klip"
+    },
+    {
+      "id": "menguap",
+      "klip": "kota42_menguap",
+      "tick": 40,
+      "bobot": 0.7,
+      "lelah": 1.5,
+      "aksi": "klip"
+    },
+    {
+      "id": "betulkan_topi",
+      "klip": "kota42_betulkan_topi",
+      "tick": 20,
+      "bobot": 0.7,
+      "aksi": "klip"
+    },
+    {
+      "id": "minum_kendi",
+      "klip": "minum_teh",
+      "kanan": "kendi",
+      "tick": 50,
+      "bobot": 0.8,
+      "panas": 1.6,
+      "aksi": "klip"
+    },
+    {
+      "id": "bersiul",
+      "klip": "sikap_santai_l",
+      "tick": 50,
+      "bobot": 0.6,
+      "sifat": {
+        "X": 0.5
+      },
+      "aksi": "siul"
+    },
+    {
+      "id": "tepuk_debu",
+      "klip": "kota42_tepuk_debu",
+      "tick": 20,
+      "bobot": 0.8,
+      "aksi": "klip"
+    },
+    {
+      "id": "hitung_koin",
+      "klip": "kota42_hitung_koin",
+      "kanan": "kantong_uang",
+      "tick": 40,
+      "bobot": 0.9,
+      "aksi": "klip"
+    },
+    {
+      "id": "sapa_anak",
+      "klip": "lambai",
+      "tick": 30,
+      "bobot": 0.8,
+      "sifat": {
+        "A": 0.8
+      },
+      "aksi": "sapa",
+      "perlu": "anak"
+    },
+    {
+      "id": "batuk",
+      "klip": "kota42_batuk",
+      "tick": 30,
+      "bobot": 0.5,
+      "aksi": "klip"
+    },
+    {
+      "id": "usir_lalat",
+      "klip": "kota42_usir_lalat",
+      "tick": 16,
+      "bobot": 0.8,
+      "panas": 1.5,
+      "aksi": "klip"
+    },
+    {
+      "id": "kipas_diri",
+      "klip": "kipas",
+      "kanan": "kipas_lipat",
+      "tick": 40,
+      "bobot": 0.7,
+      "panas": 2.0,
+      "aksi": "klip"
+    }
+  ]
+}

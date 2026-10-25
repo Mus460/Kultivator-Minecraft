@@ -164,6 +164,21 @@ public final class SosokGen {
 		npc("tetua_sekte", 35, "DT");
 		npc("ketua_sekte", 35, "DT");
 		npc("pelayan_sekte", 55, "A20M80");
+		// 42 town roles (42V-B looks): sex and age match their robes
+		npc("pencopet", 25, "M50D50");
+		npc("penjaga_malam", 10, "D50T50");
+		npc("mak_comblang", 100, "D40T60");
+		npc("pendongeng", 0, "T");
+		npc("pengamen", 40, "MD");
+		npc("akrobat", 45, "M");
+		npc("penjual_obat", 20, "DT");
+		npc("guru_sekolah", 30, "DT");
+		npc("pengurus_duka", 0, "T");
+		npc("penjaga_gudang", 40, "DT");
+		npc("pialang", 25, "D");
+		npc("penari", 85, "M");
+		npc("pemusik", 20, "MD");
+		baris("topeng_kertas", 35, "MD");
 		npc("pertapa", 20, "T");
 		npc("sisa_jiwa", 40, "DT");
 		npc("tetua_iblis", 30, "DT");

@@ -460,6 +460,8 @@ final class Kepulangan {
 		CompoundTag effects = section.getCompoundOrEmpty("efek");
 		CompoundTag effect = effects.getCompoundOrEmpty(soul.toString());
 		float hp = 1.0F;
+		// The mission may be gone already (a recall that left the wounded behind): the effect still remembers it.
+		boolean leftMark = "misi.ditinggal".equals(effect.getStringOr("mem", ""));
 		if (!effect.isEmpty()) {
 			DiscipleData data = DiscipleData.load(stored.getCompoundOrEmpty("disciple"));
 			apply(server, data, effect);
@@ -468,13 +470,13 @@ final class Kepulangan {
 			effects.remove(soul.toString());
 		}
 		int index = 0;
-		boolean left = false;
+		boolean left = leftMark;
 		if (mission != null) {
 			List<CompoundTag> team = MisiData.team(mission);
 			for (int i = 0; i < team.size(); i++) {
 				if (soul.toString().equals(team.get(i).getStringOr("soul", ""))) {
 					team.get(i).putBoolean("back", true);
-					left = team.get(i).getBooleanOr("left", false);
+					left = leftMark || team.get(i).getBooleanOr("left", false);
 					index = i;
 				}
 			}
@@ -484,7 +486,7 @@ final class Kepulangan {
 		arrival.putInt("mid", id);
 		arrival.putFloat("hp", hp);
 		arrival.putLong("since", level.getGameTime());
-		arrival.putBoolean("lead", index == 0 && !left);
+		arrival.putBoolean("lead", mission != null && index == 0 && !left);
 		arrival.putBoolean("left", left);
 		arrival.putString("tpl", mission == null ? "" : mission.getStringOr("tpl", ""));
 		Vec3 gate = null;

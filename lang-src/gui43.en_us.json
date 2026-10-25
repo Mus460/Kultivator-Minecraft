@@ -1,0 +1,13 @@
+{
+  "kultivator.gui43.host.di_sini": "Here",
+  "kultivator.gui43.host.di_sini.tip": "The place and the person you are dealing with right now.",
+  "kultivator.gui43.host.tombol_angka": "Key %s",
+  "kultivator.gui43.host.judul": "%s · %s",
+  "kultivator.gui43.host.sumber": "Source: %s",
+  "kultivator.gui43.host.sumber.tip": "Click to switch source (My Hall / My Sect).",
+  "kultivator.gui43.host.kembali": "Back (Esc)",
+  "kultivator.gui43.host.kosong": "No page in this section yet.",
+  "kultivator.gui43.host.petunjuk": "Esc back · Q/E page · Tab focus · / search · [[key:quick]] close",
+  "kultivator.gui43.host.lainnya": "More",
+  "kultivator.gui43.host.tombol_baru": "The Main Scroll has new keys: %s Technique Codex, %s Guide, %s Map. Change them in Settings › Controls."
+}

@@ -1,0 +1,181 @@
+{
+  "id": "basa_basi_cuaca",
+  "jenis": "realisasi",
+  "_catatan": "Small talk on the weather: rain, storm, snow, qi mist.",
+  "benih_dunia": 42,
+  "masukan": {
+    "niat": "BASA_BASI",
+    "pembicara": 300,
+    "hari": 120,
+    "now": 2880000,
+    "cuaca": "cerah",
+    "musim": "semi",
+    "situasi": {
+      "jam": "pagi",
+      "cuaca": "cerah",
+      "musim": "semi",
+      "kelompok": "pekerja",
+      "watak": "ramah",
+      "kebiasaan": [],
+      "sifat": {
+        "H": 10,
+        "E": 0,
+        "X": 20,
+        "A": 30,
+        "C": 10,
+        "O": 0
+      },
+      "wajah": "netral",
+      "tempat": "kota_besar"
+    },
+    "pendengar": {
+      "nama": "Han",
+      "kelamin": "l",
+      "tahap": "dewasa",
+      "pemain": true
+    },
+    "kesan": "kenal",
+    "tahu_nama": false,
+    "register": "biasa",
+    "dialek": "kampung",
+    "nilai": {
+      "konteks.tempat": {
+        "t": "Desa Bambu"
+      }
+    }
+  },
+  "langkah": [
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "hujan",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar"
+        },
+        "cuaca": "hujan"
+      },
+      "harap": {
+        "k": "kultivator.cakap.basa.cuaca.hujan.4",
+        "a": []
+      },
+      "aturan": "basa.cuaca.hujan",
+      "gestur": "hangat_tangan",
+      "seru": null,
+      "tik": null,
+      "id_id": "Kata orang tua, hujan di hari pasar artinya rezeki datang terlambat.",
+      "en_us": "The old folk say rain on market day means fortune arrives late."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "badai",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar"
+        },
+        "cuaca": "badai"
+      },
+      "harap": {
+        "k": "kultivator.cakap.basa.musim.semi.1",
+        "a": []
+      },
+      "aturan": "basa.musim.semi",
+      "gestur": "bicara_tangan",
+      "seru": null,
+      "tik": null,
+      "id_id": "Musim semi, semua orang jadi rajin. Sawah, kebun, bahkan kucing di atap.",
+      "en_us": "In spring everyone turns diligent. Paddies, gardens, even the cats on the roofs."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "salju",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar"
+        },
+        "cuaca": "salju"
+      },
+      "harap": {
+        "k": "kultivator.cakap.basa.musim.semi.4",
+        "a": []
+      },
+      "aturan": "basa.musim.semi",
+      "gestur": "bicara_tangan",
+      "seru": null,
+      "tik": null,
+      "id_id": "Burung walet kembali ke atap kami tahun ini. Pertanda rumah tangga rukun.",
+      "en_us": "The swallows came back to our eaves this year. A sign of a harmonious household."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "kabut_qi",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar"
+        },
+        "cuaca": "kabut_qi"
+      },
+      "harap": {
+        "k": "kultivator.cakap.basa.musim.semi.3",
+        "a": []
+      },
+      "aturan": "basa.musim.semi",
+      "gestur": "bicara_tangan",
+      "seru": null,
+      "tik": null,
+      "id_id": "Semi begini, udara wangi. Aku jadi ingin menulis puisi, padahal tidak bisa.",
+      "en_us": "Spring like this, the air smells sweet. Makes me want to write poems, though I can't."
+    }
+  ]
+}

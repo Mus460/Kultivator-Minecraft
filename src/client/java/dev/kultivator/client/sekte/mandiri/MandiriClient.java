@@ -1,16 +1,16 @@
 package dev.kultivator.client.sekte.mandiri;
 
 import dev.kultivator.Kultivator;
-import dev.kultivator.client.disciple.DiscipleScreen;
-import dev.kultivator.client.hub.HubCards;
 import dev.kultivator.client.hub.HubNav;
-import dev.kultivator.client.screen.ui.Glyphs;
-import dev.kultivator.sekte.mandiri.api.MandiriIds;
+import dev.kultivator.client.hub.HubPages;
+import dev.kultivator.client.hub.Tujuan;
+import dev.kultivator.client.hub.Urutan;
 import dev.kultivator.sekte.mandiri.cerita.MandiriPayloads;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,9 +23,9 @@ import java.util.Map;
  * <ul>
  * <li>the receivers of its four server-to-client payloads ({@code mandiri_harian} the diary page, {@code mandiri_papan}
  * the board, {@code mandiri_pikir} a thought bubble, {@code mandiri_toast} a notice card);</li>
- * <li>the "Jalan Hidup" tab of the disciple scroll ({@link JalanHidupTab}, the third extra tab after P's Hati and R's
- * Hubungan; {@code DiscipleScreen.MAX_EXTRA_TABS} is 3);</li>
- * <li>the hub card {@code sekte_mandiri_jalan} in section MURID ({@link MandiriBoardScreen});</li>
+ * <li>the page Murid › Daftar ({@link MandiriBoardScreen}, DESIGN 43.5; the Jalan Hidup sub of Murid › Murid,
+ * {@code JalanHidupTab}, is mounted by the Murid page); a diary page that arrives with "buka" opens Murid › Murid ›
+ * buku_harian;</li>
  * <li>the notice cards in the top-right corner of the HUD ({@link ToastMandiri}, before the chat layer);</li>
  * <li>the thought bubbles over disciples ({@link GelembungMandiri});</li>
  * <li>the props 100-129, clips 200-249 and effect hooks of the Gerak system ({@link MandiriPoses}).</li>
@@ -54,13 +54,20 @@ public final class MandiriClient {
 		}
 		initialised = true;
 		ClientPlayNetworking.registerGlobalReceiver(MandiriPayloads.Harian.TYPE, (payload, context) -> terimaHalaman(payload));
-		ClientPlayNetworking.registerGlobalReceiver(MandiriPayloads.Papan.TYPE, (payload, context) -> MandiriBoardScreen.terima(payload.data()));
+		ClientPlayNetworking.registerGlobalReceiver(MandiriPayloads.Papan.TYPE, (payload, context) -> {
+			MandiriBoardScreen.terima(payload.data());
+			// Sekte › Ikhtisar › Identitas (Kebijakan) and Sekte › Kas & Toko (Kas Mandiri) read the same board
+			dev.kultivator.client.hall.HallClient.papanMandiri(payload.data());
+		});
 		ClientPlayNetworking.registerGlobalReceiver(MandiriPayloads.Pikir.TYPE, (payload, context) -> GelembungMandiri.terima(payload));
 		ClientPlayNetworking.registerGlobalReceiver(MandiriPayloads.Toast.TYPE, (payload, context) -> ToastMandiri.terima(payload));
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> bersih());
 
-		DiscipleScreen.addExtraTab(Glyphs.JALAN, JalanHidupTab::new);
-		HubCards.register(HubNav.MURID, MandiriIds.KARTU_JALAN, Glyphs.JALAN, null, MandiriBoardScreen::buka);
+		// 43: Murid › Daftar is a page of the Gulungan; the Jalan Hidup sub of Murid › Murid is mounted by the Murid page (M03).
+		HubPages.daftar(HubNav.MURID, Urutan.ID_DAFTAR, Urutan.DAFTAR, MandiriBoardScreen::new);
+		// Kabar lives in Sekte › Ikhtisar › Catatan, Kebijakan in Identitas, Kas in Kas & Toko (G37, G44): not in Daftar too
+		dev.kultivator.client.hall.HallClient.sumberCatatan("murid", net.minecraft.network.chat.Component.translatable(
+				"kultivator.sekte.mandiri.cerita.papan.tampil.kabar"), () -> MandiriBoardScreen.kabar(MandiriBoardScreen.papan()));
 		HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, Kultivator.id("mandiri_toast"), new ToastMandiri());
 		GelembungMandiri.init();
 		MandiriPoses.init();
@@ -104,10 +111,11 @@ public final class MandiriClient {
 		}
 		HALAMAN.put(soul, page);
 		versi++;
-		BukuHarianScreen.segarkan(soul);
 		if (page.data().getBooleanOr("buka", false)) {
-			// "/kultivasi perguruan mandiri harian <murid>": open the book without asking again
-			BukuHarianScreen.bukaTanpaMinta(soul, net.minecraft.client.Minecraft.getInstance().gui.screen());
+			// "/kultivasi perguruan mandiri harian <murid>": the diary sub of Murid › Murid (43.4.4); it reads halaman(soul)
+			CompoundTag fokus = new CompoundTag();
+			fokus.putString("jiwa", soul);
+			HubNav.buka(Tujuan.of(HubNav.MURID, Urutan.ID_MURID).sub("buku_harian").fokus(fokus));
 		}
 	}
 
@@ -117,6 +125,7 @@ public final class MandiriClient {
 		GelembungMandiri.bersih();
 		ToastMandiri.bersih();
 		MandiriBoardScreen.bersih();
+		dev.kultivator.client.hall.HallClient.papanMandiri(null);
 	}
 
 	private MandiriClient() {

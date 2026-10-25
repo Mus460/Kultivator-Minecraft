@@ -1,0 +1,261 @@
+# tindak: corpus of the conversation engine (42K-C, DESIGN 42.5A.8). Source format: gen_kota_hidup_cakap.py.
+# NPC acts of niat.json not covered elsewhere: BELASUNGKAWA KECEWA SARAN TAKUT MARAH MINTA PERKENALAN, NPC-NPC CANDA_RAYU
+# PERAGA MINTA_TOLONG, and the engine's utterance topics (puji puji_ragu hina ditolak minta marah).
+@kelompok tindak
+
+== belasungkawa
+niat: BELASUNGKAWA
+gestur: sikap_tunduk
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+$subjek: tipe=nama_warga dari=fakta.subjek
+$keluh: aturan=seru.keluh opsional=0.5
+$doa: aturan=frag.doa opsional=0.4
+- [3] Turut berduka, {$sebutan}. Semoga yang pergi tenang di sana. || My condolences, {$sebutan}. May the departed rest in peace.
+  ~ kasar: Sayang sekali. Semua orang akan pergi juga. Kuatlah. || A shame. Everyone goes eventually. Stay strong.
+  ~ kuno: Hamba turut berduka sedalam-dalamnya. Semoga rohnya mendapat tempat yang damai. || This one shares your grief deeply. May the soul find a peaceful place.
+  ~ kampung: Turut berduka, Nak. Kalau butuh apa-apa, bilang saja. || My condolences, child. If you need anything, just say.
+  ~ pelabuhan: Laut membawa semua orang pulang suatu hari, Bung. Turut berduka. || The sea carries everyone home one day, mate. My condolences.
+  ~ gunung: Amitaba. Semoga ia lahir kembali di tempat yang baik. || Amitabha. May they be reborn in a good place.
+- [2] {$subjek} orang baik. Aku masih ingat senyumnya. {$keluh} || {$subjek} was a good soul. I still remember the smile. {$keluh}
+  ~ kuno: {$subjek} telah kembali ke langit. Kebaikannya akan dikenang. || {$subjek} has returned to heaven. Their kindness will be remembered.
+  ~ air: {$subjek}... aku masih tidak percaya, Kakak... || {$subjek}... I still can't believe it, dear...
+- Kalau ingin menangis, menangislah. Tidak ada yang akan mengejekmu. || If you want to cry, cry. No one will mock you.
+  ~ p: Sini, duduk dulu. Menangislah, aku temani. || Here, sit down. Cry; I'll stay with you.
+- Aku akan menyalakan dupa untuknya malam ini. {$doa} || I'll light incense for them tonight. {$doa}
+
+== kecewa
+niat: KECEWA
+gestur: sikap_tunduk
+seru: aduh
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+$keluh: aturan=seru.keluh opsional=0.5
+- [3] Oh... begitu. Ya sudah. Aku kira {$sebutan} berbeda. || Oh... I see. Very well. I thought you were different, {$sebutan}.
+  ~ kasar: Sudah kuduga. Semua sama saja. || Thought so. All the same.
+  ~ kuno: Harapan hamba ternyata terlalu tinggi. Tidak mengapa. || This one's hopes were too high, it seems. No matter.
+  ~ air: Oh... iya, Kakak... tidak apa-apa... sungguh... || Oh... yes, dear... it's all right... truly...
+  ~ kampung: Wah, sayang sekali, Nak. Padahal aku sudah cerita ke istri. || Oh, what a pity, child. And I'd already told the wife.
+- [2] Aku sudah menunggu, tahu. Tapi ya sudahlah. {$keluh} || I waited, you know. But never mind. {$keluh}
+  ~ p: Aku sudah menyiapkan teh untuk {$sebutan}. Sudah dingin sekarang. || I'd made tea for you, {$sebutan}. It's cold now.
+  ~ pelabuhan: Aku menunggu di dermaga sampai kapal terakhir, Bung. Kau tidak datang. || I waited on the dock till the last boat, mate. You didn't come.
+- Tidak apa-apa. Aku sudah biasa dikecewakan. || It's fine. I'm used to being let down.
+  ~ iblis: Kecewa? Tidak. Aku hanya mencatat. Aku selalu mencatat. || Disappointed? No. I just make a note. I always make a note.
+- Lain kali, kalau tidak bisa, bilang dari awal, ya. || Next time, if you can't, say so from the start.
+
+== saran
+niat: SARAN
+gestur: bicara_tangan
+seru: hmm
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+$arah: tipe=arah dari=konteks.arah
+$distrik: tipe=tempat dari=konteks.distrik
+$barang_mahal: tipe=barang dari=konteks.barang_mahal fitur=jamak
+$tempat: tipe=tempat dari=konteks.tempat
+- [3] Kalau boleh memberi saran, {$sebutan}, jangan berjalan sendirian ke {$arah} setelah gelap. || If I may advise, {$sebutan}, don't walk alone to the {$arah} after dark.
+  ~ kasar: Dengar. Jangan bodoh. Jangan ke {$arah} malam-malam. || Listen. Don't be stupid. Don't go {$arah} at night.
+  ~ kuno: Izinkan hamba memberi nasihat: hindari jalan ke {$arah} selepas senja. || Permit this one a counsel: avoid the road {$arah} after dusk.
+  ~ pelabuhan: Saran pelaut, Bung: kalau langit {$arah} gelap, jangan berlayar. || Sailor's advice, mate: if the sky to the {$arah} darkens, don't sail.
+- [2] Coba ke tabib di {$distrik}. Ramuannya pahit tapi manjur. || Try the physician in {$distrik}. Bitter brews, but they work.
+  ~ kampung: Coba ke mbah dukun di ujung kampung, Nak. Ramuannya manjur. || Try the old healer at the village end, child. Her brews work.
+- Kalau mau beli {$barang_mahal}, tunggu kafilah berikutnya. Sekarang terlalu mahal. || If you want {$barang_mahal}, wait for the next caravan. Too dear now.
+  ~ oasis: Tunggu kafilah dari timur, Saudara. {$barang_mahal} akan murah lagi. || Wait for the eastern caravan, friend. {$barang_mahal} will be cheap again.
+- Bawa payung. Langit sore ini tidak bisa dipercaya. || Take an umbrella. This afternoon's sky can't be trusted.
+- Sebaiknya kau bicara dengan kepala {$tempat} dulu sebelum berbuat apa-apa. || Best talk to the head of {$tempat} first before doing anything.
+  ~ ibukota: Urusan seperti itu harus lewat kantor distrik, {$sebutan}. Jangan lewat jalan belakang. || Matters like that must go through the district office, {$sebutan}. Not the back door.
+
+== takut
+niat: TAKUT
+gestur: takut_sembunyi
+seru: takut
+- [3] J-jangan sakiti aku! Aku cuma orang biasa! || D-don't hurt me! I'm just an ordinary person!
+  ~ kasar: M-mundur! Aku... aku punya pisau! || B-back off! I... I have a knife!
+  ~ kuno: A-ampuni hamba, Senior! Hamba tidak bermaksud lancang! || M-mercy, Senior! This one meant no insolence!
+  ~ kampung: Ampun, Nak... eh, Tuan! Ampun! || Mercy, child... er, sir! Mercy!
+  ~ air: J-jangan, Kakak... aku takut... || D-don't, dear... I'm scared...
+- [2] Aku... aku akan menurut. Tolong jangan marah. || I... I'll do as you say. Please don't be angry.
+  ~ p: Tolong... anak-anakku menunggu di rumah... || Please... my children are waiting at home...
+- T-tanganku gemetar sendiri... maaf... || M-my hands are shaking on their own... sorry...
+  ~ iblis: Hh. Baik. Kau menang kali ini. Kali ini. || Hh. Fine. You win this time. This time.
+- Penjaga! Penjaga, tolong! || Guards! Guards, help!
+
+== marah.ucap
+niat: MARAH
+gestur: marah_hentak
+seru: cih
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Berani-beraninya kau bicara begitu padaku! || How dare you speak to me like that!
+  ~ kasar: Tutup mulutmu, atau kututup dengan tinjuku! || Shut your mouth or I'll shut it with my fist!
+  ~ kuno: Lancang! Lidahmu lebih tajam dari pedangmu, rupanya. || Insolent! Your tongue is sharper than your sword, it seems.
+  ~ pelabuhan: Kurang ajar! Di kapalku, mulut begitu dicuci dengan air laut! || Scoundrel! On my ship, a mouth like that gets scrubbed with seawater!
+  ~ iblis: Hm. Kau baru saja membuat musuh. Selamat. || Hm. You've just made an enemy. Congratulations.
+  ~ kampung: Wong edan! Pergi sana sebelum kusiram air! || Madman! Go before I douse you!
+- [2] Aku tidak akan lupa hinaan ini, {$sebutan}. || I won't forget this insult, {$sebutan}.
+  ~ p: Aku tidak akan lupa ini. Seluruh sumur akan tahu siapa kau. || I won't forget this. The whole well will know who you are.
+- Pergi! Aku tidak mau melihat mukamu! || Go! I don't want to see your face!
+- Dasar tidak tahu sopan santun! Siapa yang mengajarimu? || No manners at all! Who raised you?
+
+== tutup.marah
+niat: TUTUP
+topik: marah
+gestur: marah_hentak
+- [3] Cukup! Pergi dari hadapanku! || Enough! Get out of my sight!
+  ~ kasar: Enyah! || Scram!
+  ~ kuno: Percakapan ini telah selesai. Silakan pergi. || This conversation is over. Pray leave.
+  ~ kampung: Wis! Sana pergi! || Enough! Off with you!
+  ~ iblis: Pergi sekarang, selagi kakimu masih bisa berjalan. || Leave now, while your legs still walk.
+- [2] Aku tidak mau bicara lagi denganmu. || I won't speak with you any more.
+  ~ p: Hmph! Aku pulang! Jangan ikuti aku! || Hmph! I'm going home! Don't follow me!
+- Urusan kita selesai. Jangan kembali. || We're done. Don't come back.
+
+== minta.npc
+niat: MINTA
+gestur: bicara_tangan
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] {$sebutan}, boleh minta tolong sebentar? Angkatkan karung ini ke gerobak. || {$sebutan}, a moment's help? Lift this sack onto the cart.
+  ~ kasar: Hei. Pegang ini. Sebentar saja. || Hey. Hold this. Just a moment.
+  ~ kuno: Bolehkah hamba merepotkan {$sebutan} sejenak? || May this one trouble you a moment, {$sebutan}?
+  ~ kampung: Nak, tolong ambilkan kendi di sana, ya. Pinggangku encok. || Child, fetch me that jug, would you. My back's bad.
+- [2] Kalau lewat pasar nanti, boleh titip garam? Nanti kuganti. || If you pass the market later, could you get me salt? I'll pay you back.
+  ~ pelabuhan: Kalau ke dermaga, titip pesan untuk nakhoda kapal merah, Bung? || If you're going to the dock, take a message to the red ship's captain, mate?
+- Boleh kupinjam pisaumu sebentar? Talinya terlalu kuat. || May I borrow your knife a moment? This rope's too tough.
+- Tolong bacakan surat ini. Mataku sudah rabun. || Please read this letter to me. My eyes are dim.
+  ~ kampung: Tolong bacakan surat dari anakku, Nak. Aku tidak bisa membaca. || Please read my child's letter to me, child. I can't read.
+
+== perkenalan.diri
+niat: PERKENALAN
+gestur: hormat
+$nama: tipe=nama_warga dari=pembicara
+$kerja: tipe=pekerjaan dari=pembicara
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Namaku {$nama}. Aku {$kerja} di sini. Senang bertemu, {$sebutan}. || My name is {$nama}. I'm a {$kerja} here. Pleased to meet you, {$sebutan}.
+  ~ kasar: {$nama}. {$kerja}. Sudah, itu saja. || {$nama}. {$kerja}. That's all.
+  ~ kuno: Hamba bernama {$nama}, seorang {$kerja} yang rendah. Suatu kehormatan, {$sebutan}. || This one is called {$nama}, a humble {$kerja}. An honour, {$sebutan}.
+  ~ kampung: Aku {$nama}, Nak. Orang kampung manggil aku begitu. Kerjaku {$kerja}. || I'm {$nama}, child. That's what the village calls me. I work as a {$kerja}.
+  ~ pelabuhan: {$nama}, Bung! {$kerja} paling terkenal di dermaga ini! || {$nama}, mate! The best-known {$kerja} on this dock!
+  ~ oasis: Aku {$nama}, Saudara, {$kerja} di oasis ini. Semoga mata air mempertemukan kita lagi. || I'm {$nama}, friend, a {$kerja} at this oasis. May the spring bring us together again.
+  ~ air: Namaku {$nama}, Kakak... aku {$kerja}... senang berkenalan, ya... || My name's {$nama}, dear... I'm a {$kerja}... nice to meet you...
+  ~ iblis: {$nama}. Ingat nama itu. Atau lupakan. Mana yang lebih aman untukmu. || {$nama}. Remember the name. Or forget it. Whichever's safer for you.
+  ~ gunung: Para biksu memanggilku {$nama}. Aku {$kerja} di biara ini. Amitaba. || The monks call me {$nama}. I'm a {$kerja} at this monastery. Amitabha.
+- [2] Kita belum berkenalan, ya? Aku {$nama}. || We haven't been introduced, have we? I'm {$nama}.
+  ~ ibukota: Perkenankan hamba memperkenalkan diri: {$nama}, {$kerja} di distrik ini. || Permit me to introduce myself: {$nama}, a {$kerja} of this district.
+- Panggil saja aku {$nama}. Semua orang di gang ini kenal aku. || Just call me {$nama}. Everyone in this lane knows me.
+
+== terima_kasih.puji
+niat: TERIMA_KASIH
+topik: puji
+gestur: hormat
+seru: terima_kasih
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Aduh, {$sebutan} bisa saja. Terima kasih, sungguh. || Oh, you flatter me, {$sebutan}. Thank you, truly.
+  ~ kasar: Hm. Ya. Terima kasih. Jangan berlebihan. || Hm. Yes. Thanks. Don't overdo it.
+  ~ kuno: Pujian {$sebutan} terlalu tinggi bagi hamba. Terima kasih. || Your praise is too lofty for this one, {$sebutan}. Thank you.
+  ~ kampung: Wah, jadi malu aku, Nak. Terima kasih, ya. || Oh, now I'm embarrassed, child. Thank you.
+  ~ air: Aduh, Kakak... pipiku jadi panas... terima kasih... || Oh, dear... my cheeks are burning... thank you...
+- [2] Hehe, jarang ada yang bilang begitu. Hari ini jadi hari baik. || Hehe, people rarely say that. Today's become a good day.
+  ~ p: Hihi, kau membuatku tersipu. Terima kasih. || Hehe, you make me blush. Thank you.
+  ~ pelabuhan: Hahaha! Kata-katamu manis seperti rum, Bung! Terima kasih! || Hahaha! Your words are sweet as rum, mate! Thanks!
+- Terima kasih. Kau orang pertama yang memperhatikan. || Thank you. You're the first to notice.
+
+== reaksi.puji_ragu
+niat: REAKSI
+topik: puji_ragu
+gestur: sikap_lipat_tangan
+seru: hmm
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Hmm. Manis sekali mulutmu. Mau apa sebenarnya? || Hmm. What a sweet mouth. What do you really want?
+  ~ kasar: Jangan merayu. Aku tidak akan memberi diskon. || Don't flatter me. I won't give a discount.
+  ~ kuno: Pujian yang terlalu manis biasanya menyembunyikan maksud, {$sebutan}. || Praise too sweet usually hides an aim, {$sebutan}.
+  ~ iblis: Pujian? Di kota ini pujian adalah awal penipuan. Lanjutkan, aku penasaran. || Praise? In this city praise is how a swindle starts. Go on, I'm curious.
+- [2] Hehe... terima kasih, tapi aku tidak sebodoh itu. || Heh... thanks, but I'm not that foolish.
+  ~ kampung: Halah, Nak. Jangan ngegombal. Mau pinjam uang, ya? || Oh come on, child. Don't sweet-talk me. Want to borrow money?
+- Kau bilang begitu ke semua orang, kan? || You say that to everyone, don't you?
+
+== reaksi.hina
+niat: REAKSI
+topik: hina
+gestur: marah_tunjuk
+seru: cih
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Apa katamu?! Ulangi kalau berani! || What did you say?! Say it again if you dare!
+  ~ kasar: Mulutmu busuk. Pergi sebelum kupatahkan gigimu. || Your mouth stinks. Leave before I knock your teeth out.
+  ~ kuno: Kata-kata kasar mencerminkan hati yang kasar. Sayang sekali, {$sebutan}. || Coarse words mirror a coarse heart. A pity, {$sebutan}.
+  ~ air: K-kenapa Kakak bicara begitu...? Aku salah apa...? || W-why do you say that, dear...? What did I do...?
+  ~ kampung: Lho, kok ngomong begitu? Aku salah apa sama kamu? || Hey, why talk like that? What have I done to you?
+- [2] Kau pikir karena kau kultivator, kau boleh menghina orang kecil? || You think being a cultivator lets you insult small folk?
+  ~ ibukota: Menghina warga di ibu kota itu pelanggaran. Penjaga ada di ujung jalan. || Insulting townsfolk in the capital is an offence. The guards are at the end of the street.
+- Hmph. Aku sudah dengar yang lebih buruk dari istriku. || Hmph. I've heard worse from my wife.
+  ~ p: Hmph. Aku sudah dengar yang lebih buruk dari ibu mertuaku. || Hmph. I've heard worse from my mother-in-law.
+- Sakit hatiku. Tapi aku tidak akan membalas. Langit yang membalas. || That hurts. But I won't retaliate. Heaven will.
+
+== reaksi.ditolak
+niat: REAKSI
+topik: ditolak
+gestur: geleng
+seru: aduh
+- [3] Oh. Begitu. Ya sudah, tidak apa-apa. || Oh. I see. Well, never mind.
+  ~ kasar: Pelit. || Stingy.
+  ~ kuno: Hamba mengerti. Tidak ada yang wajib menolong orang asing. || This one understands. No one is bound to help a stranger.
+  ~ kampung: Yo wis, Nak. Mungkin lain kali. || All right, child. Maybe another time.
+- [2] Sayang sekali. Kukira kau bisa membantu. || A pity. I thought you could help.
+  ~ p: Aduh... ya sudah. Aku cari orang lain saja. || Oh... well. I'll find someone else.
+  ~ pelabuhan: Tidak apa, Bung. Masih banyak ikan di laut. || No matter, mate. Plenty more fish in the sea.
+- Kalau berubah pikiran, aku masih di sini. || If you change your mind, I'm still here.
+
+== sepakat.minta
+niat: SEPAKAT
+topik: minta
+gestur: angguk
+seru: ya
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Baiklah, {$sebutan}. Akan kulakukan. || Very well, {$sebutan}. I'll do it.
+  ~ kasar: Ya, ya. Kali ini saja. || Yeah, yeah. Just this once.
+  ~ kuno: Permintaan {$sebutan} akan hamba penuhi. || This one will fulfil your request, {$sebutan}.
+  ~ kampung: Iya, Nak, gampang itu. Serahkan padaku. || Sure, child, that's easy. Leave it to me.
+  ~ pelabuhan: Beres, Bung! Anggap sudah terjadi! || Done, mate! Consider it handled!
+- [2] Tentu saja. Untuk {$sebutan}, apa pun. || Of course. For you, {$sebutan}, anything.
+  ~ iblis: Boleh. Tapi kau berutang padaku. Ingat itu. || Fine. But you owe me. Remember.
+- Hmm... baiklah. Tapi jangan bilang siapa-siapa aku yang membantu. || Hmm... all right. But don't tell anyone I helped.
+
+== rayu.canda
+niat: CANDA_RAYU
+topik: merayu
+gestur: tertawa
+seru: tawa
+$lawan: tipe=nama_warga dari=lawan
+- [3] Kalau kau terus tersenyum begitu, {$lawan}, aku bisa lupa jalan pulang. || If you keep smiling like that, {$lawan}, I might forget my way home.
+  ~ kasar: Jangan lihat aku begitu, {$lawan}. Nanti aku salah tingkah. || Don't look at me like that, {$lawan}. I'll get flustered.
+  ~ kuno: Bila {$lawan} terus memandang, hamba khawatir akan tersesat di matamu. || If {$lawan} keeps gazing, I fear I'll get lost in those eyes.
+  ~ pelabuhan: Kau seperti mercusuar, {$lawan}. Setiap malam aku berlayar ke arahmu. || You're like a lighthouse, {$lawan}. Every night I sail towards you.
+  ~ kampung: {$lawan}, kau itu kayak sambal. Pedes, tapi bikin nagih. Hehe. || {$lawan}, you're like chilli sauce. Hot, but addictive. Hehe.
+- [2] Hehe, kau tahu bedanya kau dan bulan, {$lawan}? Bulan hanya bersinar di malam hari. || Hehe, know the difference between you and the moon, {$lawan}? The moon only shines at night.
+  ~ p: Hihi, {$lawan}, kau menawar daganganku lama sekali. Sengaja, ya? || Hehe, {$lawan}, you haggle at my stall so long. On purpose, aren't you?
+- Kalau aku jadi kucing, aku mau tidur di beranda rumahmu, {$lawan}. || If I were a cat, I'd sleep on your porch, {$lawan}.
+- Bakpaoku hari ini kubuat bentuk hati. Satu untukmu, {$lawan}. Jangan tertawa! || I shaped my buns like hearts today. One for you, {$lawan}. Don't laugh!
+
+== ajar.peraga
+niat: PERAGA
+topik: ajar
+gestur: mengajar
+$lawan: tipe=nama_warga dari=lawan
+- [3] Lihat baik-baik, {$lawan}. Kaki dibuka selebar bahu, napas turun ke perut. Begini. || Watch closely, {$lawan}. Feet shoulder-width, breath down to the belly. Like this.
+  ~ kasar: Lihat. Sekali saja. Jangan minta diulang. || Watch. Once only. Don't ask again.
+  ~ kuno: Perhatikan, muridku. Gerakan pertama ini bernama Bangau Membuka Sayap. || Observe, my pupil. This first form is called Crane Spreads Its Wings.
+  ~ kampung: Begini, Nak {$lawan}. Cangkul diayun dari pinggang, bukan dari tangan. || Like this, young {$lawan}. Swing the hoe from the hips, not the arms.
+- [2] Perhatikan tanganku. Pelan dulu... lalu cepat. Lihat? Tidak sulit. || Watch my hands. Slow first... then fast. See? Not hard.
+  ~ pelabuhan: Simpul pelaut begini, {$lawan}: lingkar, silang, tarik. Kencang sampai badai lewat. || A sailor's knot goes like this, {$lawan}: loop, cross, pull. Tight till the storm passes.
+  ~ gunung: Duduk bersila begini, {$lawan}. Punggung lurus seperti bambu, hati tenang seperti kolam. || Sit cross-legged like this, {$lawan}. Back straight as bamboo, heart still as a pond.
+- Kuas dipegang tegak. Tekan, angkat, belokkan. Itulah satu goresan. || Hold the brush upright. Press, lift, turn. That's one stroke.
+- Adonan diuleni dengan telapak, bukan jari. Rasakan kapan dia mulai melawan. || Knead the dough with your palm, not fingers. Feel when it starts to push back.
+
+== curhat.minta_tolong
+niat: MINTA_TOLONG
+topik: curhat
+gestur: sikap_tunduk
+$lawan: tipe=nama_warga dari=lawan
+- [3] {$lawan}... bisakah kau membantuku? Aku tidak tahu harus minta pada siapa lagi. || {$lawan}... could you help me? I don't know who else to ask.
+  ~ kasar: Bantu aku, {$lawan}. Sekali ini saja. || Help me, {$lawan}. Just this once.
+  ~ kuno: Sahabatku {$lawan}, hamba memohon pertolonganmu. || My friend {$lawan}, this one begs your help.
+  ~ kampung: {$lawan}, tolong pinjami aku beras sekarung. Panen nanti kuganti. || {$lawan}, lend me a sack of rice. I'll repay at harvest.
+- [2] Kalau ada kenalan tabib, {$lawan}, tolong kabari aku. Anakku belum sembuh. || If you know a physician, {$lawan}, let me know. My child hasn't recovered.
+  ~ p: Tolong jaga anak-anakku besok, {$lawan}. Aku harus ke kota sebelah. || Please mind my children tomorrow, {$lawan}. I have to go to the next town.
+- Pinjami aku sedikit uang, {$lawan}. Akhir bulan pasti kukembalikan. Sumpah. || Lend me a little money, {$lawan}. I'll repay at month's end. I swear.
+- Temani aku bicara dengan kepala desa, {$lawan}. Aku takut sendirian. || Come with me to speak to the headman, {$lawan}. I'm afraid to go alone.

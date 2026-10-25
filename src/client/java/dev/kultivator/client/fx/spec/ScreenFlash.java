@@ -12,7 +12,8 @@ import net.minecraft.util.Util;
  * Full-screen technique flashes and edge vignettes (DESIGN 22.4.5), drawn as a HUD fill before the chat:
  * a flash has α ≤ 0.35, lasts ≤ 8 ticks, comes ≥ 10 ticks after the previous one, is × {@code screenEffectScale}, is
  * hidden in F1 and switched off by the "Kilatan layar" setting or "Kurangi gerak". A vignette darkens the screen edges
- * in a colour for a while (Langit+ ultimates).
+ * in a colour for a while (Langit+ ultimates). Since DESIGN 43.9 this class also holds the HUD's single edge painter
+ * {@link #tepi}: every edge tint of the mod asks it per frame and the strongest one shows.
  */
 public final class ScreenFlash {
 
@@ -86,12 +87,91 @@ public final class ScreenFlash {
 		speedEnd = 0L;
 	}
 
+	// ================================================================== the one edge painter (DESIGN 43.9, G29)
+
+	public static final int ATAS = 1;
+	public static final int BAWAH = 2;
+	public static final int KIRI = 4;
+	public static final int KANAN = 8;
+	public static final int SEMUA = ATAS | BAWAH | KIRI | KANAN;
+	/** The strongest edge any caller may ask for (alpha at the very edge). */
+	public static final float TEPI_MAX = 0.6F;
+
+	private static int edgeRgb;
+	private static float edgeStrength;
+	private static int edgeSides;
+
+	/** {@link #tepi(int, float, int)} on all four edges. */
+	public static void tepi(int rgb, float kuat) {
+		tepi(rgb, kuat, SEMUA);
+	}
+
+	/**
+	 * Asks for an edge tint this frame: {@code rgb} at alpha {@code kuat} (0..{@link #TEPI_MAX}) on the edges in
+	 * {@code sisi} ({@link #ATAS}, {@link #BAWAH}, {@link #KIRI}, {@link #KANAN}), fading inward. Every edge effect of the
+	 * HUD calls this every frame it wants one (own aura, soul view, sky events, themed towns, meditation danger, film
+	 * vignettes, the red sky, technique vignettes); only the strongest request is drawn, by this class's HUD element
+	 * (a request made after it drew shows on the next frame).
+	 */
+	public static void tepi(int rgb, float kuat, int sisi) {
+		if (!Float.isFinite(kuat) || kuat <= 0.004F || (sisi & SEMUA) == 0) {
+			return;
+		}
+		float k = Math.min(TEPI_MAX, kuat);
+		if (k > edgeStrength) {
+			edgeStrength = k;
+			edgeRgb = rgb & 0xFFFFFF;
+			edgeSides = sisi & SEMUA;
+		}
+	}
+
+	/** Draws the strongest edge asked for since the last frame and forgets it. */
+	private static void drawEdge(GuiGraphicsExtractor g, int width, int height) {
+		float strength = edgeStrength;
+		int rgb = edgeRgb;
+		int sides = edgeSides;
+		edgeStrength = 0.0F;
+		if (strength <= 0.0F) {
+			return;
+		}
+		int band = Math.max(10, Math.min(width, height) / 5);
+		int edge = Palette.argb(Math.round(255.0F * strength), rgb);
+		int clear = Palette.argb(0, rgb);
+		if ((sides & ATAS) != 0) {
+			g.fillGradient(0, 0, width, band, edge, clear);
+		}
+		if ((sides & BAWAH) != 0) {
+			g.fillGradient(0, height - band, width, height, clear, edge);
+		}
+		if ((sides & (KIRI | KANAN)) == 0) {
+			return;
+		}
+		// the side strips leave the corners to the top and bottom bands when those are drawn (no doubled corners)
+		int top = (sides & ATAS) != 0 ? band : 0;
+		int bottom = (sides & BAWAH) != 0 ? height - band : height;
+		for (int i = 0; i < band; i += 2) {
+			float k = 1.0F - i / (float) band;
+			int alpha = Math.round(255.0F * strength * k * k);
+			if (alpha <= 0) {
+				continue;
+			}
+			int color = Palette.argb(alpha, rgb);
+			if ((sides & KIRI) != 0) {
+				g.fill(i, top, i + 2, bottom, color);
+			}
+			if ((sides & KANAN) != 0) {
+				g.fill(width - i - 2, top, width - i, bottom, color);
+			}
+		}
+	}
+
 	/** The HUD element (registered by {@link SpecFx#init}). */
 	static final class Hud implements HudElement {
 		@Override
 		public void extractRenderState(GuiGraphicsExtractor g, DeltaTracker deltaTracker) {
 			Minecraft minecraft = Minecraft.getInstance();
 			if (minecraft.player == null || minecraft.gui.hud.isHidden()) {
+				edgeStrength = 0.0F;
 				return;
 			}
 			long now = Util.getMillis();
@@ -101,21 +181,9 @@ public final class ScreenFlash {
 			if (now < vignetteEnd) {
 				float t = (now - vignetteStart) / (float) Math.max(1L, vignetteEnd - vignetteStart);
 				float strength = (t < 0.15F ? t / 0.15F : t > 0.75F ? (1.0F - t) / 0.25F : 1.0F) * Math.max(0.3F, effect);
-				int band = Math.max(8, Math.min(width, height) / 6);
-				int edge = Palette.argb(Math.round(150 * strength), vignetteRgb);
-				int clear = Palette.argb(0, vignetteRgb);
-				g.fillGradient(0, 0, width, band, edge, clear);
-				g.fillGradient(0, height - band, width, height, clear, edge);
-				for (int i = 0; i < band; i += 2) {
-					int alpha = Math.round(150 * strength * (1.0F - i / (float) band));
-					if (alpha <= 0) {
-						continue;
-					}
-					int color = Palette.argb(alpha, vignetteRgb);
-					g.fill(i, band, i + 2, height - band, color);
-					g.fill(width - i - 2, band, width - i, height - band, color);
-				}
+				tepi(vignetteRgb, 150.0F / 255.0F * strength);
 			}
+			drawEdge(g, width, height);
 			if (now < speedEnd) {
 				// radial streaks converging on the centre, thickest at the edges (motion, not a camera snap)
 				float t = (now - speedStart) / (float) Math.max(1L, speedEnd - speedStart);

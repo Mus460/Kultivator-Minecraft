@@ -1,0 +1,6 @@
+{
+ "parent": "minecraft:item/handheld",
+ "textures": {
+  "layer0": "kultivator:item/kota42/wayang_kulit_hua_mulan"
+ }
+}

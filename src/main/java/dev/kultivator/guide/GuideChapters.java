@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 /**
- * Kitab Panduan (the in-game guide): the static list of its 20 chapters and their steps, shared by the server and the
+ * Kitab Panduan (the in-game guide): the static list of its 22 chapters and their steps, shared by the server and the
  * client. Pure data: no Minecraft classes, so both sides may use it freely.
  * <p>
  * Contract with {@code client.guide.GuideScreen} and {@link GuideProgress}:
@@ -55,9 +55,13 @@ public final class GuideChapters {
 	 * {@code lang-src/tempat_panduan.*} and {@code tempat_tema_panduan.*}, checks the {@code tempat/} advancements).
 	 * Chapter 21 (save index 20, Murid Mandiri, DESIGN 39.10.4, module 39E) has its texts in
 	 * {@code lang-src/sekte_mandiri_cerita.*} and its checks are the {@code sekte/mandiri_*} advancements of modules
-	 * 39A-39F. The book shows them in {@link #displayOrder()}.
+	 * 39A-39F. Chapter 22 (save index 21, Bergabung dengan Sekte, DESIGN 41.13.4, module 41V) has its texts in
+	 * {@code lang-src/sekte_gabung_panduan.*} and its checks are the {@code sekte/gabung_*} advancements of modules 41A-41D.
+	 * Chapter 23 (save index 22, Kota yang Hidup, DESIGN 42.14.4, module 42V) has its texts in
+	 * {@code lang-src/kota_hidup_panduan.*} and its checks are the {@code tempat/kota42_*} advancements of modules 42A-42F.
+	 * The book shows them in {@link #displayOrder()}.
 	 */
-	public static final int CHAPTER_COUNT = 21;
+	public static final int CHAPTER_COUNT = 23;
 
 	/**
 	 * The order the book shows the chapters in, as 0-based save indexes (integration audit T1): Dunia yang Luas right
@@ -65,9 +69,12 @@ public final class GuideChapters {
 	 * and the Tips last. Sekte Langit (37) inserts its chapter 17 (save index 16) right after chapter 9 (save index 8).
 	 * DESIGN 38 shows Kota Besar, Tempat-Tempat Dunia and Lima Kota Bertema (save indexes 17, 18, 19) right after Dunia
 	 * yang Luas (save index 12): the places a young cultivator travels to first. DESIGN 39 shows Murid Mandiri (save
-	 * index 20) right after Murid yang Hidup (save index 14): disciples that live their own lives.
+	 * index 20) right after Murid yang Hidup (save index 14): disciples that live their own lives. DESIGN 41 shows
+	 * Bergabung dengan Sekte (save index 21) right after the sect chapters 15/16 (save index 15): the second road. DESIGN 42
+	 * shows Kota yang Hidup (save index 22) right after the place chapters 18-20 (save indexes 17-19): the townsfolk of
+	 * the towns the player has just found.
 	 */
-	private static final int[] DISPLAY_ORDER = {0, 1, 12, 17, 18, 19, 2, 3, 4, 14, 20, 5, 15, 6, 7, 8, 16, 13, 9, 10, 11};
+	private static final int[] DISPLAY_ORDER = {0, 1, 12, 17, 18, 19, 22, 2, 3, 4, 14, 20, 5, 15, 21, 6, 7, 8, 16, 13, 9, 10, 11};
 
 	/**
 	 * Per save index: {minRealm, pastRealm, requires}. minRealm: the chapter becomes current only from that realm on (null:
@@ -98,6 +105,8 @@ public final class GuideChapters {
 			{null, "immortal_ascension", null}, // 19 Tempat-Tempat Dunia: from the start (Fana)
 			{null, "immortal_ascension", null}, // 20 Lima Kota Bertema (38.T): from the start (Fana)
 			{"foundation", "immortal_ascension", "hall"}, // 21 Murid Mandiri (39E): a hall of one's own, from Foundation
+			{"qi_refining", "golden_core", null}, // 22 Bergabung dengan Sekte (41V): the young cultivator's road, until Golden Core
+			{null, "immortal_ascension", null}, // 23 Kota yang Hidup (42V): from the start (Fana), like the place chapters
 	};
 
 	/**
@@ -433,6 +442,48 @@ public final class GuideChapters {
 		step(20, "cita", null, "adv:sekte/mandiri_cita");
 		optional(20, "abadi", null, "adv:sekte/mandiri_abadi");
 		optional(20, "seteru", null, "adv:sekte/mandiri_seteru_damai|adv:sekte/mandiri_seteru_duel");
+		// 22. Bergabung dengan Sekte (DESIGN 41.13.4, module 41V; appended last). Only finding a sect and applying hold the
+		// chapter (and only until Golden Core): founding one's own sect stays an equal road, so the life inside a sect, the
+		// ranks, the wars and the two roads together are side goals the book ticks as they happen.
+		step(21, "kenal", "/kultivasi gabung direktori", "adv:sekte/gabung_kenal");
+		step(21, "lamar", "/kultivasi gabung lamar ", "adv:sekte/gabung_lamar");
+		optional(21, "ujian", "/kultivasi gabung status", "adv:sekte/gabung_diterima");
+		optional(21, "sumpah", "/kultivasi gabung sumpah", "adv:sekte/gabung_sumpah");
+		optional(21, "shifu", "/kultivasi gabung shifu", "adv:sekte/gabung_shifu");
+		optional(21, "tugas", "/kultivasi gabung tugas", "adv:sekte/gabung_tugas");
+		optional(21, "paviliun", "/kultivasi gabung paviliun", "adv:sekte/gabung_paviliun");
+		optional(21, "misi", "/kultivasi gabung papan", "adv:sekte/gabung_misi_10");
+		optional(21, "kediaman", "/kultivasi gabung kediaman", "adv:sekte/gabung_kediaman");
+		optional(21, "pangkat_dalam", "/kultivasi gabung naik", "adv:sekte/gabung_pangkat_dalam");
+		optional(21, "turnamen", null, "adv:sekte/gabung_turnamen");
+		optional(21, "perang", "/kultivasi gabung perang", "adv:sekte/gabung_bela_gerbang");
+		optional(21, "kuota", "/kultivasi gabung kartu", "adv:sekte/gabung_kuota");
+		optional(21, "inti", "/kultivasi gabung naik", "adv:sekte/gabung_pangkat_inti");
+		optional(21, "jalan_dua", "/kultivasi gabung politik", "adv:sekte/gabung_cabang|adv:sekte/gabung_tamu");
+		optional(21, "ketua", "/kultivasi gabung politik", "adv:sekte/gabung_ketua");
+		// 23. Kota yang Hidup (DESIGN 42.14.4, module 42V; appended last). The checks are the tempat/kota42_* advancements of
+		// 42A-42F. Talking, being known by name, a rumour traced, ten favours, a ceremony attended, four tones and overheard
+		// news hold the chapter: the townsfolk themselves. House, shop, investment, the Ghost Market, the watch, a pickpocket,
+		// office, the recruitment office, a pact, a plot, a generation and a kept promise are side goals.
+		step(22, "sapa", "/kultivasi kotaku", "adv:tempat/kota42_sapa");
+		step(22, "kenal", null, "adv:tempat/kota42_kenal");
+		step(22, "kabar", null, "adv:tempat/kota42_gosip");
+		step(22, "tolong", null, "adv:tempat/kota42_tolong");
+		step(22, "upacara", null, "adv:tempat/kota42_nikah|adv:tempat/kota42_makam");
+		optional(22, "rumah", "/kultivasi kotaku rumah", "adv:tempat/kota42_rumah");
+		optional(22, "toko", "/kultivasi kotaku toko", "adv:tempat/kota42_toko");
+		optional(22, "investasi", "/kultivasi kotaku investasi", "adv:tempat/kota42_investor");
+		optional(22, "pasar_hantu", null, "adv:tempat/kota42_pasar_hantu");
+		optional(22, "ronda", null, "adv:tempat/kota42_ronda");
+		optional(22, "copet", null, "adv:tempat/kota42_copet");
+		optional(22, "jabatan", "/kultivasi kotaku jabatan", "adv:tempat/kota42_pejabat");
+		optional(22, "kantor", "/kultivasi kotaku kantor", "adv:tempat/kota42_kantor");
+		optional(22, "pakta", "/kultivasi kotaku pakta", "adv:tempat/kota42_pelindung");
+		optional(22, "kavling", "/kultivasi kotaku kavling", "adv:tempat/kota42_kavling");
+		optional(22, "generasi", "/kultivasi kotaku buku", "adv:tempat/kota42_generasi");
+		step(22, "nada", null, "adv:tempat/kota42_lidah_perak");
+		step(22, "nguping", "/kultivasi kotaku buku", "adv:tempat/kota42_nguping");
+		optional(22, "janji", null, "adv:tempat/kota42_janji");
 
 		if (GATES.length != CHAPTER_COUNT || DISPLAY_ORDER.length != CHAPTER_COUNT) {
 			throw new IllegalStateException("Guide chapter tables out of step with CHAPTER_COUNT");

@@ -1,0 +1,1200 @@
+{
+  "_catatan": "Topik 42.5A.5 (42K). golongan: sosial konflik khawatir gosip tanya (pengali sifat) + 'fakta' (masuk hanya lewat fakta yang diingat; predikat.json 'topik') + 'ucap' (topik ujaran mesin/naskah, tidak pernah dipilih perencana). minat: kelompok/peran/kebiasaan (huruf kecil). lanjut: rantai topik (+bobot.lanjut giliran berikut).",
+  "bobot": {
+    "sal": 0.35,
+    "relLawan": 0.2,
+    "cocokEmosi": 0.15,
+    "konteks": 0.1,
+    "minat": 0.1,
+    "kebutuhan": 0.1,
+    "sudahDibahas": -0.3,
+    "lanjut": 0.25,
+    "tau_dasar": 0.25,
+    "tau_O": 400
+  },
+  "topik": [
+    {
+      "id": "sapa",
+      "golongan": [
+        "ucap"
+      ],
+      "valensi": 1,
+      "syarat": {},
+      "minat": [],
+      "lanjut": [
+        "cuaca",
+        "kerja"
+      ],
+      "tabu": [],
+      "niat": [
+        "SAPA"
+      ]
+    },
+    {
+      "id": "cuaca",
+      "golongan": [
+        "sosial"
+      ],
+      "valensi": 0,
+      "syarat": {
+        "cuaca": [
+          "hujan",
+          "badai",
+          "salju",
+          "kabut_qi",
+          "gerhana",
+          "meteor"
+        ]
+      },
+      "minat": [
+        "pekerja",
+        "petani",
+        "nelayan"
+      ],
+      "lanjut": [
+        "panen",
+        "harga",
+        "kesehatan"
+      ],
+      "tabu": [],
+      "niat": [
+        "BASA_BASI",
+        "BERI_KABAR",
+        "KELUH"
+      ]
+    },
+    {
+      "id": "musim",
+      "golongan": [
+        "sosial"
+      ],
+      "valensi": 0,
+      "syarat": {},
+      "minat": [
+        "pekerja",
+        "petani",
+        "tetua"
+      ],
+      "lanjut": [
+        "panen",
+        "acara",
+        "makanan"
+      ],
+      "tabu": [],
+      "niat": [
+        "BASA_BASI",
+        "BERI_KABAR"
+      ]
+    },
+    {
+      "id": "panen",
+      "golongan": [
+        "sosial"
+      ],
+      "valensi": 1,
+      "syarat": {
+        "musim": [
+          "panas",
+          "gugur"
+        ]
+      },
+      "minat": [
+        "petani",
+        "pekerja"
+      ],
+      "lanjut": [
+        "harga",
+        "makanan"
+      ],
+      "tabu": [],
+      "niat": [
+        "BERI_KABAR",
+        "KELUH"
+      ]
+    },
+    {
+      "id": "kerja",
+      "golongan": [
+        "sosial"
+      ],
+      "valensi": 0,
+      "syarat": {},
+      "minat": [
+        "pekerja",
+        "pedagang",
+        "penjaga",
+        "pekerja_keras"
+      ],
+      "lanjut": [
+        "harga",
+        "uang",
+        "keluarga"
+      ],
+      "tabu": [
+        "gosip_saat_kerja"
+      ],
+      "niat": [
+        "BASA_BASI",
+        "BERI_KABAR",
+        "KELUH",
+        "PAMER"
+      ]
+    },
+    {
+      "id": "makanan",
+      "golongan": [
+        "sosial"
+      ],
+      "valensi": 1,
+      "syarat": {
+        "jam": [
+          "pagi",
+          "siang",
+          "malam"
+        ]
+      },
+      "minat": [
+        "pekerja",
+        "anak",
+        "pecinta_teh"
+      ],
+      "lanjut": [
+        "harga",
+        "acara"
+      ],
+      "tabu": [],
+      "niat": [
+        "BASA_BASI",
+        "TAWARAN",
+        "CERITA"
+      ]
+    },
+    {
+      "id": "anak",
+      "golongan": [
+        "sosial"
+      ],
+      "valensi": 1,
+      "syarat": {
+        "hubungan": [
+          "anak"
+        ]
+      },
+      "minat": [
+        "pencerita_anak",
+        "tetua"
+      ],
+      "lanjut": [
+        "keluarga",
+        "sekte",
+        "cita"
+      ],
+      "tabu": [],
+      "niat": [
+        "BERI_KABAR",
+        "PAMER",
+        "KHAWATIR"
+      ]
+    },
+    {
+      "id": "kebiasaan",
+      "golongan": [
+        "sosial"
+      ],
+      "valensi": 1,
+      "syarat": {},
+      "minat": [
+        "pemabuk",
+        "kakek_catur",
+        "burung_sangkar",
+        "pemancing",
+        "adu_jangkrik",
+        "penyair",
+        "pemain_erhu",
+        "layang_layang",
+        "penyulam",
+        "pecinta_teh",
+        "penggemar_opera",
+        "tari_kipas",
+        "pelukis_gula"
+      ],
+      "lanjut": [
+        "kenangan",
+        "kota"
+      ],
+      "tabu": [],
+      "niat": [
+        "CERITA",
+        "PAMER",
+        "TAWARAN"
+      ]
+    },
+    {
+      "id": "kenangan",
+      "golongan": [
+        "sosial"
+      ],
+      "valensi": 1,
+      "syarat": {},
+      "minat": [
+        "tetua",
+        "pencerita_anak"
+      ],
+      "lanjut": [
+        "kota",
+        "keluarga"
+      ],
+      "tabu": [],
+      "niat": [
+        "CERITA"
+      ]
+    },
+    {
+      "id": "kota",
+      "golongan": [
+        "sosial"
+      ],
+      "valensi": 0,
+      "syarat": {},
+      "minat": [
+        "tetua",
+        "cendekia",
+        "pejabat"
+      ],
+      "lanjut": [
+        "acara",
+        "pejabat",
+        "sekte"
+      ],
+      "tabu": [],
+      "niat": [
+        "CERITA",
+        "BERI_KABAR"
+      ]
+    },
+    {
+      "id": "cita",
+      "golongan": [
+        "sosial"
+      ],
+      "valensi": 1,
+      "syarat": {
+        "tahap": [
+          "anak",
+          "remaja",
+          "dewasa"
+        ]
+      },
+      "minat": [
+        "anak",
+        "pemuja_kultivator"
+      ],
+      "lanjut": [
+        "sekte",
+        "kerja"
+      ],
+      "tabu": [],
+      "niat": [
+        "CERITA",
+        "KHAWATIR"
+      ]
+    },
+    {
+      "id": "lelucon",
+      "golongan": [
+        "sosial"
+      ],
+      "valensi": 2,
+      "syarat": {
+        "label_emosi": [
+          "gembira",
+          "puas",
+          "netral",
+          "kagum"
+        ]
+      },
+      "minat": [
+        "anak",
+        "pemabuk"
+      ],
+      "lanjut": [
+        "makanan",
+        "tetangga"
+      ],
+      "tabu": [
+        "duka_di_pesta"
+      ],
+      "niat": [
+        "OLOK",
+        "CERITA"
+      ]
+    },
+    {
+      "id": "perjalanan",
+      "golongan": [
+        "tanya",
+        "sosial"
+      ],
+      "valensi": 1,
+      "syarat": {},
+      "minat": [
+        "pedagang",
+        "kultivator"
+      ],
+      "lanjut": [
+        "dunia",
+        "kafilah"
+      ],
+      "tabu": [],
+      "niat": [
+        "TANYA_BALIK"
+      ]
+    },
+    {
+      "id": "sekte_pemain",
+      "golongan": [
+        "tanya"
+      ],
+      "valensi": 0,
+      "syarat": {},
+      "minat": [
+        "pemuja_kultivator",
+        "kultivator",
+        "anak"
+      ],
+      "lanjut": [
+        "sekte",
+        "cita"
+      ],
+      "tabu": [],
+      "niat": [
+        "TANYA_BALIK",
+        "PUJI"
+      ]
+    },
+    {
+      "id": "ranah",
+      "golongan": [
+        "tanya"
+      ],
+      "valensi": 1,
+      "syarat": {
+        "tahu_nama": true
+      },
+      "minat": [
+        "pemuja_kultivator",
+        "kultivator",
+        "rahib"
+      ],
+      "lanjut": [
+        "sekte_pemain"
+      ],
+      "tabu": [],
+      "niat": [
+        "TANYA_BALIK",
+        "PUJI"
+      ]
+    },
+    {
+      "id": "pemain",
+      "golongan": [
+        "fakta",
+        "gosip"
+      ],
+      "valensi": 1,
+      "syarat": {},
+      "minat": [
+        "gosip_sumur",
+        "pengintip"
+      ],
+      "lanjut": [
+        "sekte_pemain",
+        "kejahatan"
+      ],
+      "tabu": [
+        "rahasia_ke_asing"
+      ],
+      "niat": [
+        "BERI_KABAR",
+        "PUJI",
+        "SINDIR",
+        "BISIK"
+      ]
+    },
+    {
+      "id": "dagang",
+      "golongan": [
+        "fakta",
+        "sosial"
+      ],
+      "valensi": 0,
+      "syarat": {},
+      "minat": [
+        "pedagang",
+        "pelit",
+        "penabung"
+      ],
+      "lanjut": [
+        "harga",
+        "kafilah",
+        "uang"
+      ],
+      "tabu": [],
+      "niat": [
+        "BERI_KABAR",
+        "TAWARAN",
+        "KELUH"
+      ]
+    },
+    {
+      "id": "janji",
+      "golongan": [
+        "fakta"
+      ],
+      "valensi": 0,
+      "syarat": {},
+      "minat": [],
+      "lanjut": [
+        "pemain"
+      ],
+      "tabu": [],
+      "niat": [
+        "KILAS_BALIK",
+        "BERI_KABAR"
+      ]
+    },
+    {
+      "id": "sekte",
+      "golongan": [
+        "fakta",
+        "sosial"
+      ],
+      "valensi": 1,
+      "syarat": {},
+      "minat": [
+        "kultivator",
+        "pemuja_kultivator",
+        "rahib"
+      ],
+      "lanjut": [
+        "sekte_pemain",
+        "bahaya",
+        "anak"
+      ],
+      "tabu": [],
+      "niat": [
+        "BERI_KABAR",
+        "CERITA",
+        "KHAWATIR"
+      ]
+    },
+    {
+      "id": "pejabat",
+      "golongan": [
+        "fakta",
+        "konflik"
+      ],
+      "valensi": -1,
+      "syarat": {},
+      "minat": [
+        "pejabat",
+        "cendekia"
+      ],
+      "lanjut": [
+        "kota",
+        "uang"
+      ],
+      "tabu": [
+        "jelek_pejabat_takut"
+      ],
+      "niat": [
+        "BERI_KABAR",
+        "KELUH",
+        "BISIK"
+      ]
+    },
+    {
+      "id": "asmara",
+      "golongan": [
+        "fakta",
+        "gosip"
+      ],
+      "valensi": 1,
+      "syarat": {
+        "tahap": [
+          "remaja",
+          "dewasa",
+          "tua"
+        ]
+      },
+      "minat": [
+        "gosip_sumur",
+        "pesolek",
+        "penyair"
+      ],
+      "lanjut": [
+        "keluarga",
+        "tetangga"
+      ],
+      "tabu": [
+        "rahasia_ke_asing"
+      ],
+      "niat": [
+        "BISIK",
+        "BERI_KABAR"
+      ]
+    },
+    {
+      "id": "keluarga",
+      "golongan": [
+        "fakta",
+        "sosial"
+      ],
+      "valensi": 2,
+      "syarat": {},
+      "minat": [
+        "tetua",
+        "pencerita_anak"
+      ],
+      "lanjut": [
+        "anak",
+        "kesehatan",
+        "kerja"
+      ],
+      "tabu": [],
+      "niat": [
+        "BERI_KABAR",
+        "PAMER",
+        "KHAWATIR"
+      ]
+    },
+    {
+      "id": "kesehatan",
+      "golongan": [
+        "fakta",
+        "khawatir"
+      ],
+      "valensi": -2,
+      "syarat": {},
+      "minat": [
+        "tabib",
+        "pendoa_kuil",
+        "takhayul"
+      ],
+      "lanjut": [
+        "keluarga",
+        "uang"
+      ],
+      "tabu": [],
+      "niat": [
+        "KHAWATIR",
+        "PERMINTAAN_NPC",
+        "BERI_KABAR"
+      ]
+    },
+    {
+      "id": "duka",
+      "golongan": [
+        "fakta",
+        "khawatir"
+      ],
+      "valensi": -3,
+      "syarat": {},
+      "minat": [],
+      "lanjut": [
+        "keluarga",
+        "kenangan"
+      ],
+      "tabu": [
+        "duka_di_pesta"
+      ],
+      "niat": [
+        "BERI_KABAR",
+        "KELUH"
+      ]
+    },
+    {
+      "id": "tetangga",
+      "golongan": [
+        "fakta",
+        "gosip"
+      ],
+      "valensi": -1,
+      "syarat": {},
+      "minat": [
+        "gosip_sumur",
+        "pengintip"
+      ],
+      "lanjut": [
+        "asmara",
+        "uang",
+        "kejahatan"
+      ],
+      "tabu": [
+        "gosip_saat_kerja",
+        "rahasia_ke_asing"
+      ],
+      "niat": [
+        "BISIK",
+        "BERI_KABAR",
+        "SINDIR"
+      ]
+    },
+    {
+      "id": "uang",
+      "golongan": [
+        "fakta",
+        "khawatir"
+      ],
+      "valensi": -1,
+      "syarat": {},
+      "minat": [
+        "pedagang",
+        "pelit",
+        "penabung",
+        "penjudi"
+      ],
+      "lanjut": [
+        "harga",
+        "kerja"
+      ],
+      "tabu": [
+        "rahasia_ke_asing"
+      ],
+      "niat": [
+        "KELUH",
+        "PERMINTAAN_NPC",
+        "BERI_KABAR"
+      ]
+    },
+    {
+      "id": "harga",
+      "golongan": [
+        "fakta",
+        "sosial"
+      ],
+      "valensi": -1,
+      "syarat": {},
+      "minat": [
+        "pedagang",
+        "pelit",
+        "penabung",
+        "pekerja"
+      ],
+      "lanjut": [
+        "kafilah",
+        "begal",
+        "panen"
+      ],
+      "tabu": [],
+      "niat": [
+        "BERI_KABAR",
+        "KELUH",
+        "TANYA"
+      ]
+    },
+    {
+      "id": "acara",
+      "golongan": [
+        "fakta",
+        "sosial"
+      ],
+      "valensi": 2,
+      "syarat": {},
+      "minat": [
+        "penggemar_opera",
+        "tari_kipas",
+        "anak"
+      ],
+      "lanjut": [
+        "makanan",
+        "kota"
+      ],
+      "tabu": [],
+      "niat": [
+        "BERI_KABAR",
+        "CERITA"
+      ]
+    },
+    {
+      "id": "bahaya",
+      "golongan": [
+        "fakta",
+        "khawatir"
+      ],
+      "valensi": -3,
+      "syarat": {},
+      "minat": [
+        "penjaga",
+        "penakut"
+      ],
+      "lanjut": [
+        "sekte",
+        "begal"
+      ],
+      "tabu": [],
+      "niat": [
+        "PERINGATAN",
+        "BERI_KABAR",
+        "KHAWATIR"
+      ]
+    },
+    {
+      "id": "kafilah",
+      "golongan": [
+        "fakta",
+        "sosial"
+      ],
+      "valensi": 1,
+      "syarat": {},
+      "minat": [
+        "pedagang"
+      ],
+      "lanjut": [
+        "begal",
+        "harga",
+        "dunia"
+      ],
+      "tabu": [],
+      "niat": [
+        "BERI_KABAR",
+        "CERITA"
+      ]
+    },
+    {
+      "id": "begal",
+      "golongan": [
+        "khawatir"
+      ],
+      "valensi": -2,
+      "syarat": {},
+      "minat": [
+        "penjaga",
+        "pedagang"
+      ],
+      "lanjut": [
+        "bahaya",
+        "sekte",
+        "harga"
+      ],
+      "tabu": [],
+      "niat": [
+        "PERINGATAN",
+        "BERI_KABAR",
+        "KELUH"
+      ]
+    },
+    {
+      "id": "pasar_hantu",
+      "golongan": [
+        "fakta",
+        "gosip"
+      ],
+      "valensi": 0,
+      "syarat": {
+        "jam": [
+          "sore",
+          "malam",
+          "larut"
+        ]
+      },
+      "minat": [
+        "pengintip",
+        "penjudi"
+      ],
+      "lanjut": [
+        "kejahatan",
+        "uang"
+      ],
+      "tabu": [
+        "rahasia_ke_asing"
+      ],
+      "niat": [
+        "BISIK",
+        "BERI_KABAR"
+      ]
+    },
+    {
+      "id": "kejahatan",
+      "golongan": [
+        "fakta",
+        "konflik"
+      ],
+      "valensi": -1,
+      "syarat": {},
+      "minat": [
+        "penjaga",
+        "pejabat"
+      ],
+      "lanjut": [
+        "bahaya",
+        "pemain"
+      ],
+      "tabu": [],
+      "niat": [
+        "BERI_KABAR",
+        "PERINGATAN",
+        "KELUH"
+      ]
+    },
+    {
+      "id": "dunia",
+      "golongan": [
+        "fakta",
+        "sosial"
+      ],
+      "valensi": 0,
+      "syarat": {},
+      "minat": [
+        "kultivator",
+        "cendekia",
+        "pengembara"
+      ],
+      "lanjut": [
+        "sekte",
+        "perjalanan"
+      ],
+      "tabu": [],
+      "niat": [
+        "BERI_KABAR",
+        "CERITA"
+      ]
+    },
+    {
+      "id": "opini",
+      "golongan": [
+        "fakta",
+        "konflik"
+      ],
+      "valensi": 0,
+      "syarat": {},
+      "minat": [
+        "sombong",
+        "pemarah"
+      ],
+      "lanjut": [
+        "pejabat",
+        "harga"
+      ],
+      "tabu": [],
+      "niat": [
+        "BERI_KABAR",
+        "SINDIR"
+      ]
+    },
+    {
+      "id": "kabar",
+      "golongan": [
+        "fakta"
+      ],
+      "valensi": 0,
+      "syarat": {},
+      "minat": [],
+      "lanjut": [
+        "kota"
+      ],
+      "tabu": [],
+      "niat": [
+        "BERI_KABAR"
+      ]
+    },
+    {
+      "id": "pamit",
+      "golongan": [
+        "ucap"
+      ],
+      "valensi": 0,
+      "syarat": {},
+      "minat": [],
+      "lanjut": [],
+      "tabu": [],
+      "niat": [
+        "TUTUP"
+      ]
+    },
+    {
+      "id": "sabar_habis",
+      "golongan": [
+        "ucap"
+      ],
+      "valensi": -1,
+      "syarat": {},
+      "minat": [],
+      "lanjut": [],
+      "tabu": [],
+      "niat": [
+        "TUTUP"
+      ]
+    },
+    {
+      "id": "marah",
+      "golongan": [
+        "ucap"
+      ],
+      "valensi": -2,
+      "syarat": {},
+      "minat": [],
+      "lanjut": [],
+      "tabu": [],
+      "niat": [
+        "TUTUP",
+        "MARAH"
+      ]
+    },
+    {
+      "id": "puji",
+      "golongan": [
+        "ucap"
+      ],
+      "valensi": 2,
+      "syarat": {},
+      "minat": [],
+      "lanjut": [],
+      "tabu": [],
+      "niat": [
+        "TERIMA_KASIH"
+      ]
+    },
+    {
+      "id": "puji_ragu",
+      "golongan": [
+        "ucap"
+      ],
+      "valensi": 0,
+      "syarat": {},
+      "minat": [],
+      "lanjut": [],
+      "tabu": [],
+      "niat": [
+        "REAKSI"
+      ]
+    },
+    {
+      "id": "hina",
+      "golongan": [
+        "ucap"
+      ],
+      "valensi": -2,
+      "syarat": {},
+      "minat": [],
+      "lanjut": [],
+      "tabu": [],
+      "niat": [
+        "REAKSI"
+      ]
+    },
+    {
+      "id": "minta",
+      "golongan": [
+        "ucap"
+      ],
+      "valensi": 0,
+      "syarat": {},
+      "minat": [],
+      "lanjut": [],
+      "tabu": [],
+      "niat": [
+        "SEPAKAT",
+        "TOLAK"
+      ]
+    },
+    {
+      "id": "ditolak",
+      "golongan": [
+        "ucap"
+      ],
+      "valensi": -1,
+      "syarat": {},
+      "minat": [],
+      "lanjut": [],
+      "tabu": [],
+      "niat": [
+        "REAKSI"
+      ]
+    },
+    {
+      "id": "kenalan",
+      "golongan": [
+        "ucap"
+      ],
+      "valensi": 1,
+      "syarat": {},
+      "minat": [],
+      "lanjut": [],
+      "tabu": [],
+      "niat": [
+        "REAKSI"
+      ]
+    },
+    {
+      "id": "kilas.janji_lewat",
+      "golongan": [
+        "ucap"
+      ],
+      "valensi": -1,
+      "syarat": {},
+      "minat": [],
+      "lanjut": [],
+      "tabu": [],
+      "niat": [
+        "KILAS_BALIK"
+      ]
+    },
+    {
+      "id": "kilas.janji_tempo",
+      "golongan": [
+        "ucap"
+      ],
+      "valensi": 0,
+      "syarat": {},
+      "minat": [],
+      "lanjut": [],
+      "tabu": [],
+      "niat": [
+        "KILAS_BALIK"
+      ]
+    },
+    {
+      "id": "kilas.utang_warga",
+      "golongan": [
+        "ucap"
+      ],
+      "valensi": -1,
+      "syarat": {},
+      "minat": [],
+      "lanjut": [],
+      "tabu": [],
+      "niat": [
+        "KILAS_BALIK"
+      ]
+    },
+    {
+      "id": "kilas.utang_pemain",
+      "golongan": [
+        "ucap"
+      ],
+      "valensi": -1,
+      "syarat": {},
+      "minat": [],
+      "lanjut": [],
+      "tabu": [],
+      "niat": [
+        "KILAS_BALIK"
+      ]
+    },
+    {
+      "id": "kilas.kenangan",
+      "golongan": [
+        "ucap"
+      ],
+      "valensi": 1,
+      "syarat": {},
+      "minat": [],
+      "lanjut": [],
+      "tabu": [],
+      "niat": [
+        "KILAS_BALIK"
+      ]
+    },
+    {
+      "id": "kilas.kabar_pemain",
+      "golongan": [
+        "ucap"
+      ],
+      "valensi": 1,
+      "syarat": {},
+      "minat": [],
+      "lanjut": [],
+      "tabu": [],
+      "niat": [
+        "KILAS_BALIK"
+      ]
+    },
+    {
+      "id": "kilas.lama",
+      "golongan": [
+        "ucap"
+      ],
+      "valensi": 0,
+      "syarat": {},
+      "minat": [],
+      "lanjut": [],
+      "tabu": [],
+      "niat": [
+        "KILAS_BALIK"
+      ]
+    },
+    {
+      "id": "gosip",
+      "golongan": [
+        "ucap"
+      ],
+      "valensi": 0,
+      "syarat": {},
+      "minat": [],
+      "lanjut": [],
+      "tabu": [],
+      "niat": []
+    },
+    {
+      "id": "debat",
+      "golongan": [
+        "ucap"
+      ],
+      "valensi": 0,
+      "syarat": {},
+      "minat": [],
+      "lanjut": [],
+      "tabu": [],
+      "niat": []
+    },
+    {
+      "id": "merayu",
+      "golongan": [
+        "ucap"
+      ],
+      "valensi": 0,
+      "syarat": {},
+      "minat": [],
+      "lanjut": [],
+      "tabu": [],
+      "niat": []
+    },
+    {
+      "id": "ajar",
+      "golongan": [
+        "ucap"
+      ],
+      "valensi": 0,
+      "syarat": {},
+      "minat": [],
+      "lanjut": [],
+      "tabu": [],
+      "niat": []
+    },
+    {
+      "id": "curhat",
+      "golongan": [
+        "ucap"
+      ],
+      "valensi": 0,
+      "syarat": {},
+      "minat": [],
+      "lanjut": [],
+      "tabu": [],
+      "niat": []
+    },
+    {
+      "id": "canda",
+      "golongan": [
+        "ucap"
+      ],
+      "valensi": 0,
+      "syarat": {},
+      "minat": [],
+      "lanjut": [],
+      "tabu": [],
+      "niat": []
+    }
+  ]
+}

@@ -115,7 +115,9 @@ public final class LangitRancang {
 			return n <= max ? null : Component.translatable("kultivator.sekte_langit.bangun.jalan_b", max);
 		}
 		if (SectTemplates.isSky(current)) {
-			return null;
+			// Redesigning an untouched path B island: still small designs only.
+			int max = LangitConfig.get().awanAwalMaks;
+			return n <= max ? null : Component.translatable("kultivator.sekte_langit.bangun.jalan_b", max);
 		}
 		// Path A: lifting the mountain.
 		if (SectRaids.active(owner)) {

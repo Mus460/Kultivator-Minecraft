@@ -1,0 +1,10 @@
+{
+  "kultivator.gui43.konteks.berakhir": "The conversation has ended.",
+  "kultivator.gui43.konteks.bersama": "With %s",
+  "kultivator.gui43.konteks.bersama.tutup": "End it here and go back to the read-only view",
+  "kultivator.gui43.konteks.judul": "%s · %s",
+  "kultivator.gui43.konteks.memuat": "Loading…",
+  "kultivator.gui43.konteks.menunggu": "Di Sini is waiting",
+  "kultivator.gui43.konteks.menunggu.isi": "%s — open the Scroll (Di Sini tablet)",
+  "kultivator.gui43.konteks.yakin": "%s?"
+}

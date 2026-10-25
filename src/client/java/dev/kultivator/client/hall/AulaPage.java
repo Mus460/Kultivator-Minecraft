@@ -1,43 +1,37 @@
 package dev.kultivator.client.hall;
 
+import dev.kultivator.client.screen.Page;
 import dev.kultivator.client.screen.ui.Brush;
-import dev.kultivator.client.screen.ui.Eased;
 import dev.kultivator.client.screen.ui.Glyphs;
+import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
-import dev.kultivator.client.screen.ui.TalismanButton;
-import dev.kultivator.sect.hall.Halls;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
- * The Aula tablet (DESIGN 20.3.1): the hall's name (renamable), level seal and renown bar, the numbers its level
- * decides, the building checklist with hints, the Formasi Agung line, the schedule of the next events and the teams
- * away. The right column scrolls with the wheel.
+ * Sekte › Ikhtisar › Aula (DESIGN 20.3.1, 43.5): the hall's name, level seal and renown bar, the numbers its level decides
+ * and the master's {@code /sect} group "Saudara Sekte" (43.14 S3, R6: a list here instead of a chat command); then the
+ * building checklist with hints, the Formasi Agung line, the schedule of the next events and the teams away. Narrow
+ * layout: one scrolling column; otherwise the hall on the left and the rest in a scrolling panel on the right. All text
+ * at 1.0 (43.0.5). Renaming moved to Identitas. Reads {@link HallClient#info()}; the Gulungan asks for fresh details every
+ * 4 s while the Sekte section is shown.
  */
-public class AulaPage extends HallPage {
+public class AulaPage extends Page {
 
-	private static final int BUTTON_H = 14;
-	private final Eased scrollShown = new Eased(14.0F);
-	private float scroll;
-	private float contentH;
-	private int leftW;
-	private InkField nameField;
-	private final List<float[]> hoverBoxes = new ArrayList<>();
-	private final List<List<Component>> hoverTips = new ArrayList<>();
+	private static final int BARIS = 10;
 
-	public AulaPage(HallScreen screen) {
-		super(screen);
-	}
+	private final GulirKolom kiri = new GulirKolom();
+	private final GulirKolom kanan = new GulirKolom();
 
 	@Override
 	public Component title() {
@@ -50,292 +44,293 @@ public class AulaPage extends HallPage {
 	}
 
 	@Override
-	public int icon() {
+	public int glyph() {
 		return Glyphs.HALL;
 	}
 
-	private boolean readonly() {
-		return info().getBooleanOr("readonly", false);
+	@Override
+	public String helpTopic() {
+		return "aula";
 	}
 
 	@Override
 	protected void build() {
-		leftW = Math.max(110, Math.min(150, Math.round(w * 0.46F)));
-		nameField = null;
-		if (!readonly()) {
-			int fy = y + h - BUTTON_H * 2 - 6;
-			nameField = add(new InkField(x + 2, fy, leftW - 6, BUTTON_H - 2, 24, text -> HallClient.send(Halls.OP_RENAME, text)));
-			int half = (leftW - 6) / 2;
-			TalismanButton rename = new TalismanButton(x + 2, fy + BUTTON_H + 2, half - 1, BUTTON_H,
-					() -> Component.translatable("kultivator.hall.ui.rename"));
-			rename.onPress(() -> {
-				if (nameField.focused() && !nameField.text().isBlank()) {
-					HallClient.send(Halls.OP_RENAME, nameField.text().trim());
-					nameField.setFocused(false);
-				} else {
-					nameField.setText(info().getStringOr("name", ""));
-					nameField.setFocused(true);
-				}
-			});
-			rename.tooltip(() -> List.of(Component.translatable("kultivator.hall.ui.rename"), Component.translatable("kultivator.hall.ui.rename.tip")));
-			add(rename);
-			// T8: the players' own group (/sect, "Saudara Sekte") is reachable from the hall it lives beside.
-			TalismanButton fellows = new TalismanButton(x + 2 + half + 1, fy + BUTTON_H + 2, leftW - 6 - half - 1, BUTTON_H,
-					() -> Component.translatable("kultivator.sekte_sambung.aula.saudara"));
-			fellows.onPress(() -> {
-				net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
-				if (mc.getConnection() != null) {
-					mc.getConnection().sendCommand("sect info");
-					screen.onClose();
-				}
-			});
-			fellows.tooltip(() -> List.of(Component.translatable("kultivator.sekte_sambung.aula.saudara"),
-					Component.translatable("kultivator.sekte_sambung.aula.saudara.tip")));
-			add(fellows);
-		}
 	}
 
 	@Override
-	public boolean capturesKeys() {
-		return nameField != null && nameField.focused();
-	}
-
-	@Override
-	public boolean keyPressed(KeyEvent event) {
-		return nameField != null && nameField.keyPressed(event);
-	}
-
-	@Override
-	public boolean charTyped(CharacterEvent event) {
-		return nameField != null && nameField.charTyped(event);
-	}
-
-	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button) {
-		if (nameField != null && nameField.focused() && !nameField.contains(mouseX, mouseY)) {
-			nameField.setFocused(false);
-		}
-		return super.mouseClicked(mouseX, mouseY, button);
-	}
-
-	@Override
-	public boolean needsRebuild() {
-		return readonly() == (nameField != null);
+	public void onShow(@Nullable CompoundTag fokus) {
+		HallClient.minta();
+		super.onShow(fokus);
 	}
 
 	@Override
 	protected void drawBehind(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
-		CompoundTag info = info();
-		hoverBoxes.clear();
-		hoverTips.clear();
-		drawLeft(g, info, mouseX, mouseY);
-		drawRight(g, info, seconds);
-		for (int i = 0; i < hoverBoxes.size() && inside(mouseX, mouseY); i++) {
-			float[] box = hoverBoxes.get(i);
-			if (mouseX >= box[0] && mouseX < box[2] && mouseY >= box[1] && mouseY < box[3]) {
-				screen.showTooltip(hoverTips.get(i));
-				break;
-			}
+	}
+
+	@Override
+	protected void lukis(Lukis l) {
+		CompoundTag info = HallClient.info();
+		if (tata() == Tata.SEMPIT) {
+			int cy = kiri.mulai(l, x, y, x + w, y + h);
+			int x1 = x + kiri.lebar();
+			cy = aula(l, info, x, cy, x1);
+			cy = bangunan(l, info, x, cy + 4, x1);
+			cy = jadwal(l, info, x, cy + 4, x1);
+			cy = saudara(l, info, x, cy + 4, x1);
+			kiri.selesai(l, cy);
+			return;
 		}
+		int lw = Math.max(140, Math.min(200, Math.round(w * 0.44F)));
+		int cy = kiri.mulai(l, x, y, x + lw - 4, y + h);
+		cy = aula(l, info, x, cy, x + lw - 8);
+		cy = saudara(l, info, x, cy + 4, x + lw - 8);
+		kiri.selesai(l, cy);
+		int px0 = x + lw;
+		l.sumur(px0, y, x + w, y + h);
+		int ry = kanan.mulai(l, px0 + 4, y + 2, x + w - 2, y + h - 2);
+		int rx1 = px0 + 4 + kanan.lebar();
+		ry = bangunan(l, info, px0 + 4, ry, rx1);
+		ry = jadwal(l, info, px0 + 4, ry + 4, rx1);
+		kanan.selesai(l, ry);
 	}
 
-	private void tip(float x0, float y0, float x1, float y1, List<Component> lines) {
-		hoverBoxes.add(new float[]{x0, y0, x1, y1});
-		hoverTips.add(lines);
-	}
+	// ================================================================== the hall
 
-	/** Name, level seal, renown bar and the level's numbers. */
-	private void drawLeft(GuiGraphicsExtractor g, CompoundTag info, int mouseX, int mouseY) {
-		float x0 = x + 2.0F;
-		float width = leftW - 6.0F;
-		heading(g, screen.hallName(), x0, y, width, 0.8F);
+	/** Name, level seal, master, renown bar and the level's numbers; returns the y below. */
+	private int aula(Lukis l, CompoundTag info, int x0, int y0, int x1) {
+		int width = x1 - x0;
+		int cy = y0 + l.kepala(HallClient.hallName(info), x0, y0, x1);
 		int level = info.getIntOr("level", 1);
-		float sealR = 13.0F;
-		float cx = x0 + sealR + 1.0F;
-		float cy = y + 14.0F + sealR;
-		Brush.disc(g, cx + 0.5F, cy + 1.0F, sealR, 0x40000000);
-		Brush.disc(g, cx, cy, sealR, Palette.JADE_DARK);
-		Brush.disc(g, cx, cy, sealR - 1.5F, Palette.JADE);
-		Brush.ring(g, cx, cy, sealR - 3.5F, sealR - 2.8F, Palette.argb(0xC0, Palette.GOLD_LIGHT));
-		Brush.centered(g, font, Brush.bold(Component.literal(String.valueOf(level))), cx, cy - 6.0F, Palette.GOLD_LIGHT, 1.4F, true);
-		tip(cx - sealR, cy - sealR, cx + sealR, cy + sealR, List.of(Component.translatable("kultivator.hall.ui.level", level),
-				Component.translatable("kultivator.hall.ui.level.tip", info.getIntOr("renown_level", 1), info.getIntOr("bcap", 2))));
-		float tx = cx + sealR + 4.0F;
-		float tw = x0 + width - tx;
-		float ty = y + 14.0F;
-		ty += HallUi.line(g, font, Component.translatable("kultivator.hall.ui.level", level), tx, ty, tw, Palette.SEAL_DARK, 0.75F);
+		float r = 13.0F;
+		float sx = x0 + r + 1.0F;
+		float sy = cy + r;
+		Brush.disc(l.g, sx + 0.5F, sy + 1.0F, r, 0x40000000);
+		Brush.disc(l.g, sx, sy, r, Palette.JADE_DARK);
+		Brush.disc(l.g, sx, sy, r - 1.5F, Palette.JADE);
+		Brush.ring(l.g, sx, sy, r - 3.5F, r - 2.8F, Palette.argb(0xC0, Palette.GOLD_LIGHT));
+		Brush.centered(l.g, l.font, Brush.bold(Component.literal(String.valueOf(level))), sx, sy - 6.0F, Palette.GOLD_LIGHT, 1.5F, true);
+		if (l.di(Math.round(sx - r), Math.round(sy - r), Math.round(sx + r), Math.round(sy + r))) {
+			l.tip(List.of(Component.translatable("kultivator.hall.ui.level", level),
+					Component.translatable("kultivator.hall.ui.level.tip", info.getIntOr("renown_level", 1), info.getIntOr("bcap", 2))));
+		}
+		int tx = Math.round(sx + r + 4.0F);
+		int tw = x1 - tx;
+		int ty = cy;
+		l.teks(Component.translatable("kultivator.hall.ui.level", level), tx, ty, tw, Palette.SEAL_DARK);
+		ty += BARIS;
 		String sect = info.getStringOr("sect", "");
 		if (!sect.isEmpty()) {
-			ty += HallUi.line(g, font, Component.translatable("kultivator.hall.ui.sect", sect), tx, ty, tw, Palette.INK_SOFT, 0.6F);
+			l.teks(Component.translatable("kultivator.hall.ui.sect", sect), tx, ty, tw, l.gaya.teksLemah);
+			ty += BARIS;
 		}
-		ty += HallUi.line(g, font, Component.translatable("kultivator.hall.ui.master", info.getStringOr("owner_name", "")), tx, ty, tw,
-				Palette.INK_SOFT, 0.6F);
+		l.teks(Component.translatable("kultivator.hall.ui.master", info.getStringOr("owner_name", "")), tx, ty, tw, l.gaya.teksLemah);
+		ty += BARIS;
 		if (info.getBooleanOr("dormant", false)) {
-			HallUi.line(g, font, Component.translatable("kultivator.hall.ui.dormant").withStyle(ChatFormatting.BOLD), tx, ty, tw, Palette.DANGER, 0.6F);
+			l.teks(Component.translatable("kultivator.hall.ui.dormant").withStyle(ChatFormatting.BOLD), tx, ty, tw, Palette.DANGER);
+			ty += BARIS;
 		}
-		float by = y + 16.0F + sealR * 2.0F;
+		cy = Math.max(ty, Math.round(sy + r) + 3);
+		// renown: name and value on one line, the bar under it
 		long renown = info.getLongOr("renown", 0L);
 		long next = info.getLongOr("renown_next", -1L);
 		long base = info.getLongOr("renown_base", 0L);
 		float fraction = next < 0L ? 1.0F : (float) (renown - base) / Math.max(1L, next - base);
-		Component value = Component.literal(next < 0L ? String.valueOf(renown) : renown + " / " + next);
-		float barH = HallUi.bar(g, font, Component.translatable("kultivator.hall.ui.renown"), value, fraction, Palette.GOLD, Palette.GOLD_LIGHT,
-				x0, by, x0 + width, 0.6F);
-		tip(x0, by, x0 + width, by + barH, List.of(Component.translatable("kultivator.hall.ui.renown"),
-				Component.translatable("kultivator.hall.ui.renown.tip"), Component.translatable("kultivator.hall.ui.renown.source")
-						.withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC)));
-		by += barH + 3.0F;
+		Component value = Component.literal(next < 0L ? Brush.angka(renown) : Brush.angka(renown) + " / " + Brush.angka(next));
+		int vw = Math.min(width / 2, l.font.width(value));
+		l.teks(Component.translatable("kultivator.hall.ui.renown"), x0, cy, width - vw - 4, l.gaya.teksLemah);
+		l.kanan(value, x1, cy, Palette.GOLD_DARK);
+		int by = cy + BARIS;
+		Brush.rect(l.g, x0, by, x1, by + 4.0F, Palette.mix(Palette.PAPER_BOTTOM, Palette.INK, 0.25F));
+		float fill = x0 + 0.5F + (width - 1.0F) * Math.max(0.0F, Math.min(1.0F, fraction));
+		Brush.rect(l.g, x0 + 0.5F, by + 0.5F, fill, by + 3.5F, Palette.GOLD);
+		Brush.rect(l.g, x0 + 0.5F, by + 0.5F, fill, by + 1.3F, Palette.GOLD_LIGHT);
+		if (l.di(x0, cy, x1, by + 4)) {
+			l.tip(List.of(Component.translatable("kultivator.hall.ui.renown"), Component.translatable("kultivator.hall.ui.renown.tip"),
+					Component.translatable("kultivator.hall.ui.renown.source").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC)));
+		}
+		cy = by + 8;
 		int alive = info.getIntOr("alive", -1);
 		Component[] lines = {
 				alive >= 0 ? Component.translatable("kultivator.hall.ui.cap", alive, info.getIntOr("cap", 5))
 						: Component.translatable("kultivator.hall.ui.cap_only", info.getIntOr("cap", 5)),
 				Component.translatable("kultivator.hall.ui.radius", info.getIntOr("radius", 24)),
-				Component.translatable("kultivator.hall.ui.price", String.format(java.util.Locale.ROOT, "%.2f", info.getDoubleOr("price", 1.0D))),
+				Component.translatable("kultivator.hall.ui.price", String.format(Locale.ROOT, "%.2f", info.getDoubleOr("price", 1.0D))),
 				Component.translatable("kultivator.hall.ui.per_arrival", info.getIntOr("per_arrival", 2)),
 				Component.translatable("kultivator.hall.ui.posts", info.getIntOr("posts", 1), info.getIntOr("missions", 3)),
 				Component.translatable("kultivator.hall.ui.pool", info.getIntOr("pool", 0))};
-		float limit = readonly() ? y + h : y + h - BUTTON_H * 2 - 8;
 		for (Component line : lines) {
-			if (by + 6.0F > limit) {
-				break;
-			}
-			Brush.rect(g, x0 + 1.0F, by + 2.0F, x0 + 3.0F, by + 4.0F, Palette.JADE);
-			by += HallUi.line(g, font, line, x0 + 6.0F, by, width - 6.0F, Palette.INK, 0.62F) + 0.5F;
+			Brush.rect(l.g, x0 + 1.0F, cy + 3.0F, x0 + 3.0F, cy + 5.0F, Palette.JADE);
+			l.teks(line, x0 + 6, cy, width - 6, l.gaya.teks);
+			cy += BARIS;
 		}
+		return cy;
 	}
 
-	/** The building checklist, the formation, the schedule and the teams away (scrolls). */
-	private void drawRight(GuiGraphicsExtractor g, CompoundTag info, float seconds) {
-		int x0 = x + leftW;
-		int x1 = x + w;
-		panel(g, x0, y, x1, y + h);
-		float maxScroll = Math.max(0.0F, contentH - h);
-		scroll = Math.max(0.0F, Math.min(maxScroll, scroll));
-		float offset = scrollShown.to(scroll, seconds);
-		g.enableScissor(x0 + 1, y + 1, x1 - 1, y + h - 1);
-		float tx = x0 + 5.0F;
-		float width = x1 - x0 - 10.0F;
-		float cursor = y + 4.0F - offset;
-		heading(g, Component.translatable("kultivator.hall.ui.buildings"), tx, cursor, width, 0.75F);
-		cursor += 12.0F;
+	/** "Saudara Sekte": the master's {@code /sect} group (S3), the master first, online members marked. */
+	private int saudara(Lukis l, CompoundTag info, int x0, int y0, int x1) {
+		int cy = y0 + l.kepala(Component.translatable("kultivator.sekte_sambung.aula.saudara"), x0, y0, x1);
+		ListTag list = info.getListOrEmpty("saudara");
+		if (list.isEmpty()) {
+			cy += Math.round(l.bungkus(Component.translatable("kultivator.gui43.m05.saudara.kosong"), x0 + 2, cy, x1 - x0 - 2, l.gaya.teksSamar));
+			return cy + 2;
+		}
+		long day = info.getLongOr("day", 0L);
+		for (Tag tag : list) {
+			if (!(tag instanceof CompoundTag e)) {
+				continue;
+			}
+			boolean online = e.getBooleanOr("online", false);
+			boolean master = e.getBooleanOr("master", false);
+			Brush.disc(l.g, x0 + 3.0F, cy + 4.0F, 2.0F, online ? Palette.JADE : Palette.LOCKED);
+			Component name = Component.literal(e.getStringOr("name", "?"));
+			if (master) {
+				name = name.copy().append(" · ").append(Component.translatable("kultivator.gui43.m05.saudara.ketua").withColor(Palette.SEAL_DARK & 0xFFFFFF));
+			}
+			l.teks(name, x0 + 8, cy, x1 - x0 - 8, online ? l.gaya.teks : l.gaya.teksLemah);
+			if (l.di(x0, cy, x1, cy + BARIS)) {
+				long joinedDay = Math.floorDiv(e.getLongOr("joined", 0L), 24000L);
+				l.tip(List.of(Component.literal(e.getStringOr("name", "?")),
+						Component.translatable(online ? "kultivator.gui43.m05.saudara.daring" : "kultivator.gui43.m05.saudara.luring"),
+						Component.translatable("kultivator.gui43.m05.saudara.sejak", Math.max(0L, day - joinedDay)).withStyle(ChatFormatting.GRAY)));
+			}
+			cy += BARIS;
+		}
+		return cy + 2;
+	}
+
+	// ================================================================== buildings, schedule, teams away
+
+	private int bangunan(Lukis l, CompoundTag info, int x0, int y0, int x1) {
+		int cy = y0 + l.kepala(Component.translatable("kultivator.hall.ui.buildings"), x0, y0, x1);
 		Component buildStatus = info.read("build_status", ComponentSerialization.CODEC).orElse(null);
 		if (buildStatus != null) {
 			// Phase 6b: a sect template builds the hall, so its status line replaces the checklist (DESIGN 21.17).
-			cursor += Brush.wrap(g, font, buildStatus, tx, cursor, width, Palette.INK, 0.6F, false) + 2.0F;
+			cy += Math.round(l.bungkus(buildStatus, x0, cy, x1 - x0, l.gaya.teks)) + 2;
 		} else {
 			int flags = info.getIntOr("bflags", 0);
 			CompoundTag counts = info.getCompoundOrEmpty("bcount");
-			boolean pavilion = (flags & 1) != 0;
-			boolean formation = (flags & 2) != 0;
-			boolean drill = (flags & 4) != 0;
-			boolean tower = (flags & 8) != 0;
-			cursor = building(g, tx, cursor, width, true, "stele", 2, Component.translatable("kultivator.hall.ui.b.stele"));
-			cursor = building(g, tx, cursor, width, pavilion, "pavilion", 4, Component.translatable("kultivator.hall.ui.b.pavilion",
+			cy = bangunan(l, x0, cy, x1, true, "stele", 2, Component.translatable("kultivator.hall.ui.b.stele"));
+			cy = bangunan(l, x0, cy, x1, (flags & 1) != 0, "pavilion", 4, Component.translatable("kultivator.hall.ui.b.pavilion",
 					counts.getIntOr("books", 0), 10, counts.getIntOr("lecterns", 0)));
-			cursor = building(g, tx, cursor, width, formation, "formation", 6, Component.translatable("kultivator.hall.ui.b.formation"));
-			cursor = building(g, tx, cursor, width, drill, "drill", 8, Component.translatable("kultivator.hall.ui.b.drill", counts.getIntOr("targets", 0), 4));
-			cursor = building(g, tx, cursor, width, tower, "tower", 9, Component.translatable("kultivator.hall.ui.b.tower", counts.getIntOr("rooms", 0), 3));
+			cy = bangunan(l, x0, cy, x1, (flags & 2) != 0, "formation", 6, Component.translatable("kultivator.hall.ui.b.formation"));
+			cy = bangunan(l, x0, cy, x1, (flags & 4) != 0, "drill", 8, Component.translatable("kultivator.hall.ui.b.drill",
+					counts.getIntOr("targets", 0), 4));
+			cy = bangunan(l, x0, cy, x1, (flags & 8) != 0, "tower", 9, Component.translatable("kultivator.hall.ui.b.tower",
+					counts.getIntOr("rooms", 0), 3));
 		}
-		cursor += 3.0F;
 		CompoundTag grand = info.getCompoundOrEmpty("formation");
 		if (!grand.isEmpty()) {
+			cy += 3;
 			Component line = grand.getBooleanOr("grand", false)
 					? Component.translatable("kultivator.hall.ui.formation_grand", grand.getIntOr("layers", 1), grand.getIntOr("radius", 16))
 					: Component.translatable("kultivator.hall.ui.formation_plain");
-			float lineH = HallUi.line(g, font, line, tx, cursor, width, Palette.JADE_DARK, 0.6F);
-			if (cursor + lineH > y && cursor < y + h) {
-				tip(tx, Math.max(y, cursor), tx + width, Math.min(y + h, cursor + lineH), List.of(line,
-						Component.translatable("kultivator.hall.ui.formation_grand.source").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC)));
+			l.teks(line, x0, cy, x1 - x0, Palette.JADE_DARK);
+			if (l.di(x0, cy, x1, cy + BARIS)) {
+				l.tip(List.of(line, Component.translatable("kultivator.hall.ui.formation_grand.source")
+						.withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC)));
 			}
-			cursor += lineH;
+			cy += BARIS;
 			String guard = grand.getStringOr("guard", "");
-			cursor += HallUi.line(g, font, guard.isEmpty() ? Component.translatable("kultivator.hall.ui.formation_unguarded")
-					: Component.translatable("kultivator.hall.ui.formation_guard", guard), tx, cursor, width, Palette.INK_SOFT, 0.55F);
-			cursor += 3.0F;
+			l.teks(guard.isEmpty() ? Component.translatable("kultivator.hall.ui.formation_unguarded")
+					: Component.translatable("kultivator.hall.ui.formation_guard", guard), x0, cy, x1 - x0, l.gaya.teksLemah);
+			cy += BARIS;
 		}
-		heading(g, Component.translatable("kultivator.hall.ui.schedule"), tx, cursor, width, 0.75F);
-		cursor += 12.0F;
+		return cy;
+	}
+
+	/** One checklist line: a tick or cross, the building, and the level it allows; the hint is its tooltip. */
+	private int bangunan(Lukis l, int x0, int cy, int x1, boolean ok, String id, int cap, Component text) {
+		HallUi.mark(l.g, x0, cy + 2.0F, ok);
+		Component allows = Component.translatable("kultivator.hall.ui.b.allows", cap);
+		int capW = Math.min((x1 - x0) / 3, l.font.width(allows));
+		l.teks(text, x0 + 8, cy, x1 - x0 - 12 - capW, ok ? l.gaya.teks : l.gaya.teksLemah);
+		l.kanan(allows, x1, cy, ok ? Palette.JADE_DARK : Palette.INK_FAINT);
+		if (l.di(x0, cy, x1, cy + BARIS)) {
+			l.tip(List.of(text, Component.translatable("kultivator.hall.ui.b." + id + ".hint"),
+					Component.translatable("kultivator.hall.ui.b." + id + ".source").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC)));
+		}
+		return cy + BARIS + 1;
+	}
+
+	private int jadwal(Lukis l, CompoundTag info, int x0, int y0, int x1) {
+		int width = x1 - x0;
+		int cy = y0 + l.kepala(Component.translatable("kultivator.hall.ui.schedule"), x0, y0, x1);
 		long day = info.getLongOr("day", 0L);
 		long nextArrival = info.getLongOr("next_arrival", day);
-		cursor += HallUi.line(g, font, Component.translatable("kultivator.hall.ui.today", day), tx, cursor, width, Palette.INK, 0.6F);
-		Component arrival = Component.translatable(info.getBooleanOr("war_next", false) ? "kultivator.hall.ui.next_war" : "kultivator.hall.ui.next_arrival",
-				nextArrival);
-		cursor += HallUi.line(g, font, arrival, tx, cursor, width, info.getBooleanOr("war_next", false) ? Palette.SEAL_DARK : Palette.INK, 0.6F);
-		cursor += HallUi.line(g, font, Component.translatable("kultivator.hall.ui.interval", info.getIntOr("interval", 3)), tx, cursor, width,
-				Palette.INK_SOFT, 0.55F);
+		boolean war = info.getBooleanOr("war_next", false);
+		l.teks(Component.translatable("kultivator.hall.ui.today", day), x0, cy, width, l.gaya.teks);
+		cy += BARIS;
+		l.teks(Component.translatable(war ? "kultivator.hall.ui.next_war" : "kultivator.hall.ui.next_arrival", nextArrival), x0, cy, width,
+				war ? Palette.SEAL_DARK : l.gaya.teks);
+		cy += BARIS;
+		l.teks(Component.translatable("kultivator.hall.ui.interval", info.getIntOr("interval", 3)), x0, cy, width, l.gaya.teksLemah);
+		cy += BARIS;
 		// Module B's events: the next Kompetisi, the forbidden ground and an open Ark (DESIGN 20.3.1 schedule).
 		CompoundTag se = info.getCompoundOrEmpty("sectevent");
 		if (se.getBooleanOr("hall", false)) {
 			long time = se.getLongOr("time", 0L);
 			long tourney = se.getCompoundOrEmpty("tourney").getLongOr("next", 0L);
 			if (tourney > 0L) {
-				cursor += HallUi.line(g, font, Component.translatable("kultivator.hall.ui.next_tourney", tourney), tx, cursor, width, Palette.INK, 0.6F);
+				l.teks(Component.translatable("kultivator.hall.ui.next_tourney", tourney), x0, cy, width, l.gaya.teks);
+				cy += BARIS;
 			}
 			CompoundTag forbidden = se.getCompoundOrEmpty("forbidden");
 			if (forbidden.getBooleanOr("open", false)) {
-				cursor += HallUi.line(g, font, Component.translatable("kultivator.hall.ui.forbidden_open", hours(forbidden.getLongOr("until", 0L) - time)),
-						tx, cursor, width, Palette.SEAL_DARK, 0.6F);
+				l.teks(Component.translatable("kultivator.hall.ui.forbidden_open", hours(forbidden.getLongOr("until", 0L) - time)), x0, cy, width,
+						Palette.SEAL_DARK);
+				cy += BARIS;
 			} else if (forbidden.getLongOr("next", 0L) > 0L) {
-				cursor += HallUi.line(g, font, Component.translatable("kultivator.hall.ui.forbidden_next", forbidden.getLongOr("next", 0L)), tx, cursor,
-						width, Palette.INK, 0.6F);
+				l.teks(Component.translatable("kultivator.hall.ui.forbidden_next", forbidden.getLongOr("next", 0L)), x0, cy, width, l.gaya.teks);
+				cy += BARIS;
 			}
 			CompoundTag ark = se.getCompoundOrEmpty("ark");
 			if (ark.getBooleanOr("open", false)) {
-				cursor += HallUi.line(g, font, Component.translatable("kultivator.hall.ui.ark_open", hours(ark.getLongOr("until", 0L) - time)), tx,
-						cursor, width, Palette.JADE_DARK, 0.6F);
+				l.teks(Component.translatable("kultivator.hall.ui.ark_open", hours(ark.getLongOr("until", 0L) - time)), x0, cy, width,
+						Palette.JADE_DARK);
+				cy += BARIS;
 			}
 		}
-		cursor += 3.0F;
-		heading(g, Component.translatable("kultivator.hall.ui.away"), tx, cursor, width, 0.75F);
-		cursor += 12.0F;
+		cy += 4;
+		cy += l.kepala(Component.translatable("kultivator.hall.ui.away"), x0, cy, x1);
 		ListTag away = info.getListOrEmpty("away");
 		if (away.isEmpty()) {
-			cursor += HallUi.line(g, font, Component.translatable("kultivator.hall.ui.away_none"), tx, cursor, width, Palette.INK_FAINT, 0.6F);
+			l.samar(Component.translatable("kultivator.hall.ui.away_none"), x0, cy, width);
+			cy += BARIS;
 		}
 		for (Tag tag : away) {
 			if (!(tag instanceof CompoundTag entry)) {
 				continue;
 			}
 			long left = HallClient.ticksLeft(entry.getLongOr("left", 0L));
+			String reason = entry.getStringOr("reason", "other");
 			Component line = Component.translatable("kultivator.hall.ui.away_entry", HallUi.name(entry, "name"),
-					Component.translatableWithFallback("kultivator.hall.away." + entry.getStringOr("reason", "other"), entry.getStringOr("reason", "?")), String.format(java.util.Locale.ROOT,
-							"%.1f", left / 24000.0D));
-			cursor += HallUi.line(g, font, line, tx, cursor, width, Palette.INK, 0.58F);
+					Component.translatableWithFallback("kultivator.hall.away." + reason, reason), String.format(Locale.ROOT, "%.1f", left / 24000.0D));
+			l.teks(line, x0, cy, width, l.gaya.teks);
+			cy += BARIS;
 		}
-		cursor += 4.0F;
-		contentH = cursor + offset - y;
-		g.disableScissor();
-		if (maxScroll > 0.0F) {
-			float bead = y + 3.0F + (h - 6.0F) * (offset / maxScroll);
-			g.fill(x1 - 2, y, x1 - 1, y + h, Palette.CORD);
-			Brush.disc(g, x1 - 1.5F, bead, 2.2F, Palette.JADE);
-		}
+		return cy + 2;
 	}
 
 	/** "1:05" (hours:minutes of real time) for a number of ticks left, counted from when the details arrived. */
 	private static String hours(long ticks) {
 		long minutes = HallClient.ticksLeft(Math.max(0L, ticks)) / 1200L;
-		return String.format(java.util.Locale.ROOT, "%d:%02d", minutes / 60L, minutes % 60L);
+		return String.format(Locale.ROOT, "%d:%02d", minutes / 60L, minutes % 60L);
 	}
 
-	/** One checklist line: a tick or cross, the building, and the level it allows; the hint is its tooltip. */
-	private float building(GuiGraphicsExtractor g, float tx, float cursor, float width, boolean ok, String id, int cap, Component text) {
-		HallUi.mark(g, tx, cursor + 1.0F, ok);
-		Component cap1 = Component.translatable("kultivator.hall.ui.b.allows", cap);
-		float capW = Math.min(width * 0.35F, font.width(cap1) * 0.55F);
-		Brush.fit(g, font, text, tx + 7.0F, cursor, width - 9.0F - capW, ok ? Palette.INK : Palette.INK_SOFT, 0.6F, 0.4F, false);
-		Brush.fit(g, font, cap1, tx + width - capW, cursor + 0.5F, capW, ok ? Palette.JADE_DARK : Palette.INK_FAINT, 0.55F, 0.4F, false);
-		tip(tx, cursor, tx + width, cursor + 7.0F, List.of(text, Component.translatable("kultivator.hall.ui.b." + id + ".hint"),
-				Component.translatable("kultivator.hall.ui.b." + id + ".source").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC)));
-		return cursor + 8.5F;
+	// ================================================================== input
+
+	@Override
+	public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+		return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY) || kanan.roda(mouseX, mouseY, scrollY) || kiri.roda(mouseX, mouseY, scrollY);
 	}
 
 	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-		if (mouseX >= x + leftW && inside(mouseX, mouseY)) {
-			scroll -= (float) amount * 14.0F;
-			return true;
+	public boolean keyPressed(KeyEvent event) {
+		// both columns page together (each stops at its own end), so the keyboard reaches the left column too
+		boolean dipakai = kiri.tombol(event.key());
+		if (tata() != Tata.SEMPIT) {
+			dipakai = kanan.tombol(event.key()) || dipakai;
 		}
-		return false;
+		return dipakai || super.keyPressed(event);
 	}
 }

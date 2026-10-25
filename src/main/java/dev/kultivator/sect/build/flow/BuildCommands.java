@@ -278,7 +278,7 @@ public final class BuildCommands {
 			if (oldTier > 0) {
 				FlowData.setGuarantee(player.getUUID(), oldTier, FlowData.UNTIL_REACHED, "upgrade");
 			}
-			FlowData.openHistory(player.getUUID(), template);
+			// The history line follows from Ceremonies.onConfirmed once the upgrade really begins.
 			Halls.refreshBuildings(player.getUUID());
 			return done(ctx);
 		})));

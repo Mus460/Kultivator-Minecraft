@@ -47,6 +47,12 @@
       "dz": 0,
       "pool": "kultivator:kota_tema/oasis/tembok/lurus",
       "putar": 3
+    },
+    {
+      "dx": -112,
+      "dz": -24,
+      "pool": "kultivator:kota_tema/oasis/hidup42/makam",
+      "putar": 0
     }
   ],
   "gaya": [

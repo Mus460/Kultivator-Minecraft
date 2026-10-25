@@ -131,6 +131,8 @@ bulat di dalam game.
 71. [**Murid Mandiri dan Perseteruan antar-sekte**](#71-murid-mandiri-dan-perseteruan-antar-sekte): jalan hidup,
     kebijakan aula, belanja ke kota, tumbuh sendiri, buku harian, perseteruan
 72. [**Penampilan dan Animasi**](#72-penampilan-dan-animasi): Sosok untuk murid dan NPC, setelan detail animasi
+74. [**Gulungan Utama**](#74-gulungan-utama): satu GUI untuk semua menu, delapan bagian, tablet Di Sini, tombol,
+    konfirmasi, HUD
 
 ---
 
@@ -10011,3 +10013,44 @@ Tempat berpenghuni kini terdengar hidup. Semua suara ini hanya diputar di klien 
   juga diatur penggeser vanilla "Sekitar/Lingkungan"; obrolan diatur penggeser "Suara/Ucapan" dan hanya berbunyi bila
   "Suara bicara: Semua". Pada kualitas efek Minimal pemindaian suasana berjalan lebih jarang.
 * Kredit suara (VOICEVOX, Kenney CC0, OpenGameArt CC0): `docs/CREDITS.md`.
+
+## 74. Gulungan Utama
+
+Semua menu mod kini ada di **satu** layar: gulungan giok **Gulungan Utama** (tombol **V**). Aula, Murid, Dunia, Keabadian,
+Kitab Teknik, Kitab Panduan, Duel dan semua layar toko/NPC "Pasar Giok" yang dulu terpisah menjadi halaman di dalamnya.
+Tidak ada lagi dua layar berbeda untuk fungsi yang sama.
+
+* **Delapan bagian** di rel kiri (tombol angka **1-8**):
+  1. **Diri**: Status, Akar & Dao, Jalan, Alkimia, Pusaka (dengan tombol Cincin Penyimpanan), Harta (Gua Kediaman, usaha).
+  2. **Teknik**: Kodeks, Cincin Segel (satu-satunya tempat memasang slot), Kehancuran (diri dan murid).
+  3. **Murid**: Daftar (ringkas, suasana hati, Catatan Tangga), Murid (pilih murid dengan ← →; status, teknik, pil &
+     Dao, kekuatan, jalan, hati, hubungan, Jalan Hidup, Buku Harian, dompet), Jaring.
+  4. **Sekte**: Ikhtisar, Anggota, Bangun, Formasi, Kas & Toko, Kegiatan, Wilayah, Luar. Tanpa aula dan tanpa
+     keanggotaan hanya tampil "Dirikan atau Bergabung" dan Luar; anggota sekte NPC melihat kartu, pangkat, toko jasa,
+     papan dan arena sektenya.
+  5. **Dunia**: Peta, Alam, Musuh, Duel, Perjalanan, Dagang.
+  6. **Keabadian**: Alam Abadi, Purba, Batin, Ciptaan, Lelang, Titah.
+  7. **Panduan**: Kitab (Jalan Kultivasi dan bab-bab) dan Ensiklopedia. Segel **?** di kepala setiap halaman membuka
+     topik Ensiklopedia halaman itu.
+  8. **Pengaturan**: Tampilan & Efek, Kamera & Film, Suara, HUD, Kontrol.
+* **Di Sini** (tablet di atas rel, tombol **9**): muncul saat kamu bicara dengan NPC atau mengklik blok/item yang punya
+  layanan. Judulnya tempat · lawan bicara, mis. "Toko Senjata · Paman Li". Kalau kamu menjauh, tablet hilang dengan pesan
+  dan Gulungan tetap terbuka. Klik kanan murid, prasasti aula, NPC toko, Juru Lelang, NPC dunia bawah, kemudi kapal dan
+  item peta semuanya membuka Gulungan langsung di halaman yang tepat.
+* **Tombol** (sama di semua halaman): **Q/E** halaman sebelumnya/berikutnya, **Tab** pindah fokus, **← →** pindah sub
+  pada bilah terfokus atau mengubah jumlah, **↑ ↓ PgUp PgDn Home End** menggulir daftar, **Enter/Spasi** menjalankan,
+  **/** mencari, **Esc** mundur satu langkah sampai kembali ke dunia, **V** menutup semuanya. Saat Di Sini menampilkan
+  dialog atau daftar pilihan, angka memilih pilihan itu. Tombol bawaan baru (hanya bila belum dipakai): **K** Kitab
+  Teknik, **N** Peta, **J** Panduan; **M** membuka halaman Murid.
+* **Konfirmasi** selalu satu rupa, kartu segel di atas halaman: ringan cukup klik, sedang tahan 1,5 detik, berat
+  centang lalu tahan (mis. perang diplomasi, menyerah dalam duel, Kehancuran).
+* **Mudah dibaca**: teks hanya ukuran 1.0 dan 1.5; teks yang terlalu panjang dipotong dengan "…" dan tampil utuh di
+  tooltip. Semua halaman muat di 1366×768 dengan skala GUI 4. Semua bisa dimainkan dengan papan ketik saja.
+* **Tempa dan Cincin** tetap layar wadah sendiri (karena slot barang) dengan rupa yang sama; Esc membawamu kembali ke
+  Gulungan bila dibuka dari sana.
+* **HUD**: semua pemberitahuan lewat satu jalur "Kabar"; hanya satu gulungan sisi tampil pada satu waktu.
+* **Pengaturan › Kontrol**: ubah tombol mod langsung di tempat; tombol yang bentrok ditandai. Tautan "Semua tombol
+  Minecraft" membuka layar tombol vanilla. Sakelar Langit Sekte, setelan duel dan peringatan cahaya kini ada di
+  Pengaturan.
+* Lembar kota 42 (Kota yang Hidup) belum dipetakan; akan dibangun langsung sebagai halaman Gulungan. Rancangan lengkap:
+  `docs/rancangan/43-satu-gui.md`; daftar uji `docs/uji/FASE-43.md`.

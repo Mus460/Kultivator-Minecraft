@@ -1,0 +1,251 @@
+# reaksi: corpus of the conversation engine (42K-C, DESIGN 42.5A.8). Source format: gen_kota_hidup_cakap.py.
+# Gossip bait and reactions: UMPAN_GOSIP, REAKSI by mood, KAGET, RAGU, KOREKSI, SAMBUNG_RASA, KOMENTAR (all without topik so
+# both the player dialogue and the NPC-NPC scripts reach them).
+@kelompok reaksi
+
+== umpan.gosip
+niat: UMPAN_GOSIP
+gestur: bisik
+seru: bisik
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+$waktu_lalu: tipe=waktu_lalu dari=fakta.hariKejadian
+$katanya: aturan=frag.katanya
+- [3] Sst, sudah dengar kabar terbaru? || Psst, heard the latest?
+  ~ kasar: Hei. Ada cerita. Mau dengar atau tidak? || Hey. Got a story. Want it or not?
+  ~ kuno: Ada kabar yang beredar, {$sebutan}. Mungkin menarik bagi telinga yang bijak. || A tale is going round, {$sebutan}. Perhaps of interest to a wise ear.
+  ~ pelabuhan: Sini, Bung, dekat sini. Ada kabar dari dermaga. || Come here, mate, closer. News from the docks.
+  ~ oasis: Duduklah, Saudara. Angin gurun membawa kabar. || Sit, friend. The desert wind carries news.
+  ~ air: Kakak... sini sebentar, ya... ada yang mau kuceritakan... || Dear... come here a moment... there's something I want to tell...
+- [2] Kau tidak akan percaya apa yang kudengar {$waktu_lalu}. || You won't believe what I heard {$waktu_lalu}.
+  ~ kampung: Nak, tahu tidak apa yang terjadi {$waktu_lalu}? Heboh sekampung! || Child, know what happened {$waktu_lalu}? The whole village is abuzz!
+  ~ iblis: Ada kabar. Gratis, untuk kali ini. Jangan biasakan. || Got news. Free, this once. Don't get used to it.
+- [2] Mendekatlah. Ini jangan sampai terdengar orang lain. || Come closer. This mustn't be overheard.
+  ~ p: Mendekatlah, ini urusan perempuan... eh, urusan semua orang sebenarnya. || Come closer, this is women's business... well, everyone's, really.
+- Aku punya cerita, tapi janji jangan bilang aku yang cerita. || I have a story, but promise not to say it was me.
+  ~ kasar: Aku punya cerita. Bilang-bilang, kucabut lidahmu. || Got a story. Blab and I'll pull your tongue out.
+- {$katanya}... ah, tapi ini rahasia. Ya sudah, kuceritakan. Tapi sedikit saja. || {$katanya}... ah, but it's a secret. Fine, I'll tell. Only a little.
+  ~ ibukota: Ada desas-desus di distrik ini. Belum resmi, tentu. Tapi semua orang sudah tahu. || There's a whisper in this district. Unofficial, of course. But everyone knows.
+- Tebak siapa yang jadi bahan omongan di sumur pagi ini? || Guess who was the talk of the well this morning?
+  ~ gunung: Seharusnya biksu tidak bergosip. Tapi... Amitaba, yang satu ini lain. || Monks shouldn't gossip. But... Amitabha, this one's different.
+- Duduk dulu. Ceritanya panjang dan sedikit gila. || Sit first. It's a long story and a bit mad.
+
+== reaksi.kaget
+niat: KAGET
+gestur: kaget
+seru: eh
+$kaget: aturan=seru.kaget opsional=0.5
+$subjek: tipe=nama_warga dari=fakta.subjek
+- [3] {$kaget} Sungguh? Aku baru dengar sekarang! || {$kaget} Truly? First I've heard of it!
+  ~ kasar: Hah? Jangan bohong. || What? Don't lie.
+  ~ kuno: Sungguh di luar dugaan. Dunia fana memang penuh kejutan. || Truly beyond expectation. The mortal world is full of surprises.
+  ~ pelabuhan: Demi ombak! Sungguh, Bung? || By the waves! Really, mate?
+  ~ oasis: Demi mata air! Kau tidak bercanda, Saudara? || By the spring! You're not joking, friend?
+- [2] Masa? {$subjek}? Tidak mungkin! || No! {$subjek}? Impossible!
+  ~ air: Masa, Kakak? {$subjek}...? Aduh... || Really, dear? {$subjek}...? Oh my...
+  ~ kampung: Lho, {$subjek}? Masa sih? Orangnya kelihatan biasa saja. || What, {$subjek}? Really? They seem so ordinary.
+- Astaga, astaga... aku harus duduk dulu. || Goodness, goodness... I need to sit down.
+  ~ p: Aduh biyung... jantungku sampai berdebar. || Oh mother... my heart's pounding.
+- Pantas saja! Aku sudah merasa ada yang aneh sejak kemarin. || No wonder! I felt something was off since yesterday.
+  ~ iblis: Hm. Pantas. Di kota ini, kejutan berarti seseorang akan kehilangan sesuatu. || Hm. Figures. In this city a surprise means someone's about to lose something.
+- Wah, wah, wah. Kalau begitu, besok pasar pasti ribut. || Well, well, well. Then the market will be in uproar tomorrow.
+
+== reaksi.ragu
+niat: RAGU
+gestur: garuk_kepala
+seru: hmm
+$ragu: aturan=seru.ragu opsional=0.5
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+$subjek: tipe=nama_warga dari=fakta.subjek
+$pepatah: aturan=frag.pepatah opsional=0.25
+- [3] {$ragu} Siapa yang bilang begitu? || {$ragu} Who said so?
+  ~ kasar: Omong kosong. Mulut pasar. || Rubbish. Market mouths.
+  ~ kuno: Kabar burung tanpa akar, {$sebutan}. Aku tidak akan menelannya begitu saja. || Hearsay without roots, {$sebutan}. I won't swallow it whole.
+  ~ pelabuhan: Kabar dermaga itu seperti ikan kemarin, Bung. Baunya lebih besar dari isinya. || Dock news is like yesterday's fish, mate. More smell than meat.
+- [2] Hmm, aku tidak yakin. {$subjek} bukan orang seperti itu. || Hmm, I'm not sure. {$subjek} isn't that sort.
+  ~ kampung: Masa iya {$subjek} begitu? Aku kenal dia dari kecil, Nak. || Would {$subjek} really do that? I've known them since they were small, child.
+  ~ ibukota: Tuduhan seperti itu harus ada saksinya. Di ibu kota, fitnah bisa dihukum. || An accusation like that needs a witness. In the capital, slander is punishable.
+- Kau lihat sendiri, atau cuma dengar dari orang? || Did you see it yourself, or just hear it?
+  ~ air: Kakak lihat sendiri, ya...? Atau dengar dari tukang perahu? || Did you see it yourself, dear...? Or hear it from a boatman?
+- Kemarin kabarnya lain lagi. Besok mungkin berubah lagi. || Yesterday the story was different. Tomorrow it may change again.
+  ~ iblis: Di sini kebohongan lebih murah dari roti. Aku tidak beli. || Lies are cheaper than bread here. I'm not buying.
+- Jangan cepat percaya. {$pepatah} || Don't believe too quickly. {$pepatah}
+
+== reaksi.gembira
+niat: REAKSI
+syarat: label_emosi=gembira,puas,lega
+gestur: tertawa
+seru: oh
+$senang: aturan=seru.senang opsional=0.5
+- [3] {$senang} Itu kabar terbaik minggu ini! || {$senang} That's the best news this week!
+  ~ kasar: Bagus. Akhirnya ada yang beres. || Good. Something finally went right.
+  ~ kuno: Sungguh berkah langit. Hatiku lapang mendengarnya. || Truly a blessing of heaven. My heart opens to hear it.
+  ~ oasis: Seperti hujan di gurun, Saudara! Senang sekali! || Like rain on the desert, friend! Wonderful!
+- [2] Hahaha! Bagus, bagus! Nanti malam aku minum untuk itu. || Hahaha! Good, good! I'll drink to that tonight.
+  ~ p: Hihi, senangnya! Nanti kubawakan kue untuk merayakan. || Hehe, how lovely! I'll bring cakes to celebrate.
+  ~ kampung: Wah, syukur, Nak! Nanti kubilang ke istri, biar ikut senang. || Oh, thank goodness, child! I'll tell the wife; she'll be glad too.
+- Akhirnya ada kabar enak. Belakangan ini kabar jelek melulu. || Finally some good news. It's been nothing but bad lately.
+  ~ pelabuhan: Angin baik akhirnya, Bung! Layar terkembang! || A fair wind at last, mate! Full sail!
+- Langit masih sayang pada kita. Hehe. || Heaven still loves us. Hehe.
+- Ini harus dirayakan! Siapa yang traktir? || This calls for a celebration! Who's buying?
+  ~ kasar: Ini harus dirayakan. Kau yang bayar. || This calls for a celebration. You're paying.
+
+== reaksi.sedih
+niat: REAKSI
+syarat: label_emosi=sedih
+gestur: menangis
+seru: aduh
+$keluh: aturan=seru.keluh opsional=0.5
+$doa: aturan=frag.doa opsional=0.4
+- [3] {$keluh} Kasihan sekali... || {$keluh} How very sad...
+  ~ kasar: Sial. Kenapa selalu orang baik yang kena. || Damn. Why is it always the good ones.
+  ~ kuno: Roda nasib memang kejam. Semoga ada cahaya setelah gelap ini. || The wheel of fate is cruel. May light follow this darkness.
+- [2] Aduh... hatiku ikut berat mendengarnya. || Oh dear... my heart grows heavy hearing it.
+  ~ air: Aduh, Kakak... air mataku jadi turun... || Oh, dear... now my tears are falling...
+  ~ kampung: Aduh, Nak... kasihan. Nanti kubawakan nasi ke rumahnya. || Oh, child... poor thing. I'll bring rice to their house later.
+- Hidup memang tidak adil. Kenapa harus dia? || Life isn't fair. Why them?
+  ~ gunung: Semua yang lahir akan menderita. Amitaba... tetap saja sedih mendengarnya. || All that is born will suffer. Amitabha... still, it's sad to hear.
+- Aku tidak tahu harus bilang apa. || I don't know what to say.
+  ~ p: Aku jadi ingin menangis juga... || Now I want to cry too...
+- Kalau ada yang bisa kubantu, bilang saja. {$doa} || If there's anything I can do, just say. {$doa}
+
+== reaksi.marah
+niat: REAKSI
+syarat: label_emosi=marah
+gestur: marah_hentak
+seru: cih
+- [3] Keterlaluan! Siapa yang berani begitu? || Outrageous! Who dares do that?
+  ~ kuno: Lancang! Perbuatan seperti itu menodai langit dan bumi. || Insolent! Such a deed stains heaven and earth.
+  ~ pelabuhan: Kurang ajar! Kalau di kapalku, sudah kulempar ke laut! || Scoundrel! On my ship I'd have thrown them overboard!
+  ~ iblis: Hm. Orang itu harus belajar sopan santun. Dengan pisau, kalau perlu. || Hm. That one needs to learn manners. With a knife if need be.
+- [2] Cih! Aku sudah curiga dari dulu. Orang macam itu! || Tch! I suspected it all along. That sort!
+  ~ kampung: Kurang ajar! Kalau kulihat, kusiram air comberan! || The nerve! If I see them, I'll douse them in gutter water!
+  ~ p: Ih! Kalau dia lewat, kusapu kakinya! || Ugh! If they pass, I'll sweep their feet!
+- Darahku mendidih mendengarnya. || My blood boils hearing it.
+  ~ kasar: Darahku mendidih. Mana orangnya? || My blood's boiling. Where are they?
+- Ini tidak bisa dibiarkan. Harus ada yang lapor ke penjaga. || This can't stand. Someone must tell the guards.
+  ~ ibukota: Ini harus dibawa ke hakim. Ibu kota punya hukum. || This must go to the magistrate. The capital has laws.
+
+== reaksi.cemas
+niat: REAKSI
+syarat: label_emosi=cemas
+gestur: lihat_sekeliling
+seru: takut
+$doa: aturan=frag.doa opsional=0.4
+- [3] Aduh, aku jadi takut... Apa kita aman? || Oh, now I'm scared... Are we safe?
+  ~ kasar: Sial. Kunci pintu nanti malam. || Damn. Lock the door tonight.
+  ~ kuno: Firasatku buruk tentang ini. Sebaiknya kita waspada. || I have a bad feeling about this. We had best be wary.
+  ~ air: A-aduh... Kakak... aku tidak berani pulang sendiri malam ini... || O-oh... dear... I don't dare walk home alone tonight...
+- [2] J-jangan bilang begitu... nanti terjadi betulan. || D-don't say that... it might come true.
+  ~ kampung: Hus! Jangan ngomong begitu, Nak. Pamali. || Hush! Don't say that, child. It's bad luck.
+- Aku harus pulang memeriksa anak-anak. || I have to go home and check on the children.
+  ~ p: Aku harus pulang. Anak-anakku sendirian di rumah. || I must go home. My children are alone.
+- Semoga tidak terjadi apa-apa. {$doa} || I hope nothing happens. {$doa}
+- Apa penjaga sudah tahu? Harus ada yang memberi tahu mereka. || Do the guards know? Someone has to tell them.
+
+== reaksi.jemu
+niat: REAKSI
+syarat: label_emosi=jemu
+gestur: menguap_peregangan
+- [2] Hmm. Sudah biasa. Apa lagi yang baru? || Hmm. Same old. What else is new?
+  ~ kasar: Terus? Aku harus bilang apa? || And? What am I supposed to say?
+  ~ kuno: Kabar semacam itu datang dan pergi seperti awan. || News like that comes and goes like clouds.
+- Oh. Ya. Begitu, ya. || Oh. Yes. Is that so.
+  ~ pelabuhan: Ombak naik, ombak turun, Bung. Kabar juga begitu. || Waves rise, waves fall, mate. So does news.
+- Itu lagi? Sudah tiga orang yang cerita hari ini. || That again? Three people told me today.
+  ~ p: Itu lagi? Sudah tiga kali aku dengar di sumur. || That again? I've heard it three times at the well.
+- Biarlah. Bukan urusanku. || Let it be. Not my business.
+
+== reaksi.kagum
+niat: REAKSI
+syarat: label_emosi=kagum
+gestur: kagum
+seru: oh
+- [3] Hebat sekali! Aku tidak menyangka! || Amazing! I never would have thought!
+  ~ kasar: Hm. Lumayan juga. || Hm. Not bad, actually.
+  ~ kuno: Sungguh luar biasa. Kemampuan seperti itu hanya muncul seribu tahun sekali. || Truly extraordinary. Such ability appears once in a thousand years.
+  ~ oasis: Demi mata air, itu menakjubkan, Saudara! || By the spring, that's astounding, friend!
+- [2] Wah! Ceritakan lagi, bagaimana kejadiannya? || Wow! Tell it again, how did it happen?
+  ~ kampung: Wah, hebat! Nanti kuceritakan ke anak-anak, biar mereka semangat. || Wow, great! I'll tell the kids, it'll fire them up.
+  ~ air: Wah, Kakak... indah sekali ceritanya... || Oh, dear... what a lovely story...
+- Aku sampai merinding. Sungguh. || I've got goosebumps. Truly.
+- Kalau aku masih muda, aku juga ingin seperti itu. || If I were young, I'd want to be like that too.
+
+== reaksi.netral
+niat: REAKSI
+gestur: angguk
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Oh, begitu. || Oh, I see.
+  ~ kasar: Hm. Oke. || Hm. Fine.
+  ~ kuno: Begitukah. Akan kuingat. || Is that so. I'll remember it.
+  ~ pelabuhan: Begitu, ya, Bung. || That so, mate.
+  ~ oasis: Begitu rupanya, Saudara. || So it seems, friend.
+  ~ air: Oh, begitu, ya... || Oh, is that so...
+  ~ kampung: Oh, gitu toh, Nak. || Oh, so that's it, child.
+  ~ iblis: Hm. Berguna. Mungkin. || Hm. Useful. Maybe.
+  ~ gunung: Amitaba. Begitulah. || Amitabha. So it is.
+- [2] Hmm, menarik juga. || Hmm, interesting.
+  ~ kasar: Menarik. Sedikit. || Interesting. A bit.
+- Terima kasih sudah bercerita. || Thanks for telling me.
+  ~ kuno: Terima kasih atas kabarnya, {$sebutan}. || Thank you for the news, {$sebutan}.
+- Yah, dunia memang begitu. || Well, the world is like that.
+- Nanti kutanyakan ke yang lain. || I'll ask the others later.
+
+== koreksi.saksi
+niat: KOREKSI
+gestur: geleng
+$subjek: tipe=nama_warga dari=fakta.subjek
+- [3] Bukan begitu kejadiannya. Aku ada di sana. || That's not how it went. I was there.
+  ~ kasar: Salah. Aku lihat sendiri. Jangan sebar cerita bengkok. || Wrong. I saw it myself. Don't spread crooked tales.
+  ~ kuno: Izinkan aku meluruskan. Mataku sendiri yang menyaksikan. || Allow me to set it straight. My own eyes witnessed it.
+  ~ pelabuhan: Bukan begitu, Bung. Aku di dermaga waktu itu. || Not so, mate. I was on the dock then.
+  ~ kampung: Lho, bukan begitu, Nak. Aku lihat sendiri kok. || No, not like that, child. I saw it myself.
+- [2] Tunggu, tunggu. {$subjek} tidak bersalah. Yang sebenarnya lain. || Wait, wait. {$subjek} isn't to blame. The truth is different.
+  ~ ibukota: Keterangan itu keliru. Kalau diadukan ke hakim, aku bersedia bersaksi. || That account is wrong. If it goes to the magistrate, I'll testify.
+  ~ air: Bukan, Kakak... {$subjek} tidak begitu... aku lihat dari perahu... || No, dear... {$subjek} didn't... I saw from the boat...
+- Ceritanya sudah dibumbui. Aslinya tidak seheboh itu. || The story's been spiced. The original wasn't half so dramatic.
+  ~ kasar: Sudah dibumbui. Aslinya membosankan. || It's been spiced. The real thing's dull.
+- Kau dengar dari siapa? Itu setengah benar, setengah karangan. || Who told you? That's half true, half invented.
+- Yang benar: memang terjadi, tapi tidak separah itu. || The truth: it happened, but not that badly.
+  ~ p: Yang benar begini: memang terjadi, tapi semua sudah baikan. Jangan diperpanjang. || The truth is this: it happened, but it's all mended. Don't drag it out.
+
+== sambung.rasa
+niat: SAMBUNG_RASA
+gestur: angguk_dengar
+- [4] Hmm. || Hmm.
+  ~ kasar: Hm. || Hm.
+  ~ kuno: Hm, hm. || Hm, hm.
+  ~ air: Hmm... || Hmm...
+- [3] Oh ya? || Oh yes?
+  ~ kasar: Terus? || And?
+  ~ pelabuhan: Masa, Bung? || Really, mate?
+  ~ oasis: Benarkah, Saudara? || Truly, friend?
+  ~ kampung: Lho, iya? || Oh, yeah?
+- [2] Lalu? || Then?
+  ~ kuno: Lalu bagaimana? || And then?
+  ~ air: Lalu, Kakak...? || And then, dear...?
+- [2] Iya, iya. || Yes, yes.
+  ~ gunung: Amitaba, iya. || Amitabha, yes.
+  ~ iblis: Ya. Lanjutkan. || Yes. Go on.
+- Wah. || Wow.
+  ~ p: Ih, wah. || Ooh, wow.
+- Begitu ya. || Is that so.
+- Ck, ck, ck. || Tsk, tsk, tsk.
+- Hehe, lanjut. || Hehe, go on.
+- Sungguh? || Really?
+
+== setuju
+niat: KOMENTAR
+gestur: angguk
+seru: setuju
+- [3] Betul, betul! Aku juga berpikir begitu. || Right, right! I think so too.
+  ~ kasar: Ya. Jelas. || Yeah. Obviously.
+  ~ kuno: Pandanganmu tepat sekali. Aku sepaham. || Your view is most apt. I concur.
+  ~ pelabuhan: Betul sekali, Bung! || Dead right, mate!
+  ~ oasis: Benar, Saudara, benar. || True, friend, true.
+  ~ kampung: Iya, Nak, betul itu. || Yes, child, that's right.
+- [2] Nah, itu dia! Akhirnya ada yang sependapat denganku. || There it is! At last someone agrees with me.
+  ~ p: Nah! Itu yang dari kemarin kubilang ke ibu-ibu. || There! That's what I've been telling the women since yesterday.
+- Tidak bisa lebih setuju lagi. || Couldn't agree more.
+  ~ ibukota: Sepenuhnya setuju. Seharusnya para menteri mendengar ini. || Wholly agreed. The ministers ought to hear this.
+- Persis seperti kata kakekku dulu. || Just as my grandfather used to say.
+- Kalau semua orang berpikir seperti kita, kota ini sudah makmur. || If everyone thought like us, this town would prosper.

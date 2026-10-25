@@ -1,18 +1,22 @@
 package dev.kultivator.client.sekte.hubungan;
 
-import com.mojang.blaze3d.platform.InputConstants;
+import dev.kultivator.client.hub.HubNav;
+import dev.kultivator.client.hub.Tujuan;
+import dev.kultivator.client.hub.Urutan;
+import dev.kultivator.client.screen.Page;
 import dev.kultivator.client.screen.ui.Brush;
+import dev.kultivator.client.screen.ui.Glyphs;
+import dev.kultivator.client.screen.ui.KeadaanKosong;
+import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
-import dev.kultivator.client.screen.ui.UiSound;
+import dev.kultivator.client.screen.ui.TalismanButton;
+import dev.kultivator.client.sekte.mandiri.MandiriBoardScreen;
 import dev.kultivator.data.Realm;
 import dev.kultivator.sekte.api.Ikatan;
 import dev.kultivator.sekte.hubungan.HubunganPayloads;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
@@ -25,18 +29,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Jaring Hubungan, the web of ties of the whole sect (DESIGN 36.2.2; hub SEKTE card "Jaring Hubungan",
- * {@code /kultivasi perguruan hubungan}). The disciples sit on a ring like the seats of a council, each a jade disc in the
- * colour of its spiritual root (hollow while away), its name outside; every known pair is a thread between them: jade for
- * friends, gold double cords for sworn kin, rose for lovers, a glowing rose double cord for Dao companions, amber for
- * rivals and red for grudges, thicker the stronger the feeling, acquaintances only a faint grey hair. Hovering or
- * choosing a disciple lights its threads and lists its ties beside the ring. At most 16 discs, one quad per thread per
- * frame (36.3.9). The data arrives as {@code HubunganPayloads.Jaring} and is asked for again every 5 s while open.
+ * Murid › Jaring (DESIGN 43.5; was the Jaring Hubungan screen of DESIGN 36.2.2): the web of ties of the whole sect as a
+ * page of the Gulungan Utama. The disciples sit on a ring like the seats of a council, each a disc in the colour of its
+ * spiritual root (hollow while away); every known pair is a thread drawn by {@link PelukisIkatan}. Hovering, Tab focus or a
+ * click lights a disciple's threads and lists its ties beside the ring; a second click (or Enter, or "Buka murid") opens
+ * that disciple on Murid › Murid › hubungan (R18). The data ({@code HubunganPayloads.Jaring}) is asked for only while the
+ * page shows, again every 5 s (43.0.12); an unasked payload ({@code /kultivasi perguruan hubungan}) opens this page through
+ * {@link HubNav#buka} instead of a screen of its own (R15). At most 16 discs, one quad per thread per frame (36.3.9).
  */
-public class JaringScreen extends Screen {
+public final class JaringScreen extends Page {
 
 	private static final String K = "kultivator.sekte.hubungan.jaring.";
+	private static final String M = "kultivator.gui43.m04.";
 	private static final long REFRESH_MILLIS = 5000L;
+	private static final long GROW_MILLIS = 450L;
+	private static final int ROW = 11;
+	private static final int BUTTON_H = 14;
 
 	private record Node(String soul, Component name, boolean here, int realm, int rootColor, int balance) {
 	}
@@ -44,48 +52,153 @@ public class JaringScreen extends Screen {
 	private record Edge(int i, int j, Ikatan kind, int affinity, int meetings) {
 	}
 
-	private static @Nullable JaringScreen open;
+	private static @Nullable CompoundTag terbaru;
+	private static long terbaruAt;
+	private static long versi;
+	/** The page while it is on screen (an unasked payload then only refreshes it). */
+	private static @Nullable JaringScreen tampil;
+	/** When the shown page last asked (0 = answered): its answer never reopens a closed Gulungan. */
+	private static long refreshAskedAt;
 
 	private final List<Node> nodes = new ArrayList<>();
 	private final List<Edge> edges = new ArrayList<>();
+	private long dimuat = -1L;
 	private boolean loaded;
 	private boolean hall;
 	private boolean on;
 	private int pinned = -1;
-	private int hovered = -1;
 	private long openedAt;
 	private long askedAt;
-	private int x0;
-	private int y0;
-	private int x1;
-	private int y1;
 	private float cx;
 	private float cy;
 	private float radius;
+	private int ringX1;
+	private int sideX0;
 	private float[] nx = new float[0];
 	private float[] ny = new float[0];
 
 	public JaringScreen() {
-		super(Component.translatable(K + "judul"));
+		super();
 	}
 
-	/** A Jaring payload arrived: fill the open screen, or open it (the player asked through the command or the card). */
+	/** A Jaring payload arrived: kept for the page; an unasked one opens Murid › Jaring (R15). */
 	static void receive(CompoundTag data) {
-		net.minecraft.client.Minecraft minecraft = net.minecraft.client.Minecraft.getInstance();
-		if (open != null && minecraft.gui.screen() == open) {
-			open.load(data);
+		boolean refreshReply = Util.getMillis() - refreshAskedAt < 3000L;
+		refreshAskedAt = 0L;
+		terbaru = data;
+		terbaruAt = Util.getMillis();
+		versi++;
+		if (tampil == null && !refreshReply) {
+			HubNav.buka(Tujuan.of(HubNav.MURID, Urutan.ID_JARING));
+		}
+	}
+
+	/** Forgets the data (disconnect). */
+	static void bersih() {
+		terbaru = null;
+		versi++;
+		tampil = null;
+	}
+
+	private static void ask() {
+		HubunganPayloads.Aksi payload = new HubunganPayloads.Aksi("jaring", "", "", 0);
+		if (ClientPlayNetworking.canSend(payload.type())) {
+			refreshAskedAt = Util.getMillis();
+			ClientPlayNetworking.send(payload);
+		}
+	}
+
+	// ================================================================== identity
+
+	@Override
+	public Component title() {
+		return Component.translatable(K + "judul");
+	}
+
+	@Override
+	public Component shortName() {
+		return Component.translatable("kultivator.gui43.hal.murid.jaring");
+	}
+
+	@Override
+	public int glyph() {
+		return Glyphs.HUBUNGAN;
+	}
+
+	@Override
+	public String helpTopic() {
+		// the ties between disciples are part (2) of "Sekte yang Hidup"; "ikatan" is the master's bond (Murid › Jalan)
+		return "sekte_hidup";
+	}
+
+	@Override
+	public boolean rinci() {
+		return pinned >= 0;
+	}
+
+	@Override
+	public boolean mundur() {
+		if (pinned >= 0) {
+			pinned = -1;
+			return true;
+		}
+		return false;
+	}
+
+	// ================================================================== life
+
+	@Override
+	public void onShow(@Nullable CompoundTag fokus) {
+		tampil = this;
+		long now = Util.getMillis();
+		askedAt = now;
+		if (terbaru == null || now - terbaruAt > 1000L) {
+			ask();
+		}
+		// the soul -> body map behind "Buka murid" comes from the hall board
+		MandiriBoardScreen.minta();
+		super.onShow(fokus);
+	}
+
+	@Override
+	public void onHide() {
+		if (tampil == this) {
+			tampil = null;
+		}
+	}
+
+	@Override
+	public void tick() {
+		long now = Util.getMillis();
+		if (now - askedAt > REFRESH_MILLIS) {
+			askedAt = now;
+			ask();
+		}
+	}
+
+	@Override
+	protected void build() {
+		int sideW = tata() == Tata.SEMPIT ? Math.max(110, w * 45 / 100) : Math.round(w * 0.36F);
+		ringX1 = x + w - sideW - 6;
+		sideX0 = ringX1 + 6;
+		cx = (x + ringX1) / 2.0F;
+		cy = y + h / 2.0F;
+		radius = Math.max(20.0F, Math.min((ringX1 - x) / 2.0F - 14.0F, h / 2.0F - 14.0F));
+		layoutNodes();
+	}
+
+	private void muat(@Nullable CompoundTag data) {
+		dimuat = versi;
+		if (data == null) {
+			loaded = false;
+			nodes.clear();
+			edges.clear();
+			pinned = -1;
 			return;
 		}
-		JaringScreen screen = new JaringScreen();
-		screen.load(data);
-		minecraft.gui.setScreen(screen);
-	}
-
-	static void ask() {
-		ClientPlayNetworking.send(new HubunganPayloads.Aksi("jaring", "", "", 0));
-	}
-
-	private void load(CompoundTag data) {
+		if (!loaded) {
+			openedAt = Util.getMillis();
+		}
 		loaded = true;
 		hall = data.getBooleanOr("hall", false);
 		on = data.getBooleanOr("on", false);
@@ -118,26 +231,6 @@ public class JaringScreen extends Screen {
 		layoutNodes();
 	}
 
-	@Override
-	protected void init() {
-		open = this;
-		if (openedAt == 0L) {
-			openedAt = Util.getMillis();
-			UiSound.open();
-		}
-		int w = Math.min(420, width - 16);
-		int h = Math.min(270, height - 16);
-		x0 = (width - w) / 2;
-		x1 = x0 + w;
-		y0 = (height - h) / 2;
-		y1 = y0 + h;
-		float ringW = w * 0.62F;
-		cx = x0 + ringW / 2.0F + 8.0F;
-		cy = y0 + 22.0F + (h - 34.0F) / 2.0F;
-		radius = Math.max(30.0F, Math.min(ringW / 2.0F - 30.0F, (h - 34.0F) / 2.0F - 16.0F));
-		layoutNodes();
-	}
-
 	private void layoutNodes() {
 		int n = nodes.size();
 		nx = new float[n];
@@ -149,63 +242,56 @@ public class JaringScreen extends Screen {
 		}
 	}
 
+	// ================================================================== drawing
+
 	@Override
-	public void tick() {
-		long now = Util.getMillis();
-		if (now - askedAt > REFRESH_MILLIS) {
-			askedAt = now;
-			ask();
+	protected void drawBehind(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
+	}
+
+	@Override
+	protected void lukis(Lukis l) {
+		if (dimuat != versi) {
+			muat(terbaru);
 		}
-	}
-
-	@Override
-	public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float a) {
-		g.fillGradient(0, 0, width, height, 0xB0081018, 0xD0040A10);
-	}
-
-	@Override
-	public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float a) {
-		super.extractRenderState(g, mouseX, mouseY, a);
-		long now = Util.getMillis();
-		float grow = Mth.clamp((now - openedAt) / 450.0F, 0.0F, 1.0F);
-		grow = grow * grow * (3.0F - 2.0F * grow);
-		// the scroll: paper, rods, a gold frame
-		g.fill(x0 + 3, y0 + 4, x1 + 3, y1 + 4, 0x70000000);
-		g.fillGradient(x0, y0, x1, y1, Palette.PAPER_TOP, Palette.PAPER_BOTTOM);
-		Brush.frame(g, x0, y0, x1, y1, Palette.GOLD_DARK);
-		Brush.frame(g, x0 + 3, y0 + 3, x1 - 3, y1 - 3, Palette.argb(0x90, Palette.GOLD));
-		g.fill(x0 - 4, y0 - 3, x1 + 4, y0 + 1, Palette.ROD);
-		g.fill(x0 - 4, y1 - 1, x1 + 4, y1 + 3, Palette.ROD);
-		Brush.fit(g, font, Brush.bold(title), x0 + 10.0F, y0 + 7.0F, (x1 - x0) * 0.6F, Palette.SEAL_DARK, 1.0F, 0.6F, false);
-		Brush.rect(g, x0 + 10.0F, y0 + 18.0F, x1 - 10.0F, y0 + 18.6F, Palette.argb(0xB0, Palette.GOLD));
-
 		Component empty = !loaded ? Component.translatable(K + "memuat") : !on ? Component.translatable("kultivator.sekte.hubungan.tab.mati")
 				: !hall ? Component.translatable("kultivator.sekte.hubungan.tab.tanpa_aula")
 				: nodes.size() < 2 ? Component.translatable(K + "kosong") : null;
-		drawLegend(g);
 		if (empty != null) {
-			Brush.wrap(g, font, empty, x0 + 14.0F, cy - 6.0F, (x1 - x0) * 0.55F, Palette.INK_SOFT, 0.85F, false);
+			KeadaanKosong.gambar(l, loaded ? KeadaanKosong.Gambar.GULUNGAN : KeadaanKosong.Gambar.LENTERA, empty, null, null, x, y, x + w, y + h);
 			return;
 		}
-		hovered = nodeAt(mouseX, mouseY);
-		int focus = hovered >= 0 ? hovered : pinned;
-		// the faint ring the discs sit on
+		GuiGraphicsExtractor g = l.g;
+		float grow = Mth.clamp((l.kini - openedAt) / (float) GROW_MILLIS, 0.0F, 1.0F);
+		grow = grow * grow * (3.0F - 2.0F * grow);
+		int hovered = -1;
+		int focused = -1;
+		for (int i = 0; i < nodes.size() && i < nx.length; i++) {
+			if (l.di(Math.round(nx[i] - 9), Math.round(ny[i] - 9), Math.round(nx[i] + 9), Math.round(ny[i] + 9))) {
+				hovered = i;
+			}
+			if (l.difokus("simpul" + i)) {
+				focused = i;
+			}
+		}
+		int focus = hovered >= 0 ? hovered : focused >= 0 ? focused : pinned;
+		// the faint ring the discs sit on, the sect's seal in the middle
 		Brush.ring(g, cx, cy, radius - 0.6F, radius + 0.6F, Palette.argb(0x50, Palette.GOLD_DARK));
 		Brush.ring(g, cx, cy, radius * 0.18F, radius * 0.18F + 1.0F, Palette.argb(0x40, Palette.GOLD_DARK));
-		Brush.fitCentered(g, font, Component.literal("宗"), cx, cy - 5.0F, 20.0F, Palette.argb(0x60, Palette.SEAL_DARK), 1.2F, 0.6F, false);
-		float pulse = 0.5F + 0.5F * (float) Math.sin(now / 420.0D);
+		Component seal = Component.literal("宗");
+		Brush.text(g, font, seal, cx - font.width(seal) / 2.0F, cy - 4.0F, Palette.argb(0x60, Palette.SEAL_DARK), 1.0F, false);
+		float pulse = 0.5F + 0.5F * (float) Math.sin(l.kini / 420.0D);
 		for (Edge edge : edges) {
-			drawEdge(g, edge, focus, grow, pulse);
+			boolean lit = focus < 0 || edge.i() == focus || edge.j() == focus;
+			PelukisIkatan.benang(g, font, Mth.lerp(grow, cx, nx[edge.i()]), Mth.lerp(grow, cy, ny[edge.i()]), Mth.lerp(grow, cx, nx[edge.j()]),
+					Mth.lerp(grow, cy, ny[edge.j()]), edge.kind(), edge.affinity(), lit, pulse, focus >= 0);
 		}
-		for (int i = 0; i < nodes.size(); i++) {
-			drawNode(g, i, focus, grow);
+		int n = nodes.size();
+		float arc = (float) (Math.PI * 2.0D * radius / Math.max(1, n));
+		boolean allNames = arc >= 34.0F;
+		for (int i = 0; i < n && i < nx.length; i++) {
+			drawNode(l, i, focus, grow, allNames, arc);
 		}
-		if (focus >= 0) {
-			drawSide(g, focus);
-		} else {
-			Brush.wrap(g, font, Component.translatable(K + "petunjuk"), x0 + (x1 - x0) * 0.66F, y0 + 108.0F, (x1 - x0) * 0.3F, Palette.INK_FAINT,
-					0.6F, false);
-		}
+		drawSide(l, focus);
 		if (hovered >= 0) {
 			Node node = nodes.get(hovered);
 			List<Component> tip = new ArrayList<>();
@@ -219,96 +305,37 @@ public class JaringScreen extends Screen {
 			}
 			tip.add(Component.translatable("kultivator.sekte.hubungan.tab.suasana", (node.balance() > 0 ? "+" : "") + node.balance())
 					.withStyle(ChatFormatting.GRAY));
-			g.setComponentTooltipForNextFrame(font, tip, mouseX, mouseY);
+			tip.add(Component.translatable(M + "jaring.klik").withStyle(ChatFormatting.DARK_GRAY));
+			l.tip(tip);
 		}
 	}
 
-	private void drawLegend(GuiGraphicsExtractor g) {
-		float lx = x0 + (x1 - x0) * 0.66F;
-		float ly = y0 + 26.0F;
-		Ikatan[] kinds = {Ikatan.SAHABAT, Ikatan.SAUDARA_ANGKAT, Ikatan.KEKASIH, Ikatan.PASANGAN_DAO, Ikatan.SAINGAN, Ikatan.DENDAM, Ikatan.KENALAN};
-		if (hovered >= 0 || pinned >= 0) {
-			return;
-		}
-		Brush.fit(g, font, Brush.bold(Component.translatable(K + "legenda")), lx, ly, (x1 - lx) - 10.0F, Palette.SEAL_DARK, 0.7F, 0.45F, false);
-		ly += 10.0F;
-		for (Ikatan kind : kinds) {
-			int rgb = HubunganColors.of(kind);
-			Brush.line(g, lx, ly + 3.0F, lx + 14.0F, ly + 3.0F, kind == Ikatan.KENALAN ? 0.8F : 1.8F, Palette.opaque(rgb));
-			if (kind == Ikatan.SAUDARA_ANGKAT || kind == Ikatan.PASANGAN_DAO) {
-				Brush.line(g, lx, ly + 5.5F, lx + 14.0F, ly + 5.5F, 1.0F, Palette.opaque(rgb));
-			}
-			Brush.fit(g, font, Component.translatable(kind.key()), lx + 18.0F, ly, (x1 - lx) - 28.0F, Palette.onPaper(rgb), 0.62F, 0.4F, false);
-			ly += 9.0F;
-		}
-	}
-
-	private void drawEdge(GuiGraphicsExtractor g, Edge edge, int focus, float grow, float pulse) {
-		if (edge.kind() == Ikatan.NONE) {
-			return;
-		}
-		float ax = Mth.lerp(grow, cx, nx[edge.i()]);
-		float ay = Mth.lerp(grow, cy, ny[edge.i()]);
-		float bx = Mth.lerp(grow, cx, nx[edge.j()]);
-		float by = Mth.lerp(grow, cy, ny[edge.j()]);
-		boolean lit = focus < 0 || edge.i() == focus || edge.j() == focus;
-		int rgb = HubunganColors.of(edge.kind());
-		float strength = Math.abs(edge.affinity()) / 100.0F;
-		float thick = edge.kind() == Ikatan.KENALAN ? 0.6F : 0.9F + 1.6F * strength;
-		int alpha = lit ? (edge.kind() == Ikatan.KENALAN ? 0x70 : 0xE0) : 0x22;
-		if (edge.kind() == Ikatan.PASANGAN_DAO && lit) {
-			Brush.line(g, ax, ay, bx, by, thick + 3.0F, Palette.argb(Math.round(0x30 + 0x30 * pulse), rgb));
-		}
-		if (edge.kind() == Ikatan.SAUDARA_ANGKAT || edge.kind() == Ikatan.PASANGAN_DAO) {
-			// a double cord
-			float dx = by - ay;
-			float dy = ax - bx;
-			float len = (float) Math.sqrt(dx * dx + dy * dy);
-			if (len > 0.01F) {
-				dx = dx / len * 1.3F;
-				dy = dy / len * 1.3F;
-			}
-			Brush.line(g, ax + dx, ay + dy, bx + dx, by + dy, thick * 0.7F, Palette.argb(alpha, rgb));
-			Brush.line(g, ax - dx, ay - dy, bx - dx, by - dy, thick * 0.7F, Palette.argb(alpha, rgb));
-		} else {
-			Brush.line(g, ax, ay, bx, by, thick, Palette.argb(alpha, rgb));
-		}
-		if (lit && focus >= 0) {
-			// the affinity written on the middle of the thread
-			float mx = (ax + bx) / 2.0F;
-			float my = (ay + by) / 2.0F;
-			Component value = Component.literal((edge.affinity() > 0 ? "+" : "") + edge.affinity());
-			Brush.disc(g, mx, my, 5.5F, Palette.argb(0xD0, Palette.PAPER_TOP));
-			Brush.fitCentered(g, font, value, mx, my - 2.5F, 12.0F, Palette.onPaper(rgb), 0.55F, 0.4F, false);
-		}
-	}
-
-	private void drawNode(GuiGraphicsExtractor g, int i, int focus, float grow) {
+	private void drawNode(Lukis l, int i, int focus, float grow, boolean allNames, float arc) {
 		Node node = nodes.get(i);
-		float x = Mth.lerp(grow, cx, nx[i]);
-		float y = Mth.lerp(grow, cy, ny[i]);
+		float px = Mth.lerp(grow, cx, nx[i]);
+		float py = Mth.lerp(grow, cy, ny[i]);
 		boolean lit = focus < 0 || focus == i || connected(focus, i);
 		float r = (i == focus ? 7.5F : 6.0F) * (0.4F + 0.6F * grow);
-		int root = Palette.opaque(node.rootColor());
-		if (i == focus) {
-			Brush.halo(g, x, y, r + 1.0F, 4.0F, node.rootColor(), 0.5F);
+		PelukisIkatan.simpul(l.g, px, py, r, node.rootColor(), node.here(), lit, i == focus);
+		if (i == pinned) {
+			Brush.ring(l.g, px, py, r + 2.5F, r + 3.5F, Palette.GOLD);
 		}
-		Brush.disc(g, x, y, r + 1.2F, lit ? Palette.INK : Palette.argb(0x60, Palette.INK));
-		if (node.here()) {
-			Brush.disc(g, x, y, r, lit ? root : Palette.argb(0x70, root));
-			Brush.disc(g, x - r * 0.3F, y - r * 0.3F, r * 0.3F, 0x80FFFFFF);
-		} else {
-			Brush.disc(g, x, y, r, Palette.argb(0xC0, Palette.PAPER_TOP));
-			Brush.ring(g, x, y, r - 1.6F, r, lit ? root : Palette.argb(0x70, root));
+		int index = i;
+		l.zona("simpul" + i, Math.round(nx[i] - 9), Math.round(ny[i] - 9), Math.round(nx[i] + 9), Math.round(ny[i] + 9), () -> klikSimpul(index),
+				true, null, true);
+		l.fokusCincin("simpul" + i, Math.round(px - r - 1), Math.round(py - r - 1), Math.round(px + r + 1), Math.round(py + r + 1));
+		if (!allNames && !(focus >= 0 && lit)) {
+			return;
 		}
-		// the name outside the ring
-		double a = Math.atan2(y - cy, x - cx);
-		float lx = x + (float) Math.cos(a) * (r + 5.0F);
-		float ly = y + (float) Math.sin(a) * (r + 5.0F) - 3.0F;
-		Component name = node.name();
-		float tw = Math.min(70.0F, font.width(name) * 0.62F);
+		// the name outside the ring, kept inside the ring's half of the page
+		double a = Math.atan2(py - cy, px - cx);
+		float lx = px + (float) Math.cos(a) * (r + 5.0F);
+		float ly = py + (float) Math.sin(a) * (r + 5.0F) - 4.0F;
+		float tw = Math.min(font.width(node.name()), allNames ? Mth.clamp(arc - 4.0F, 28.0F, 64.0F) : 56.0F);
 		float tx = Math.cos(a) < -0.3D ? lx - tw : Math.cos(a) > 0.3D ? lx : lx - tw / 2.0F;
-		Brush.fit(g, font, name, tx, ly, tw, lit ? Palette.INK : Palette.INK_FAINT, 0.62F, 0.4F, false);
+		tx = Mth.clamp(tx, x + 1.0F, ringX1 - tw);
+		ly = Mth.clamp(ly, y, y + h - 9.0F);
+		l.teks(node.name(), tx, ly, tw, lit ? Palette.INK : Palette.INK_FAINT);
 	}
 
 	private boolean connected(int a, int b) {
@@ -320,21 +347,33 @@ public class JaringScreen extends Screen {
 		return false;
 	}
 
-	/** The ties of the focused disciple, beside the ring. */
-	private void drawSide(GuiGraphicsExtractor g, int focus) {
+	/** Beside the ring: the focused disciple and its ties (each a row that moves the focus there), or the legend and the hint. */
+	private void drawSide(Lukis l, int focus) {
+		int sx = sideX0;
+		int sw = x + w - sideX0;
+		int sy = y + 2;
+		int bottom = y + h;
+		Brush.rect(l.g, sx - 4, y + 2, sx - 3, bottom - 2, Palette.argb(0x60, Palette.GOLD_DARK));
+		if (focus < 0) {
+			l.teks(Brush.bold(Component.translatable(K + "legenda")), sx, sy, sw, Palette.SEAL_DARK);
+			sy += 12;
+			sy += PelukisIkatan.legenda(l, sx, sy, sw, bottom) + 4;
+			if (bottom - sy >= 18) {
+				l.bungkus(Component.translatable(M + "jaring.petunjuk"), sx, sy, sw, Palette.INK_FAINT, bottom - sy);
+			}
+			return;
+		}
 		Node node = nodes.get(focus);
-		float lx = x0 + (x1 - x0) * 0.66F;
-		float lw = x1 - lx - 10.0F;
-		float ly = y0 + 26.0F;
-		Brush.fit(g, font, Brush.bold(node.name()), lx, ly, lw, Palette.INK, 0.85F, 0.5F, false);
-		ly += 11.0F;
+		l.teks(Brush.bold(node.name()), sx, sy, sw, Palette.INK);
+		sy += 10;
 		if (node.realm() >= 0 && node.realm() < Realm.values().length) {
 			Realm realm = Realm.values()[node.realm()];
-			Brush.fit(g, font, realm.displayName(), lx, ly, lw, Palette.onPaper(realm.color()), 0.62F, 0.4F, false);
-			ly += 9.0F;
+			l.teks(realm.displayName(), sx, sy, sw, Palette.onPaper(realm.color()));
+			sy += 10;
 		}
-		Brush.rect(g, lx, ly, lx + lw, ly + 0.6F, Palette.argb(0x90, Palette.GOLD));
-		ly += 4.0F;
+		Brush.rect(l.g, sx, sy + 1, sx + sw, sy + 1.6F, Palette.argb(0x90, Palette.GOLD));
+		sy += 4;
+		int buttonY = bottom - BUTTON_H - 1;
 		List<Edge> mine = new ArrayList<>();
 		for (Edge edge : edges) {
 			if ((edge.i() == focus || edge.j() == focus) && edge.kind() != Ikatan.NONE) {
@@ -343,70 +382,56 @@ public class JaringScreen extends Screen {
 		}
 		mine.sort((p, q) -> Integer.compare(Math.abs(q.affinity()), Math.abs(p.affinity())));
 		if (mine.isEmpty()) {
-			Brush.wrap(g, font, Component.translatable(K + "sendiri"), lx, ly, lw, Palette.INK_SOFT, 0.6F, false);
-			return;
+			l.bungkus(Component.translatable(K + "sendiri"), sx, sy, sw, Palette.INK_SOFT, buttonY - sy - 2);
 		}
-		for (Edge edge : mine) {
-			if (ly > y1 - 14.0F) {
+		for (int k = 0; k < mine.size(); k++) {
+			if (sy + ROW > buttonY - 2) {
 				break;
 			}
-			Node other = nodes.get(edge.i() == focus ? edge.j() : edge.i());
-			int rgb = HubunganColors.of(edge.kind());
-			Brush.disc(g, lx + 4.0F, ly + 3.5F, 3.5F, Palette.opaque(rgb));
-			Brush.fit(g, font, other.name(), lx + 10.0F, ly, lw * 0.55F, Palette.INK, 0.6F, 0.4F, false);
-			Component kind = Component.translatable(edge.kind().key()).append(" " + (edge.affinity() > 0 ? "+" : "") + edge.affinity());
-			Brush.fit(g, font, kind, lx + 10.0F + lw * 0.55F, ly, lw * 0.45F - 10.0F, Palette.onPaper(rgb), 0.55F, 0.38F, false);
-			ly += 9.0F;
+			Edge edge = mine.get(k);
+			int otherIndex = edge.i() == focus ? edge.j() : edge.i();
+			Node other = nodes.get(otherIndex);
+			int rgb = PelukisIkatan.warna(edge.kind());
+			boolean over = l.di(sx, sy, sx + sw, sy + ROW);
+			if (over || l.difokus("ikatan" + k)) {
+				l.g.fill(sx - 1, sy - 1, sx + sw, sy + ROW - 1, Palette.argb(0x40, Palette.PAPER_DEEP));
+			}
+			Brush.disc(l.g, sx + 3.5F, sy + 3.5F, 3.0F, Palette.opaque(rgb));
+			Component kind = Component.translatable(edge.kind().key()).append(" ").append(PelukisIkatan.nilai(edge.affinity()));
+			int kindW = Math.min(font.width(kind), Math.round((sw - 10) * 0.48F));
+			l.teks(other.name(), sx + 9, sy, sw - 12 - kindW, Palette.INK);
+			l.teks(kind, sx + sw - kindW, sy, kindW, Palette.onPaper(rgb));
+			l.zona("ikatan" + k, sx, sy - 1, sx + sw, sy + ROW - 1, () -> pinned = otherIndex, true, null, true);
+			l.fokusCincin("ikatan" + k, sx, sy - 1, sx + sw, sy + ROW - 1);
+			sy += ROW;
+		}
+		Component open = Component.translatable(M + "jaring.buka");
+		TalismanButton.gambar(l, "buka", sx, buttonY, sw, BUTTON_H, open, true, null, () -> buka(focus));
+	}
+
+	// ================================================================== input
+
+	private void klikSimpul(int i) {
+		if (pinned == i) {
+			buka(i);
+		} else {
+			pinned = i;
 		}
 	}
 
-	private int nodeAt(double mouseX, double mouseY) {
-		for (int i = 0; i < nodes.size() && i < nx.length; i++) {
-			double dx = mouseX - nx[i];
-			double dy = mouseY - ny[i];
-			if (dx * dx + dy * dy <= 81.0D) {
-				return i;
-			}
+	/** Opens the disciple on Murid › Murid › hubungan (its diary when the body is out of reach). */
+	private void buka(int i) {
+		if (i >= 0 && i < nodes.size()) {
+			MandiriBoardScreen.bukaMurid(nodes.get(i).soul(), "hubungan");
 		}
-		return -1;
 	}
 
 	@Override
-	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-		if (event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
-			int at = nodeAt(event.x(), event.y());
-			if (at >= 0) {
-				pinned = pinned == at ? -1 : at;
-				UiSound.press();
-				return true;
-			}
-			if (event.x() >= x0 && event.x() < x1 && event.y() >= y0 && event.y() < y1) {
-				pinned = -1;
-				return true;
-			}
-		}
-		return super.mouseClicked(event, doubleClick);
-	}
-
-	@Override
-	public boolean keyPressed(KeyEvent event) {
-		if (event.isEscape()) {
-			onClose();
+	protected boolean clickedElsewhere(double mouseX, double mouseY) {
+		if (mouseX >= x && mouseX < ringX1 && mouseY >= y && mouseY < y + h && pinned >= 0) {
+			pinned = -1;
 			return true;
 		}
-		return super.keyPressed(event);
-	}
-
-	@Override
-	public void removed() {
-		if (open == this) {
-			open = null;
-		}
-		super.removed();
-	}
-
-	@Override
-	public boolean isPauseScreen() {
 		return false;
 	}
 }

@@ -13,7 +13,7 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 /**
- * The speaker portrait of {@code GelembungDialog} and the recruit cards (DESIGN 38.U.3.1): the NPC's real head (its model
+ * The speaker portrait of the kit-38 sheets and the recruit cards (DESIGN 38.U.3.1): the NPC's real head (its model
  * with the 38.O / 40 face, so it blinks with its renderer) in a gold frame, rendered live as a picture-in-picture from the
  * entity id the sheet sends ({@code potret}). While the NPC "speaks" the head nods and turns a little; a frightened NPC
  * ({@code takut}, 38.R.5) looks down and trembles. Without a live entity the frame shows the sheet's icon on a paper

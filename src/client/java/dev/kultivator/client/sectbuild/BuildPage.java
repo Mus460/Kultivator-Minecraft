@@ -1,16 +1,19 @@
 package dev.kultivator.client.sectbuild;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import dev.kultivator.client.hall.HallPage;
-import dev.kultivator.client.hall.HallScreen;
+import dev.kultivator.client.hall.HallClient;
+import dev.kultivator.client.hub.HubNav;
+import dev.kultivator.client.hub.Tujuan;
+import dev.kultivator.client.hub.Urutan;
+import dev.kultivator.client.screen.Page;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.client.screen.ui.JadeCoin;
+import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
-import dev.kultivator.client.screen.ui.SectionPicker;
+import dev.kultivator.client.screen.ui.PemilihOrang;
+import dev.kultivator.client.screen.ui.SegelKonfirmasi;
 import dev.kultivator.client.screen.ui.TalismanButton;
-import dev.kultivator.client.screen.ui.UiSound;
-import dev.kultivator.client.screen.ui.Widget;
 import dev.kultivator.sect.build.api.Bahan;
 import dev.kultivator.sect.build.api.Bill;
 import dev.kultivator.sect.build.api.ComponentView;
@@ -18,8 +21,11 @@ import dev.kultivator.sect.build.api.SectTemplates;
 import dev.kultivator.sect.build.api.SiteView;
 import dev.kultivator.sect.build.blueprint.Glaze;
 import dev.kultivator.sect.build.flow.Deposits;
+import dev.kultivator.sect.build.flow.Fmt;
+import dev.kultivator.sect.hall.Halls;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -35,7 +41,7 @@ import net.minecraft.world.item.Items;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -43,65 +49,68 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * The Bangun tablet of the Sect Hall scroll, placed second after Aula (DESIGN 21.21): on the left the 120x120 site
- * diagram (done parts in full ink, the open one with a pulsing gold edge and its percent, queued ones as faint outlines,
- * blocked ones with a red seal, future tiers faded; hovering names a part with its tier and bill), on the right the chosen
- * panel, picked from a vertical seal column on the right edge (no top tab row):
+ * Sekte › Bangun of the Gulungan Utama (DESIGN 21.21, 43.5, 43.12.2), drawn from the {@code build} part of
+ * {@code HallInfo}. On the left the site diagram (done parts in full ink, the open one with a pulsing gold edge, queued ones
+ * faint, blocked ones with a red seal, future tiers faded; hovering names a part with its tier and bill); on the right the
+ * chosen sub (the old seal column):
  * <ul>
- * <li><b>Ikhtisar</b>: "Tingkat 4/9 · Tembok dan Air", the tier ladder drawn as a mountain path of nine terraces, the open
- * building, the rate ("≈ 22 blok/detik · 3 pekerja · x2 tabungan"), the status, what the next building still needs and
- * the talismans <i>Setor dari tas</i> (only what is needed) and the <i>Jeda</i> coin;</li>
- * <li><b>Bahan</b>: bamboo-slip bill bars per category for this tier and the next, exact items, the deposit grid of the
- * bag (click: a stack, shift-click: all of that item), "Setor yang dibutuhkan" and "Ambil dari Lumbung";</li>
- * <li><b>Misi</b>: tier missions, daily offers, gathering parties and sending one;</li>
- * <li><b>Pekerja</b>: up to four builders; <b>Galian</b>: the Peti Galian, the surplus and the "Pakai hasil galian" coin;</li>
- * <li><b>Templat</b>: upgrade, repair, deconstruct, abandon, glaze, history and the obstacle list with "Periksa ulang",
- * "Lewati bagian ini", "Selesaikan tanpa blok terhalang" and "Prioritaskan"; <b>Penyumbang</b>: donors (LAN only).</li>
+ * <li><b>Ikhtisar</b>: "Tingkat 4/9 · Tembok dan Air", the nine terraces of the tier ladder, the open building, the rate,
+ * the status, what the next building still needs, <i>Jeda</i> and the deposit talismans (before a template: the founding
+ * text, "Pilih Templat" and "Bangun sendiri");</li>
+ * <li><b>Bahan</b>: bamboo bars per category for this tier and the next, exact items, the bag's accepted items (click: a
+ * stack, shift-click: all of that item) and "Ambil dari Lumbung";</li>
+ * <li><b>Misi</b>: tier missions, daily offers and the gathering parties under stacked headings; the party is picked in
+ * the kit's {@link PemilihOrang} pop-up;</li>
+ * <li><b>Pekerja</b>: up to four builders, ticked in a {@link PemilihOrang}; <b>Galian</b>: the surplus, the Peti Galian
+ * and its coins;</li>
+ * <li><b>Templat</b>: before a template the catalog ({@link TemplateScreen}, wide paper); after it upgrade, repair,
+ * deconstruct, abandon, change, the obstacles, the queue and the history, with "Naik Templat" opening the catalog as the
+ * detail view; <b>Penyumbang</b>: donors (LAN only).</li>
  * </ul>
- * A sect mate sees it read-only and may deposit. Fits 320x240 (the panels scroll with the wheel). Jade scroll of DESIGN 5b.
+ * A sect mate sees it read-only and may deposit. Everything is drawn immediately (zones in the Tab ring); text is 1.0
+ * (43.0.5); dangerous acts ask the kit's {@link SegelKonfirmasi} (43.7) instead of the old second click.
  */
-public class BuildPage extends HallPage {
+public class BuildPage extends Page {
 
-	private static final String[] PANELS = {"overview", "materials", "missions", "builders", "salvage", "template", "donors"};
-	private static final int[] PANEL_ICONS = {Glyphs.BUILD, Glyphs.TREASURE, Glyphs.PATH, Glyphs.TALENT, Glyphs.SEAL, Glyphs.HALL, Glyphs.STATUS};
-	private static final int SEAL_W = 15;
-	private static final int BUTTON_H = 12;
-	private static final float TEXT = 0.6F;
+	static final String[] SUBS = {"ikhtisar", "bahan", "misi", "pekerja", "galian", "templat", "penyumbang"};
+	private static final int LINE = 10;
+	private static final String K = "kultivator.sectbuild.ui.";
+	private static final String M = "kultivator.gui43.m07.";
+	/** Sect rank names of module A (Tercatat ... Tetua Agung). */
+	private static final String[] RANK_IDS = {"tercatat", "luar", "dalam", "inti", "tetua", "tetua_agung"};
 
-	private static int panel;
-	private static int missionView;
+	private static String sub = SUBS[0];
+	/** The catalog is open as the detail view of Templat ("Naik Templat"). */
+	private static boolean katalog;
 	private static int gatherCat;
 	private static boolean gatherLong;
-	private static final Set<String> PARTY = new HashSet<>();
-	private static final Map<Integer, Float> SCROLL = new LinkedHashMap<>();
+	private static final Map<String, Float> SCROLL = new HashMap<>();
 
-	/** A clickable area drawn this frame (list rows, chips, seals). */
-	private record Hit(float x0, float y0, float x1, float y1, Runnable action, @Nullable List<Component> tip) {
-	}
-
-	private final List<Hit> hits = new ArrayList<>();
+	private final TemplateScreen catalog = new TemplateScreen(this);
+	private final PemilihOrang pekerja = new PemilihOrang(4).onUbah(this::pekerjaBerubah);
+	private final PemilihOrang regu = new PemilihOrang(3);
+	private final List<String> builderSouls = new ArrayList<>();
 	private @Nullable CompoundTag partsFor;
 	private List<SiteDiagram.Part> parts = List.of();
 	private SiteDiagram.Bounds bounds = SiteDiagram.Bounds.of(1);
-	private int diagram;
 	private int panelX;
 	private int panelW;
-	private int panelTop;
-	private int listTop;
-	private int listBottom;
-	private float contentHeight;
-	private boolean askDeconstruct;
-	private boolean askTotal;
-	private boolean askAbandon;
-	private long askUntil;
+	// the scroll of this frame
+	private String scrollKey = "";
+	private int scrollTop;
+	private int scrollBottom;
+	private boolean catalogShown;
 
-	public BuildPage(HallScreen screen) {
-		super(screen);
+	public BuildPage() {
+		regu.kolom(List.of(Component.translatable(M + "kolom.pangkat"), Component.translatable(M + "kolom.kekuatan")));
+		pekerja.kolom(List.of(Component.translatable(M + "kolom.keadaan")));
 	}
+
+	// ================================================================== identity
 
 	@Override
 	public Component title() {
-		return Component.translatable("kultivator.spine6b.page.bangun");
+		return Component.translatable("kultivator.gui43.hal.sekte.bangun");
 	}
 
 	@Override
@@ -110,17 +119,120 @@ public class BuildPage extends HallPage {
 	}
 
 	@Override
-	public int icon() {
+	public int glyph() {
 		return Glyphs.BUILD;
+	}
+
+	@Override
+	public String helpTopic() {
+		return "bangun";
+	}
+
+	/** Hidden for players without a hall (43.5 "*"); shown while the details are still unknown so they can be asked for. */
+	@Override
+	public boolean tampil() {
+		return HallClient.version() == 0L || HallClient.info().getBooleanOr("has", false);
+	}
+
+	@Override
+	public List<Sub> subs() {
+		List<Sub> subs = new ArrayList<>();
+		for (String id : SUBS) {
+			if (shows(id)) {
+				subs.add(new Sub(id, Component.translatable("kultivator.gui43.sub.bangun." + id)));
+			}
+		}
+		return subs;
+	}
+
+	/** Whether sub {@code id} applies now (without a template only Ikhtisar and Templat; Penyumbang only on LAN). */
+	private boolean shows(String id) {
+		if (template() <= 0) {
+			return "ikhtisar".equals(id) || "templat".equals(id);
+		}
+		return !"penyumbang".equals(id) || lan();
+	}
+
+	@Override
+	public void showSub(String id) {
+		if (!id.equals(sub)) {
+			katalog = false;
+		}
+		sub = id;
+		if ("templat".equals(id) && template() <= 0) {
+			catalog.opened();
+		}
+	}
+
+	private String shownSub() {
+		return shows(sub) ? sub : SUBS[0];
+	}
+
+	@Override
+	public boolean lebar() {
+		return "templat".equals(shownSub()) && (template() <= 0 || katalog);
+	}
+
+	@Override
+	public boolean rinci() {
+		return katalog && template() > 0 && "templat".equals(shownSub());
+	}
+
+	@Override
+	public boolean mundur() {
+		if (regu.tutup()) {
+			return true;
+		}
+		if (rinci()) {
+			katalog = false;
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public void fokus(CompoundTag fokus) {
+		if (fokus.contains("templat")) {
+			catalog.select(fokus.getIntOr("templat", 0));
+			if (template() > 0) {
+				katalog = true;
+			}
+			catalog.opened();
+		}
+	}
+
+	// ================================================================== life
+
+	@Override
+	protected void build() {
+	}
+
+	@Override
+	public void onShow(@Nullable CompoundTag fokus) {
+		// HallClient asks again every 4 s while the Sekte section shows (43.0.12).
+		HallClient.minta();
+		if ("templat".equals(shownSub()) && (template() <= 0 || katalog)) {
+			catalog.opened();
+		}
+		super.onShow(fokus);
+	}
+
+	/** Fresh details now (after an action; the server answers in order, so they already show its effect). */
+	private void refresh() {
+		HallClient.send(Halls.OP_REFRESH, "");
 	}
 
 	// ================================================================== data
 
-	private CompoundTag b() {
+	private static CompoundTag info() {
+		return HallClient.info();
+	}
+
+	private static CompoundTag b() {
 		return info().getCompoundOrEmpty("build");
 	}
 
-	private int template() {
+	int template() {
 		return b().getIntOr("t", 0);
 	}
 
@@ -132,7 +244,7 @@ public class BuildPage extends HallPage {
 		return b().getCompoundOrEmpty("site");
 	}
 
-	private boolean readonly() {
+	boolean readonly() {
 		return b().getBooleanOr("readonly", false);
 	}
 
@@ -144,8 +256,18 @@ public class BuildPage extends HallPage {
 		return b().getBooleanOr("lan", false);
 	}
 
+	private CompoundTag flags() {
+		return b().getCompoundOrEmpty("flags");
+	}
+
+	/** Sends a construction action and asks for fresh details right after (the server answers in order). */
 	private void act(String text) {
 		BuildClient.send(0, text);
+		refresh();
+	}
+
+	private @Nullable Component roWhy() {
+		return readonly() ? Component.translatable(M + "baca_saja") : null;
 	}
 
 	/** Re-reads the diagram parts when new details arrived. */
@@ -163,406 +285,374 @@ public class BuildPage extends HallPage {
 			parts = SiteDiagram.fromComponents(b().getListOrEmpty("comps"), stele, rot);
 			bounds = SiteDiagram.bounds(fp, stele, rot);
 		} else {
-			int t = Math.max(1, template());
+			// rank(): sky templates are numbered 11-19, the sketches 1-9.
+			int t = Math.max(1, SectTemplates.rank(template()));
 			parts = SiteDiagram.sketch(t);
 			bounds = SiteDiagram.Bounds.of(t);
 		}
 	}
 
-	// ================================================================== layout and controls
+	// ================================================================== services for the catalog
 
-	@Override
-	protected void build() {
-		diagram = Math.max(64, Math.min(120, Math.min(h - 12, Math.round(w * 0.36F))));
-		panelX = x + diagram + 6;
-		panelW = x + w - SEAL_W - 3 - panelX;
-		panelTop = y + 12;
-		if (!lan() && panel == 6) {
-			panel = 0;
-		}
-		if (template() <= 0) {
-			buildFounding();
+	/** Button height of the current layout (43.3.2: 12 narrow, else 14). */
+	int buttonH() {
+		return tata() == Tata.SEMPIT ? 12 : 14;
+	}
+
+	/** Asks for confirmation over the page. */
+	void minta(SegelKonfirmasi.Tingkat tingkat, Component teks, Runnable ya) {
+		konfirmasi(tingkat, teks, ya);
+	}
+
+	/** The footprint was confirmed: back to Ikhtisar, where the first building starts. */
+	void afterConfirm() {
+		katalog = false;
+		refresh();
+		tuju(Tujuan.of(HubNav.SEKTE, Urutan.ID_BANGUN).sub("ikhtisar"));
+	}
+
+	/** A scroll bead on the right edge of a list. */
+	void bead(Lukis l, int x1, int y0, int y1, float offset, float max) {
+		if (max <= 0.0F) {
 			return;
 		}
-		switch (panel) {
-			case 0 -> buildOverview();
-			case 1 -> buildMaterials();
-			case 2 -> buildMissions();
-			case 3 -> {
-			}
-			case 4 -> buildSalvage();
-			case 5 -> buildTemplate();
-			default -> {
-			}
-		}
+		float bead = y0 + 3.0F + (y1 - y0 - 6.0F) * (offset / max);
+		l.g.fill(x1 - 2, y0, x1 - 1, y1, Palette.argb(0x80, Palette.CORD));
+		Brush.disc(l.g, x1 - 1.5F, bead, 2.0F, Palette.JADE);
 	}
 
-	@Override
-	public boolean needsRebuild() {
-		CompoundTag build = b();
-		return build.getIntOr("t", 0) > 0 != builtWithTemplate || build.getBooleanOr("readonly", false) != builtReadonly;
-	}
+	/** Per-key state of an immediate jade coin. */
+	private static final class Koin {
+		Component label = Component.empty();
+		boolean on;
+		boolean aktif = true;
+		@Nullable Component alasan;
+		@Nullable Runnable aksi;
+		final JadeCoin widget;
 
-	private boolean builtWithTemplate;
-	private boolean builtReadonly;
-
-	@Override
-	public void onInfo() {
-		builtWithTemplate = template() > 0;
-		builtReadonly = readonly();
-	}
-
-	private TalismanButton talisman(int bx, int by, int bw, String key, Runnable action) {
-		TalismanButton button = new TalismanButton(bx, by, bw, BUTTON_H, () -> Component.translatable(key));
-		button.onPress(action);
-		add(button);
-		return button;
-	}
-
-	private void buildFounding() {
-		int bw = Math.min(120, panelW);
-		TalismanButton choose = talisman(panelX, y + h - 2 * BUTTON_H - 6, bw, "kultivator.sectbuild.ui.choose", () -> BuildClient.openTemplates(0, false));
-		choose.enabledWhen(() -> !readonly() && b().getBooleanOr("engine", false) && b().getBooleanOr("on", true));
-		choose.urgentWhen(() -> !readonly());
-		JadeCoin self = new JadeCoin(panelX, y + h - BUTTON_H - 2, bw, 11, () -> Component.translatable("kultivator.sectbuild.ui.self_build"),
-				() -> b().getCompoundOrEmpty("flags").getBooleanOr("self", false));
-		self.onPress(() -> act("flag:self:" + (b().getCompoundOrEmpty("flags").getBooleanOr("self", false) ? "0" : "1")));
-		self.enabledWhen(() -> !readonly());
-		self.tooltip(() -> List.of(Component.translatable("kultivator.sectbuild.ui.self_build"), Component.translatable("kultivator.sectbuild.ui.self_build_tip")));
-		add(self);
-	}
-
-	private void buildOverview() {
-		int half = (panelW - 3) / 2;
-		int by = y + h - BUTTON_H;
-		TalismanButton needed = talisman(panelX, by, half, "kultivator.sectbuild.ui.deposit_needed", () -> act("deposit_needed"));
-		needed.urgentWhen(() -> site().getIntOr("status", 0) == SiteView.STATUS_WAITING_FUNDS);
-		needed.tooltip(() -> List.of(Component.translatable("kultivator.sectbuild.ui.deposit_needed"), Component.translatable("kultivator.sectbuild.ui.deposit_needed_tip")));
-		TalismanButton all = talisman(panelX + half + 3, by, half, "kultivator.sectbuild.ui.deposit_all", () -> act("deposit_all"));
-		all.tooltip(() -> List.of(Component.translatable("kultivator.sectbuild.ui.deposit_all"), Component.translatable("kultivator.sectbuild.ui.deposit_all_tip")));
-		JadeCoin pause = new JadeCoin(panelX, by - 13, half, 11, () -> Component.translatable("kultivator.sectbuild.ui.pause"),
-				() -> site().getIntOr("state", 0) == SiteView.STATE_PAUSED);
-		pause.onPress(() -> act("pause:" + (site().getIntOr("state", 0) == SiteView.STATE_PAUSED ? "0" : "1")));
-		pause.enabledWhen(() -> !readonly());
-		add(pause);
-		TalismanButton screenButton = talisman(panelX + half + 3, by - 13, half, "kultivator.sectbuild.ui.templates", () -> BuildClient.openTemplates(template(), false));
-		screenButton.enabledWhen(() -> true);
-	}
-
-	private void buildMaterials() {
-		int third = (panelW - 4) / 3;
-		int by = y + h - BUTTON_H;
-		TalismanButton needed = talisman(panelX, by, third, "kultivator.sectbuild.ui.deposit_needed_short", () -> act("deposit_needed"));
-		needed.tooltip(() -> List.of(Component.translatable("kultivator.sectbuild.ui.deposit_needed"), Component.translatable("kultivator.sectbuild.ui.deposit_needed_tip")));
-		talisman(panelX + third + 2, by, third, "kultivator.sectbuild.ui.deposit_all_short", () -> act("deposit_all"));
-		TalismanButton store = talisman(panelX + 2 * (third + 2), by, third, "kultivator.sectbuild.ui.storehouse", () -> act("lumbung"));
-		store.enabledWhen(() -> !readonly());
-		store.tooltip(() -> List.of(Component.translatable("kultivator.sectbuild.ui.storehouse"), Component.translatable("kultivator.sectbuild.ui.storehouse_tip")));
-	}
-
-	private void buildMissions() {
-		SectionPicker picker = new SectionPicker(panelX, panelTop, panelW, 11, new String[]{"kultivator.sectbuild.ui.missions_view",
-				"kultivator.sectbuild.ui.gather_view"}, () -> missionView, index -> {
-			missionView = index;
-			SCROLL.put(2, 0.0F);
-			layout(x, y, w, h);
-		});
-		add(picker);
-		if (missionView == 1) {
-			int by = y + h - BUTTON_H;
-			int half = (panelW - 3) / 2;
-			SectionPicker cats = new SectionPicker(panelX, panelTop + 13, panelW, 11, catKeys(), () -> gatherCat, index -> gatherCat = index);
-			add(cats);
-			JadeCoin length = new JadeCoin(panelX, by - 13, panelW, 11, () -> Component.translatable(gatherLong ? "kultivator.sectbuild.ui.trip_long"
-					: "kultivator.sectbuild.ui.trip_short"), () -> gatherLong);
-			length.onPress(() -> gatherLong = !gatherLong);
-			add(length);
-			TalismanButton send = talisman(panelX, by, panelW, "kultivator.sectbuild.ui.send_party", () -> {
-				act("gather:" + Bahan.values()[gatherCat].id() + ":" + (gatherLong ? "1" : "0") + ":" + String.join(",", PARTY));
-				PARTY.clear();
+		Koin() {
+			widget = new JadeCoin(0, 0, TalismanButton.MIN_W, TalismanButton.MIN_H, () -> label, () -> on);
+			widget.enabledWhen(() -> aktif);
+			widget.alasanWhen(() -> alasan);
+			widget.onPress(() -> {
+				if (aksi != null) {
+					aksi.run();
+				}
 			});
-			send.enabledWhen(() -> !readonly() && !PARTY.isEmpty() && parties() < b().getIntOr("party_max", 1));
-			send.urgentWhen(() -> !PARTY.isEmpty());
 		}
 	}
 
-	private void buildSalvage() {
-		int by = y + h - BUTTON_H;
-		JadeCoin excavation = new JadeCoin(panelX, by, panelW, 11, () -> Component.translatable("kultivator.sectbuild.ui.use_excavation"),
-				() -> b().getCompoundOrEmpty("flags").getBooleanOr("exc", true));
-		excavation.onPress(() -> act("flag:exc:" + (b().getCompoundOrEmpty("flags").getBooleanOr("exc", true) ? "0" : "1")));
-		excavation.enabledWhen(() -> !readonly());
-		excavation.tooltip(() -> List.of(Component.translatable("kultivator.sectbuild.ui.use_excavation"), Component.translatable("kultivator.sectbuild.ui.use_excavation_tip")));
-		add(excavation);
-		if (b().getCompoundOrEmpty("flags").getBooleanOr("can_auth", false)) {
-			int half = (panelW - 3) / 2;
-			JadeCoin remove = new JadeCoin(panelX, by - 13, half, 11, () -> Component.translatable("kultivator.sectbuild.ui.remove_player"),
-					() -> b().getCompoundOrEmpty("flags").getBooleanOr("rm", false));
-			remove.onPress(() -> act("flag:rm:" + (b().getCompoundOrEmpty("flags").getBooleanOr("rm", false) ? "0" : "1")));
-			remove.tooltip(() -> List.of(Component.translatable("kultivator.sectbuild.ui.remove_player"), Component.translatable("kultivator.sectbuild.ui.remove_player_tip")));
-			add(remove);
-			JadeCoin empty = new JadeCoin(panelX + half + 3, by - 13, half, 11, () -> Component.translatable("kultivator.sectbuild.ui.empty_containers"),
-					() -> b().getCompoundOrEmpty("flags").getBooleanOr("empty", false));
-			empty.onPress(() -> act("flag:empty:" + (b().getCompoundOrEmpty("flags").getBooleanOr("empty", false) ? "0" : "1")));
-			empty.tooltip(() -> List.of(Component.translatable("kultivator.sectbuild.ui.empty_containers"), Component.translatable("kultivator.sectbuild.ui.empty_containers_tip")));
-			add(empty);
+	/** A jade coin of the kit (on/off) drawn immediately and kept in the Tab ring; {@code alasan} shows while disabled. */
+	static void koin(Lukis l, String kunci, int x, int y, int w, int h, Component label, boolean on, boolean aktif, @Nullable Component alasan,
+			Runnable aksi, @Nullable List<Component> tip) {
+		Koin koin = l.fokusRing().simpan("koin:" + kunci, Koin::new);
+		koin.label = label;
+		koin.on = on;
+		koin.aktif = aktif;
+		koin.alasan = aktif ? null : alasan;
+		koin.aksi = aksi;
+		koin.widget.x = x;
+		koin.widget.y = y;
+		koin.widget.w = Math.max(TalismanButton.MIN_W, w);
+		koin.widget.h = Math.max(TalismanButton.MIN_H, h);
+		l.widget(kunci, koin.widget);
+		if (tip != null && l.di(x, y, x + koin.widget.w, y + koin.widget.h)) {
+			l.tip(tip);
 		}
 	}
 
-	private void buildTemplate() {
-		int half = (panelW - 3) / 2;
-		int by = y + h - BUTTON_H;
-		TalismanButton upgrade = talisman(panelX, by - 2 * (BUTTON_H + 2), half, "kultivator.sectbuild.ui.upgrade", () -> BuildClient.openTemplates(Math.min(9,
-				template() + 1), true));
-		upgrade.enabledWhen(() -> !readonly() && template() < b().getIntOr("max_t", 9));
-		TalismanButton repair = talisman(panelX + half + 3, by - 2 * (BUTTON_H + 2), half, "kultivator.sectbuild.ui.repair", () -> act("repair"));
-		repair.enabledWhen(() -> !readonly());
-		repair.tooltip(() -> List.of(Component.translatable("kultivator.sectbuild.ui.repair"), Component.translatable("kultivator.sectbuild.ui.repair_tip")));
-		JadeCoin deconstruct = new JadeCoin(panelX, by - BUTTON_H - 2, half, 11, () -> Component.translatable("kultivator.sectbuild.ui.deconstruct"),
-				() -> false);
-		deconstruct.askingWhen(() -> askDeconstruct && Util.getMillis() < askUntil);
-		deconstruct.onPress(() -> ask(0));
-		deconstruct.enabledWhen(() -> !readonly());
-		deconstruct.tooltip(() -> List.of(Component.translatable("kultivator.sectbuild.ui.deconstruct"), Component.translatable("kultivator.sectbuild.ui.deconstruct_tip")));
-		add(deconstruct);
-		JadeCoin total = new JadeCoin(panelX + half + 3, by - BUTTON_H - 2, half, 11, () -> Component.translatable("kultivator.sectbuild.ui.deconstruct_total"),
-				() -> false);
-		total.askingWhen(() -> askTotal && Util.getMillis() < askUntil);
-		total.onPress(() -> ask(1));
-		total.enabledWhen(() -> !readonly());
-		total.tooltip(() -> List.of(Component.translatable("kultivator.sectbuild.ui.deconstruct_total"), Component.translatable("kultivator.sectbuild.ui.deconstruct_total_tip")));
-		add(total);
-		JadeCoin abandon = new JadeCoin(panelX, by, half, 11, () -> Component.translatable("kultivator.sectbuild.ui.abandon"), () -> false);
-		abandon.askingWhen(() -> askAbandon && Util.getMillis() < askUntil);
-		abandon.onPress(() -> ask(2));
-		abandon.enabledWhen(() -> !readonly());
-		abandon.tooltip(() -> List.of(Component.translatable("kultivator.sectbuild.ui.abandon"), Component.translatable("kultivator.sectbuild.ui.abandon_tip")));
-		add(abandon);
-		TalismanButton change = talisman(panelX + half + 3, by, half, "kultivator.sectbuild.ui.change", () -> act("change"));
-		change.enabledWhen(() -> !readonly() && b().getBooleanOr("can_change", false));
-		change.tooltip(() -> List.of(Component.translatable("kultivator.sectbuild.ui.change"), Component.translatable("kultivator.sectbuild.ui.change_tip")));
-	}
-
-	/** A dangerous coin: the first click asks (its rim pulses red), a second click within 4 s acts. */
-	private void ask(int which) {
-		long now = Util.getMillis();
-		boolean asking = now < askUntil && (which == 0 && askDeconstruct || which == 1 && askTotal || which == 2 && askAbandon);
-		if (asking) {
-			askDeconstruct = false;
-			askTotal = false;
-			askAbandon = false;
-			askUntil = 0L;
-			act(which == 2 ? "abandon" : "deconstruct:" + (which == 1 ? "1" : "0"));
-			return;
+	/** A talisman with a two-line tooltip (name, explanation). */
+	private void tombol(Lukis l, String kunci, int bx, int by, int bw, int bh, String label, boolean aktif, @Nullable Component alasan, Runnable aksi,
+			@Nullable String tipKey, boolean mendesak) {
+		Component name = Component.translatable(label);
+		boolean over = TalismanButton.gambar(l, kunci, bx, by, bw, bh, name, aktif, aktif ? null : alasan, aksi, mendesak && aktif, false);
+		if (over && tipKey != null) {
+			l.tip(List.of(name, Component.translatable(tipKey)));
 		}
-		askDeconstruct = which == 0;
-		askTotal = which == 1;
-		askAbandon = which == 2;
-		askUntil = now + 4000L;
-		UiSound.ask();
 	}
 
-	private static String[] catKeys() {
-		String[] keys = new String[Bahan.COUNT];
-		for (Bahan cat : Bahan.values()) {
-			keys[cat.ordinal()] = cat.nameKey();
+	// ================================================================== scrolling
+
+	private float scroll(String key) {
+		return SCROLL.getOrDefault(key, 0.0F);
+	}
+
+	/** Starts the clipped, scrolling list {@code key} between {@code top} and {@code bottom}; returns the first line's y. */
+	private float mulaiGulir(Lukis l, String key, int top, int bottom) {
+		scrollKey = key;
+		scrollTop = top;
+		scrollBottom = Math.max(top + 10, bottom);
+		l.klip(panelX, scrollTop, panelX + panelW, scrollBottom);
+		return scrollTop - scroll(key);
+	}
+
+	/** Ends the list started by {@link #mulaiGulir}; {@code end} is the y below its last line. */
+	private void akhirGulir(Lukis l, float end) {
+		l.lepasKlip();
+		float content = end + scroll(scrollKey) - scrollTop;
+		float max = Math.max(0.0F, content - (scrollBottom - scrollTop));
+		SCROLL.put(scrollKey, Math.max(0.0F, Math.min(max, scroll(scrollKey))));
+		bead(l, panelX + panelW, scrollTop, scrollBottom, scroll(scrollKey), max);
+	}
+
+	@Override
+	public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+		if (modal()) {
+			return true;
 		}
-		return keys;
+		if (super.mouseScrolled(mouseX, mouseY, scrollX, scrollY)) {
+			return true;
+		}
+		if (catalogShown) {
+			return catalog.scrolled(mouseX, mouseY, scrollY) || inside(mouseX, mouseY);
+		}
+		if (!scrollKey.isEmpty() && mouseX >= panelX && mouseX < panelX + panelW && mouseY >= scrollTop && mouseY < scrollBottom) {
+			SCROLL.put(scrollKey, Math.max(0.0F, scroll(scrollKey) - (float) scrollY * 18.0F));
+			return true;
+		}
+		return inside(mouseX, mouseY);
 	}
 
-	private int parties() {
-		return b().getListOrEmpty("parties").size();
+	/** PgUp / PgDn / Home / End scroll the shown list (or the catalog's column) after the focus ring's own keys (43.0.7). */
+	@Override
+	public boolean keyPressed(KeyEvent event) {
+		if (super.keyPressed(event)) {
+			return true;
+		}
+		if (mauTombol()) {
+			return false;
+		}
+		if (catalogShown) {
+			return catalog.tombol(event.key());
+		}
+		if (scrollKey.isEmpty()) {
+			return false;
+		}
+		float page = Math.max(18.0F, scrollBottom - scrollTop - 18.0F);
+		switch (event.key()) {
+			case InputConstants.KEY_PAGEDOWN -> SCROLL.put(scrollKey, scroll(scrollKey) + page);
+			case InputConstants.KEY_PAGEUP -> SCROLL.put(scrollKey, Math.max(0.0F, scroll(scrollKey) - page));
+			case InputConstants.KEY_HOME -> SCROLL.put(scrollKey, 0.0F);
+			case InputConstants.KEY_END -> SCROLL.put(scrollKey, Float.MAX_VALUE / 4.0F); // clamped by akhirGulir
+			default -> {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	// ================================================================== drawing
 
 	@Override
 	protected void drawBehind(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
-		lastGraphics = g;
-		hits.clear();
-		refreshParts();
-		CompoundTag build = b();
-		// The diagram on the left.
-		int scrub = template() > 0 ? Math.min(9, tier() + 1) : BuildClient.scrubTier();
-		int hover = SiteDiagram.draw(g, x, y + 1, diagram, parts, bounds, template() > 0 ? 9 : scrub, template() > 0 ? Math.min(9, tier() + 1) : 0,
-				mouseX, mouseY, true);
-		Brush.frame(g, x - 1, y, x + diagram + 1, y + diagram + 2, Palette.argb(0xC0, Palette.GOLD));
-		if (hover >= 0 && hover < parts.size()) {
-			screen.showTooltip(partTip(hover));
-		}
-		if (diagram + 14 < h) {
-			Component caption = template() > 0 ? SectTemplates.name(template()) : Component.translatable("kultivator.sectbuild.ui.no_template_short");
-			Brush.fitCentered(g, font, caption, x + diagram / 2.0F, y + diagram + 4.0F, diagram, Palette.SEAL_DARK, 0.7F, 0.45F, false);
-		}
-		if (!build.getBooleanOr("on", true) || !build.getBooleanOr("engine", false)) {
-			heading(g, title(), panelX, y, panelW, 0.75F);
-			Brush.wrap(g, font, Component.translatable(build.getBooleanOr("on", true) ? "kultivator.spine6b.unavailable" : "kultivator.sectbuild.disabled"),
-					panelX, y + 14, panelW, Palette.INK_SOFT, 0.7F, false);
-			if (template() <= 0) {
-				drawFounding(g, mouseX, mouseY, y + 34);
-			}
+	}
+
+	@Override
+	protected void lukis(Lukis l) {
+		scrollKey = "";
+		catalogShown = false;
+		if (HallClient.version() == 0L || !info().getBooleanOr("has", false)) {
+			l.samar(Component.translatable(M + "memuat"), x + 4, y + 4, w - 8);
 			return;
+		}
+		refreshParts();
+		String shown = shownSub();
+		if ("templat".equals(shown) && (template() <= 0 || katalog)) {
+			catalogShown = true;
+			catalog.draw(l, x, y, w, h);
+			return;
+		}
+		boolean diagram = "ikhtisar".equals(shown) || tata() != Tata.SEMPIT;
+		int size = diagram ? Math.max(64, Math.min(120, Math.min(h - 14, Math.round(w * 0.36F)))) : 0;
+		panelX = diagram ? x + size + 6 : x;
+		panelW = x + w - panelX;
+		if (diagram) {
+			drawDiagram(l, size);
+		}
+		CompoundTag build = b();
+		int top = y;
+		if (!build.getBooleanOr("on", true) || !build.getBooleanOr("engine", false)) {
+			top += l.kepala(title(), panelX, top, panelX + panelW);
+			top += Math.round(l.bungkus(Component.translatable(build.getBooleanOr("on", true) ? "kultivator.spine6b.unavailable" : "kultivator.sectbuild.disabled"),
+					panelX, top, panelW, l.gaya.teksSamar, 40.0F)) + 4;
+			if (template() > 0) {
+				return;
+			}
 		}
 		if (template() <= 0) {
-			drawFounding(g, mouseX, mouseY, y);
-			return;
+			drawFounding(l, top);
+		} else {
+			switch (shown) {
+				case "bahan" -> drawMaterials(l);
+				case "misi" -> drawMissions(l);
+				case "pekerja" -> drawBuilders(l);
+				case "galian" -> drawSalvage(l);
+				case "templat" -> drawTemplate(l);
+				case "penyumbang" -> drawDonors(l);
+				default -> drawOverview(l);
+			}
 		}
-		drawSeals(g, mouseX, mouseY);
-		switch (panel) {
-			case 0 -> drawOverview(g, mouseX, mouseY);
-			case 1 -> drawMaterials(g, mouseX, mouseY);
-			case 2 -> drawMissions(g, mouseX, mouseY);
-			case 3 -> drawBuilders(g, mouseX, mouseY);
-			case 4 -> drawSalvage(g, mouseX, mouseY);
-			case 5 -> drawTemplate(g, mouseX, mouseY);
-			default -> drawDonors(g, mouseX, mouseY);
+		if (regu.terbuka()) {
+			Bahan cat = Bahan.values()[gatherCat];
+			regu.gambarSembul(l, "bangun:regu", Component.translatable(K + "party_pick", cat.displayName()), candidates(cat));
+		}
+	}
+
+	private void drawDiagram(Lukis l, int size) {
+		int scrub = template() > 0 ? Math.min(9, tier() + 1) : BuildClient.scrubTier();
+		int hover = SiteDiagram.draw(l.g, x, y + 1, size, parts, bounds, template() > 0 ? 9 : scrub, template() > 0 ? Math.min(9, tier() + 1) : 0,
+				l.mx, l.my, true);
+		Brush.frame(l.g, x - 1, y, x + size + 1, y + size + 2, Palette.argb(0xC0, Palette.GOLD));
+		if (hover >= 0 && hover < parts.size()) {
+			l.tip(partTip(hover));
+		}
+		if (size + 16 < h) {
+			Component caption = template() > 0 ? SectTemplates.name(template()) : Component.translatable(K + "no_template_short");
+			l.tengah(caption, x + size / 2.0F, y + size + 5.0F, size, Palette.SEAL_DARK);
 		}
 	}
 
 	private List<Component> partTip(int index) {
 		SiteDiagram.Part part = parts.get(index);
 		List<Component> tip = new ArrayList<>();
-		tip.add(part.name() != null ? part.name() : Component.translatable("kultivator.sectbuild.ui.part." + part.shape()));
-		tip.add(Component.translatable("kultivator.sectbuild.ui.part_tier", part.tier(), SectTemplates.tierName(part.tier())));
+		tip.add(part.name() != null ? part.name() : Component.translatable(K + "part." + part.shape()));
+		tip.add(Component.translatable(K + "part_tier", part.tier(), SectTemplates.tierName(part.tier())));
 		if (part.state() >= 0) {
-			tip.add(Component.translatable("kultivator.sectbuild.ui.state." + part.state(), part.progress()));
+			tip.add(Component.translatable(K + "state." + part.state(), part.progress()));
 		}
 		ListTag comps = b().getListOrEmpty("comps");
 		if (index < comps.size() && comps.get(index) instanceof CompoundTag comp && comp.contains("bill")) {
 			Bill bill = Bill.readFrom(comp.getCompoundOrEmpty("bill"));
 			if (!bill.isEmpty()) {
-				tip.add(Component.translatable("kultivator.sectbuild.ui.part_bill", dev.kultivator.sect.build.flow.Fmt.joined(bill, 5)));
+				tip.add(Component.translatable(K + "part_bill", Fmt.joined(bill, 5)));
 			}
 		}
 		return tip;
 	}
 
-	/** The seal column on the right edge. */
-	private void drawSeals(GuiGraphicsExtractor g, int mouseX, int mouseY) {
-		int count = lan() ? PANELS.length : PANELS.length - 1;
-		int sx = x + w - SEAL_W;
-		int sealH = Math.max(14, Math.min(24, (h - 2) / count));
-		for (int i = 0; i < count; i++) {
-			int sy = y + i * sealH;
-			boolean active = panel == i;
-			boolean over = mouseX >= sx && mouseX < sx + SEAL_W && mouseY >= sy && mouseY < sy + sealH - 1;
-			int base = active ? Palette.SEAL : over ? Palette.mix(Palette.SEAL, Palette.SEAL_GLOW, 0.3F) : Palette.argb(0xC0, Palette.SEAL_DARK);
-			int out = active ? -2 : 0;
-			g.fill(sx + out, sy, sx + SEAL_W, sy + sealH - 1, base);
-			Brush.frame(g, sx + out + 1, sy + 1, sx + SEAL_W - 1, sy + sealH - 2, Palette.argb(0xB0, Palette.TALISMAN));
-			Glyphs.tab(g, PANEL_ICONS[i], sx + out / 2.0F + SEAL_W / 2.0F, sy + (sealH - 1) / 2.0F, Math.min(8.0F, sealH - 6.0F), Palette.TALISMAN);
-			int index = i;
-			hits.add(new Hit(sx - 2, sy, sx + SEAL_W, sy + sealH - 1, () -> {
-				if (panel != index) {
-					panel = index;
-					UiSound.tab();
-					layout(x, y, w, h);
-				}
-			}, List.of(Component.translatable("kultivator.sectbuild.panel." + PANELS[i]),
-					Component.translatable("kultivator.sectbuild.panel." + PANELS[i] + ".tip"))));
-		}
+	/** The top of {@code rows} rows of buttons at the bottom of the box. */
+	private int rowsTop(int rows) {
+		return y + h - rows * (buttonH() + 2) + 2;
 	}
 
 	// ---- no template yet
 
-	private void drawFounding(GuiGraphicsExtractor g, int mouseX, int mouseY, int top) {
-		heading(g, Component.translatable("kultivator.sectbuild.ui.no_template"), panelX, top, panelW + SEAL_W, 0.8F);
-		float ty = top + 14.0F;
-		ty += Brush.wrap(g, font, Component.translatable("kultivator.sectbuild.ui.founding_text"), panelX, ty, panelW + SEAL_W, Palette.INK, TEXT, false) + 4.0F;
+	private void drawFounding(Lukis l, int top) {
+		int bh = buttonH();
+		int rows = rowsTop(2);
+		top += l.kepala(Component.translatable(K + "no_template"), panelX, top, panelX + panelW);
+		float ty = mulaiGulir(l, "ikhtisar0", top, rows - 3);
+		int tw = panelW - 5;
+		ty += l.bungkus(Component.translatable(K + "founding_text"), panelX, ty, tw, Palette.INK) + 4;
 		Bill ledger = bill("ledger");
 		if (!ledger.isEmpty()) {
-			ty += Brush.wrap(g, font, Component.translatable("kultivator.sectbuild.ui.ledger_now", dev.kultivator.sect.build.flow.Fmt.joined(ledger, 6)),
-					panelX, ty, panelW + SEAL_W, Palette.INK_SOFT, TEXT, false) + 2.0F;
+			ty += l.bungkus(Component.translatable(K + "ledger_now", Fmt.joined(ledger, 6)), panelX, ty, tw, Palette.INK_SOFT) + 2;
 		}
-		Brush.wrap(g, font, Component.translatable("kultivator.sectbuild.ui.stele_hint"), panelX, ty, panelW + SEAL_W, Palette.INK_SOFT, TEXT * 0.95F, false);
+		ty += l.bungkus(Component.translatable(K + "stele_hint"), panelX, ty, tw, l.gaya.teksSamar);
+		akhirGulir(l, ty);
+		CompoundTag build = b();
+		boolean canChoose = !readonly() && build.getBooleanOr("engine", false) && build.getBooleanOr("on", true);
+		Component why = readonly() ? roWhy() : Component.translatable(M + "mesin_mati");
+		tombol(l, "bangun:pilih", panelX, rows, panelW, bh, K + "choose", canChoose, why,
+				() -> tuju(Tujuan.of(HubNav.SEKTE, Urutan.ID_BANGUN).sub("templat")), null, true);
+		boolean self = flags().getBooleanOr("self", false);
+		koin(l, "bangun:sendiri", panelX, rows + bh + 2, panelW, bh, Component.translatable(K + "self_build"), self, !readonly(), roWhy(),
+				() -> act("flag:self:" + (self ? "0" : "1")), List.of(Component.translatable(K + "self_build"), Component.translatable(K + "self_build_tip")));
 	}
 
 	// ---- Ikhtisar
 
-	private void drawOverview(GuiGraphicsExtractor g, int mouseX, int mouseY) {
+	private void drawOverview(Lukis l) {
+		int bh = buttonH();
+		int rows = rowsTop(2);
 		int tier = tier();
 		int building = Math.min(9, tier + 1);
-		Component title = tier >= 9 ? Component.translatable("kultivator.sectbuild.ui.tier_complete", SectTemplates.TIERS, SectTemplates.TIERS)
-				: Component.translatable("kultivator.sectbuild.ui.tier_title", tier, SectTemplates.TIERS, SectTemplates.tierName(building));
-		heading(g, title, panelX, y, panelW, 0.75F);
-		// The mountain path of nine terraces.
-		float lx = panelX + 2.0F;
-		float ly = y + 13.0F;
-		float lw = panelW - 4.0F;
-		float lh = 24.0F;
-		drawLadder(g, lx, ly, lw, lh, tier, mouseX, mouseY);
-		float ty = ly + lh + 4.0F;
+		Component title = tier >= 9 ? Component.translatable(K + "tier_complete", SectTemplates.TIERS, SectTemplates.TIERS)
+				: Component.translatable(K + "tier_title", tier, SectTemplates.TIERS, SectTemplates.tierName(building));
+		int top = y + l.kepala(title, panelX, y, panelX + panelW);
+		float ty = mulaiGulir(l, "ikhtisar", top, rows - 3);
+		int tw = panelW - 5;
+		drawLadder(l, panelX + 2.0F, ty, tw - 4.0F, 32.0F, tier);
+		ty += 36.0F;
 		CompoundTag site = site();
 		// The open building.
-		ListTag comps = b().getListOrEmpty("comps");
 		String openId = b().getStringOr("open", "");
 		CompoundTag open = null;
-		for (Tag each : comps) {
-			if (each instanceof CompoundTag comp && comp.getStringOr("id", "").equals(openId) && !openId.isEmpty()) {
+		for (Tag each : b().getListOrEmpty("comps")) {
+			if (each instanceof CompoundTag comp && !openId.isEmpty() && comp.getStringOr("id", "").equals(openId)) {
 				open = comp;
 			}
 		}
 		if (open != null) {
 			Component name = open.read("name", ComponentSerialization.CODEC).orElse(Component.literal(openId));
 			int pg = open.getIntOr("pg", 0);
-			bar(g, panelX, ty, panelW, 7.0F, pg / 100.0F, Palette.GOLD, Component.translatable("kultivator.sectbuild.holo.open", name, pg));
-			ty += 10.0F;
+			bar(l, panelX, ty, tw, pg / 100.0F, Palette.GOLD, Component.translatable("kultivator.sectbuild.holo.open", name, pg));
+			ty += 13.0F;
 		}
 		// Rate and status.
 		double rate = site.getDoubleOr("rate", 0.0D);
 		int active = b().getCompoundOrEmpty("builders").getIntOr("active", 0);
 		boolean banked = site.getLongOr("bank", 0L) > 0L;
-		Component rateLine = Component.translatable(banked ? "kultivator.sectbuild.ui.rate_bank" : "kultivator.sectbuild.ui.rate",
-				String.format(Locale.ROOT, "%.0f", rate), active);
-		Brush.fit(g, font, rateLine, panelX, ty, panelW, Palette.INK_SOFT, TEXT, 0.4F, false);
-		ty += 7.0F;
+		l.teks(Component.translatable(banked ? K + "rate_bank" : K + "rate", String.format(Locale.ROOT, "%.0f", rate), active), panelX, ty, tw,
+				Palette.INK_SOFT);
+		ty += LINE;
 		Component status = b().read("status_text", ComponentSerialization.CODEC).orElse(Component.empty());
 		int code = site.getIntOr("status", 0);
 		int color = code == SiteView.STATUS_RUNNING || code == SiteView.STATUS_COMPLETE ? Palette.JADE_DARK
 				: code == SiteView.STATUS_WAITING_FUNDS ? Palette.GOLD_DARK : code == SiteView.STATUS_BLOCKED ? Palette.SEAL : Palette.INK_SOFT;
-		ty += Brush.wrap(g, font, status, panelX, ty, panelW, color, TEXT, false) + 2.0F;
+		ty += l.bungkus(status, panelX, ty, tw, color) + 2;
 		// What the next building still needs.
 		CompoundTag next = b().getCompoundOrEmpty("next");
 		if (!next.isEmpty()) {
 			Bill shortfall = Bill.readFrom(next.getCompoundOrEmpty("short"));
 			Component name = next.read("name", ComponentSerialization.CODEC).orElse(Component.empty());
 			if (shortfall.isEmpty()) {
-				ty += Brush.wrap(g, font, Component.translatable("kultivator.sectbuild.ui.next_ready", name), panelX, ty, panelW, Palette.JADE_DARK, TEXT,
-						false) + 1.0F;
+				ty += l.bungkus(Component.translatable(K + "next_ready", name), panelX, ty, tw, Palette.JADE_DARK) + 1;
 			} else {
-				ty += Brush.wrap(g, font, Component.translatable("kultivator.sectbuild.ui.next_needs", name), panelX, ty, panelW, Palette.SEAL_DARK, TEXT,
-						false) + 1.0F;
-				ty = shortfallBars(g, shortfall, ty, y + h - 2 * BUTTON_H - 6, mouseX, mouseY);
+				ty += l.bungkus(Component.translatable(K + "next_needs", name), panelX, ty, tw, Palette.SEAL_DARK) + 1;
+				ty = shortfallLines(l, shortfall, ty, tw);
 			}
 		}
+		akhirGulir(l, ty);
+		boolean paused = site.getIntOr("state", 0) == SiteView.STATE_PAUSED;
+		koin(l, "bangun:jeda", panelX, rows, panelW, bh, Component.translatable(K + "pause"), paused, !readonly(), roWhy(),
+				() -> act("pause:" + (paused ? "0" : "1")), null);
+		int half = (panelW - 3) / 2;
+		int by = rows + bh + 2;
+		tombol(l, "bangun:setor_perlu", panelX, by, half, bh, K + "deposit_needed", true, null, () -> act("deposit_needed"), K + "deposit_needed_tip",
+				code == SiteView.STATUS_WAITING_FUNDS);
+		tombol(l, "bangun:setor_semua", panelX + half + 3, by, panelW - half - 3, bh, K + "deposit_all", true, null, () -> act("deposit_all"),
+				K + "deposit_all_tip", false);
 	}
 
 	/** Nine terraces climbing a mountain path; done in jade, the one being built glowing gold, later ones in faint ink. */
-	private void drawLadder(GuiGraphicsExtractor g, float lx, float ly, float lw, float lh, int tier, int mouseX, int mouseY) {
+	private void drawLadder(Lukis l, float lx, float ly, float lw, float lh, int tier) {
+		GuiGraphicsExtractor g = l.g;
 		float step = lw / 9.0F;
 		float pulse = 0.5F + 0.5F * (float) Math.sin(Util.getMillis() / 260.0D);
-		// The mountain behind the path.
+		float base = ly + lh;
+		float rise = lh - 12.0F;
 		for (int i = 0; i < 18; i++) {
 			float t = i / 18.0F;
-			float mh = lh * (0.25F + 0.7F * t) * (0.9F + 0.1F * (float) Math.sin(i * 1.7F));
-			Brush.rect(g, lx + lw * t, ly + lh - mh, lx + lw * (t + 1.0F / 18.0F), ly + lh, Palette.argb(0x28, Palette.MOUNTAIN));
+			float mh = rise * (0.25F + 0.7F * t) * (0.9F + 0.1F * (float) Math.sin(i * 1.7F));
+			Brush.rect(g, lx + lw * t, base - mh, lx + lw * (t + 1.0F / 18.0F), base, Palette.argb(0x28, Palette.MOUNTAIN));
 		}
 		for (int i = 0; i < 9; i++) {
 			float tx0 = lx + i * step;
-			float top = ly + lh - (i + 1) * (lh - 3.0F) / 9.0F;
+			float top = base - (i + 1) * (rise - 3.0F) / 9.0F;
 			boolean done = i < tier;
 			boolean current = i == tier;
 			int color = done ? Palette.JADE : current ? Palette.mix(Palette.GOLD, Palette.GOLD_LIGHT, pulse) : Palette.argb(0x70, Palette.INK_FAINT);
 			Brush.rect(g, tx0 + 0.5F, top, tx0 + step - 0.5F, top + 2.2F, color);
-			Brush.rect(g, tx0 + 0.5F, top + 2.2F, tx0 + step - 0.5F, ly + lh, Palette.argb(done ? 0x50 : 0x20, Palette.PAPER_DEEP));
+			Brush.rect(g, tx0 + 0.5F, top + 2.2F, tx0 + step - 0.5F, base, Palette.argb(done ? 0x50 : 0x20, Palette.PAPER_DEEP));
 			if (i > 0) {
-				float prevTop = ly + lh - i * (lh - 3.0F) / 9.0F;
+				float prevTop = base - i * (rise - 3.0F) / 9.0F;
 				Brush.line(g, tx0, prevTop + 1.0F, tx0 + 1.5F, top + 1.0F, 0.6F, Palette.argb(0x90, Palette.INK_SOFT));
 			}
-			Brush.centered(g, font, Component.literal(Integer.toString(i + 1)), tx0 + step / 2.0F, top - 6.0F, done ? Palette.JADE_DARK : current ? Palette.GOLD_DARK
-					: Palette.INK_FAINT, 0.5F, false);
-			if (mouseX >= tx0 && mouseX < tx0 + step && mouseY >= top - 6 && mouseY < ly + lh) {
-				screen.showTooltip(List.of(Component.translatable("kultivator.sectbuild.ui.part_tier", i + 1, SectTemplates.tierName(i + 1)),
+			Brush.centered(g, l.font, Component.literal(Integer.toString(i + 1)), tx0 + step / 2.0F, top - 10.0F,
+					done ? Palette.JADE_DARK : current ? Palette.GOLD_DARK : Palette.INK_FAINT, 1.0F, false);
+			if (l.di(Math.round(tx0), Math.round(top - 10.0F), Math.round(tx0 + step), Math.round(base))) {
+				l.tip(List.of(Component.translatable(K + "part_tier", i + 1, SectTemplates.tierName(i + 1)),
 						Component.translatable("kultivator.sectbuild.tier_feature." + (i + 1))));
 			}
 		}
@@ -573,50 +663,47 @@ public class BuildPage extends HallPage {
 		Brush.rect(g, sx - 2.0F, sy + 1.2F, sx + 2.0F, sy + 3.0F, Palette.SEAL);
 	}
 
-	/** One bamboo bar with a label in it. */
-	private void bar(GuiGraphicsExtractor g, float bx, float by, float bw, float bh, float fill, int color, Component label) {
-		g.fill(Math.round(bx), Math.round(by), Math.round(bx + bw), Math.round(by + bh), Palette.argb(0x60, Palette.BAMBOO_ALT));
-		Brush.rect(g, bx, by, bx + bw * Math.max(0.0F, Math.min(1.0F, fill)), by + bh, Palette.argb(0xC0, color));
-		Brush.frame(g, Math.round(bx), Math.round(by), Math.round(bx + bw), Math.round(by + bh), Palette.argb(0xA0, Palette.BAMBOO_KNOT));
-		Brush.fit(g, font, label, bx + 2.0F, by + (bh - 8.0F * 0.55F) / 2.0F, bw - 4.0F, Palette.INK, 0.55F, 0.4F, false);
+	/** One bamboo bar (11 px) with its label in it at 1.0. */
+	private void bar(Lukis l, float bx, float by, float bw, float fill, int color, Component label) {
+		GuiGraphicsExtractor g = l.g;
+		g.fill(Math.round(bx), Math.round(by), Math.round(bx + bw), Math.round(by + 11.0F), Palette.argb(0x60, Palette.BAMBOO_ALT));
+		Brush.rect(g, bx, by, bx + bw * Math.max(0.0F, Math.min(1.0F, fill)), by + 11.0F, Palette.argb(0xC0, color));
+		Brush.frame(g, Math.round(bx), Math.round(by), Math.round(bx + bw), Math.round(by + 11.0F), Palette.argb(0xA0, Palette.BAMBOO_KNOT));
+		l.teks(label, bx + 2.0F, by + 2.0F, bw - 4.0F, Palette.INK);
 	}
 
-	/** Bars of what is still missing, by category and exact item; returns the y below them. */
-	private float shortfallBars(GuiGraphicsExtractor g, Bill shortfall, float ty, float limit, int mouseX, int mouseY) {
+	/** Lines of what is still missing, by category and exact item; returns the y below them. */
+	private float shortfallLines(Lukis l, Bill shortfall, float ty, int tw) {
 		for (Bahan cat : Bahan.values()) {
 			long centi = shortfall.centi(cat);
-			if (centi <= 0L || ty + 7.0F > limit) {
+			if (centi <= 0L) {
 				continue;
 			}
-			Brush.rect(g, panelX, ty + 1.0F, panelX + 3.0F, ty + 6.0F, Palette.opaque(cat.rgb()));
-			Brush.fit(g, font, dev.kultivator.sect.build.flow.Fmt.line(cat, centi), panelX + 5.0F, ty, panelW - 5.0F, Palette.INK, TEXT, 0.4F, false);
-			ty += 7.0F;
+			Brush.rect(l.g, panelX, ty + 2.0F, panelX + 3.0F, ty + 7.0F, Palette.opaque(cat.rgb()));
+			l.teks(Fmt.line(cat, centi), panelX + 5.0F, ty, tw - 5.0F, Palette.INK);
+			ty += LINE;
 		}
 		for (Map.Entry<Item, Integer> entry : shortfall.exact().entrySet()) {
-			if (ty + 7.0F > limit) {
-				break;
-			}
-			Brush.rect(g, panelX, ty + 1.0F, panelX + 3.0F, ty + 6.0F, Palette.SEAL);
-			Brush.fit(g, font, dev.kultivator.sect.build.flow.Fmt.line(entry.getKey(), entry.getValue()), panelX + 5.0F, ty, panelW - 5.0F, Palette.INK, TEXT,
-					0.4F, false);
-			ty += 7.0F;
+			Brush.rect(l.g, panelX, ty + 2.0F, panelX + 3.0F, ty + 7.0F, Palette.SEAL);
+			l.teks(Fmt.line(entry.getKey(), entry.getValue()), panelX + 5.0F, ty, tw - 5.0F, Palette.INK);
+			ty += LINE;
 		}
 		return ty;
 	}
 
 	// ---- Bahan
 
-	private void drawMaterials(GuiGraphicsExtractor g, int mouseX, int mouseY) {
-		heading(g, Component.translatable("kultivator.sectbuild.panel.materials"), panelX, y, panelW, 0.75F);
+	private void drawMaterials(Lukis l) {
+		int bh = buttonH();
+		int rows = rowsTop(1);
+		int top = y + l.kepala(Component.translatable("kultivator.sectbuild.panel.materials"), panelX, y, panelX + panelW);
 		Bill ledger = bill("ledger");
 		Bill need1 = bill("need1");
 		Bill need2 = bill("need2");
-		beginList(1, panelTop, y + h - BUTTON_H - 3);
-		float ty = listTop - scroll(1);
-		g.enableScissor(panelX - 1, listTop, panelX + panelW + 1, listBottom);
-		Brush.fit(g, font, Component.translatable("kultivator.sectbuild.ui.bills_head", Math.min(9, tier() + 1)), panelX, ty, panelW, Palette.INK_SOFT, 0.55F, 0.4F,
-				false);
-		ty += 7.0F;
+		float ty = mulaiGulir(l, "bahan", top, rows - 3);
+		int tw = panelW - 5;
+		l.samar(Component.translatable(K + "bills_head", Math.min(9, tier() + 1)), panelX, ty, tw);
+		ty += LINE + 1;
 		for (Bahan cat : Bahan.values()) {
 			long have = ledger.centi(cat);
 			long now = need1.centi(cat);
@@ -625,61 +712,61 @@ public class BuildPage extends HallPage {
 				continue;
 			}
 			float fill = now <= 0L ? 1.0F : Math.min(1.0F, have / (float) now);
-			int color = Palette.opaque(cat.rgb());
-			Component label = now > 0L ? Component.translatable("kultivator.sectbuild.ui.bill_line", cat.displayName(), dev.kultivator.sect.build.flow.Fmt.units(have),
-					dev.kultivator.sect.build.flow.Fmt.units(now)) : Component.translatable("kultivator.sectbuild.ui.bill_have", cat.displayName(),
-					dev.kultivator.sect.build.flow.Fmt.units(have));
-			bar(g, panelX, ty, panelW, 6.5F, fill, color, label);
+			Component label = now > 0L ? Component.translatable(K + "bill_line", cat.displayName(), Fmt.units(have), Fmt.units(now))
+					: Component.translatable(K + "bill_have", cat.displayName(), Fmt.units(have));
+			bar(l, panelX, ty, tw, fill, Palette.opaque(cat.rgb()), label);
 			if (later > 0L) {
 				float nextFill = Math.min(1.0F, Math.max(0L, have - now) / (float) later);
-				Brush.rect(g, panelX, ty + 6.5F, panelX + panelW * nextFill, ty + 7.5F, Palette.argb(0xA0, Palette.JADE));
+				Brush.rect(l.g, panelX, ty + 11.0F, panelX + tw * nextFill, ty + 12.0F, Palette.argb(0xA0, Palette.JADE));
 			}
-			if (inList(mouseX, mouseY) && mouseY >= ty && mouseY < ty + 8.0F && mouseX >= panelX && mouseX < panelX + panelW) {
-				screen.showTooltip(List.of(cat.displayName(), Component.translatable("kultivator.sectbuild.ui.bill_tip", dev.kultivator.sect.build.flow.Fmt.units(have),
-						dev.kultivator.sect.build.flow.Fmt.units(now), dev.kultivator.sect.build.flow.Fmt.units(later)),
+			if (l.di(panelX, Math.round(ty), panelX + tw, Math.round(ty + 12.0F))) {
+				l.tip(List.of(cat.displayName(), Component.translatable(K + "bill_tip", Fmt.units(have), Fmt.units(now), Fmt.units(later)),
 						Component.translatable("kultivator.sectbuild.bahan_tip." + cat.id())));
 			}
-			ty += 9.0F;
+			ty += 14.0F;
 		}
 		// Exact items.
 		Map<Item, Integer> exactNeed = new LinkedHashMap<>(need1.exact());
 		need2.exact().forEach((item, count) -> exactNeed.merge(item, count, Integer::sum));
 		ledger.exact().forEach((item, count) -> exactNeed.putIfAbsent(item, 0));
 		if (!exactNeed.isEmpty()) {
-			Brush.fit(g, font, Component.translatable("kultivator.sectbuild.ui.exact_head"), panelX, ty, panelW, Palette.INK_SOFT, 0.55F, 0.4F, false);
-			ty += 7.0F;
-			int perRow = Math.max(1, (int) (panelW / 30.0F));
+			l.samar(Component.translatable(K + "exact_head"), panelX, ty, tw);
+			ty += LINE + 1;
+			int cellW = 56;
+			int perRow = Math.max(1, tw / cellW);
 			int index = 0;
 			for (Map.Entry<Item, Integer> entry : exactNeed.entrySet()) {
-				float ix = panelX + (index % perRow) * 30.0F;
-				float iy = ty + (index / perRow) * 14.0F;
-				icon(g, new ItemStack(entry.getKey()), ix, iy, 0.75F);
+				int ix = panelX + (index % perRow) * cellW;
+				int iy = Math.round(ty) + (index / perRow) * 18;
+				l.g.item(new ItemStack(entry.getKey()), ix, iy);
 				int have = ledger.exact(entry.getKey());
-				Brush.text(g, font, Component.literal(have + "/" + entry.getValue()), ix + 13.0F, iy + 3.0F, have >= entry.getValue() ? Palette.JADE_DARK
-						: Palette.SEAL_DARK, 0.5F, false);
-				if (inList(mouseX, mouseY) && mouseX >= ix && mouseX < ix + 28.0F && mouseY >= iy && mouseY < iy + 13.0F) {
-					screen.showTooltip(List.of(new ItemStack(entry.getKey()).getHoverName(), Component.translatable("kultivator.sectbuild.ui.exact_tip", have,
-							entry.getValue())));
+				l.teks(Component.literal(have + "/" + entry.getValue()), ix + 18, iy + 4, cellW - 20, have >= entry.getValue() ? Palette.JADE_DARK : Palette.SEAL_DARK);
+				if (l.di(ix, iy, ix + cellW - 2, iy + 17)) {
+					l.tip(List.of(new ItemStack(entry.getKey()).getHoverName(), Component.translatable(K + "exact_tip", have, entry.getValue())));
 				}
 				index++;
 			}
-			ty += ((index + perRow - 1) / perRow) * 14.0F + 2.0F;
+			ty += ((index + perRow - 1) / perRow) * 18.0F + 2.0F;
 		}
 		// The deposit grid: accepted items in the bag.
-		Brush.fit(g, font, Component.translatable("kultivator.sectbuild.ui.bag_head"), panelX, ty, panelW, Palette.INK_SOFT, 0.55F, 0.4F, false);
-		ty += 7.0F;
-		ty = depositGrid(g, ty, mouseX, mouseY);
-		g.disableScissor();
-		endList(ty + scroll(1));
+		l.samar(Component.translatable(K + "bag_head"), panelX, ty, tw);
+		ty += LINE + 1;
+		ty = depositGrid(l, ty, tw);
+		akhirGulir(l, ty);
+		int third = (panelW - 4) / 3;
+		tombol(l, "bahan:perlu", panelX, rows, third, bh, K + "deposit_needed_short", true, null, () -> act("deposit_needed"), K + "deposit_needed_tip", false);
+		tombol(l, "bahan:semua", panelX + third + 2, rows, third, bh, K + "deposit_all_short", true, null, () -> act("deposit_all"), K + "deposit_all_tip", false);
+		tombol(l, "bahan:lumbung", panelX + 2 * (third + 2), rows, panelW - 2 * (third + 2), bh, K + "storehouse", !readonly(), roWhy(), () -> act("lumbung"),
+				K + "storehouse_tip", false);
 	}
 
 	/** The bag's accepted items, one cell per item; click deposits a stack, shift-click all of that item. */
-	private float depositGrid(GuiGraphicsExtractor g, float ty, int mouseX, int mouseY) {
-		Minecraft minecraft = Minecraft.getInstance();
-		if (minecraft.player == null) {
+	private float depositGrid(Lukis l, float ty, int tw) {
+		Minecraft mc = Minecraft.getInstance();
+		if (mc.player == null) {
 			return ty;
 		}
-		Inventory inventory = minecraft.player.getInventory();
+		Inventory inventory = mc.player.getInventory();
 		Map<Item, int[]> cells = new LinkedHashMap<>();
 		for (int slot = 0; slot < Inventory.INVENTORY_SIZE; slot++) {
 			ItemStack stack = inventory.getItem(slot);
@@ -691,10 +778,10 @@ public class BuildPage extends HallPage {
 			cell[1] += stack.getCount();
 		}
 		if (cells.isEmpty()) {
-			ty += Brush.wrap(g, font, Component.translatable("kultivator.sectbuild.ui.bag_empty"), panelX, ty, panelW, Palette.INK_FAINT, 0.55F, false);
-			return ty + 2.0F;
+			return ty + l.bungkus(Component.translatable(K + "bag_empty"), panelX, ty, tw, l.gaya.teksSamar) + 2;
 		}
-		int perRow = Math.max(1, (int) (panelW / 15.0F));
+		int cell = 20;
+		int perRow = Math.max(1, tw / cell);
 		int index = 0;
 		// Listed by category (Batu ... Emas & Giok), the exact items last.
 		List<Map.Entry<Item, int[]>> sorted = new ArrayList<>(cells.entrySet());
@@ -706,54 +793,55 @@ public class BuildPage extends HallPage {
 			Item item = entry.getKey();
 			int slot = entry.getValue()[0];
 			int count = entry.getValue()[1];
-			float ix = panelX + (index % perRow) * 15.0F;
-			float iy = ty + (index / perRow) * 15.0F;
+			int ix = panelX + (index % perRow) * cell;
+			int iy = Math.round(ty) + (index / perRow) * cell;
 			Deposits.Value value = Deposits.valueOf(item);
 			int edge = value == null ? Palette.INK_FAINT : value.exact() ? Palette.SEAL : Palette.opaque(value.cat().rgb());
-			boolean over = inList(mouseX, mouseY) && mouseX >= ix && mouseX < ix + 14.0F && mouseY >= iy && mouseY < iy + 14.0F;
-			g.fill(Math.round(ix), Math.round(iy), Math.round(ix + 14.0F), Math.round(iy + 14.0F), Palette.argb(over ? 0x90 : 0x50, Palette.PAPER_TOP));
-			Brush.frame(g, Math.round(ix), Math.round(iy), Math.round(ix + 14.0F), Math.round(iy + 14.0F), Palette.argb(0xC0, edge));
-			icon(g, new ItemStack(item), ix + 1.0F, iy + 1.0F, 0.75F);
-			Brush.text(g, font, Component.literal(count > 999 ? "999+" : Integer.toString(count)), ix + 1.0F, iy + 9.0F, Palette.INK, 0.45F, false);
-			if (inList(mouseX, mouseY)) {
-				List<Component> tip = new ArrayList<>();
-				tip.add(new ItemStack(item).getHoverName());
-				if (value != null) {
-					tip.add(value.exact() ? Component.translatable("kultivator.sectbuild.ui.value_exact")
-							: Component.translatable("kultivator.sectbuild.ui.value", dev.kultivator.sect.build.flow.Fmt.units(value.centi()), value.cat().displayName()));
+			boolean over = l.di(ix, iy, ix + cell - 1, iy + cell - 1);
+			l.g.fill(ix, iy, ix + cell - 1, iy + cell - 1, Palette.argb(over ? 0x90 : 0x50, Palette.PAPER_TOP));
+			Brush.frame(l.g, ix, iy, ix + cell - 1, iy + cell - 1, Palette.argb(0xC0, edge));
+			l.g.item(new ItemStack(item), ix + 1, iy + 1);
+			Component n = Component.literal(count > 99 ? "99+" : Integer.toString(count));
+			Brush.text(l.g, l.font, n, ix + cell - 1 - l.font.width(n), iy + cell - 9, 0xFFFFFFFF, 1.0F, true);
+			List<Component> tip = new ArrayList<>();
+			tip.add(new ItemStack(item).getHoverName());
+			if (value != null) {
+				tip.add(value.exact() ? Component.translatable(K + "value_exact")
+						: Component.translatable(K + "value", Fmt.units(value.centi()), value.cat().displayName()));
+			}
+			tip.add(Component.literal(Integer.toString(count)));
+			tip.add(Component.translatable(K + "deposit_click"));
+			String key = "bahan:tas:" + index;
+			l.zona(key, ix, iy, ix + cell - 1, iy + cell - 1, () -> {
+				if (Minecraft.getInstance().hasShiftDown()) {
+					act("deposit_item:" + BuiltInRegistries.ITEM.getKey(item));
+				} else {
+					act("deposit:" + slot);
 				}
-				tip.add(Component.translatable("kultivator.sectbuild.ui.deposit_click"));
-				hits.add(new Hit(ix, iy, ix + 14.0F, iy + 14.0F, () -> {
-					if (Minecraft.getInstance().hasShiftDown()) {
-						act("deposit_item:" + BuiltInRegistries.ITEM.getKey(item));
-					} else {
-						act("deposit:" + slot);
-					}
-				}, tip));
+			}, true, null, true);
+			l.fokusCincin(key, ix, iy, ix + cell - 1, iy + cell - 1);
+			if (over) {
+				l.tip(tip);
 			}
 			index++;
 		}
-		return ty + ((index + perRow - 1) / perRow) * 15.0F + 2.0F;
+		return ty + ((index + perRow - 1) / perRow) * (float) cell + 2.0F;
 	}
 
 	// ---- Misi
 
-	private void drawMissions(GuiGraphicsExtractor g, int mouseX, int mouseY) {
-		heading(g, Component.translatable("kultivator.sectbuild.panel.missions"), panelX, y, panelW, 0.75F);
-		if (missionView == 1) {
-			drawGather(g, mouseX, mouseY);
-			return;
-		}
+	private void drawMissions(Lukis l) {
+		int bh = buttonH();
+		int rows = rowsTop(2);
+		int top = y + l.kepala(Component.translatable("kultivator.sectbuild.panel.missions"), panelX, y, panelX + panelW);
 		CompoundTag missions = b().getCompoundOrEmpty("missions");
-		beginList(2, panelTop + 13, y + h);
-		float ty = listTop - scroll(2);
-		g.enableScissor(panelX - 1, listTop, panelX + panelW + 1, listBottom);
+		float ty = mulaiGulir(l, "misi", top, rows - 3);
+		int tw = panelW - 5;
 		if (missions.getBooleanOr("complete", false)) {
-			ty += Brush.wrap(g, font, Component.translatable("kultivator.sectbuild.ui.sect_complete"), panelX, ty, panelW, Palette.JADE_DARK, TEXT, false) + 3.0F;
+			ty += l.bungkus(Component.translatable(K + "sect_complete"), panelX, ty, tw, Palette.JADE_DARK) + 3;
 		}
-		Brush.fit(g, font, Component.translatable("kultivator.sectbuild.ui.tier_missions", missions.getIntOr("tier", 0)), panelX, ty, panelW, Palette.SEAL_DARK,
-				0.6F, 0.4F, false);
-		ty += 8.0F;
+		l.teks(Brush.bold(Component.translatable(K + "tier_missions", missions.getIntOr("tier", 0))), panelX, ty, tw, Palette.SEAL_DARK);
+		ty += LINE + 1;
 		for (Tag each : missions.getListOrEmpty("lines")) {
 			if (!(each instanceof CompoundTag line)) {
 				continue;
@@ -765,25 +853,23 @@ public class BuildPage extends HallPage {
 			boolean prep = line.getBooleanOr("prep", false);
 			boolean covered = line.getBooleanOr("covered", false);
 			boolean paid = line.getBooleanOr("paid", false);
-			Component what = cat != null ? dev.kultivator.sect.build.flow.Fmt.line(cat, amount) : item != null
-					? dev.kultivator.sect.build.flow.Fmt.line(item, (int) amount) : Component.literal("?");
-			Component label = Component.translatable(prep ? "kultivator.sectbuild.ui.line_prep" : "kultivator.sectbuild.ui.line", what,
-					line.getIntOr("pk", 0));
+			Component what = cat != null ? Fmt.line(cat, amount) : item != null ? Fmt.line(item, (int) amount) : Component.literal("?");
+			Component label = Component.translatable(prep ? K + "line_prep" : K + "line", what, line.getIntOr("pk", 0));
 			int color = cat != null ? Palette.opaque(cat.rgb()) : Palette.SEAL;
-			bar(g, panelX, ty, panelW, 6.5F, amount <= 0L ? 1.0F : have / (float) amount, paid ? Palette.JADE_LIGHT : covered ? Palette.GOLD : color, label);
-			if (paid) {
-				Brush.text(g, font, Component.literal("✓"), panelX + panelW - 6.0F, ty, Palette.JADE_DARK, 0.6F, false);
-			}
-			ty += 8.0F;
+			bar(l, panelX, ty, tw, amount <= 0L ? 1.0F : have / (float) amount, paid ? Palette.JADE_LIGHT : covered ? Palette.GOLD : color,
+					paid ? Component.literal("✓ ").append(label) : label);
+			ty += 13.0F;
 		}
 		ty += 2.0F;
-		Brush.fit(g, font, Component.translatable("kultivator.sectbuild.ui.offers", missions.getIntOr("pk_today", 0), missions.getIntOr("pk_cap", 150)), panelX,
-				ty, panelW, Palette.SEAL_DARK, 0.6F, 0.4F, false);
-		ty += 8.0F;
+		l.teks(Brush.bold(Component.translatable(K + "offers", missions.getIntOr("pk_today", 0), missions.getIntOr("pk_cap", 150))), panelX, ty, tw,
+				Palette.SEAL_DARK);
+		ty += LINE + 1;
 		ListTag offers = missions.getListOrEmpty("offers");
 		if (offers.isEmpty()) {
-			ty += Brush.wrap(g, font, Component.translatable("kultivator.sectbuild.ui.no_offers"), panelX, ty, panelW, Palette.INK_FAINT, 0.55F, false) + 2.0F;
+			ty += l.bungkus(Component.translatable(K + "no_offers"), panelX, ty, tw, l.gaya.teksSamar) + 2;
 		}
+		Component acceptLabel = Component.translatable(K + "accept");
+		int acceptW = TalismanButton.lebar(l.font, acceptLabel, 36, 70);
 		for (int i = 0; i < offers.size(); i++) {
 			if (!(offers.get(i) instanceof CompoundTag offer)) {
 				continue;
@@ -792,49 +878,34 @@ public class BuildPage extends HallPage {
 			if (cat == null) {
 				continue;
 			}
-			boolean deliver = "deliver".equals(offer.getStringOr("kind", ""));
-			Component label;
-			if (deliver) {
+			float rowH = Math.max(13.0F, bh + 2.0F);
+			if ("deliver".equals(offer.getStringOr("kind", ""))) {
 				long amount = offer.getLongOr("amount", 0L);
 				long progress = offer.getLongOr("progress", 0L) / Bahan.CENTI;
 				boolean accepted = offer.getBooleanOr("accepted", false);
 				boolean done = offer.getBooleanOr("done", false);
-				label = Component.translatable(done ? "kultivator.sectbuild.ui.offer_done" : accepted ? "kultivator.sectbuild.ui.offer_progress"
-						: "kultivator.sectbuild.ui.offer_deliver", amount, cat.displayName(), progress, offer.getIntOr("pk", 0), offer.getLongOr("bonus", 0L));
-				float rowW = accepted || done || readonly() ? panelW : panelW - 34.0F;
-				bar(g, panelX, ty, rowW, 8.0F, amount <= 0L ? 0.0F : progress / (float) amount, done ? Palette.JADE_LIGHT : Palette.opaque(cat.rgb()), label);
-				if (!accepted && !done && !readonly()) {
-					float bx = panelX + panelW - 32.0F;
-					boolean over = inList(mouseX, mouseY) && mouseX >= bx && mouseX < bx + 32.0F && mouseY >= ty && mouseY < ty + 8.0F;
-					g.fillGradient(Math.round(bx), Math.round(ty), Math.round(bx + 32.0F), Math.round(ty + 8.0F), over ? 0xFFF7DFA0 : Palette.TALISMAN,
-							Palette.TALISMAN_LOW);
-					Brush.frame(g, Math.round(bx), Math.round(ty), Math.round(bx + 32.0F), Math.round(ty + 8.0F), Palette.TALISMAN_EDGE);
-					Brush.fitCentered(g, font, Component.translatable("kultivator.sectbuild.ui.accept"), bx + 16.0F, ty + 1.5F, 30.0F, Palette.INK, 0.55F, 0.4F,
-							false);
+				Component label = Component.translatable(done ? K + "offer_done" : accepted ? K + "offer_progress" : K + "offer_deliver", amount,
+						cat.displayName(), progress, offer.getIntOr("pk", 0), offer.getLongOr("bonus", 0L));
+				boolean button = !accepted && !done && !readonly();
+				float rowW = button ? tw - acceptW - 3 : tw;
+				bar(l, panelX, ty + (rowH - 11.0F) / 2.0F, rowW, amount <= 0L ? 0.0F : progress / (float) amount,
+						done ? Palette.JADE_LIGHT : Palette.opaque(cat.rgb()), label);
+				if (button) {
 					int index = i;
-					if (inList(mouseX, mouseY)) {
-						hits.add(new Hit(bx, ty, bx + 32.0F, ty + 8.0F, () -> act("accept:" + index), null));
-					}
+					TalismanButton.gambar(l, "misi:terima:" + i, panelX + tw - acceptW, Math.round(ty), acceptW, bh, acceptLabel, true, null,
+							() -> act("accept:" + index));
 				}
 			} else {
-				label = Component.translatable("kultivator.sectbuild.ui.offer_bless", cat.displayName());
-				bar(g, panelX, ty, panelW, 8.0F, 1.0F, Palette.argb(0xFF, 0xB8E6D0), label);
+				bar(l, panelX, ty + (rowH - 11.0F) / 2.0F, tw, 1.0F, Palette.argb(0xFF, 0xB8E6D0),
+						Component.translatable(K + "offer_bless", cat.displayName()));
 			}
-			ty += 10.0F;
+			ty += rowH;
 		}
-		g.disableScissor();
-		endList(ty + scroll(2));
-	}
-
-	/** The gathering view: parties away, then the party to send (category, length, up to three disciples). */
-	private void drawGather(GuiGraphicsExtractor g, int mouseX, int mouseY) {
-		beginList(2, panelTop + 26, y + h - BUTTON_H - 16);
-		float ty = listTop - scroll(2);
-		g.enableScissor(panelX - 1, listTop, panelX + panelW + 1, listBottom);
+		// The gathering parties away.
+		ty += 2.0F;
 		ListTag parties = b().getListOrEmpty("parties");
-		Brush.fit(g, font, Component.translatable("kultivator.sectbuild.ui.parties", parties.size(), b().getIntOr("party_max", 1)), panelX, ty, panelW,
-				Palette.SEAL_DARK, 0.6F, 0.4F, false);
-		ty += 8.0F;
+		l.teks(Brush.bold(Component.translatable(K + "parties", parties.size(), b().getIntOr("party_max", 1))), panelX, ty, tw, Palette.SEAL_DARK);
+		ty += LINE + 1;
 		for (Tag each : parties) {
 			if (!(each instanceof CompoundTag party)) {
 				continue;
@@ -846,43 +917,59 @@ public class BuildPage extends HallPage {
 					compound.read("name", ComponentSerialization.CODEC).ifPresent(name -> names.add(name.getString()));
 				}
 			}
-			long left = dev.kultivator.client.hall.HallClient.ticksLeft(party.getLongOr("left", 0L));
-			Component line = Component.translatable("kultivator.sectbuild.ui.party", cat == null ? Component.literal("?") : cat.displayName(),
-					String.join(", ", names), dev.kultivator.sect.build.flow.Fmt.clock(left), Math.round(party.getDoubleOr("chance", 0.0D) * 100.0D),
-					dev.kultivator.sect.build.flow.Fmt.units(party.getLongOr("yield", 0L)));
-			ty += Brush.wrap(g, font, line, panelX, ty, panelW, Palette.INK, 0.55F, false) + 2.0F;
+			long left = HallClient.ticksLeft(party.getLongOr("left", 0L));
+			Component line = Component.translatable(K + "party", cat == null ? Component.literal("?") : cat.displayName(), String.join(", ", names),
+					Fmt.clock(left), Math.round(party.getDoubleOr("chance", 0.0D) * 100.0D), Fmt.units(party.getLongOr("yield", 0L)));
+			ty += l.bungkus(line, panelX, ty, tw, Palette.INK) + 2;
 		}
-		ty += 2.0F;
+		akhirGulir(l, ty);
+		// The party to send: category, length, the people (pop-up picker) and the send talisman.
+		int half = (panelW - 3) / 2;
 		Bahan cat = Bahan.values()[gatherCat];
-		Brush.fit(g, font, Component.translatable("kultivator.sectbuild.ui.party_pick", cat.displayName()), panelX, ty, panelW, Palette.SEAL_DARK, 0.6F, 0.4F, false);
-		ty += 8.0F;
-		ListTag candidates = b().getCompoundOrEmpty("builders").getListOrEmpty("cands");
-		for (Tag each : candidates) {
+		Component catLabel = Component.translatable(M + "kategori", cat.displayName());
+		TalismanButton.gambar(l, "misi:kategori", panelX, rows, half, bh, catLabel, !readonly(), roWhy(), () -> {
+			gatherCat = (gatherCat + 1) % Bahan.COUNT;
+			regu.terpilih().clear();
+		});
+		koin(l, "misi:lama", panelX + half + 3, rows, panelW - half - 3, bh, Component.translatable(gatherLong ? K + "trip_long" : K + "trip_short"),
+				gatherLong, !readonly(), roWhy(), () -> gatherLong = !gatherLong, null);
+		List<PemilihOrang.Orang> cands = candidates(cat);
+		List<PemilihOrang.Orang> chosen = regu.pilihan(cands);
+		int by = rows + bh + 2;
+		TalismanButton.gambar(l, "misi:pilih", panelX, by, half, bh, Component.translatable(M + "pilih_regu", chosen.size(), 3), !readonly(), roWhy(),
+				regu::bukaSembul);
+		boolean canSend = !readonly() && !chosen.isEmpty() && parties.size() < b().getIntOr("party_max", 1);
+		Component noSend = readonly() ? roWhy() : chosen.isEmpty() ? Component.translatable(M + "regu_kosong") : Component.translatable(M + "regu_penuh");
+		TalismanButton.gambar(l, "misi:kirim", panelX + half + 3, by, panelW - half - 3, bh, Component.translatable(K + "send_party"), canSend, noSend, () -> {
+			List<String> ids = new ArrayList<>();
+			for (PemilihOrang.Orang o : regu.pilihan(candidates(Bahan.values()[gatherCat]))) {
+				ids.add(o.id());
+			}
+			act("gather:" + Bahan.values()[gatherCat].id() + ":" + (gatherLong ? "1" : "0") + ":" + String.join(",", ids));
+			regu.terpilih().clear();
+		}, canSend, false);
+	}
+
+	/** The disciples that could join a party for {@code cat} (rank and realm checked; the server decides). */
+	private List<PemilihOrang.Orang> candidates(Bahan cat) {
+		List<PemilihOrang.Orang> out = new ArrayList<>();
+		for (Tag each : b().getCompoundOrEmpty("builders").getListOrEmpty("cands")) {
 			if (!(each instanceof CompoundTag cand)) {
 				continue;
 			}
 			int eid = cand.getIntOr("eid", -1);
-			String key = Integer.toString(eid);
-			boolean chosen = PARTY.contains(key);
+			if (eid < 0) {
+				continue;
+			}
 			int rank = cand.getIntOr("rank", 0);
 			boolean rankOk = rank >= minRank(cat) && (cat != Bahan.LOGAM || cand.getIntOr("realm", 0) >= 1);
-			boolean free = eid >= 0 && cand.getBooleanOr("free", false) && rankOk;
 			Component name = cand.read("name", ComponentSerialization.CODEC).orElse(Component.literal("?"));
-			chip(g, ty, name, Component.translatable("kultivator.sectbuild.ui.cand_info", rankName(rank),
-					String.format(Locale.ROOT, "%.1f", cand.getDoubleOr("power", 0.0D))), chosen, free, mouseX, mouseY, () -> {
-				if (chosen) {
-					PARTY.remove(key);
-				} else if (PARTY.size() < 3) {
-					PARTY.add(key);
-				}
-			});
-			ty += 9.0F;
+			Component lock = !rankOk ? Component.translatable(M + "regu_pangkat") : !cand.getBooleanOr("free", false)
+					? Component.translatable(M + "regu_sibuk") : null;
+			out.add(new PemilihOrang.Orang(Integer.toString(eid), name, 0x7CC8A0, eid,
+					List.of(rankName(rank), Component.literal(String.format(Locale.ROOT, "%.1f", cand.getDoubleOr("power", 0.0D)))), null, lock, null));
 		}
-		if (candidates.isEmpty()) {
-			ty += Brush.wrap(g, font, Component.translatable("kultivator.sectbuild.ui.no_candidates"), panelX, ty, panelW, Palette.INK_FAINT, 0.55F, false);
-		}
-		g.disableScissor();
-		endList(ty + scroll(2));
+		return out;
 	}
 
 	private static int minRank(Bahan cat) {
@@ -893,96 +980,106 @@ public class BuildPage extends HallPage {
 		};
 	}
 
-	/** A disciple chip: a jade bead, the name and a small line; click toggles. */
-	private void chip(GuiGraphicsExtractor g, float ty, Component name, Component info, boolean chosen, boolean enabled, int mouseX, int mouseY, Runnable action) {
-		boolean over = inList(mouseX, mouseY) && mouseX >= panelX && mouseX < panelX + panelW && mouseY >= ty && mouseY < ty + 8.0F;
-		g.fill(panelX, Math.round(ty), panelX + panelW, Math.round(ty + 8.0F), Palette.argb(chosen ? 0x90 : over ? 0x60 : 0x30, chosen ? Palette.JADE_PALE : Palette.PAPER_DEEP));
-		Brush.disc(g, panelX + 4.0F, ty + 4.0F, 2.5F, chosen ? Palette.JADE_LIGHT : enabled ? Palette.JADE_DULL : Palette.LOCKED);
-		Brush.fit(g, font, name, panelX + 9.0F, ty + 1.0F, panelW * 0.55F, enabled ? Palette.INK : Palette.INK_FAINT, 0.6F, 0.4F, false);
-		Brush.fit(g, font, info, panelX + 9.0F + panelW * 0.56F, ty + 1.5F, panelW * 0.42F - 9.0F, Palette.INK_SOFT, 0.5F, 0.35F, false);
-		if (inList(mouseX, mouseY) && (enabled || chosen) && !readonly()) {
-			hits.add(new Hit(panelX, ty, panelX + panelW, ty + 8.0F, action, null));
-		}
-	}
-
 	// ---- Pekerja
 
-	private void drawBuilders(GuiGraphicsExtractor g, int mouseX, int mouseY) {
+	private void drawBuilders(Lukis l) {
 		CompoundTag builders = b().getCompoundOrEmpty("builders");
-		heading(g, Component.translatable("kultivator.sectbuild.panel.builders"), panelX, y, panelW, 0.75F);
-		beginList(3, panelTop, y + h);
-		float ty = listTop - scroll(3);
-		g.enableScissor(panelX - 1, listTop, panelX + panelW + 1, listBottom);
-		ty += Brush.wrap(g, font, Component.translatable("kultivator.sectbuild.ui.builders_line", builders.getIntOr("active", 0),
-				String.format(Locale.ROOT, "%.2f", builders.getDoubleOr("factor", 1.0D))), panelX, ty, panelW, Palette.INK_SOFT, 0.55F, false) + 2.0F;
+		int top = y + l.kepala(Component.translatable("kultivator.sectbuild.panel.builders"), panelX, y, panelX + panelW);
+		l.teks(Component.translatable(K + "builders_line", builders.getIntOr("active", 0), String.format(Locale.ROOT, "%.2f", builders.getDoubleOr("factor", 1.0D))),
+				panelX, top, panelW, Palette.INK_SOFT);
+		top += LINE + 1;
+		Component hint = Component.translatable(K + "builders_hint");
+		int hintH = Math.min(30, l.font.split(hint, Math.max(10, panelW)).size() * 9);
+		List<PemilihOrang.Orang> people = new ArrayList<>();
+		builderSouls.clear();
 		ListTag list = builders.getListOrEmpty("list");
+		Component ro = roWhy();
 		for (Tag each : list) {
 			if (!(each instanceof CompoundTag builder)) {
 				continue;
 			}
 			String soul = builder.getStringOr("soul", "");
+			builderSouls.add(soul);
 			Component name = builder.read("name", ComponentSerialization.CODEC).orElse(Component.literal("?"));
 			boolean working = builder.getBooleanOr("working", false);
-			Component info = Component.translatable(working ? "kultivator.sectbuild.ui.builder_working" : builder.getBooleanOr("loaded", false)
-					? "kultivator.sectbuild.ui.builder_idle" : "kultivator.sectbuild.ui.builder_away", builder.getLongOr("ticks", 0L) / 1200L);
-			chip(g, ty, name, info, true, true, mouseX, mouseY, () -> act("builder_off:" + soul));
-			ty += 9.0F;
+			Component state = Component.translatable(working ? K + "builder_working" : builder.getBooleanOr("loaded", false) ? K + "builder_idle"
+					: K + "builder_away", builder.getLongOr("ticks", 0L) / 1200L);
+			people.add(new PemilihOrang.Orang("s:" + soul, name, 0xE8C060, builder.getIntOr("eid", -1), List.of(state), null, ro, null));
 		}
-		ty += 2.0F;
-		Brush.fit(g, font, Component.translatable("kultivator.sectbuild.ui.builders_add", list.size(), 4), panelX, ty, panelW, Palette.SEAL_DARK, 0.6F, 0.4F, false);
-		ty += 8.0F;
 		for (Tag each : builders.getListOrEmpty("cands")) {
 			if (!(each instanceof CompoundTag cand)) {
 				continue;
 			}
 			int eid = cand.getIntOr("eid", -1);
-			boolean free = eid >= 0 && cand.getBooleanOr("free", false) && list.size() < 4;
+			if (eid < 0) {
+				continue;
+			}
 			Component name = cand.read("name", ComponentSerialization.CODEC).orElse(Component.literal("?"));
 			String duty = cand.getStringOr("duty", "");
-			Component info = duty.isEmpty() ? rankName(cand.getIntOr("rank", 0))
-					: Component.translatable("kultivator.sectbuild.ui.on_duty");
-			chip(g, ty, name, info, false, free, mouseX, mouseY, () -> act("builder:" + eid + ":1"));
-			ty += 9.0F;
+			Component info = duty.isEmpty() ? rankName(cand.getIntOr("rank", 0)) : Component.translatable(K + "on_duty");
+			Component lock = ro != null ? ro : !cand.getBooleanOr("free", false) ? Component.translatable(K + "on_duty") : null;
+			people.add(new PemilihOrang.Orang("e:" + eid, name, 0x7CC8A0, eid, List.of(info), null, lock, null));
 		}
-		ty += Brush.wrap(g, font, Component.translatable("kultivator.sectbuild.ui.builders_hint"), panelX, ty + 2.0F, panelW, Palette.INK_FAINT, 0.5F, false);
-		g.disableScissor();
-		endList(ty + scroll(3));
+		// The ticks mirror the server: every builder ticked, every candidate not (a click sends the change at once).
+		Set<String> ticked = pekerja.terpilih();
+		ticked.clear();
+		for (String soul : builderSouls) {
+			ticked.add("s:" + soul);
+		}
+		pekerja.gambar(l, "bangun:pekerja", people, panelX, top, panelX + panelW, y + h - hintH - 2);
+		l.bungkus(hint, panelX, y + h - hintH, panelW, l.gaya.teksSamar, hintH);
+	}
+
+	/** A tick changed in the builder picker: add the newly ticked candidate, dismiss the unticked builder. */
+	private void pekerjaBerubah() {
+		if (readonly()) {
+			return;
+		}
+		Set<String> ticked = pekerja.terpilih();
+		for (String id : ticked) {
+			if (id.startsWith("e:")) {
+				act("builder:" + id.substring(2) + ":1");
+			}
+		}
+		for (String soul : builderSouls) {
+			if (!ticked.contains("s:" + soul)) {
+				act("builder_off:" + soul);
+			}
+		}
 	}
 
 	// ---- Galian
 
-	private void drawSalvage(GuiGraphicsExtractor g, int mouseX, int mouseY) {
-		heading(g, Component.translatable("kultivator.sectbuild.panel.salvage"), panelX, y, panelW, 0.75F);
-		boolean auth = b().getCompoundOrEmpty("flags").getBooleanOr("can_auth", false);
-		beginList(4, panelTop, y + h - BUTTON_H - (auth ? 16 : 3));
-		float ty = listTop - scroll(4);
-		g.enableScissor(panelX - 1, listTop, panelX + panelW + 1, listBottom);
+	private void drawSalvage(Lukis l) {
+		int bh = buttonH();
+		boolean auth = flags().getBooleanOr("can_auth", false);
+		int rows = rowsTop(auth ? 2 : 1);
+		int top = y + l.kepala(Component.translatable("kultivator.sectbuild.panel.salvage"), panelX, y, panelX + panelW);
+		float ty = mulaiGulir(l, "galian", top, rows - 3);
+		int tw = panelW - 5;
 		// The surplus of Batu, Tanah and Kayu.
 		CompoundTag surplus = b().getCompoundOrEmpty("surplus");
-		int third = (int) ((panelW - 4) / 3.0F);
+		int third = (tw - 4) / 3;
 		for (int i = 0; i < Deposits.SURPLUS.length; i++) {
 			Bahan cat = Deposits.SURPLUS[i];
 			long units = surplus.getLongOr(cat.id(), 0L);
-			float bx = panelX + i * (third + 2);
-			boolean over = inList(mouseX, mouseY) && mouseX >= bx && mouseX < bx + third && mouseY >= ty && mouseY < ty + 10.0F;
-			int top = units > 0L ? over ? 0xFFF7DFA0 : Palette.TALISMAN : Palette.grey(Palette.TALISMAN, 0.7F);
-			g.fillGradient(Math.round(bx), Math.round(ty), Math.round(bx + third), Math.round(ty + 10.0F), top, Palette.TALISMAN_LOW);
-			Brush.frame(g, Math.round(bx), Math.round(ty), Math.round(bx + third), Math.round(ty + 10.0F), Palette.TALISMAN_EDGE);
-			Brush.fitCentered(g, font, Component.translatable("kultivator.sectbuild.ui.surplus", cat.displayName(), units), bx + third / 2.0F, ty + 2.0F, third - 2.0F,
-					units > 0L ? Palette.INK : Palette.INK_FAINT, 0.55F, 0.35F, false);
-			if (units > 0L && !readonly() && inList(mouseX, mouseY)) {
-				hits.add(new Hit(bx, ty, bx + third, ty + 10.0F, () -> act("surplus:" + cat.id()),
-						List.of(Component.translatable("kultivator.sectbuild.ui.surplus_tip", cat.displayName()))));
+			int bx = panelX + i * (third + 2);
+			Component label = Component.translatable(K + "surplus", cat.displayName(), units);
+			boolean over = TalismanButton.gambar(l, "galian:lebih:" + i, bx, Math.round(ty), third, bh, label, units > 0L && !readonly(),
+					readonly() ? roWhy() : Component.translatable(M + "kosong"), () -> act("surplus:" + cat.id()));
+			if (over) {
+				l.tip(List.of(label, Component.translatable(K + "surplus_tip", cat.displayName())));
 			}
 		}
-		ty += 13.0F;
+		ty += bh + 4;
 		// The Peti Galian.
 		CompoundTag salvage = b().getCompoundOrEmpty("salvage");
 		ListTag counts = salvage.getListOrEmpty("list");
 		if (counts.isEmpty() && salvage.getListOrEmpty("rich").isEmpty()) {
-			ty += Brush.wrap(g, font, Component.translatable("kultivator.sectbuild.ui.salvage_empty"), panelX, ty, panelW, Palette.INK_FAINT, 0.55F, false);
+			ty += l.bungkus(Component.translatable(K + "salvage_empty"), panelX, ty, tw, l.gaya.teksSamar) + 2;
 		}
-		int perRow = Math.max(1, (int) (panelW / 30.0F));
+		int cellW = 56;
+		int perRow = Math.max(1, tw / cellW);
 		int index = 0;
 		for (Tag each : counts) {
 			if (!(each instanceof CompoundTag entry)) {
@@ -993,23 +1090,24 @@ public class BuildPage extends HallPage {
 				continue;
 			}
 			long count = entry.getLongOr("n", 0L);
-			float ix = panelX + (index % perRow) * 30.0F;
-			float iy = ty + (index / perRow) * 14.0F;
-			boolean over = inList(mouseX, mouseY) && mouseX >= ix && mouseX < ix + 28.0F && mouseY >= iy && mouseY < iy + 13.0F;
-			g.fill(Math.round(ix), Math.round(iy), Math.round(ix + 28.0F), Math.round(iy + 13.0F), Palette.argb(over ? 0x90 : 0x40, Palette.PAPER_TOP));
-			icon(g, new ItemStack(item), ix + 1.0F, iy + 0.5F, 0.75F);
-			Brush.text(g, font, Component.literal(count > 9999 ? "9999+" : Long.toString(count)), ix + 13.0F, iy + 3.5F, Palette.INK, 0.5F, false);
-			if (inList(mouseX, mouseY) && !readonly()) {
-				hits.add(new Hit(ix, iy, ix + 28.0F, iy + 13.0F, () -> act("take:" + BuiltInRegistries.ITEM.getKey(item)),
-						List.of(new ItemStack(item).getHoverName(), Component.translatable("kultivator.sectbuild.ui.take_tip", count))));
+			int ix = panelX + (index % perRow) * cellW;
+			int iy = Math.round(ty) + (index / perRow) * 19;
+			boolean over = l.di(ix, iy, ix + cellW - 2, iy + 18);
+			l.g.fill(ix, iy, ix + cellW - 2, iy + 18, Palette.argb(over ? 0x90 : 0x40, Palette.PAPER_TOP));
+			l.g.item(new ItemStack(item), ix + 1, iy + 1);
+			l.teks(Component.literal(count > 9999 ? "9999+" : Long.toString(count)), ix + 19, iy + 5, cellW - 22, Palette.INK);
+			String key = "galian:peti:" + index;
+			l.zona(key, ix, iy, ix + cellW - 2, iy + 18, () -> act("take:" + BuiltInRegistries.ITEM.getKey(item)), !readonly(), roWhy(), true);
+			l.fokusCincin(key, ix, iy, ix + cellW - 2, iy + 18);
+			if (over) {
+				l.tip(List.of(new ItemStack(item).getHoverName(), Component.translatable(K + "take_tip", count)));
 			}
 			index++;
 		}
-		ty += ((index + perRow - 1) / perRow) * 14.0F + 2.0F;
+		ty += ((index + perRow - 1) / perRow) * 19.0F + 2.0F;
 		if (salvage.getIntOr("more", 0) > 0) {
-			Brush.fit(g, font, Component.translatable("kultivator.sectbuild.ui.salvage_more", salvage.getIntOr("more", 0)), panelX, ty, panelW, Palette.INK_FAINT,
-					0.5F, 0.35F, false);
-			ty += 7.0F;
+			l.samar(Component.translatable(K + "salvage_more", salvage.getIntOr("more", 0)), panelX, ty, tw);
+			ty += LINE;
 		}
 		for (Tag each : salvage.getListOrEmpty("rich")) {
 			if (!(each instanceof CompoundTag entry)) {
@@ -1017,207 +1115,152 @@ public class BuildPage extends HallPage {
 			}
 			int richIndex = entry.getIntOr("index", 0);
 			Component name = entry.read("name", ComponentSerialization.CODEC).orElse(Component.literal("?"));
-			chip(g, ty, name, Component.literal("x" + entry.getIntOr("n", 1)), false, true, mouseX, mouseY, () -> act("take_rich:" + richIndex));
-			ty += 9.0F;
+			TalismanButton.gambar(l, "galian:kaya:" + richIndex, panelX, Math.round(ty), tw, bh,
+					Component.empty().append(name).append(" ×" + entry.getIntOr("n", 1)), !readonly(), roWhy(), () -> act("take_rich:" + richIndex));
+			ty += bh + 2;
 		}
-		g.disableScissor();
-		endList(ty + scroll(4));
+		akhirGulir(l, ty);
+		boolean exc = flags().getBooleanOr("exc", true);
+		koin(l, "galian:pakai", panelX, rows, panelW, bh, Component.translatable(K + "use_excavation"), exc, !readonly(), roWhy(),
+				() -> act("flag:exc:" + (exc ? "0" : "1")),
+				List.of(Component.translatable(K + "use_excavation"), Component.translatable(K + "use_excavation_tip")));
+		if (auth) {
+			int half = (panelW - 3) / 2;
+			int by = rows + bh + 2;
+			boolean rm = flags().getBooleanOr("rm", false);
+			koin(l, "galian:hapus", panelX, by, half, bh, Component.translatable(K + "remove_player"), rm, true, null, () -> act("flag:rm:" + (rm ? "0" : "1")),
+					List.of(Component.translatable(K + "remove_player"), Component.translatable(K + "remove_player_tip")));
+			boolean empty = flags().getBooleanOr("empty", false);
+			koin(l, "galian:kosongkan", panelX + half + 3, by, panelW - half - 3, bh, Component.translatable(K + "empty_containers"), empty, true, null,
+					() -> act("flag:empty:" + (empty ? "0" : "1")),
+					List.of(Component.translatable(K + "empty_containers"), Component.translatable(K + "empty_containers_tip")));
+		}
 	}
 
-	// ---- Templat
+	// ---- Templat (with a template standing)
 
-	private void drawTemplate(GuiGraphicsExtractor g, int mouseX, int mouseY) {
-		heading(g, Component.translatable("kultivator.sectbuild.panel.template"), panelX, y, panelW, 0.75F);
-		beginList(5, panelTop, y + h - 3 * (BUTTON_H + 2) - 2);
-		float ty = listTop - scroll(5);
-		g.enableScissor(panelX - 1, listTop, panelX + panelW + 1, listBottom);
+	private void drawTemplate(Lukis l) {
+		int bh = buttonH();
+		int rows = rowsTop(3);
+		int top = y + l.kepala(Component.translatable("kultivator.sectbuild.panel.template"), panelX, y, panelX + panelW);
+		float ty = mulaiGulir(l, "templat", top, rows - 3);
+		int tw = panelW - 5;
 		CompoundTag site = site();
 		Glaze glaze = Glaze.byId(site.getStringOr("glaze", "tinta"));
 		Component gate = Component.translatable("kultivator.sectbuild.gate." + SectTemplates.gate(site.getIntOr("rot", 0)).getSerializedName());
-		ty += Brush.wrap(g, font, Component.translatable("kultivator.sectbuild.ui.template_line", SectTemplates.name(template()),
-				glaze == null ? Component.literal("?") : glaze.displayName(), gate), panelX, ty, panelW, Palette.INK, 0.6F, false) + 1.0F;
+		ty += l.bungkus(Component.translatable(K + "template_line", SectTemplates.name(template()), glaze == null ? Component.literal("?") : glaze.displayName(), gate),
+				panelX, ty, tw, Palette.INK) + 1;
 		CompoundTag guarantee = b().getCompoundOrEmpty("guarantee");
-		ty += Brush.wrap(g, font, Component.translatable("kultivator.sectbuild.ui.coupling", b().getIntOr("frozen_cap", -1), guarantee.getIntOr("tier", 0)),
-				panelX, ty, panelW, Palette.INK_SOFT, 0.55F, false) + 3.0F;
-		// The obstacles: blocked components with their buttons.
+		ty += l.bungkus(Component.translatable(K + "coupling", b().getIntOr("frozen_cap", -1), guarantee.getIntOr("tier", 0)), panelX, ty, tw,
+				Palette.INK_SOFT) + 3;
+		// The obstacles: blocked components with their talismans.
 		boolean anyBlocked = false;
 		for (Tag each : b().getListOrEmpty("comps")) {
 			if (!(each instanceof CompoundTag comp) || comp.getIntOr("st", 0) != ComponentView.STATE_BLOCKED) {
 				continue;
 			}
 			if (!anyBlocked) {
-				Brush.fit(g, font, Component.translatable("kultivator.sectbuild.ui.obstacles"), panelX, ty, panelW, Palette.SEAL, 0.6F, 0.4F, false);
-				ty += 8.0F;
+				l.teks(Brush.bold(Component.translatable(K + "obstacles")), panelX, ty, tw, Palette.SEAL);
+				ty += LINE + 1;
 				anyBlocked = true;
 			}
 			String id = comp.getStringOr("id", "");
 			Component name = comp.read("name", ComponentSerialization.CODEC).orElse(Component.literal(id));
-			Brush.fit(g, font, Component.translatable("kultivator.sectbuild.ui.blocked_line", name, comp.getIntOr("bl", 0)), panelX, ty, panelW, Palette.INK,
-					0.55F, 0.4F, false);
-			ty += 7.0F;
-			ty = miniButtons(g, ty, mouseX, mouseY, new String[]{"kultivator.sectbuild.ui.recheck", "kultivator.sectbuild.ui.skip", "kultivator.sectbuild.ui.finish_blocked"},
-					new String[]{"recheck", "skip:" + id, "finish_blocked:" + id});
+			l.teks(Component.translatable(K + "blocked_line", name, comp.getIntOr("bl", 0)), panelX, ty, tw, Palette.INK);
+			ty += LINE;
+			String[] keys = {K + "recheck", K + "skip", K + "finish_blocked"};
+			String[] actions = {"recheck", "skip:" + id, "finish_blocked:" + id};
+			int each3 = (tw - 4) / 3;
+			for (int i = 0; i < 3; i++) {
+				String action = actions[i];
+				TalismanButton.gambar(l, "templat:hambat:" + id + ":" + i, panelX + i * (each3 + 2), Math.round(ty), each3, bh, Component.translatable(keys[i]),
+						!readonly(), roWhy(), () -> act(action));
+			}
+			ty += bh + 3;
 		}
 		// Prioritaskan: the queued components of the tier being built.
 		int building = Math.min(9, tier() + 1);
 		boolean anyQueued = false;
+		Component prioLabel = Component.translatable(K + "prioritize");
+		int prioW = TalismanButton.lebar(l.font, prioLabel, 40, 100);
 		for (Tag each : b().getListOrEmpty("comps")) {
 			if (!(each instanceof CompoundTag comp) || comp.getIntOr("st", 0) != ComponentView.STATE_QUEUED || comp.getIntOr("tier", 0) != building) {
 				continue;
 			}
 			if (!anyQueued) {
-				Brush.fit(g, font, Component.translatable("kultivator.sectbuild.ui.queue"), panelX, ty, panelW, Palette.SEAL_DARK, 0.6F, 0.4F, false);
-				ty += 8.0F;
+				l.teks(Brush.bold(Component.translatable(K + "queue")), panelX, ty, tw, Palette.SEAL_DARK);
+				ty += LINE + 1;
 				anyQueued = true;
 			}
 			String id = comp.getStringOr("id", "");
 			Component name = comp.read("name", ComponentSerialization.CODEC).orElse(Component.literal(id));
-			chip(g, ty, name, Component.translatable("kultivator.sectbuild.ui.prioritize"), false, true, mouseX, mouseY, () -> act("prio:" + id));
-			ty += 9.0F;
+			l.teks(name, panelX, ty + (bh - 8) / 2.0F, tw - prioW - 4, Palette.INK);
+			TalismanButton.gambar(l, "templat:prio:" + id, panelX + tw - prioW, Math.round(ty), prioW, bh, prioLabel, !readonly(), roWhy(), () -> act("prio:" + id));
+			ty += bh + 2;
 		}
 		// The history.
 		ListTag history = b().getListOrEmpty("history");
 		if (!history.isEmpty()) {
 			ty += 2.0F;
-			Brush.fit(g, font, Component.translatable("kultivator.sectbuild.ui.history"), panelX, ty, panelW, Palette.SEAL_DARK, 0.6F, 0.4F, false);
-			ty += 8.0F;
+			l.teks(Brush.bold(Component.translatable(K + "history")), panelX, ty, tw, Palette.SEAL_DARK);
+			ty += LINE + 1;
 			for (int i = history.size() - 1; i >= 0; i--) {
 				if (history.get(i) instanceof CompoundTag entry) {
 					long to = entry.getLongOr("to", -1L);
-					Component line = Component.translatable(to < 0L ? "kultivator.sectbuild.ui.history_now" : "kultivator.sectbuild.ui.history_line",
-							SectTemplates.name(entry.getIntOr("t", 1)), entry.getLongOr("from", 0L), to);
-					Brush.fit(g, font, line, panelX, ty, panelW, Palette.INK_SOFT, 0.55F, 0.4F, false);
-					ty += 7.0F;
+					Component line = Component.translatable(to < 0L ? K + "history_now" : K + "history_line", SectTemplates.name(entry.getIntOr("t", 1)),
+							entry.getLongOr("from", 0L), to);
+					l.teks(line, panelX, ty, tw, Palette.INK_SOFT);
+					ty += LINE;
 				}
 			}
 		}
-		g.disableScissor();
-		endList(ty + scroll(5));
-	}
-
-	/** A row of small talisman strips; returns the y below them. */
-	private float miniButtons(GuiGraphicsExtractor g, float ty, int mouseX, int mouseY, String[] keys, String[] actions) {
-		float each = (panelW - 2.0F * (keys.length - 1)) / keys.length;
-		for (int i = 0; i < keys.length; i++) {
-			float bx = panelX + i * (each + 2.0F);
-			boolean over = inList(mouseX, mouseY) && mouseX >= bx && mouseX < bx + each && mouseY >= ty && mouseY < ty + 9.0F;
-			g.fillGradient(Math.round(bx), Math.round(ty), Math.round(bx + each), Math.round(ty + 9.0F), over ? 0xFFF7DFA0 : Palette.TALISMAN, Palette.TALISMAN_LOW);
-			Brush.frame(g, Math.round(bx), Math.round(ty), Math.round(bx + each), Math.round(ty + 9.0F), Palette.TALISMAN_EDGE);
-			Brush.fitCentered(g, font, Component.translatable(keys[i]), bx + each / 2.0F, ty + 2.0F, each - 2.0F, Palette.INK, 0.5F, 0.35F, false);
-			String action = actions[i];
-			if (inList(mouseX, mouseY) && !readonly()) {
-				hits.add(new Hit(bx, ty, bx + each, ty + 9.0F, () -> act(action), null));
-			}
-		}
-		return ty + 11.0F;
+		akhirGulir(l, ty);
+		// The six talismans: upgrade, repair / deconstruct, total / abandon, change.
+		int half = (panelW - 3) / 2;
+		int right = panelX + half + 3;
+		int rightW = panelW - half - 3;
+		boolean canUpgrade = !readonly() && SectTemplates.rank(template()) < b().getIntOr("max_t", 9);
+		tombol(l, "templat:naik", panelX, rows, half, bh, K + "upgrade", canUpgrade, readonly() ? roWhy() : Component.translatable(M + "naik_maks"), () -> {
+			katalog = true;
+			catalog.select(SectTemplates.isSky(template()) ? Math.min(SectTemplates.SKY_LAST, template() + 1) : Math.min(9, template() + 1));
+			catalog.opened();
+		}, M + "naik.tip", false);
+		tombol(l, "templat:perbaiki", right, rows, rightW, bh, K + "repair", !readonly(), roWhy(), () -> act("repair"), K + "repair_tip", false);
+		int r2 = rows + bh + 2;
+		tombol(l, "templat:bongkar", panelX, r2, half, bh, K + "deconstruct", !readonly(), roWhy(),
+				() -> minta(SegelKonfirmasi.Tingkat.SEDANG, Component.translatable(M + "bongkar"), () -> act("deconstruct:0")), M + "bongkar", false);
+		tombol(l, "templat:bongkar_total", right, r2, rightW, bh, K + "deconstruct_total", !readonly(), roWhy(),
+				() -> minta(SegelKonfirmasi.Tingkat.BERAT, Component.translatable(M + "bongkar_total"), () -> act("deconstruct:1")), M + "bongkar_total", false);
+		int r3 = r2 + bh + 2;
+		tombol(l, "templat:tinggalkan", panelX, r3, half, bh, K + "abandon", !readonly(), roWhy(),
+				() -> minta(SegelKonfirmasi.Tingkat.BERAT, Component.translatable(M + "tinggalkan"), () -> act("abandon")), M + "tinggalkan", false);
+		boolean canChange = !readonly() && b().getBooleanOr("can_change", false);
+		tombol(l, "templat:ganti", right, r3, rightW, bh, K + "change", canChange, readonly() ? roWhy() : Component.translatable(M + "ganti_tidak"),
+				() -> act("change"), K + "change_tip", false);
 	}
 
 	// ---- Penyumbang
 
-	private void drawDonors(GuiGraphicsExtractor g, int mouseX, int mouseY) {
-		heading(g, Component.translatable("kultivator.sectbuild.panel.donors"), panelX, y, panelW, 0.75F);
-		beginList(6, panelTop, y + h);
-		float ty = listTop - scroll(6);
-		g.enableScissor(panelX - 1, listTop, panelX + panelW + 1, listBottom);
-		ty += Brush.wrap(g, font, Component.translatable("kultivator.sectbuild.ui.donors_text"), panelX, ty, panelW, Palette.INK_SOFT, 0.55F, false) + 3.0F;
+	private void drawDonors(Lukis l) {
+		int top = y + l.kepala(Component.translatable("kultivator.sectbuild.panel.donors"), panelX, y, panelX + panelW);
+		float ty = mulaiGulir(l, "penyumbang", top, y + h);
+		int tw = panelW - 5;
+		ty += l.bungkus(Component.translatable(K + "donors_text"), panelX, ty, tw, Palette.INK_SOFT) + 3;
 		ListTag donors = b().getListOrEmpty("donors");
 		int rank = 1;
 		for (Tag each : donors) {
 			if (each instanceof CompoundTag donor) {
-				Brush.fit(g, font, Component.translatable("kultivator.sectbuild.ui.donor_line", rank++, donor.getStringOr("name", "?"), donor.getLongOr("units", 0L)),
-						panelX, ty, panelW, Palette.INK, 0.6F, 0.4F, false);
-				ty += 8.0F;
+				l.teks(Component.translatable(K + "donor_line", rank++, donor.getStringOr("name", "?"), donor.getLongOr("units", 0L)), panelX, ty, tw, Palette.INK);
+				ty += LINE;
 			}
 		}
 		if (donors.isEmpty()) {
-			ty += Brush.wrap(g, font, Component.translatable("kultivator.sectbuild.ui.no_donors"), panelX, ty, panelW, Palette.INK_FAINT, 0.55F, false);
+			ty += l.bungkus(Component.translatable(K + "no_donors"), panelX, ty, tw, l.gaya.teksSamar);
 		}
-		g.disableScissor();
-		endList(ty + scroll(6));
-	}
-
-	// ================================================================== list scrolling and clicks
-
-	private void beginList(int id, int top, int bottom) {
-		listTop = top;
-		listBottom = Math.max(top + 10, bottom);
-	}
-
-	private void endList(float contentBottom) {
-		contentHeight = contentBottom - listTop;
-		float max = Math.max(0.0F, contentHeight - (listBottom - listTop));
-		SCROLL.put(panel, Math.max(0.0F, Math.min(max, scroll(panel))));
-		if (max > 0.0F) {
-			float bead = listTop + 2.0F + (listBottom - listTop - 4.0F) * (scroll(panel) / max);
-			g().fill(panelX + panelW, listTop, panelX + panelW + 1, listBottom, Palette.argb(0x80, Palette.CORD));
-			Brush.disc(g(), panelX + panelW + 0.5F, bead, 1.8F, Palette.JADE);
-		}
-	}
-
-	/** The frame's graphics, kept for the list scrollbar drawn in {@link #endList}. */
-	private @Nullable GuiGraphicsExtractor lastGraphics;
-
-	private GuiGraphicsExtractor g() {
-		return lastGraphics;
-	}
-
-	@Override
-	protected void drawAbove(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
-		for (Hit hit : hits) {
-			if (hit.tip() != null && mouseX >= hit.x0() && mouseX < hit.x1() && mouseY >= hit.y0() && mouseY < hit.y1()) {
-				screen.showTooltip(hit.tip());
-			}
-		}
-	}
-
-	private float scroll(int id) {
-		return SCROLL.getOrDefault(id, 0.0F);
-	}
-
-	private boolean inList(int mouseX, int mouseY) {
-		return mouseY >= listTop && mouseY < listBottom;
-	}
-
-	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button) {
-		if (super.mouseClicked(mouseX, mouseY, button)) {
-			return true;
-		}
-		if (button != InputConstants.MOUSE_BUTTON_LEFT) {
-			return false;
-		}
-		for (int i = hits.size() - 1; i >= 0; i--) {
-			Hit hit = hits.get(i);
-			if (mouseX >= hit.x0() && mouseX < hit.x1() && mouseY >= hit.y0() && mouseY < hit.y1()) {
-				UiSound.press();
-				hit.action().run();
-				return true;
-			}
-		}
-		return false;
-	}
-
-	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-		if (mouseX >= panelX && mouseX < panelX + panelW + 2 && mouseY >= listTop && mouseY < listBottom) {
-			SCROLL.put(panel, Math.max(0.0F, scroll(panel) - (float) amount * 12.0F));
-			return true;
-		}
-		return false;
+		akhirGulir(l, ty);
 	}
 
 	// ================================================================== small helpers
-
-	private void icon(GuiGraphicsExtractor g, ItemStack stack, float ix, float iy, float scale) {
-		g.pose().pushMatrix();
-		g.pose().translate(ix, iy);
-		g.pose().scale(scale, scale);
-		g.item(stack, 0, 0);
-		g.pose().popMatrix();
-	}
-
-	/** Sect rank names of module A (Tercatat ... Tetua Agung). */
-	private static final String[] RANK_IDS = {"tercatat", "luar", "dalam", "inti", "tetua", "tetua_agung"};
 
 	private static Component rankName(int rank) {
 		return Component.translatable("kultivator.hall.rank." + RANK_IDS[Math.max(0, Math.min(RANK_IDS.length - 1, rank))]);
@@ -1228,5 +1271,4 @@ public class BuildPage extends HallPage {
 		Item item = key == null ? null : BuiltInRegistries.ITEM.getOptional(key).orElse(null);
 		return item == null || item == Items.AIR ? null : item;
 	}
-
 }

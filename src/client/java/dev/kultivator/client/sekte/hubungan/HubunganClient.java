@@ -1,12 +1,11 @@
 package dev.kultivator.client.sekte.hubungan;
 
-import dev.kultivator.client.disciple.DiscipleScreen;
 import dev.kultivator.client.epic.SekteScenes;
 import dev.kultivator.client.epic.sky.SkyDirector;
 import dev.kultivator.client.epic.sound.MusicCue;
-import dev.kultivator.client.hub.HubCards;
 import dev.kultivator.client.hub.HubNav;
-import dev.kultivator.client.screen.ui.Glyphs;
+import dev.kultivator.client.hub.HubPages;
+import dev.kultivator.client.hub.Urutan;
 import dev.kultivator.client.sekte.SektePoses;
 import dev.kultivator.epic.EpicIds;
 import dev.kultivator.sekte.SekteIds;
@@ -24,8 +23,8 @@ import java.util.List;
  * The client of module R, Hubungan antar-murid (DESIGN 36.2.2, 36.4 R), one line in {@code SekteContentClient}:
  * <ul>
  * <li>the payload receivers (bubbles, the lovers near the player, the Jaring data);</li>
- * <li>the "Hubungan" tab of the disciple scroll (after P's "Hati", {@code DiscipleScreen.addExtraTab});</li>
- * <li>the hub card "Jaring Hubungan" in the SEKTE section;</li>
+ * <li>the page Murid › Jaring ({@link JaringScreen}, DESIGN 43.5; the Hubungan sub of Murid › Murid, {@code HubunganTab},
+ * is mounted by the Murid page);</li>
  * <li>the pose of {@code SekteIds.ACT_SOCIAL}: a celadon tea cup held before the chest in the right hand, the left hand
  * beneath it as courtesy asks, and every eight seconds a sip (the cup tilts toward the lips);</li>
  * <li>the scenes of beats 110 (sworn kin), 111 (Dao companions) and 112 (a grudge settled), through {@code SekteScenes}
@@ -48,13 +47,13 @@ public final class HubunganClient {
 		ClientPlayNetworking.registerGlobalReceiver(HubunganPayloads.Jaring.TYPE, (payload, context) -> JaringScreen.receive(payload.data()));
 		ClientTickEvents.END_CLIENT_TICK.register(GelembungIkatan::tick);
 		LevelRenderEvents.COLLECT_SUBMITS.register(GelembungIkatan::render);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> GelembungIkatan.clear());
-
-		DiscipleScreen.addExtraTab(Glyphs.RING, HubunganTab::new);
-		HubCards.register(HubNav.SEKTE, "sekte_hubungan_jaring", Glyphs.RING, null, () -> {
-			HubNav.openChild(new JaringScreen(), HubNav.SEKTE);
-			JaringScreen.ask();
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+			GelembungIkatan.clear();
+			JaringScreen.bersih();
 		});
+
+		// 43: Murid › Jaring is a page of the Gulungan; the Hubungan sub of Murid › Murid is mounted by the Murid page (M03).
+		HubPages.daftar(HubNav.MURID, Urutan.ID_JARING, Urutan.JARING, JaringScreen::new);
 
 		SektePoses.register(SekteIds.ACT_SOCIAL, HubunganClient::teaPose, List.of(new SektePoses.Prop("sekte_hubungan_teacup", false, 0.55F, 66.0F)));
 

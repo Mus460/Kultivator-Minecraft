@@ -1,0 +1,39 @@
+{
+  "pembicara": [
+    "peran:penjaga_gerbang"
+  ],
+  "prioritas": 60,
+  "syarat": [
+    "gabung.calon_sini"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "312",
+      "suara": "gabung.gerbang_panggil",
+      "pilihan": [
+        {
+          "akibat": [
+            "gabung.mulai_ujian"
+          ]
+        },
+        {
+          "ke": "tahap"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "tahap",
+      "pilihan": [
+        {
+          "akibat": [
+            "gabung.mulai_ujian"
+          ]
+        },
+        {}
+      ]
+    }
+  ]
+}

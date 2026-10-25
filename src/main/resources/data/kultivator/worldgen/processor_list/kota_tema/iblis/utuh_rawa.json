@@ -847,6 +847,56 @@
           "input_predicate": {
             "predicate_type": "minecraft:blockstate_match",
             "block_state": {
+              "id": "minecraft:dark_oak_fence_gate",
+              "properties": {
+                "facing": "south",
+                "in_wall": "false",
+                "open": "false",
+                "powered": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:mangrove_fence_gate",
+            "properties": {
+              "facing": "south",
+              "in_wall": "false",
+              "open": "false",
+              "powered": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:dark_oak_leaves",
+              "properties": {
+                "distance": "1",
+                "persistent": "true",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:mangrove_leaves",
+            "properties": {
+              "distance": "1",
+              "persistent": "true",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
               "id": "minecraft:dark_oak_log",
               "properties": {
                 "axis": "x"
@@ -1338,6 +1388,34 @@
               "facing": "south",
               "half": "top",
               "open": "false",
+              "powered": "false",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:dark_oak_trapdoor",
+              "properties": {
+                "facing": "west",
+                "half": "bottom",
+                "open": "true",
+                "powered": "false",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:mangrove_trapdoor",
+            "properties": {
+              "facing": "west",
+              "half": "bottom",
+              "open": "true",
               "powered": "false",
               "waterlogged": "false"
             }

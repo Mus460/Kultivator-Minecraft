@@ -1,0 +1,311 @@
+# basa_basi: corpus of the conversation engine (42K-C, DESIGN 42.5A.8). Source format: gen_kota_hidup_cakap.py.
+# BASA_BASI: small talk after the greeting (weather, season, the day, the street). Topics cuaca, musim, kota, kerja.
+@kelompok basa_basi
+
+== basa.cuaca.cerah
+niat: BASA_BASI
+topik: cuaca
+syarat: cuaca=cerah
+lanjut: kerja kota
+gestur: tatap_langit
+$penguat: aturan=frag.penguat opsional=0.3
+$senang: aturan=seru.senang opsional=0.5
+- [2] Langit bersih sekali hari ini. Pertanda baik, kata orang. || Such a clear sky today. A good omen, they say.
+  ~ kuno: Langit jernih tanpa awan. Pertanda baik bagi jalan siapa pun. || A cloudless clear sky. A good omen for anyone's road.
+  ~ kasar: Langit bersih. Bagus. Itu saja. || Clear sky. Good. That's all.
+- Cuaca begini enak untuk menjemur apa saja. Kasur, ikan, bahkan diri sendiri. {$penguat} || Weather like this is good for drying anything. Mattresses, fish, even yourself. {$penguat}
+- Matahari bersahabat hari ini. Semoga awet sampai panen. || The sun is friendly today. May it last till harvest.
+  ~ kampung: Mataharinya ramah, Nak. Moga-moga awet sampai panen. || The sun's kind, child. Hope it holds till harvest.
+- Kalau cerah begini, pedagang dari luar kota pasti banyak yang datang. || On clear days like this, plenty of outside traders come.
+  ~ pelabuhan: Cerah begini kapal dagang berdatangan, Bung. Dermaga bakal sesak. || Clear like this the merchantmen come in, mate. The dock will be packed.
+- Cerah begini, hatiku ikut terang. {$senang} || A clear day like this brightens my heart too. {$senang}
+  ~ kasar: Cerah. Bagus. Jangan buang waktu bicara cuaca. || Clear. Good. Don't waste time on the weather.
+- Lihat itu, burung layang-layang terbang tinggi. Tidak akan hujan. || Look, the swallows fly high. It won't rain.
+  ~ oasis: Lihat, Saudara, elang terbang tinggi. Badai pasir tidak akan datang. || Look, friend, the hawks fly high. No sandstorm today.
+
+== basa.cuaca.hujan
+niat: BASA_BASI
+topik: cuaca
+syarat: cuaca=hujan
+lanjut: harga kerja
+gestur: hangat_tangan
+$keluh: aturan=seru.keluh opsional=0.5
+$ajakan: aturan=frag.ajakan opsional=0.35
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [2] Hujan sejak subuh. Jalanan jadi bubur. {$keluh} || Raining since dawn. The streets have turned to porridge. {$keluh}
+  ~ kasar: Hujan terus. Sial. || Raining nonstop. Damn.
+  ~ kampung: Hujan dari subuh, Nak. Pematang licin semua. || Raining since dawn, child. Every bund is slippery.
+- Petani senang, tukang jemur menangis. Begitulah hujan. || Farmers rejoice, washerfolk weep. That's rain for you.
+  ~ kuno: Hujan yang sama menyenangkan petani dan menyusahkan tukang jemur. Begitulah langit. || The same rain gladdens the farmer and grieves the washer. So is heaven.
+- Atap rumahku bocor lagi. Ember sudah tiga di lantai. || My roof leaks again. Three buckets on the floor already.
+  ~ pelabuhan: Atap gudangku bocor lagi, Bung. Karung garam jadi air asin. || My warehouse roof leaks again, mate. The salt sacks turned to brine.
+- Hujan begini enaknya makan mi panas di kedai. {$ajakan} || Rain like this calls for hot noodles at the eatery. {$ajakan}
+- Kata orang tua, hujan di hari pasar artinya rezeki datang terlambat. || The old folk say rain on market day means fortune arrives late.
+  ~ kasar: Hujan di hari pasar. Rugi. || Rain on market day. Loss.
+  ~ air: Hujan di kanal itu musik, ya. Perahu-perahu jadi berirama. || Rain on the canal is music, isn't it. The boats rock in rhythm.
+- Bau tanah basah ini mengingatkanku pada masa kecil. || The smell of wet earth reminds me of childhood.
+  ~ kuno: Aroma tanah basah membangkitkan kenangan masa kecil, {$sebutan}. || The scent of wet earth awakens childhood memories, {$sebutan}.
+
+== basa.cuaca.badai
+niat: BASA_BASI
+topik: cuaca
+syarat: cuaca=badai
+lanjut: bahaya
+gestur: lihat_sekeliling
+- Petir tadi menyambar dekat menara. Telingaku masih berdenging. || That bolt struck near the tower. My ears are still ringing.
+  ~ kasar: Petir tadi hampir kena menara. Hebat. || That bolt nearly hit the tower. Impressive.
+- Badai begini kapal-kapal tidak berani berlayar. Harga ikan pasti naik. || In storms like this no ship dares sail. Fish prices will rise.
+  ~ pelabuhan: Badai begini, Bung, kapal diikat dua kali. Besok harga ikan melonjak. || Storms like this, mate, boats get double-tied. Tomorrow fish prices leap.
+- Anak-anakku bersembunyi di bawah meja. Aku pura-pura berani. || My children are hiding under the table. I'm pretending to be brave.
+  ~ p: Anak-anakku sembunyi di bawah meja. Aku pura-pura tenang sambil memeluk mereka. || My children hide under the table. I pretend to be calm while hugging them.
+- Kata almanak, badai di musim ini tanda naga sedang berganti sisik. || The almanac says storms this season mean a dragon is shedding scales.
+  ~ kuno: Kitab lama berkata, badai musim ini adalah naga yang sedang berganti sisik. || The old books say this season's storms are a dragon shedding its scales.
+
+== basa.cuaca.salju
+niat: BASA_BASI
+topik: cuaca
+syarat: cuaca=salju
+lanjut: harga keluarga
+gestur: hangat_tangan
+$keluh: aturan=seru.keluh opsional=0.5
+- Kayu bakar sekarang semahal daging. {$keluh} || Firewood costs as much as meat now. {$keluh}
+  ~ kampung: Kayu bakar mahal, Nak. Sekarang bakar sekam saja. || Firewood's dear, child. Burning husks now.
+- Anak-anak membuat boneka salju di alun-alun. Hidungnya dari wortel curian dapurku. || The children built a snowman in the square. Its nose is a carrot stolen from my kitchen.
+  ~ kasar: Anak-anak bikin boneka salju. Pakai wortelku. Bocah-bocah itu. || Kids made a snowman. With my carrot. Brats.
+- Salju pertama selalu cantik. Salju kesepuluh hanya merepotkan. || The first snow is always pretty. The tenth is only a nuisance.
+  ~ kuno: Salju pertama adalah puisi; salju kesepuluh hanyalah pekerjaan. || The first snow is poetry; the tenth is only work.
+- Sumur membeku tadi pagi. Kami harus memecah esnya dengan kapak. || The well froze this morning. We had to break the ice with an axe.
+  ~ gunung: Kolam biara membeku. Para biksu muda memecah esnya sambil bernyanyi. || The monastery pond froze. The young monks break the ice while singing.
+
+== basa.cuaca.kabut
+niat: BASA_BASI
+topik: cuaca
+syarat: cuaca=kabut_qi
+lanjut: dunia sekte
+gestur: tatap_langit
+- Kabut Qi begini, para kultivator di bukit pasti sedang bersemedi semua. || In Qi mist like this, every cultivator on the hill must be meditating.
+  ~ kuno: Kabut Qi turun; para penempuh Dao di bukit tentu sedang menyerapnya. || The Qi mist descends; the Dao walkers on the hill must be absorbing it.
+- Tanaman obat tumbuh cepat sekali kalau kabut Qi turun. Petani herba senang. || Herbs grow so fast when the Qi mist falls. The herb farmers are glad.
+  ~ gunung: Herba di tebing tumbuh dua kali lipat saat kabut Qi. Pemetik herba sibuk sekali. || Cliff herbs grow twice as fast in Qi mist. The herb pickers are so busy.
+- Nenekku bilang, kabut Qi bisa membuat orang biasa bermimpi masa lalu. || My grandmother said Qi mist makes ordinary folk dream of past lives.
+  ~ kampung: Simbahku bilang, kalau kabut Qi turun, orang bisa mimpi jadi raja. || My granny says when the Qi mist falls, folk dream of being kings.
+- Kemarin dalam kabut aku hampir menabrak tiang lentera. Malu sekali. || In yesterday's mist I nearly walked into a lamp post. So embarrassing.
+  ~ kasar: Kemarin aku menabrak tiang lentera di kabut. Jangan tertawa. || Yesterday I walked into a lamp post in the mist. Don't laugh.
+
+== basa.musim.semi
+niat: BASA_BASI
+topik: musim
+syarat: musim=semi
+lanjut: acara keluarga
+gestur: bicara_tangan
+- [2] Bunga persik sudah mekar di tepi sungai. Musim yang bagus untuk melamar, kata orang. || The peach blossoms are out by the river. A good season for proposals, they say.
+  ~ kampung: Kembang persik sudah mekar, Nak. Musim orang melamar. || The peach blossoms are out, child. Proposal season.
+  ~ kuno: Bunga persik bermekaran di tepi sungai. Musim yang baik untuk mengikat janji. || Peach blossoms bloom by the river. A fine season to bind vows.
+- Musim semi, semua orang jadi rajin. Sawah, kebun, bahkan kucing di atap. || In spring everyone turns diligent. Paddies, gardens, even the cats on the roofs.
+  ~ kasar: Musim semi. Semua sibuk. Kucing juga. Berisik. || Spring. Everyone busy. Cats too. Noisy.
+- Anak-anak sudah main layangan lagi. Langit penuh naga kertas. || The children fly kites again. The sky is full of paper dragons.
+  ~ air: Layang-layang memantul di air kanal, Kakak... seperti naga berenang... || Kites reflected in the canal, dear... like dragons swimming...
+- Semi begini, udara wangi. Aku jadi ingin menulis puisi, padahal tidak bisa. || Spring like this, the air smells sweet. Makes me want to write poems, though I can't.
+- Burung walet kembali ke atap kami tahun ini. Pertanda rumah tangga rukun. || The swallows came back to our eaves this year. A sign of a harmonious household.
+  ~ kuno: Burung walet kembali ke atap kami. Leluhur berkata itu tanda rumah yang rukun. || The swallows returned to our eaves. The elders say it marks a harmonious home.
+
+== basa.musim.panas
+niat: BASA_BASI
+topik: musim
+syarat: musim=panas
+lanjut: kerja harga
+gestur: seka_keringat
+- [2] Panas sekali musim ini. Jangkrik pun malas berbunyi. || So hot this season. Even the crickets are too lazy to sing.
+  ~ kasar: Panas. Gerah. Malas. || Hot. Sticky. Lazy.
+  ~ oasis: Panas ini belum seberapa, Saudara. Di gurun telur matang di atas batu. || This heat is nothing, friend. In the desert eggs cook on stones.
+- Semangka dari ladang timur manis-manis tahun ini. Sudah coba? || The watermelons from the east fields are sweet this year. Tried them?
+  ~ kampung: Semangka ladang timur manis, Nak. Mau kupotongkan? || The east field melons are sweet, child. Shall I cut you one?
+- Malam-malam aku tidur di serambi. Di dalam seperti tungku. || At night I sleep on the veranda. Indoors is like an oven.
+  ~ pelabuhan: Malam-malam aku tidur di geladak, Bung. Kabin seperti tungku. || Nights I sleep on deck, mate. The cabin's like an oven.
+- Musim panas, sungai surut. Tukang perahu banyak menganggur. || Summer, the river shrinks. Many boatmen sit idle.
+  ~ air: Kanal surut, Kakak... perahu-perahu kandas di lumpur... || The canals are low, dear... the boats are stuck in mud...
+  ~ oasis: Panas begini, Saudara, air lebih mahal dari kata-kata. || In heat like this, friend, water is dearer than words.
+- Kata tabib, minum teh krisan supaya panas dalam tidak naik. || The physician says drink chrysanthemum tea so inner heat won't rise.
+  ~ kuno: Teh krisan meredakan panas dalam, demikian kata tabib tua. || Chrysanthemum tea calms inner heat, so says the old physician.
+
+== basa.musim.gugur
+niat: BASA_BASI
+topik: musim
+syarat: musim=gugur
+lanjut: acara harga
+gestur: tatap_langit
+- [2] Daun-daun mulai merah. Sebentar lagi festival bulan. || The leaves are turning red. The moon festival is near.
+  ~ kuno: Daun-daun memerah. Festival bulan sebentar lagi; semoga keluarga berkumpul. || The leaves redden. The moon festival is near; may families gather.
+  ~ kasar: Daun merah. Festival. Ramai lagi. || Red leaves. Festival. Crowds again.
+- Musim gugur musim panen. Semua orang sibuk, semua orang lelah, semua orang makan enak. || Autumn is harvest. Everyone busy, everyone tired, everyone eating well.
+  ~ kampung: Musim panen, Nak! Capek, tapi nasi baru wangi sekali. || Harvest time, child! Tiring, but the new rice smells wonderful.
+- Angin gugur membawa bau padi. Aku suka sekali. || The autumn wind carries the smell of rice. I love it.
+  ~ gunung: Angin gugur membawa bau dupa dari biara. Damai sekali. || The autumn wind carries incense from the monastery. So peaceful.
+- Kue bulan tahun ini isinya kacang merah atau biji teratai? Aku pilih teratai. || This year's mooncakes: red bean or lotus seed? I'll take lotus.
+  ~ p: Tahun ini aku membuat kue bulan sendiri. Isi teratai, tentu saja. || This year I'm making mooncakes myself. Lotus filling, of course.
+- Gugur begini aku selalu teringat orang-orang yang sudah pergi. || Autumn always makes me think of those who have passed.
+  ~ kuno: Musim gugur selalu mengingatkan pada mereka yang telah kembali ke langit. || Autumn always recalls those who have returned to heaven.
+
+== basa.musim.dingin
+niat: BASA_BASI
+topik: musim
+syarat: musim=dingin
+lanjut: keluarga harga
+gestur: hangat_tangan
+$keluh: aturan=seru.keluh opsional=0.5
+- [2] Musim dingin panjang tahun ini. Semoga lumbung cukup. || A long winter this year. May the granary hold.
+  ~ kasar: Dingin panjang. Lumbung tipis. Bagus sekali. || Long cold. Thin granary. Wonderful.
+  ~ kampung: Musim dingin panjang, Nak. Semoga lumbung desa cukup. || A long winter, child. May the village granary last.
+- Tahun Baru tinggal sebentar lagi. Aku belum beli kertas merah. || New Year is almost here. I haven't bought red paper yet.
+  ~ p: Tahun Baru sebentar lagi, belum menjahit baju anak-anak! Aduh. || New Year's nearly here and I haven't sewn the children's clothes! Oh dear.
+- Pagi-pagi napas jadi asap. Anak-anak pura-pura jadi naga. || Mornings your breath turns to smoke. The children pretend to be dragons.
+  ~ kuno: Napas menjadi kabut di pagi hari. Anak-anak berlagak seperti naga muda. || Breath becomes mist in the morning. The children play at young dragons.
+- Dingin begini, sup tulang di rumah makan paling dicari. || In cold like this, bone soup at the eatery sells best.
+  ~ oasis: Malam gurun dingin sekali, Saudara. Sup kambing paling dicari. || Desert nights are freezing, friend. Mutton soup sells best.
+- Tanganku pecah-pecah kena air dingin. {$keluh} || My hands are cracked from cold water. {$keluh}
+  ~ kasar: Tanganku pecah-pecah. Dingin sialan. || Hands all cracked. Damn cold.
+
+== basa.jam.pagi
+niat: BERI_KABAR
+topik: kota
+syarat: jam=subuh,pagi
+lanjut: kerja harga
+gestur: bicara_tangan
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+$ajakan: aturan=frag.ajakan opsional=0.35
+- Pasar pagi tadi ramai sekali. Ada yang jual ikan sebesar anak kecil. || The morning market was packed. Someone was selling a fish the size of a child.
+  ~ pelabuhan: Pasar ikan pagi tadi ramai, Bung! Ada tuna sebesar anak kecil! || The fish market was packed this morning, mate! A tuna the size of a child!
+  ~ kuno: Pasar pagi ramai sekali, {$sebutan}. Seseorang menjual ikan sebesar anak kecil. || The morning market was teeming, {$sebutan}. Someone sold a fish the size of a child.
+- Aku bangun kesiangan. Ayam jago tetangga sakit tenggorokan, katanya. || I overslept. The neighbour's rooster has a sore throat, apparently.
+  ~ kasar: Kesiangan. Ayam tetangga tidak berkokok. Salahkan ayam. || Overslept. The neighbour's rooster didn't crow. Blame the rooster.
+- Pagi begini paling enak bubur dan cakwe. {$ajakan} || Mornings like this call for porridge and fried dough. {$ajakan}
+  ~ kampung: Pagi-pagi enaknya bubur sama gorengan, Nak. {$ajakan} || Mornings call for porridge and fritters, child. {$ajakan}
+- Para kakek sudah tai chi di alun-alun sejak subuh. Gerakannya lambat sekali, tapi mereka tidak pernah sakit. || The old men have done tai chi in the square since dawn. Slow as anything, but they never fall ill.
+  ~ gunung: Para biksu tua berlatih di halaman sejak subuh. Gerakan mereka lambat seperti awan. || The old monks practise in the yard since dawn. Their moves are slow as clouds.
+- Hari ini hari pasar. Gerobak-gerobak sudah antre di gerbang. || Today's market day. The carts are already queued at the gate.
+  ~ oasis: Hari pasar, Saudara! Unta-unta sudah antre di gerbang oasis. || Market day, friend! The camels are queued at the oasis gate.
+
+== basa.jam.siang
+niat: BERI_KABAR
+topik: kota
+syarat: jam=siang
+lanjut: kerja
+gestur: seka_keringat
+- Siang begini kedai teh penuh orang yang pura-pura sibuk. || At this hour the teahouse is full of people pretending to be busy.
+  ~ kasar: Kedai teh penuh pemalas. Seperti biasa. || Teahouse full of idlers. As usual.
+- Perutku sudah bunyi sejak tadi. Pedagang bakpao lewat belum, ya? || My stomach's been growling a while. Has the bun seller passed yet?
+  ~ kampung: Perutku keroncongan, Nak. Tukang bakso lewat belum, ya? || My belly's rumbling, child. Has the meatball seller passed yet?
+- Separuh hari sudah lewat. Separuh lagi masih panjang. || Half the day's gone. The other half is still long.
+  ~ kuno: Separuh hari telah berlalu. Separuh lagi masih menanti. || Half the day has passed. The other half still waits.
+- Siang bolong begini, bahkan hantu malas keluar, kata orang. || High noon like this, even ghosts can't be bothered, they say.
+  ~ kampung: Siang bolong begini, kata simbah, setan pun tidur. || Broad noon like this, granny says, even devils nap.
+
+== basa.jam.sore
+niat: BERI_KABAR
+topik: kota
+syarat: jam=sore
+lanjut: keluarga acara
+gestur: bicara_tangan
+- Sore-sore begini anak-anak main di gang. Ramainya seperti pasar burung. || Evenings the children play in the alleys. Noisy as a bird market.
+  ~ kasar: Anak-anak berisik di gang. Setiap sore. || Kids making a racket in the lane. Every evening.
+- Sebentar lagi lentera dinyalakan. Aku suka saat kota berubah jingga. || Soon the lanterns will be lit. I love when the town turns amber.
+  ~ air: Sebentar lagi lentera kanal dinyalakan, Kakak... kota jadi jingga... indah... || Soon the canal lanterns will be lit, dear... the town turns amber... lovely...
+- Para pekerja pulang. Bau masakan dari setiap dapur. Ini waktu terbaik di kota. || The workers head home. Cooking smells from every kitchen. The best hour in town.
+  ~ kuno: Para pekerja pulang dan asap dapur naik. Inilah saat kota bernapas lega. || The workers go home and kitchen smoke rises. This is when the town breathes easy.
+- Kalau sore cerah, para kakek main catur di bawah pohon sampai gelap. || On clear evenings the old men play chess under the tree till dark.
+  ~ kampung: Kalau sore cerah, simbah-simbah main catur sampai gelap. || On clear evenings the old folk play chess till dark.
+
+== basa.jam.malam
+niat: BERI_KABAR
+topik: kota
+syarat: jam=malam,larut
+lanjut: bahaya pasar_hantu
+gestur: lihat_sekeliling
+- Malam ini sunyi. Terlalu sunyi, kalau kau tanya aku. || Quiet tonight. Too quiet, if you ask me.
+  ~ kasar: Sepi. Tidak suka. || Quiet. Don't like it.
+  ~ iblis: Malam ini sunyi. Di kota ini, sunyi berarti seseorang sedang mengasah pisau. || Quiet tonight. In this city, quiet means someone is sharpening a knife.
+- Penjaga malam baru saja memukul kentongan. Sudah jam dua. || The night watchman just struck his clapper. Second watch already.
+  ~ kampung: Kentongan sudah dipukul dua kali, Nak. Sudah larut. || The slit drum's struck twice, child. It's late.
+- Bulan setengah malam ini. Bagus untuk mencuri, kata pencopet. Hehe, bercanda. || Half moon tonight. Good for stealing, the pickpockets say. Hehe, joking.
+  ~ kasar: Setengah bulan. Pencopet suka. Jaga dompetmu. || Half moon. Pickpockets love it. Mind your purse.
+- Kedai arak masih ramai. Dengar? Ada yang bernyanyi sumbang. || The tavern is still lively. Hear that? Someone singing off-key.
+  ~ pelabuhan: Kedai pelaut masih ramai, Bung. Dengar? Lagu laut sumbang. || The sailors' tavern is still lively, mate. Hear that? An off-key sea shanty.
+
+== basa.kota.umum
+niat: CERITA
+topik: kota
+lanjut: kota harga tetangga
+gestur: bicara_tangan
+$tempat: tipe=tempat dari=konteks.tempat
+$distrik: tipe=tempat dari=konteks.distrik
+- [3] {$tempat} makin ramai saja dari tahun ke tahun. || {$tempat} gets busier every year.
+  ~ kasar: {$tempat} makin sesak. Terlalu banyak orang. || {$tempat} gets more crowded. Too many people.
+  ~ kuno: {$tempat} kian ramai dari tahun ke tahun; tanda rezeki mengalir. || {$tempat} grows busier year by year; a sign fortune flows.
+- Jalan di depan sudah diperbaiki. Akhirnya gerobakku tidak terguncang lagi. || The road out front's been mended. At last my cart doesn't jolt.
+  ~ kampung: Jalan desa sudah diperbaiki, Nak. Gerobakku tidak oleng lagi. || The village road's been mended, child. My cart doesn't wobble now.
+- Kau sudah coba mi tarik di {$distrik}? Katanya terbaik di seluruh {$tempat}. || Tried the pulled noodles in {$distrik}? They say they're the best in {$tempat}.
+  ~ kasar: Mi tarik di {$distrik} enak. Pergi sana kalau lapar. || The pulled noodles in {$distrik} are good. Go if you're hungry.
+- Semakin banyak pendatang. Kemarin ada rombongan dari jauh, pakaiannya aneh-aneh. || More and more newcomers. Yesterday a group came from far off, in such odd clothes.
+  ~ oasis: Banyak pendatang lewat oasis ini, Saudara. Kemarin ada yang berjubah perak. || Many newcomers pass this oasis, friend. Yesterday one wore silver robes.
+- Di {$tempat} ini semua orang tahu urusan semua orang. Hati-hati bicara. || In {$tempat} everybody knows everybody's business. Mind what you say.
+  ~ kasar: Semua orang di sini suka ikut campur. Hati-hati. || Everyone here sticks their nose in. Careful.
+- Sumur di ujung jalan airnya paling manis. Itu rahasia. || The well at the end of the street has the sweetest water. That's a secret.
+  ~ kampung: Sumur di ujung kampung paling seger airnya, Nak. Itu rahasia, ya. || The well at the village end has the freshest water, child. That's a secret.
+- Ada lentera baru di gerbang. Warnanya merah keemasan. Cantik. || New lanterns at the gate. Red and gold. Pretty.
+  ~ kuno: Lentera baru menghiasi gerbang, merah keemasan bagai senja. || New lanterns adorn the gate, red-gold like dusk.
+- Kucing-kucing di sini lebih gemuk daripada orangnya. || The cats here are fatter than the people.
+  ~ kasar: Kucing-kucing gemuk. Orangnya kurus. Adil? || Fat cats. Thin people. Fair?
+- [2] Hidup di {$tempat} tidak mewah, tapi tenang. Itu sudah cukup. || Life in {$tempat} isn't lavish, but it's calm. That's enough.
+  ~ kuno: Hidup di {$tempat} tidak mewah, namun tenteram. Itu sudah karunia. || Life in {$tempat} isn't lavish, but tranquil. That's grace enough.
+  ~ iblis: Hidup di sini tidak tenang, tapi setidaknya jujur: semua orang jahat terang-terangan. || Life here isn't calm, but at least it's honest: everyone's openly wicked.
+  ~ pelabuhan: Hidup di pelabuhan itu seperti ombak, Bung. Naik, turun, basah. || Harbour life is like the waves, mate. Up, down, wet.
+- Para tukang sedang membangun rumah baru di kavling ujung. Kota kita tumbuh. || The builders are putting up a new house on the end plot. Our town is growing.
+  ~ kampung: Gotong royong bangun rumah di ujung kampung, Nak. Kampung kita tumbuh. || Everyone's building a house at the end of the village, child. Our village grows.
+
+== basa.kota.ibukota
+niat: CERITA
+topik: kota
+syarat: dialek=ibukota
+lanjut: pejabat harga
+gestur: bicara_tangan
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- Di ibu kota, bahkan pengemis pun memakai sandal sutra. Hampir. || In the capital even the beggars wear silk sandals. Nearly.
+  ~ kasar: Ibu kota. Semua pamer. Bahkan pengemis. || The capital. Everyone shows off. Even beggars.
+- Kau sudah lihat istana dari jembatan utama? Atapnya berkilau seperti emas cair. || Seen the palace from the main bridge? Its roofs gleam like molten gold.
+  ~ kuno: Atap istana dari jembatan utama berkilau bagai emas cair, {$sebutan}. || From the main bridge the palace roofs gleam like molten gold, {$sebutan}.
+- Di sini, kalau mau urusan cepat, kenali pejabat yang tepat. Kalau tidak, bersabarlah tiga musim. || Here, if you want things done quickly, know the right official. Otherwise, wait three seasons.
+  ~ kasar: Mau cepat? Suap. Mau lambat? Ikuti aturan. || Want it fast? Bribe. Want it slow? Follow the rules.
+- Distrik pasar ramai sejak subuh sampai tengah malam. Ibu kota tidak pernah tidur. || The market district bustles from dawn to midnight. The capital never sleeps.
+  ~ kuno: Distrik pasar tak pernah tidur; ibu kota bernapas siang dan malam. || The market district never sleeps; the capital breathes day and night.
+
+== basa.kota.kampung
+niat: CERITA
+topik: kota
+syarat: dialek=kampung
+lanjut: kerja keluarga
+gestur: bicara_tangan
+- Di kampung ini, kalau ada yang masak daging, seluruh kampung tahu baunya. || In this village, if anyone cooks meat, the whole village smells it.
+  ~ kasar: Masak daging di sini? Satu kampung datang minta. || Cook meat here? The whole village comes begging.
+- Sawah sebelah timur bagus tahun ini. Kerbau Pak Lurah sampai gemuk. || The east paddies are good this year. Even the headman's buffalo got fat.
+  ~ kuno: Sawah timur subur tahun ini; bahkan kerbau kepala desa bertambah gemuk. || The east paddies flourish this year; even the headman's buffalo has fattened.
+- Hidup di kampung itu sederhana, Nak. Bangun, kerja, makan, tidur. Diulang. || Village life is simple, child. Wake, work, eat, sleep. Repeat.
+  ~ kasar: Hidup di kampung: kerja, makan, tidur. Bosan. || Village life: work, eat, sleep. Boring.
+- Jembatan bambu di sungai sudah goyang. Semoga ada yang mau memperbaiki. || The bamboo bridge over the stream wobbles now. I hope someone fixes it.
+  ~ kuno: Jembatan bambu di sungai mulai goyah. Semoga ada tangan yang sudi memperbaikinya. || The bamboo bridge over the stream wavers. May some hand deign to fix it.
+
+== basa.tanya.perjalanan
+niat: TANYA_BALIK
+topik: perjalanan
+lanjut: dunia sekte
+gestur: bicara_tangan
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+$tempat: tipe=tempat dari=konteks.tempat
+- Jalanmu dari mana tadi, {$sebutan}? Debu di sepatumu bukan debu sini. || Where did your road start today, {$sebutan}? That dust on your boots isn't local.
+  ~ kasar: Dari mana kau? Debumu bukan debu sini. || Where're you from? Your dust isn't ours.
+  ~ kuno: Dari manakah langkah {$sebutan} bermula hari ini? Debu di alas kakimu dari negeri lain. || Where did your steps begin today, {$sebutan}? The dust on your soles is from another land.
+- {$sebutan} pasti sudah melihat banyak tempat. Aku belum pernah keluar dari {$tempat}. || You must have seen many places, {$sebutan}. I've never been outside {$tempat}.
+  ~ kampung: {$sebutan} pasti sudah ke mana-mana. Aku belum pernah keluar dari {$tempat}, Nak. || You must have been everywhere, {$sebutan}. I've never left {$tempat}, child.
+- Apa di luar sana betul ada gunung yang melayang? Aku penasaran sekali. || Out there, are there truly floating mountains? I'm dying to know.
+  ~ pelabuhan: Benarkah ada pulau yang melayang di langit, Bung? Pelaut tua bilang begitu. || Is there truly an island floating in the sky, mate? The old sailors say so.
+- Kultivator seperti {$sebutan} tidur tidak, sih? Atau bersemedi saja? || Do cultivators like you sleep, {$sebutan}? Or only meditate?
+  ~ kasar: Kultivator tidur tidak? Jujur saja. || Do cultivators sleep? Be honest.

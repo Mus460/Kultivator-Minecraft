@@ -43,15 +43,17 @@ public final class CincinWaktu {
 		Component t = TeksTempat.waktu(left);
 		switch (teks) {
 			case DALAM -> {
-				float s = Brush.fitScale(l.font, t, r * 1.6F, 0.75F, 0.6F);
-				Brush.centered(l.g, l.font, t, cx, cy - 4.0F * s, l.gaya.gelap() ? 0xFFF4E8D0 : 0xFFF4FAF6, s, true);
+				// 43.0.5: 1.0 or nothing; a ring too small for the time keeps it in the tooltip below
+				if (l.font.width(t) <= r * 1.8F) {
+					Brush.centered(l.g, l.font, t, cx, cy - 4.0F, l.gaya.gelap() ? 0xFFF4E8D0 : 0xFFF4FAF6, 1.0F, true);
+				}
 			}
-			case KANAN -> Brush.text(l.g, l.font, t, cx + r + 3.0F, cy - 3.0F, l.gaya.teks, 0.75F, false);
-			case KIRI -> l.kanan(t, cx - r - 3.0F, cy - 3.0F, l.gaya.teks, 0.75F);
+			case KANAN -> Brush.text(l.g, l.font, t, cx + r + 3.0F, cy - 4.0F, l.gaya.teks, 1.0F, false);
+			case KIRI -> l.kanan(t, cx - r - 3.0F, cy - 4.0F, l.gaya.teks, 1.0F);
 			default -> {
 			}
 		}
-		if (teks != DALAM && l.di(Math.round(cx - r), Math.round(cy - r), Math.round(cx + r), Math.round(cy + r))) {
+		if ((teks != DALAM || l.font.width(t) > r * 1.8F) && l.di(Math.round(cx - r), Math.round(cy - r), Math.round(cx + r), Math.round(cy + r))) {
 			l.tip(TeksTempat.k("waktu.sisa", t));
 		}
 		return left;

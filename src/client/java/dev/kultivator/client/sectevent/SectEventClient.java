@@ -22,8 +22,8 @@ import java.util.List;
 /**
  * Client side of module B (DESIGN 20.4.2): keeps the newest {@code "sectevent"} part of the hall details (from a full
  * {@code HallInfo} or from the module's own {@link SectEventPayload} after an action; the higher {@code rev} wins), the
- * decoded storehouse, and drives the continuous event effects ({@link SectEventFx#tick}). Called once from
- * {@code KultivatorClient}.
+ * decoded storehouse, drives the continuous event effects ({@link SectEventFx#tick}) and registers the page Sekte ›
+ * Kegiatan ({@link KegiatanPage}). Called once from {@code KultivatorClient}.
  */
 public final class SectEventClient {
 
@@ -48,6 +48,8 @@ public final class SectEventClient {
 			storeVersion = -1L;
 			SectEventFx.clear();
 		});
+		// Sekte › Kegiatan (DESIGN 43.5): Tugas, Misi, Papan, Arena in the Gulungan Utama
+		KegiatanPage.daftar();
 	}
 
 	/** The newest sect-activity details (never null; empty before the hall was opened). */

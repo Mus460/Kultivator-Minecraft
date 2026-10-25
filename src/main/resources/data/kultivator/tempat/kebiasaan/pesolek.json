@@ -1,0 +1,42 @@
+{
+  "_catatan": "Kebiasaan #14 pesolek (DESIGN 42.4.12)",
+  "nomor": 14,
+  "siapa": {
+    "umur": [
+      16,
+      35
+    ],
+    "tahap": [
+      "dewasa"
+    ]
+  },
+  "sesi": [
+    {
+      "jam": [
+        10,
+        12
+      ],
+      "peluang": 0.8,
+      "tujuan": [
+        "@depan_lapak:11",
+        "lapak",
+        "obrol"
+      ],
+      "klip": "kota42:bercermin",
+      "kanan": "kota42:cermin_tangan",
+      "ganti": [
+        {
+          "klip": "kota42:bercermin"
+        },
+        {
+          "klip": "lihat_barang",
+          "kanan": ""
+        },
+        {
+          "klip": "kota42:bercermin"
+        }
+      ],
+      "ganti_menit": 6
+    }
+  ]
+}

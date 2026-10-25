@@ -11,6 +11,8 @@ import dev.kultivator.dunia.kota.Kota;
 import dev.kultivator.dunia.kota.KultivatorNpc;
 import dev.kultivator.dunia.kota.NilaiBatu;
 import dev.kultivator.dunia.kota.NpcRole;
+import dev.kultivator.dunia.kota42.api.Kategori;
+import dev.kultivator.dunia.kota42.ekonomi.HargaKota;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import dev.kultivator.dunia.tempat.ui.TempatLayar;
 import dev.kultivator.sosok.GerakId;
@@ -170,7 +172,7 @@ public final class Hidangan {
 			row.putString(LembarKunci.ID, jenis.id);
 			ItemStack stack = new ItemStack(jenis.item());
 			LembarKunci.barang(row, stack, player.registryAccess());
-			long harga = Barang.harga(jenis.harga, 1.0D);
+			long harga = harga(player, jenis);
 			row.putLong(LembarKunci.HARGA, harga);
 			LembarKunci.teks(row, LembarKunci.Layanan.EFEK, Component.translatable("kultivator.tempat_ekonomi.hidangan.efek." + jenis.id));
 			row.putString(LembarKunci.KEADAAN, toko ? Lembar.keadaan(player, harga, false) : LembarKunci.K_TUTUP);
@@ -216,13 +218,19 @@ public final class Hidangan {
 		beli(player, npc, LembarKunci.arg(parts, 1));
 	}
 
+	/** A dish's price here: base x one {@code HargaKota.faktor} (wine MEWAH, the rest PANGAN; 42.6.3) of the place. */
+	static long harga(ServerPlayer player, Jenis jenis) {
+		Kategori kategori = jenis == Jenis.ARAK ? Kategori.MEWAH : Kategori.PANGAN;
+		return Barang.harga(jenis.harga, HargaKota.faktor(player, null, kategori));
+	}
+
 	/** Buys one dish (rumah makan and inn). */
 	static void beli(ServerPlayer player, @Nullable KultivatorNpc npc, String id) {
 		Jenis jenis = Jenis.byId(id);
 		if (jenis == null || !EkonomiConfig.get().toko) {
 			return;
 		}
-		long harga = Barang.harga(jenis.harga, 1.0D);
+		long harga = harga(player, jenis);
 		if (!NilaiBatu.pay(player, harga)) {
 			Lembar.kurangUang(player, harga);
 			return;

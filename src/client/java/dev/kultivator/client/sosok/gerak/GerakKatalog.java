@@ -8,8 +8,8 @@ import java.util.Map;
 
 /**
  * The clip catalog of the shared Gerak system (DESIGN 40.5.10-40.5.13, contract C40.G1). Ids 1-176 are DESIGN 38 and 40
- * ({@link KatalogTempat}, {@link KatalogSosok}); 200-399 are registered by other modules from their client init with
- * {@link #daftar} (39E 200-249, 39F 250-299, later DESIGN 38 300-399). The disciple-activity map (autonomous activities
+ * ({@link KatalogTempat}, {@link KatalogSosok}); 200-469 are registered by other modules from their client init with
+ * {@link #daftar} (39E 200-249, 39F 250-299, later DESIGN 38 and DESIGN 41 300-349, DESIGN 42 350-469). The disciple-activity map (autonomous activities
  * 40-56 of DESIGN 39, defaults for 57-60) tells {@code DutyPoses} which clip shows an activity; owners may remap with
  * {@link #petakanAktivitas}. Client effect hooks for {@code KAIT} events are registered with {@link #daftarKait}.
  * <p>
@@ -19,7 +19,7 @@ import java.util.Map;
  */
 public final class GerakKatalog {
 
-	private static final int UKURAN = GerakId.CADANGAN_FIRST;
+	private static final int UKURAN = GerakId.KOTA_HIDUP_LAST + 1;
 	private static final int AKTIVITAS_MAKS = 128;
 
 	private static final Klip[] KLIP = new Klip[UKURAN];
@@ -54,13 +54,13 @@ public final class GerakKatalog {
 	}
 
 	/**
-	 * Registers a clip of another module (ids 200-399 only: 39E 200-249, 39F 250-299, DESIGN 38 300-399). Registering an
-	 * id twice replaces it.
+	 * Registers a clip of another module (ids 200-469 only: 39E 200-249, 39F 250-299, DESIGN 38/41 300-349, DESIGN 42
+	 * 350-469). Registering an id twice replaces it.
 	 */
 	public static void daftar(Klip klip) {
 		int id = klip.id();
-		if (id < GerakId.MANDIRI_FIRST || id > GerakId.TEMPAT_TAMBAHAN_LAST) {
-			throw new IllegalArgumentException("Gerak clip id outside 200-399: " + id);
+		if (id < GerakId.MANDIRI_FIRST || id > GerakId.KOTA_HIDUP_LAST) {
+			throw new IllegalArgumentException("Gerak clip id outside 200-469: " + id);
 		}
 		pastikan();
 		simpan(klip);

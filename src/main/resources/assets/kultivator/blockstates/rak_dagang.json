@@ -1,0 +1,19 @@
+{
+ "variants": {
+  "facing=north": {
+   "model": "kultivator:block/kota42/rak_dagang"
+  },
+  "facing=east": {
+   "model": "kultivator:block/kota42/rak_dagang",
+   "y": 90
+  },
+  "facing=south": {
+   "model": "kultivator:block/kota42/rak_dagang",
+   "y": 180
+  },
+  "facing=west": {
+   "model": "kultivator:block/kota42/rak_dagang",
+   "y": 270
+  }
+ }
+}

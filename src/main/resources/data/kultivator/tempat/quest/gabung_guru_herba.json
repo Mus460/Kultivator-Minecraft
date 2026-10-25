@@ -1,0 +1,41 @@
+{
+  "pemberi": "peran:tetua_sekte",
+  "tempat": "gabung_sekte",
+  "tahap": [
+    {
+      "id": "pesan",
+      "tujuan": [
+        "pergi gua/urat_roh"
+      ],
+      "akibat_masuk": [
+        "gabung.cerita guru_herba pesan shifu"
+      ]
+    },
+    {
+      "id": "jaga",
+      "tujuan": [
+        "kalahkan elit"
+      ],
+      "akibat_masuk": [
+        "gabung.cerita guru_herba jaga"
+      ]
+    },
+    {
+      "id": "pulang",
+      "tujuan": [
+        "gabung temu:shifu"
+      ],
+      "akibat_masuk": [
+        "gabung.cerita guru_herba pulang"
+      ],
+      "akibat": [
+        "gabung.cerita guru_herba selesai shifu",
+        "gabung.ikatan 15",
+        "gabung.sikap shifu 10",
+        "gabung.pk 60"
+      ],
+      "ke": "selesai",
+      "arah": "sekte/kompleks"
+    }
+  ]
+}

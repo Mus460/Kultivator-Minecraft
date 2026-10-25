@@ -160,8 +160,11 @@ public final class Validator {
 	/** The path of a structure id that matters to players ({@link #STRUCTURES}), or null. */
 	private static String relevant(Identifier id) {
 		String path = id == null ? "" : id.getPath();
+		// Other mods' ruins, temples and towers ("structory:desert_ruin") are cleared like terrain (Classifier.worldgen);
+		// only their villages keep a site away. Vanilla and this mod's own ids keep the full list.
+		boolean foreign = id != null && !"minecraft".equals(id.getNamespace()) && !dev.kultivator.Kultivator.MOD_ID.equals(id.getNamespace());
 		for (String each : STRUCTURES) {
-			if (path.contains(each)) {
+			if (path.contains(each) && (!foreign || "village".equals(each))) {
 				return path;
 			}
 		}

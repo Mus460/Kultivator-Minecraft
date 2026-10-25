@@ -122,6 +122,8 @@ public final class TutupDiri {
 			return;
 		}
 		long start = tutup.getLongOr("mulai", now);
+		// the planner block outlasts the whole days of the retreat: ending after "sampai" is a finished retreat, not a cut
+		boolean dipotong = batal && tutup.getLongOr("sampai", 0L) > now + 20L;
 		CompoundTag live = MandiriApi.bagianTulis(data).getCompoundOrEmpty(MandiriIds.K_TUTUP);
 		live.putBoolean("selesai", true);
 		if (tutup.getLongOr("sampai", 0L) > now) {
@@ -140,7 +142,7 @@ public final class TutupDiri {
 			Fx.ring(level, at.add(0.0D, 0.1D, 0.0D), color, 2.6F);
 			level.playSound(null, at.x, at.y + 1.0D, at.z, SoundEvents.FIRECHARGE_USE, SoundSource.NEUTRAL, 0.5F, 1.4F);
 		}
-		if (batal) {
+		if (dipotong) {
 			KabarTumbuh.catat(entity, "tutup", "tutup.terganggu", EntriHarian.Suasana.KESAL, false, "n:" + days);
 			return;
 		}

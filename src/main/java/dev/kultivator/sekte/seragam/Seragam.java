@@ -204,6 +204,9 @@ public final class Seragam {
 			case NO_PK -> Component.translatable("kultivator.sekte.seragam.no_pk", SeragamConfig.get().ubahPK).withStyle(ChatFormatting.RED);
 		};
 		player.sendSystemMessage(message);
+		if (result == Result.SAVED_FREE || result == Result.SAVED_PAID) {
+			openDesigner(player); // the open designer refreshes its free-left/cost/pool line (SeragamClient.open)
+		}
 	}
 
 	/**

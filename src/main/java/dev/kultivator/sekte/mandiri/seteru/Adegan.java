@@ -115,6 +115,13 @@ final class Adegan {
 		return level != null ? level : server.overworld();
 	}
 
+	/** True when the feud's real disciple is loaded and busy (breakthrough, deviation, the master's order...): no live fight. */
+	static boolean asliSibuk(Perseteruan f) {
+		UUID soul = f.jiwaUtama();
+		DiscipleEntity real = soul == null ? null : Antrean.loaded(f.owner, soul);
+		return real != null && dev.kultivator.util.SibukMurid.busy(real);
+	}
+
 	/** True when a player stands within {@link #JARAK_LIHAT} of {@code pos}. */
 	static boolean terlihat(ServerLevel level, BlockPos pos) {
 		return level.getNearestPlayer(pos.getX() + 0.5D, pos.getY(), pos.getZ() + 0.5D, JARAK_LIHAT, false) != null;

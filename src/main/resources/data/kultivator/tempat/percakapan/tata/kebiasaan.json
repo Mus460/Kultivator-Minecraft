@@ -1,0 +1,982 @@
+{
+  "_dibuat": "tools/gen_kota_hidup_cakap.py dari tools/kota_cakap_sumber (jangan disunting tangan)",
+  "kelompok": "kebiasaan",
+  "isi": [
+    {
+      "aturan": "kebiasaan.pemabuk",
+      "niat": "CERITA",
+      "topik": "kebiasaan",
+      "syarat": {
+        "kebiasaan": [
+          "pemabuk"
+        ],
+        "jam": [
+          "malam",
+          "larut"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "kebiasaan.pemabuk.0",
+          "slot": [],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "kebiasaan.pemabuk.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "kebiasaan.pemabuk.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "p"
+          ]
+        }
+      ],
+      "slot": {},
+      "gestur": "minum_arak",
+      "seru": "mabuk"
+    },
+    {
+      "aturan": "kebiasaan.kakek_catur",
+      "niat": "PAMER",
+      "topik": "kebiasaan",
+      "syarat": {
+        "kebiasaan": [
+          "kakek_catur"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "kebiasaan.kakek_catur.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "kebiasaan.kakek_catur.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "kebiasaan.kakek_catur.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "catur"
+    },
+    {
+      "aturan": "kebiasaan.gosip_sumur",
+      "niat": "CERITA",
+      "topik": "kebiasaan",
+      "syarat": {
+        "kebiasaan": [
+          "gosip_sumur"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "kebiasaan.gosip_sumur.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "kebiasaan.gosip_sumur.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "kebiasaan.gosip_sumur.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "bisik"
+    },
+    {
+      "aturan": "kebiasaan.burung_sangkar",
+      "niat": "PAMER",
+      "topik": "kebiasaan",
+      "syarat": {
+        "kebiasaan": [
+          "burung_sangkar"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "kebiasaan.burung_sangkar.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "kebiasaan.burung_sangkar.1",
+          "slot": [],
+          "bobot": 2
+        },
+        {
+          "kunci": "kebiasaan.burung_sangkar.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "p"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "gantung_sangkar"
+    },
+    {
+      "aturan": "kebiasaan.tai_chi",
+      "niat": "CERITA",
+      "topik": "kebiasaan",
+      "syarat": {
+        "kebiasaan": [
+          "tai_chi"
+        ],
+        "jam": [
+          "subuh",
+          "pagi"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "kebiasaan.tai_chi.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "kebiasaan.tai_chi.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "gunung"
+          ]
+        },
+        {
+          "kunci": "kebiasaan.tai_chi.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "tai_chi_pagi"
+    },
+    {
+      "aturan": "kebiasaan.pemancing",
+      "niat": "CERITA",
+      "topik": "kebiasaan",
+      "syarat": {
+        "kebiasaan": [
+          "pemancing"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "kebiasaan.pemancing.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "kebiasaan.pemancing.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "air"
+          ]
+        },
+        {
+          "kunci": "kebiasaan.pemancing.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "memancing"
+    },
+    {
+      "aturan": "kebiasaan.adu_jangkrik",
+      "niat": "PAMER",
+      "topik": "kebiasaan",
+      "syarat": {
+        "kebiasaan": [
+          "adu_jangkrik",
+          "penjudi"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "kebiasaan.adu_jangkrik.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "kebiasaan.adu_jangkrik.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "kebiasaan.adu_jangkrik.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "p"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "lempar_dadu"
+    },
+    {
+      "aturan": "kebiasaan.penyair",
+      "niat": "CERITA",
+      "topik": "kebiasaan",
+      "syarat": {
+        "kebiasaan": [
+          "penyair",
+          "penggemar_opera"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "kebiasaan.penyair.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "kebiasaan.penyair.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "air"
+          ]
+        },
+        {
+          "kunci": "kebiasaan.penyair.2",
+          "slot": [
+            "$musim"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        },
+        "$musim": {
+          "tipe": "musim",
+          "dari": "konteks.musim"
+        }
+      },
+      "gestur": "deklamasi"
+    },
+    {
+      "aturan": "kebiasaan.pemain_erhu",
+      "niat": "CERITA",
+      "topik": "kebiasaan",
+      "syarat": {
+        "kebiasaan": [
+          "pemain_erhu"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "kebiasaan.pemain_erhu.0",
+          "slot": [],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "kebiasaan.pemain_erhu.1",
+          "slot": [],
+          "bobot": 2
+        },
+        {
+          "kunci": "kebiasaan.pemain_erhu.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {},
+      "gestur": "main_erhu"
+    },
+    {
+      "aturan": "kebiasaan.pendoa",
+      "niat": "CERITA",
+      "topik": "kebiasaan",
+      "syarat": {
+        "kebiasaan": [
+          "pendoa_kuil",
+          "takhayul"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "kebiasaan.pendoa.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "kebiasaan.pendoa.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "kebiasaan.pendoa.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "sujud_dupa"
+    },
+    {
+      "aturan": "kebiasaan.layang",
+      "niat": "CERITA",
+      "topik": "kebiasaan",
+      "syarat": {
+        "kebiasaan": [
+          "layang_layang",
+          "pencerita_anak"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "kebiasaan.layang.0",
+          "slot": [],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "kebiasaan.layang.1",
+          "slot": [],
+          "bobot": 2
+        },
+        {
+          "kunci": "kebiasaan.layang.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {},
+      "gestur": "main_layangan"
+    },
+    {
+      "aturan": "kebiasaan.penyulam",
+      "niat": "CERITA",
+      "topik": "kebiasaan",
+      "syarat": {
+        "kebiasaan": [
+          "penyulam",
+          "tari_kipas"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "kebiasaan.penyulam.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "kebiasaan.penyulam.1",
+          "slot": [],
+          "bobot": 2
+        },
+        {
+          "kunci": "kebiasaan.penyulam.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "menyulam"
+    },
+    {
+      "aturan": "kebiasaan.tidur_siang",
+      "niat": "CERITA",
+      "topik": "kebiasaan",
+      "syarat": {
+        "kebiasaan": [
+          "tidur_siang",
+          "pemalas"
+        ],
+        "jam": [
+          "siang"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "kebiasaan.tidur_siang.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "kebiasaan.tidur_siang.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "kebiasaan.tidur_siang.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "menguap_peregangan"
+    },
+    {
+      "aturan": "kebiasaan.pesolek",
+      "niat": "PAMER",
+      "topik": "kebiasaan",
+      "syarat": {
+        "kebiasaan": [
+          "pesolek"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "kebiasaan.pesolek.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "kebiasaan.pesolek.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "l"
+          ]
+        },
+        {
+          "kunci": "kebiasaan.pesolek.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "bercermin"
+    },
+    {
+      "aturan": "kebiasaan.pelit",
+      "niat": "CERITA",
+      "topik": "kebiasaan",
+      "syarat": {
+        "kebiasaan": [
+          "pelit",
+          "penabung"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "kebiasaan.pelit.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "kebiasaan.pelit.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "kebiasaan.pelit.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "hitung_koin"
+    },
+    {
+      "aturan": "kebiasaan.dermawan",
+      "niat": "CERITA",
+      "topik": "kebiasaan",
+      "syarat": {
+        "kebiasaan": [
+          "dermawan"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "kebiasaan.dermawan.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "kebiasaan.dermawan.1",
+          "slot": [],
+          "bobot": 2
+        },
+        {
+          "kunci": "kebiasaan.dermawan.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "beri_koin"
+    },
+    {
+      "aturan": "kebiasaan.pemarah",
+      "niat": "CERITA",
+      "topik": "kebiasaan",
+      "syarat": {
+        "kebiasaan": [
+          "pemarah"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "kebiasaan.pemarah.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "kebiasaan.pemarah.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "kebiasaan.pemarah.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "marah_hentak",
+      "seru": "cih"
+    },
+    {
+      "aturan": "kebiasaan.kutu_buku",
+      "niat": "CERITA",
+      "topik": "kebiasaan",
+      "syarat": {
+        "kebiasaan": [
+          "kutu_buku"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "kebiasaan.kutu_buku.0",
+          "slot": [],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "kebiasaan.kutu_buku.1",
+          "slot": [],
+          "bobot": 2
+        },
+        {
+          "kunci": "kebiasaan.kutu_buku.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "jalan_baca"
+    },
+    {
+      "aturan": "kebiasaan.kucing",
+      "niat": "CERITA",
+      "topik": "kebiasaan",
+      "syarat": {
+        "kebiasaan": [
+          "teman_kucing"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "kebiasaan.kucing.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "kebiasaan.kucing.1",
+          "slot": [],
+          "bobot": 2
+        },
+        {
+          "kunci": "kebiasaan.kucing.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "beri_makan_kucing"
+    },
+    {
+      "aturan": "kebiasaan.penyapu",
+      "niat": "CERITA",
+      "topik": "kebiasaan",
+      "syarat": {
+        "kebiasaan": [
+          "penyapu_jalan",
+          "pekerja_keras"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "kebiasaan.penyapu.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "kebiasaan.penyapu.1",
+          "slot": [
+            "$musim"
+          ],
+          "bobot": 2
+        },
+        {
+          "kunci": "kebiasaan.penyapu.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        },
+        "$musim": {
+          "tipe": "musim",
+          "dari": "konteks.musim"
+        }
+      },
+      "gestur": "sapu"
+    },
+    {
+      "aturan": "kebiasaan.pelukis_gula",
+      "niat": "CERITA",
+      "topik": "kebiasaan",
+      "syarat": {
+        "kebiasaan": [
+          "pelukis_gula",
+          "pecinta_teh"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "kebiasaan.pelukis_gula.0",
+          "slot": [],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "kebiasaan.pelukis_gula.1",
+          "slot": [],
+          "bobot": 2
+        },
+        {
+          "kunci": "kebiasaan.pelukis_gula.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {},
+      "gestur": "lukis_gula"
+    },
+    {
+      "aturan": "kebiasaan.pengintip",
+      "niat": "CERITA",
+      "topik": "kebiasaan",
+      "syarat": {
+        "kebiasaan": [
+          "pengintip"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "kebiasaan.pengintip.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "kebiasaan.pengintip.1",
+          "slot": [],
+          "bobot": 2
+        },
+        {
+          "kunci": "kebiasaan.pengintip.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "intip"
+    },
+    {
+      "aturan": "kebiasaan.pemuja_kultivator",
+      "niat": "CERITA",
+      "topik": "kebiasaan",
+      "syarat": {
+        "kebiasaan": [
+          "pemuja_kultivator"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "kebiasaan.pemuja_kultivator.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "kebiasaan.pemuja_kultivator.1",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "kebiasaan.pemuja_kultivator.2",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "kagum",
+      "seru": "oh"
+    }
+  ]
+}

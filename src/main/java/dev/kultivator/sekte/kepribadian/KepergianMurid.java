@@ -6,6 +6,7 @@ import dev.kultivator.disciple.DiscipleEntity;
 import dev.kultivator.disciple.Disciples;
 import dev.kultivator.disciple.DuelRules;
 import dev.kultivator.duel.DuelIds;
+import dev.kultivator.duel.api.DuelEndListeners;
 import dev.kultivator.duel.session.DuelChallenges;
 import dev.kultivator.duel.session.DuelRuleSet;
 import dev.kultivator.duel.session.DuelSession;
@@ -40,6 +41,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
@@ -364,6 +366,9 @@ public final class KepergianMurid {
 			DiscipleEntity e = body(p);
 			if (e == null || master == null) {
 				// Unloaded or the master left: start over on its next tick20 (the counter is kept in its data).
+				if (e != null) {
+					resetWalk(e);
+				}
 				it.remove();
 				continue;
 			}
@@ -441,11 +446,7 @@ public final class KepergianMurid {
 	private static void tickDuel(MinecraftServer server, Pending p, DiscipleEntity e, ServerPlayer master, List<Runnable> after) {
 		DuelSession session = DuelSessions.byEntity(e);
 		if (session != null) {
-			if (session.decided() && !p.decided) {
-				p.decided = true;
-				// No public winner accessor: the duel stops the loser at its 10% line, so the higher health share won.
-				p.masterWon = share(master) >= share(e);
-			}
+			// The result comes from onDuelEnd (surrender, ring-out and timeout decide it too, not the health share).
 			return;
 		}
 		if (p.decided) {
@@ -535,9 +536,23 @@ public final class KepergianMurid {
 		}
 	}
 
-	private static float share(net.minecraft.world.entity.LivingEntity entity) {
-		float max = entity.getMaxHealth();
-		return max <= 0.0F ? 0.0F : entity.getHealth() / max;
+	/** Registered once from {@code Kepribadian.init}. */
+	static void init() {
+		DuelEndListeners.add(KepergianMurid::onDuelEnd);
+	}
+
+	/** The rebel's honour duel ended: a draw or a cancellation (null winner) leaves it undecided, so tickDuel asks again. */
+	private static void onDuelEnd(DuelSession session, @Nullable LivingEntity winner, @Nullable LivingEntity loser) {
+		if (winner == null) {
+			return;
+		}
+		for (Pending p : PENDING.values()) {
+			DiscipleEntity e = p.fase == Fase.DUEL && !p.decided ? body(p) : null;
+			if (e != null && session.involves(e)) {
+				p.decided = true;
+				p.masterWon = winner.getUUID().equals(p.owner);
+			}
+		}
 	}
 
 	/** The master won the rebel's duel: the disciple bows its head and stays (contentment 40, a memory "Tunduk"). */
@@ -583,6 +598,7 @@ public final class KepergianMurid {
 		String why = blocker(e, master, how == Kepergian.DIUSIR);
 		if (why != null) {
 			Msg.chat(master, Component.translatable(why, e.getDisplayName()).withStyle(ChatFormatting.YELLOW));
+			resetWalk(e); // out of the farewell bow, it stays after all
 			return false;
 		}
 		UUID owner = master.getUUID();

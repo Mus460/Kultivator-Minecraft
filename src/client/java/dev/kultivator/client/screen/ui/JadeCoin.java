@@ -10,8 +10,9 @@ import java.util.function.Supplier;
 
 /**
  * A round jade coin with a square hole, used as an on/off toggle: bright green jade with a gold rim when on, dull
- * grey-green when off. The label sits to its right. While {@code asking} (waiting for a confirming click) the rim
- * pulses red.
+ * grey-green when off. The label sits to its right (1.0, cut with "…"). The single toggle of the kit (DESIGN 43.7);
+ * confirming a switch is {@link SegelKonfirmasi}'s job, so {@link #askingWhen} is only kept until the old pages that
+ * call it have moved (43-M1), then P1 removes it.
  */
 public class JadeCoin extends Widget {
 
@@ -21,11 +22,13 @@ public class JadeCoin extends Widget {
 	private final Eased lit = new Eased(10.0F);
 
 	public JadeCoin(int x, int y, int w, int h, Supplier<Component> label, BooleanSupplier on) {
-		super(x, y, w, h);
+		super(x, y, Math.max(TalismanButton.MIN_W, w), Math.max(TalismanButton.MIN_H, h));
 		this.label = label;
 		this.on = on;
 	}
 
+	/** @deprecated DESIGN 43.7: confirm with {@link SegelKonfirmasi} instead; removed by P1. */
+	@Deprecated
 	public JadeCoin askingWhen(BooleanSupplier asking) {
 		this.asking = asking;
 		return this;
@@ -64,8 +67,7 @@ public class JadeCoin extends Widget {
 		Component text = label.get();
 		float tx = x + h + 4.0F;
 		float room = x + w - tx;
-		float scale = Brush.fitScale(font, text, room, 1.0F, 0.6F);
-		Brush.fit(g, font, text, tx, y + (h - 8.0F * scale) / 2.0F, room, isEnabled() ? Palette.INK : Palette.INK_FAINT, 1.0F, 0.6F, false);
+		Brush.fit(g, font, text, tx, y + (h - 8.0F) / 2.0F, room, isEnabled() ? Palette.INK : Palette.INK_FAINT, 1.0F, 1.0F, false);
 	}
 
 	@Override

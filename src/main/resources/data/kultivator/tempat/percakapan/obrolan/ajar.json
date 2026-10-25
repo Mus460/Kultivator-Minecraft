@@ -1,0 +1,95 @@
+{
+  "_catatan": "AJAR 42.5A.9: nasihat/peragaan > pertanyaan > pujian/teguran. A = guru (starter). 42K-C.",
+  "jenis": "ajar",
+  "syarat": {},
+  "mulai": {
+    "dasar": 0.3,
+    "X": 300,
+    "hubungan": 400
+  },
+  "jeda_tick": [
+    50,
+    90
+  ],
+  "langkah": [
+    {
+      "id": "sapa",
+      "oleh": "B",
+      "niat": "SAPA",
+      "lanjut": [
+        "nasihat",
+        "peraga"
+      ]
+    },
+    {
+      "id": "nasihat",
+      "oleh": "A",
+      "niat": "NASIHAT",
+      "lanjut": [
+        "tanya",
+        "peraga"
+      ]
+    },
+    {
+      "id": "peraga",
+      "oleh": "A",
+      "niat": "PERAGA",
+      "lanjut": [
+        "tanya",
+        "puji",
+        "tegur"
+      ]
+    },
+    {
+      "id": "tanya",
+      "oleh": "B",
+      "niat": "TANYA_MURID",
+      "lanjut": [
+        "nasihat_lagi",
+        "puji",
+        "tegur"
+      ]
+    },
+    {
+      "id": "nasihat_lagi",
+      "oleh": "A",
+      "niat": "NASIHAT",
+      "syarat": {
+        "ronde_maks": 1
+      },
+      "lanjut": [
+        "puji",
+        "tegur"
+      ]
+    },
+    {
+      "id": "puji",
+      "oleh": "A",
+      "niat": "PUJI_MURID",
+      "lanjut": [
+        "terima"
+      ]
+    },
+    {
+      "id": "tegur",
+      "oleh": "A",
+      "niat": "TEGUR",
+      "lanjut": [
+        "maaf"
+      ]
+    },
+    {
+      "id": "terima",
+      "oleh": "B",
+      "niat": "TERIMA_KASIH"
+    },
+    {
+      "id": "maaf",
+      "oleh": "B",
+      "niat": "MAAF"
+    }
+  ],
+  "efek": {
+    "ahli": 1
+  }
+}

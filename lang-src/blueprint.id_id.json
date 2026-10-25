@@ -156,6 +156,7 @@
   "kultivator.blueprint.error.upgrade_smaller": "Pilih templat yang lebih besar untuk dinaikkan.",
   "kultivator.blueprint.error.no_test_site": "Tetapkan templat uji dulu (uji sekte templat).",
   "kultivator.blueprint.error.restoring": "Tapak uji yang lama masih dipulihkan; konfirmasikan lagi sebentar lagi.",
+  "kultivator.blueprint.error.busy": "Sekte sedang dibongkar atau dipulihkan; tunggu sampai selesai.",
 
   "kultivator.blueprint.repair.none": "Pemeriksaan selesai: setiap bagian yang selesai masih utuh.",
   "kultivator.blueprint.repair.found": "Pemeriksaan selesai: %s blok yang hilang sedang diperbaiki (dengan biaya biasa).",

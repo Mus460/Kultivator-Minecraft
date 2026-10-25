@@ -756,6 +756,11 @@ public final class BuildEngine implements EngineApi {
 			site.cursor = Math.max(0, Math.min(site.cursor, run.size()));
 			site.deferred.removeIf(i -> i < 0 || i >= run.size());
 			site.blockedOps.removeIf(i -> i < 0 || i >= run.size());
+			// The legacy queue is not saved: rebuilt so an upgrade's old cells still come down after a restart.
+			if (site.openMode != Site.MODE_REPAIR && server != null && CellIndex.get(server).hasLegacy(site.owner)) {
+				site.legacyQueue = legacyColumns(site, run);
+				site.legacyCursor = 0;
+			}
 			return;
 		}
 		if (site.reopened) {
@@ -763,8 +768,18 @@ public final class BuildEngine implements EngineApi {
 			Site.Parked parked = site.parked.remove(id);
 			site.waiting.remove(id);
 			site.suspended.remove(id);
-			resumeParked(level, site, id, emission, parked == null ? new Site.Parked() : parked);
-			return;
+			if (site.finished(id)) {
+				// Skipped or finished while its layout was emitting: nothing to resume.
+				if (parked != null) {
+					release(site, parked.held);
+				}
+				return;
+			}
+			if (parked != null) {
+				resumeParked(level, site, id, emission, parked);
+				return;
+			}
+			// No parked share left: funded below like a fresh component, never opened with nothing reserved.
 		}
 		Bill bill = Costs.bill(emission);
 		long[] dig = new long[Bahan.COUNT];
@@ -1194,7 +1209,9 @@ public final class BuildEngine implements EngineApi {
 						again.add(i);
 					}
 				}
-				case BLOCKED, UNLOADED -> site.blockedOps.add(i);
+				case BLOCKED -> site.blockedOps.add(i);
+				// An unloaded chunk at the footprint's edge is not an obstacle: try again when it is loaded.
+				case UNLOADED -> again.add(i);
 				case SKIPPED -> {
 					if (site.paid() && !target.isAir()) {
 						Bill.Builder refund = Bill.builder();
@@ -1499,7 +1516,9 @@ public final class BuildEngine implements EngineApi {
 			}
 			BlockPos pos = plan.world(emission.pos[i]);
 			if (!level.isLoaded(pos)) {
-				continue;
+				// Wait for the chunk: skipping would mark the component removed with this block unrefunded.
+				site.cursor = i;
+				break;
 			}
 			if (guard == null) {
 				guard = EntityGuard.gather(level, new AABB(pos).inflate(8.0D));
@@ -2081,6 +2100,7 @@ public final class BuildEngine implements EngineApi {
 		if (componentId.equals(site.openId)) {
 			closeOpen(site, true);
 		}
+		dropPending(site, componentId);
 		Site.Parked parked = site.parked.remove(componentId);
 		if (parked != null) {
 			release(site, parked.held);
@@ -2103,6 +2123,15 @@ public final class BuildEngine implements EngineApi {
 		return true;
 	}
 
+	/** A recheck's layout still emitting for {@code componentId} is dropped so it never reopens. */
+	private static void dropPending(Site site, String componentId) {
+		if (componentId.equals(site.pendingId)) {
+			site.pending = null;
+			site.pendingId = null;
+			site.reopened = false;
+		}
+	}
+
 	/** True when the owner may skip the component now (blocked, or waiting for materials; anything on a test site). */
 	static boolean skippable(Site site, String componentId) {
 		if (site.test || site.showcase) {
@@ -2118,6 +2147,7 @@ public final class BuildEngine implements EngineApi {
 			return false;
 		}
 		site.waiting.remove(componentId);
+		dropPending(site, componentId);
 		Site.Parked parked = site.parked.remove(componentId);
 		if (parked != null) {
 			// The blocked cells are never placed: their reserved share goes back.
@@ -2340,6 +2370,10 @@ public final class BuildEngine implements EngineApi {
 		Site site = sites.get(owner);
 		if (site == null) {
 			return err("no_site");
+		}
+		if (site.dismantling || site.restoring) {
+			// Upgrading mid-dismantle would wipe the record of the blocks still standing.
+			return err("busy");
 		}
 		Previews.Job job = previews.job(ticket);
 		if (job == null || job.compiled == null || job.data == null) {

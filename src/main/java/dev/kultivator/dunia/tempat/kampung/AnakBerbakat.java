@@ -5,6 +5,9 @@ import dev.kultivator.desa.Tribute;
 import dev.kultivator.disciple.DiscipleData;
 import dev.kultivator.dunia.DuniaAnchorEntity;
 import dev.kultivator.dunia.kota.Kota;
+import dev.kultivator.dunia.kota42.api.WargaApi;
+import dev.kultivator.dunia.kota42.sekte.KotaSekte;
+import dev.kultivator.dunia.kota42.warga.Warga;
 import dev.kultivator.sect.hall.Halls;
 import dev.kultivator.util.Msg;
 import net.minecraft.ChatFormatting;
@@ -13,6 +16,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -60,6 +64,9 @@ final class AnakBerbakat {
 		if (Halls.hallOf(owner.getUUID()) == null) {
 			return false;
 		}
+		if (anakWarga(level, owner, d, day)) {
+			return true;
+		}
 		RandomSource random = level.getRandom();
 		DiscipleData child = DiscipleData.fresh(random);
 		if (child.rootGrade().ordinal() < RootGrade.MID.ordinal()) {
@@ -74,6 +81,32 @@ final class AnakBerbakat {
 		Msg.chat(owner, Component.translatable("kultivator.kampung.anak.akar", child.rootGrade().displayName().copy()
 				.withStyle(s -> s.withColor(child.rootGrade().color()))).withStyle(ChatFormatting.GRAY));
 		return true;
+	}
+
+	/**
+	 * 42.4.9: when the village's residents are stored (42A), the head brings a real gifted child of the village (MID root or
+	 * better, 8-15, the best root first) through {@code WargaApi.jadikanCalon}, so the family, its name and its later visits
+	 * stay true. False when none may come (none gifted enough, or every such family still has to agree).
+	 */
+	private static boolean anakWarga(ServerLevel level, ServerPlayer owner, KampungData.Desa d, long day) {
+		List<Warga> calon = new ArrayList<>(WargaApi.berbakat(d.situs));
+		calon.removeIf(w -> w.akar < 3);
+		calon.sort((a, b) -> a.akar != b.akar ? Integer.compare(b.akar, a.akar) : Integer.compare(a.id, b.id));
+		for (Warga w : calon) {
+			Halls.CandidateSpec spec = KotaSekte.tandai(WargaApi.jadikanCalon(w, owner.getUUID(), "kampung:" + d.situs), w);
+			if (spec == null) {
+				continue;
+			}
+			Halls.addCandidates(owner.getUUID(), List.of(spec));
+			KampungData.get(level.getServer()).hariAnak(d, day);
+			Component name = KampungNames.nama(d.ukuran, d.situs);
+			Msg.chat(owner, Component.translatable("kultivator.kampung.anak.datang." + Math.floorMod(w.id, CERITA), name).withStyle(ChatFormatting.GOLD));
+			Msg.chat(owner, Component.translatable("kultivator.kota42.sekte.kampung_anak", WargaApi.nama(w), WargaApi.umur(w),
+					spec.data().rootGrade().displayName().copy().withStyle(s -> s.withColor(spec.data().rootGrade().color())))
+					.withStyle(ChatFormatting.GRAY));
+			return true;
+		}
+		return false;
 	}
 
 	private AnakBerbakat() {

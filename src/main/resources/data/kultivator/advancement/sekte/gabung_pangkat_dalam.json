@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:sekte/gabung_pangkat_luar",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "kultivator.gabung.adv.pangkat_dalam.desc"
+    },
+    "icon": {
+      "id": "minecraft:gold_ingot"
+    },
+    "title": {
+      "translate": "kultivator.gabung.adv.pangkat_dalam.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

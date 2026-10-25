@@ -196,6 +196,7 @@ public final class GiliranTambang {
 		entry.putString("soul", disciple.soulId().toString());
 		slots.put(String.valueOf(slot), entry);
 		Kebun.kerja(disciple.data()).putString("job", "tambang");
+		Kebun.kerja(disciple.data()).remove("mandiri"); // a job the master gives is no longer self-chosen (KebunMandiri re-marks its own)
 		BlockPos spot = Kebun.minerSpot(aula, slot);
 		disciple.setActivity(SekteIds.ACT_MINE, spot);
 		Halls.setDirty();

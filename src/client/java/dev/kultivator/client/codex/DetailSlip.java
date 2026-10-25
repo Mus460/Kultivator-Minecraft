@@ -1,16 +1,16 @@
 package dev.kultivator.client.codex;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import dev.kultivator.client.ClientCultivation;
 import dev.kultivator.client.Keys;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Eased;
 import dev.kultivator.client.screen.ui.Glyphs;
+import dev.kultivator.client.screen.ui.KeadaanKosong;
+import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.TalismanButton;
-import dev.kultivator.client.screen.ui.UiSound;
-import dev.kultivator.client.screen.ui.Widget;
 import dev.kultivator.data.CultivationData;
-import dev.kultivator.data.TechniqueRegistry;
 import dev.kultivator.data.TechniqueSpec;
 import dev.kultivator.network.Actions;
 import dev.kultivator.network.Payloads;
@@ -34,19 +34,19 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 /**
- * The bamboo detail slip of the Kitab Teknik (DESIGN 22.12.4): the large glyph and both names; chips for the Dao, the
- * grade, the type, the realm gate and Gerbang Dewa; the Sumber line ("Terinspirasi" lines in grey italic); the
+ * The bamboo detail slip of Teknik › Kodeks (DESIGN 22.12.4, 43.5): the large glyph and both names; chips for the Dao,
+ * the grade, the type, the realm gate and Gerbang Dewa; the Sumber line ("Terinspirasi" lines in grey italic); the
  * description and lore; the live numbers from {@link TechniquePower} (damage, area, duration, count, qi and cooldown,
  * boss cap, the crater while Mode Kehancuran is on, "Di arena: kekuatan lama"); the mastery bar with today's points;
- * the acquisition checklist; and the talismans Pilih, Pasang ke Cincin (a slot picker) and Uji (op + creative).
- * It scrolls with the wheel above its talismans.
+ * the acquisition checklist; and the talismans Pilih, Pasang ke Cincin (G48: Teknik › Cincin Segel with this card carried)
+ * and Uji (op + creative). Drawn immediately into the page's {@link Lukis} (the talismans are in the page's Tab ring); the
+ * body scrolls with the wheel above its talismans. Text at 1.0 (43.0.5).
  */
 public final class DetailSlip {
 
-	private static final int BUTTON_H = 15;
+	private static final int BUTTON_H = 14;
 	private static final String P = "kultivator.codex.detail.";
 
 	private int x;
@@ -57,10 +57,6 @@ public final class DetailSlip {
 	private final Eased scrollShown = new Eased(14.0F);
 	private float scroll;
 	private float contentHeight;
-	private final List<Widget> widgets = new ArrayList<>();
-	private @Nullable Widget pressed;
-	private boolean picker;
-	private int pickerTop;
 	private final Font font = Minecraft.getInstance().font;
 
 	public void layout(int x, int y, int w, int h) {
@@ -68,41 +64,6 @@ public final class DetailSlip {
 		this.y = y;
 		this.w = w;
 		this.h = h;
-		widgets.clear();
-		picker = false;
-		int by = y + h - BUTTON_H - 3;
-		boolean tester = tester();
-		int count = tester ? 3 : 2;
-		int gap = 3;
-		int bw = (w - 8 - gap * (count - 1)) / count;
-		TalismanButton pick = new TalismanButton(x + 4, by, bw, BUTTON_H, () -> Component.translatable(P + "select"));
-		pick.enabledWhen(() -> spec != null && SpecInfo.castable(data(), spec) && Keys.connected());
-		pick.stampedWhen(() -> spec != null && spec.id().equals(data().selectedId()));
-		pick.onPress(() -> {
-			if (spec != null) {
-				Keys.send(new Payloads.Action(Actions.SELECT_TECHNIQUE, 0, spec.id()));
-			}
-		});
-		pick.tooltip(() -> List.of(Component.translatable(P + "select"), Component.translatable(P + "select.tip").withStyle(ChatFormatting.GRAY)));
-		widgets.add(pick);
-		TalismanButton assign = new TalismanButton(x + 4 + bw + gap, by, bw, BUTTON_H, () -> Component.translatable(P + "assign"));
-		assign.enabledWhen(() -> spec != null && SpecInfo.castable(data(), spec) && Keys.connected());
-		assign.urgentWhen(() -> picker);
-		assign.onPress(() -> picker = !picker);
-		assign.tooltip(() -> List.of(Component.translatable(P + "assign"), Component.translatable(P + "assign.tip").withStyle(ChatFormatting.GRAY)));
-		widgets.add(assign);
-		if (tester) {
-			TalismanButton test = new TalismanButton(x + 4 + (bw + gap) * 2, by, bw, BUTTON_H, () -> Component.translatable(P + "test"));
-			test.enabledWhen(() -> spec != null && Keys.connected());
-			test.onPress(() -> {
-				if (spec != null) {
-					Keys.send(new Payloads.Action(Actions.TECHNIQUE, 0, "test:" + spec.id()));
-				}
-			});
-			test.tooltip(() -> List.of(Component.translatable(P + "test"), Component.translatable(P + "test.tip").withStyle(ChatFormatting.GRAY)));
-			widgets.add(test);
-		}
-		pickerTop = by - 36;
 	}
 
 	/** Op and in creative: the "Uji" talisman is offered (the server checks again). */
@@ -115,7 +76,6 @@ public final class DetailSlip {
 		if (value != spec) {
 			spec = value;
 			scroll = 0.0F;
-			picker = false;
 			if (value != null && data().knows(value.id())) {
 				CodexFilters.markSeen(value);
 			}
@@ -136,37 +96,63 @@ public final class DetailSlip {
 
 	// ================================================================== drawing
 
-	public void render(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds, Consumer<List<Component>> tooltip) {
+	public void render(Lukis l) {
+		GuiGraphicsExtractor g = l.g;
 		bamboo(g);
 		if (spec == null) {
-			Brush.wrap(g, font, Component.translatable(P + "empty"), x + 8.0F, y + 10.0F, w - 16.0F, Palette.INK_SOFT, 0.7F, false);
+			KeadaanKosong.gambar(l, KeadaanKosong.Gambar.GULUNGAN, Component.translatable(P + "empty"), null, null, x + 4, y + 6, x + w - 4, y + h - 6);
 			return;
 		}
 		int bodyBottom = y + h - BUTTON_H - 6;
 		float maxScroll = Math.max(0.0F, contentHeight - (bodyBottom - y - 4));
 		scroll = Math.max(0.0F, Math.min(maxScroll, scroll));
-		float offset = scrollShown.to(scroll, seconds);
-		g.enableScissor(x + 1, y + 2, x + w - 1, bodyBottom);
+		float offset = scrollShown.to(scroll, l.detik);
+		l.klip(x + 1, y + 2, x + w - 1, bodyBottom);
 		float top = y + 5.0F - offset;
 		float cursor = body(g, top);
 		contentHeight = cursor - top + 6.0F;
-		g.disableScissor();
+		l.lepasKlip();
 		if (maxScroll > 0.0F) {
 			float bead = y + 4.0F + (bodyBottom - y - 8.0F) * (offset / maxScroll);
 			g.fill(x + w - 3, y + 3, x + w - 2, bodyBottom - 1, Palette.CORD);
 			Brush.disc(g, x + w - 2.5F, bead, 2.0F, Palette.JADE);
 		}
-		for (Widget widget : widgets) {
-			widget.render(g, font, mouseX, mouseY, seconds);
-			if (widget.contains(mouseX, mouseY)) {
-				List<Component> tip = widget.tooltipLines();
-				if (!tip.isEmpty()) {
-					tooltip.accept(tip);
-				}
+		buttons(l);
+	}
+
+	/** Pilih, Pasang ke Cincin and (op + creative) Uji along the bottom. */
+	private void buttons(Lukis l) {
+		TechniqueSpec s = spec;
+		CultivationData data = data();
+		int by = y + h - BUTTON_H - 3;
+		boolean tester = tester();
+		int count = tester ? 3 : 2;
+		int gap = 3;
+		int bw = (w - 8 - gap * (count - 1)) / count;
+		boolean castable = s != null && SpecInfo.castable(data, s);
+		boolean online = Keys.connected();
+		Component lock = s == null ? null : SpecInfo.lockReason(data, s);
+		Component why = !online ? Component.translatable("kultivator.gui43.m02.luring")
+				: castable || s == null ? null : lock != null ? lock : Component.translatable("kultivator.codex.ring.not_castable");
+		boolean chosen = s != null && s.id().equals(data.selectedId());
+		if (TalismanButton.gambar(l, "slip.pilih", x + 4, by, bw, BUTTON_H, Component.translatable(P + "select"), castable && online, why, () -> {
+			if (spec != null) {
+				Keys.send(new Payloads.Action(Actions.SELECT_TECHNIQUE, 0, spec.id()));
 			}
+		}, false, chosen)) {
+			l.tip(List.of(Component.translatable(P + "select"), Component.translatable(P + "select.tip").withStyle(ChatFormatting.GRAY)));
 		}
-		if (picker) {
-			drawPicker(g, mouseX, mouseY, tooltip);
+		if (TalismanButton.gambar(l, "slip.pasang", x + 4 + bw + gap, by, bw, BUTTON_H, Component.translatable(P + "assign"), castable && online, why,
+				() -> Codex.pasang(spec))) {
+			l.tip(List.of(Component.translatable(P + "assign"), Component.translatable("kultivator.gui43.m02.pasang.tip").withStyle(ChatFormatting.GRAY)));
+		}
+		if (tester && TalismanButton.gambar(l, "slip.uji", x + 4 + (bw + gap) * 2, by, bw, BUTTON_H, Component.translatable(P + "test"),
+				s != null && online, online ? null : Component.translatable("kultivator.gui43.m02.luring"), () -> {
+					if (spec != null) {
+						Keys.send(new Payloads.Action(Actions.TECHNIQUE, 0, "test:" + spec.id()));
+					}
+				})) {
+			l.tip(List.of(Component.translatable(P + "test"), Component.translatable(P + "test.tip").withStyle(ChatFormatting.GRAY)));
 		}
 	}
 
@@ -203,9 +189,9 @@ public final class DetailSlip {
 		Glyphs.spec(g, s, tx + glyph / 2.0F + 2.0F, cursor + glyph / 2.0F + 2.0F, glyph * 0.8F, ink);
 		float nameX = tx + glyph + 8.0F;
 		float nameRoom = room - glyph - 8.0F;
-		float used = Brush.wrap(g, font, Brush.bold(CodexNames.name(s)), nameX, cursor + 1.0F, nameRoom, ink, 0.8F, false);
-		Brush.fit(g, font, Component.literal(SearchIndex.otherName(s)), nameX, cursor + 2.0F + used, nameRoom, Palette.INK_FAINT, 0.6F, 0.45F, false);
-		cursor += Math.max(glyph + 6.0F, used + 10.0F);
+		float used = Brush.wrap(g, font, Brush.bold(CodexNames.name(s)), nameX, cursor + 1.0F, nameRoom, ink, 1.0F, false);
+		Brush.fit(g, font, Component.literal(SearchIndex.otherName(s)), nameX, cursor + 2.0F + used, nameRoom, Palette.INK_FAINT, 1.0F, 1.0F, false);
+		cursor += Math.max(glyph + 6.0F, used + 12.0F);
 
 		// 2. Chips.
 		List<Component> chips = new ArrayList<>();
@@ -219,12 +205,12 @@ public final class DetailSlip {
 		cursor = chips(g, chips, tx, cursor, room);
 
 		// 3. Sumber.
-		cursor += Brush.wrap(g, font, SpecInfo.sourceLine(s), tx, cursor, room, SpecInfo.inspired(s) ? Palette.INK_FAINT : 0xFF8A5A1E, 0.62F, false) + 3.0F;
+		cursor += Brush.wrap(g, font, SpecInfo.sourceLine(s), tx, cursor, room, SpecInfo.inspired(s) ? Palette.INK_FAINT : 0xFF8A5A1E, 1.0F, false) + 3.0F;
 
 		// 4. Description and lore.
-		cursor += Brush.wrap(g, font, s.description(), tx, cursor, room, Palette.INK, 0.62F, false) + 2.0F;
+		cursor += Brush.wrap(g, font, s.description(), tx, cursor, room, Palette.INK, 1.0F, false) + 2.0F;
 		if (Language.getInstance().has(s.loreKey())) {
-			cursor += Brush.wrap(g, font, Component.translatable(s.loreKey()).withStyle(ChatFormatting.ITALIC), tx, cursor, room, Palette.INK_SOFT, 0.6F,
+			cursor += Brush.wrap(g, font, Component.translatable(s.loreKey()).withStyle(ChatFormatting.ITALIC), tx, cursor, room, Palette.INK_SOFT, 1.0F,
 					false) + 2.0F;
 		}
 		cursor = rule(g, tx, cursor, room);
@@ -262,9 +248,9 @@ public final class DetailSlip {
 			lines.add(crater(data, s).copy().withColor(0xB3281D));
 		}
 		for (Component line : lines) {
-			cursor += Brush.wrap(g, font, line, tx, cursor, room, Palette.INK, 0.6F, false) + 0.5F;
+			cursor += Brush.wrap(g, font, line, tx, cursor, room, Palette.INK, 1.0F, false) + 0.5F;
 		}
-		cursor += Brush.wrap(g, font, Component.translatable(P + "arena").withStyle(ChatFormatting.ITALIC), tx, cursor, room, Palette.INK_FAINT, 0.55F,
+		cursor += Brush.wrap(g, font, Component.translatable(P + "arena").withStyle(ChatFormatting.ITALIC), tx, cursor, room, Palette.INK_FAINT, 1.0F,
 				false) + 2.0F;
 		cursor = rule(g, tx, cursor, room);
 
@@ -273,15 +259,15 @@ public final class DetailSlip {
 		cursor = rule(g, tx, cursor, room);
 
 		// 7. Acquisition checklist.
-		Brush.fit(g, font, Brush.bold(Component.translatable(P + "how")), tx, cursor, room, Palette.SEAL_DARK, 0.65F, 0.45F, false);
-		cursor += 8.0F;
+		Brush.fit(g, font, Brush.bold(Component.translatable(P + "how")), tx, cursor, room, Palette.SEAL_DARK, 1.0F, 1.0F, false);
+		cursor += 10.0F;
 		for (Unlocks.Line line : Checklist.lines(data, s)) {
 			Component mark = Component.literal(line.met() ? "✓ " : "✗ ").withColor(line.met() ? 0x2E8963 : 0xB3281D);
 			MutableComponent text = Component.empty().append(mark).append(line.text());
 			if (line.goal() > 0 && !line.text().getString().contains("/")) {
 				text.append(Component.literal(" (" + Math.min(line.progress(), line.goal()) + "/" + line.goal() + ")").withColor(0x7A8C83));
 			}
-			cursor += Brush.wrap(g, font, text, tx, cursor, room, line.met() ? Palette.INK_SOFT : Palette.INK, 0.58F, false) + 0.5F;
+			cursor += Brush.wrap(g, font, text, tx, cursor, room, line.met() ? Palette.INK_SOFT : Palette.INK, 1.0F, false) + 0.5F;
 		}
 		return cursor;
 	}
@@ -332,11 +318,11 @@ public final class DetailSlip {
 		int next = level >= 4 ? s.grade().masteryThreshold(4) : s.grade().masteryThreshold(level + 1);
 		int previous = s.grade().masteryThreshold(level);
 		Component title = Component.translatable(P + "mastery", SpecInfo.masteryName(level));
-		Brush.fit(g, font, Brush.bold(title), tx, cursor, room * 0.6F, Palette.SEAL_DARK, 0.65F, 0.45F, false);
 		Component pts = Component.literal(SpecInfo.number(points) + " / " + SpecInfo.number(next));
-		float ptsScale = 0.55F;
-		Brush.text(g, font, pts, tx + room - font.width(pts) * ptsScale, cursor + 1.0F, Palette.INK_SOFT, ptsScale, false);
-		cursor += 8.0F;
+		float ptsW = font.width(pts);
+		Brush.fit(g, font, Brush.bold(title), tx, cursor, room - ptsW - 4.0F, Palette.SEAL_DARK, 1.0F, 1.0F, false);
+		Brush.text(g, font, pts, tx + room - ptsW, cursor, Palette.INK_SOFT, 1.0F, false);
+		cursor += 10.0F;
 		float fill = level >= 4 ? 1.0F : Math.max(0.0F, Math.min(1.0F, (points - previous) / (float) Math.max(1, next - previous)));
 		Brush.rect(g, tx, cursor, tx + room, cursor + 3.0F, Palette.argb(0x70, Palette.BAMBOO_KNOT));
 		Brush.rect(g, tx, cursor, tx + room * fill, cursor + 3.0F, Palette.GOLD);
@@ -358,7 +344,7 @@ public final class DetailSlip {
 			notes.add(Component.translatable(P + "today", Math.max(0, 200 - today[0]), Math.max(0, 20 - today[1])));
 		}
 		for (Component note : notes) {
-			cursor += Brush.wrap(g, font, note, tx, cursor, room, Palette.INK_SOFT, 0.56F, false) + 0.5F;
+			cursor += Brush.wrap(g, font, note, tx, cursor, room, Palette.INK_SOFT, 1.0F, false) + 0.5F;
 		}
 		return cursor + 1.0F;
 	}
@@ -389,8 +375,8 @@ public final class DetailSlip {
 
 	private float chips(GuiGraphicsExtractor g, List<Component> chips, float tx, float cursor, float room) {
 		float cx = tx;
-		float scale = 0.52F;
-		float height = 8.0F;
+		float scale = 1.0F;
+		float height = 10.0F;
 		for (Component chip : chips) {
 			float width = font.width(chip) * scale + 6.0F;
 			if (cx + width > tx + room && cx > tx) {
@@ -399,7 +385,7 @@ public final class DetailSlip {
 			}
 			Brush.rect(g, cx, cursor, cx + width, cursor + height, Palette.argb(0x90, 0xFFF4E6B8));
 			Brush.frame(g, Math.round(cx), Math.round(cursor), Math.round(cx + width), Math.round(cursor + height), Palette.argb(0xC0, Palette.GOLD_DARK));
-			Brush.text(g, font, chip, cx + 3.0F, cursor + 1.6F, Palette.INK, scale, false);
+			Brush.text(g, font, chip, cx + 3.0F, cursor + 1.0F, Palette.INK, scale, false);
 			cx += width + 2.0F;
 		}
 		return cursor + height + 4.0F;
@@ -410,86 +396,23 @@ public final class DetailSlip {
 		return cursor + 4.0F;
 	}
 
-	// ================================================================== the slot picker
-
-	private void drawPicker(GuiGraphicsExtractor g, int mouseX, int mouseY, Consumer<List<Component>> tooltip) {
-		int px0 = x + 3;
-		int px1 = x + w - 3;
-		g.fill(px0, pickerTop, px1, pickerTop + 34, 0xF2112A23);
-		Brush.frame(g, px0, pickerTop, px1, pickerTop + 34, Palette.GOLD);
-		Brush.fit(g, font, Component.translatable(P + "picker"), px0 + 3.0F, pickerTop + 2.0F, px1 - px0 - 6.0F, Palette.GOLD_LIGHT, 0.55F, 0.4F, false);
-		String[] slots = TeknikSession.slots();
-		int cell = Math.min(14, (px1 - px0 - 8) / 6);
-		for (int i = 0; i < 12; i++) {
-			int cx = px0 + 4 + (i % 6) * (cell + 1);
-			int cy = pickerTop + 10 + (i / 6) * (cell + 1);
-			boolean over = mouseX >= cx && mouseX < cx + cell && mouseY >= cy && mouseY < cy + cell;
-			g.fill(cx, cy, cx + cell, cy + cell, over ? 0xFFF7DFA0 : Palette.TALISMAN);
-			Brush.frame(g, cx, cy, cx + cell, cy + cell, i < 4 ? Palette.GOLD_DARK : Palette.TALISMAN_EDGE);
-			TechniqueSpec there = slots[i].isEmpty() ? null : TechniqueRegistry.byId(slots[i]);
-			if (there != null) {
-				Glyphs.spec(g, there, cx + cell / 2.0F, cy + cell / 2.0F, cell * 0.6F, SpecInfo.ink(there));
-			}
-			Brush.text(g, font, Component.literal(String.valueOf(i + 1)), cx + 1.0F, cy + 1.0F, i < 4 ? Palette.SEAL : Palette.INK_SOFT, 0.45F, false);
-			if (over) {
-				List<Component> tip = new ArrayList<>();
-				tip.add(Component.translatable(P + "picker.slot", i + 1));
-				tip.add(there == null ? Component.translatable(P + "picker.empty").withStyle(ChatFormatting.GRAY) : there.displayName());
-				tooltip.accept(tip);
-			}
-		}
-	}
-
-	private int pickerSlot(double mouseX, double mouseY) {
-		int px0 = x + 3;
-		int px1 = x + w - 3;
-		int cell = Math.min(14, (px1 - px0 - 8) / 6);
-		for (int i = 0; i < 12; i++) {
-			int cx = px0 + 4 + (i % 6) * (cell + 1);
-			int cy = pickerTop + 10 + (i / 6) * (cell + 1);
-			if (mouseX >= cx && mouseX < cx + cell && mouseY >= cy && mouseY < cy + cell) {
-				return i;
-			}
-		}
-		return -1;
-	}
-
 	// ================================================================== input
 
-	public boolean mouseClicked(double mouseX, double mouseY, int button) {
-		if (picker) {
-			int slot = pickerSlot(mouseX, mouseY);
-			if (slot >= 0 && spec != null) {
-				UiSound.press();
-				Keys.send(new Payloads.Action(Actions.TECHNIQUE, 0, "slot:" + slot + ":" + spec.id()));
-				picker = false;
-				return true;
-			}
-			if (mouseY >= pickerTop && mouseY < pickerTop + 34 && contains(mouseX, mouseY)) {
-				return true;
-			}
-		}
-		for (Widget widget : widgets) {
-			if (widget.contains(mouseX, mouseY)) {
-				widget.press();
-				pressed = widget;
-				return true;
+	/** Keyboard scroll of the body (43.4.2): ↑↓ a line, PgUp/PgDn a page, Home/End the ends; true when used. */
+	public boolean gulirTombol(int key) {
+		float page = Math.max(20.0F, h - BUTTON_H - 24.0F);
+		switch (key) {
+			case InputConstants.KEY_UP -> scroll -= 14.0F;
+			case InputConstants.KEY_DOWN -> scroll += 14.0F;
+			case InputConstants.KEY_PAGEUP -> scroll -= page;
+			case InputConstants.KEY_PAGEDOWN -> scroll += page;
+			case InputConstants.KEY_HOME -> scroll = 0.0F;
+			case InputConstants.KEY_END -> scroll = contentHeight;
+			default -> {
+				return false;
 			}
 		}
-		if (picker) {
-			picker = false;
-			return contains(mouseX, mouseY);
-		}
-		return contains(mouseX, mouseY);
-	}
-
-	public boolean mouseReleased(double mouseX, double mouseY) {
-		if (pressed == null) {
-			return false;
-		}
-		Widget widget = pressed;
-		pressed = null;
-		widget.release(mouseX, mouseY);
+		// render() clamps to the body.
 		return true;
 	}
 
@@ -499,14 +422,5 @@ public final class DetailSlip {
 		}
 		scroll -= (float) amount * 14.0F;
 		return true;
-	}
-
-	/** Escape closes the slot picker first. */
-	public boolean escape() {
-		if (picker) {
-			picker = false;
-			return true;
-		}
-		return false;
 	}
 }

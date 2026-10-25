@@ -172,6 +172,9 @@ public final class Pertumbuhan {
 
 	/** Pulls bed {@code index} up (the herb is lost unless it is ripe: then it is harvested). */
 	static @Nullable Component uproot(Aula aula, int index, @Nullable ServerPlayer player) {
+		if (index < 0 || index >= Kebun.plotCount(aula.owner())) {
+			return Component.translatable("kultivator.sekte.kebun.bed.none");
+		}
 		PetakHerba bed = PetakHerba.of(aula.sec(), index);
 		if (bed.empty()) {
 			return Component.translatable("kultivator.sekte.kebun.bed.bare", index + 1);
@@ -326,6 +329,7 @@ public final class Pertumbuhan {
 		entry.putString("soul", disciple.soulId().toString());
 		tenders.put(String.valueOf(slot), entry);
 		Kebun.kerja(disciple.data()).putString("job", SekteIds.W);
+		Kebun.kerja(disciple.data()).remove("mandiri"); // a job the master gives is no longer self-chosen (KebunMandiri re-marks its own)
 		BlockPos spot = Kebun.tenderSpot(aula, slot);
 		disciple.setActivity(SekteIds.ACT_TEND, spot);
 		Halls.setDirty();

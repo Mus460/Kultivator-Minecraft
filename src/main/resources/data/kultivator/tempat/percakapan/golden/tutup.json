@@ -1,0 +1,127 @@
+{
+  "id": "tutup",
+  "jenis": "realisasi",
+  "_catatan": "Closing lines: patience gone, night, friend, enemy.",
+  "benih_dunia": 42,
+  "masukan": {
+    "niat": "TUTUP",
+    "pembicara": 504,
+    "hari": 120,
+    "now": 2880000,
+    "cuaca": "cerah",
+    "musim": "semi",
+    "situasi": {
+      "jam": "pagi",
+      "cuaca": "cerah",
+      "musim": "semi",
+      "kelompok": "pekerja",
+      "watak": "ramah",
+      "kebiasaan": [],
+      "sifat": {
+        "H": 10,
+        "E": 0,
+        "X": 20,
+        "A": 30,
+        "C": 10,
+        "O": 0
+      },
+      "wajah": "netral",
+      "tempat": "kota_besar"
+    },
+    "pendengar": {
+      "nama": "Han",
+      "kelamin": "l",
+      "tahap": "dewasa",
+      "pemain": true
+    },
+    "kesan": "kenal",
+    "tahu_nama": false,
+    "register": "sopan",
+    "dialek": "ibukota",
+    "topik": "pamit"
+  },
+  "langkah": [
+    {
+      "ubah": {},
+      "harap": {
+        "k": "kultivator.cakap.tutup.pamit_balas.0.ibukota",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.tuan.ibukota",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "tutup.pamit_balas",
+      "gestur": "lambai",
+      "seru": null,
+      "tik": null,
+      "id_id": "Selamat jalan, Tuanku. Semoga urusan Tuanku di ibu kota lancar.",
+      "en_us": "Farewell, My Lord. May your business in the capital go smoothly."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "malam",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar"
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.tutup.pamit_balas.3",
+        "a": []
+      },
+      "aturan": "tutup.pamit_balas",
+      "gestur": "lambai",
+      "seru": null,
+      "tik": null,
+      "id_id": "Sampai nanti. Jangan lupa pesanku tadi.",
+      "en_us": "Till later. Don't forget what I said."
+    },
+    {
+      "ubah": {
+        "kesan": "sahabat"
+      },
+      "harap": {
+        "k": "kultivator.cakap.tutup.akrab.0",
+        "a": []
+      },
+      "aturan": "tutup.akrab",
+      "gestur": "tepuk_bahu",
+      "seru": null,
+      "tik": null,
+      "id_id": "Mampir lagi kapan-kapan, ya! Pintuku selalu terbuka untukmu.",
+      "en_us": "Drop by again some time! My door's always open for you."
+    },
+    {
+      "ubah": {
+        "kesan": "musuh",
+        "register": "kasar",
+        "topik": "marah"
+      },
+      "harap": {
+        "k": "kultivator.cakap.tutup.marah.1",
+        "a": []
+      },
+      "aturan": "tutup.marah",
+      "gestur": "marah_hentak",
+      "seru": null,
+      "tik": null,
+      "id_id": "Aku tidak mau bicara lagi denganmu.",
+      "en_us": "I won't speak with you any more."
+    }
+  ]
+}

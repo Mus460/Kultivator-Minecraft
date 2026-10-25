@@ -161,7 +161,8 @@ final class Contribution {
 		// Phase 7 (DESIGN 19.1.5): spirit stones, beast cores and aged spirit herbs, graded by P7-harta.
 		double treasure = dev.kultivator.harta.Harta.missionValue(stack);
 		if (treasure > 0.0D) {
-			return treasure;
+			// Above the daily cap it would round to zero offerable items (grade-3 spirit stone, very old herbs).
+			return Math.min(OFFER_DAILY_CAP, treasure);
 		}
 		// Audit T17: a pill is worth its town base in PK (Harga.NB_PER_PK) × its quality, so a Tribulation Warding Pill is
 		// worth more than a Healing Pill; the flat table stays for a pill the towns do not price.
@@ -239,6 +240,8 @@ final class Contribution {
 			Msg.chat(player, Component.translatable("kultivator.hall.offer.too_little").withStyle(ChatFormatting.GRAY));
 			return;
 		}
+		// Only as many as the whole points pay for (an odd glow berry stays in the inventory).
+		count = Math.min(count, (int) Math.ceil(value / unit - 1.0E-6D));
 		Component itemName = stack.getHoverName();
 		stack.shrink(count);
 		player.getInventory().setChanged();

@@ -197,7 +197,8 @@ public final class AwanTemplates {
 		} else {
 			b.add(Component.of("aw_t6_aula_utama", 6).kind("gilding").name("gilding").group(Group.MAIN).add(aula.gilding()));
 		}
-		b.add(Component.of("aw_t6_paifang", 6).kind("paifang").name("paifang").group(Group.AXIS).add(GerbangAwan.marmer(L.frontZ - 4)));
+		// MAIN after the ring (-10..-7): it stands on ring 3, so never before it.
+		b.add(Component.of("aw_t6_paifang", 6).kind("paifang").name("paifang").group(Group.MAIN, 0).add(GerbangAwan.marmer(L.frontZ - 4)));
 		Component.Builder lattice = Component.of("aw_t6_jembatan", 6).kind("bridge").name("awan_jembatan").group(Group.GARDEN);
 		boolean anyOld = false;
 		for (AwanLayout.Jembatan bridge : L.bridges) {
@@ -286,7 +287,8 @@ public final class AwanTemplates {
 		if (satellite(b, L, AwanLayout.Fungsi.TAMBANG, "aw_t9_satelit_tambang", "aw_t9_jembatan_tambang", false)) {
 			int[] mouth = PulauSatelit.spot(L, AwanLayout.Fungsi.TAMBANG, 0, -1);
 			AwanLayout.Satelit mine = L.satellite(AwanLayout.Fungsi.TAMBANG);
-			b.add(Component.of("sx_kebun_tambang", 9).kind("mine").name("sx_kebun_tambang").group(Group.SIDE)
+			// After its satellite island (GARDEN 0) and bridge (GARDEN 1).
+			b.add(Component.of("sx_kebun_tambang", 9).kind("mine").name("sx_kebun_tambang").group(Group.GARDEN, 2)
 					.add(new RonggaAkar(mouth[0], mouth[1], mine.toMain(), Lv.at(mouth[2]))));
 		}
 		b.add(Component.of("aw_t9_finale", 9).kind("finale").name("finale").group(Group.GARDEN)

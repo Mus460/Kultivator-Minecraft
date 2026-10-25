@@ -69,7 +69,7 @@
   "kultivator.duel.ui.offer.decline": "[Decline]",
   "kultivator.duel.ui.offer.decline.tip": "Declining has no consequence.",
   "kultivator.duel.ui.offer.title": "Duel Challenge · %s",
-  "kultivator.duel.ui.offer.hint": "%s s · answer in the chat or Scroll › World › Sword Duel",
+  "kultivator.duel.ui.offer.hint": "%s s · answer in the chat or V › World › Duel",
   "kultivator.duel.ui.camera_now": "Duel camera: %s",
   "kultivator.duel.ui.predict.stats": "Deflect predictions right: %s of %s",
   "kultivator.duel.ui.pair.0": "player",

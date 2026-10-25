@@ -290,7 +290,11 @@ final class NpcLife {
 		KultivatorNpc listener = speaker == npc ? partner : npc;
 		face(speaker, listener.position());
 		face(listener, speaker.position());
-		speak(speaker, "kultivator.kota.obrol." + npc.memory().getStringOr("chat_topic", "harga") + "." + step, LINE_TICKS);
+		String chatTopic = npc.memory().getStringOr("chat_topic", "harga");
+		// 42K (42.5A.11): a stored warga talks through the conversation engine (bubble); else the 38 line
+		if (!dev.kultivator.dunia.kota42.cakap.ObrolanWarga.ujar(level, speaker, listener, chatTopic, step, now)) {
+			speak(speaker, "kultivator.kota.obrol." + chatTopic + "." + step, LINE_TICKS);
+		}
 		npc.memory().putInt("chat_step", step + 1);
 		npc.memory().putLong("chat_next", now + LINE_TICKS + 10L);
 	}

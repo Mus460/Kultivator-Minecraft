@@ -1,0 +1,26 @@
+{
+  "pemberi": "peran:tetua_sekte",
+  "tempat": "gabung_sekte",
+  "tahap": [
+    {
+      "id": "ember",
+      "tujuan": [
+        "tanda gabung_tugas_pikul_air x3"
+      ],
+      "akibat": [
+        "gabung.sikap kakak 3"
+      ]
+    },
+    {
+      "id": "bahu",
+      "tujuan": [
+        "tanda gabung_tugas_pikul_air x3"
+      ],
+      "akibat": [
+        "gabung.pk 30",
+        "gabung.ikatan 5",
+        "efek minecraft:strength 2400 0"
+      ]
+    }
+  ]
+}

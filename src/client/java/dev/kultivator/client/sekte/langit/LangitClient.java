@@ -1,15 +1,15 @@
 package dev.kultivator.client.sekte.langit;
 
 import dev.kultivator.client.disciple.DiscipleRenderer;
+import dev.kultivator.client.hub.HubNav;
+import dev.kultivator.client.hub.Tujuan;
+import dev.kultivator.client.hub.Urutan;
 import dev.kultivator.sekte.langit.api.LangitPayloads;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityRenderLayerRegistrationCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Sekte Langit on the client (DESIGN 37, the client entry of the four sky-sect modules), called once from
@@ -48,7 +48,7 @@ public final class LangitClient {
 		});
 		// 37M: the Cloud Ferry renderer.
 		dev.kultivator.client.sekte.langit.gerak.LangitGerakClient.init();
-		// 37G: the "Sekte Langit" hub card and screen, the story beats of the sky events.
+		// 37G: the board data of Sekte › Wilayah › Langit, the story beats of the sky events.
 		dev.kultivator.client.sekte.langit.ui.LangitUiClient.init();
 	}
 
@@ -60,9 +60,12 @@ public final class LangitClient {
 		return ready && LangitClientConfig.on(LangitClientConfig.Toggle.CUACA_KEBAL) && LangitSkyState.shelter(x, y, z) != null;
 	}
 
-	/** Opens the sky view settings over {@code parent} (37G's sky-sect screen, a button "Pemandangan"). */
-	public static void openSettings(@Nullable Screen parent) {
-		Minecraft.getInstance().gui.setScreen(new LangitVisualScreen(parent));
+	/**
+	 * The sky view settings (the "Pemandangan" talisman of Sekte › Wilayah › Langit): the rows of
+	 * {@link LangitClientConfig#rows()} in Pengaturan › Tampilan &amp; Efek (DESIGN 43.10.1).
+	 */
+	public static void openSettings() {
+		HubNav.buka(Tujuan.of(HubNav.PENGATURAN, Urutan.ID_TAMPILAN));
 	}
 
 	private LangitClient() {

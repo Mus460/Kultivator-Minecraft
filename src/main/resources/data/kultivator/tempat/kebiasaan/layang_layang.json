@@ -1,0 +1,33 @@
+{
+  "_catatan": "Kebiasaan #11 layang_layang (DESIGN 42.4.12)",
+  "nomor": 11,
+  "siapa": {
+    "umur": [
+      6,
+      25
+    ],
+    "tahap": [
+      "anak",
+      "dewasa"
+    ]
+  },
+  "sesi": [
+    {
+      "jam": [
+        15,
+        17
+      ],
+      "peluang": 0.75,
+      "syarat": [
+        "angin"
+      ],
+      "tujuan": [
+        "lapangan",
+        "panggung",
+        "@jalan:5"
+      ],
+      "klip": "main_layangan",
+      "kanan": "layang_layang"
+    }
+  ]
+}

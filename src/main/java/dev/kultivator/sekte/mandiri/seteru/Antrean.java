@@ -124,6 +124,9 @@ final class Antrean {
 						left.add(t);
 					}
 				}
+				if (left.size() == e.getValue().size()) {
+					continue; // nothing applied: no save every 100 ticks for an effect still waiting
+				}
 				changed = true;
 				if (left.isEmpty()) {
 					it.remove();

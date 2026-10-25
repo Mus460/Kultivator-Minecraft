@@ -1,14 +1,12 @@
 package dev.kultivator.client.tempat.ui.tema;
 
 import dev.kultivator.client.screen.ui.Brush;
+import dev.kultivator.client.screen.ui.CincinWaktu;
+import dev.kultivator.client.screen.ui.LabelHarga;
+import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
-import dev.kultivator.client.tempat.ui.kit.CincinWaktu;
-import dev.kultivator.client.tempat.ui.kit.LabelHarga;
 import dev.kultivator.client.tempat.ui.kit.Lembar;
-import dev.kultivator.client.tempat.ui.kit.Lukis;
-import dev.kultivator.client.tempat.ui.kit.PanelTempat;
 import dev.kultivator.client.tempat.ui.kit.TabLentera;
-import dev.kultivator.client.tempat.ui.kit.TeksTempat;
 import dev.kultivator.client.tempat.ui.kit.TempatWarna;
 import dev.kultivator.dunia.tempat.tema.bersama.TemaLayar.Teh;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
@@ -20,9 +18,10 @@ import net.minecraft.network.chat.Component;
  * {@code tema_teh} (DESIGN 38.T.5.4): Paviliun Teh Awan, Lu Yuqing's tea house over the canal. The active tea (only the
  * strongest one works) is a steaming cup band on top with its countdown; the menu is the shared shop block with each
  * tea's effect and the band it needs; along the bottom the tea ceremony card: the clay pot pouring a thread of tea into
- * three cups with the steam curling, the price and "Upacara teh" (a 4 s scene in the world).
+ * three cups with the steam curling, the price and "Upacara teh" (a 4 s scene in the world). A Di Sini page on the single
+ * kit (43.8.3); Space still pours the ceremony.
  */
-public final class LayarTeh extends LayarTemaDasar {
+public final class LayarTeh extends TemaHalaman {
 
 	private final Toko toko = new Toko();
 
@@ -51,15 +50,15 @@ public final class LayarTeh extends LayarTemaDasar {
 	}
 
 	@Override
-	protected void gambar(Lukis l, int x0, int y0, int x1, int y1) {
+	protected void lukisTema(Lukis l, int x0, int y0, int x1, int y1) {
 		int y = y0;
 		Lembar aktif = lembar.sub(Teh.AKTIF_TEH);
 		if (aktif.ada(LembarKunci.NAMA)) {
 			y += efekAktif(l, aktif, x0, y, x1);
 		} else {
-			y += strip(l, TemaUi.k("teh.ucap"), x0, y, x1, 32);
+			y += strip(l, TemaUi.k("teh.ucap"), x0, y, x1, 34);
 		}
-		int upH = lembar.ada(Teh.UPACARA) ? 42 : 0;
+		int upH = lembar.ada(Teh.UPACARA) ? 44 : 0;
 		Kotak[] k = bagi(x0, y, x1, y1 - upH);
 		int pita = lembar.i(LembarKunci.PITA, -1);
 		toko(l, "menu", toko, lembar.daftar(Teh.MENU), k[0], k[1], Teh.OP_BELI, false, (lk, e, ex0, ey, ex1) -> {
@@ -67,16 +66,16 @@ public final class LayarTeh extends LayarTemaDasar {
 			Component efek = e.teksAtau(Teh.EFEK);
 			if (efek != null) {
 				TemaUi.ikon(lk.g, TemaUi.I_CAWAN, ex0, ey, 10);
-				h += Math.round(lk.bungkus(efek, ex0 + 12, ey + 1, ex1 - ex0 - 12, aksen(), 0.75F)) + 3;
+				h += Math.round(lk.bungkus(efek, ex0 + 12, ey + 1, ex1 - ex0 - 12, aksen())) + 3;
 			}
 			int min = e.i(Teh.PITA_MIN, 0);
 			if (min > 0) {
 				boolean cukup = pita < 0 || pita >= min;
-				lk.keterangan(TemaUi.k("teh.pita_min", min), ex0, ey + h, ex1 - ex0, cukup ? gaya.teksSamar : 0xFFFF8A7A);
+				lk.teks(TemaUi.k("teh.pita_min", min), ex0, ey + h, ex1 - ex0, cukup ? gaya.teksSamar : lk.gaya.turun());
 				h += 10;
 			}
 			if (aktif.ada(LembarKunci.NAMA)) {
-				lk.keterangan(TemaUi.k("teh.terkuat"), ex0, ey + h, ex1 - ex0, gaya.teksSamar);
+				lk.samar(TemaUi.k("teh.terkuat"), ex0, ey + h, ex1 - ex0);
 				h += 10;
 			}
 			return h;
@@ -87,12 +86,12 @@ public final class LayarTeh extends LayarTemaDasar {
 	}
 
 	private int efekAktif(Lukis l, Lembar aktif, int x0, int y, int x1) {
-		int h = 26;
-		PanelTempat.kartu(l.g, gaya, x0, y, x1, y + h, 0.0F, false);
+		int h = 28;
+		l.kartu(x0, y, x1, y + h, 0.0F, false);
 		l.g.fillGradient(x0 + 1, y + 1, x1 - 1, y + h - 1, 0x307FC8B0, 0x00000000);
 		cangkir(l, x0 + 6, y + 6, 1.0F);
-		l.teks(Brush.bold(TemaUi.k("teh.aktif", aktif.teks(LembarKunci.NAMA))), x0 + 28, y + 4, x1 - x0 - 70, aksen(), 0.9F);
-		l.keterangan(TemaUi.k("teh.aktif_jelas"), x0 + 28, y + 15, x1 - x0 - 70, gaya.teksLemah);
+		l.teks(Brush.bold(TemaUi.k("teh.aktif", aktif.teks(LembarKunci.NAMA))), x0 + 28, y + 4, x1 - x0 - 70, aksen());
+		l.teks(TemaUi.k("teh.aktif_jelas"), x0 + 28, y + 15, x1 - x0 - 70, gaya.teksLemah);
 		CincinWaktu.gambar(l, x1 - 16, y + h / 2.0F, 10.0F, aktif.l(LembarKunci.SISA_TICK, 0L), 6000L, diterima, CincinWaktu.KIRI);
 		return h + 4;
 	}
@@ -116,7 +115,7 @@ public final class LayarTeh extends LayarTemaDasar {
 	/** The ceremony card: the pot pours a thread of tea into three cups in turn. */
 	private void upacara(Lukis l, int x0, int y0, int x1, int y1) {
 		Lembar u = lembar.sub(Teh.UPACARA);
-		PanelTempat.kartu(l.g, gaya, x0, y0, x1, y1, 0.0F, false);
+		l.kartu(x0, y0, x1, y1, 0.0F, false);
 		int sx = x0 + 4;
 		int sy = y0 + 3;
 		int sw = 86;
@@ -135,14 +134,14 @@ public final class LayarTeh extends LayarTemaDasar {
 		Brush.line(l.g, px + 14, py + 7, px + 19, py + 5 + tuang * 2, 2.0F, 0xFF8A4A2A);
 		Brush.line(l.g, px + 19, py + 6 + tuang * 2, px + 20, y1 - 17, 1.0F, Palette.argb(Math.round(0x60 + 0x90 * tuang), 0xC89040));
 		int tx = sx + sw + 6;
-		l.teks(Brush.bold(TemaUi.k("teh.upacara_judul")), tx, y0 + 4, x1 - tx - 100, aksen(), 0.9F);
-		l.keterangan(TemaUi.k("teh.upacara_jelas"), tx, y0 + 15, x1 - tx - 100, gaya.teksLemah);
+		l.teks(Brush.bold(TemaUi.k("teh.upacara_judul")), tx, y0 + 3, x1 - tx - 100, aksen());
+		l.teks(TemaUi.k("teh.upacara_jelas"), tx, y0 + 14, x1 - tx - 100, gaya.teksLemah);
 		long harga = u.l(LembarKunci.HARGA, 0L);
-		LabelHarga.gambar(l, harga, uang(), tx, y0 + 25, false, 0.85F, true);
+		LabelHarga.gambar(l, harga, uang(), tx, y0 + 26, false, true);
 		boolean bisa = u.b(LembarKunci.BISA) && mampu(harga);
 		Component alasan = !u.b(LembarKunci.BISA) ? u.teksAtau(LembarKunci.ALASAN) != null ? u.teks(LembarKunci.ALASAN) : TemaUi.k("teh.upacara_tidak")
 				: !mampu(harga) ? kurang(harga) : null;
-		tombolOp(l, "upacara", x1 - 96, y0 + (y1 - y0) / 2 - 8, 90, 15, TemaUi.k("teh.upacara", TeksTempat.angka(harga)), bisa, alasan,
+		tombolOp(l, "upacara", x1 - 96, y0 + (y1 - y0) / 2 - 8, 90, 15, TemaUi.k("teh.upacara", Brush.angka(harga)), bisa, alasan,
 				Teh.OP_UPACARA);
 	}
 }

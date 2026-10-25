@@ -134,7 +134,7 @@ public final class Payloads {
 		public static final int SECT_TEMPLATE = 5;
 		/** The Kitab Teknik (DESIGN 22.12.1); {@code arg} = the net id to focus, or −1. */
 		public static final int CODEX = 6;
-		/** The Dunia screen (DESIGN 25.10); {@code arg} = the tab: 0 Alam, 1 Pusaka, 2 Musuh, 3 Desa. */
+		/** The Dunia screen (DESIGN 25.10); {@code arg} = the tab: 0 Alam, 1 Pusaka, 2 Musuh, 3 Desa, 4 Duel. */
 		public static final int DUNIA = 7;
 
 		/** Tabs of {@link #DUNIA}. */
@@ -142,6 +142,8 @@ public final class Payloads {
 		public static final int DUNIA_PUSAKA = 1;
 		public static final int DUNIA_MUSUH = 2;
 		public static final int DUNIA_DESA = 3;
+		/** Gulungan › Dunia › Duel (DESIGN 43.14 S1, {@code /kultivasi duel layar}). */
+		public static final int DUNIA_DUEL = 4;
 
 		/**
 		 * The Keabadian screen (DESIGN 26.10, phase 9); {@code arg} = the tab: 0 Alam, 1 Purba, 2 Bencana, 3 Batin, 4 Ciptaan,

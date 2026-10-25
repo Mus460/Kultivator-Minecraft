@@ -1,7 +1,7 @@
 package dev.kultivator.client.disciple.power;
 
-import dev.kultivator.client.disciple.DiscipleScreen;
-import dev.kultivator.client.disciple.DiscipleTab;
+import dev.kultivator.client.disciple.MuridPage;
+import dev.kultivator.client.disciple.MuridSub;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.TalismanButton;
@@ -20,12 +20,12 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Pusaka, the treasure page of the disciple scroll ({@code DiscipleScreen.TAB_TREASURE}; DESIGN 20.3.16-20.3.17): on the
+ * Pusaka, the treasure page of the disciple scroll (Murid › Murid › Kekuatan, under Bakat; DESIGN 20.3.16-20.3.17): on the
  * left the natal treasure (four talismans to choose its form once, then its seal with the folds, the next fold's cost
  * and chance and the "Tempa Lipatan" talisman); on the right the Undying Codex ladder with the Undying Blood bar, the
  * Heavenly Flame orbs (and a running absorption) and the Kunpeng Wings with their talisman.
  */
-public class TreasureTab extends DiscipleTab {
+public class TreasureTab extends MuridSub {
 
 	private static final int BUTTON_H = 17;
 	private static final String P = "kultivator.dpower.";
@@ -36,9 +36,22 @@ public class TreasureTab extends DiscipleTab {
 	private final List<TalismanButton> forms = new ArrayList<>();
 	private TalismanButton enhance;
 	private TalismanButton kunpeng;
+	/** The refine-cost height the forms were placed under (a new count may wrap differently: lay out again). */
+	private int costH = -1;
 
-	public TreasureTab(DiscipleScreen screen) {
-		super(screen);
+	public TreasureTab(MuridPage murid) {
+		super(murid);
+	}
+
+	@Override
+	public String helpTopic() {
+		return "bakat";
+	}
+
+	/** Stacked under Kekuatan: tall enough for its column of talismans and lines at 1.0 (43.0.5). */
+	@Override
+	public int tinggiMin() {
+		return 196;
 	}
 
 	@Override
@@ -63,8 +76,10 @@ public class TreasureTab extends DiscipleTab {
 	protected void build() {
 		forms.clear();
 		columnW = Math.max(110, Math.min(180, Math.round(w * 0.45F)));
-		int top = y + 26;
-		int gap = Math.max(2, Math.min(4, (h - 60 - 4 * BUTTON_H) / 4));
+		// The forms go under the wrapped refine cost (1.0 text, 43.0.5).
+		costH = Math.round(Brush.wrapHeight(font, refineCost(), columnW - 4.0F, 1.0F));
+		int top = y + 16 + costH;
+		int gap = Math.max(2, Math.min(4, (y + h - top - 30 - 4 * BUTTON_H) / 4));
 		for (int i = 0; i < PowerIds.NATAL_IDS.length; i++) {
 			int form = i;
 			TalismanButton button = add(new TalismanButton(x + 2, top + i * (BUTTON_H + gap), columnW - 4, BUTTON_H,
@@ -125,13 +140,23 @@ public class TreasureTab extends DiscipleTab {
 		return forms.contains(widget) ? !refined : true;
 	}
 
+	@Override
+	public boolean needsRebuild() {
+		return costH != Math.round(Brush.wrapHeight(font, refineCost(), columnW - 4.0F, 1.0F));
+	}
+
+	private Component refineCost() {
+		CompoundTag natal = natal();
+		return Component.translatable(P + "natal.refine_cost", natal.getIntOr("diamonds", 0), natal.getIntOr("feathers", 0));
+	}
+
 	// ================================================================== drawing
 
 	@Override
 	protected void drawBehind(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
 		CompoundTag power = power();
 		if (power.isEmpty()) {
-			heading(g, title(), x + 2.0F, y, w - 4.0F, 0.8F);
+			heading(g, title(), x + 2.0F, y, w - 4.0F, 1.0F);
 			return;
 		}
 		drawNatal(g, natal(), mouseX, mouseY);
@@ -141,14 +166,13 @@ public class TreasureTab extends DiscipleTab {
 	private void drawNatal(GuiGraphicsExtractor g, CompoundTag natal, int mouseX, int mouseY) {
 		float x0 = x + 2.0F;
 		float width = columnW - 4.0F;
-		heading(g, Component.translatable(P + "natal.heading"), x0, y, width, 0.8F);
+		heading(g, Component.translatable(P + "natal.heading"), x0, y, width, 1.0F);
 		int form = natal.getIntOr("form", -1);
 		if (form < 0) {
-			Component cost = Component.translatable(P + "natal.refine_cost", natal.getIntOr("diamonds", 0), natal.getIntOr("feathers", 0));
-			Brush.fit(g, font, cost, x0, y + 13.0F, width, Palette.INK_SOFT, 0.6F, 0.4F, false);
+			Brush.wrap(g, font, refineCost(), x0, y + 14.0F, width, Palette.INK_SOFT, 1.0F, false);
 			String why = natal.getStringOr("refine_reason", "");
 			if (!why.isEmpty()) {
-				Brush.wrap(g, font, Component.translatable(why), x0, y + h - 18.0F, width, Palette.DANGER, 0.55F, false);
+				Brush.wrap(g, font, Component.translatable(why), x0, y + h - 20.0F, width, Palette.DANGER, 1.0F, false);
 			}
 			return;
 		}
@@ -156,7 +180,7 @@ public class TreasureTab extends DiscipleTab {
 		int max = natal.getIntOr("max_folds", 18);
 		int tone = folds >= 9 ? GOLD : folds >= 3 ? SILVER : 0xFF9AA49C;
 		// The treasure's seal: a round disc in its tier's metal with the folds around it.
-		float size = Math.max(26.0F, Math.min(44.0F, h * 0.3F));
+		float size = Math.max(30.0F, Math.min(44.0F, h * 0.3F));
 		float cx = x0 + size / 2.0F + 2.0F;
 		float cy = y + 14.0F + size / 2.0F;
 		Brush.disc(g, cx + 1.0F, cy + 1.5F, size / 2.0F, 0x40000000);
@@ -171,26 +195,26 @@ public class TreasureTab extends DiscipleTab {
 		drawForm(g, form, cx, cy, size * 0.55F, Palette.darken(tone, 0.6F));
 		float tx = cx + size / 2.0F + 6.0F;
 		float tw = x0 + width - tx;
-		Brush.fit(g, font, Brush.bold(Component.translatable(P + "natal.form." + PowerIds.NATAL_IDS[form])), tx, y + 14.0F, tw, Palette.INK, 0.8F, 0.45F, false);
-		Brush.fit(g, font, Component.translatable(P + "natal.folds", folds, max), tx, y + 24.0F, tw, Palette.onPaper(tone), 0.65F, 0.42F, false);
-		Brush.fit(g, font, Component.translatable(P + "natal.damage", folds * 5), tx, y + 32.0F, tw, Palette.INK_SOFT, 0.6F, 0.4F, false);
-		float ty = cy + size / 2.0F + 8.0F;
+		Brush.fit(g, font, Brush.bold(Component.translatable(P + "natal.form." + PowerIds.NATAL_IDS[form])), tx, y + 14.0F, tw, Palette.INK, 1.0F, 1.0F, false);
+		Brush.fit(g, font, Component.translatable(P + "natal.folds", folds, max), tx, y + 24.0F, tw, Palette.onPaper(tone), 1.0F, 1.0F, false);
+		Brush.fit(g, font, Component.translatable(P + "natal.damage", folds * 5), tx, y + 34.0F, tw, Palette.INK_SOFT, 1.0F, 1.0F, false);
+		float ty = Math.max(cy + size / 2.0F + 8.0F, y + 46.0F);
 		Component ability = folds >= 9 ? Component.translatable(P + "natal.ability." + PowerIds.NATAL_IDS[form] + (folds >= 14 ? ".eternal" : ""))
 				: Component.translatable(P + "natal.ability.locked");
-		int abilityBottom = y + h - BUTTON_H - 20;
+		float costY = y + h - BUTTON_H - 22.0F;
+		int abilityBottom = Math.round(costY) - 2;
 		g.enableScissor(Math.round(x0), Math.round(ty), Math.round(x0 + width), abilityBottom);
-		Brush.wrap(g, font, ability, x0, ty, width, folds >= 9 ? Palette.JADE_DARK : Palette.INK_FAINT, 0.58F, false);
+		Brush.wrap(g, font, ability, x0, ty, width, folds >= 9 ? Palette.JADE_DARK : Palette.INK_FAINT, 1.0F, false);
 		g.disableScissor();
-		float costY = y + h - BUTTON_H - 17.0F;
 		Component cost = Component.translatable(P + "natal.next", natal.getIntOr("next_feathers", 1), natal.getIntOr("feathers", 0),
 				natal.getIntOr("next_pk", 40), Math.round(natal.getDoubleOr("chance", 0.0D) * 100.0D));
-		Brush.fit(g, font, cost, x0, costY, width, Palette.INK_SOFT, 0.55F, 0.4F, false);
+		Brush.fit(g, font, cost, x0, costY, width, Palette.INK_SOFT, 1.0F, 1.0F, false);
 		String why = natal.getStringOr("enhance_reason", "");
 		if (!why.isEmpty()) {
-			Brush.fit(g, font, Component.translatable(why), x0, costY + 7.0F, width, Palette.DANGER, 0.52F, 0.38F, false);
+			Brush.fit(g, font, Component.translatable(why), x0, costY + 10.0F, width, Palette.DANGER, 1.0F, 1.0F, false);
 		}
 		if (mouseX >= cx - size / 2.0F && mouseX < cx + size / 2.0F && mouseY >= cy - size / 2.0F && mouseY < cy + size / 2.0F) {
-			screen.showTooltip(List.of(Component.translatable(P + "natal.form." + PowerIds.NATAL_IDS[form]).withStyle(ChatFormatting.GOLD),
+			tooltip(List.of(Component.translatable(P + "natal.form." + PowerIds.NATAL_IDS[form]).withStyle(ChatFormatting.GOLD),
 					Component.translatable(P + "natal.tiers"), TalentTab.source("natal")));
 		}
 	}
@@ -226,26 +250,25 @@ public class TreasureTab extends DiscipleTab {
 		float width = x1 - x0;
 		float cy = y;
 		// The Undying Codex.
-		heading(g, Component.translatable(P + "codex.heading"), x0, cy, width, 0.8F);
-		cy += 13.0F;
+		heading(g, Component.translatable(P + "codex.heading"), x0, cy, width, 1.0F);
+		cy += 14.0F;
 		CompoundTag codex = power.getCompoundOrEmpty("codex");
 		boolean access = codex.getBooleanOr("access", false);
 		int stage = codex.getIntOr("stage", 0);
 		float ladderTop = cy;
 		if (!access) {
-			Brush.wrap(g, font, Component.translatable(P + "codex.locked"), x0, cy, width, Palette.INK_FAINT, 0.58F, false);
-			cy += 22.0F;
+			cy += Brush.wrap(g, font, Component.translatable(P + "codex.locked"), x0, cy, width, Palette.INK_FAINT, 1.0F, false) + 3.0F;
 		} else {
 			float step = width / 4.0F;
 			for (int i = 0; i < 4; i++) {
 				float sx = x0 + step * i;
 				boolean done = i < stage;
 				int color = done ? (i == 1 ? GOLD : i == 0 ? SILVER : 0xFF8FB8A0) : 0x60465950;
-				Brush.rect(g, sx + 1.0F, cy, sx + step - 1.0F, cy + 9.0F, done ? Palette.argb(0xC0, color) : Palette.argb(0x30, Palette.PAPER_DEEP));
+				Brush.rect(g, sx + 1.0F, cy, sx + step - 1.0F, cy + 11.0F, done ? Palette.argb(0xC0, color) : Palette.argb(0x30, Palette.PAPER_DEEP));
 				Brush.fitCentered(g, font, Component.translatable(P + "codex.stage." + (i + 1) + ".short"), sx + step / 2.0F, cy + 1.5F, step - 3.0F,
-						done ? Palette.INK : Palette.INK_FAINT, 0.55F, 0.35F, false);
+						done ? Palette.INK : Palette.INK_FAINT, 1.0F, 1.0F, false);
 			}
-			cy += 11.0F;
+			cy += 13.0F;
 			int blood = codex.getIntOr("blood", 0);
 			Brush.rect(g, x0, cy, x1, cy + 4.0F, Palette.mix(Palette.PAPER_BOTTOM, Palette.INK, 0.25F));
 			if (blood > 0) {
@@ -255,11 +278,11 @@ public class TreasureTab extends DiscipleTab {
 			int next = codex.getIntOr("next_at", 0);
 			Component points = next > 0 ? Component.translatable(P + "codex.points", codex.getIntOr("pts", 0), next, blood)
 					: Component.translatable(P + "codex.points_full", codex.getIntOr("pts", 0));
-			Brush.fit(g, font, points, x0, cy, width, Palette.INK_SOFT, 0.55F, 0.38F, false);
-			cy += 7.0F;
+			Brush.fit(g, font, points, x0, cy, width, Palette.INK_SOFT, 1.0F, 1.0F, false);
+			cy += 10.0F;
 			Brush.fit(g, font, Component.translatable(P + "codex.today", codex.getIntOr("day_pts", 0), codex.getIntOr("day_cap", 200)), x0, cy, width,
-					Palette.INK_FAINT, 0.52F, 0.36F, false);
-			cy += 8.0F;
+					Palette.INK_FAINT, 1.0F, 1.0F, false);
+			cy += 11.0F;
 		}
 		if (mouseX >= x0 && mouseX < x1 && mouseY >= ladderTop && mouseY < cy) {
 			List<Component> tip = new ArrayList<>();
@@ -272,13 +295,13 @@ public class TreasureTab extends DiscipleTab {
 				tip.add(Component.translatable(P + "codex.trained", String.format(Locale.ROOT, "%.0f", trained)).withStyle(ChatFormatting.AQUA));
 			}
 			tip.add(TalentTab.source("codex"));
-			screen.showTooltip(tip);
+			tooltip(tip);
 		}
 
 		// The Heavenly Flames.
 		cy += 2.0F;
-		heading(g, Component.translatable(P + "flame.heading"), x0, cy, width, 0.8F);
-		cy += 13.0F;
+		heading(g, Component.translatable(P + "flame.heading"), x0, cy, width, 1.0F);
+		cy += 14.0F;
 		ListTag flames = power.getListOrEmpty("flames");
 		int owned = 0;
 		for (int i = 0; i < flames.size(); i++) {
@@ -296,7 +319,7 @@ public class TreasureTab extends DiscipleTab {
 			Brush.disc(g, ox, oy, orb, has ? Palette.opaque(rgb) : 0x50465950);
 			Brush.disc(g, ox, oy - orb * 0.3F, orb * 0.4F, has ? 0xC0FFFFFF : 0x30FFFFFF);
 			if (mouseX >= ox - orb && mouseX < ox + orb && mouseY >= oy - orb && mouseY < oy + orb) {
-				screen.showTooltip(List.of(Component.translatable("item.kultivator.heavenly_flame_seed." + PowerIds.FLAME_IDS[kind]).withColor(rgb),
+				tooltip(List.of(Component.translatable("item.kultivator.heavenly_flame_seed." + PowerIds.FLAME_IDS[kind]).withColor(rgb),
 						Component.translatable(P + "flame.where." + PowerIds.FLAME_IDS[kind]),
 						Component.translatable(has ? P + "flame.owned" : P + "flame.missing").withStyle(ChatFormatting.GRAY),
 						TalentTab.source("flame")));
@@ -307,13 +330,13 @@ public class TreasureTab extends DiscipleTab {
 		Component flameLine = ritualLeft > 0 ? Component.translatable(P + "flame.ritual_left", (ritualLeft + 19) / 20)
 				: !power.getBooleanOr("flame_eligible", false) ? Component.translatable(P + "why.flame_unfit")
 				: Component.translatable(P + "flame.count", flames.size(), power.getIntOr("flame_max", 3));
-		Brush.fit(g, font, flameLine, x0, cy, width, ritualLeft > 0 ? Palette.WARN : Palette.INK_SOFT, 0.58F, 0.38F, false);
-		cy += 9.0F;
+		Brush.fit(g, font, flameLine, x0, cy, width, ritualLeft > 0 ? Palette.WARN : Palette.INK_SOFT, 1.0F, 1.0F, false);
+		cy += 11.0F;
 
 		// The Kunpeng Wings.
-		if (power.getBooleanOr("kunpeng", false) && cy < y + h - BUTTON_H - 8) {
+		if (power.getBooleanOr("kunpeng", false) && cy < y + h - BUTTON_H - 10) {
 			Component wings = Component.translatable(power.getBooleanOr("kunpeng_full", false) ? P + "kunpeng.state_full" : P + "kunpeng.state_third");
-			Brush.fit(g, font, wings, x0, y + h - BUTTON_H - 9.0F, width, Palette.onPaper(0x8FD0FF), 0.58F, 0.38F, false);
+			Brush.fit(g, font, wings, x0, y + h - BUTTON_H - 11.0F, width, Palette.onPaper(0x8FD0FF), 1.0F, 1.0F, false);
 		}
 	}
 }

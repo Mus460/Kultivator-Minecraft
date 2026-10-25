@@ -124,6 +124,7 @@ final class Aksi {
 		UUID owner = player.getUUID();
 		DiplomasiData data = DiplomasiData.get(server);
 		Relasi r = data.relasi(owner, sect);
+		if (DiplomasiGabung.vetoKirim(player, sect.id, action >= 0 && action < IDS.length ? IDS[action] : "")) return;
 		Component why = why(server, owner, sect, r, action);
 		if (why != null) {
 			player.sendSystemMessage(why.copy().withStyle(ChatFormatting.RED));

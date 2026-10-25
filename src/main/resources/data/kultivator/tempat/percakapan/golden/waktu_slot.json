@@ -1,0 +1,434 @@
+{
+  "id": "waktu_slot",
+  "jenis": "realisasi",
+  "_catatan": "Typed slots: waktu_lalu at 0/1/2/5/10/30/90 days, prices, numbers above twenty (gossip of a neighbour).",
+  "benih_dunia": 42,
+  "masukan": {
+    "niat": "BERI_KABAR",
+    "pembicara": 404,
+    "hari": 120,
+    "now": 2880000,
+    "cuaca": "cerah",
+    "musim": "semi",
+    "situasi": {
+      "jam": "pagi",
+      "cuaca": "cerah",
+      "musim": "semi",
+      "kelompok": "pekerja",
+      "watak": "ramah",
+      "kebiasaan": [
+        "gosip_sumur"
+      ],
+      "sifat": {
+        "H": 10,
+        "E": 0,
+        "X": 20,
+        "A": 30,
+        "C": 10,
+        "O": 0
+      },
+      "wajah": "netral",
+      "tempat": "kota_besar"
+    },
+    "pendengar": {
+      "nama": "Han",
+      "kelamin": "l",
+      "tahap": "dewasa",
+      "pemain": true
+    },
+    "kesan": "kenal",
+    "tahu_nama": false,
+    "register": "biasa",
+    "dialek": "kampung"
+  },
+  "langkah": [
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [
+            "gosip_sumur"
+          ],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar",
+          "fakta": "PINDAH"
+        },
+        "nilai": {
+          "fakta.subjek": {
+            "orang": {
+              "nama": "Paman Li",
+              "kelamin": "l",
+              "tahap": "dewasa"
+            }
+          },
+          "fakta.objek": {
+            "t": "Kota Awan"
+          },
+          "fakta.hariKejadian": 120
+        },
+        "topik": "tetangga"
+      },
+      "harap": {
+        "k": "kultivator.cakap.kabar.pindah.1.kampung",
+        "a": [
+          {
+            "t": "Paman Li"
+          },
+          {
+            "t": "Kota Awan"
+          }
+        ]
+      },
+      "aturan": "kabar.pindah",
+      "gestur": "tunjuk",
+      "seru": null,
+      "tik": null,
+      "id_id": "Paman Li merantau ke Kota Awan. Anak kampung kalau sudah besar, pergi semua.",
+      "en_us": "Paman Li went off to Kota Awan. Village kids grow up and all leave."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [
+            "gosip_sumur"
+          ],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar",
+          "fakta": "PINDAH"
+        },
+        "nilai": {
+          "fakta.subjek": {
+            "orang": {
+              "nama": "Paman Li",
+              "kelamin": "l",
+              "tahap": "dewasa"
+            }
+          },
+          "fakta.objek": {
+            "t": "Kota Awan"
+          },
+          "fakta.hariKejadian": 119
+        },
+        "topik": "tetangga"
+      },
+      "harap": {
+        "k": "kultivator.cakap.tetangga.umum.0.kampung",
+        "a": []
+      },
+      "aturan": "tetangga.umum",
+      "gestur": "tunjuk",
+      "seru": null,
+      "tik": null,
+      "id_id": "Tetangga sebelah baru beli kambing, Nak. Sekarang tiap pagi kebangun gara-gara mengembik.",
+      "en_us": "The neighbour bought a goat, child. Now I wake every morning to bleating."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [
+            "gosip_sumur"
+          ],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar",
+          "fakta": "PINDAH"
+        },
+        "nilai": {
+          "fakta.subjek": {
+            "orang": {
+              "nama": "Paman Li",
+              "kelamin": "l",
+              "tahap": "dewasa"
+            }
+          },
+          "fakta.objek": {
+            "t": "Kota Awan"
+          },
+          "fakta.hariKejadian": 118
+        },
+        "topik": "tetangga"
+      },
+      "harap": {
+        "k": "kultivator.cakap.kabar.pindah.2",
+        "a": [
+          {
+            "t": "Paman Li"
+          }
+        ]
+      },
+      "aturan": "kabar.pindah",
+      "gestur": "tunjuk",
+      "seru": null,
+      "tik": null,
+      "id_id": "Sebelum pindah, Paman Li menitipkan kucingnya padaku. Sekarang kucing itu tidur di kursiku.",
+      "en_us": "Before moving, Paman Li left me their cat. Now the cat sleeps on my chair."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [
+            "gosip_sumur"
+          ],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar",
+          "fakta": "PINDAH"
+        },
+        "nilai": {
+          "fakta.subjek": {
+            "orang": {
+              "nama": "Paman Li",
+              "kelamin": "l",
+              "tahap": "dewasa"
+            }
+          },
+          "fakta.objek": {
+            "t": "Kota Awan"
+          },
+          "fakta.hariKejadian": 115
+        },
+        "topik": "tetangga"
+      },
+      "harap": {
+        "k": "kultivator.cakap.kabar.pindah.0",
+        "a": [
+          {
+            "t": "Paman Li"
+          },
+          {
+            "t": "Kota Awan"
+          },
+          {
+            "k": "kultivator.cakap.lex.hari_lalu",
+            "a": [
+              {
+                "k": "kultivator.cakap.lex.angka.5",
+                "a": []
+              }
+            ]
+          }
+        ]
+      },
+      "aturan": "kabar.pindah",
+      "gestur": "tunjuk",
+      "seru": null,
+      "tik": null,
+      "id_id": "Paman Li pindah ke Kota Awan lima hari lalu. Rumahnya sekarang kosong.",
+      "en_us": "Paman Li moved to Kota Awan five days ago. The house stands empty now."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [
+            "gosip_sumur"
+          ],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar",
+          "fakta": "PINDAH"
+        },
+        "nilai": {
+          "fakta.subjek": {
+            "orang": {
+              "nama": "Paman Li",
+              "kelamin": "l",
+              "tahap": "dewasa"
+            }
+          },
+          "fakta.objek": {
+            "t": "Kota Awan"
+          },
+          "fakta.hariKejadian": 110
+        },
+        "topik": "tetangga"
+      },
+      "harap": {
+        "k": "kultivator.cakap.kabar.pindah.1.kampung",
+        "a": [
+          {
+            "t": "Paman Li"
+          },
+          {
+            "t": "Kota Awan"
+          }
+        ]
+      },
+      "aturan": "kabar.pindah",
+      "gestur": "tunjuk",
+      "seru": null,
+      "tik": null,
+      "id_id": "Paman Li merantau ke Kota Awan. Anak kampung kalau sudah besar, pergi semua.",
+      "en_us": "Paman Li went off to Kota Awan. Village kids grow up and all leave."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [
+            "gosip_sumur"
+          ],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar",
+          "fakta": "PINDAH"
+        },
+        "nilai": {
+          "fakta.subjek": {
+            "orang": {
+              "nama": "Paman Li",
+              "kelamin": "l",
+              "tahap": "dewasa"
+            }
+          },
+          "fakta.objek": {
+            "t": "Kota Awan"
+          },
+          "fakta.hariKejadian": 90
+        },
+        "topik": "tetangga"
+      },
+      "harap": {
+        "k": "kultivator.cakap.tetangga.umum.1",
+        "a": []
+      },
+      "aturan": "tetangga.umum",
+      "gestur": "tunjuk",
+      "seru": null,
+      "tik": null,
+      "id_id": "Keluarga baru pindah ke ujung gang. Anaknya tiga, semuanya ribut.",
+      "en_us": "A new family moved to the end of the lane. Three kids, all noisy."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [
+            "gosip_sumur"
+          ],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kota_besar",
+          "fakta": "PINDAH"
+        },
+        "nilai": {
+          "fakta.subjek": {
+            "orang": {
+              "nama": "Paman Li",
+              "kelamin": "l",
+              "tahap": "dewasa"
+            }
+          },
+          "fakta.objek": {
+            "t": "Kota Awan"
+          },
+          "fakta.hariKejadian": 30
+        },
+        "topik": "tetangga"
+      },
+      "harap": {
+        "k": "kultivator.cakap.kabar.pindah.3",
+        "a": [
+          {
+            "t": "Paman Li"
+          },
+          {
+            "t": "Kota Awan"
+          },
+          {
+            "k": "kultivator.cakap.frag.doa.6",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "kabar.pindah",
+      "gestur": "tunjuk",
+      "seru": null,
+      "tik": null,
+      "id_id": "Semoga Paman Li betah di Kota Awan. Semoga panjang umur dan sehat.",
+      "en_us": "I hope Paman Li settles well in Kota Awan. Long life and good health to you."
+    }
+  ]
+}

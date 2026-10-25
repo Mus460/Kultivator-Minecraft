@@ -21,6 +21,16 @@ after the lots with dy = -naik, so they stand on the lower floor and end on the 
 the NBT: a processor per alignment swaps the base blocks (white jade and blue tiles) for neutral wood and gold or
 demonic blackstone and blood red (38.C.3.2); demonic halls and pools that the other two have not are their own lots.
 Only world generation in NEW chunks places these templates (DESIGN 38.0 rule 1). Deterministic: the same bytes each run.
+
+DESIGN 41.11.2 (joining an NPC sect, module 41W-G): the court's servants' storehouse lot is now the Merit Pavilion
+(halaman/paviliun_jasa; in a small sect's only court it takes the refectory's lot and the kitchen moves into a wing of
+the outer dormitory, halaman/asrama_dapur), and the lots carry the named titik of 41 as kompleks/<titik> anchors
+(protect 0, Rotation = the way a body put there faces) that KompleksAnchors stores per sect: jasa, jasa_meja,
+papan_misi, pesanan (pavilion), altar_sumpah, hukum (main hall; the Iblis compound's blood altar is its altar_sumpah),
+ujian_corak, pilar_0..4, kandang, lorong (training ground), kerja:sumur, kerja:tong (herb garden), kediaman_0..5 and
+gua_renungan (meditation caves of the inner court; of the summit in the middle band), kediaman_dalam_0..3 (inner
+disciples' rooms), kediaman_puncak_0..1 (two retreat pavilions beside the summit hall / in the small master's garden),
+ujian_bawah, ujian_atas (first step and top landing of the climb out of the court) and ujian_darah (blood pool).
 """
 import hashlib
 import json
@@ -360,6 +370,47 @@ def batu_hias(k, x, y, z, h=3):
     k.put(x, y + h, z, "minecraft:moss_carpet")
 
 
+def titik41(k, x, y, z, nama, yaw=0.0, **data):
+    """A DESIGN 41 titik (41.11.2): anchor kompleks/<nama>, stored by KompleksAnchors as the sect's named spot (read
+    through KompleksApi.spot / TitikGabung); no protection radius of its own (the situs anchor protects the court).
+    yaw = the way a body or entity put there faces (0 south, 90 west, 180 north, 270 east)."""
+    k.jangkar(x, y, z, "kompleks/" + nama, yaw=yaw, protect=0, **data)
+
+
+def tegak_lilin(k, x, y, z, n=3):
+    """A candle stand: a fence post with lit white candles on top."""
+    k.put(x, y, z, "wood_fence")
+    k.put(x, y + 1, z, "minecraft:white_candle", {"candles": str(n), "lit": "true", "waterlogged": "false"})
+
+
+RAK_KOSONG = {"facing": "south", "slot_0_occupied": "false", "slot_1_occupied": "false", "slot_2_occupied": "false",
+              "slot_3_occupied": "false", "slot_4_occupied": "false", "slot_5_occupied": "false"}
+
+
+def rak_giok(k, x, y, z, facing):
+    """An empty jade-stock rack (chiseled bookshelf with no books: the wares are shown by the Paviliun screen)."""
+    st = dict(RAK_KOSONG)
+    st["facing"] = facing
+    k.put(x, y, z, "minecraft:chiseled_bookshelf", st)
+
+
+def tumpuk_stok(k, x0, z0, x1, z1, y):
+    """A fixed stack of stock (barrels, sacks of hay, bound crates) - no canvas random, so the lot stays identical in every
+    canvas that draws it."""
+    for x in range(x0, x1 + 1):
+        for z in range(z0, z1 + 1):
+            m = (x * 5 + z * 3) % 7
+            h = 2 if m in (0, 2, 3, 5) else 1
+            for dy in range(h):
+                r = (m + dy * 3) % 5
+                if r in (0, 3):
+                    K.barrel(k, x, y + dy, z, ("up", "north", "east")[(x + z + dy) % 3])
+                elif r == 1:
+                    k.put(x, y + dy, z, "minecraft:hay_block", {"axis": "y"})
+                else:
+                    k.put(x, y + dy, z, "minecraft:stripped_spruce_wood", {"axis": "y"})
+
+
 # ===================================================================================================== HALAMAN
 def gerbang_halaman(k):
     """The court gate on the south wall (lot (1,2)): a two-storey gatehouse with three passages, a drum loft, a gold name
@@ -408,12 +459,19 @@ def gerbang_halaman(k):
     k.jalur([(72, 142), (72, 126), (72, 108), (72, 98)], jalur="gerbang")
 
 
-def asrama_luar(k):
-    """Outer disciples' dormitory (lot (0,2)): two long halls of eight beds facing a laundry court with a well."""
+def asrama_luar(k, dapur=False):
+    """Outer disciples' dormitory (lot (0,2)): two long halls of eight beds facing a laundry court with a well. In a small
+    sect's only court (dapur=True, DESIGN 41.11.2) the Merit Pavilion takes the refectory's lot, so the south hall is the
+    dormitory's kitchen wing and refectory (dapur_sayap)."""
     for (z0, z1, door) in ((101, 112, "south"), (122, 133, "north")):
         f = K.podium(k, 6, z0, 40, z1, LY, 1, steps=(door,), step_w=3)
         inner = K.hall(k, 7, z0 + 1, 39, z1 - 1, f, 5, door_sides=(door,), door_w=2, windows=4)
         ix0, iz0, ix1, iz1 = inner
+        if dapur and door == "north":
+            dapur_sayap(k, ix0, iz0, ix1, iz1, f)
+            K.gable(k, 6, f + 6, z0, 40, z1, along="x", overhang=1)
+            k.titik("pintu", 23, f + 1, z0 - 1, door)
+            continue
         for x in range(ix0 + 1, ix1, 4):
             if abs(x - 23) <= 2:
                 continue
@@ -440,6 +498,54 @@ def asrama_luar(k):
     k.titik("obrol", 32, LY + 1, 117, "west")
     k.titik("kerja:sapu", 28, LY + 1, 120, "west")
     k.jalur([(23, 98), (23, 117), (44, 117), (64, 117)], jalur="asrama")
+
+
+def dapur_sayap(k, ix0, iz0, ix1, iz1, f):
+    """The kitchen wing of a small sect's dormitory (DESIGN 41.11.2; interior ix0..ix1 x iz0..iz1, door on the north at
+    x 22-23): west of a plank partition the kitchen - a stove wall with smoker, furnace and pot rack, two cooking fires
+    under hanging cauldrons (the court's only lit fires), a chopping counter, a larder of barrels and sacks, a water vat;
+    east of it the refectory - two long tables with benches for sixteen and a banner of the sect."""
+    px = ix0 + 13
+    for z in range(iz0, iz1 + 1):
+        for dy in range(1, 5):
+            if 127 <= z <= 128 and dy <= 2:
+                k.put(px, f + dy, z, "minecraft:air")
+            elif dy == 4:
+                k.put(px, f + dy, z, "beam", {"axis": "z"})
+            else:
+                k.put(px, f + dy, z, "wood")
+    # kitchen
+    K.furnish_kitchen(k, ix0 + 1, iz0, px - 1, f, iz1, "north", lit_fire=True)
+    for x in (ix0 + 3, ix0 + 9):
+        k.put(x, f + 1, iz0 + 3, "minecraft:campfire", {"facing": "north", "lit": "true", "signal_fire": "false",
+                                                       "waterlogged": "false"})
+        k.put(x, f + 2, iz0 + 3, "minecraft:cauldron")
+        k.put(x, f + 3, iz0 + 3, "minecraft:iron_chain", {"axis": "y", "waterlogged": "false"})
+        k.put(x, f + 4, iz0 + 3, "minecraft:iron_chain", {"axis": "y", "waterlogged": "false"})
+        k.titik("kerja:kuali", x, f + 1, iz0 + 2, "south")
+    K.counter(k, ix0 + 4, ix0 + 8, iz0, f, "south")
+    k.titik("kerja:lumpang", ix0 + 6, f + 1, iz0 + 1, "north")
+    for z in (iz0, iz0 + 1):
+        K.barrel(k, ix0, f + 1, z, "east")
+        K.barrel(k, ix0, f + 2, z, "east")
+    k.put(ix0, f + 1, iz0 + 3, "minecraft:hay_block", {"axis": "y"})
+    k.put(ix0, f + 1, iz0 + 4, "minecraft:water_cauldron", {"level": "3"})
+    k.put(ix0, f + 1, iz0 + 5, "minecraft:barrel", {"facing": "up", "open": "false"})
+    k.put(ix0, f + 2, iz0 + 5, "minecraft:flower_pot")
+    # refectory
+    n = 0
+    for z in (iz0 + 2, iz0 + 5):
+        for x in range(px + 4, ix1):
+            K.table(k, x, f + 1, z)
+            if (x - px) % 3 == 1 and n < 16:
+                K.chair(k, x, f + 1, z - 1, "south")
+                K.chair(k, x, f + 1, z + 1, "north")
+                k.titik("kursi", x, f + 1, z - 1, "south")
+                k.titik("kursi", x, f + 1, z + 1, "north")
+                n += 2
+        k.titik("meja_makan", (px + 4 + ix1) // 2, f + 1, z, "south")
+    K.wall_banner(k, (px + ix1) // 2, f + 3, iz1, "north")
+    K.lit(k, px + 8, f + 5, iz0 + 3, chain=1, role="lamp")
 
 
 def dapur_makan(k):
@@ -487,8 +593,10 @@ def dapur_makan(k):
 
 
 def lapangan_latihan(k):
-    """Training ground (lot (1,1)): a 36 x 36 stone court with a carved border, six dummies, striking posts, weapon
-    racks, a referee's drum, banner poles, stone benches for spectators; 12 drill points (38.C.3.2)."""
+    """Training ground (lot (1,1)): a 36 x 36 stone court with a carved border. North: four dummies, three striking posts,
+    the weapon rack and the referee's drums; middle: 12 drill points (38.C.3.2); west: the Bronze Men Corridor (titik
+    lorong); south: the Ring of Five Pillars (titik ujian_corak, pilar_0..4) and, in the south-east corner, the beast pen
+    (titik kandang) of the corak tests (DESIGN 41.5.4, 41.11.2); stone benches for spectators on both sides."""
     x0, z0, x1, z1 = 54, 54, 89, 89
     for x in range(x0, x1 + 1):
         for z in range(z0, z1 + 1):
@@ -497,67 +605,317 @@ def lapangan_latihan(k):
                   ("paving_alt" if ((x - x0) // 6 + (z - z0) // 6) % 2 else "paving"))
     for x in range(x0, x1 + 1):
         for z in (z0, z1):
-            if not 69 <= x <= 74:
+            if not (69 <= x <= 74 or 56 <= x <= 59):
                 k.put(x, LY + 1, z, "kerb_wall")
     for z in range(z0, z1 + 1):
         for x in (x0, x1):
             if not 69 <= z <= 74:
                 k.put(x, LY + 1, z, "kerb_wall")
-    for i, x in enumerate((60, 72, 84)):
-        boneka(k, x + 0.5, LY + 1, 59.5, 0.0, "wooden_sword", "leather_chestplate" if i == 1 else None)
-        boneka(k, x + 0.5, LY + 1, 84.5, 180.0, "stone_sword")
-        tiang_latih(k, x - 3, LY + 1, 64)
-    rak_senjata(k, x0 + 1, 64, LY, "east", n=6)
+    for i, x in enumerate((64, 72, 80, 86)):
+        boneka(k, x + 0.5, LY + 1, 59.5, 0.0, ("wooden_sword", "stone_sword")[i % 2], "leather_chestplate" if i == 1 else None)
+    for x in (67, 77, 83):
+        tiang_latih(k, x, LY + 1, 64)
     rak_senjata(k, x1 - 1, 64, LY, "west", n=6)
     K.drum(k, 72, LY + 1, z0 + 1, "south")
     K.drum(k, 71, LY + 1, z0 + 1, "south")
-    for x in (57, 86):
+    for x in (63, 86):
         K.banner_pole(k, x, LY + 1, z0 + 2, height=6)
     for z in (60, 72, 84):
         bangku_batu(k, x0 - 3, z, "east", n=3)
         bangku_batu(k, x1 + 3, z - 2, "west", n=3)
         k.titik("penonton", x0 - 3, LY + 1, z + 1, "east")
         k.titik("penonton", x1 + 3, LY + 1, z - 1, "west")
-    for x in range(60, 85, 8):
-        for z in range(68, 81, 6):
+    for x in (64, 70, 76, 82):
+        for z in (67, 72, 77):
             k.titik("latihan", x, LY + 1, z, "north")
     k.titik("jaga", 72, LY + 1, z0 + 2, "south")
     k.jangkar(72.0, LY + 1, 72.0, "kompleks/arena", protect=36)
+    lorong_perunggu(k, 55, z0 + 1, 60, z1 - 1)
+    lingkar_pilar(k, 72, 83)
+    kandang(k, 81, 80, 88, 88)
 
 
-def gudang_pelayan(k):
-    """Storehouse and servants' quarters (lot (2,1)): granary with crates and sacks, a cart, a servants' house of four
-    beds, a firewood stack and a wash place."""
-    f = K.podium(k, 100, 53, 121, 70, LY, 1, steps=("south",), step_w=3)
-    K.hall(k, 101, 54, 120, 69, f, 6, door_sides=("south",), door_w=3, windows=0)
-    K.crates(k, 102, 55, 108, 60, f + 1, h=3)
-    K.crates(k, 113, 55, 119, 60, f + 1, h=3)
-    for x in range(103, 119, 3):
-        K.chest(k, x, f + 1, 68, None, "north")
-    k.titik("kerja:rak", 110, f + 1, 63, "north")
-    K.gable(k, 100, f + 7, 53, 121, 70, along="x", overhang=1)
-    fh = K.podium(k, 125, 54, 138, 68, LY, 1, steps=("west",), step_w=3)
-    inner = K.hall(k, 126, 55, 137, 67, fh, 5, door_sides=("west",), door_w=2, windows=3)
-    for i, x in enumerate((128, 131, 134)):
-        K.bed(k, x, fh + 1, 56, "north")
-        k.titik("kasur", x, fh + 1, 56, "south")
-    K.bed(k, 135, fh + 1, 66, "south")
-    k.titik("kasur", 135, fh + 1, 66, "north")
-    K.furnish_dining(k, 130, 62, fh, n=4)
-    K.gable(k, 125, fh + 6, 54, 138, 68, along="z", overhang=1)
-    _ = inner
-    # cart and firewood
-    for x in range(104, 110):
-        k.put(x, LY + 1, 76, "wood_slab", {"type": "top", "waterlogged": "false"})
-    k.put(104, LY + 1, 77, "minecraft:oak_fence")
-    k.put(109, LY + 1, 77, "minecraft:oak_fence")
-    for x in range(126, 138):
+def lorong_perunggu(k, xa, za, xb, zb):
+    """The Bronze Men Corridor (DESIGN 41.5.4 BUDDHA test, titik lorong): a roofed gallery 4 wide inside the west edge of
+    the training ground, both ends open through gaps in the court wall. Copper walls between lacquer posts every 4 with
+    barred windows at eye height (the spectators watch the waves), copper bulbs for light, a stone floor with a bronze
+    grate runner, a plank ceiling under a tiled gable, an arched mouth with a name board at each end. The anchor stands
+    inside the south mouth facing north (the waves come from the north end)."""
+    for z in range(za, zb + 1):
+        for x in range(xa, xb + 1):
+            k.put(x, LY, z, "kerb")
+        for x in range(xa + 1, xb):
+            k.put(x, LY, z, "minecraft:waxed_copper_grate" if x in (xa + 2, xb - 2) else "kerb_alt" if (x + z) % 7 == 0 else "kerb")
+            for y in range(LY + 1, LY + 5):
+                k.put(x, y, z, "minecraft:air")
+            k.put(x, LY + 5, z, "wood")
+        post = (z - za) % 4 == 0 or z == zb
+        for side, x in enumerate((xa, xb)):
+            for dy in range(1, 6):
+                y = LY + dy
+                if post:
+                    K.put_ax(k, x, y, z, "red")
+                elif dy == 1:
+                    k.put(x, y, z, "kerb")
+                elif dy == 5:
+                    k.put(x, y, z, "beam", {"axis": "z"})
+                elif dy == 3 and (z - za) % 4 == 2:
+                    k.put(x, y, z, "minecraft:iron_bars")
+                elif dy == 4 and (z - za) % 8 == (2 if side == 0 else 6):
+                    k.put(x, y, z, "minecraft:waxed_copper_bulb", {"lit": "true", "powered": "false"})
+                else:
+                    k.put(x, y, z, "minecraft:waxed_cut_copper")
+    for z in (za, zb):
+        k.stairs(xa + 1, LY + 4, z, "kerb_stairs", "east", half="top")
+        k.stairs(xb - 1, LY + 4, z, "kerb_stairs", "west", half="top")
+        K.plaque(k, (xa + xb) // 2 + 1, LY + 5, z, "x")
+    K.gable(k, xa, LY + 6, za, xb, zb, along="z", overhang=1, role="tile_stairs", slab_role="tile_slab", full_role="tile")
+    titik41(k, (xa + xb + 1) / 2.0, LY + 1, zb - 0.5, "lorong", yaw=180.0)
+
+
+UNSUR_WARNA = ("minecraft:green_terracotta", "minecraft:red_terracotta", "minecraft:yellow_terracotta",
+               "minecraft:white_terracotta", "minecraft:black_terracotta")
+
+
+def lingkar_pilar(k, cx, cz, r=4.5):
+    """The Ring of Five Pillars (DESIGN 41.5.4 UNSUR test; titik ujian_corak at the centre, pilar_0..4): a circle of 9
+    blocks inlaid in carved stone round a jade medallion with a gold heart; the five pillar seats are tiles in the five
+    element colours (wood green, fire red, earth yellow, metal white, water black: the generating order clockwise from
+    the north) where PilarQiEntity stands during a test."""
+    ccx, ccz = cx + 0.5, cz + 0.5
+    for x in range(cx - 6, cx + 7):
+        for z in range(cz - 6, cz + 7):
+            d = math.hypot(x + 0.5 - ccx, z + 0.5 - ccz)
+            if max(abs(x - cx), abs(z - cz)) <= 1:
+                k.put(x, LY, z, "gold" if (x, z) == (cx, cz) else "jade")
+            elif abs(d - r) <= 0.5:
+                k.put(x, LY, z, "kerb_chisel")
+    for i in range(5):
+        a = -math.pi / 2 + i * 2 * math.pi / 5
+        px, pz = int(math.floor(ccx + r * math.cos(a))), int(math.floor(ccz + r * math.sin(a)))
+        k.put(px, LY, pz, UNSUR_WARNA[i])
+        yaw = (math.degrees(math.atan2(-(ccx - px - 0.5), ccz - pz - 0.5)) + 360.0) % 360.0
+        titik41(k, px + 0.5, LY + 1, pz + 0.5, "pilar_%d" % i, yaw=round(yaw, 1))
+    titik41(k, ccx, LY + 1, ccz, "ujian_corak", yaw=180.0)
+
+
+def kandang(k, xa, za, xb, zb):
+    """The beast pen (titik kandang; DESIGN 41.5.4 BINATANG test and the "Beri Makan Binatang" duty): a fenced run in the
+    south-east corner of the training ground on trampled podzol and coarse dirt, a lean-to shelter on four posts over a
+    hay store, a feeding trough of barrels, a water trough, lanterns on the corner posts; the gate is on the west side."""
+    for x in range(xa, xb + 1):
+        for z in range(za, zb + 1):
+            k.put(x, LY, z, "ground_alt" if (x * 3 + z) % 5 else "minecraft:coarse_dirt")
+            if x in (xa, xb) or z in (za, zb):
+                k.put(x, LY + 1, z, "wood_fence")
+    k.put(xa, LY + 1, (za + zb) // 2, "wood_gate", {"facing": "east", "in_wall": "false", "open": "false", "powered": "false"})
+    for x, z in ((xa, za), (xb, za), (xa, zb), (xb, zb)):
+        k.put(x, LY + 2, z, "glow", {"hanging": "false", "waterlogged": "false"})
+    sx0, sz0, sx1, sz1 = xb - 4, za + 1, xb - 1, za + 3
+    for x, z in ((sx0, sz0), (sx1, sz0), (sx0, sz1), (sx1, sz1)):
         for dy in (1, 2, 3):
-            k.put(x, LY + dy, 80, "log", {"axis": "x"})
-    k.put(131, LY + 1, 86, "minecraft:water_cauldron", {"level": "3"})
-    for x, z, hd in ((112, 78, "south"), (128, 76, "north"), (96, 88, "east")):
-        k.titik("kerja:sapu", x, LY + 1, z, hd)
-    k.titik("peti_milik", 106, f + 1, 68, "north")
+            k.put(x, LY + dy, z, "wood_fence")
+    for x in range(sx0 - 1, sx1 + 2):
+        for z in range(sz0 - 1, sz1 + 2):
+            k.slab(x, LY + 4, z, "tile_slab")
+    for x, z, h in ((sx1, sz0, 2), (sx1 - 1, sz0, 1), (sx1, sz0 + 1, 1)):
+        for dy in range(h):
+            k.put(x, LY + 1 + dy, z, "minecraft:hay_block", {"axis": "y"})
+    for x in range(xa + 2, xa + 5):
+        K.barrel(k, x, LY + 1, zb - 1, "up")
+    k.put(xa + 1, LY + 1, zb - 1, "minecraft:water_cauldron", {"level": "3"})
+    titik41(k, (xa + xb + 1) / 2.0, LY + 1, (za + zb + 1) / 2.0 + 0.5, "kandang", yaw=270.0)
+
+
+def paviliun_jasa(k, x0, z0, jalan):
+    """The Merit Pavilion (DESIGN 41.6.5, 41.11.2; lot halaman/paviliun_jasa): a 30 x 22 two-storey hall on a podium
+    facing south, a veranda colonnade, double eaves. Ground floor: the exchange counter across the atrium with the
+    keeper behind it (titik jasa) and the scale tray before him (jasa_meja), the jade racks of the stock (empty chiseled
+    bookshelves between jade posts with lanterns) under the back gallery, the order counter and its slate of requests
+    on the east side (pesanan), a tea corner and benches for waiting disciples, a carpet from the door, the stair under
+    the west gallery. Upper floor: a U-shaped gallery round the atrium with the treasure stands, scroll shelves and the
+    Pavilion Elder's desk at the back, pill cabinets on the west, crates of stock on the east; lanterns hang into the
+    atrium. Before it a paved forecourt with the mission board wall (papan_misi: PapanHidupEntity of 38 stands one block
+    in front of it, facing west), stone lanterns, potted pines and benches. jalan = the forecourt path [(x, z), ...]
+    from the steps to the street; the NPC path "jasa" follows it to the counter."""
+    x1, z1 = x0 + 29, z0 + 21
+    a = K.aula(k, x0, z0, x1, z1, h=9, podium_h=1, teras=2, roof="hip", tiers=2, door_sides=("south",), door_w=3)
+    ix0, iz0, ix1, iz1 = a["inner"]
+    f = a["f"]
+    g = f + 5
+    mid = (x0 + 2 + x1 - 2) // 2
+    k.air(ix0, g + 1, iz0, ix1, g + 2, iz1)
+    gx0, gx1, gz = ix0 + 4, ix1 - 4, iz0 + 4
+    hole = (ix0, iz1 - 6, ix0 + 1, iz1 - 2)
+    K.upper_floor(k, ix0, iz0, ix1, gz - 1, g)
+    K.upper_floor(k, ix0, gz, gx0 - 1, iz1, g, hole=hole)
+    K.upper_floor(k, gx1 + 1, gz, ix1, iz1, g)
+    k.staircase(ix0, f + 1, iz1 - 2, "north", 5, width=2, role="wood_stairs", support="wood")
+    for x in range(gx0, gx1 + 1):
+        k.put(x, g + 1, gz - 1, "rail")
+    for z in range(gz, iz1 + 1):
+        k.put(gx0 - 1, g + 1, z, "rail")
+        k.put(gx1 + 1, g + 1, z, "rail")
+    for x, z in ((gx0 - 1, gz - 1), (gx1 + 1, gz - 1), (gx0 - 1, iz1), (gx1 + 1, iz1)):
+        k.put(x, g + 1, z, "rail")
+        k.put(x, g + 2, z, "glow", {"hanging": "false", "waterlogged": "false"})
+    for x in (gx0 + 3, gx1 - 3):
+        for z in (gz + 3, iz1 - 3):
+            K.lit(k, x, f + 9, z, chain=3)
+    # --- ground floor: the jade racks of the stock
+    for x in range(ix0, ix1 + 1):
+        if (x - ix0) % 4 == 0:
+            for y in (f + 1, f + 2, f + 3):
+                k.put(x, y, iz0, "jade")
+            k.put(x, f + 4, iz0, "glow", {"hanging": "false", "waterlogged": "false"})
+        else:
+            for y in (f + 1, f + 2, f + 3):
+                rak_giok(k, x, y, iz0, "south")
+    for z in range(iz0 + 1, iz0 + 4):
+        for y in (f + 1, f + 2, f + 3):
+            rak_giok(k, ix0, y, z, "east")
+            rak_giok(k, ix1, y, z, "west")
+    # the exchange counter and the keeper's floor behind it
+    cz = iz0 + 6
+    for x in range(mid - 6, mid + 7):
+        d = x - mid
+        if d == 0:
+            k.put(x, f + 1, cz, "jade")
+            k.put(x, f + 2, cz, "minecraft:light_weighted_pressure_plate", {"power": "0"})
+        elif abs(d) == 1:
+            K.barrel(k, x, f + 1, cz, "up")
+            k.put(x, f + 2, cz, "minecraft:decorated_pot" if d < 0 else "glow",
+                  None if d < 0 else {"hanging": "false", "waterlogged": "false"})
+        elif abs(d) == 6:
+            K.put_ax(k, x, f + 1, cz, "red")
+            k.put(x, f + 2, cz, "glow", {"hanging": "false", "waterlogged": "false"})
+        else:
+            k.put(x, f + 1, cz, "wood_trapdoor", {"facing": "south", "half": "top", "open": "false", "powered": "false",
+                                                  "waterlogged": "false"})
+    for z in range(gz, cz):
+        k.put(mid - 6, f + 1, z, "wood_trapdoor", {"facing": "west", "half": "top", "open": "false", "powered": "false",
+                                                   "waterlogged": "false"})
+        if z == cz - 1:
+            k.put(mid + 6, f + 1, z, "wood_gate", {"facing": "east", "in_wall": "false", "open": "false", "powered": "false"})
+        else:
+            k.put(mid + 6, f + 1, z, "wood_trapdoor", {"facing": "east", "half": "top", "open": "false", "powered": "false",
+                                                       "waterlogged": "false"})
+    K.chair(k, mid + 3, f + 1, cz - 1, "south")
+    k.titik("kerja:timbangan", mid - 3, f + 1, cz - 1, "south")
+    titik41(k, mid + 0.5, f + 1, cz - 0.5, "jasa", yaw=0.0)
+    titik41(k, mid + 0.5, f + 1, cz + 1.5, "jasa_meja", yaw=180.0)
+    # the order counter, the clerk and the slate of the day's requests (east)
+    ox = ix1 - 3
+    for z in range(iz1 - 7, iz1 - 2):
+        if (z - iz1) % 3 == 0:
+            K.barrel(k, ox, f + 1, z, "west")
+        else:
+            k.put(ox, f + 1, z, "wood_trapdoor", {"facing": "west", "half": "top", "open": "false", "powered": "false",
+                                                  "waterlogged": "false"})
+        for y in (f + 2, f + 3):
+            k.put(ix1, y, z, "minecraft:birch_trapdoor", {"facing": "west", "half": "bottom", "open": "true",
+                                                          "powered": "false", "waterlogged": "false"})
+        k.put(ix1, f + 4, z, "beam", {"axis": "z"})
+    K.chair(k, ix1 - 1, f + 1, iz1 - 5, "west")
+    k.titik("meja_tulis", ix1 - 1, f + 1, iz1 - 5, "west")
+    titik41(k, ox - 0.5, f + 1, iz1 - 4.5, "pesanan", yaw=270.0)
+    # waiting disciples: a tea corner and a bench by the door; the carpet from the door to the counter
+    K.low_table(k, gx0 + 1, f + 1, iz1 - 3)
+    bantal(k, gx0, f + 1, iz1 - 3, "east")
+    bantal(k, gx0 + 2, f + 1, iz1 - 3, "west")
+    bantal(k, gx0 + 1, f + 1, iz1 - 2, "north")
+    K.bench(k, ix0 + 2, iz1, "north", y=f, n=4)
+    k.titik("kursi", ix0 + 3, f + 1, iz1, "north")
+    k.titik("kursi", ix0 + 4, f + 1, iz1, "north")
+    K.rug(k, mid - 1, cz + 2, mid + 1, iz1, f + 1)
+    K.pot(k, mid - 2, f + 1, iz1, "minecraft:potted_bamboo")
+    K.pot(k, mid + 2, f + 1, iz1, "minecraft:potted_bamboo")
+    for x, z in ((mid - 4, iz0 + 2), (mid + 4, iz0 + 2), (ix1 - 1, iz1 - 2), (ix0 + 2, iz0 + 5)):
+        K.lit(k, x, g, z, chain=0)
+    # --- upper floor: the Pavilion Elder's desk, scroll shelves and treasure stands at the back
+    K.chair(k, mid, g + 1, iz0, "south")
+    K.table(k, mid, g + 1, iz0 + 1)
+    k.titik("meja_tulis", mid, g + 1, iz0, "south")
+    tegak_lilin(k, mid - 1, g + 1, iz0 + 1, 2)
+    K.bookshelf_wall(k, ix0 + 1, iz0, mid - 2, iz0, g + 1, g + 2, face="south")
+    K.bookshelf_wall(k, mid + 2, iz0, ix1 - 1, iz0, g + 1, g + 2, face="south")
+    for x, (senjata, zirah) in zip((ix0 + 2, ix0 + 6, ix1 - 6, ix1 - 2),
+                                   (("iron_sword", "chainmail_chestplate"), ("golden_sword", None),
+                                    ("iron_axe", "iron_chestplate"), ("bow", "golden_helmet"))):
+        k.put(x, g + 1, iz0 + 2, "kerb_slab", {"type": "bottom", "waterlogged": "false"})
+        boneka(k, x + 0.5, g + 1.5, iz0 + 2.5, 0.0, senjata, zirah)
+    # pill cabinets (west gallery) and crates of stock (east gallery)
+    for z in range(gz, gz + 4):
+        K.shelf(k, ix0, g + 2, z, "east")
+        k.put(ix0, g + 1, z, "minecraft:decorated_pot" if z % 2 else "minecraft:barrel",
+              None if z % 2 else {"facing": "east", "open": "false"})
+    k.put(ix0 + 1, g + 1, gz + 1, "minecraft:brewing_stand", {"has_bottle_0": "true", "has_bottle_1": "false",
+                                                             "has_bottle_2": "true"})
+    k.put(ix0 + 1, g + 1, gz + 3, "minecraft:cauldron")
+    for x in (ix0, ix0 + 1):
+        K.chest(k, x, g + 1, iz1, None, "north")
+    tumpuk_stok(k, ix1 - 1, gz + 1, ix1, iz1 - 1, g + 1)
+    # --- forecourt: the path, the mission board wall, lanterns, pines, benches
+    fz = z1 + 1
+    for (ax, az), (bx_, bz_) in zip(jalan, jalan[1:]):
+        for x in range(min(ax, bx_) - 1, max(ax, bx_) + 2):
+            for z in range(min(az, bz_) - 1, max(az, bz_) + 2):
+                if k.get(x, LY, z) in ("minecraft:smooth_quartz", "minecraft:quartz_bricks", None):
+                    k.put(x, LY, z, "path_alt" if (x * 3 + z) % 8 == 0 else "path")
+    bx, bz0, bz1 = mid + 5, fz + 3, fz + 9
+    for z in range(bz0, bz1 + 1):
+        end = z in (bz0, bz1)
+        k.put(bx, LY + 1, z, "kerb")
+        for dy in range(2, 6):
+            if end:
+                K.put_ax(k, bx, LY + dy, z, "red")
+            elif dy == 5:
+                k.put(bx, LY + dy, z, "beam", {"axis": "z"})
+            else:
+                k.put(bx, LY + dy, z, "plaster")
+                if dy in (3, 4):
+                    k.put(bx - 1, LY + dy, z, "minecraft:birch_trapdoor", {"facing": "west", "half": "bottom",
+                                                                          "open": "true", "powered": "false",
+                                                                          "waterlogged": "false"})
+        k.slab(bx, LY + 6, z, "tile_slab")
+        k.stairs(bx - 1, LY + 6, z, "tile_stairs", "east")
+        k.stairs(bx + 1, LY + 6, z, "tile_stairs", "west")
+    k.put(bx, LY + 5, (bz0 + bz1) // 2, "gold")
+    titik41(k, bx - 1.5, LY + 1, (bz0 + bz1) / 2.0 + 0.5, "papan_misi", yaw=90.0)
+    K.stone_lantern(k, mid - 3, LY + 1, fz + 2)
+    K.stone_lantern(k, mid + 3, LY + 1, fz + 2)
+    K.potted_pine(k, x0 + 2, LY + 1, fz + 2)
+    K.potted_pine(k, x1 - 2, LY + 1, fz + 2)
+    K.bench(k, mid - 6, fz + 4, "east", n=4)
+    k.titik("kursi", mid - 6, LY + 1, fz + 5, "east")
+    k.titik("kursi", mid - 6, LY + 1, fz + 6, "east")
+    k.jalur([(x, z) for x, z in jalan] + [(mid, iz1 - 1, f + 1), (mid, cz + 2, f + 1)], jalur="jasa")
+
+
+def paviliun_kediaman(k, x0, z0, x1, z1, nama, pintu="south"):
+    """A private retreat (DESIGN 41.6.6 Puncak Pribadi, titik kediaman_puncak_<n>): one room on a low podium - the bed at
+    the back beside a lattice screen, a meditation mat on a jade inlay in the middle (the anchor), a lectern and a scroll
+    shelf, an incense candle, a hanging lantern, potted bamboo and a barrel by the door - under a tiled gable."""
+    f = K.podium(k, x0, z0, x1, z1, LY, 1, steps=(pintu,), step_w=1)
+    ix0, iz0, ix1, iz1 = K.hall(k, x0, z0, x1, z1, f, 4, door_sides=(pintu,), door_w=1, windows=3, lamps=False,
+                                plaque_top=False)
+    back, front = (iz0, iz1) if pintu == "south" else (iz1, iz0)
+    sgn = 1 if pintu == "south" else -1
+    K.bed(k, ix0, f + 1, back, "north" if pintu == "south" else "south")
+    K.lattice(k, ix0 + 1, f + 1, back + sgn, "east")
+    K.lattice(k, ix0 + 1, f + 2, back + sgn, "east")
+    k.put(ix1, f + 1, back, "minecraft:lectern", {"facing": "west", "has_book": "false", "powered": "false"})
+    K.shelf(k, ix1, f + 2, back + sgn, "west")
+    k.put(ix1, f + 1, back + sgn, "wood")
+    mx, mz = (ix0 + ix1 + 1) // 2, back + 3 * sgn
+    k.put(mx, f, mz, "jade")
+    k.put(mx, f + 1, mz, "rug")
+    tegak_lilin(k, ix1, f + 1, mz, 1)
+    k.put(mx, f + 3, mz, "glow", {"hanging": "true", "waterlogged": "false"})
+    K.pot(k, ix0, f + 1, front, "minecraft:potted_bamboo")
+    K.barrel(k, ix1, f + 1, front, "up")
+    K.gable(k, x0, f + 5, z0, x1, z1, along="z", overhang=1)
+    titik41(k, mx + 0.5, f + 1, mz + 0.5, nama, yaw=180.0 if pintu == "south" else 0.0)
 
 
 def aula_utama(k):
@@ -592,8 +950,24 @@ def aula_utama(k):
     for x in (ix0 + 2, ix1 - 2):
         for z in range(iz0 + 3, iz1, 5):
             K.put_ax(k, x, f + 1, z, "red")
-    K.rug(k, 71, iz0 + 6, 72, iz1, f + 1, role="rug_alt", border="rug_alt")
+    K.rug(k, 71, iz0 + 9, 72, iz1, f + 1, role="rug_alt", border="rug_alt")
     k.jangkar(72.0, f + 1, iz0 + 5.0, "kompleks/aula", yaw=180.0)
+    # DESIGN 41: the oath dais (titik altar_sumpah) - a gold-bordered jade inlay in the floor before the altar between
+    # four candle stands - and the Discipline Elder's side table on the east aisle (titik hukum: his chair)
+    for x in range(70, 74):
+        for z in range(iz0 + 6, iz0 + 9):
+            k.put(x, f, z, "jade" if (x in (71, 72) and z == iz0 + 7) else "gold")
+    for x, z in ((70, iz0 + 5), (73, iz0 + 5), (70, iz0 + 9), (73, iz0 + 9)):
+        tegak_lilin(k, x, f + 1, z)
+    titik41(k, 72.0, f + 1, iz0 + 7.5, "altar_sumpah", yaw=180.0)
+    hx, hz = ix1 - 1, iz0 + 11
+    K.table(k, hx - 1, f + 1, hz)
+    K.table(k, hx - 1, f + 1, hz + 1)
+    k.put(hx - 1, f + 1, hz - 1, "minecraft:lectern", {"facing": "west", "has_book": "false", "powered": "false"})
+    K.chair(k, hx, f + 1, hz, "west")
+    K.wall_banner(k, ix1, f + 4, hz + 1, "west", "black")
+    k.put(hx, f + 1, hz + 2, "minecraft:white_candle", {"candles": "1", "lit": "true", "waterlogged": "false"})
+    titik41(k, hx + 0.5, f + 1, hz + 0.5, "hukum", yaw=90.0)
     # plaza
     K.huabiao(k, 62, LY + 1, 38, 8)
     K.huabiao(k, 81, LY + 1, 38, 8)
@@ -649,6 +1023,19 @@ def kebun_obat(k):
     K.gable(k, 8, f + 5, 86, 30, 94, along="x", overhang=1)
     k.titik("kerja:sabit", 20, f + 1, 89, "south")
     k.titik("kerja:lumpang", 26, f + 1, 91, "west")
+    # DESIGN 41 "Pikul Air" duty: the garden well (titik kerja:sumur) beside the drying shed and the water vats at the
+    # head of the channel (titik kerja:tong), a carrying yoke rack between them
+    K.well(k, 40, 89, LY)
+    k.titik("sumur_timba", 40, LY + 1, 91, "north")
+    titik41(k, 40.5, LY + 1, 91.5, "kerja:sumur", yaw=180.0)
+    for z, blk in ((64, "minecraft:water_cauldron"), (65, "minecraft:barrel"), (66, "minecraft:water_cauldron"),
+                   (67, "minecraft:barrel")):
+        k.put(36, LY + 1, z, blk, {"level": "3"} if "cauldron" in blk else {"facing": "up", "open": "false"})
+    titik41(k, 35.5, LY + 1, 68.5, "kerja:tong", yaw=0.0)
+    for dy in (1, 2):
+        k.put(42, LY + dy, 80, "wood_fence")
+        k.put(44, LY + dy, 80, "wood_fence")
+    k.put(43, LY + 2, 80, "beam", {"axis": "x"})
 
 
 def pasar_sekte(k):
@@ -764,6 +1151,8 @@ def altar_iblis(k):
         k.titik("dupa", x, LY + 1, z, hd)
     k.titik("jaga", 8, LY + 1, 40, "north")
     k.titik("jaga", 38, LY + 1, 40, "north")
+    # DESIGN 41.11.2: the demonic sects swear on the altar top before the obsidian heart (preferred over the main hall)
+    titik41(k, cx + 0.5, LY + 5, cz + 2.5, "altar_sumpah", yaw=180.0, aliran="iblis")
 
 
 def paviliun_alkimia(k):
@@ -809,7 +1198,7 @@ def aula_racun(k):
     k.titik("jaga", 104, LY + 1, 36, "south")
 
 
-def aula_puncak(k, x0, z0, x1, z1, podium_h=3, tiers=2, h=9, besar=True):
+def aula_puncak(k, x0, z0, x1, z1, podium_h=3, tiers=2, h=9, besar=True, kediaman=()):
     """A summit hall: a high podium with a grand flight, a throne under a carved screen, gold-and-jade pillars, a long
     carpet, censers; anchor kompleks/puncak (the sect master's seat, TempatApi.spot "puncak")."""
     a = K.aula(k, x0, z0, x1, z1, h=h, podium_h=podium_h, teras=2, roof="hip", tiers=tiers, door_sides=("south",), door_w=5)
@@ -841,14 +1230,17 @@ def aula_puncak(k, x0, z0, x1, z1, podium_h=3, tiers=2, h=9, besar=True):
         for z in range(iz0 + 7, iz1 - 1, 4):
             K.banner_pole(k, ix0 + 1, f + 1, z, height=4)
             K.banner_pole(k, ix1 - 1, f + 1, z, height=4)
+    for i, (px0, pz0, px1, pz1, pintu) in enumerate(kediaman):
+        paviliun_kediaman(k, px0, pz0, px1, pz1, "kediaman_puncak_%d" % i, pintu)
     return a
 
 
 def aula_puncak_kecil(k, langit=False):
     """The master's hall of a small sect inside its only court (halaman_kecil lot (2,1)); with a sky palace a cloud pier
     rises behind it (anchor kompleks/dermaga_awan)."""
-    aula_puncak(k, 102, 52, 133, 77, podium_h=2, tiers=1, h=7, besar=False)
     K.garden(k, 100, 82, 138, 93, LY, trees=("pine", "pine"), pond_too=False)
+    aula_puncak(k, 102, 52, 133, 77, podium_h=2, tiers=1, h=7, besar=False,
+                kediaman=((101, 83, 107, 91, "south"), (126, 83, 132, 91, "south")))
     if langit:
         dermaga_awan(k, 134, 52, 140, 90)
 
@@ -906,7 +1298,7 @@ def asrama_dalam(k):
     a plum tree and a well in the yard."""
     K.yard_wall(k, 5, 100, 42, 138, LY, h=3, gate="east", gate_w=3)
     rooms = ((8, 103, 22, 113, "south"), (25, 103, 39, 113, "south"), (8, 125, 22, 135, "north"), (25, 125, 39, 135, "north"))
-    for (x0, z0, x1, z1, door) in rooms:
+    for ri, (x0, z0, x1, z1, door) in enumerate(rooms):
         f = K.podium(k, x0, z0, x1, z1, LY, 1, steps=(door,), step_w=3)
         inner = K.hall(k, x0 + 1, z0 + 1, x1 - 1, z1 - 1, f, 5, door_sides=(door,), door_w=2, windows=3)
         ix0, iz0, ix1, iz1 = inner
@@ -925,6 +1317,12 @@ def asrama_dalam(k):
         K.pot(k, ix1, f + 2, front, "minecraft:potted_bamboo")
         k.put(ix0, f + 1, mid, "minecraft:white_candle", {"candles": "1", "lit": "true", "waterlogged": "false"})
         K.lit(k, (ix0 + ix1) // 2, f + 5, mid, chain=1, role="lamp")
+        # DESIGN 41.6.6 Gua Urat (titik kediaman_dalam_<n>): a jade vein in the floor between the two cushions, a Qi
+        # crystal in the corner; the anchor stands on the vein's heart
+        for x in range(ix0 + 3, ix1 - 2):
+            k.put(x, f, mid, "jade")
+        k.put(ix1, f + 1, mid, "minecraft:amethyst_cluster", {"facing": "up", "waterlogged": "false"})
+        titik41(k, (ix0 + ix1) // 2 + 0.5, f + 1, mid + 0.5, "kediaman_dalam_%d" % ri, yaw=180.0 if door == "south" else 0.0)
         K.gable(k, x0, f + 6, z0, x1, z1, along="x", overhang=1)
     K.well(k, 23, 119, LY)
     K.cherry(k, 12, LY + 1, 119, 5)
@@ -999,6 +1397,7 @@ def kolam_darah(k, x0, z0):
         K.post(k, cx + dx, LY + 1, cz + dz, height=3, role="minecraft:soul_lantern", post_role="minecraft:nether_brick_fence")
     for x, z, hd in ((cx, cz + 14, "north"), (cx - 16, cz, "east"), (cx + 16, cz, "west")):
         k.titik("jaga", x, LY + 1, z, hd)
+    titik41(k, cx + 1.5, LY + 1, cz + 13.5, "ujian_darah", yaw=180.0)
 
 
 def paviliun_sutra(k):
@@ -1023,9 +1422,12 @@ def paviliun_sutra(k):
     K.bookshelf_wall(k, ix1, iz0 + 2, ix1, iz1 - 2, f + 1, f + 3, face="west")
 
 
-def gua_meditasi(k, x0, z0, w=40, d=26, n=6):
+def gua_meditasi(k, x0, z0, w=40, d=26, n=6, gabung=False):
     """Meditation caves (38.C.3.2 gua_meditasi): an artificial cliff of stone and moss with a row of 5 x 4 x 5 niches, a
-    cushion and a lamp in each, a thin waterfall into a basin, ferns and dripleaf."""
+    cushion and a lamp in each, a thin waterfall into a basin, ferns and dripleaf. gabung=True (DESIGN 41.6.6, 41.11.2):
+    every niche is a small dwelling cave behind a carved front with an arched doorway (bed, chest and scroll shelf,
+    candle; titik kediaman_<i>) and a cell with an iron door is cut into the cliff's back face (titik gua_renungan,
+    the confinement cave of the sect's discipline)."""
     top = LY + 12
     for x in range(x0, x0 + w):
         for z in range(z0, z0 + d):
@@ -1046,14 +1448,68 @@ def gua_meditasi(k, x0, z0, w=40, d=26, n=6):
         bantal(k, nx + 2, LY + 1, nz + 1, "south", "meditasi")
         k.put(nx + 2, LY + 4, nz + 1, "glow", {"hanging": "true", "waterlogged": "false"})
         k.put(nx, LY + 1, nz + 4, "minecraft:fern")
+        if gabung:
+            gua_kediaman(k, nx, nz, i)
     wx = x0 + w // 2
     for y in range(LY + 1, top + 1):
         k.put(wx, y, z0 + d - 9, "minecraft:water", {"level": "0"})
-    for x in range(wx - 2, wx + 3):
-        for z in range(z0 + d - 3, z0 + d):
-            k.put(x, LY, z, "minecraft:water", {"level": "0"})
-            k.put(x, LY - 1, z, "minecraft:clay")
+    if gabung:
+        basin = [(x, z) for x in range(wx - 1, wx + 2) for z in (z0 + d - 1, z0 + d)]
+        gua_renungan(k, wx, z0)
+    else:
+        basin = [(x, z) for x in range(wx - 2, wx + 3) for z in range(z0 + d - 3, z0 + d)]
+    for x, z in basin:
+        k.put(x, LY, z, "minecraft:water", {"level": "0"})
+        k.put(x, LY - 1, z, "minecraft:clay")
     k.put(x0 + 1, LY + 1, z0 + d - 1, "minecraft:big_dripleaf", {"facing": "south", "tilt": "none", "waterlogged": "false"})
+
+
+def gua_kediaman(k, nx, nz, i):
+    """Turns niche (nx..nx+4, nz..nz+4) into the small dwelling cave kediaman_<i> (DESIGN 41.6.6 Gua Kecil): a carved
+    stone front with an arched doorway 3 wide and a keystone, the cliff foot cleared before it, a bed at the back wall, a
+    chest under a scroll shelf, a candle; the anchor stands in the middle facing the door."""
+    fz = nz + 5
+    for x in range(nx, nx + 5):
+        for y in range(LY + 1, LY + 5):
+            k.put(x, y, fz, "minecraft:mossy_stone_bricks" if (x + y) % 3 == 0 else "kerb")
+        k.put(x, LY, fz, "kerb")
+        for y in range(LY + 1, LY + 4):
+            if k.get(x, y, fz + 1) not in (None, "minecraft:air"):
+                k.put(x, y, fz + 1, "minecraft:air")
+    for x in range(nx + 1, nx + 4):
+        for y in (LY + 1, LY + 2):
+            k.put(x, y, fz, "minecraft:air")
+    k.put(nx + 2, LY + 3, fz, "minecraft:air")
+    k.stairs(nx + 1, LY + 3, fz, "kerb_stairs", "east", half="top")
+    k.stairs(nx + 3, LY + 3, fz, "kerb_stairs", "west", half="top")
+    k.put(nx + 2, LY + 4, fz, "kerb_chisel")
+    K.bed(k, nx, LY + 1, nz, "north")
+    K.chest(k, nx + 4, LY + 1, nz, None, "west")
+    K.shelf(k, nx + 4, LY + 2, nz, "west")
+    k.put(nx + 4, LY + 1, nz + 2, "minecraft:white_candle", {"candles": "2", "lit": "true", "waterlogged": "false"})
+    titik41(k, nx + 2.5, LY + 1, nz + 2.5, "kediaman_%d" % i, yaw=0.0)
+
+
+def gua_renungan(k, rx, z0):
+    """The confinement cave (DESIGN 41.6.11 Gua Renungan, titik gua_renungan): from the cliff's back face a tunnel one wide
+    behind an iron door (no handle: only the Discipline Hall opens it) to a bare 3 x 3 cell - a straw mat, one candle,
+    a carved precept stone in the back wall."""
+    for z in range(z0, z0 + 4):
+        k.put(rx, LY, z, "kerb")
+        for y in (LY + 1, LY + 2):
+            k.put(rx, y, z, "minecraft:air")
+    for x in range(rx - 1, rx + 2):
+        for z in range(z0 + 4, z0 + 7):
+            k.put(x, LY, z, "kerb")
+            for y in range(LY + 1, LY + 4):
+                k.put(x, y, z, "minecraft:air")
+    K.door(k, rx, LY + 1, z0, "north", role="minecraft:iron_door")
+    k.put(rx, LY + 3, z0, "kerb_chisel")
+    k.put(rx - 1, LY + 1, z0 + 6, "rug_alt")
+    k.put(rx, LY + 1, z0 + 6, "rug_alt")
+    k.put(rx + 1, LY + 1, z0 + 6, "minecraft:white_candle", {"candles": "1", "lit": "true", "waterlogged": "false"})
+    k.put(rx, LY + 2, z0 + 7, "kerb_chisel")
+    titik41(k, rx + 0.5, LY + 1, z0 + 5.5, "gua_renungan", yaw=180.0)
 
 
 def menara_lonceng(k, x0, z0, bell=True):
@@ -1290,8 +1746,9 @@ def rumah_tetua(k, x0, flip=False):
     k.jangkar(x0 + 19.5, f + 1, iz1 - 1.5, "kompleks/tetua", yaw=180.0)
 
 
-def gua_puncak(k):
-    gua_meditasi(k, 4, 6, w=40, d=26, n=5)
+def gua_puncak(k, gabung=False):
+    """The summit caves; in the middle band (no inner court) they are the six dwelling caves and the confinement cave."""
+    gua_meditasi(k, 4, 6, w=40, d=26, n=6 if gabung else 5, gabung=gabung)
 
 
 def paviliun_pandang(k):
@@ -1419,14 +1876,16 @@ def halaman(kecil=False, langit=False, slot=None):
     tembok_sisi(k)
     tembok_lintang(k, 141, gap=(57, 86))
     gerbang_halaman(k)
-    asrama_luar(k)
-    dapur_makan(k)
+    asrama_luar(k, dapur=kecil)
+    if not kecil:
+        dapur_makan(k)
     lapangan_latihan(k)
     aula_utama(k)
     if kecil:
+        paviliun_jasa(k, 104, 99, [(97, 130), (118, 130), (118, 122)])
         aula_puncak_kecil(k, langit)
     else:
-        gudang_pelayan(k)
+        paviliun_jasa(k, 104, 56, [(118, 95), (118, 79)])
     if slot:
         slot[0](k)
         slot[1](k)
@@ -1441,7 +1900,7 @@ def dalam(slot=None):
     gerbang_dalam(k)
     asrama_dalam(k)
     paviliun_sutra(k)
-    gua_meditasi(k, 4, 56, w=40, d=26, n=6)
+    gua_meditasi(k, 4, 56, w=40, d=26, n=6, gabung=True)
     taman_dalam(k)
     aula_harta(k)
     if slot:
@@ -1457,8 +1916,8 @@ def puncak(rows, langit=False):
     tanah(k, rows)
     tembok_sisi(k)
     tembok_lintang(k, 0)
-    aula_puncak(k, 54, 6, 89, 36)
-    gua_puncak(k)
+    aula_puncak(k, 54, 6, 89, 36, kediaman=((49, 18, 53, 26, "south"), (90, 18, 94, 26, "south")))
+    gua_puncak(k, gabung=(rows == 2))
     if langit:
         dermaga_awan(k, 108, 6, 138, 40)
     else:
@@ -1519,7 +1978,18 @@ def tangga(naik):
         lot.put(4, LY + hh + 6, zz, "gold")
     lot.titik("jalan", 4, LY + 1, run - 1, "north", {"urut": 0, "jalur": "tangga"})
     lot.titik("jalan", 4, LY + naik + 1, 0, "north", {"urut": 1, "jalur": "tangga"})
+    if naik in TANGGA_UJIAN:
+        for nama, y, z in (("ujian_bawah", LY + 1, run - 0.5), ("ujian_atas", LY + naik + 1, 0.5)):
+            lot.entity(4.5, y, z, {"id": "kultivator:dunia_anchor", "kind": "kompleks/" + nama,
+                                   "Rotation": [structgen.nbt.Float(180.0), structgen.nbt.Float(0.0)],
+                                   "data": {"protect": structgen.nbt.Int(0)}})
+            lot.jangkar_n += 1
     return simpan_lot(lot), run
+
+
+# DESIGN 41.5.4 Tangga Ujian: the climbs out of the court (into the inner court of the great band, to the summit of the
+# middle band) carry titik ujian_bawah (first step) and ujian_atas (top landing); the inner court -> summit climb not.
+TANGGA_UJIAN = (10, 18)
 
 
 def tebing(naik, tengah):
@@ -1579,7 +2049,7 @@ def build():
     # --- court: shared lots once, then each alignment's three slot lots, then the small band's master hall lot
     k = halaman()
     potong_distrik(k, "halaman", {(1, 0): "halaman/aula_utama", (1, 1): "halaman/lapangan_latihan",
-                                  (2, 1): "halaman/gudang_pelayan", (0, 2): "halaman/asrama_luar",
+                                  (2, 1): "halaman/paviliun_jasa", (0, 2): "halaman/asrama_luar",
                                   (1, 2): "halaman/gerbang", (2, 2): "halaman/dapur"})
     slots = {
         "lurus": (kebun_obat, paviliun_kitab, paviliun_alkimia),
@@ -1600,7 +2070,8 @@ def build():
             potong_distrik(k, ("halaman", a), {ij: "halaman/%s" % nama_slot[fn]}, aliran=only)
     for langit in (False, True):
         k = halaman(kecil=True, langit=langit)
-        potong_distrik(k, ("halaman_kecil", langit), {(2, 1): "halaman/aula_ketua%s" % ("_langit" if langit else "")})
+        potong_distrik(k, ("halaman_kecil", langit), {(2, 1): "halaman/aula_ketua%s" % ("_langit" if langit else ""),
+                                                      (2, 2): "halaman/paviliun_jasa_kecil", (0, 2): "halaman/asrama_dapur"})
     # --- inner court (great band)
     k = dalam()
     potong_distrik(k, "dalam", {(1, 2): "dalam/gerbang_dalam", (0, 2): "dalam/asrama_dalam", (1, 1): "dalam/paviliun_sutra",
@@ -1625,7 +2096,7 @@ def build():
     for rows in (3, 2):
         for langit in (False, True):
             k = puncak(rows, langit)
-            names = {(1, 0): "puncak/aula_puncak", (0, 0): "puncak/gua_puncak",
+            names = {(1, 0): "puncak/aula_puncak", (0, 0): "puncak/gua_puncak" if rows == 3 else "puncak/gua_kediaman",
                      (2, 0): "puncak/dermaga_awan" if langit else "puncak/paviliun_pandang", (1, 1): "puncak/pelataran",
                      (0, 1): "puncak/rumah_tetua_barat", (2, 1): "puncak/rumah_tetua_timur"}
             if rows == 3:
@@ -1671,8 +2142,8 @@ def climb(rows, naik):
 def distrik_lots(a):
     """{district id (without aliran): [lot dicts with template ids]} for alignment a."""
     def court(i, j, kecil=False, langit=False):
-        if kecil and (i, j) == (2, 1):
-            return lot_of(("halaman_kecil", langit), 2, 1)
+        if kecil and (i, j) in ((2, 1), (2, 2), (0, 2)):
+            return lot_of(("halaman_kecil", langit), i, j)
         if (i, j) in ((0, 1), (0, 0), (2, 0)):
             return lot_of(("halaman", a), i, j)
         return lot_of("halaman", i, j)

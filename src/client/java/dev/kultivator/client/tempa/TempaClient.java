@@ -1,10 +1,13 @@
 package dev.kultivator.client.tempa;
 
 import dev.kultivator.tempa.TempaMenus;
+import net.minecraft.client.Minecraft;
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityRenderLayerRegistrationCallback;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.game.ServerboundContainerClosePacket;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 
 /**
  * The client side of forging, the natal treasure and storage rings (DESIGN 25.15, owned by P8-tempa): the forge and ring
@@ -39,6 +42,18 @@ public final class TempaClient {
 	/** The open forge's preview card (empty when none arrived). */
 	public static CompoundTag forge() {
 		return data.getCompoundOrEmpty("forge");
+	}
+
+	/**
+	 * Called from a forge / ring screen's {@code removed()}: when another screen replaced it while its menu is still open
+	 * (the "?" seal opens the Gulungan), the server closes the menu too, as vanilla's own close would have.
+	 */
+	static void tutupDiServer(AbstractContainerMenu menu) {
+		Minecraft minecraft = Minecraft.getInstance();
+		if (minecraft.player != null && minecraft.player.containerMenu == menu) {
+			minecraft.player.connection.send(new ServerboundContainerClosePacket(menu.containerId));
+			minecraft.player.containerMenu = minecraft.player.inventoryMenu;
+		}
 	}
 
 	private TempaClient() {

@@ -212,7 +212,8 @@ public final class LangitUtusan {
 			return deposit(player, hall);
 		}
 		long asked = hall.getLongOr("utusan_menunggu", Long.MIN_VALUE);
-		if (today - asked > 1L) {
+		// contains() first: today - Long.MIN_VALUE overflows negative and would pass with no envoy.
+		if (!hall.contains("utusan_menunggu") || today - asked > 1L) {
 			Msg.actionBar(player, Component.translatable("kultivator.sekte_langit.utusan.tak_ada").withStyle(ChatFormatting.GRAY));
 			return 0;
 		}

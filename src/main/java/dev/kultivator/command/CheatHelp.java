@@ -78,7 +78,11 @@ final class CheatHelp {
 			// DESIGN 37.7.9 (audit 4.1: group "sekte_langit", not "langit"): Sekte Langit's tests (module 37G).
 			new Group("sekte_langit", dev.kultivator.sekte.langit.LangitTests.CHIPS),
 			// DESIGN 39 + 39.F: Murid Mandiri's tests (the live list of MandiriCommands; 39A-39F, incl. 39F's "seteru" chips).
-			new Group("perguruan_mandiri", dev.kultivator.sekte.mandiri.MandiriCommands.CHIPS));
+			new Group("perguruan_mandiri", dev.kultivator.sekte.mandiri.MandiriCommands.CHIPS),
+			// DESIGN 41.13.3: Gabung Sekte's tests (the live list of GabungUji; modules append their chips there).
+			new Group("gabung_sekte", dev.kultivator.sekte.gabung.GabungUji.CHIPS),
+			// DESIGN 42.14.3: Kota yang Hidup's tests (the live list of KotaUji; modules append their chips there).
+			new Group("kota_hidup", dev.kultivator.dunia.kota42.KotaUji.CHIPS));
 
 	/** Prints the grouped help; {@code root} is the alias that was typed ("kultivasi" or "cultivate"). */
 	static int show(CommandSourceStack source, String root) {

@@ -1,0 +1,32 @@
+{
+  "_catatan": "Kebiasaan #9 pemain_erhu (DESIGN 42.4.12); ilham: Abing",
+  "nomor": 9,
+  "siapa": {
+    "umur": [
+      12,
+      200
+    ],
+    "tahap": [
+      "dewasa",
+      "tua"
+    ]
+  },
+  "sesi": [
+    {
+      "jam": [
+        18,
+        20
+      ],
+      "peluang": 0.8,
+      "syarat": [
+        "tidak_hujan"
+      ],
+      "tujuan": [
+        "serambi",
+        "@rumah"
+      ],
+      "klip": "kota42:main_erhu",
+      "kanan": "kota42:erhu"
+    }
+  ]
+}

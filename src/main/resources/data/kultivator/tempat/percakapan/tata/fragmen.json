@@ -1,0 +1,842 @@
+{
+  "_dibuat": "tools/gen_kota_hidup_cakap.py dari tools/kota_cakap_sumber (jangan disunting tangan)",
+  "kelompok": "fragmen",
+  "isi": [
+    {
+      "aturan": "seru.keluh",
+      "bingkai": [
+        {
+          "kunci": "seru.keluh.0",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kampung",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "seru.keluh.1",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "seru.keluh.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kuno",
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "seru.keluh.3",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "seru.keluh.4",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "seru.keluh.5",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "air"
+          ]
+        },
+        {
+          "kunci": "seru.keluh.6",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "seru.keluh.7",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kuno",
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "seru.keluh.8",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "seru.keluh.9",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "seru.keluh.10",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "gunung"
+          ]
+        }
+      ],
+      "slot": {}
+    },
+    {
+      "aturan": "seru.kaget",
+      "bingkai": [
+        {
+          "kunci": "seru.kaget.0",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kampung",
+            "pelabuhan",
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "seru.kaget.1",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "seru.kaget.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "air"
+          ]
+        },
+        {
+          "kunci": "seru.kaget.3",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "gunung"
+          ]
+        },
+        {
+          "kunci": "seru.kaget.4",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "seru.kaget.5",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "seru.kaget.6",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "iblis",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "seru.kaget.7",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "seru.kaget.8",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "seru.kaget.9",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {}
+    },
+    {
+      "aturan": "seru.senang",
+      "bingkai": [
+        {
+          "kunci": "seru.senang.0",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kampung",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "seru.senang.1",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "seru.senang.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "seru.senang.3",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "seru.senang.4",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "seru.senang.5",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "air"
+          ]
+        },
+        {
+          "kunci": "seru.senang.6",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "pelabuhan",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "seru.senang.7",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "seru.senang.8",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kampung"
+          ]
+        }
+      ],
+      "slot": {}
+    },
+    {
+      "aturan": "seru.ragu",
+      "bingkai": [
+        {
+          "kunci": "seru.ragu.0",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "seru.ragu.1",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "seru.ragu.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "ibukota"
+          ]
+        },
+        {
+          "kunci": "seru.ragu.3",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "seru.ragu.4",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "seru.ragu.5",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "seru.ragu.6",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "seru.ragu.7",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "pelabuhan",
+            "oasis"
+          ]
+        }
+      ],
+      "slot": {}
+    },
+    {
+      "aturan": "frag.doa",
+      "bingkai": [
+        {
+          "kunci": "frag.doa.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kuno",
+            "gunung"
+          ]
+        },
+        {
+          "kunci": "frag.doa.1",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "pelabuhan",
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "frag.doa.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "frag.doa.3",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "frag.doa.4",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "frag.doa.5",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kampung",
+            "air"
+          ]
+        },
+        {
+          "kunci": "frag.doa.6",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "frag.doa.7",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "frag.doa.8",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "pelabuhan"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      }
+    },
+    {
+      "aturan": "frag.pepatah",
+      "bingkai": [
+        {
+          "kunci": "frag.pepatah.0",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "frag.pepatah.1",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "frag.pepatah.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "frag.pepatah.3",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "frag.pepatah.4",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "frag.pepatah.5",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "frag.pepatah.6",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "frag.pepatah.7",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "frag.pepatah.8",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "frag.pepatah.9",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "frag.pepatah.10",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "frag.pepatah.11",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "frag.pepatah.12",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "frag.pepatah.13",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {}
+    },
+    {
+      "aturan": "frag.katanya",
+      "bingkai": [
+        {
+          "kunci": "frag.katanya.0",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "frag.katanya.1",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "frag.katanya.2",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "frag.katanya.3",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "frag.katanya.4",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "frag.katanya.5",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "frag.katanya.6",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "frag.katanya.7",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {}
+    },
+    {
+      "aturan": "frag.penutup_kecil",
+      "bingkai": [
+        {
+          "kunci": "frag.penutup_kecil.0",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "frag.penutup_kecil.1",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "frag.penutup_kecil.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "frag.penutup_kecil.3",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "frag.penutup_kecil.4",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "frag.penutup_kecil.5",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "frag.penutup_kecil.6",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "frag.penutup_kecil.7",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {}
+    },
+    {
+      "aturan": "frag.ajakan",
+      "bingkai": [
+        {
+          "kunci": "frag.ajakan.0",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "frag.ajakan.1",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kuno",
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "frag.ajakan.2",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "frag.ajakan.3",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "frag.ajakan.4",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "frag.ajakan.5",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {}
+    },
+    {
+      "aturan": "frag.alasan_pergi",
+      "bingkai": [
+        {
+          "kunci": "frag.alasan_pergi.0",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "frag.alasan_pergi.1",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "frag.alasan_pergi.2",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "frag.alasan_pergi.3",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "frag.alasan_pergi.4",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "frag.alasan_pergi.5",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "frag.alasan_pergi.6",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "frag.alasan_pergi.7",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "frag.alasan_pergi.8",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "frag.alasan_pergi.9",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "frag.alasan_pergi.10",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "frag.alasan_pergi.11",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {}
+    },
+    {
+      "aturan": "frag.sebab_harga",
+      "bingkai": [
+        {
+          "kunci": "frag.sebab_harga.0",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "frag.sebab_harga.1",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "frag.sebab_harga.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "frag.sebab_harga.3",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "frag.sebab_harga.4",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "ibukota"
+          ]
+        },
+        {
+          "kunci": "frag.sebab_harga.5",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "frag.sebab_harga.6",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "frag.sebab_harga.7",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "frag.sebab_harga.8",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {}
+    },
+    {
+      "aturan": "frag.penguat",
+      "bingkai": [
+        {
+          "kunci": "frag.penguat.0",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "frag.penguat.1",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "frag.penguat.2",
+          "slot": [],
+          "bobot": 1
+        },
+        {
+          "kunci": "frag.penguat.3",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "frag.penguat.4",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "oasis",
+            "kuno"
+          ]
+        }
+      ],
+      "slot": {}
+    }
+  ]
+}

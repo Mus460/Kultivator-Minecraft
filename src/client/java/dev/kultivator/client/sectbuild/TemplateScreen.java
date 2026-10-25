@@ -2,31 +2,24 @@ package dev.kultivator.client.sectbuild;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import dev.kultivator.client.screen.ui.Brush;
-import dev.kultivator.client.screen.ui.Eased;
 import dev.kultivator.client.screen.ui.Glyphs;
-import dev.kultivator.client.screen.ui.JadeCoin;
+import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
-import dev.kultivator.client.screen.ui.ScrollFrame;
-import dev.kultivator.client.screen.ui.SlipTooltip;
+import dev.kultivator.client.screen.ui.SegelKonfirmasi;
 import dev.kultivator.client.screen.ui.TalismanButton;
 import dev.kultivator.client.screen.ui.UiSound;
-import dev.kultivator.client.screen.ui.Widget;
 import dev.kultivator.sect.build.api.Bahan;
 import dev.kultivator.sect.build.api.Bill;
 import dev.kultivator.sect.build.api.PlanStats;
 import dev.kultivator.sect.build.api.SectTemplates;
 import dev.kultivator.sect.build.blueprint.Glaze;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -34,26 +27,20 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * The template screen (DESIGN 21.12 step 2, 21.21): the jade scroll with a 3x3 grid of jade plaques on the left (a numeral
- * seal, the name and an ink sketch of each of the nine templates) and the chosen template on the right: a large site
- * diagram with a scrubber of nine jade beads (later tiers fade in) and a skyline strip along the axis, the numbers
- * (footprint, envelope, components, the whole bill and exact items, the estimated time at the current builder count, the
- * perks and the realm hint), the glaze (Tinta, Giok, Langit), and the talismans "Lihat Tapak" and "Putar". Once the
- * footprint preview of the chosen template arrives, its warnings show as bamboo slips with the consent checkbox and the
- * jade Konfirmasi seal, held for 3 s. In upgrade mode ("Naik Templat") only larger templates can be chosen. The world and
- * its hologram stay visible behind the scroll; Esc keeps the preview for walking around (the HUD and chat take over).
- * <p>
- * Sekte Langit (DESIGN 37.3.4): two jade tabs under the grid switch between the ground family (Darat, 1-9) and the sky
- * family (Awan, A1-A9 = templates 11-19). On the Awan tab "Lihat Tapak" asks for a sky design over the ground stele
- * ({@code langit:<n>}), and while a sky preview is shown the glaze coins become the plaza height (down 4, the plaza y,
- * up 4); the offering's bill is announced in chat with the preview.
+ * The template catalog of Sekte › Bangun › Templat (DESIGN 21.12 step 2, 21.21, 43.12.1 "H"): once a screen of its own, now
+ * the painter of that sub inside the Gulungan Utama (the class stays, its base is gone). On the left a 3x3 grid of jade
+ * plaques (a numeral seal and an ink sketch of each of the nine templates, the name in the tooltip) with the "Templat Awan"
+ * coin under it (Sekte Langit, DESIGN 37.3.4: the sky family A1-A9 = templates 11-19). On the right, in one scroll: the
+ * chosen template's name, a site diagram with the tier talisman (the wheel over the diagram works too) and the skyline
+ * strip, the numbers (footprint, envelope, components, bill, time, perks, realm hint), the glaze coins (on a sky preview
+ * they are the plaza height, down 4 / up 4), and the whole bill or, once the footprint preview of the chosen template
+ * arrived, its warnings as bamboo slips. Under the scroll the talismans "Lihat Tapak", "Putar", "Batal", "Lihat di dunia"
+ * (the Gulungan steps aside so the hologram can be walked around; Enter or Esc brings it back) and "Konfirmasi", which asks
+ * the heavy {@link SegelKonfirmasi} (tick the consent, hold 3 s) of DESIGN 43.7 in place of the old checkbox and seal. With
+ * a template already standing it is the "Naik Templat" catalog (only larger templates). Text 1.0 (43.0.5).
  */
-public class TemplateScreen extends Screen {
+final class TemplateScreen {
 
-	private static final int MAX_W = 372;
-	private static final int MAX_H = 250;
-	private static final long HOLD_MILLIS = 3000L;
-	private static final long UNROLL_MILLIS = 250L;
 	/** DESIGN 21.1 Table B perks: tower rooms, Qi seat tier, gate altars. */
 	private static final int[] TOWER_ROOMS = {3, 3, 4, 4, 5, 6, 6, 7, 7};
 	private static final int[] QI_SEAT = {1, 1, 1, 2, 2, 2, 3, 3, 3};
@@ -65,82 +52,63 @@ public class TemplateScreen extends Screen {
 	/** DESIGN 21.11 target totals (units, Tinta) before the dry run answers, and 21.15 minutes at the base rate. */
 	private static final int[] TARGET_UNITS = {3240, 6350, 10170, 15850, 21090, 29430, 36440, 51820, 65230};
 	private static final int[] TARGET_MINUTES = {25, 34, 43, 53, 64, 81, 96, 116, 142};
+	private static final int LINE = 10;
+	private static final String K = "kultivator.sectbuild.ui.";
+	private static final String M = "kultivator.gui43.m07.";
 
-	private final boolean upgrade;
-	private final @Nullable Screen back;
-	private final List<Widget> widgets = new ArrayList<>();
-	private final Eased backdrop = new Eased(6.0F);
-	private @Nullable Widget pressed;
-	private int selected;
-	/** The Awan tab (sky templates 11-19) is shown. */
-	private boolean sky;
-	private int glaze;
-	private boolean consent;
-	private boolean holding;
-	private long holdStart;
-	private boolean done;
-	private long openedAt;
-	private long lastFrame;
-	private int warnScroll;
-	private @Nullable List<Component> tooltip;
+	// Kept across openings of the Gulungan (the player steps out to look at the hologram and comes back).
+	private static int selected = 1;
+	/** The sky family (templates 11-19) is shown. */
+	private static boolean sky;
+	private static int glaze = -1;
+	private static float scroll;
 
-	private int x0;
-	private int x1;
-	private int y0;
-	private int y1;
-	private int gridX;
-	private int gridY;
-	private int plaqueW;
-	private int plaqueH;
-	private int gap;
-	private int rightX;
-	private int rightW;
-	private int contentTop;
-	private int contentBottom;
-	private int diagramX;
-	private int diagramY;
+	private final BuildPage page;
+	private float content;
+	private int scrollX0;
+	private int scrollY0;
+	private int scrollX1;
+	private int scrollY1;
+	private int diagramX0;
+	private int diagramY0;
 	private int diagramSize;
-	private int beadY;
-	private int skylineY;
-	private int bottomY;
-	private float sealX;
-	private float sealY;
-	private float sealR;
-	private int boxX0;
-	private int boxY0;
-	private int boxX1;
-	private int boxY1;
 
-	public TemplateScreen(int select, boolean upgrade, @Nullable Screen back) {
-		super(Component.translatable(upgrade ? "kultivator.sectbuild.ui.upgrade_title" : "kultivator.sectbuild.ui.template_title"));
-		this.upgrade = upgrade;
-		this.back = back instanceof TemplateScreen ? null : back;
-		this.selected = SectTemplates.validAny(select) ? select : 1;
-		this.sky = SectTemplates.isSky(selected);
-		this.openedAt = Util.getMillis();
-		this.lastFrame = openedAt;
-		Glaze chosen = Glaze.byId(BuildClient.catalog().getStringOr("glaze", "tinta"));
-		this.glaze = chosen == null ? 0 : chosen.ordinal();
-		BuildClient.send(0, "catalog");
+	TemplateScreen(BuildPage page) {
+		this.page = page;
 	}
 
-	/** The server asked to select {@code template} while the screen is open. */
-	public void select(int template) {
-		if (SectTemplates.validAny(template)) {
+	/** The server or a focus tag asked for {@code template}; 0 keeps the current choice. */
+	void select(int template) {
+		if (SectTemplates.validAny(template) && template != selected) {
 			selected = template;
 			sky = SectTemplates.isSky(template);
-			consent = false;
-			warnScroll = 0;
+			scroll = 0.0F;
 		}
+	}
+
+	/** The catalog came on screen: ask for it and take the stored glaze the first time. */
+	void opened() {
+		BuildClient.send(0, "catalog");
+		if (glaze < 0) {
+			Glaze chosen = Glaze.byId(BuildClient.catalog().getStringOr("glaze", "tinta"));
+			glaze = chosen == null ? 0 : chosen.ordinal();
+		}
+		if (!SectTemplates.validAny(selected)) {
+			selected = 1;
+		}
+	}
+
+	private boolean upgrade() {
+		return page.template() > 0;
 	}
 
 	// ================================================================== state
 
-	private CompoundTag catalog() {
+	private static CompoundTag catalog() {
 		return BuildClient.catalog();
 	}
 
-	private PlanStats stats(int template) {
+	private static PlanStats stats(int template) {
 		ListTag list = catalog().getListOrEmpty("stats");
 		for (Tag each : list) {
 			if (each instanceof CompoundTag tag && tag.getIntOr("t", 0) == template) {
@@ -150,8 +118,8 @@ public class TemplateScreen extends Screen {
 		return PlanStats.empty(template);
 	}
 
-	/** The template of grid cell {@code n} (1-9) on the current tab. */
-	private int templateOf(int n) {
+	/** The template of grid cell {@code n} (1-9) on the current family. */
+	private static int templateOf(int n) {
 		return sky ? SectTemplates.SKY_FIRST + n - 1 : n;
 	}
 
@@ -171,7 +139,7 @@ public class TemplateScreen extends Screen {
 			return Component.translatable("kultivator.sekte_langit.bangun.ranah", SectTemplates.name(template), realm.displayName());
 		}
 		int current = catalog.getIntOr("t", 0);
-		if (upgrade) {
+		if (upgrade()) {
 			if (!SectTemplates.isSky(current)) {
 				return Component.translatable("kultivator.blueprint.error.upgrade_family");
 			}
@@ -196,7 +164,7 @@ public class TemplateScreen extends Screen {
 			return lockedSky(template);
 		}
 		CompoundTag catalog = catalog();
-		if (upgrade && SectTemplates.isSky(catalog.getIntOr("t", 0))) {
+		if (upgrade() && SectTemplates.isSky(catalog.getIntOr("t", 0))) {
 			return Component.translatable("kultivator.blueprint.error.upgrade_family");
 		}
 		int max = catalog.getIntOr("max_t", 9);
@@ -208,17 +176,17 @@ public class TemplateScreen extends Screen {
 					Component.translatable("kultivator.sectbuild.realm_hint." + template));
 		}
 		int current = catalog.getIntOr("t", 0);
-		if (upgrade && template <= current) {
+		if (upgrade() && template <= current) {
 			return Component.translatable("kultivator.sectbuild.upgrade.smaller", SectTemplates.name(Math.max(1, current)));
 		}
-		if (!upgrade && current > 0) {
+		if (!upgrade() && current > 0) {
 			return Component.translatable("kultivator.sectbuild.template.already", SectTemplates.name(current));
 		}
 		return null;
 	}
 
 	/** The preview of the selected template, or null. */
-	private @Nullable CompoundTag preview() {
+	static @Nullable CompoundTag preview() {
 		if (!BuildClient.previewActive()) {
 			return null;
 		}
@@ -226,203 +194,89 @@ public class TemplateScreen extends Screen {
 		return tag.getIntOr("t", 0) == selected ? tag : null;
 	}
 
-	private boolean confirmable() {
+	private static boolean confirmable() {
 		CompoundTag preview = preview();
 		return preview != null && preview.getBooleanOr("confirmable", false) && preview.getLongOr("ticket", 0L) != 0L;
 	}
 
-	// ================================================================== layout
-
-	@Override
-	protected void init() {
-		int w = Math.min(MAX_W, width - 12);
-		int h = Math.min(MAX_H, height - 12);
-		x0 = (width - w) / 2;
-		x1 = x0 + w;
-		y0 = (height - h) / 2 + 5;
-		y1 = y0 + h - 10;
-		int cx0 = x0 + ScrollFrame.SIDE + 7;
-		int cx1 = x1 - ScrollFrame.SIDE - 7;
-		contentTop = y0 + ScrollFrame.END + 16;
-		contentBottom = y1 - ScrollFrame.END - 5;
-		int contentW = cx1 - cx0;
-		int gridW = Math.min(150, Math.round(contentW * 0.42F));
-		gap = contentW < 280 ? 2 : 4;
-		plaqueW = (gridW - 2 * gap) / 3;
-		plaqueH = Math.min(Math.round(plaqueW * 0.84F), (contentBottom - contentTop - 2 * gap - 14) / 3);
-		gridX = cx0;
-		gridY = contentTop;
-		rightX = cx0 + gridW + 8;
-		rightW = cx1 - rightX;
-		int rightH = contentBottom - contentTop;
-		diagramSize = Math.max(48, Math.min(Math.round(rightW * 0.5F), rightH - 20 - 10 - 12 - 14 - 15 - 40));
-		diagramX = rightX;
-		diagramY = contentTop + 20;
-		beadY = diagramY + diagramSize + 3;
-		skylineY = beadY + 8;
-		int glazeY = skylineY + 12;
-		int talismanY = glazeY + 13;
-		bottomY = talismanY + 15;
-
-		widgets.clear();
-		pressed = null;
-		int coinW = rightW / 3;
-		for (Glaze each : Glaze.values()) {
-			int index = each.ordinal();
-			JadeCoin coin = new JadeCoin(rightX + index * coinW, glazeY, coinW - 2, 11, () -> coinLabel(each), () -> !skyPreview() && glaze == index);
-			coin.onPress(() -> {
-				if (skyPreview()) {
-					// Down 4 / up 4: the plaza height of the sky design (the middle coin only shows it).
-					if (index != 1) {
-						consent = false;
-						BuildClient.send(0, "langit_tinggi:" + (index == 0 ? -1 : 1));
-					}
-					return;
-				}
-				glaze = index;
-				consent = false;
-			});
-			coin.enabledWhen(() -> !sky || skyPreview() && index != 1);
-			coin.tooltip(() -> skyPreview() ? List.of(Component.translatable("kultivator.sectbuild.ui.sky_height_tip"))
-					: List.of(each.displayName(), Component.translatable("kultivator.sectbuild.glaze_tip." + each.id())));
-			widgets.add(coin);
-		}
-		int third = (rightW - 4) / 3;
-		TalismanButton look = new TalismanButton(rightX, talismanY, third, 13, () -> Component.translatable("kultivator.sectbuild.ui.look"));
-		look.enabledWhen(() -> locked(selected) == null);
-		look.onPress(() -> {
-			consent = false;
-			if (sky && !upgrade) {
-				BuildClient.send(0, "langit:" + (selected - SectTemplates.SKY_FIRST + 1));
-			} else {
-				BuildClient.send(0, "preview:" + selected + ":-1:" + Glaze.byOrdinal(glaze).id() + (upgrade ? ":upgrade" : ""));
-			}
-		});
-		look.tooltip(() -> List.of(Component.translatable("kultivator.sectbuild.ui.look"), Component.translatable("kultivator.sectbuild.ui.look_tip")));
-		widgets.add(look);
-		TalismanButton turn = new TalismanButton(rightX + third + 2, talismanY, third, 13, () -> Component.translatable("kultivator.sectbuild.ui.rotate"));
-		turn.enabledWhen(() -> preview() != null && !upgrade);
-		turn.onPress(() -> {
-			consent = false;
-			BuildClient.send(0, "rotate");
-		});
-		widgets.add(turn);
-		TalismanButton cancel = new TalismanButton(rightX + 2 * (third + 2), talismanY, third, 13, () -> Component.translatable("kultivator.sectbuild.ui.cancel"));
-		cancel.enabledWhen(() -> preview() != null);
-		cancel.onPress(() -> {
-			consent = false;
-			BuildClient.send(0, "cancel");
-		});
-		widgets.add(cancel);
-
-		// The Darat / Awan tabs under the grid.
-		int tabY = gridY + 3 * (plaqueH + gap) + 1;
-		int tabW = (3 * plaqueW + 2 * gap) / 2;
-		for (int i = 0; i < 2; i++) {
-			boolean awan = i == 1;
-			JadeCoin tab = new JadeCoin(gridX + i * tabW, tabY, tabW - 2, 11,
-					() -> Component.translatable(awan ? "kultivator.sectbuild.ui.tab_awan" : "kultivator.sectbuild.ui.tab_darat"), () -> sky == awan);
-			tab.onPress(() -> {
-				if (sky != awan) {
-					sky = awan;
-					int n = SectTemplates.rank(selected);
-					selected = templateOf(n);
-					consent = false;
-					warnScroll = 0;
-				}
-			});
-			if (awan) {
-				tab.enabledWhen(() -> catalog().getBooleanOr("sky_on", false));
-				tab.tooltip(() -> List.of(Component.translatable("kultivator.sectbuild.ui.tab_awan"), Component.translatable("kultivator.sectbuild.ui.tab_awan_tip")));
-			}
-			widgets.add(tab);
-		}
-
-		sealR = Math.max(9.0F, Math.min(13.0F, (contentBottom - bottomY) * 0.28F));
-		sealX = rightX + rightW - sealR - 4.0F;
-		sealY = contentBottom - sealR - 9.0F;
-		boxX0 = rightX;
-		boxX1 = Math.round(sealX - sealR - 6.0F);
-		boxY1 = contentBottom - 2;
-		boxY0 = boxY1 - 14;
-	}
-
 	/** True while the shown preview is a sky design. */
-	private boolean skyPreview() {
+	private static boolean skyPreview() {
 		CompoundTag preview = preview();
 		return preview != null && preview.getBooleanOr("sky", false);
 	}
 
 	/** A glaze coin's label, or the sky height control it stands for. */
-	private Component coinLabel(Glaze each) {
+	private static Component coinLabel(Glaze each) {
 		if (!skyPreview()) {
 			return each.displayName();
 		}
 		return switch (each.ordinal()) {
-			case 0 -> Component.literal("\u25BC 4");
-			case 2 -> Component.literal("\u25B2 4");
-			default -> Component.translatable("kultivator.sectbuild.ui.sky_height", preview() == null ? 0 : preview().getIntOr("yP", 0));
+			case 0 -> Component.literal("▼ 4");
+			case 2 -> Component.literal("▲ 4");
+			default -> Component.translatable(K + "sky_height", preview() == null ? 0 : preview().getIntOr("yP", 0));
 		};
+	}
+
+	/** The realm hint of a template: the ground's own line, or the sky family's realm (DESIGN 37.3.3). */
+	private static Component realmHint(int template) {
+		if (SectTemplates.isSky(template)) {
+			return dev.kultivator.sect.build.flow.LangitRancang.realmFor(template).displayName();
+		}
+		return Component.translatable("kultivator.sectbuild.realm_hint." + template);
 	}
 
 	// ================================================================== drawing
 
-	@Override
-	public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float a) {
-		long now = Util.getMillis();
-		float fade = backdrop.to(1.0F, Math.min(0.1F, (now - lastFrame) / 1000.0F), 0.0F);
-		g.fillGradient(0, 0, width, height, Palette.argb(Math.round(0x70 * fade), Palette.NIGHT), Palette.argb(Math.round(0xA0 * fade), Palette.NIGHT_MIST));
-	}
+	/** Draws the catalog into the box (the whole content box of the page). */
+	void draw(Lukis l, int x, int y, int w, int h) {
+		int bh = page.buttonH();
+		int gridW = Math.max(84, Math.min(156, Math.round(w * 0.36F)));
+		int gap = w < 360 ? 2 : 4;
+		int plaqueW = (gridW - 2 * gap) / 3;
+		int coinY0 = y + h - bh;
+		int plaqueH = Math.max(18, Math.min(Math.round(plaqueW * 0.84F), (coinY0 - 4 - y - 2 * gap) / 3));
+		drawGrid(l, x, y, plaqueW, plaqueH, gap);
+		int under = y + 3 * (plaqueH + gap) + 2;
+		BuildPage.koin(l, "tpl:awan", x, Math.max(under, coinY0 - 2), 3 * plaqueW + 2 * gap, bh, Component.translatable(K + "tab_awan"), sky,
+				catalog().getBooleanOr("sky_on", false), Component.translatable("kultivator.sekte_langit.bangun.mati"), () -> {
+					sky = !sky;
+					selected = templateOf(SectTemplates.rank(selected));
+					scroll = 0.0F;
+				}, List.of(Component.translatable(K + "tab_awan"), Component.translatable(K + "tab_awan_tip")));
+		int textTop = under + 2;
+		if (coinY0 - 4 - textTop >= 18) {
+			l.bungkus(Component.translatable(K + "promise"), x, textTop, 3 * plaqueW + 2 * gap, l.gaya.teksSamar, coinY0 - 4 - textTop);
+		}
 
-	@Override
-	public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float a) {
-		super.extractRenderState(g, mouseX, mouseY, a);
-		long now = Util.getMillis();
-		float seconds = Math.max(0.0F, Math.min(0.1F, (now - lastFrame) / 1000.0F));
-		lastFrame = now;
-		tooltip = null;
-		float open = Eased.out(Math.min(1.0F, (now - openedAt) / (float) UNROLL_MILLIS));
-		int mid = (y0 + y1) / 2;
-		int half = Math.round((y1 - y0) / 2.0F * open);
-		ScrollFrame.paper(g, x0, x1, mid - half, mid + half, y0, y1);
-		ScrollFrame.rod(g, x0, x1, mid - half);
-		ScrollFrame.rod(g, x0, x1, mid + half);
-		if (open < 1.0F) {
-			return;
-		}
-		g.nextStratum();
-		// The header between gold rules.
-		float cx = (x0 + x1) / 2.0F;
-		float headY = y0 + ScrollFrame.END + 4.0F;
-		Brush.fitCentered(g, font, Brush.bold(title), cx, headY, x1 - x0 - 60.0F, Palette.INK, 1.0F, 0.6F, false);
-		Brush.rect(g, x0 + 20.0F, headY + 10.0F, x1 - 20.0F, headY + 10.6F, Palette.argb(0xB0, Palette.GOLD));
-
-		drawGrid(g, mouseX, mouseY);
-		drawDetail(g, mouseX, mouseY, now);
-		for (Widget widget : widgets) {
-			widget.render(g, font, mouseX, mouseY, seconds);
-			if (widget.contains(mouseX, mouseY) && tooltip == null && !widget.tooltipLines().isEmpty()) {
-				tooltip = widget.tooltipLines();
-			}
-		}
-		if (holding && progress(now, mouseX, mouseY) >= 1.0F && !done) {
-			confirm();
-		}
-		if (tooltip != null) {
-			g.nextStratum();
-			SlipTooltip.draw(g, font, tooltip, mouseX, mouseY, width, height);
-		}
+		int rx = x + 3 * plaqueW + 2 * gap + 8;
+		int rw = x + w - rx;
+		CompoundTag preview = preview();
+		int rows = preview != null ? 2 : 1;
+		int buttonsTop = y + h - rows * (bh + 2) + 2;
+		drawButtons(l, rx, buttonsTop, rw, bh, preview);
+		scrollX0 = rx;
+		scrollY0 = y;
+		scrollX1 = rx + rw;
+		scrollY1 = buttonsTop - 3;
+		float view = scrollY1 - scrollY0;
+		scroll = Math.max(0.0F, Math.min(scroll, Math.max(0.0F, content - view)));
+		l.klip(rx, y, rx + rw, scrollY1);
+		float top = y - scroll;
+		float bottom = drawDetail(l, rx, top, rw - 4, preview);
+		l.lepasKlip();
+		content = bottom - top;
+		page.bead(l, rx + rw, y, scrollY1, scroll, Math.max(0.0F, content - view));
 	}
 
 	/** The 3x3 grid of jade plaques. */
-	private void drawGrid(GuiGraphicsExtractor g, int mouseX, int mouseY) {
+	private void drawGrid(Lukis l, int gridX, int gridY, int plaqueW, int plaqueH, int gap) {
 		for (int n = 1; n <= SectTemplates.COUNT; n++) {
 			int template = templateOf(n);
 			int col = (n - 1) % 3;
 			int row = (n - 1) / 3;
 			int px = gridX + col * (plaqueW + gap);
 			int py = gridY + row * (plaqueH + gap);
-			boolean over = mouseX >= px && mouseX < px + plaqueW && mouseY >= py && mouseY < py + plaqueH;
+			boolean over = l.di(px, py, px + plaqueW, py + plaqueH);
 			boolean chosen = template == selected;
 			Component lock = locked(template);
 			int top = chosen ? Palette.JADE_LIGHT : over ? Palette.lighten(Palette.JADE_PALE, 0.1F) : Palette.JADE_PALE;
@@ -431,45 +285,51 @@ public class TemplateScreen extends Screen {
 				top = Palette.grey(top, 0.75F);
 				bottom = Palette.grey(bottom, 0.75F);
 			}
-			g.fill(px + 1, py + 2, px + plaqueW + 1, py + plaqueH + 1, 0x40000000);
-			Brush.chamferGradient(g, px, py, px + plaqueW, py + plaqueH, 2, top, bottom);
-			Brush.frame(g, px + 1, py + 1, px + plaqueW - 1, py + plaqueH - 1, chosen ? Palette.GOLD : Palette.argb(0x90, Palette.JADE_DARK));
-			// The ink sketch.
-			float size = Math.min(plaqueW - 6.0F, plaqueH - 12.0F);
-			SiteDiagram.draw(g, px + (plaqueW - size) / 2.0F, py + 2.0F, size, SiteDiagram.sketch(n), SiteDiagram.Bounds.of(n), 9, 0,
-					-1, -1, false);
-			// The numeral seal and the name.
-			g.fill(px + 2, py + 2, px + 9, py + 9, lock == null ? Palette.SEAL : Palette.grey(Palette.SEAL, 0.7F));
-			Brush.centered(g, font, Component.literal(sky ? "A" + n : Integer.toString(n)), px + 5.6F, py + 3.0F, Palette.TALISMAN, sky ? 0.5F : 0.62F, false);
-			Brush.fitCentered(g, font, SectTemplates.name(template), px + plaqueW / 2.0F, py + plaqueH - 8.0F, plaqueW - 4.0F,
-					lock == null ? Palette.INK : Palette.INK_FAINT, 0.6F, 0.4F, false);
-			if (lock != null) {
-				Glyphs.lock(g, px + plaqueW - 6.0F, py + 6.0F, 6.0F, Palette.INK_SOFT);
+			l.g.fill(px + 1, py + 2, px + plaqueW + 1, py + plaqueH + 1, 0x40000000);
+			Brush.chamferGradient(l.g, px, py, px + plaqueW, py + plaqueH, 2, top, bottom);
+			Brush.frame(l.g, px + 1, py + 1, px + plaqueW - 1, py + plaqueH - 1, chosen ? Palette.GOLD : Palette.argb(0x90, Palette.JADE_DARK));
+			boolean named = plaqueH >= 30;
+			float size = Math.min(plaqueW - 6.0F, plaqueH - (named ? 13.0F : 4.0F));
+			SiteDiagram.draw(l.g, px + (plaqueW - size) / 2.0F, py + 2.0F, size, SiteDiagram.sketch(n), SiteDiagram.Bounds.of(n), 9, 0, -1, -1, false);
+			// The numeral seal; the name when the plaque is tall enough (else in the tooltip).
+			Component numeral = Component.literal(sky ? "A" + n : Integer.toString(n));
+			int sealW = Math.max(9, l.font.width(numeral) + 3);
+			l.g.fill(px + 2, py + 2, px + 2 + sealW, py + 12, lock == null ? Palette.SEAL : Palette.grey(Palette.SEAL, 0.7F));
+			Brush.text(l.g, l.font, numeral, px + 4.0F, py + 3.0F, Palette.TALISMAN, 1.0F, false);
+			if (named) {
+				l.tengah(SectTemplates.name(template), px + plaqueW / 2.0F, py + plaqueH - 10.0F, plaqueW - 4.0F, lock == null ? Palette.INK : Palette.INK_FAINT);
 			}
-			if (over) {
-				List<Component> tip = new ArrayList<>();
-				tip.add(SectTemplates.name(template));
-				tip.add(Component.translatable("kultivator.sectbuild.archetype." + template));
-				tip.add(Component.translatable("kultivator.sectbuild.ui.realm_hint", realmHint(template)));
-				if (lock != null) {
-					tip.add(lock);
+			if (lock != null) {
+				Glyphs.lock(l.g, px + plaqueW - 6.0F, py + 6.0F, 6.0F, Palette.INK_SOFT);
+			}
+			List<Component> tip = new ArrayList<>();
+			tip.add(SectTemplates.name(template));
+			tip.add(Component.translatable("kultivator.sectbuild.archetype." + template));
+			tip.add(Component.translatable(K + "realm_hint", realmHint(template)));
+			if (lock != null) {
+				tip.add(lock);
+			}
+			String key = "tpl:plakat:" + n;
+			l.zona(key, px, py, px + plaqueW, py + plaqueH, () -> {
+				if (template != selected) {
+					select(template);
+					UiSound.tab();
 				}
-				tooltip = tip;
+			}, true, null, true);
+			l.fokusCincin(key, px, py, px + plaqueW, py + plaqueH);
+			if (over) {
+				l.tip(tip);
 			}
 		}
-		// Below the grid and its tabs: the source line of the chosen template and the "just deposit" promise.
-		int textY = gridY + 3 * (plaqueH + gap) + 14;
-		float textW = 3 * plaqueW + 2 * gap;
-		Brush.wrap(g, font, Component.translatable("kultivator.sectbuild.ui.promise"), gridX, textY, textW, Palette.INK_SOFT, 0.55F, false);
 	}
 
-	/** The chosen template: diagram, beads, skyline, numbers, and the preview's slips, consent and seal. */
-	private void drawDetail(GuiGraphicsExtractor g, int mouseX, int mouseY, long now) {
-		Brush.fit(g, font, Brush.bold(SectTemplates.name(selected)), rightX, contentTop, rightW, Palette.SEAL_DARK, 0.9F, 0.55F, false);
-		Brush.fit(g, font, Component.translatable("kultivator.sectbuild.archetype." + selected), rightX, contentTop + 10.0F, rightW, Palette.INK_SOFT,
-				0.6F, 0.45F, false);
+	/** The chosen template in one scroll; returns the bottom of what was laid out. */
+	private float drawDetail(Lukis l, int rx, float top, int rw, @Nullable CompoundTag preview) {
+		float y = top;
+		l.teks(Brush.bold(SectTemplates.name(selected)), rx, y, rw, Palette.SEAL_DARK);
+		y += LINE + 1;
+		y += l.bungkus(Component.translatable("kultivator.sectbuild.archetype." + selected), rx, y, rw, l.gaya.teksSamar) + 3;
 
-		CompoundTag preview = preview();
 		List<SiteDiagram.Part> parts;
 		SiteDiagram.Bounds bounds;
 		int[] stele = preview == null ? null : preview.getIntArray("stele").orElse(null);
@@ -483,135 +343,170 @@ public class TemplateScreen extends Screen {
 			bounds = SiteDiagram.Bounds.of(SectTemplates.rank(selected));
 		}
 		int scrub = BuildClient.scrubTier();
-		int hover = SiteDiagram.draw(g, diagramX, diagramY, diagramSize, parts, bounds, scrub, 0, mouseX, mouseY, true);
-		Brush.frame(g, diagramX - 1, diagramY - 1, diagramX + diagramSize + 1, diagramY + diagramSize + 1, Palette.argb(0xC0, Palette.GOLD));
+		diagramSize = Math.max(48, Math.min(120, rw));
+		diagramX0 = rx;
+		diagramY0 = Math.round(y);
+		int hover = SiteDiagram.draw(l.g, rx, y, diagramSize, parts, bounds, scrub, 0, l.mx, l.my, true);
+		Brush.frame(l.g, rx - 1, Math.round(y) - 1, rx + diagramSize + 1, Math.round(y) + diagramSize + 1, Palette.argb(0xC0, Palette.GOLD));
 		if (hover >= 0) {
 			SiteDiagram.Part part = parts.get(hover);
 			List<Component> tip = new ArrayList<>();
-			tip.add(part.name() != null ? part.name() : Component.translatable("kultivator.sectbuild.ui.part." + part.shape()));
-			tip.add(Component.translatable("kultivator.sectbuild.ui.part_tier", part.tier(), SectTemplates.tierName(part.tier())));
-			tooltip = tip;
+			tip.add(part.name() != null ? part.name() : Component.translatable(K + "part." + part.shape()));
+			tip.add(Component.translatable(K + "part_tier", part.tier(), SectTemplates.tierName(part.tier())));
+			l.tip(tip);
 		}
-		// The nine jade beads of the scrubber.
+		// The nine jade beads (the scrubber's state) under the diagram.
+		float beadY = y + diagramSize + 4.0F;
 		float beadStep = diagramSize / 9.0F;
 		for (int tier = 1; tier <= 9; tier++) {
-			float bx = diagramX + beadStep * (tier - 0.5F);
+			float bx = rx + beadStep * (tier - 0.5F);
 			boolean lit = tier <= scrub;
-			Brush.disc(g, bx, beadY + 2.5F, 2.6F, Palette.darken(lit ? Palette.JADE_LIGHT : Palette.JADE_DULL, 0.3F));
-			Brush.disc(g, bx, beadY + 2.5F, 2.0F, lit ? Palette.JADE_LIGHT : Palette.JADE_DULL);
+			Brush.disc(l.g, bx, beadY + 2.5F, 2.6F, Palette.darken(lit ? Palette.JADE_LIGHT : Palette.JADE_DULL, 0.3F));
+			Brush.disc(l.g, bx, beadY + 2.5F, 2.0F, lit ? Palette.JADE_LIGHT : Palette.JADE_DULL);
 			if (tier == scrub) {
-				Brush.ring(g, bx, beadY + 2.5F, 2.8F, 3.4F, Palette.GOLD);
-			}
-			if (Math.abs(mouseX - bx) < beadStep / 2.0F && Math.abs(mouseY - beadY - 2.5F) < 4.0F) {
-				tooltip = List.of(Component.translatable("kultivator.sectbuild.ui.part_tier", tier, SectTemplates.tierName(tier)));
+				Brush.ring(l.g, bx, beadY + 2.5F, 2.8F, 3.4F, Palette.GOLD);
 			}
 		}
-		SiteDiagram.skyline(g, rightX, skylineY, rightW, 10.0F, parts, bounds, scrub);
+		y = beadY + 8.0F;
+		Component tierLabel = Component.translatable(K + "part_tier", scrub, SectTemplates.tierName(scrub));
+		TalismanButton.gambar(l, "tpl:tingkat", rx, Math.round(y), Math.min(rw, Math.max(diagramSize, TalismanButton.lebar(l.font, tierLabel, 60, rw))),
+				page.buttonH(), tierLabel, true, null, () -> BuildClient.setScrubTier(scrub >= 9 ? 1 : scrub + 1));
+		if (l.di(rx, Math.round(y), rx + rw, Math.round(y) + page.buttonH())) {
+			l.tip(List.of(tierLabel, Component.translatable(M + "tingkat.tip")));
+		}
+		y += page.buttonH() + 3;
+		SiteDiagram.skyline(l.g, rx, y, Math.min(rw, diagramSize + 40), 10.0F, parts, bounds, scrub);
+		y += 13;
 
-		drawNumbers(g, preview);
+		y = drawNumbers(l, rx, y, rw, preview);
+		y = drawGlaze(l, rx, y + 2, rw);
 		if (preview != null) {
-			drawPreviewBottom(g, preview, mouseX, mouseY, now);
+			y = drawWarnings(l, rx, y + 2, rw, preview);
 		} else {
-			drawBillBottom(g);
+			y = drawBill(l, rx, y + 2, rw);
 		}
+		return y + 2;
 	}
 
-	/** The numbers beside the diagram. */
-	private void drawNumbers(GuiGraphicsExtractor g, @Nullable CompoundTag preview) {
+	/** The numbers of the chosen template, one 1.0 line each (cut with "…", whole in the tooltip). */
+	private float drawNumbers(Lukis l, int x, float y, int w, @Nullable CompoundTag preview) {
 		int t = SectTemplates.rank(selected) - 1;
 		PlanStats stats = stats(selected);
 		boolean real = !stats.isEmpty();
-		float x = diagramX + diagramSize + 5.0F;
-		float w = rightX + rightW - x;
-		float y = diagramY;
-		float scale = 0.55F;
 		List<Component> lines = new ArrayList<>();
 		int width = real ? stats.width() : 2 * SiteDiagram.X_HALF[t] + 1;
 		int depth = real ? stats.depth() : SiteDiagram.Z_MAX[t] - SiteDiagram.Z_MIN[t] + 1;
-		lines.add(Component.translatable("kultivator.sectbuild.ui.footprint", width, depth));
-		lines.add(Component.translatable("kultivator.sectbuild.ui.envelope", real ? stats.above() : ABOVE[t], real ? stats.below() : BELOW[t]));
+		lines.add(Component.translatable(K + "footprint", width, depth));
+		lines.add(Component.translatable(K + "envelope", real ? stats.above() : ABOVE[t], real ? stats.below() : BELOW[t]));
 		if (real) {
-			lines.add(Component.translatable("kultivator.sectbuild.ui.components", stats.totalComponents()));
+			lines.add(Component.translatable(K + "components", stats.totalComponents()));
 		}
 		long units = real ? stats.total().totalCenti() / Bahan.CENTI : TARGET_UNITS[t];
-		lines.add(Component.translatable(real ? "kultivator.sectbuild.ui.units" : "kultivator.sectbuild.ui.units_target", units));
+		lines.add(Component.translatable(real ? K + "units" : K + "units_target", units));
 		if (real) {
 			int exact = stats.total().exact().values().stream().mapToInt(Integer::intValue).sum();
-			lines.add(Component.translatable("kultivator.sectbuild.ui.exact", exact));
+			lines.add(Component.translatable(K + "exact", exact));
 		}
 		int builders = catalog().getIntOr("builders", 0);
 		double speed = Math.max(0.25D, catalog().getDoubleOr("speed", 1.0D));
 		double minutes = (real && stats.minutes() > 0.0D ? stats.minutes() : TARGET_MINUTES[t]) / ((1.0D + 0.25D * builders) * speed);
-		lines.add(Component.translatable("kultivator.sectbuild.ui.time", Math.max(1L, Math.round(minutes)), builders));
+		lines.add(Component.translatable(K + "time", Math.max(1L, Math.round(minutes)), builders));
 		int[] skyTerritory = catalog().getIntArray("sky_terr").orElse(null);
 		int territory = SectTemplates.isSky(selected) && skyTerritory != null && skyTerritory.length > t ? skyTerritory[t] : TERRITORY[t];
-		lines.add(Component.translatable("kultivator.sectbuild.ui.perks", TOWER_ROOMS[t], QI_SEAT[t], territory));
+		lines.add(Component.translatable(K + "perks", TOWER_ROOMS[t], QI_SEAT[t], territory));
 		if (ALTARS[t] > 0) {
-			lines.add(Component.translatable("kultivator.sectbuild.ui.altars", ALTARS[t]));
+			lines.add(Component.translatable(K + "altars", ALTARS[t]));
 		}
 		if (t + 1 >= 5) {
-			lines.add(Component.translatable("kultivator.sectbuild.ui.cap_bonus"));
+			lines.add(Component.translatable(K + "cap_bonus"));
 		}
 		if (t + 1 >= 6) {
-			lines.add(Component.translatable("kultivator.sectbuild.ui.candidate_bonus"));
+			lines.add(Component.translatable(K + "candidate_bonus"));
 		}
-		lines.add(Component.translatable("kultivator.sectbuild.ui.realm_hint", realmHint(selected)));
+		lines.add(Component.translatable(K + "realm_hint", realmHint(selected)));
 		if (preview != null) {
-			lines.add(Component.translatable("kultivator.sectbuild.ui.gate",
+			lines.add(Component.translatable(K + "gate",
 					Component.translatable("kultivator.sectbuild.gate." + SectTemplates.gate(preview.getIntOr("rot", 0)).getSerializedName())));
 		}
-		float bottom = diagramY + diagramSize;
 		for (Component line : lines) {
-			if (y + 9.0F * scale > bottom) {
-				break;
-			}
-			Brush.rect(g, x, y + 2.0F * scale, x + 1.6F, y + 4.4F * scale, Palette.SEAL);
-			y += Brush.wrap(g, font, line, x + 3.0F, y, w - 3.0F, Palette.INK, scale, false) + 0.5F;
+			Brush.rect(l.g, x, y + 3.0F, x + 2.0F, y + 6.0F, Palette.SEAL);
+			y += l.bungkus(line, x + 4, y, w - 4, Palette.INK) + 1;
 		}
+		return y;
 	}
 
-	/** The realm hint of a template: the ground's own line, or the sky family's realm (DESIGN 37.3.3). */
-	private static Component realmHint(int template) {
-		if (SectTemplates.isSky(template)) {
-			return dev.kultivator.sect.build.flow.LangitRancang.realmFor(template).displayName();
+	/** The three glaze coins (Tinta, Giok, Langit), or the plaza height on a sky preview. */
+	private float drawGlaze(Lukis l, int x, float y, int w) {
+		int bh = page.buttonH();
+		int coinW = (w - 4) / 3;
+		boolean skyShown = skyPreview();
+		for (Glaze each : Glaze.values()) {
+			int index = each.ordinal();
+			boolean enabled = !sky || skyShown && index != 1;
+			BuildPage.koin(l, "tpl:glasir:" + index, x + index * (coinW + 2), Math.round(y), coinW, bh, coinLabel(each), !skyShown && glaze == index, enabled,
+					Component.translatable(M + "glasir_langit"), () -> {
+						if (skyPreview()) {
+							// Down 4 / up 4: the plaza height of the sky design (the middle coin only shows it).
+							if (index != 1) {
+								BuildClient.send(0, "langit_tinggi:" + (index == 0 ? -1 : 1));
+							}
+							return;
+						}
+						glaze = index;
+					}, skyShown ? List.of(Component.translatable(K + "sky_height_tip"))
+							: List.of(each.displayName(), Component.translatable("kultivator.sectbuild.glaze_tip." + each.id())));
 		}
-		return Component.translatable("kultivator.sectbuild.realm_hint." + template);
+		return y + bh + 3;
 	}
 
 	/** Without a preview: the whole bill as bamboo slips and the hint to look at the footprint. */
-	private void drawBillBottom(GuiGraphicsExtractor g) {
+	private float drawBill(Lukis l, int x, float y, int w) {
 		PlanStats stats = stats(selected);
-		float y = bottomY;
-		float scale = 0.55F;
 		if (!stats.isEmpty()) {
 			Bill total = stats.total();
-			int columns = 3;
-			float colW = rightW / (float) columns;
+			int columns = w >= 240 ? 2 : 1;
+			float colW = w / (float) columns;
 			int index = 0;
 			for (Bahan cat : Bahan.values()) {
 				long centi = total.centi(cat);
 				if (centi <= 0L) {
 					continue;
 				}
-				float sx = rightX + (index % columns) * colW;
-				float sy = y + (index / columns) * 8.0F;
-				if (sy + 7.0F > contentBottom) {
-					break;
-				}
-				Brush.rect(g, sx, sy + 1.0F, sx + 3.0F, sy + 6.0F, Palette.opaque(cat.rgb()));
-				Brush.fit(g, font, Component.translatable("kultivator.sectbuild.amount", centi / Bahan.CENTI, cat.displayName()), sx + 5.0F, sy, colW - 6.0F,
-						Palette.INK, scale, 0.4F, false);
+				float sx = x + (index % columns) * colW;
+				float sy = y + (index / columns) * LINE;
+				Brush.rect(l.g, sx, sy + 2.0F, sx + 3.0F, sy + 7.0F, Palette.opaque(cat.rgb()));
+				l.teks(Component.translatable("kultivator.sectbuild.amount", centi / Bahan.CENTI, cat.displayName()), sx + 5.0F, sy, colW - 6.0F, Palette.INK);
 				index++;
 			}
-			y += ((index + columns - 1) / columns) * 8.0F + 2.0F;
+			y += ((index + columns - 1) / columns) * LINE + 2;
 		}
-		if (y + 8.0F < contentBottom) {
-			Brush.wrap(g, font, Component.translatable("kultivator.sectbuild.ui.look_hint"), rightX, y, rightW, Palette.INK_SOFT, scale, false);
-		}
+		return y + l.bungkus(Component.translatable(M + "lihat_hint"), x, y, w, l.gaya.teksSamar);
 	}
 
-	/** With a preview: the warnings as slips, the consent checkbox and the seal to hold. */
-	private void drawPreviewBottom(GuiGraphicsExtractor g, CompoundTag preview, int mouseX, int mouseY, long now) {
+	/** With a preview: the snapshot line and the warnings as slips (worst first). */
+	private float drawWarnings(Lukis l, int x, float y, int w, CompoundTag preview) {
+		List<CompoundTag> warnings = warnings(preview);
+		int snap = preview.getIntOr("snap", 0);
+		l.teks(Component.translatable("kultivator.sectbuild.hud.snapshot", snap), x, y, w, snap >= 100 ? Palette.JADE_DARK : Palette.WARN);
+		y += LINE + 1;
+		if (warnings.isEmpty()) {
+			l.teks(Component.translatable(K + "no_warnings"), x, y, w, Palette.JADE_DARK);
+			return y + LINE;
+		}
+		for (CompoundTag warning : warnings) {
+			int sev = warning.getIntOr("sev", 0);
+			int slip = sev >= 2 ? 0xFFE8B4A8 : sev == 1 ? Palette.BAMBOO : Palette.BAMBOO_ALT;
+			Component text = BuildClient.warning(warning);
+			float height = Math.max(LINE, Brush.wrapHeight(l.font, text, w - 5, 1.0F) + 1);
+			Brush.rect(l.g, x, y, x + w, y + height, Palette.argb(0xD0, slip));
+			Brush.rect(l.g, x, y, x + 1.5F, y + height, sev >= 2 ? Palette.SEAL : sev == 1 ? Palette.WARN : Palette.BAMBOO_KNOT);
+			l.bungkus(text, x + 4, y + 1, w - 5, Palette.INK);
+			y += height + 1;
+		}
+		return y;
+	}
+
+	private static List<CompoundTag> warnings(CompoundTag preview) {
 		List<CompoundTag> warnings = new ArrayList<>();
 		for (Tag each : preview.getListOrEmpty("warn")) {
 			if (each instanceof CompoundTag warning) {
@@ -619,212 +514,101 @@ public class TemplateScreen extends Screen {
 			}
 		}
 		warnings.sort((a, b) -> Integer.compare(b.getIntOr("sev", 0), a.getIntOr("sev", 0)));
-		float y = bottomY;
-		int snap = preview.getIntOr("snap", 0);
-		Brush.fit(g, font, Component.translatable("kultivator.sectbuild.hud.snapshot", snap), rightX, y, boxX1 - rightX, snap >= 100 ? Palette.JADE_DARK
-				: Palette.WARN, 0.6F, 0.45F, false);
-		y += 7.0F;
-		int slots = Math.max(1, (int) ((boxY0 - 2 - y) / 8.0F));
-		warnScroll = Math.max(0, Math.min(warnScroll, Math.max(0, warnings.size() - slots)));
-		for (int i = warnScroll; i < Math.min(warnings.size(), warnScroll + slots); i++) {
-			CompoundTag warning = warnings.get(i);
-			int sev = warning.getIntOr("sev", 0);
-			int slip = sev >= 2 ? 0xFFE8B4A8 : sev == 1 ? Palette.BAMBOO : Palette.BAMBOO_ALT;
-			float sy = y + (i - warnScroll) * 8.0F;
-			Brush.rect(g, rightX, sy, boxX1, sy + 7.0F, Palette.argb(0xD0, slip));
-			Brush.rect(g, rightX, sy, rightX + 1.5F, sy + 7.0F, sev >= 2 ? Palette.SEAL : sev == 1 ? Palette.WARN : Palette.BAMBOO_KNOT);
-			Component text = BuildClient.warning(warning);
-			Brush.fit(g, font, text, rightX + 3.0F, sy + 1.0F, boxX1 - rightX - 4.0F, Palette.INK, 0.55F, 0.4F, false);
-			if (mouseX >= rightX && mouseX < boxX1 && mouseY >= sy && mouseY < sy + 7.0F) {
-				tooltip = List.of(text);
+		return warnings;
+	}
+
+	/** Look / turn / cancel, and with a preview: see it in the world / confirm. */
+	private void drawButtons(Lukis l, int x, int y, int w, int bh, @Nullable CompoundTag preview) {
+		int third = (w - 4) / 3;
+		Component lock = locked(selected);
+		boolean ro = page.readonly();
+		Component why = ro ? Component.translatable(M + "baca_saja") : lock;
+		TalismanButton.gambar(l, "tpl:lihat", x, y, third, bh, Component.translatable(K + "look"), lock == null && !ro, why, () -> {
+			if (sky && !upgrade()) {
+				BuildClient.send(0, "langit:" + (selected - SectTemplates.SKY_FIRST + 1));
+			} else {
+				BuildClient.send(0, "preview:" + selected + ":-1:" + Glaze.byOrdinal(Math.max(0, glaze)).id() + (upgrade() ? ":upgrade" : ""));
 			}
+		}, lock == null && !ro && preview == null, false);
+		if (l.di(x, y, x + third, y + bh)) {
+			l.tip(List.of(Component.translatable(K + "look"), Component.translatable(M + "lihat_tapak.tip")));
 		}
-		if (warnings.isEmpty()) {
-			Brush.fit(g, font, Component.translatable("kultivator.sectbuild.ui.no_warnings"), rightX, y, boxX1 - rightX, Palette.JADE_DARK, 0.6F, 0.45F, false);
-		}
-		// The consent checkbox talisman.
-		boolean overBox = mouseX >= boxX0 && mouseX < boxX1 && mouseY >= boxY0 && mouseY < boxY1;
-		g.fillGradient(boxX0, boxY0, boxX1, boxY1, overBox ? 0xFFF7DFA0 : Palette.TALISMAN, Palette.TALISMAN_LOW);
-		Brush.frame(g, boxX0, boxY0, boxX1, boxY1, consent ? Palette.SEAL : Palette.TALISMAN_EDGE);
-		int check = boxY1 - boxY0 - 5;
-		g.fill(boxX0 + 2, boxY0 + 2, boxX0 + 2 + check, boxY0 + 2 + check, 0xFFFFF4D6);
-		Brush.frame(g, boxX0 + 2, boxY0 + 2, boxX0 + 2 + check, boxY0 + 2 + check, Palette.INK);
-		if (consent) {
-			float bx = boxX0 + 2.0F;
-			float by = boxY0 + 2.0F;
-			Brush.line(g, bx + 1.5F, by + check * 0.55F, bx + check * 0.42F, by + check - 1.5F, 1.4F, Palette.SEAL);
-			Brush.line(g, bx + check * 0.42F, by + check - 1.5F, bx + check - 1.0F, by + 1.0F, 1.4F, Palette.SEAL);
-		}
-		Brush.fit(g, font, Component.translatable("kultivator.sectbuild.ui.consent_short"), boxX0 + check + 5.0F, boxY0 + 3.5F, boxX1 - boxX0 - check - 7.0F,
-				Palette.INK, 0.6F, 0.4F, false);
-		if (overBox) {
-			tooltip = List.of(Component.translatable("kultivator.sectbuild.consent"));
-		}
-		// The jade Konfirmasi seal, held 3 s.
-		boolean ready = consent && confirmable();
-		float progress = progress(now, mouseX, mouseY);
-		boolean overSeal = overSeal(mouseX, mouseY);
-		if (ready) {
-			float pulse = 0.5F + 0.5F * (float) Math.sin(now / 300.0D);
-			Brush.halo(g, sealX, sealY, sealR, 5.0F, 0x9CFFD0, (overSeal ? 0.8F : 0.4F) * (0.6F + 0.4F * pulse));
-		}
-		Brush.disc(g, sealX, sealY, sealR + 1.5F, Palette.JADE_DARK);
-		Brush.band(g, sealX, sealY, sealR, -sealR, sealR, ready ? Palette.JADE_LIGHT : Palette.JADE_DULL, ready ? Palette.JADE : Palette.grey(Palette.JADE, 0.6F));
-		if (progress > 0.0F) {
-			Brush.arc(g, sealX, sealY, sealR + 2.0F, sealR + 4.0F, 0.0F, progress, 0xFFFFD27A);
-		}
-		Brush.rect(g, sealX - sealR * 0.45F, sealY - 0.6F, sealX + sealR * 0.45F, sealY + 0.6F, Palette.argb(0xD0, Palette.TALISMAN));
-		Brush.rect(g, sealX - 0.6F, sealY - sealR * 0.45F, sealX + 0.6F, sealY + sealR * 0.45F, Palette.argb(0xD0, Palette.TALISMAN));
-		Component hint = ready ? Component.translatable("kultivator.sectbuild.ui.hold", HOLD_MILLIS / 1000L)
-				: Component.translatable(consent ? "kultivator.sectbuild.ui.not_ready" : "kultivator.sectbuild.ui.check_first");
-		Brush.fitCentered(g, font, hint, sealX, sealY + sealR + 3.0F, sealR * 2.0F + 22.0F, Palette.INK_SOFT, 0.55F, 0.4F, false);
-		if (overSeal) {
-			tooltip = List.of(Component.translatable("kultivator.sectbuild.ui.confirm"), hint);
-		}
-	}
-
-	// ================================================================== the hold
-
-	private boolean overSeal(double mouseX, double mouseY) {
-		double dx = mouseX - sealX;
-		double dy = mouseY - sealY;
-		return dx * dx + dy * dy <= (sealR + 3.0F) * (sealR + 3.0F);
-	}
-
-	private float progress(long now, int mouseX, int mouseY) {
-		if (!holding) {
-			return 0.0F;
-		}
-		if (!consent || !confirmable() || !overSeal(mouseX, mouseY)) {
-			holding = false;
-			return 0.0F;
-		}
-		return Math.min(1.0F, (now - holdStart) / (float) HOLD_MILLIS);
-	}
-
-	private void confirm() {
-		CompoundTag preview = preview();
+		Component noPreview = Component.translatable(M + "tanpa_pratinjau");
+		TalismanButton.gambar(l, "tpl:putar", x + third + 2, y, third, bh, Component.translatable(K + "rotate"), preview != null && !upgrade(),
+				preview == null ? noPreview : Component.translatable(M + "putar_naik"), () -> BuildClient.send(0, "rotate"));
+		TalismanButton.gambar(l, "tpl:batal", x + 2 * (third + 2), y, w - 2 * (third + 2), bh, Component.translatable(K + "cancel"), preview != null,
+				noPreview, () -> BuildClient.send(0, "cancel"));
 		if (preview == null) {
-			holding = false;
 			return;
 		}
-		done = true;
-		holding = false;
-		BuildClient.send(0, "confirm:" + preview.getLongOr("ticket", 0L));
-		minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.BELL_BLOCK, 0.8F, 0.9F));
-		minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.AMETHYST_BLOCK_RESONATE, 1.0F, 1.0F));
-		onClose();
+		int ry = y + bh + 2;
+		int half = (w - 2) / 2;
+		TalismanButton.gambar(l, "tpl:dunia", x, ry, half, bh, Component.translatable(M + "lihat_dunia"), true, null, BuildClient::lihatDiDunia);
+		if (l.di(x, ry, x + half, ry + bh)) {
+			l.tip(List.of(Component.translatable(M + "lihat_dunia"), Component.translatable(M + "lihat_dunia.tip")));
+		}
+		boolean ready = confirmable() && !ro;
+		Component notReady = ro ? Component.translatable(M + "baca_saja") : Component.translatable(K + "not_ready");
+		TalismanButton.gambar(l, "tpl:konfirmasi", x + half + 2, ry, w - half - 2, bh, Component.translatable(K + "confirm"), ready, notReady,
+				this::askConfirm, ready, false);
+	}
+
+	/** The heavy seal (tick the consent, hold 3 s) of DESIGN 43.7, then the confirm ticket. */
+	private void askConfirm() {
+		CompoundTag shown = preview();
+		if (shown == null) {
+			return;
+		}
+		long ticket = shown.getLongOr("ticket", 0L);
+		int count = warnings(shown).size();
+		Component text = Component.translatable(M + "konfirmasi_tapak", SectTemplates.name(selected), count, Component.translatable("kultivator.sectbuild.consent"));
+		page.minta(SegelKonfirmasi.Tingkat.BERAT, text, () -> {
+			CompoundTag now = preview();
+			if (now == null || now.getLongOr("ticket", 0L) != ticket) {
+				return;
+			}
+			BuildClient.send(0, "confirm:" + ticket);
+			Minecraft minecraft = Minecraft.getInstance();
+			minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.BELL_BLOCK, 0.8F, 0.9F));
+			minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.AMETHYST_BLOCK_RESONATE, 1.0F, 1.0F));
+			page.afterConfirm();
+		});
 	}
 
 	// ================================================================== input
 
-	@Override
-	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-		if (event.button() != InputConstants.MOUSE_BUTTON_LEFT) {
-			return super.mouseClicked(event, doubleClick);
+	/** The wheel: over the diagram the tier, elsewhere in the right column the scroll. True when used. */
+	boolean scrolled(double mx, double my, double amount) {
+		if (amount == 0.0D) {
+			return false;
 		}
-		double mx = event.x();
-		double my = event.y();
-		for (int i = widgets.size() - 1; i >= 0; i--) {
-			Widget widget = widgets.get(i);
-			if (widget.contains(mx, my)) {
-				widget.press();
-				pressed = widget;
-				return true;
-			}
-		}
-		for (int n = 1; n <= SectTemplates.COUNT; n++) {
-			int template = templateOf(n);
-			int px = gridX + (n - 1) % 3 * (plaqueW + gap);
-			int py = gridY + (n - 1) / 3 * (plaqueH + gap);
-			if (mx >= px && mx < px + plaqueW && my >= py && my < py + plaqueH) {
-				if (template != selected) {
-					select(template);
-					UiSound.tab();
-				}
-				return true;
-			}
-		}
-		float beadStep = diagramSize / 9.0F;
-		if (my >= beadY - 2 && my <= beadY + 7 && mx >= diagramX && mx < diagramX + diagramSize) {
-			BuildClient.setScrubTier((int) ((mx - diagramX) / beadStep) + 1);
-			UiSound.toggle(true);
+		if (mx >= diagramX0 && mx < diagramX0 + diagramSize && my >= diagramY0 && my < diagramY0 + diagramSize && my >= scrollY0 && my < scrollY1) {
+			BuildClient.setScrubTier(BuildClient.scrubTier() + (amount > 0.0D ? 1 : -1));
 			return true;
 		}
-		if (preview() != null) {
-			if (mx >= boxX0 && mx < boxX1 && my >= boxY0 && my < boxY1) {
-				consent = !consent;
-				UiSound.toggle(consent);
-				return true;
-			}
-			if (overSeal(mx, my)) {
-				if (consent && confirmable()) {
-					holding = true;
-					holdStart = Util.getMillis();
-					UiSound.ask();
-				} else {
-					UiSound.denied();
-				}
-				return true;
-			}
-		}
-		return super.mouseClicked(event, doubleClick);
-	}
-
-	@Override
-	public boolean mouseReleased(MouseButtonEvent event) {
-		if (holding) {
-			holding = false;
+		if (mx >= scrollX0 && mx < scrollX1 && my >= scrollY0 && my < scrollY1) {
+			scroll = Math.max(0.0F, scroll - (float) amount * 18.0F);
 			return true;
 		}
-		if (pressed != null) {
-			Widget widget = pressed;
-			pressed = null;
-			widget.release(event.x(), event.y());
-			return true;
-		}
-		return super.mouseReleased(event);
-	}
-
-	@Override
-	public boolean mouseScrolled(double x, double y, double scrollX, double scrollY) {
-		if (x >= diagramX && x < diagramX + diagramSize && y >= diagramY && y < diagramY + diagramSize && scrollY != 0.0D) {
-			BuildClient.setScrubTier(BuildClient.scrubTier() + (scrollY > 0.0D ? 1 : -1));
-			return true;
-		}
-		if (y >= bottomY && x >= rightX && scrollY != 0.0D) {
-			warnScroll = Math.max(0, warnScroll + (scrollY < 0.0D ? 1 : -1));
-			return true;
-		}
-		return super.mouseScrolled(x, y, scrollX, scrollY);
-	}
-
-	@Override
-	public boolean keyPressed(KeyEvent event) {
-		if (event.isEscape()) {
-			onClose();
-			return true;
-		}
-		int number = event.key() - InputConstants.KEY_1;
-		if (number >= 0 && number < SectTemplates.COUNT) {
-			select(templateOf(number + 1));
-			UiSound.tab();
-			return true;
-		}
-		return super.keyPressed(event);
-	}
-
-	@Override
-	public void onClose() {
-		minecraft.gui.setScreen(back);
-	}
-
-	@Override
-	public boolean isPauseScreen() {
 		return false;
 	}
 
-	/** "1.570" style grouping is left to the language; numbers stay plain (no locale surprises). */
+	/** PgUp / PgDn / Home / End: the right column's scroll (keyboard only, 43.0.7; clamped by the next frame). True when used. */
+	boolean tombol(int key) {
+		float page = Math.max(18.0F, scrollY1 - scrollY0 - 18.0F);
+		switch (key) {
+			case InputConstants.KEY_PAGEDOWN -> scroll += page;
+			case InputConstants.KEY_PAGEUP -> scroll = Math.max(0.0F, scroll - page);
+			case InputConstants.KEY_HOME -> scroll = 0.0F;
+			case InputConstants.KEY_END -> scroll = Float.MAX_VALUE / 4.0F;
+			default -> {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/** "1570": numbers stay plain (no locale surprises). */
 	static String number(long value) {
 		return String.format(Locale.ROOT, "%d", value);
 	}

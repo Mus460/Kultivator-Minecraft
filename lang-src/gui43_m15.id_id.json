@@ -1,0 +1,23 @@
+{
+  "kultivator.gui43.hal.dunia.dagang": "Dagang",
+  "kultivator.gui43.sub.dagang.pasar": "Pasar",
+  "kultivator.gui43.sub.dagang.harga": "Harga",
+  "kultivator.gui43.sub.dagang.laba": "Laba",
+  "kultivator.gui43.sub.dagang.kontrak": "Kontrak",
+  "kultivator.gui43.m15.nama_baik": "Nama Baik %s",
+  "kultivator.gui43.m15.pilih_barang": "Pilih barang di daftar dulu.",
+  "kultivator.gui43.m15.beli": "Beli (%s NB)",
+  "kultivator.gui43.m15.beli_asal": "Beli (%s Batu Asal)",
+  "kultivator.gui43.m15.jual_habis": "Pedagang tidak membeli lagi darimu hari ini.",
+  "kultivator.gui43.m15.lelang.ke_juru": "Menawar dan menitip hanya di depan Juru Lelang.",
+  "kultivator.gui43.m15.lelang.memimpin": "Tawaranmu sedang memimpin.",
+  "kultivator.gui43.m15.misi.nama_baik": "+5 Nama Baik",
+  "kultivator.gui43.m15.misi.habis": "Jatah misi hari ini sudah habis.",
+  "kultivator.gui43.m15.misi.batal_yakin": "Batalkan misi yang sedang berjalan? Hadiahnya hilang.",
+  "kultivator.gui43.m15.titah.ke_utusan": "Perintah diterima dan dilaporkan pada Utusan Kaisar Giok.",
+  "kultivator.gui43.m15.temu.beri": "Bertukar Pengetahuan: %s",
+  "kultivator.gui43.m15.temu.tak_punya": "Kamu tidak membawa barang itu.",
+  "kultivator.gui43.m15.temu.sudah_tanding": "Kalian sudah beradu sekali.",
+  "kultivator.gui43.m15.temu.tak_mau": "Hanya pengembara ramah yang mau ikut, dari Inti Emas ke atas.",
+  "kultivator.gui43.m15.temu.tip_pamit": "Berpisah dengan pengembara ini."
+}

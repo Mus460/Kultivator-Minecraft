@@ -1,7 +1,7 @@
 package dev.kultivator.client.disciple.power;
 
-import dev.kultivator.client.disciple.DiscipleScreen;
-import dev.kultivator.client.disciple.DiscipleTab;
+import dev.kultivator.client.disciple.MuridPage;
+import dev.kultivator.client.disciple.MuridSub;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.TalismanButton;
@@ -23,14 +23,14 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Bakat, the talent page of the disciple scroll ({@code DiscipleScreen.TAB_TALENT}; DESIGN 20.3.4-20.3.6, 20.3.16): on
+ * Bakat, the talent page of the disciple scroll (Murid › Murid › Kekuatan, top; DESIGN 20.3.4-20.3.6, 20.3.16): on
  * the left the soul colour (an orb in the colour of its soul realm with its XP factor), the sect rank tile, the talent
  * seals and the special candidate's slip; on the right the rare physique's card (with its live meter: toxin, golden
  * blood, the seven gates, the bone technique...) and the signature ultimate with its talismans: "Jurus Pamungkas", the
  * master's "Fusi" during the lotus charge and "Ledakan Gerbang" for the Heretic God Veins. Every line names its source
  * story in the tooltip.
  */
-public class TalentTab extends DiscipleTab {
+public class TalentTab extends MuridSub {
 
 	private static final int BUTTON_H = 18;
 	private static final String P = "kultivator.dpower.";
@@ -42,8 +42,19 @@ public class TalentTab extends DiscipleTab {
 	private TalismanButton fusion;
 	private TalismanButton burst;
 
-	public TalentTab(DiscipleScreen screen) {
-		super(screen);
+	public TalentTab(MuridPage murid) {
+		super(murid);
+	}
+
+	@Override
+	public String helpTopic() {
+		return "bakat";
+	}
+
+	/** Stacked under Kekuatan: tall enough for its column of seals and lines at 1.0 (43.0.5). */
+	@Override
+	public int tinggiMin() {
+		return 186;
 	}
 
 	@Override
@@ -107,18 +118,20 @@ public class TalentTab extends DiscipleTab {
 	protected void drawBehind(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
 		CompoundTag power = power();
 		if (power.isEmpty()) {
-			heading(g, title(), x + 2.0F, y, w - 4.0F, 0.8F);
-			Brush.wrap(g, font, Component.translatable(P + "tab.loading"), x + 4.0F, y + 16.0F, w - 8.0F, Palette.INK_SOFT, 0.8F, false);
+			heading(g, title(), x + 2.0F, y, w - 4.0F, 1.0F);
+			Brush.wrap(g, font, Component.translatable(P + "tab.loading"), x + 4.0F, y + 16.0F, w - 8.0F, Palette.INK_SOFT, 1.0F, false);
 			return;
 		}
+		g.enableScissor(x, y, x + columnW + 2, y + h);
 		drawLeft(g, power, mouseX, mouseY);
+		g.disableScissor();
 		drawRight(g, power, mouseX, mouseY);
 	}
 
 	private void drawLeft(GuiGraphicsExtractor g, CompoundTag power, int mouseX, int mouseY) {
 		float x0 = x + 2.0F;
 		float width = columnW - 4.0F;
-		heading(g, Component.translatable(P + "tab.soul"), x0, y, width, 0.8F);
+		heading(g, Component.translatable(P + "tab.soul"), x0, y, width, 1.0F);
 		float cy = y + 14.0F;
 		// The soul realm: an orb in its colour.
 		int colour = Math.max(0, Math.min(6, power.getIntOr("colour", 2)));
@@ -133,26 +146,27 @@ public class TalentTab extends DiscipleTab {
 		float tx = ox + r + 4.0F;
 		float tw = x0 + width - tx;
 		Component colourName = Brush.bold(Component.translatable(P + "colour." + PowerIds.COLOUR_IDS[colour]));
-		Brush.fit(g, font, colourName, tx, cy, tw, Palette.onPaper(rgb), 0.85F, 0.5F, false);
+		Brush.fit(g, font, colourName, tx, cy, tw, Palette.onPaper(rgb), 1.0F, 1.0F, false);
 		Component factor = Component.translatable(P + "colour.factor", String.format(Locale.ROOT, "%.2f", power.getDoubleOr("colour_factor", 1.0D)));
-		Brush.fit(g, font, factor, tx, cy + 9.0F, tw, Palette.INK_SOFT, 0.65F, 0.45F, false);
-		if (power.getBooleanOr("red_capped", false)) {
-			Brush.fit(g, font, Component.translatable(P + "colour.red_capped"), tx, cy + 16.0F, tw, Palette.DANGER, 0.55F, 0.4F, false);
+		Brush.fit(g, font, factor, tx, cy + 10.0F, tw, Palette.INK_SOFT, 1.0F, 1.0F, false);
+		boolean capped = power.getBooleanOr("red_capped", false);
+		if (capped) {
+			Brush.fit(g, font, Component.translatable(P + "colour.red_capped"), tx, cy + 20.0F, tw, Palette.DANGER, 1.0F, 1.0F, false);
 		}
 		if (mouseX >= x0 && mouseX < x0 + width && mouseY >= cy && mouseY < cy + 2.0F * r) {
-			screen.showTooltip(List.of(Component.translatable(P + "colour." + PowerIds.COLOUR_IDS[colour]).withColor(rgb),
+			tooltip(List.of(Component.translatable(P + "colour." + PowerIds.COLOUR_IDS[colour]).withColor(rgb),
 					Component.translatable(P + "colour.tip"), source("colour")));
 		}
-		cy += 2.0F * r + 6.0F;
+		cy += (capped ? 30.0F : 2.0F * r + 2.0F) + 4.0F;
 
 		// The sect rank tile.
 		int rank = Math.max(0, Math.min(PhysiqueVisuals.RANK_TRIM.length - 1, power.getIntOr("sect_rank", 1)));
 		int trim = PhysiqueVisuals.RANK_TRIM[rank];
-		Brush.rect(g, x0, cy, x0 + width, cy + 11.0F, Palette.argb(0x50, Palette.PAPER_DEEP));
-		Brush.rect(g, x0, cy, x0 + 3.0F, cy + 11.0F, Palette.opaque(trim));
+		Brush.rect(g, x0, cy, x0 + width, cy + 12.0F, Palette.argb(0x50, Palette.PAPER_DEEP));
+		Brush.rect(g, x0, cy, x0 + 3.0F, cy + 12.0F, Palette.opaque(trim));
 		Brush.fit(g, font, Component.translatable(P + "tab.rank", Component.translatable(P + "rank." + rank)), x0 + 6.0F, cy + 2.0F, width - 8.0F,
-				Palette.onPaper(trim), 0.7F, 0.45F, false);
-		cy += 15.0F;
+				Palette.onPaper(trim), 1.0F, 1.0F, false);
+		cy += 16.0F;
 
 		// The restored sect arts (DESIGN 20.3.8) and the Seven Fairies formation (20.3.16), when any is in effect.
 		int arts = power.getIntOr("arts", 0);
@@ -183,18 +197,18 @@ public class TalentTab extends DiscipleTab {
 				tip.add(Component.translatable(P + "fairies.desc"));
 				tip.add(source("fairies"));
 			}
-			Brush.fit(g, font, line, x0, cy, width, Palette.JADE_DARK, 0.62F, 0.4F, false);
-			if (mouseX >= x0 && mouseX < x0 + width && mouseY >= cy && mouseY < cy + 8.0F) {
-				screen.showTooltip(tip);
+			Brush.fit(g, font, line, x0, cy, width, Palette.JADE_DARK, 1.0F, 1.0F, false);
+			if (mouseX >= x0 && mouseX < x0 + width && mouseY >= cy && mouseY < cy + 9.0F) {
+				tooltip(tip);
 			}
-			cy += 10.0F;
+			cy += 11.0F;
 		}
 
 		// Talent seals.
-		Brush.fit(g, font, Brush.bold(Component.translatable(P + "tab.talents")), x0, cy, width, Palette.SEAL_DARK, 0.7F, 0.45F, false);
-		cy += 9.0F;
+		Brush.fit(g, font, Brush.bold(Component.translatable(P + "tab.talents")), x0, cy, width, Palette.SEAL_DARK, 1.0F, 1.0F, false);
+		cy += 11.0F;
 		int talents = power.getIntOr("talents", 0);
-		float seal = 15.0F;
+		float seal = 17.0F;
 		float sx = x0;
 		boolean any = false;
 		for (int i = 0; i < PowerIds.TALENT_IDS.length; i++) {
@@ -216,12 +230,12 @@ public class TalentTab extends DiscipleTab {
 					tip.add(Component.translatable(P + "talent.sword_sense.kills", power.getIntOr("sword_kills", 0)).withStyle(ChatFormatting.GRAY));
 				}
 				tip.add(source("talent." + id));
-				screen.showTooltip(tip);
+				tooltip(tip);
 			}
 			sx += seal + 3.0F;
 		}
 		if (!any) {
-			Brush.fit(g, font, Component.translatable(P + "tab.no_talent"), x0, cy + 3.0F, width, Palette.INK_FAINT, 0.65F, 0.45F, false);
+			Brush.fit(g, font, Component.translatable(P + "tab.no_talent"), x0, cy + 4.0F, width, Palette.INK_FAINT, 1.0F, 1.0F, false);
 		}
 		cy += seal + 5.0F;
 
@@ -231,7 +245,7 @@ public class TalentTab extends DiscipleTab {
 			String id = PowerIds.SPECIAL_IDS[special];
 			boolean hidden = power.getBooleanOr("hidden", false) && special == PowerIds.SPECIAL_BEGGAR;
 			Component name = hidden ? Component.translatable(P + "special.hidden") : Component.translatable(P + "special." + id);
-			Brush.fit(g, font, Brush.bold(name), x0, cy, width, Palette.SEAL_DARK, 0.7F, 0.45F, false);
+			Brush.fit(g, font, Brush.bold(name), x0, cy, width, Palette.SEAL_DARK, 1.0F, 1.0F, false);
 			MutableComponent line = hidden ? Component.translatable(P + "special.hidden.desc")
 					: special == PowerIds.SPECIAL_REGRESSOR ? Component.translatable(P + "special.regressor.line",
 					power.getBooleanOr("regressor_known", true)
@@ -239,9 +253,9 @@ public class TalentTab extends DiscipleTab {
 							: Component.literal("???"),
 					Component.translatable(power.getBooleanOr("regressing", false) ? P + "special.regressor.active" : P + "special.regressor.done"))
 					: Component.translatable(P + "special." + id + ".short");
-			float lineH = Brush.wrap(g, font, line, x0, cy + 9.0F, width, Palette.INK_SOFT, 0.6F, false);
-			if (mouseX >= x0 && mouseX < x0 + width && mouseY >= cy && mouseY < cy + 9.0F + lineH) {
-				screen.showTooltip(hidden ? List.of(name, Component.translatable(P + "special.hidden.desc"))
+			float lineH = Brush.wrap(g, font, line, x0, cy + 10.0F, width, Palette.INK_SOFT, 1.0F, false);
+			if (mouseX >= x0 && mouseX < x0 + width && mouseY >= cy && mouseY < cy + 10.0F + lineH) {
+				tooltip(hidden ? List.of(name, Component.translatable(P + "special.hidden.desc"))
 						: List.of(Component.translatable(P + "special." + id).withStyle(ChatFormatting.GOLD),
 						Component.translatable(P + "special." + id + ".desc"), source("special." + id)));
 			}
@@ -253,37 +267,39 @@ public class TalentTab extends DiscipleTab {
 		int x1 = x + w;
 		float width = x1 - x0;
 		float cy = y;
-		heading(g, Component.translatable(P + "tab.physique"), x0, cy, width, 0.8F);
-		cy += 13.0F;
+		heading(g, Component.translatable(P + "tab.physique"), x0, cy, width, 1.0F);
+		cy += 14.0F;
 		int physique = power.getIntOr("physique", 0);
 		boolean hidden = power.getBooleanOr("hidden", false) && physique == PowerIds.PHYSIQUE_HERETIC;
 		int bottom = y + h - BUTTON_H - 4;
-		int ultTop = bottom - 30;
+		int ultTop = bottom - 31;
 		panel(g, x0, Math.round(cy), x1, ultTop - 3);
 		float px = x0 + 4.0F;
 		float pw = width - 8.0F;
 		float py = cy + 3.0F;
 		if (physique <= 0 || physique >= PowerIds.PHYSIQUE_IDS.length || hidden) {
-			Brush.wrap(g, font, Component.translatable(hidden ? P + "physique.hidden" : P + "physique.none"), px, py, pw, Palette.INK_FAINT, 0.65F, false);
+			g.enableScissor(x0 + 1, Math.round(py), x1 - 1, ultTop - 4);
+			Brush.wrap(g, font, Component.translatable(hidden ? P + "physique.hidden" : P + "physique.none"), px, py, pw, Palette.INK_FAINT, 1.0F, false);
+			g.disableScissor();
 		} else {
 			String id = PowerIds.PHYSIQUE_IDS[physique];
 			int rgb = PowerIds.PHYSIQUE_RGB[physique];
-			Brush.fit(g, font, Brush.bold(Component.translatable(P + "physique." + id)), px, py, pw, Palette.onPaper(rgb), 0.8F, 0.5F, false);
-			py += 10.0F;
+			Brush.fit(g, font, Brush.bold(Component.translatable(P + "physique." + id)), px, py, pw, Palette.onPaper(rgb), 1.0F, 1.0F, false);
+			py += 11.0F;
 			Component state = physiqueState(physique, power);
 			if (state != null) {
-				Brush.fit(g, font, state, px, py, pw, Palette.JADE_DARK, 0.62F, 0.42F, false);
-				py += 8.0F;
+				Brush.fit(g, font, state, px, py, pw, Palette.JADE_DARK, 1.0F, 1.0F, false);
+				py += 10.0F;
 			}
 			if (physique == PowerIds.PHYSIQUE_HERETIC) {
 				drawGates(g, px, py, pw, power.getIntOr("gates", 0), mouseX, mouseY);
 				py += 10.0F;
 			}
 			g.enableScissor(x0 + 1, Math.round(py), x1 - 1, ultTop - 4);
-			Brush.wrap(g, font, Component.translatable(P + "physique." + id + ".short"), px, py, pw, Palette.INK_SOFT, 0.58F, false);
+			Brush.wrap(g, font, Component.translatable(P + "physique." + id + ".short"), px, py, pw, Palette.INK_SOFT, 1.0F, false);
 			g.disableScissor();
 			if (mouseX >= x0 && mouseX < x1 && mouseY >= cy && mouseY < ultTop - 3) {
-				screen.showTooltip(List.of(Component.translatable(P + "physique." + id).withColor(rgb),
+				tooltip(List.of(Component.translatable(P + "physique." + id).withColor(rgb),
 						Component.translatable(P + "physique." + id + ".desc"), source("physique." + id)));
 			}
 		}
@@ -292,8 +308,8 @@ public class TalentTab extends DiscipleTab {
 		int dao = power.getIntOr("ult_dao", -1);
 		Dao chosen = Dao.byOrdinal(dao);
 		Component ultName = chosen == null ? Component.translatable(P + "ult.none") : Component.translatable(P + "ult." + chosen.id());
-		Brush.fit(g, font, Brush.bold(Component.translatable(P + "tab.ultimate")), x0, ultTop, width, Palette.SEAL_DARK, 0.65F, 0.45F, false);
-		Brush.fit(g, font, ultName, x0, ultTop + 9.0F, width, chosen == null ? Palette.INK_FAINT : Palette.onPaper(chosen.color()), 0.75F, 0.45F, false);
+		Brush.fit(g, font, Brush.bold(Component.translatable(P + "tab.ultimate")), x0, ultTop, width, Palette.SEAL_DARK, 1.0F, 1.0F, false);
+		Brush.fit(g, font, ultName, x0, ultTop + 10.0F, width, chosen == null ? Palette.INK_FAINT : Palette.onPaper(chosen.color()), 1.0F, 1.0F, false);
 		Component state;
 		if (!power.getBooleanOr("ult_has", false)) {
 			state = Component.translatable(chosen == null ? P + "why.ult_no_dao" : P + "why.ult_realm");
@@ -303,9 +319,9 @@ public class TalentTab extends DiscipleTab {
 			int left = power.getIntOr("ult_left", 0);
 			state = left > 0 ? cooldownLine(left) : Component.translatable(P + "ult.ready");
 		}
-		Brush.fit(g, font, state, x0, ultTop + 18.0F, width, Palette.INK_SOFT, 0.6F, 0.42F, false);
+		Brush.fit(g, font, state, x0, ultTop + 20.0F, width, Palette.INK_SOFT, 1.0F, 1.0F, false);
 		if (mouseX >= x0 && mouseX < x1 && mouseY >= ultTop && mouseY < bottom) {
-			screen.showTooltip(ultimateTip());
+			tooltip(ultimateTip());
 		}
 	}
 
@@ -365,7 +381,7 @@ public class TalentTab extends DiscipleTab {
 				Brush.disc(g, cx - 0.8F, cy - 0.8F, 0.8F, 0xA0FFFFFF);
 			}
 			if (mouseX >= cx - 4.0F && mouseX < cx + 4.0F && mouseY >= cy - 4.0F && mouseY < cy + 4.0F) {
-				screen.showTooltip(List.of(Component.translatable(P + "gate." + (i + 1)).withColor(0xD8263A),
+				tooltip(List.of(Component.translatable(P + "gate." + (i + 1)).withColor(0xD8263A),
 						Component.translatable(P + "gate.when." + (i + 1)),
 						Component.translatable(open ? P + "gate.open" : P + "gate.closed").withStyle(ChatFormatting.GRAY)));
 			}
@@ -382,7 +398,7 @@ public class TalentTab extends DiscipleTab {
 		g.fill(x0, y0, x1, y1, Palette.SEAL);
 		Brush.frame(g, x0 + 1, y0 + 1, x1 - 1, y1 - 1, Palette.argb(0xB0, Palette.TALISMAN));
 		Component mark = Component.translatable(P + "talent." + PowerIds.TALENT_IDS[index] + ".mark");
-		Brush.fitCentered(g, font, mark, sx + size / 2.0F, sy + size / 2.0F - 3.5F, size - 3.0F, Palette.TALISMAN, 0.8F, 0.4F, false);
+		Brush.fitCentered(g, font, mark, sx + size / 2.0F, sy + size / 2.0F - 4.0F, size - 2.0F, Palette.TALISMAN, 1.0F, 1.0F, false);
 	}
 
 	private static Component cooldownLine(int ticks) {

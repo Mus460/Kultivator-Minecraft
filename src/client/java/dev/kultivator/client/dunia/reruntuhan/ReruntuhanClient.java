@@ -2,9 +2,6 @@ package dev.kultivator.client.dunia.reruntuhan;
 
 import dev.kultivator.Kultivator;
 import dev.kultivator.client.dunia.DuniaScenes;
-import dev.kultivator.client.hub.HubCards;
-import dev.kultivator.client.hub.HubNav;
-import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.dunia.reruntuhan.REntities;
 import dev.kultivator.dunia.reruntuhan.RNet;
 import dev.kultivator.dunia.reruntuhan.penjara.RajaIblisEntity;
@@ -18,16 +15,15 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.Util;
 
 /**
  * Client entry of module R, Reruntuhan, Penjara &amp; Menara (DESIGN 34.6 R), wired by its one line in
  * {@code DuniaContentClient.init()}: the renderers of every entity of the module (puzzle parts, sealed doors and phantom
  * walls, the stone guardian, the mirror shadow, the remnant soul, the demon kings and lesser demons, the floor
  * guardians), the receiver of {@link RNet.Sync} (effects, the tower floor's scenery, the lobby's gates, the pagoda's
- * cloud ring, the ranking steles, the talisman warning, the Ujian Hati riddles, the tower card's numbers), the world
- * render of the effects (one {@code COLLECT_SUBMITS} listener), the client tick, and the hub card "Menara Seratus" in
- * the Dunia section. Every visual follows EffectQuality, the 7b budgets and camera rules; nothing touches a block.
+ * cloud ring, the ranking steles, the talisman warning and the Ujian Hati riddles as Di Sini prompts (DESIGN 43.8.2), the
+ * numbers of Dunia › Alam › Menara), the world render of the effects (one {@code COLLECT_SUBMITS} listener) and the client
+ * tick. Every visual follows EffectQuality, the 7b budgets and camera rules; nothing touches a block.
  */
 public final class ReruntuhanClient {
 
@@ -64,12 +60,9 @@ public final class ReruntuhanClient {
 			TowerScenery.reset();
 			TowerSights.clear();
 			LobbyState.clear();
-			UjianScreen.pending = null;
+			UjianScreen.reset();
+			MenaraScreen.reset();
 			RModels.clear();
-		});
-		HubCards.register(HubNav.DUNIA, "menara_seratus", Glyphs.HALL, null, () -> {
-			HubNav.openChild(new MenaraScreen(null), HubNav.DUNIA);
-			MenaraScreen.request();
 		});
 		// a seal breaks rarely: one shot per prison moment and minute at most; milestones every 10 floors are rarer still
 		DuniaScenes.cooldown("segel/pecah", 1200);
@@ -88,29 +81,14 @@ public final class ReruntuhanClient {
 				case "scene" -> TowerScenery.setScene(data);
 				case "scene_end" -> {
 					TowerScenery.endScene();
-					UjianScreen.pending = null;
-					if (minecraft.gui.screen() instanceof UjianScreen) {
-						minecraft.gui.setScreen(null);
-					}
+					UjianScreen.akhir();
 				}
 				case "lobby" -> LobbyState.update(data, ticks);
 				case "luar" -> TowerSights.onPagoda(data);
 				case "stele" -> TowerSights.onStele(data);
-				case "riddle" -> {
-					UjianScreen.pending = data.copy();
-					minecraft.gui.setScreen(new UjianScreen(data));
-				}
-				case "riddle_end" -> {
-					UjianScreen.pending = null;
-					if (minecraft.gui.screen() instanceof UjianScreen) {
-						minecraft.gui.setScreen(null);
-					}
-				}
-				case "warn" -> {
-					if (minecraft.gui.screen() == null) {
-						minecraft.gui.setScreen(new JimatScreen(data));
-					}
-				}
+				case "riddle" -> UjianScreen.tampil(data.copy());
+				case "riddle_end" -> UjianScreen.akhir();
+				case "warn" -> JimatScreen.tampil(data);
 				case "seal" -> {
 					if (minecraft.player != null) {
 						boolean broken = data.getBooleanOr("broken", false);
@@ -133,11 +111,6 @@ public final class ReruntuhanClient {
 		RFxClient.tick(minecraft);
 		TowerScenery.tick(minecraft);
 		TowerSights.tick();
-		// an Ujian Hati question hidden with Esc comes back after three seconds while it waits
-		CompoundTag pending = UjianScreen.pending;
-		if (pending != null && minecraft.gui.screen() == null && minecraft.player != null && Util.getMillis() - UjianScreen.hiddenAt > 3000L) {
-			minecraft.gui.setScreen(new UjianScreen(pending));
-		}
 	}
 
 	private ReruntuhanClient() {

@@ -174,7 +174,7 @@ final class Tanding implements Pelaksana {
 		}
 		// No new round when it could not finish before the block ends: both stand and breathe.
 		boolean rondeMuat = sisaBlok == Long.MAX_VALUE || sisaBlok >= RONDE - dalam;
-		if (!rondeMuat && dalam < SALAM) {
+		if (!rondeMuat) {
 			return true;
 		}
 		langkah(laga, level, dalam);

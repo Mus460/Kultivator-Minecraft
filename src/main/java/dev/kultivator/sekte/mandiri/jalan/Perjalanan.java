@@ -223,6 +223,7 @@ public final class Perjalanan {
 			pointer.putString(Rencana.SOUL, member.soulId().toString());
 			pointer.putString(Rencana.NAMA, member.getName().getString());
 			pointer.putString(Rencana.IKUT, leader.soulId().toString());
+			pointer.putLong(Rencana.BERANGKAT, now); // else the orphan sweep (bersih) can never age this pointer out
 			data.simpan(member.soulId(), pointer);
 			Halls.storeAway(owner, member, r.pulang(), MandiriIds.AWAY_JALAN, info);
 			if (Tahap.rekamAway(owner, member.soulId()) == null) {

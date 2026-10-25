@@ -1,0 +1,196 @@
+# keluarga: corpus of the conversation engine (42K-C, DESIGN 42.5A.8). Source format: gen_kota_hidup_cakap.py.
+# Family and relations without a fresh fact ("Ceritakan keluargamu", 42.5.3; topik keluarga, anak, asmara, tetangga, kerja)
+# and dreams (CERITA on topik cita). Rules naming {$pasangan} {$anak} {$almarhum} {$kekasih} {$sahabat} {$musuh} {$guru}
+# {$murid} need that konteks value (frames whose slot cannot be filled are skipped by the realiser).
+@kelompok keluarga
+
+== keluarga.pasangan
+niat: BERI_KABAR
+topik: keluarga
+syarat: hubungan=pasangan
+lanjut: keluarga kerja
+gestur: bicara_tangan
+$pasangan: tipe=nama_warga dari=konteks.pasangan
+- [3] {$pasangan} sedang di rumah, memasak. Masakannya yang terbaik di gang ini. || {$pasangan} is at home cooking. Best cooking in this lane.
+  ~ kasar: {$pasangan}? Di rumah. Mengomel, mungkin. || {$pasangan}? At home. Nagging, probably.
+  ~ kuno: {$pasangan} adalah pendamping hidupku. Tanpanya, rumah ini hanya dinding. || {$pasangan} is my life's companion. Without them this house is only walls.
+  ~ l: Istriku, {$pasangan}, galak tapi baik hati. Kalau aku pulang larut, piring melayang. Hehe. || My wife, {$pasangan}, is fierce but kind. Come home late and plates fly. Heh.
+  ~ p: Suamiku, {$pasangan}, pendiam. Tapi setiap pagi dia menyiapkan air hangat untukku. || My husband, {$pasangan}, is quiet. But every morning he readies warm water for me.
+- [2] Sudah dua puluh tahun aku bersama {$pasangan}. Masih saja dia membuatku tertawa. || Twenty years with {$pasangan}. They still make me laugh.
+  ~ kampung: Aku sama {$pasangan} dijodohkan orang tua, Nak. Awalnya malu-malu, sekarang tak terpisah. || {$pasangan} and I were matched by our parents, child. Shy at first, inseparable now.
+  ~ pelabuhan: {$pasangan} menunggu di dermaga setiap aku pulang melaut, Bung. Setiap kali. || {$pasangan} waits on the dock every time I come home from sea, mate. Every time.
+  ~ air: {$pasangan} suka mendayung perahu bersamaku di malam hari... kanal jadi milik kami berdua... || {$pasangan} loves rowing with me at night... the canal belongs to just us two...
+- {$pasangan} menyuruhku membeli garam, tapi aku malah mengobrol di sini. Jangan bilang, ya. || {$pasangan} sent me for salt, but here I am chatting. Don't tell.
+  ~ p: {$pasangan} menungguku pulang, tapi biarlah sebentar. Laki-laki juga perlu menunggu. Hihi. || {$pasangan} is waiting for me, but let him wait a bit. Men need practice waiting too. Hehe.
+- Kami bertengkar kemarin soal hal kecil. Sudah baikan, tapi aku masih malu. || We quarrelled yesterday over a small thing. Made up, but I'm still embarrassed.
+- Kalau ditanya rahasia rumah tangga awet: makan bersama setiap malam, apa pun yang terjadi. || If you ask the secret of a lasting marriage: eat together every night, whatever happens.
+
+== keluarga.anak
+niat: BERI_KABAR
+topik: anak
+syarat: tahap=dewasa,tua
+lanjut: keluarga sekte
+gestur: tertawa
+$anak: tipe=nama_warga dari=konteks.anak
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] {$anak} sudah mulai belajar membaca. Kemarin dia membaca papan toko sendirian! || {$anak} has started learning to read. Yesterday they read a shop sign all alone!
+  ~ kasar: {$anak} nakal sekali. Tapi pintar. Mirip aku. || {$anak} is a terror. But clever. Takes after me.
+  ~ kuno: Buah hatiku, {$anak}, rajin belajar. Semoga kelak berguna bagi kota. || My child, {$anak}, studies diligently. May they serve the town someday.
+  ~ kampung: {$anak} sudah bisa bantu angon kambing, Nak. Bangga aku. || {$anak} can herd the goats now, child. I'm proud.
+- [2] {$anak} ingin jadi kultivator. Setiap hari mengayun-ayunkan tongkat seperti pedang. || {$anak} wants to be a cultivator. Swings a stick like a sword every day.
+  ~ pelabuhan: {$anak} sudah bisa berenang lebih jauh dariku, Bung! Anak laut sejati. || {$anak} swims further than me now, mate! A true child of the sea.
+  ~ p: {$anak} menolong aku memasak tadi pagi. Bubur gosong, tapi niatnya manis. || {$anak} helped me cook this morning. The porridge burned, but the thought was sweet.
+- {$anak} sakit perut kemarin, makan jambu mentah tiga buah. Sudah kubilang! || {$anak} had a bellyache yesterday; ate three green guavas. I told them!
+- Kalau ada kultivator yang mau menguji akar roh {$anak}, aku rela membayar. || If any cultivator would test {$anak}'s spirit roots, I'd gladly pay.
+  ~ kuno: Bila {$sebutan} berkenan memeriksa akar roh {$anak}, hamba akan sangat berterima kasih. || If you would deign to examine {$anak}'s spirit roots, {$sebutan}, I'd be most grateful.
+- Waktu cepat sekali. Kemarin {$anak} masih digendong, sekarang sudah lari ke mana-mana. || Time flies. Yesterday {$anak} was in arms, now running everywhere.
+
+== keluarga.cucu
+niat: PAMER
+topik: anak
+syarat: tahap=tua
+lanjut: keluarga kota
+gestur: sikap_tua
+$anak: tipe=nama_warga dari=konteks.anak
+- [3] Cucuku sudah tujuh. Namanya saja kadang aku salah sebut. Hehe. || I have seven grandchildren. Sometimes I mix up their names. Heh.
+  ~ kasar: Cucu-cucuku berisik. Tapi rumah sepi tanpa mereka. || My grandchildren are noisy. But the house is dead without them.
+  ~ kuno: Melihat cucu tumbuh adalah ganjaran terbesar usia tua. || Watching grandchildren grow is old age's greatest reward.
+  ~ kampung: Simbah ini sudah punya cucu tujuh, Nak. Yang paling kecil paling bandel. || Granny here has seven grandkids, child. The littlest is the naughtiest.
+- [2] Dulu aku yang menggendong {$anak}. Sekarang {$anak} yang menuntunku ke pasar. || Once I carried {$anak}. Now {$anak} leads me to market.
+  ~ p: Dulu aku yang menyuapi {$anak}. Sekarang {$anak} yang memasakkan bubur untukku. || Once I spoon-fed {$anak}. Now {$anak} cooks my porridge.
+- Lututku sudah tidak kuat, tapi kalau cucu minta digendong, tetap saja kuangkat. || My knees aren't strong, but when a grandchild asks to be carried, I still lift them.
+- Umurku sudah delapan puluh. Langit masih memberiku waktu, entah untuk apa. Hehe. || I'm eighty. Heaven still gives me time, who knows what for. Heh.
+  ~ gunung: Delapan puluh musim dingin sudah kulewati. Biara ini rumahku lebih lama dari siapa pun. || I've passed eighty winters. This monastery has been my home longer than anyone's.
+
+== keluarga.almarhum
+niat: BERI_KABAR
+topik: duka
+lanjut: duka keluarga
+gestur: menangis
+seru: aduh
+$almarhum: tipe=nama_warga dari=konteks.almarhum
+$keluh: aturan=seru.keluh opsional=0.5
+- [3] Maaf, aku tidak bisa bicara lama. {$almarhum} baru saja dimakamkan. || Sorry, I can't talk long. {$almarhum} was just laid to rest.
+  ~ kasar: {$almarhum} sudah mati. Jangan tanya-tanya. || {$almarhum} is dead. Don't ask.
+  ~ kuno: {$almarhum} telah berpulang. Rumah ini terasa terlalu luas sekarang. || {$almarhum} has passed on. This house feels too large now.
+  ~ kampung: {$almarhum} sudah tiada, Nak. Sawahnya sekarang aku yang garap sendiri. || {$almarhum} is gone, child. I work the paddies alone now.
+- [2] Setiap pagi aku masih memanggil nama {$almarhum}. Lalu ingat. {$keluh} || Every morning I still call {$almarhum}'s name. Then I remember. {$keluh}
+  ~ p: Baju {$almarhum} masih kulipat rapi di lemari. Aku belum sanggup memberikannya. || {$almarhum}'s clothes are still folded in the chest. I can't bear to give them away.
+  ~ pelabuhan: Laut mengambil {$almarhum}, Bung. Sekarang aku memandang laut dengan cara lain. || The sea took {$almarhum}, mate. I look at the sea differently now.
+- {$almarhum} dulu suka duduk di bangku itu. Sekarang tidak ada yang berani mendudukinya. || {$almarhum} used to sit on that bench. Now no one dares sit there.
+- Aku membakar uang kertas untuk {$almarhum} setiap bulan. Semoga dia tidak kekurangan di sana. || I burn spirit money for {$almarhum} every month. May they want for nothing there.
+  ~ gunung: Para biksu mendoakan {$almarhum} empat puluh sembilan hari. Amitaba. || The monks prayed for {$almarhum} forty-nine days. Amitabha.
+
+== keluarga.kekasih
+niat: BERI_KABAR
+topik: asmara
+syarat: hubungan=kekasih
+lanjut: asmara
+gestur: bisik
+$kekasih: tipe=nama_warga dari=konteks.kekasih
+- [3] Jangan bilang siapa-siapa... aku dan {$kekasih} sering bertemu di jembatan. || Don't tell anyone... {$kekasih} and I often meet on the bridge.
+  ~ kasar: Ya, aku dan {$kekasih}. Kenapa? Ada masalah? || Yes, {$kekasih} and me. So? Got a problem?
+  ~ kuno: Hatiku dan hati {$kekasih} telah saling menemukan. Tinggal menunggu restu keluarga. || My heart and {$kekasih}'s have found each other. Only the families' blessing remains.
+  ~ air: {$kekasih} menulis puisi di daun teratai untukku, Kakak... lalu menghanyutkannya ke perahuku... || {$kekasih} writes poems on lotus leaves for me, dear... then floats them to my boat...
+- [2] {$kekasih} memberiku ini kemarin. Cantik, kan? Hihi. || {$kekasih} gave me this yesterday. Pretty, isn't it? Hehe.
+  ~ l: {$kekasih} menjahitkan kantong uang ini untukku. Jahitannya miring, tapi aku suka. || {$kekasih} sewed this purse for me. The stitches are crooked, but I love it.
+  ~ kampung: {$kekasih} kirim jambu lewat adiknya tiap sore. Ibu sudah curiga, Nak. || {$kekasih} sends guavas through their little sibling every evening. Mother suspects, child.
+- Orang tua {$kekasih} belum tahu. Aku takut mereka tidak setuju. || {$kekasih}'s parents don't know yet. I'm afraid they won't approve.
+- Kalau sudah cukup tabungan, aku akan melamar {$kekasih}. Sedikit lagi. || When I've saved enough I'll propose to {$kekasih}. A little more.
+
+== keluarga.sahabat
+niat: BERI_KABAR
+topik: tetangga
+syarat: hubungan=sahabat
+lanjut: tetangga
+gestur: tertawa
+$sahabat: tipe=nama_warga dari=konteks.sahabat
+- [3] {$sahabat} dan aku sudah berteman sejak kecil. Dulu kami mencuri jambu bersama. Hehe. || {$sahabat} and I have been friends since childhood. We used to steal guavas together. Heh.
+  ~ kasar: {$sahabat}? Satu-satunya orang di kota ini yang tidak menyebalkan. || {$sahabat}? The only person in this town who isn't irritating.
+  ~ kuno: Persahabatanku dengan {$sahabat} lebih kokoh dari batu gunung. || My friendship with {$sahabat} is firmer than mountain stone.
+  ~ pelabuhan: {$sahabat} pernah menarikku dari laut waktu badai, Bung. Saudara lebih dari darah. || {$sahabat} once pulled me from the sea in a storm, mate. More than blood kin.
+- [2] Nanti malam aku minum teh dengan {$sahabat}. Kalau mau, ikut saja. || Tonight I'm having tea with {$sahabat}. Come along if you like.
+  ~ p: Nanti sore aku menjahit bersama {$sahabat}. Sambil bergosip, tentu. Hihi. || This afternoon I'm sewing with {$sahabat}. And gossiping, of course. Hehe.
+- {$sahabat} tahu semua rahasiaku. Kalau dia mau, aku sudah hancur. Untung dia baik. || {$sahabat} knows all my secrets. If they wished, I'd be ruined. Luckily they're kind.
+- Kalau aku sakit, {$sahabat} yang pertama datang. Selalu begitu. || When I fall ill, {$sahabat} is the first to come. Always.
+
+== keluarga.musuh
+niat: BERI_KABAR
+topik: tetangga
+syarat: hubungan=musuh,saingan
+lanjut: tetangga
+gestur: marah_tunjuk
+$musuh: tipe=nama_warga dari=konteks.musuh
+$keluh: aturan=seru.keluh opsional=0.5
+- [3] Lihat itu, {$musuh} lewat. Ayamku hilang sejak dia pindah ke sebelah. || Look, {$musuh} is passing. My chickens went missing since they moved next door.
+  ~ kasar: {$musuh}. Cih. Kalau dia mati besok, aku pesta. || {$musuh}. Tch. If they died tomorrow, I'd throw a party.
+  ~ kuno: Antara aku dan {$musuh} ada ganjalan lama. Lebih baik tidak dibahas. || Between {$musuh} and me lies an old grievance. Better not discussed.
+  ~ kampung: Itu si {$musuh}. Dulu dia geser pematang sawahku. Sampai sekarang tidak minta maaf. || That's {$musuh}. Moved my paddy bund once. Still hasn't apologised.
+- [2] Jangan beli dari {$musuh}. Timbangannya curang. Aku tidak bohong. || Don't buy from {$musuh}. The scales cheat. I'm not lying.
+  ~ iblis: {$musuh} punya utang darah denganku. Kalau kau melihatnya terluka di gang, jangan tolong. || {$musuh} owes me a blood debt. If you see them hurt in an alley, don't help.
+- Setiap aku membuka lapak, {$musuh} membuka lapak di seberang. Sengaja! || Every time I open my stall, {$musuh} opens one opposite. On purpose!
+- Dulu kami berteman, aku dan {$musuh}. Lalu uang datang di antara kami. {$keluh} || {$musuh} and I were friends once. Then money came between us. {$keluh}
+
+== keluarga.guru
+niat: BERI_KABAR
+topik: kerja
+syarat: hubungan=guru_murid
+lanjut: kerja
+gestur: hormat
+$guru: tipe=nama_warga dari=konteks.guru
+$murid: tipe=nama_warga dari=konteks.murid
+- [3] Guruku, {$guru}, keras sekali. Tapi semua yang kubisa, dia yang mengajarkan. || My master, {$guru}, is very strict. But all I know, they taught me.
+  ~ kasar: {$guru} galak. Tanganku sudah biru dipukul rotan. Tapi aku jadi bisa. || {$guru} is harsh. My hands are bruised from the cane. But I learned.
+  ~ kuno: Budi guruku, {$guru}, setinggi gunung dan sedalam lautan. || The kindness of my master, {$guru}, is high as mountains and deep as seas.
+- [2] Muridku, {$murid}, berbakat. Sebentar lagi dia melampauiku. Dan itu membuatku bangga. || My pupil, {$murid}, is gifted. Soon they'll surpass me. And that makes me proud.
+  ~ kasar: {$murid} lambat. Tapi tidak pernah menyerah. Itu cukup. || {$murid} is slow. But never gives up. That's enough.
+  ~ pelabuhan: {$murid} sudah bisa membaca bintang, Bung. Tahun depan dia pegang kemudi. || {$murid} can read the stars now, mate. Next year they take the helm.
+- {$guru} bilang aku harus mengulang dari awal. Tiga tahun! Tapi dia benar. || {$guru} says I must start again from scratch. Three years! But they're right.
+- Mengajar {$murid} membuatku ingat waktu aku sendiri masih bodoh. Hehe. || Teaching {$murid} reminds me of when I was a fool myself. Heh.
+
+== cita.anak
+niat: CERITA
+topik: cita
+syarat: tahap=anak,remaja
+gestur: kagum
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Kalau besar, aku mau jadi kultivator! Terbang di atas awan dan menebas naga! || When I grow up I'll be a cultivator! Fly above the clouds and slay dragons!
+  ~ kasar: Aku mau jadi kuat. Biar tidak ada yang berani mengejekku lagi. || I want to be strong. So nobody dares mock me again.
+  ~ kuno: Aku ingin menapaki jalan Dao dan melihat puncak langit. || I wish to tread the path of the Dao and see heaven's summit.
+  ~ p: Aku mau jadi tabib! Biar nenekku tidak batuk lagi. || I want to be a healer! So my grandma stops coughing.
+  ~ kampung: Aku mau jadi kayak {$sebutan}! Punya pedang, bisa terbang! || I want to be like you, {$sebutan}! Have a sword and fly!
+- [2] Aku mau punya toko kue paling besar di kota. Semua orang boleh makan gratis hari Minggu! || I want the biggest cake shop in town. Everyone eats free on rest days!
+  ~ pelabuhan: Aku mau jadi nakhoda! Punya kapal sendiri, berlayar sampai ujung dunia! || I want to be a captain! My own ship, sailing to the end of the world!
+  ~ oasis: Aku mau memimpin kafilah melewati gurun terbesar! Seratus unta! || I want to lead a caravan across the greatest desert! A hundred camels!
+- Ayah mau aku jadi pandai besi. Tapi aku mau jadi pendongeng. Boleh tidak, ya? || Father wants me to be a smith. But I want to be a storyteller. Is that allowed?
+- Aku mau masuk sekte! Sudah latihan kuda-kuda setiap pagi. Lihat! || I want to join a sect! I practise horse stance every morning. Look!
+
+== cita.dewasa
+niat: CERITA
+topik: cita
+syarat: tahap=dewasa
+gestur: tatap_langit
+- [3] Cita-cita? Sederhana saja. Rumah dengan atap yang tidak bocor dan anak-anak yang kenyang. || A dream? Simple. A roof that doesn't leak and children with full bellies.
+  ~ kasar: Cita-cita itu untuk orang kaya. Aku cuma mau sampai besok. || Dreams are for the rich. I just want to reach tomorrow.
+  ~ kuno: Aku ingin meninggalkan nama yang baik. Harimau mati meninggalkan belang. || I wish to leave a good name. A tiger leaves its stripes.
+  ~ pelabuhan: Kapal sendiri, Bung. Satu saja. Tidak perlu besar. || A boat of my own, mate. Just one. Needn't be big.
+  ~ oasis: Aku ingin melihat laut sekali sebelum mati, Saudara. Katanya air sebanyak pasir. || I want to see the sea once before I die, friend. They say there's as much water as sand.
+- [2] Aku menabung untuk membuka kedai teh sendiri. Tinggal sedikit lagi. || I'm saving to open my own teahouse. Just a little more.
+  ~ p: Aku ingin anakku sekolah tinggi, jadi pejabat. Biar tidak susah seperti ibunya. || I want my child to study and become an official. So they don't struggle like their mother.
+  ~ ibukota: Lulus ujian negara dan bekerja di istana. Sudah tiga kali gagal, tapi tahun ini pasti. || Pass the state exam and serve at the palace. Failed three times, but this year for sure.
+- Dulu aku ingin jadi kultivator. Akar rohku tidak ada. Jadi sekarang aku membuat bakpao. Tidak buruk. || I once wanted to be a cultivator. No spirit roots. So now I make buns. Not bad.
+- Melunasi utang, lalu pulang kampung dan menanam persik. Itu saja. || Clear my debts, then go home and plant peaches. That's all.
+  ~ kampung: Pengin berziarah ke kuil gunung sekali seumur hidup, Nak. Doakan, ya. || I'd love to pilgrimage to the mountain temple once in my life, child. Pray for me.
+
+== cita.tua
+niat: CERITA
+topik: cita
+syarat: tahap=tua
+gestur: sikap_tua
+- [3] Cita-cita? Di umur begini? Hehe. Melihat cucu menikah, itu saja. || A dream? At my age? Heh. To see my grandchild wed, that's all.
+  ~ kasar: Mati dengan tenang. Tanpa utang. Itu cita-citaku. || Die in peace. Debt-free. That's my dream.
+  ~ kuno: Aku hanya ingin melihat sekali lagi gunung tempat aku lahir. || I only wish to see once more the mountain where I was born.
+  ~ gunung: Mencapai pencerahan sebelum lonceng terakhir. Amitaba. Masih jauh. || To reach enlightenment before the last bell. Amitabha. Still far off.
+- [2] Dulu aku ingin keliling dunia. Sekarang keliling pasar saja sudah capek. Hehe. || I once wanted to travel the world. Now going round the market tires me out. Heh.
+- Aku ingin menuliskan cerita-cerita kota ini sebelum lupa. Tapi tanganku gemetar. || I'd like to write down this town's stories before I forget. But my hands shake.
+- Semoga kota ini tetap damai setelah aku tiada. || May this town stay peaceful after I'm gone.

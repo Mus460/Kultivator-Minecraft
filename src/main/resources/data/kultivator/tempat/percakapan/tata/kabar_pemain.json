@@ -1,0 +1,1170 @@
+{
+  "_dibuat": "tools/gen_kota_hidup_cakap.py dari tools/kota_cakap_sumber (jangan disunting tangan)",
+  "kelompok": "kabar_pemain",
+  "isi": [
+    {
+      "aturan": "kabar.menolong",
+      "niat": "BERI_KABAR",
+      "topik": "pemain",
+      "syarat": {
+        "fakta": "MENOLONG"
+      },
+      "bingkai": [
+        {
+          "kunci": "kabar.menolong.0",
+          "slot": [
+            "$katanya",
+            "$subjek",
+            "$objek",
+            "$waktu_lalu"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "kabar.menolong.1",
+          "slot": [
+            "$objek",
+            "$subjek",
+            "$senang"
+          ],
+          "bobot": 2,
+          "varian": [
+            "pelabuhan",
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "kabar.menolong.2",
+          "slot": [
+            "$objek",
+            "$subjek",
+            "$waktu_lalu"
+          ],
+          "bobot": 1,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "kabar.menolong.3",
+          "slot": [
+            "$subjek",
+            "$objek"
+          ],
+          "bobot": 1,
+          "varian": [
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "kabar.menolong.4",
+          "slot": [
+            "$sebutan",
+            "$subjek",
+            "$objek"
+          ],
+          "bobot": 1,
+          "register": [
+            "sopan"
+          ],
+          "varian": [
+            "ibukota"
+          ]
+        }
+      ],
+      "slot": {
+        "$katanya": {
+          "aturan": "frag.katanya"
+        },
+        "$subjek": {
+          "tipe": "nama_warga",
+          "dari": "fakta.subjek"
+        },
+        "$objek": {
+          "tipe": "nama_warga",
+          "dari": "fakta.objek"
+        },
+        "$waktu_lalu": {
+          "tipe": "waktu_lalu",
+          "dari": "fakta.hariKejadian"
+        },
+        "$senang": {
+          "aturan": "seru.senang",
+          "opsional": 0.5
+        },
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "lanjut": [
+        "kota",
+        "tetangga"
+      ],
+      "gestur": "bicara_tangan"
+    },
+    {
+      "aturan": "kabar.mencuri",
+      "niat": "BERI_KABAR",
+      "topik": "pemain",
+      "syarat": {
+        "fakta": "MENCURI"
+      },
+      "bingkai": [
+        {
+          "kunci": "kabar.mencuri.0",
+          "slot": [
+            "$katanya",
+            "$subjek",
+            "$objek",
+            "$waktu_lalu"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "kabar.mencuri.1",
+          "slot": [
+            "$objek",
+            "$waktu_lalu",
+            "$subjek"
+          ],
+          "bobot": 2,
+          "varian": [
+            "air",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "kabar.mencuri.2",
+          "slot": [
+            "$subjek",
+            "$objek",
+            "$ragu"
+          ],
+          "bobot": 1,
+          "varian": [
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "kabar.mencuri.3",
+          "slot": [
+            "$objek",
+            "$subjek",
+            "$keluh"
+          ],
+          "bobot": 1,
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "kabar.mencuri.4",
+          "slot": [
+            "$sebutan",
+            "$subjek",
+            "$objek"
+          ],
+          "bobot": 1,
+          "register": [
+            "sopan"
+          ]
+        }
+      ],
+      "slot": {
+        "$katanya": {
+          "aturan": "frag.katanya"
+        },
+        "$subjek": {
+          "tipe": "nama_warga",
+          "dari": "fakta.subjek"
+        },
+        "$objek": {
+          "tipe": "nama_warga",
+          "dari": "fakta.objek"
+        },
+        "$waktu_lalu": {
+          "tipe": "waktu_lalu",
+          "dari": "fakta.hariKejadian"
+        },
+        "$ragu": {
+          "aturan": "seru.ragu",
+          "opsional": 0.5
+        },
+        "$keluh": {
+          "aturan": "seru.keluh",
+          "opsional": 0.5
+        },
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "lanjut": [
+        "kejahatan",
+        "pejabat"
+      ],
+      "gestur": "bisik"
+    },
+    {
+      "aturan": "kabar.membeli",
+      "niat": "BERI_KABAR",
+      "topik": "dagang",
+      "syarat": {
+        "fakta": "MEMBELI"
+      },
+      "bingkai": [
+        {
+          "kunci": "kabar.membeli.0",
+          "slot": [
+            "$subjek",
+            "$barang",
+            "$waktu_lalu"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "kabar.membeli.1",
+          "slot": [
+            "$subjek",
+            "$angka",
+            "$barang",
+            "$kaget"
+          ],
+          "bobot": 2,
+          "varian": [
+            "pelabuhan",
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "kabar.membeli.2",
+          "slot": [
+            "$subjek",
+            "$barang",
+            "$keluh"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "kabar.membeli.3",
+          "slot": [
+            "$barang",
+            "$subjek"
+          ],
+          "bobot": 1
+        },
+        {
+          "kunci": "kabar.membeli.4",
+          "slot": [
+            "$sebutan",
+            "$barang",
+            "$subjek"
+          ],
+          "bobot": 1,
+          "register": [
+            "sopan"
+          ]
+        }
+      ],
+      "slot": {
+        "$subjek": {
+          "tipe": "nama_warga",
+          "dari": "fakta.subjek"
+        },
+        "$barang": {
+          "tipe": "barang",
+          "dari": "fakta.objek",
+          "fitur": [
+            "jamak"
+          ]
+        },
+        "$waktu_lalu": {
+          "tipe": "waktu_lalu",
+          "dari": "fakta.hariKejadian"
+        },
+        "$angka": {
+          "tipe": "angka",
+          "dari": "fakta.nilai"
+        },
+        "$kaget": {
+          "aturan": "seru.kaget",
+          "opsional": 0.5
+        },
+        "$keluh": {
+          "aturan": "seru.keluh",
+          "opsional": 0.5
+        },
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "lanjut": [
+        "harga",
+        "kafilah"
+      ],
+      "gestur": "hitung_koin"
+    },
+    {
+      "aturan": "kabar.menawar_keras",
+      "niat": "BERI_KABAR",
+      "topik": "dagang",
+      "syarat": {
+        "fakta": "MENAWAR_KERAS"
+      },
+      "bingkai": [
+        {
+          "kunci": "kabar.menawar_keras.0",
+          "slot": [
+            "$subjek",
+            "$objek"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "kabar.menawar_keras.1",
+          "slot": [
+            "$subjek"
+          ],
+          "bobot": 2,
+          "varian": [
+            "pelabuhan",
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "kabar.menawar_keras.2",
+          "slot": [
+            "$objek",
+            "$subjek",
+            "$tik"
+          ],
+          "bobot": 1,
+          "varian": [
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "kabar.menawar_keras.3",
+          "slot": [
+            "$subjek",
+            "$objek"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$subjek": {
+          "tipe": "nama_warga",
+          "dari": "fakta.subjek"
+        },
+        "$objek": {
+          "tipe": "nama_warga",
+          "dari": "fakta.objek"
+        },
+        "$tik": {
+          "tipe": "tik",
+          "dari": "pembicara"
+        }
+      },
+      "lanjut": [
+        "harga"
+      ],
+      "gestur": "geleng"
+    },
+    {
+      "aturan": "kabar.berjanji",
+      "niat": "BERI_KABAR",
+      "topik": "janji",
+      "syarat": {
+        "fakta": "BERJANJI"
+      },
+      "bingkai": [
+        {
+          "kunci": "kabar.berjanji.0",
+          "slot": [
+            "$subjek",
+            "$objek",
+            "$waktu_depan"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "kabar.berjanji.1",
+          "slot": [
+            "$objek",
+            "$subjek",
+            "$waktu_depan"
+          ],
+          "bobot": 2,
+          "varian": [
+            "air",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "kabar.berjanji.2",
+          "slot": [
+            "$subjek",
+            "$objek",
+            "$doa"
+          ],
+          "bobot": 1
+        },
+        {
+          "kunci": "kabar.berjanji.3",
+          "slot": [
+            "$sebutan",
+            "$objek",
+            "$subjek"
+          ],
+          "bobot": 1,
+          "register": [
+            "sopan"
+          ]
+        }
+      ],
+      "slot": {
+        "$subjek": {
+          "tipe": "nama_warga",
+          "dari": "fakta.subjek"
+        },
+        "$objek": {
+          "tipe": "nama_warga",
+          "dari": "fakta.objek"
+        },
+        "$waktu_depan": {
+          "tipe": "waktu_depan",
+          "dari": "fakta.nilai"
+        },
+        "$doa": {
+          "aturan": "frag.doa",
+          "opsional": 0.4
+        },
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "lanjut": [
+        "janji"
+      ],
+      "gestur": "angguk"
+    },
+    {
+      "aturan": "kabar.ingkar",
+      "niat": "BERI_KABAR",
+      "topik": "janji",
+      "syarat": {
+        "fakta": "INGKAR"
+      },
+      "bingkai": [
+        {
+          "kunci": "kabar.ingkar.0",
+          "slot": [
+            "$subjek",
+            "$objek",
+            "$keluh"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "kabar.ingkar.1",
+          "slot": [
+            "$subjek",
+            "$objek"
+          ],
+          "bobot": 2,
+          "varian": [
+            "iblis",
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "kabar.ingkar.2",
+          "slot": [
+            "$objek",
+            "$subjek"
+          ],
+          "bobot": 1
+        },
+        {
+          "kunci": "kabar.ingkar.3",
+          "slot": [
+            "$pepatah",
+            "$subjek",
+            "$objek"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$subjek": {
+          "tipe": "nama_warga",
+          "dari": "fakta.subjek"
+        },
+        "$objek": {
+          "tipe": "nama_warga",
+          "dari": "fakta.objek"
+        },
+        "$keluh": {
+          "aturan": "seru.keluh",
+          "opsional": 0.5
+        },
+        "$pepatah": {
+          "aturan": "frag.pepatah",
+          "opsional": 0.25
+        }
+      },
+      "lanjut": [
+        "tetangga"
+      ],
+      "gestur": "geleng"
+    },
+    {
+      "aturan": "kabar.ranah",
+      "niat": "BERI_KABAR",
+      "topik": "pemain",
+      "syarat": {
+        "fakta": "RANAH"
+      },
+      "bingkai": [
+        {
+          "kunci": "kabar.ranah.0",
+          "slot": [
+            "$katanya",
+            "$subjek"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "kabar.ranah.1",
+          "slot": [
+            "$subjek",
+            "$waktu_lalu",
+            "$kaget"
+          ],
+          "bobot": 2,
+          "varian": [
+            "gunung",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "kabar.ranah.2",
+          "slot": [
+            "$subjek",
+            "$angka"
+          ],
+          "bobot": 1,
+          "varian": [
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "kabar.ranah.3",
+          "slot": [
+            "$subjek"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$katanya": {
+          "aturan": "frag.katanya"
+        },
+        "$subjek": {
+          "tipe": "nama_warga",
+          "dari": "fakta.subjek"
+        },
+        "$waktu_lalu": {
+          "tipe": "waktu_lalu",
+          "dari": "fakta.hariKejadian"
+        },
+        "$kaget": {
+          "aturan": "seru.kaget",
+          "opsional": 0.5
+        },
+        "$angka": {
+          "tipe": "angka",
+          "dari": "fakta.nilai"
+        }
+      },
+      "lanjut": [
+        "sekte",
+        "dunia"
+      ],
+      "gestur": "kagum"
+    },
+    {
+      "aturan": "kabar.sekte",
+      "niat": "BERI_KABAR",
+      "topik": "sekte",
+      "syarat": {
+        "fakta": "SEKTE"
+      },
+      "bingkai": [
+        {
+          "kunci": "kabar.sekte.0",
+          "slot": [
+            "$subjek",
+            "$sekte_fakta"
+          ],
+          "bobot": 2,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "kabar.sekte.1",
+          "slot": [
+            "$subjek",
+            "$sekte_fakta"
+          ],
+          "bobot": 1,
+          "varian": [
+            "ibukota"
+          ]
+        },
+        {
+          "kunci": "kabar.sekte.2",
+          "slot": [
+            "$sekte_fakta",
+            "$subjek"
+          ],
+          "bobot": 1
+        },
+        {
+          "kunci": "kabar.sekte.3",
+          "slot": [
+            "$sekte_fakta",
+            "$subjek"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$subjek": {
+          "tipe": "nama_warga",
+          "dari": "fakta.subjek"
+        },
+        "$sekte_fakta": {
+          "tipe": "tempat",
+          "dari": "fakta.objek"
+        }
+      },
+      "lanjut": [
+        "sekte"
+      ],
+      "gestur": "bicara_tangan"
+    },
+    {
+      "aturan": "kabar.pejabat",
+      "niat": "BERI_KABAR",
+      "topik": "pejabat",
+      "syarat": {
+        "fakta": "PEJABAT"
+      },
+      "bingkai": [
+        {
+          "kunci": "kabar.pejabat.0",
+          "slot": [
+            "$subjek",
+            "$tempat_fakta"
+          ],
+          "bobot": 2,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "kabar.pejabat.1",
+          "slot": [
+            "$tempat_fakta",
+            "$subjek",
+            "$ragu"
+          ],
+          "bobot": 1,
+          "varian": [
+            "ibukota"
+          ]
+        },
+        {
+          "kunci": "kabar.pejabat.2",
+          "slot": [
+            "$subjek",
+            "$tempat_fakta"
+          ],
+          "bobot": 1,
+          "varian": [
+            "p"
+          ]
+        }
+      ],
+      "slot": {
+        "$subjek": {
+          "tipe": "nama_warga",
+          "dari": "fakta.subjek"
+        },
+        "$tempat_fakta": {
+          "tipe": "tempat",
+          "dari": "fakta.objek"
+        },
+        "$ragu": {
+          "aturan": "seru.ragu",
+          "opsional": 0.5
+        }
+      },
+      "lanjut": [
+        "pejabat",
+        "kota"
+      ],
+      "gestur": "hormat"
+    },
+    {
+      "aturan": "kabar.menang_duel",
+      "niat": "BERI_KABAR",
+      "topik": "pemain",
+      "syarat": {
+        "fakta": "MENANG_DUEL"
+      },
+      "bingkai": [
+        {
+          "kunci": "kabar.menang_duel.0",
+          "slot": [
+            "$waktu_lalu",
+            "$subjek",
+            "$objek"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "kabar.menang_duel.1",
+          "slot": [
+            "$subjek",
+            "$objek"
+          ],
+          "bobot": 2,
+          "varian": [
+            "iblis",
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "kabar.menang_duel.2",
+          "slot": [
+            "$objek",
+            "$subjek"
+          ],
+          "bobot": 1
+        },
+        {
+          "kunci": "kabar.menang_duel.3",
+          "slot": [
+            "$subjek",
+            "$objek"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$waktu_lalu": {
+          "tipe": "waktu_lalu",
+          "dari": "fakta.hariKejadian"
+        },
+        "$subjek": {
+          "tipe": "nama_warga",
+          "dari": "fakta.subjek"
+        },
+        "$objek": {
+          "tipe": "nama_warga",
+          "dari": "fakta.objek"
+        }
+      },
+      "lanjut": [
+        "sekte",
+        "pemain"
+      ],
+      "gestur": "tunjuk"
+    },
+    {
+      "aturan": "kabar.mengancam",
+      "niat": "BERI_KABAR",
+      "topik": "pemain",
+      "syarat": {
+        "fakta": "MENGANCAM"
+      },
+      "bingkai": [
+        {
+          "kunci": "kabar.mengancam.0",
+          "slot": [
+            "$subjek",
+            "$waktu_lalu",
+            "$objek"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "kabar.mengancam.1",
+          "slot": [
+            "$objek",
+            "$subjek",
+            "$keluh"
+          ],
+          "bobot": 2,
+          "varian": [
+            "ibukota",
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "kabar.mengancam.2",
+          "slot": [
+            "$subjek",
+            "$objek"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$subjek": {
+          "tipe": "nama_warga",
+          "dari": "fakta.subjek"
+        },
+        "$waktu_lalu": {
+          "tipe": "waktu_lalu",
+          "dari": "fakta.hariKejadian"
+        },
+        "$objek": {
+          "tipe": "nama_warga",
+          "dari": "fakta.objek"
+        },
+        "$keluh": {
+          "aturan": "seru.keluh",
+          "opsional": 0.5
+        }
+      },
+      "lanjut": [
+        "kejahatan",
+        "pejabat"
+      ],
+      "gestur": "bisik"
+    },
+    {
+      "aturan": "kabar.menyuap",
+      "niat": "BERI_KABAR",
+      "topik": "pemain",
+      "syarat": {
+        "fakta": "MENYUAP"
+      },
+      "bingkai": [
+        {
+          "kunci": "kabar.menyuap.0",
+          "slot": [
+            "$subjek",
+            "$harga",
+            "$objek"
+          ],
+          "bobot": 2,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "kabar.menyuap.1",
+          "slot": [
+            "$objek",
+            "$harga",
+            "$subjek"
+          ],
+          "bobot": 1,
+          "varian": [
+            "ibukota"
+          ]
+        },
+        {
+          "kunci": "kabar.menyuap.2",
+          "slot": [
+            "$katanya",
+            "$subjek",
+            "$objek",
+            "$ragu"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$subjek": {
+          "tipe": "nama_warga",
+          "dari": "fakta.subjek"
+        },
+        "$harga": {
+          "tipe": "harga",
+          "dari": "fakta.nilai"
+        },
+        "$objek": {
+          "tipe": "nama_warga",
+          "dari": "fakta.objek"
+        },
+        "$katanya": {
+          "aturan": "frag.katanya"
+        },
+        "$ragu": {
+          "aturan": "seru.ragu",
+          "opsional": 0.5
+        }
+      },
+      "lanjut": [
+        "pejabat"
+      ],
+      "gestur": "bisik"
+    },
+    {
+      "aturan": "kabar.merayu",
+      "niat": "BERI_KABAR",
+      "topik": "asmara",
+      "syarat": {
+        "fakta": "MERAYU"
+      },
+      "bingkai": [
+        {
+          "kunci": "kabar.merayu.0",
+          "slot": [
+            "$subjek",
+            "$objek",
+            "$waktu_lalu"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "kabar.merayu.1",
+          "slot": [
+            "$objek",
+            "$subjek"
+          ],
+          "bobot": 2,
+          "varian": [
+            "air",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "kabar.merayu.2",
+          "slot": [
+            "$subjek",
+            "$objek"
+          ],
+          "bobot": 1
+        },
+        {
+          "kunci": "kabar.merayu.3",
+          "slot": [
+            "$subjek",
+            "$objek"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$subjek": {
+          "tipe": "nama_warga",
+          "dari": "fakta.subjek"
+        },
+        "$objek": {
+          "tipe": "nama_warga",
+          "dari": "fakta.objek"
+        },
+        "$waktu_lalu": {
+          "tipe": "waktu_lalu",
+          "dari": "fakta.hariKejadian"
+        }
+      },
+      "lanjut": [
+        "asmara"
+      ],
+      "gestur": "tertawa"
+    },
+    {
+      "aturan": "kabar.bercanda",
+      "niat": "BERI_KABAR",
+      "topik": "pemain",
+      "syarat": {
+        "fakta": "BERCANDA"
+      },
+      "bingkai": [
+        {
+          "kunci": "kabar.bercanda.0",
+          "slot": [
+            "$subjek",
+            "$objek",
+            "$waktu_lalu"
+          ],
+          "bobot": 2,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "kabar.bercanda.1",
+          "slot": [
+            "$objek",
+            "$subjek"
+          ],
+          "bobot": 1,
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "kabar.bercanda.2",
+          "slot": [
+            "$subjek",
+            "$objek"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$subjek": {
+          "tipe": "nama_warga",
+          "dari": "fakta.subjek"
+        },
+        "$objek": {
+          "tipe": "nama_warga",
+          "dari": "fakta.objek"
+        },
+        "$waktu_lalu": {
+          "tipe": "waktu_lalu",
+          "dari": "fakta.hariKejadian"
+        }
+      },
+      "lanjut": [
+        "tetangga"
+      ],
+      "gestur": "tertawa"
+    },
+    {
+      "aturan": "kabar.dermawan",
+      "niat": "BERI_KABAR",
+      "topik": "pemain",
+      "syarat": {
+        "fakta": "DERMAWAN"
+      },
+      "bingkai": [
+        {
+          "kunci": "kabar.dermawan.0",
+          "slot": [
+            "$subjek",
+            "$objek",
+            "$harga",
+            "$kaget"
+          ],
+          "bobot": 3,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "kabar.dermawan.1",
+          "slot": [
+            "$objek",
+            "$subjek",
+            "$harga"
+          ],
+          "bobot": 2,
+          "varian": [
+            "oasis",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "kabar.dermawan.2",
+          "slot": [
+            "$subjek"
+          ],
+          "bobot": 1
+        },
+        {
+          "kunci": "kabar.dermawan.3",
+          "slot": [
+            "$subjek"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$subjek": {
+          "tipe": "nama_warga",
+          "dari": "fakta.subjek"
+        },
+        "$objek": {
+          "tipe": "nama_warga",
+          "dari": "fakta.objek"
+        },
+        "$harga": {
+          "tipe": "harga",
+          "dari": "fakta.nilai"
+        },
+        "$kaget": {
+          "aturan": "seru.kaget",
+          "opsional": 0.5
+        }
+      },
+      "lanjut": [
+        "kota",
+        "pemain"
+      ],
+      "gestur": "kagum"
+    }
+  ]
+}

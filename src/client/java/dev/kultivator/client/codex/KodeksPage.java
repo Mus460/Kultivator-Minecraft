@@ -2,20 +2,33 @@ package dev.kultivator.client.codex;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import dev.kultivator.client.ClientCultivation;
+import dev.kultivator.client.Keys;
+import dev.kultivator.client.screen.Page;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Glyphs;
+import dev.kultivator.client.screen.ui.InkField;
+import dev.kultivator.client.screen.ui.KeadaanKosong;
+import dev.kultivator.client.screen.ui.KeyHints;
+import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.SealCard;
+import dev.kultivator.client.screen.ui.TalismanButton;
+import dev.kultivator.client.screen.ui.UiSound;
+import dev.kultivator.client.screen.ui.Widget;
 import dev.kultivator.data.CultivationData;
 import dev.kultivator.data.Dao;
 import dev.kultivator.data.TechniqueGrade;
 import dev.kultivator.data.TechniqueRegistry;
 import dev.kultivator.data.TechniqueSpec;
 import dev.kultivator.data.TechniqueType;
+import dev.kultivator.goals.Guide;
+import dev.kultivator.network.Actions;
+import dev.kultivator.technique.spec.TechniquePower;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,28 +36,47 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The Kodeks tablet (DESIGN 22.12.2-22.12.4): row A the ink search, the "Dikuasai 37/168" counter and the sort talisman;
- * row B the Dao coins (all, universal, the eight trigrams) and the six grade coins; row C the Ranah and Jenis talismans,
- * the state chips and the Pamungkas coin; then the virtualized seal-card grid, grouped by grade when sorted by grade.
- * The bamboo detail slip docks on the right from 420 GUI px wide screens, else it opens over the grid on click.
+ * Teknik › Kodeks (DESIGN 22.12.2-22.12.4, 43.5; a wide page): the strip of the old Teknik launcher (selected seal, power,
+ * best mastery, the keys) when the paper is tall enough, else in the counter's tooltip; row A the search, the counter and
+ * the sort talisman; row B the Dao and grade coins; row C the Ranah, Jenis and state talismans and the Pamungkas coin;
+ * then the virtualized seal-card grid, grouped by grade when sorted by grade. The bamboo detail slip docks on the right
+ * when the page is wide enough (R31); on narrow paper it replaces the grid as a detail view (Esc / back returns).
+ * Keyboard (43.4.2): the grid is one stop of the Tab ring ("kisi"); the arrows move the selected card (↑/↓ also focus the
+ * grid when nothing has the focus), Enter opens its slip and puts the focus on Pilih; ↑↓ PgUp PgDn scroll the slip while it
+ * is the detail view or one of its talismans is focused. No match: the empty state offers to clear every filter.
  */
-final class KodeksPage extends CodexPage {
+public final class KodeksPage extends Page {
 
-	private static final int ROW = 13;
-	private static final int SLIP_W = 150;
+	private static final CodexFilters FILTERS = CodexFilters.player();
+	private static final int ROW = 14;
+	private static final int CTRL_H = 13;
+	private static final int COIN_W = 16;
+	private static final String M = "kultivator.gui43.m02.";
+	private static final String KISI = "kisi";
 
-	private final CodexFilters filters;
+	/** Draws an icon centred on (cx, cy) of the given size and colour. */
+	private interface Ikon {
+		void draw(GuiGraphicsExtractor g, float cx, float cy, float size, int color);
+	}
+
+	private final CodexFilters filters = FILTERS;
 	private final CodexGrid grid = new CodexGrid();
 	private final DetailSlip slip = new DetailSlip();
-	private InkSearchField search;
+	private final List<Widget> filterWidgets = new ArrayList<>();
 	private boolean docked;
-	private boolean overlay;
+	/** Narrow paper: the slip is shown instead of the grid. */
+	private boolean detail;
+	private int strip;
 	private int gridX;
 	private int gridW;
+	private int rowA;
+	private int rowB;
+	private int coinRows;
 	private int counterX;
 	private int counterW;
+	private int gridTop;
+	private @Nullable InkField search;
 	private long builtVersion = -1L;
-	private @Nullable TechniqueSpec focus;
 	private final CodexFilters.View view = new CodexFilters.View() {
 		@Override
 		public SpecInfo.State state(TechniqueSpec spec) {
@@ -62,164 +94,150 @@ final class KodeksPage extends CodexPage {
 		}
 	};
 
-	KodeksPage(CodexScreen screen, CodexFilters filters) {
-		super(screen);
-		this.filters = filters;
+	public KodeksPage() {
 	}
 
 	@Override
-	Component title() {
-		return Component.translatable("kultivator.codex.tab.kodeks");
+	public Component title() {
+		return Component.translatable("kultivator.gui43.hal.teknik.kodeks");
 	}
 
 	@Override
-	Component shortName() {
-		return Component.translatable("kultivator.codex.tab.kodeks.short");
-	}
-
-	@Override
-	int icon() {
+	public int glyph() {
 		return Glyphs.CODEX;
 	}
 
-	/** Opens the detail of {@code spec} and scrolls the grid to it. */
-	void focus(@Nullable TechniqueSpec spec) {
-		focus = spec;
-		if (spec != null) {
-			grid.select(spec);
-			slip.setSpec(spec);
-			overlay = !docked;
-			grid.reveal(spec);
+	@Override
+	public String helpTopic() {
+		return "kitab_teknik";
+	}
+
+	@Override
+	public boolean lebar() {
+		return true;
+	}
+
+	@Override
+	public boolean rinci() {
+		return detail;
+	}
+
+	@Override
+	public void onShow(@Nullable CompoundTag fokus) {
+		// The guide's "open the Kitab Teknik" step (was GoalsClient's check for the old codex screen).
+		if (Keys.connected() && !Guide.seen(data())) {
+			send(Actions.JALAN, 0, "seen:codex");
 		}
+		super.onShow(fokus);
+	}
+
+	@Override
+	public void fokus(CompoundTag fokus) {
+		int net = fokus.getIntOr("spec", -1);
+		TechniqueSpec spec = net < 0 ? null : TechniqueRegistry.byNet(net);
+		if (spec != null && spec.playerVisible()) {
+			focus(spec);
+		}
+	}
+
+	/** Opens the detail of {@code spec} and scrolls the grid to it. */
+	void focus(TechniqueSpec spec) {
+		grid.select(spec);
+		slip.setSpec(spec);
+		detail = !docked;
+		grid.reveal(spec);
 	}
 
 	@Override
 	protected void build() {
-		docked = screen.width >= 420 && w >= SLIP_W + 160;
+		filterWidgets.clear();
+		int slipW = Math.max(160, Math.min(210, Math.round(w * 0.38F)));
+		docked = w - slipW - 4 >= 200;
+		if (docked) {
+			detail = false;
+		}
 		gridX = x;
-		gridW = docked ? w - SLIP_W - 4 : w;
-		int top = y;
+		gridW = docked ? w - slipW - 4 : w;
+		strip = h >= 200 ? ROW : 0;
+		rowA = y + strip;
 
-		// Row A.
-		int searchW = Math.max(60, Math.round(gridW * 0.42F));
-		search = add(new InkSearchField(gridX, top, searchW, ROW - 2, filters.query, text -> {
-			filters.query = text;
+		// Row A: search, counter, sort.
+		int sortW = Math.max(64, Math.min(96, gridW / 4));
+		int searchW = Math.max(70, Math.round(gridW * 0.42F));
+		search = filter(new InkField(gridX, rowA, searchW, CTRL_H, 40, null)
+				.cari(Component.translatable("kultivator.codex.search.hint"), text -> {
+					filters.query = text;
+					refresh();
+				}));
+		search.setText(filters.query);
+		TalismanButton sort = filter(new TalismanButton(gridX + gridW - sortW, rowA, sortW, CTRL_H,
+				() -> Component.translatable(M + "urut", filters.sortLabel())));
+		sort.siklus(() -> {
+			filters.cycleSort();
 			refresh();
-		}));
-		int sortW = Math.min(70, Math.max(54, gridW / 4));
-		CodexWidgets.Cycle sort = add(new CodexWidgets.Cycle(gridX + gridW - sortW, top, sortW, ROW - 2, Palette.SEAL, filters::sortLabel, step -> {
-			for (int i = 0; i < (step > 0 ? 1 : CodexFilters.Sort.values().length - 1); i++) {
+		}, () -> {
+			for (int i = 0; i < CodexFilters.Sort.values().length - 1; i++) {
 				filters.cycleSort();
 			}
 			refresh();
-		}));
-		sort.tooltip(() -> List.of(Component.translatable("kultivator.codex.sort"), filters.sortLabel()));
+		});
+		sort.tooltip(() -> List.of(Component.translatable("kultivator.codex.sort"), filters.sortLabel(),
+				Component.translatable("kultivator.codex.filter.cycle").withStyle(ChatFormatting.GRAY)));
 		counterX = gridX + searchW + 4;
 		counterW = gridW - searchW - sortW - 8;
 
-		// Row B: Dao coins, then grade coins.
-		int coin = 11;
-		int cx = gridX;
-		int rowB = top + ROW;
-		cx = daoCoin(cx, rowB, coin, -2, (g, px, py, s, c) -> {
-			Brush.ring(g, px, py, s * 0.25F, s * 0.5F, c);
-			Brush.dot(g, px, py, 0.8F, c);
-		});
-		cx = daoCoin(cx, rowB, coin, -1, (g, px, py, s, c) -> {
-			Brush.ring(g, px, py, s * 0.25F, s * 0.45F, c);
-			Brush.disc(g, px, py, s * 0.13F, c);
-		});
-		for (Dao dao : Glyphs.BAGUA) {
-			cx = daoCoin(cx, rowB, coin, dao.ordinal(), (g, px, py, s, c) -> Glyphs.trigram(g, px, py, s, Math.max(0.8F, s * 0.15F), s * 0.3F,
-					Glyphs.trigramOf(dao), c));
-		}
-		cx += 5;
-		for (TechniqueGrade grade : TechniqueGrade.values()) {
-			if (cx + coin > gridX + gridW) {
-				break;
-			}
-			CodexWidgets.Coin gradeCoin = add(new CodexWidgets.Coin(cx, rowB, coin, SpecInfo.ribbon(grade), (g, px, py, s, c) ->
-					Brush.disc(g, px, py, s * 0.35F, SpecInfo.ribbon(grade)), () -> filters.gradeOn(grade)));
-			gradeCoin.onPress(() -> {
-				filters.toggleGrade(grade);
-				refresh();
-			});
-			gradeCoin.tooltip(() -> List.of(Component.translatable("kultivator.codex.filter.grade", grade.displayName()),
-					Component.translatable("kultivator.codex.filter.grade.tip").withStyle(ChatFormatting.GRAY)));
-			cx += coin + 1;
-		}
+		// Row B: the Dao and grade coins (drawn as zones in lukis), one row when they fit, else two.
+		rowB = rowA + ROW;
+		coinRows = gridW >= (10 + 6) * (COIN_W + 1) + 4 ? 1 : 2;
 
-		// Row C: Ranah, Jenis, state chips, Pamungkas.
-		int rowC = top + ROW * 2;
-		int realmW = Math.max(52, Math.min(80, gridW / 4));
-		CodexWidgets.Cycle realm = add(new CodexWidgets.Cycle(gridX, rowC, realmW, ROW - 2, Palette.JADE, filters::realmLabel, step -> {
-			filters.cycleRealm(step);
+		// Row C: Ranah, Jenis, state; the Pamungkas coin at its end.
+		int rowC = rowB + ROW * coinRows;
+		int cycleW = (gridW - COIN_W - 8) / 3;
+		TalismanButton realm = filter(new TalismanButton(gridX, rowC, cycleW, CTRL_H, filters::realmLabel));
+		realm.siklus(() -> {
+			filters.cycleRealm(1);
 			refresh();
-		}));
+		}, () -> {
+			filters.cycleRealm(-1);
+			refresh();
+		});
 		realm.tooltip(() -> List.of(Component.translatable("kultivator.codex.filter.realm"), filters.realmLabel(),
 				Component.translatable("kultivator.codex.filter.cycle").withStyle(ChatFormatting.GRAY)));
-		int typeW = Math.max(48, Math.min(72, gridW / 5));
-		CodexWidgets.Cycle type = add(new CodexWidgets.Cycle(gridX + realmW + 2, rowC, typeW, ROW - 2, Palette.GOLD_DARK, filters::typeLabel, step -> {
-			filters.cycleType(step);
+		TalismanButton type = filter(new TalismanButton(gridX + cycleW + 2, rowC, cycleW, CTRL_H, filters::typeLabel));
+		type.siklus(() -> {
+			filters.cycleType(1);
 			refresh();
-		}));
+		}, () -> {
+			filters.cycleType(-1);
+			refresh();
+		});
 		type.tooltip(() -> List.of(Component.translatable("kultivator.codex.filter.type"), filters.typeLabel(),
 				Component.translatable("kultivator.codex.filter.cycle").withStyle(ChatFormatting.GRAY)));
-		int chipX = gridX + realmW + typeW + 5;
-		int chipRoom = gridX + gridW - chipX - coin - 3;
-		int chipW = Math.max(18, Math.min(40, (chipRoom - 3) / 4));
-		for (int state = 0; state < 4; state++) {
-			int index = state;
-			CodexWidgets.Chip chip = add(new CodexWidgets.Chip(chipX + state * (chipW + 1), rowC, chipW, ROW - 2,
-					() -> CodexFilters.stateLabel(index), () -> filters.state == index));
-			chip.onPress(() -> {
-				filters.state = index;
-				filters.save();
-				refresh();
-			});
-			chip.tooltip(() -> List.of(CodexFilters.stateLabel(index), Component.translatable("kultivator.codex.filter.state." + index + ".tip")
-					.withStyle(ChatFormatting.GRAY)));
-		}
-		CodexWidgets.Coin ultimate = add(new CodexWidgets.Coin(gridX + gridW - coin, rowC, coin, Palette.SEAL, (g, px, py, s, c) ->
-				Glyphs.typeMark(g, TechniqueType.PAMUNGKAS, px, py, s * 0.8F, c), () -> filters.ultimates));
-		ultimate.onPress(() -> {
-			filters.ultimates = !filters.ultimates;
-			filters.save();
-			refresh();
-		});
-		ultimate.tooltip(() -> List.of(Component.translatable("kultivator.codex.filter.ultimates"),
-				Component.translatable("kultivator.codex.filter.ultimates.tip").withStyle(ChatFormatting.GRAY)));
+		TalismanButton state = filter(new TalismanButton(gridX + (cycleW + 2) * 2, rowC, cycleW, CTRL_H,
+				() -> CodexFilters.stateLabel(filters.state)));
+		state.siklus(() -> stepState(1), () -> stepState(-1));
+		state.tooltip(() -> List.of(Component.translatable(M + "keadaan"), CodexFilters.stateLabel(filters.state),
+				Component.translatable("kultivator.codex.filter.state." + filters.state + ".tip").withStyle(ChatFormatting.GRAY)));
 
-		int gridTop = top + ROW * 3 + 2;
+		gridTop = rowC + ROW + 2;
 		grid.layout(gridX, gridTop, gridW, y + h - gridTop, 28, 40);
 		if (docked) {
-			slip.layout(x + w - SLIP_W, y, SLIP_W, h);
-		} else {
-			int slipW = Math.min(w, Math.max(SLIP_W, Math.round(w * 0.62F)));
 			slip.layout(x + w - slipW, y, slipW, h);
+		} else {
+			slip.layout(x, y, w, h);
 		}
 		refresh();
-		if (focus != null) {
-			focus(focus);
-		}
 	}
 
-	private int daoCoin(int cx, int y, int size, int dao, CodexWidgets.Icon icon) {
-		int tint = dao >= 0 ? Palette.opaque(Dao.values()[dao].color()) : Palette.JADE_LIGHT;
-		CodexWidgets.Coin coin = add(new CodexWidgets.Coin(cx, y, size, tint, icon, () -> filters.dao == dao));
-		coin.onPress(() -> {
-			filters.dao = dao;
-			filters.save();
-			refresh();
-		});
-		coin.tooltip(() -> {
-			int saved = filters.dao;
-			filters.dao = dao;
-			Component label = filters.daoLabel();
-			filters.dao = saved;
-			return List.of(Component.translatable("kultivator.codex.filter.dao", label));
-		});
-		return cx + size + 1;
+	private <T extends Widget> T filter(T widget) {
+		filterWidgets.add(widget);
+		return add(widget);
+	}
+
+	private void stepState(int step) {
+		filters.state = Math.floorMod(filters.state + step, 4);
+		filters.save();
+		refresh();
 	}
 
 	private void refresh() {
@@ -229,38 +247,178 @@ final class KodeksPage extends CodexPage {
 	}
 
 	@Override
-	void onData() {
+	public void onData() {
 		if (ClientCultivation.version() != builtVersion && (filters.state != 0 || filters.realm == 1 || filters.sort == CodexFilters.Sort.MASTERY)) {
 			refresh();
 		}
+	}
+
+	@Override
+	protected boolean visible(Widget widget) {
+		return !detail || !filterWidgets.contains(widget);
 	}
 
 	// ================================================================== drawing
 
 	@Override
 	protected void drawBehind(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
-		CultivationData data = data();
-		Component counter = Component.translatable("kultivator.codex.counter", SpecInfo.learnedCount(data), TechniqueRegistry.playerTotal());
-		Brush.fitCentered(g, font, Brush.bold(counter), counterX + counterW / 2.0F, y + 1.5F, counterW, Palette.SEAL_DARK, 0.7F, 0.45F, false);
-		String[] slots = TeknikSession.slots();
-		String selected = data.selectedId();
-		boolean overSlip = overlay && slip.contains(mouseX, mouseY) || docked && slip.contains(mouseX, mouseY);
-		grid.render(g, font, overSlip ? -1 : mouseX, overSlip ? -1 : mouseY, seconds, spec -> look(data, spec, slots, selected));
-		if (grid.specs().isEmpty()) {
-			Brush.wrap(g, font, Component.translatable("kultivator.codex.empty"), gridX + 6.0F, y + ROW * 3 + 12.0F, gridW - 12.0F, Palette.INK_SOFT,
-					0.7F, false);
-		}
-		TechniqueSpec hovered = grid.hovered();
-		if (hovered != null && !overSlip) {
-			screen.showTooltip(tooltip(data, hovered));
-		}
 	}
 
 	@Override
-	protected void drawAbove(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
-		if (docked || overlay) {
-			g.nextStratum();
-			slip.render(g, mouseX, mouseY, seconds, screen::showTooltip);
+	protected void lukis(Lukis l) {
+		CultivationData data = data();
+		if (detail) {
+			slip.render(l);
+			return;
+		}
+		GuiGraphicsExtractor g = l.g;
+		if (strip > 0) {
+			drawStrip(g, data);
+		}
+		Component counter = Component.translatable("kultivator.codex.launcher.counter", SpecInfo.learnedCount(data), TechniqueRegistry.playerTotal());
+		Brush.fitCentered(g, font, Brush.bold(counter), counterX + counterW / 2.0F, rowA + 2.5F, counterW, Palette.SEAL_DARK, 1.0F, 1.0F, false);
+		if (l.di(counterX, rowA, counterX + counterW, rowA + CTRL_H)) {
+			l.tip(stripLines(data));
+		}
+		coins(l);
+		koin(l, "pamungkas", gridX + gridW - COIN_W, rowB + ROW * coinRows, Palette.SEAL,
+				(gg, px, py, s, c) -> Glyphs.typeMark(gg, TechniqueType.PAMUNGKAS, px, py, s * 0.8F, c), filters.ultimates, () -> {
+					filters.ultimates = !filters.ultimates;
+					filters.save();
+					refresh();
+				}, List.of(Component.translatable("kultivator.codex.filter.ultimates"),
+						Component.translatable("kultivator.codex.filter.ultimates.tip").withStyle(ChatFormatting.GRAY)));
+
+		String[] slots = TeknikSession.slots();
+		String selected = data.selectedId();
+		boolean overSlip = docked && slip.contains(l.mx, l.my);
+		grid.render(g, font, overSlip ? -1 : l.mx, overSlip ? -1 : l.my, l.detik, spec -> look(data, spec, slots, selected));
+		if (grid.specs().isEmpty()) {
+			KeadaanKosong.gambar(l, KeadaanKosong.Gambar.GULUNGAN, Component.translatable("kultivator.codex.empty"),
+					Component.translatable("kultivator.gui43.p2.saring.kosongkan"), this::kosongkanSaringan, gridX, gridTop, gridX + gridW, y + h);
+		} else {
+			// The grid as one stop of the Tab ring: ←/→ here, ↑↓ PgUp PgDn Home End in keyPressed, Enter opens the slip.
+			Lukis.Zona kisi = l.zona(KISI, gridX, gridTop, gridX + gridW, y + h, this::bukaTerpilih, true, null, true);
+			if (kisi != null) {
+				kisi.geser = arah -> pindah(arah > 0 ? InputConstants.KEY_RIGHT : InputConstants.KEY_LEFT);
+			}
+			int[] box = grid.kotakTerpilih();
+			if (box != null) {
+				l.fokusCincin(KISI, box[0], box[1], box[2], box[3]);
+			}
+		}
+		TechniqueSpec hovered = grid.hovered();
+		if (hovered != null && !overSlip) {
+			l.tip(tooltip(data, hovered));
+		}
+		if (docked) {
+			slip.render(l);
+		}
+	}
+
+	/** The strip of the old Teknik launcher: selected seal, its name, power and best mastery. */
+	private void drawStrip(GuiGraphicsExtractor g, CultivationData data) {
+		TechniqueSpec selected = data.selectedId().isEmpty() ? null : TechniqueRegistry.byId(data.selectedId());
+		Brush.rect(g, x, y + strip - 2.0F, x + w, y + strip - 1.4F, Palette.argb(0x80, Palette.GOLD));
+		float tx = x + 2.0F;
+		if (selected != null) {
+			Glyphs.spec(g, selected, x + 6.0F, y + 5.5F, 10.0F, SpecInfo.ink(selected));
+			tx = x + 14.0F;
+		}
+		Component line = Component.translatable(M + "strip",
+				selected == null ? Component.translatable("kultivator.screen.tech.none_selected") : selected.displayName(),
+				SpecInfo.compact(TechniquePower.power(data)), SpecInfo.masteryName(bestMastery(data)));
+		Brush.fit(g, font, line, tx, y + 1.5F, x + w - tx - 2.0F, selected == null ? Palette.INK_SOFT : Palette.INK, 1.0F, 1.0F, false);
+	}
+
+	private static int bestMastery(CultivationData data) {
+		int best = 0;
+		for (TechniqueSpec spec : data.learnedSpecs()) {
+			best = Math.max(best, SpecInfo.mastery(data, spec));
+		}
+		return best;
+	}
+
+	/** The launcher's summary as tooltip lines (the counter's tooltip; the whole strip on short paper). */
+	private static List<Component> stripLines(CultivationData data) {
+		TechniqueSpec selected = data.selectedId().isEmpty() ? null : TechniqueRegistry.byId(data.selectedId());
+		List<Component> lines = new ArrayList<>();
+		lines.add(Component.translatable("kultivator.codex.counter", SpecInfo.learnedCount(data), TechniqueRegistry.playerTotal()));
+		lines.add(Component.translatable("kultivator.codex.launcher.power", SpecInfo.compact(TechniquePower.power(data))));
+		lines.add(Component.translatable("kultivator.codex.launcher.mastery", SpecInfo.masteryName(bestMastery(data))));
+		lines.add(selected == null ? Component.translatable("kultivator.screen.tech.none_selected")
+				: Component.translatable("kultivator.codex.launcher.selected", selected.displayName()));
+		lines.add(Component.translatable("kultivator.codex.launcher.keys", KeyHints.name(Keys.CAST), KeyHints.name(Keys.PREVIOUS),
+				KeyHints.name(Keys.NEXT), KeyHints.name(Keys.CODEX)).withStyle(ChatFormatting.GRAY));
+		return lines;
+	}
+
+	/** Row B: all, universal, the eight trigrams; then the six grade coins (a second row on narrow paper). */
+	private void coins(Lukis l) {
+		int cx = gridX;
+		int cy = rowB;
+		cx = daoCoin(l, cx, cy, -2, (g, px, py, s, c) -> {
+			Brush.ring(g, px, py, s * 0.25F, s * 0.5F, c);
+			Brush.dot(g, px, py, 0.8F, c);
+		});
+		cx = daoCoin(l, cx, cy, -1, (g, px, py, s, c) -> {
+			Brush.ring(g, px, py, s * 0.25F, s * 0.45F, c);
+			Brush.disc(g, px, py, s * 0.13F, c);
+		});
+		for (Dao dao : Glyphs.BAGUA) {
+			cx = daoCoin(l, cx, cy, dao.ordinal(), (g, px, py, s, c) -> Glyphs.trigram(g, px, py, s, Math.max(0.8F, s * 0.15F), s * 0.3F,
+					Glyphs.trigramOf(dao), c));
+		}
+		if (coinRows == 1) {
+			cx += 4;
+		} else {
+			cx = gridX;
+			cy += ROW;
+		}
+		for (TechniqueGrade grade : TechniqueGrade.values()) {
+			int ribbon = SpecInfo.ribbon(grade);
+			koin(l, "grade." + grade.name(), cx, cy, ribbon, (g, px, py, s, c) -> Brush.disc(g, px, py, s * 0.35F, ribbon), filters.gradeOn(grade), () -> {
+				filters.toggleGrade(grade);
+				refresh();
+			}, List.of(Component.translatable("kultivator.codex.filter.grade", grade.displayName()),
+					Component.translatable("kultivator.codex.filter.grade.tip").withStyle(ChatFormatting.GRAY)));
+			cx += COIN_W + 1;
+		}
+	}
+
+	private int daoCoin(Lukis l, int cx, int cy, int dao, Ikon icon) {
+		int tint = dao >= 0 ? Palette.opaque(Dao.values()[dao].color()) : Palette.JADE_LIGHT;
+		int saved = filters.dao;
+		filters.dao = dao;
+		Component label = filters.daoLabel();
+		filters.dao = saved;
+		koin(l, "dao." + dao, cx, cy, tint, icon, filters.dao == dao, () -> {
+			filters.dao = dao;
+			filters.save();
+			refresh();
+		}, List.of(Component.translatable("kultivator.codex.filter.dao", label)));
+		return cx + COIN_W + 1;
+	}
+
+	/** A round jade coin with a carved icon in a 16×13 focusable zone; lit (gold rim, bright jade) while on. */
+	private static void koin(Lukis l, String kunci, int x0, int y0, int tint, Ikon icon, boolean on, Runnable aksi, List<Component> tip) {
+		int x1 = x0 + COIN_W;
+		int y1 = y0 + CTRL_H;
+		l.zona(kunci, x0, y0, x1, y1, aksi, true, null, true);
+		boolean over = l.di(x0, y0, x1, y1);
+		GuiGraphicsExtractor g = l.g;
+		float r = CTRL_H / 2.0F - 0.5F;
+		float cx = x0 + COIN_W / 2.0F;
+		float cy = y0 + CTRL_H / 2.0F;
+		if (on || over) {
+			Brush.halo(g, cx, cy, r, 2.0F, on ? 0xFFE07A : 0x9CFFD0, on ? 0.8F : 0.6F);
+		}
+		Brush.disc(g, cx, cy, r, on ? Palette.GOLD : Palette.JADE_DULL);
+		Brush.disc(g, cx, cy, r - 1.0F, on ? Palette.mix(Palette.JADE_LIGHT, tint, 0.35F) : Palette.mix(0xFFA9B5AE, tint, 0.2F));
+		icon.draw(g, cx, cy, CTRL_H * 0.62F, on ? Palette.INK : Palette.INK_SOFT);
+		l.fokusCincin(kunci, x0, y0, x1, y1);
+		if (over) {
+			l.tip(tip);
 		}
 	}
 
@@ -321,74 +479,106 @@ final class KodeksPage extends CodexPage {
 
 	// ================================================================== input
 
+	/** Every filter back to "all" and the search emptied (the empty state's talisman). */
+	private void kosongkanSaringan() {
+		filters.reset();
+		if (search != null) {
+			search.setText("");
+		}
+		refresh();
+	}
+
+	/** A grid key: moves the selected card and shows it in the slip; true when it moved. */
+	private boolean pindah(int key) {
+		if (!grid.tombol(key)) {
+			return false;
+		}
+		slip.setSpec(grid.selected());
+		UiSound.hover();
+		return true;
+	}
+
+	/** Enter on the grid: the selected card's slip (the detail view on narrow paper), the focus on its first talisman. */
+	private void bukaTerpilih() {
+		TechniqueSpec spec = grid.selected();
+		if (spec == null && !pindah(InputConstants.KEY_HOME)) {
+			return;
+		}
+		slip.setSpec(grid.selected());
+		detail = !docked;
+		fokusRing.set("slip.pilih");
+	}
+
+	private static boolean vertikal(int key) {
+		return key == InputConstants.KEY_UP || key == InputConstants.KEY_DOWN || key == InputConstants.KEY_PAGEUP || key == InputConstants.KEY_PAGEDOWN
+				|| key == InputConstants.KEY_HOME || key == InputConstants.KEY_END;
+	}
+
 	@Override
-	boolean mouseClicked(double mouseX, double mouseY, int button) {
-		if ((docked || overlay) && slip.contains(mouseX, mouseY)) {
-			if (button == InputConstants.MOUSE_BUTTON_LEFT) {
-				slip.mouseClicked(mouseX, mouseY, button);
+	public boolean keyPressed(KeyEvent event) {
+		int key = event.key();
+		if (!fokusRing.mauTombol() && vertikal(key)) {
+			String focused = fokusRing.kunci();
+			if (detail || (docked && focused != null && focused.startsWith("slip."))) {
+				return slip.gulirTombol(key);
+			}
+			if (KISI.equals(focused)) {
+				pindah(key);
+				return true;
+			}
+			if (focused == null && (key == InputConstants.KEY_UP || key == InputConstants.KEY_DOWN) && !grid.specs().isEmpty()) {
+				fokusRing.set(KISI);
+				if (grid.selected() == null) {
+					pindah(InputConstants.KEY_HOME);
+				}
+				return true;
+			}
+		}
+		return super.keyPressed(event);
+	}
+
+	@Override
+	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+		double mx = event.x();
+		double my = event.y();
+		// The grid before the focus ring: its "kisi" zone covers the cards, a click picks the card under the mouse.
+		if (!detail && !modal() && !grid.specs().isEmpty() && grid.contains(mx, my)) {
+			fokusRing.set(KISI);
+			TechniqueSpec spec = grid.at(mx, my);
+			if (spec != null && event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
+				UiSound.press();
+				grid.select(spec);
+				slip.setSpec(spec);
+				detail = !docked;
 			}
 			return true;
 		}
-		if (overlay && !slip.contains(mouseX, mouseY) && grid.contains(mouseX, mouseY) && grid.at(mouseX, mouseY) == null) {
-			overlay = false;
+		if (super.mouseClicked(event, doubleClick)) {
 			return true;
 		}
-		if (super.mouseClicked(mouseX, mouseY, button)) {
-			if (!(search.contains(mouseX, mouseY))) {
-				search.setFocused(false);
-			}
-			return true;
-		}
-		TechniqueSpec spec = grid.at(mouseX, mouseY);
-		if (spec != null && button == InputConstants.MOUSE_BUTTON_LEFT) {
-			search.setFocused(false);
-			dev.kultivator.client.screen.ui.UiSound.press();
-			grid.select(spec);
-			slip.setSpec(spec);
-			overlay = !docked;
-			return true;
-		}
-		search.setFocused(false);
-		return false;
+		return (detail || docked) && slip.contains(mx, my);
 	}
 
 	@Override
-	boolean mouseReleased(double mouseX, double mouseY, int button) {
-		if (slip.mouseReleased(mouseX, mouseY)) {
+	public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+		if ((detail || docked) && slip.mouseScrolled(mouseX, mouseY, scrollY)) {
 			return true;
 		}
-		return super.mouseReleased(mouseX, mouseY, button);
+		return !detail && grid.scrolled(mouseX, mouseY, scrollY);
 	}
 
 	@Override
-	boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-		if ((docked || overlay) && slip.mouseScrolled(mouseX, mouseY, amount)) {
+	public boolean mundur() {
+		if (detail) {
+			detail = false;
+			// back on the grid, the cursor where it was
+			fokusRing.set(KISI);
 			return true;
 		}
-		return grid.scrolled(mouseX, mouseY, amount);
-	}
-
-	@Override
-	boolean keyPressed(KeyEvent event) {
-		return search != null && search.keyPressed(event);
-	}
-
-	@Override
-	boolean charTyped(CharacterEvent event) {
-		return search != null && search.charTyped(event);
-	}
-
-	@Override
-	boolean escape() {
-		if (slip.escape()) {
-			return true;
-		}
-		if (search != null && search.focused()) {
-			search.setFocused(false);
-			return true;
-		}
-		if (overlay) {
-			overlay = false;
+		String focused = fokusRing.kunci();
+		if (docked && focused != null && focused.startsWith("slip.") && !grid.specs().isEmpty()) {
+			// from the docked slip's talismans Esc goes back to the cards first
+			fokusRing.set(KISI);
 			return true;
 		}
 		return false;

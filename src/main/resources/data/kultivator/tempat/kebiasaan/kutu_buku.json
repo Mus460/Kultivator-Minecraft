@@ -1,0 +1,51 @@
+{
+  "_catatan": "Kebiasaan #19 kutu_buku (DESIGN 42.4.12)",
+  "nomor": 19,
+  "siapa": {
+    "umur": [
+      7,
+      200
+    ],
+    "kelompok": [
+      "anak",
+      "cendekia"
+    ],
+    "tahap": [
+      "anak",
+      "dewasa"
+    ]
+  },
+  "sesi": [
+    {
+      "jam": [
+        16,
+        18
+      ],
+      "peluang": 0.6,
+      "syarat": [
+        "tidak_hujan"
+      ],
+      "tujuan": [
+        "@jalan:2"
+      ],
+      "klip": "membaca",
+      "kanan": "kitab",
+      "jalan": "kota42:jalan_baca"
+    },
+    {
+      "jam": [
+        19,
+        20.5
+      ],
+      "peluang": 0.5,
+      "kegiatan": "kb_kutu_buku_malam",
+      "tujuan": [
+        "meja_tulis",
+        "kursi",
+        "@rumah"
+      ],
+      "klip": "membaca",
+      "kanan": "kitab"
+    }
+  ]
+}

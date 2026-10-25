@@ -223,19 +223,8 @@ public final class NagaHud implements HudElement {
 		float time = minecraft.player.tickCount + partial;
 		float pulse = dev.kultivator.client.EffectQuality.reduceMotion() ? 0.8F : 0.6F + 0.4F * Mth.sin(time * 0.5F);
 		float fade = Mth.clamp((dangerTicks - 1 + partial) / DANGER_HOLD, 0.0F, 1.0F);
-		int strips = 6;
-		for (int i = 0; i < strips; i++) {
-			int a = Math.round(90 * pulse * fade * (1.0F - i / (float) strips));
-			if (a <= 0) {
-				continue;
-			}
-			int c = ARGB.color(a, 0xFF3020);
-			int s = i * 4;
-			g.fill(s, 0, s + 4, h, c);
-			g.fill(w - s - 4, 0, w - s, h, c);
-			g.fill(0, s, w, s + 3, c);
-			g.fill(0, h - s - 3, w, h - s, c);
-		}
+		// red edges through the one edge painter (DESIGN 43.9)
+		dev.kultivator.client.fx.spec.ScreenFlash.tepi(0xFF3020, 90.0F / 255.0F * pulse * fade);
 		// the pointer: where it comes from, relative to where you look
 		double dx = dangerAt.x - minecraft.player.getX();
 		double dz = dangerAt.z - minecraft.player.getZ();
@@ -256,12 +245,11 @@ public final class NagaHud implements HudElement {
 		int cy = g.guiHeight() / 2;
 		float t = Math.min(current.ticks, current.age + partial);
 		float fade = current.endAge >= 0 ? Mth.clamp(1.0F - (current.age - current.endAge + partial) / 40.0F, 0.0F, 1.0F) : 1.0F;
-		// the ring of dots
-		for (int deg = 0; deg < 360; deg += 6) {
-			dot(g, cx, cy, deg, RING, 1, ARGB.color(Math.round(90 * fade), 0xFFFFFF));
-		}
 		float will = current.will(t);
 		int kindRgb = current.kind.glow;
+		// the ring (the one crosshair ring, DESIGN 43.9): its fill is the time left
+		dev.kultivator.client.codex.CodexHud.cincin(g, cx, cy, RING - 1.0F, (current.ticks - t) / Math.max(1.0F, current.ticks),
+				ARGB.color(Math.max(1, Math.round(150 * fade)), kindRgb), null);
 		for (int d = -current.arc / 2; d <= current.arc / 2; d += 2) {
 			dot(g, cx, cy, will + d, RING, 2, ARGB.color(Math.round(230 * fade), kindRgb));
 			dot(g, cx, cy, will + d, RING + 4, 1, ARGB.color(Math.round(110 * fade), kindRgb));

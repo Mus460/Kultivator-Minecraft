@@ -1,0 +1,449 @@
+"""Author sources of the conversation-engine corpus (DESIGN 42.5A.8 "isi minimum", 42K-C) and their reader.
+
+The corpus is written by hand in ``tools/kota_cakap_sumber/*.txt``, one line per variant. This module parses it into the
+frozen ``tata/<kelompok>.json`` format of ``CakapData`` (42K0) plus the lang fragment ``kota_hidup_cakap`` (id_id primary,
+en_us mirror, identical keys). ``tools/gen_kota_hidup_cakap.py`` (42K-T) calls ``baca()`` / ``tulis()``; nothing here
+invents text: every sentence below the sources was written by the author.
+
+Source format
+-------------
+* Files whose name starts with ``_`` are libraries (``_slot.txt``), every other ``<stem>.txt`` becomes
+  ``tata/<stem>.json`` (``"kelompok": "<stem>"``). ``#`` starts a comment line. Blank lines are ignored.
+* ``slot: $name key=value ...`` before the first rule = file default; in ``_slot.txt`` = global default; after
+  ``@aturan`` = rule slot. Keys: ``tipe`` (typed slot of TipeSlot), ``aturan`` (rule id), ``dari``, ``fitur`` (comma
+  list), ``opsional`` (float). A placeholder ``{$name}`` resolves rule -> file -> global.
+* ``@aturan <id>`` starts a rule. Header lines until the first frame: ``niat: X`` (absent = fragment, reachable only through
+  a slot ``aturan=``), ``topik: t``, ``syarat: key=v1,v2 key2=v`` (``sifat.E=>60`` -> ``{"sifat": {"E": ">60"}}``; bool and
+  scalar keys see ``SKALAR``), ``lanjut: a b``, ``gestur: g``, ``seru: s``, ``kunci: prefix`` (key prefix; default = rule id).
+* ``- [b3 r:sopan,kuno] Indonesian text {$slot} | English text {$slot}`` = one frame (bingkai). The optional bracket holds
+  ``b<weight>`` (default 1) and ``r:<register,...>`` (frame register filter). Frame keys are ``<prefix>.<n>`` numbered in
+  order. The frame's slot list is the order of first appearance in the Indonesian text; the English text must use the same
+  set (any order). ``%`` is escaped, placeholders become ``%n$s``.
+* ``.<feat>[.<feat>] id text | en text`` right after a frame = a variant terminal ``<frame key>.<feat>...`` (features:
+  ``l p s j``, registers, dialects). An empty side copies the frame's base text of that language (e.g. ``.p | she ...``).
+  A variant uses a subset of the frame's slots (same positions; a dialect variant may drop ``{$sebutan}`` when it names
+  the listener its own way). The frame's base text always uses every slot.
+* ``@leksikon <prefix>`` starts a plain key list: ``- <name> id text | en text`` -> ``kultivator.cakap.<prefix>.<name>``
+  (variants allowed). Used for option labels (``niat.*``), mood hints (``isyarat.*``) and chat labels (``obrolan.*``).
+
+``python -I sumber.py [repo]`` runs every check and prints the counts; ``--tulis <dir>`` also writes a preview
+(``<dir>/tata/*.json``, ``<dir>/kota_hidup_cakap.{id_id,en_us}.json``).
+"""
+import json
+import os
+import re
+import sys
+from collections import OrderedDict
+
+KUNCI = 'kultivator.cakap.'
+
+REGISTER = ['sopan', 'biasa', 'kasar', 'kuno']
+DIALEK = ['ibukota', 'pelabuhan', 'oasis', 'air', 'gunung', 'iblis', 'kampung']
+FITUR = ['l', 'p', 's', 'j'] + REGISTER + DIALEK
+TIPE = ['sebutan_pendengar', 'nama_warga', 'ganti', 'barang', 'tempat', 'arah', 'jarak', 'angka', 'harga', 'waktu_lalu',
+        'waktu_depan', 'cuaca', 'musim', 'kata_emosi', 'seru', 'tik', 'pekerjaan', 'hubungan']
+DARI = re.compile(r'^(fakta\.(subjek|objek|nilai|hariKejadian)|pendengar|pembicara|lawan|konteks\.[a-z_]+)$')
+
+ROLES = ('JURU_LELANG PEMILIK_TEH MAKELAR_GELAP PEDAGANG_PIL PANDAI_PUSAKA PENJAGA WARGA PENGEMBARA SAINGAN ABADI PENCERAMAH '
+         'PEDAGANG_ABADI JURU_LELANG_ABADI UTUSAN PENJAGA_KEBUN PANGERAN_KOTA MENTERI PENGAWAL_ISTANA KAPTEN_PENJAGA '
+         'PENJAGA_GERBANG HAKIM BANKIR BANDAR_BATU PEMOTONG_BATU PEDAGANG_BINATANG PEDAGANG_SENJATA EMPU ALKEMIS KETUA_GILDA '
+         'PETUGAS_GILDA PENGUJI PENJAGA_FORMASI NAKHODA KULI PEMILIK_PENGINAPAN KOKI PELAYAN PUSTAKAWAN PENCERAMAH_FANA RAHIB '
+         'TABIB TUKANG PENJAGA_TEKA JUARA_SEKTE KEPALA_DESA PETANI NELAYAN PANDAI_DESA PEDAGANG_KELILING ANAK TETUA_DESA '
+         'PATRIARK_KLAN TUAN_MUDA TETUA_KLAN MURID_KLAN MURID_SEKTE_LUAR MURID_SEKTE_DALAM TETUA_SEKTE PELAYAN_SEKTE PERTAPA '
+         'SISA_JIWA TETUA_IBLIS TAWANAN PENGEMIS SYAHBANDAR PETUGAS_BEA PELAUT NAKHODA_LAUT PENJAGA_SUAR TUKANG_KAPAL '
+         'PENJUAL_IKAN PEDAGANG_SEBERANG PENDETA_LAUT TUAN_BENTENG KAFILAH_BASHI PENUNTUN_UNTA PEDAGANG_BAZAR PENDETA_AIR '
+         'PELUKIS_GUA PENARI_GURUN PENGAWAL_GURUN NYONYA_SUTRA PENENUN_SUTRA PEMELIHARA_ULAT AHLI_TEH PEMETIK_TEH PENDAYUNG '
+         'SASTRAWAN KEPALA_BIARA BIKSU_GUNUNG PENJAGA_LIFT KULI_GUNUNG PEMETIK_HERBA PEZIARAH PENGUASA_IBLIS PENEGAK_IBLIS '
+         'JAGAL_ARENA GLADIATOR_IBLIS PENJAGA_KITAB_TERLARANG PEMBUNUH_BAYARAN WARGA_IBLIS PEMBURU_LURUS PENCOPET PENJAGA_MALAM '
+         'MAK_COMBLANG PENDONGENG PENGAMEN AKROBAT PENJUAL_OBAT GURU_SEKOLAH PENGURUS_DUKA PENJAGA_GUDANG PIALANG PENARI '
+         'PEMUSIK').lower().split()
+KEBIASAAN = ('pemabuk kakek_catur gosip_sumur burung_sangkar tai_chi pemancing adu_jangkrik penyair pemain_erhu pendoa_kuil '
+             'layang_layang penyulam tidur_siang pesolek pelit dermawan pemarah takhayul kutu_buku teman_kucing penjudi '
+             'pencerita_anak tari_kipas penyapu_jalan pelukis_gula pecinta_teh penggemar_opera pengintip penabung '
+             'pemuja_kultivator pemalas pekerja_keras').split()
+PREDIKAT = ('MENOLONG MENCURI MEMBELI MENAWAR_KERAS BERJANJI INGKAR RANAH SEKTE PEJABAT MENANG_DUEL MENGANCAM MENYUAP MERAYU '
+            'BERCANDA DERMAWAN NIKAH BERTUNANGAN HAMIL LAHIR SAKIT WAFAT PINDAH BERUTANG SUKA BENCI BERKELAHI MABUK KALAH_JUDI '
+            'DIREKRUT USAHA_LARIS USAHA_BANGKRUT HARGA_NAIK HARGA_TURUN ACARA BAHAYA KAFILAH_TIBA KAVLING_JADI PELINDUNG_BARU '
+            'PASAR_HANTU_DI COPET_TERTANGKAP TEMPAT_ADA HARTA_LAHIR SEKTE_PERANG OPINI').split()
+# acara ids of kota_suasana (42.5.2 list, 42.9.3 states)
+ACARA = ('festival nikah makam lahir serangan perang kebakaran copet_tertangkap pasar_hantu rombongan harga_pangan '
+         'kavling_jadi pembangunan pelindung_baru tahun_baru panen qingming').split()
+NILAI = {
+    'peran': ROLES,
+    'kelompok': 'pekerja pedagang penjaga anak tetua kultivator cendekia rahib pejabat khusus'.split(),
+    'tahap': 'anak remaja dewasa tua'.split(),
+    'watak': 'ramah curiga serakah bijak penakut sombong jujur licik'.split(),
+    'kebiasaan': KEBIASAAN,
+    'jam': 'subuh pagi siang sore malam larut'.split(),
+    'cuaca': 'cerah hujan badai salju kabut_qi gerhana meteor'.split(),
+    'musim': 'semi panas gugur dingin'.split(),
+    'acara': ACARA,
+    'wajah': 'senang netral sedih takut marah mabuk sakit'.split(),
+    'label_emosi': 'gembira puas kagum lega marah cemas jemu sedih netral'.split(),
+    'kesan': 'musuh asing kenal akrab sahabat'.split(),
+    'kenangan': ('DIBERI_HADIAH DIBANTU DISELAMATKAN HADIR_NIKAH HADIR_MAKAM ANAK_DIREKRUT DIPUKUL DICURI RUMAH_RUSAK '
+                 'UTANG_LUNAS UTANG_MANGKIR CERITA_ORANG_TUA').split(),
+    'hubungan': 'sahabat kekasih pasangan musuh saingan guru_murid'.split(),
+    'tempat': None,  # place kinds / titik ids: free lower_snake
+    'dialek': DIALEK,
+    'register': REGISTER,
+}
+SKALAR = {'kelamin': ['l', 'p'], 'tahu_nama': ['true', 'false'], 'fakta': PREDIKAT, 'ranah_selisih': None}
+NAMA = re.compile(r'^[a-z][a-z0-9_]*(\.[a-z0-9_]+)*$')
+NIAT = re.compile(r'^[A-Z][A-Z_]*$')
+PH = re.compile(r'\{\$([a-z][a-z0-9_]*)\}')
+
+
+class Salah(Exception):
+    pass
+
+
+def _slot(teks, tempat):
+    bag = teks.split()
+    if not bag or not bag[0].startswith('$'):
+        raise Salah(f'{tempat}: slot needs $name')
+    nama, d = bag[0], OrderedDict()
+    for b in bag[1:]:
+        if '=' not in b:
+            raise Salah(f'{tempat}: bad slot part {b!r}')
+        k, v = b.split('=', 1)
+        if k == 'tipe':
+            if v not in TIPE:
+                raise Salah(f'{tempat}: unknown slot type {v}')
+            d['tipe'] = v
+        elif k == 'aturan':
+            d['aturan'] = v
+        elif k == 'dari':
+            if not DARI.match(v):
+                raise Salah(f'{tempat}: bad dari {v}')
+            d['dari'] = v
+        elif k == 'fitur':
+            d['fitur'] = v.split(',')
+        elif k == 'opsional':
+            d['opsional'] = float(v)
+        else:
+            raise Salah(f'{tempat}: unknown slot key {k}')
+    if ('tipe' in d) == ('aturan' in d):
+        raise Salah(f'{tempat}: slot {nama} needs exactly one of tipe/aturan')
+    order = [k for k in ('tipe', 'aturan', 'dari', 'fitur', 'opsional') if k in d]
+    return nama, OrderedDict((k, d[k]) for k in order)
+
+
+def _syarat(teks, tempat):
+    s = OrderedDict()
+    for b in teks.split():
+        if '=' not in b:
+            raise Salah(f'{tempat}: bad syarat part {b!r}')
+        k, v = b.split('=', 1)
+        if k.startswith('sifat.'):
+            t = k[6:]
+            if t not in list('HEXACO') or not re.match(r'^[<>]=?-?\d+$', v):
+                raise Salah(f'{tempat}: bad sifat {b}')
+            s.setdefault('sifat', OrderedDict())[t] = v
+        elif k in SKALAR:
+            if SKALAR[k] is not None and v not in SKALAR[k]:
+                raise Salah(f'{tempat}: bad {k}={v}')
+            s[k] = (v == 'true') if k == 'tahu_nama' else v
+        elif k in NILAI:
+            vals = v.split(',')
+            for x in vals:
+                ok = NILAI[k] is None and NAMA.match(x) or NILAI[k] is not None and x in NILAI[k]
+                if not ok:
+                    raise Salah(f'{tempat}: bad {k} value {x}')
+            s[k] = vals
+        else:
+            raise Salah(f'{tempat}: unknown syarat key {k}')
+    return s
+
+
+def _teks(baris, tempat):
+    if '|' not in baris:
+        raise Salah(f'{tempat}: missing " | " between id and en')
+    a, b = baris.split('|', 1)
+    return a.strip(), b.strip()
+
+
+def _format(teks, urutan, tempat):
+    if '%' in teks.replace('%%', ''):
+        teks = teks.replace('%', '%%')
+    def ganti(m):
+        n = '$' + m.group(1)
+        if n not in urutan:
+            raise Salah(f'{tempat}: placeholder {n} not in frame slots {urutan}')
+        return '%' + str(urutan.index(n) + 1) + '$s'
+    out = PH.sub(ganti, teks)
+    if '{' in out or '}' in out:
+        raise Salah(f'{tempat}: stray brace in {teks!r}')
+    return out
+
+
+def _parse_file(path, global_slot):
+    stem = os.path.splitext(os.path.basename(path))[0]
+    file_slot = OrderedDict()
+    rules, leks = [], []
+    cur = None
+    with open(path, encoding='utf-8') as f:
+        lines = f.read().split('\n')
+    for i, raw in enumerate(lines, 1):
+        tempat = f'{os.path.basename(path)}:{i}'
+        line = raw.rstrip()
+        if not line.strip() or line.lstrip().startswith('#'):
+            continue
+        if line.startswith('@aturan '):
+            rid = line[8:].strip()
+            if not NAMA.match(rid):
+                raise Salah(f'{tempat}: bad rule id {rid}')
+            cur = {'jenis': 'aturan', 'aturan': rid, 'kunci': rid, 'slot': OrderedDict(), 'bingkai': [], 'tempat': tempat,
+                   'hdr': OrderedDict()}
+            rules.append(cur)
+            continue
+        if line.startswith('@leksikon '):
+            p = line[10:].strip()
+            if not NAMA.match(p):
+                raise Salah(f'{tempat}: bad prefix {p}')
+            cur = {'jenis': 'leksikon', 'kunci': p, 'butir': [], 'tempat': tempat}
+            leks.append(cur)
+            continue
+        if line.startswith('slot:'):
+            nama, d = _slot(line[5:], tempat)
+            target = global_slot if stem.startswith('_') else (file_slot if cur is None else cur.get('slot'))
+            if target is None:
+                raise Salah(f'{tempat}: slot inside @leksikon')
+            if nama in target:
+                raise Salah(f'{tempat}: slot {nama} defined twice')
+            target[nama] = d
+            continue
+        if cur is None:
+            raise Salah(f'{tempat}: text outside a rule')
+        if line.startswith('- '):
+            body = line[2:].strip()
+            if cur['jenis'] == 'leksikon':
+                nama, rest = body.split(' ', 1)
+                if not NAMA.match(nama):
+                    raise Salah(f'{tempat}: bad name {nama}')
+                ti, te = _teks(rest, tempat)
+                cur['butir'].append({'nama': nama, 'id': ti, 'en': te, 'varian': [], 'tempat': tempat})
+                continue
+            bobot, reg = 1, None
+            m = re.match(r'^\[([^\]]*)\]\s*', body)
+            if m:
+                for tok in m.group(1).split():
+                    if re.match(r'^b\d+$', tok):
+                        bobot = int(tok[1:])
+                    elif tok.startswith('r:'):
+                        reg = tok[2:].split(',')
+                        for r in reg:
+                            if r not in REGISTER:
+                                raise Salah(f'{tempat}: bad register {r}')
+                    else:
+                        raise Salah(f'{tempat}: bad frame option {tok}')
+                body = body[m.end():]
+            ti, te = _teks(body, tempat)
+            cur['bingkai'].append({'id': ti, 'en': te, 'bobot': bobot, 'register': reg, 'varian': [], 'tempat': tempat})
+            continue
+        if line.startswith('.'):
+            m = re.match(r'^\.([a-z_.]+)\s+(.*)$', line)
+            if not m:
+                raise Salah(f'{tempat}: bad variant line')
+            feats = m.group(1).split('.')
+            for ft in feats:
+                if ft not in FITUR:
+                    raise Salah(f'{tempat}: unknown feature {ft}')
+            ti, te = _teks(' ' + m.group(2), tempat)
+            target = cur['bingkai'] if cur['jenis'] == 'aturan' else cur['butir']
+            if not target:
+                raise Salah(f'{tempat}: variant before any frame')
+            target[-1]['varian'].append({'fitur': '.'.join(feats), 'id': ti, 'en': te, 'tempat': tempat})
+            continue
+        m = re.match(r'^(niat|topik|syarat|lanjut|gestur|seru|kunci):\s*(.*)$', line)
+        if m and cur['jenis'] == 'aturan':
+            if cur['bingkai']:
+                raise Salah(f'{tempat}: header after frames')
+            k, v = m.group(1), m.group(2).strip()
+            if k == 'niat' and not NIAT.match(v):
+                raise Salah(f'{tempat}: bad niat {v}')
+            if k in ('topik', 'gestur', 'seru', 'kunci') and not NAMA.match(v):
+                raise Salah(f'{tempat}: bad {k} {v}')
+            if k == 'syarat':
+                v = _syarat(v, tempat)
+            elif k == 'lanjut':
+                v = v.split()
+            if k == 'kunci':
+                cur['kunci'] = v
+            else:
+                cur['hdr'][k] = v
+            continue
+        raise Salah(f'{tempat}: cannot parse {line!r}')
+    return stem, file_slot, rules, leks
+
+
+def baca(folder=None):
+    """Parses every source. Returns (tata: OrderedDict stem -> {"kelompok", "isi"}, id_id: OrderedDict, en_us: OrderedDict,
+    stat: dict). Raises Salah on the first error."""
+    folder = folder or os.path.dirname(os.path.abspath(__file__))
+    names = sorted(n for n in os.listdir(folder) if n.endswith('.txt'))
+    global_slot = OrderedDict()
+    parsed = []
+    for n in [x for x in names if x.startswith('_')] + [x for x in names if not x.startswith('_')]:
+        st, fs, rules, leks = _parse_file(os.path.join(folder, n), global_slot)
+        if not st.startswith('_'):
+            parsed.append((st, fs, rules, leks))
+    tata, lid, len_ = OrderedDict(), OrderedDict(), OrderedDict()
+    ids = {}
+    stat = {'aturan': 0, 'fragmen': 0, 'bingkai': 0, 'terminal': 0, 'niat': OrderedDict(), 'topik': set(), 'ref': [],
+            'kombinasi': OrderedDict()}
+
+    def put(key, ti, te, tempat):
+        if key in lid:
+            raise Salah(f'{tempat}: duplicate key {key}')
+        if not ti or not te:
+            raise Salah(f'{tempat}: empty text for {key}')
+        lid[key], len_[key] = ti, te
+        stat['terminal'] += 1
+
+    for st, fs, rules, leks in parsed:
+        isi = []
+        for r in rules:
+            if r['aturan'] in ids:
+                raise Salah(f"{r['tempat']}: rule {r['aturan']} also at {ids[r['aturan']]}")
+            ids[r['aturan']] = r['tempat']
+            if not r['bingkai']:
+                raise Salah(f"{r['tempat']}: rule without frames")
+            out = OrderedDict([('aturan', r['aturan'])])
+            for k in ('niat', 'topik', 'syarat'):
+                if k in r['hdr']:
+                    out[k] = r['hdr'][k]
+            bingkai, used = [], OrderedDict()
+            for n, b in enumerate(r['bingkai']):
+                urutan = []
+                for m in PH.finditer(b['id']):
+                    if '$' + m.group(1) not in urutan:
+                        urutan.append('$' + m.group(1))
+                se = sorted(set('$' + m.group(1) for m in PH.finditer(b['en'])))
+                if se != sorted(urutan):
+                    raise Salah(f"{b['tempat']}: en slots {se} != id slots {sorted(urutan)}")
+                for s in urutan:
+                    d = r['slot'].get(s) or fs.get(s) or global_slot.get(s)
+                    if d is None:
+                        raise Salah(f"{b['tempat']}: slot {s} undefined")
+                    used[s] = d
+                key = KUNCI + r['kunci'] + '.' + str(n)
+                put(key, _format(b['id'], urutan, b['tempat']), _format(b['en'], urutan, b['tempat']), b['tempat'])
+                for v in b['varian']:
+                    vid, ven = v['id'] or b['id'], v['en'] or b['en']
+                    for side in (vid, ven):
+                        if not set('$' + m.group(1) for m in PH.finditer(side)) <= set(urutan):
+                            raise Salah(f"{v['tempat']}: variant uses a slot its frame does not have")
+                    put(key + '.' + v['fitur'], _format(vid, urutan, v['tempat']), _format(ven, urutan, v['tempat']),
+                        v['tempat'])
+                fb = OrderedDict([('kunci', r['kunci'] + '.' + str(n)), ('slot', urutan), ('bobot', b['bobot'])])
+                if b['register']:
+                    fb['register'] = b['register']
+                bingkai.append(fb)
+                stat['bingkai'] += 1
+            out['bingkai'] = bingkai
+            out['slot'] = used
+            for k in ('lanjut', 'gestur', 'seru'):
+                if k in r['hdr']:
+                    out[k] = r['hdr'][k]
+            for s, d in used.items():
+                if 'aturan' in d:
+                    stat['ref'].append((r['aturan'], d['aturan'], r['tempat']))
+            if 'niat' in out:
+                stat['aturan'] += 1
+                stat['niat'][out['niat']] = stat['niat'].get(out['niat'], 0) + 1
+            else:
+                stat['fragmen'] += 1
+            if 'topik' in out:
+                stat['topik'].add(out['topik'])
+            isi.append(out)
+        for lk in leks:
+            for b in lk['butir']:
+                key = KUNCI + lk['kunci'] + '.' + b['nama']
+                if PH.search(b['id']) or PH.search(b['en']):
+                    raise Salah(f"{b['tempat']}: no slots in @leksikon")
+                put(key, _format(b['id'], [], b['tempat']), _format(b['en'], [], b['tempat']), b['tempat'])
+                for v in b['varian']:
+                    put(key + '.' + v['fitur'], v['id'] or b['id'], v['en'] or b['en'], v['tempat'])
+        if isi:
+            tata[st] = OrderedDict([('kelompok', st), ('isi', isi)])
+    # references, orphans, depth
+    alle = {r['aturan']: r for t in tata.values() for r in t['isi']}
+    refd = set()
+    for src, dst, tempat in stat['ref']:
+        if dst not in alle:
+            raise Salah(f'{tempat}: rule {src} refers to unknown rule {dst}')
+        if 'niat' in alle[dst]:
+            raise Salah(f'{tempat}: rule {src} refers to {dst}, which is not a fragment')
+        refd.add(dst)
+    yatim = [k for k, r in alle.items() if 'niat' not in r and k not in refd]
+    if yatim:
+        raise Salah(f'orphan fragments: {yatim}')
+    memo = {}
+
+    def depth(rid, stack=()):
+        if rid in stack:
+            raise Salah(f'cycle: {stack + (rid,)}')
+        if rid not in memo:
+            memo[rid] = 1 + max([depth(d['aturan'], stack + (rid,)) for d in alle[rid]['slot'].values() if 'aturan' in d],
+                                default=0)
+        return memo[rid]
+
+    def komb(rid):
+        r = alle[rid]
+        tot = 0
+        for b in r['bingkai']:
+            k = 1
+            for s in b['slot']:
+                d = r['slot'][s]
+                if 'aturan' in d:
+                    k *= komb(d['aturan']) + (1 if 'opsional' in d else 0)
+            tot += k
+        return tot
+
+    for rid in alle:
+        if depth(rid) > 4:
+            raise Salah(f'rule {rid} expands deeper than 4')
+        n = alle[rid].get('niat')
+        if n:
+            stat['kombinasi'][n] = stat['kombinasi'].get(n, 0) + komb(rid)
+    return tata, lid, len_, stat
+
+
+def _dump(obj, path):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, 'w', encoding='utf-8', newline='\n') as f:
+        f.write(json.dumps(obj, ensure_ascii=False, indent=2) + '\n')
+
+
+def tulis(tata_dir, lang_dir, folder=None):
+    """Writes tata/<stem>.json into tata_dir and kota_hidup_cakap.{id_id,en_us}.json into lang_dir. Returns stat."""
+    tata, lid, len_, stat = baca(folder)
+    for st, obj in tata.items():
+        _dump(obj, os.path.join(tata_dir, st + '.json'))
+    _dump(lid, os.path.join(lang_dir, 'kota_hidup_cakap.id_id.json'))
+    _dump(len_, os.path.join(lang_dir, 'kota_hidup_cakap.en_us.json'))
+    return stat
+
+
+def main(argv):
+    try:
+        if '--tulis' in argv:
+            d = argv[argv.index('--tulis') + 1]
+            stat = tulis(os.path.join(d, 'tata'), d)
+        else:
+            stat = baca()[3]
+    except Salah as e:
+        print('SALAH:', e)
+        return 1
+    print(f"aturan {stat['aturan']} fragmen {stat['fragmen']} bingkai {stat['bingkai']} terminal {stat['terminal']}")
+    print('niat', len(stat['niat']), dict(stat['niat']))
+    print('topik', sorted(stat['topik']))
+    print('kombinasi', {k: v for k, v in stat['kombinasi'].items()})
+    ok = stat['bingkai'] >= 900 and stat['terminal'] >= 2400
+    print('TARGET', 'OK' if ok else 'BELUM (>= 900 bingkai, >= 2400 terminal)')
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main(sys.argv[1:]))

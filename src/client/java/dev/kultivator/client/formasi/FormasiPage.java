@@ -1,17 +1,20 @@
 package dev.kultivator.client.formasi;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import dev.kultivator.client.hall.HallPage;
-import dev.kultivator.client.hall.HallScreen;
+import dev.kultivator.client.hall.HallClient;
+import dev.kultivator.client.hub.HubNav;
+import dev.kultivator.client.screen.Page;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Glyphs;
+import dev.kultivator.client.screen.ui.InkField;
+import dev.kultivator.client.screen.ui.JadeCoin;
+import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
-import dev.kultivator.client.screen.ui.UiSound;
+import dev.kultivator.client.screen.ui.TalismanButton;
 import dev.kultivator.formasi.FormationRegistry;
 import dev.kultivator.formasi.spec.FormationSpec;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -28,20 +31,20 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * The Formasi tablet of the hall scroll (DESIGN 24.7.1, owned by P7c-katalog-ui): drawn third, after Bangun, from the
- * {@code formasi} part of {@code HallInfo}. A header strip with the Kas Daya, the slots and the talismans <i>Setor dari
- * tas</i> and <i>Isi Semua</i>; a seal column on the right edge picks the panel (Inti, Kitab, Medan, Simpul, Catatan);
- * clicking a core or a Kitab card opens the bamboo slip ({@link FormationSlip}); a transport eye opens the node map
- * ({@link NodeMap}). Sect mates see everything read-only except <i>Setor</i>. Shown only once the server sends the
- * {@code formasi} part. Jade scroll of DESIGN 5b; fits 320×240 (lists scroll with the wheel).
+ * Sekte › Formasi of the Gulungan Utama (DESIGN 24.7.1, 43.5, 43.12.2), drawn from the {@code formasi} part of
+ * {@code HallInfo}. A header strip with the Kas Daya, the slots and the talismans <i>Setor dari tas</i> and <i>Isi
+ * Semua</i>; the subs Inti, Kitab, Medan, Simpul and Catatan (the old seal column); clicking a core or a Kitab card opens the
+ * bamboo slip ({@link FormationSlip}) and a transport node's <i>Peta</i> the node map ({@link NodeMap}), both as the page's
+ * detail view (the host's back control and Esc close them). Sect mates see everything read-only except <i>Setor</i>.
+ * Everything is drawn immediately; each clickable thing is a {@link Lukis.Zona} so Tab, Enter and the mouse reach it.
+ * Showing a hologram or starting a node trip closes the Gulungan on purpose so the world can be seen (43.13 R32).
  */
-public class FormasiPage extends HallPage {
+public class FormasiPage extends Page {
 
 	static final String[] PANELS = {"inti", "kitab", "medan", "simpul", "catatan"};
-	private static final int[] PANEL_ICONS = {Glyphs.SEAL, Glyphs.CODEX, Glyphs.STATUS, Glyphs.JALAN, Glyphs.HELP};
-	static final int SEAL_W = 15;
-	static final int HEADER_H = 22;
-	static final float TEXT = 0.6F;
+	static final int HEADER_H = 24;
+	static final int BUTTON_H = 14;
+	static final int LINE = 10;
 
 	private static int panel;
 	private static final Map<Integer, Float> SCROLL = new HashMap<>();
@@ -49,21 +52,24 @@ public class FormasiPage extends HallPage {
 	private static @Nullable String slipSpec;
 	private static int nodeMapFrom = -1;
 
-	/** A clickable area drawn this frame (rows, cards, seals, talismans). */
-	record Hit(float x0, float y0, float x1, float y1, @Nullable Runnable action, @Nullable List<Component> tip) {
-	}
-
-	private final List<Hit> hits = new ArrayList<>();
+	/** The frame being drawn (valid inside {@link #lukis}). */
+	private @Nullable Lukis l;
+	private int hitCount;
 	private int renaming = -1;
-	private String renameText = "";
+	// the scroll area of this frame (for the wheel)
+	private int scrollX0;
+	private int scrollY0;
+	private int scrollX1;
+	private int scrollY1;
 
-	public FormasiPage(HallScreen screen) {
-		super(screen);
+	public FormasiPage() {
 	}
+
+	// ================================================================== identity
 
 	@Override
 	public Component title() {
-		return Component.translatable("kultivator.spine7c.tablet");
+		return Component.translatable("kultivator.gui43.hal.sekte.formasi");
 	}
 
 	@Override
@@ -72,25 +78,79 @@ public class FormasiPage extends HallPage {
 	}
 
 	@Override
-	public int icon() {
+	public int glyph() {
 		return Glyphs.SEAL;
 	}
 
 	@Override
-	public boolean shown() {
-		return info().contains("formasi");
+	public String helpTopic() {
+		return "formasi";
 	}
+
+	/** Hidden for players without a hall (43.5 "*"); shown while the details are still unknown so they can be asked for. */
+	@Override
+	public boolean tampil() {
+		return HallClient.version() == 0L || HallClient.info().contains("formasi");
+	}
+
+	@Override
+	public List<Sub> subs() {
+		List<Sub> subs = new ArrayList<>(PANELS.length);
+		for (String id : PANELS) {
+			subs.add(new Sub(id, Component.translatable("kultivator.gui43.sub.formasi." + id)));
+		}
+		return subs;
+	}
+
+	@Override
+	public void showSub(String id) {
+		for (int i = 0; i < PANELS.length; i++) {
+			if (PANELS[i].equals(id)) {
+				if (panel != i) {
+					renaming = -1;
+				}
+				panel = i;
+				closeSlip();
+				closeNodeMap();
+				return;
+			}
+		}
+	}
+
+	@Override
+	public boolean rinci() {
+		return slipCore >= 0 || slipSpec != null || nodeMapFrom >= 0;
+	}
+
+	@Override
+	public boolean mundur() {
+		if (renaming >= 0) {
+			renaming = -1;
+			return true;
+		}
+		if (rinci()) {
+			closeSlip();
+			closeNodeMap();
+			return true;
+		}
+		return false;
+	}
+
+	// ================================================================== life
 
 	@Override
 	protected void build() {
-		takeNodeMap();
 	}
 
 	@Override
-	public void onInfo() {
+	public void onShow(@Nullable CompoundTag fokus) {
+		// HallClient asks again every 4 s while the Sekte section shows (43.0.12).
+		HallClient.minta();
 		takeNodeMap();
+		super.onShow(fokus);
 	}
 
+	/** The server asked for the node map of a core ({@code FxB.NODE_MAP}); the Formasi page followed. */
 	private void takeNodeMap() {
 		int id = FormasiClient.takeNodeMap();
 		if (id >= 0) {
@@ -102,6 +162,10 @@ public class FormasiPage extends HallPage {
 	}
 
 	// ================================================================== data
+
+	CompoundTag info() {
+		return HallClient.info();
+	}
 
 	CompoundTag f() {
 		return info().getCompoundOrEmpty("formasi");
@@ -184,8 +248,9 @@ public class FormasiPage extends HallPage {
 		return font;
 	}
 
-	void tip(List<Component> lines) {
-		screen.showTooltip(lines);
+	/** The list of legacy rows (Pelindung, Agung) written by module A. */
+	ListTag legacy() {
+		return f().getListOrEmpty("legacy");
 	}
 
 	// ================================================================== slip, node map, rename
@@ -193,11 +258,13 @@ public class FormasiPage extends HallPage {
 	void openCoreSlip(int id) {
 		slipCore = id;
 		slipSpec = null;
+		SCROLL.put(100, 0.0F);
 	}
 
 	void openKitabSlip(FormationSpec spec) {
 		slipCore = -1;
 		slipSpec = spec.id();
+		SCROLL.put(100, 0.0F);
 	}
 
 	void closeSlip() {
@@ -215,276 +282,313 @@ public class FormasiPage extends HallPage {
 
 	void startRename(int id, String current) {
 		renaming = id;
-		renameText = current == null ? "" : current;
+		InkField field = renameField();
+		field.setText(current == null ? "" : current);
+		field.setFocused(id >= 0);
 	}
 
 	int renaming() {
 		return renaming;
 	}
 
-	String renameText() {
-		return renameText;
-	}
-
-	@Override
-	public boolean capturesKeys() {
-		return renaming >= 0;
-	}
-
-	@Override
-	public boolean keyPressed(KeyEvent event) {
-		if (renaming < 0) {
-			if (event.key() == InputConstants.KEY_ESCAPE && (slipCore >= 0 || slipSpec != null || nodeMapFrom >= 0)) {
-				closeSlip();
-				closeNodeMap();
-				return true;
+	/** The one rename field (kept by the focus ring across frames): Enter saves; Esc leaves it, a second Esc cancels. */
+	InkField renameField() {
+		return fokusRing.simpan("formasi:rename", () -> new InkField(0, 0, 40, 12, 24, text -> {
+			if (renaming >= 0) {
+				send("node:" + renaming + ":" + text.trim());
+				renaming = -1;
 			}
-			return false;
-		}
-		int key = event.key();
-		if (key == InputConstants.KEY_ESCAPE) {
-			renaming = -1;
-		} else if (key == InputConstants.KEY_RETURN || key == InputConstants.KEY_NUMPADENTER) {
-			send("node:" + renaming + ":" + renameText.trim());
-			renaming = -1;
-		} else if (key == InputConstants.KEY_BACKSPACE && !renameText.isEmpty()) {
-			renameText = renameText.substring(0, renameText.length() - 1);
-		}
-		return true;
+		}));
 	}
 
-	@Override
-	public boolean charTyped(CharacterEvent event) {
-		if (renaming < 0) {
-			return false;
+	/** Draws the rename field into its box (called by the node panel while renaming). */
+	void drawRenameField(int x0, int y0, int x1, int y1) {
+		InkField field = renameField();
+		field.x = x0;
+		field.y = y0;
+		field.w = Math.max(TalismanButton.MIN_W, x1 - x0);
+		field.h = Math.max(TalismanButton.MIN_H, y1 - y0);
+		if (l != null) {
+			l.widget("formasi:rename", field);
 		}
-		int c = event.codepoint();
-		if (renameText.length() < 24 && Character.isBmpCodePoint(c) && (Character.isLetterOrDigit(c) || c == ' ' || c == '-' || c == '_')) {
-			renameText = renameText + (char) c;
-		}
-		return true;
 	}
 
-	// ================================================================== hits and scrolling
+	/** R32: a hologram or a node trip closes the Gulungan so the world shows; a Kabar card says why. */
+	static void closeToWorld(Component why) {
+		HubNav.tutupSemua();
+		dev.kultivator.client.hud.Kabar.kirim(null, why, dev.kultivator.client.hud.Kabar.glyph(Glyphs.SEAL), false);
+	}
 
+	// ================================================================== zones and scrolling (used by the panels)
+
+	/** A clickable / hoverable box: a zone of this frame (Tab-focusable when it acts) with its tooltip. */
 	void hit(float x0, float y0, float x1, float y1, @Nullable Runnable action, @Nullable List<Component> tip) {
-		hits.add(new Hit(x0, y0, x1, y1, action, tip));
+		if (l == null) {
+			return;
+		}
+		int ix0 = Math.round(x0);
+		int iy0 = Math.round(y0);
+		int ix1 = Math.round(x1);
+		int iy1 = Math.round(y1);
+		l.zona("f" + panelKey() + ":" + hitCount++, ix0, iy0, ix1, iy1, action, true, null, action != null);
+		if (tip != null && l.di(ix0, iy0, ix1, iy1)) {
+			l.tip(tip);
+		}
+		if (action != null) {
+			l.fokusCincin("f" + panelKey() + ":" + (hitCount - 1), ix0, iy0, ix1, iy1);
+		}
+	}
+
+	private String panelKey() {
+		return nodeMapFrom >= 0 ? "m" : rinci() ? "s" : Integer.toString(panel);
+	}
+
+	/** Clips the drawing and the zones to a box (lists that scroll). */
+	void klip(int x0, int y0, int x1, int y1) {
+		if (l != null) {
+			l.klip(x0, y0, x1, y1);
+		}
+	}
+
+	void lepasKlip() {
+		if (l != null) {
+			l.lepasKlip();
+		}
 	}
 
 	float scroll(int key) {
 		return SCROLL.getOrDefault(key, 0.0F);
 	}
 
-	/** Clamps the scroll of {@code key} to the content and returns it. */
+	/** Clamps the scroll of {@code key} to the content, remembers the area for the wheel and returns the offset. */
 	float clampScroll(int key, float content, float view) {
 		float value = Math.max(0.0F, Math.min(Math.max(0.0F, content - view), scroll(key)));
 		SCROLL.put(key, value);
 		return value;
 	}
 
-	/** The scroll key of the list under the mouse now. */
+	/** The box the wheel scrolls this frame. */
+	void scrollArea(int x0, int y0, int x1, int y1) {
+		scrollX0 = x0;
+		scrollY0 = y0;
+		scrollX1 = x1;
+		scrollY1 = y1;
+	}
+
 	private int scrollKey() {
 		if (nodeMapFrom >= 0) {
 			return -1;
 		}
-		if (slipCore >= 0 || slipSpec != null) {
-			return 100;
-		}
-		return panel;
+		return slipCore >= 0 || slipSpec != null ? 100 : panel;
 	}
 
+	/** PgUp / PgDn / Home / End scroll the shown list after the focus ring's own keys (43.0.7; clamped by the next frame). */
 	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-		if (!inside(mouseX, mouseY)) {
+	public boolean keyPressed(KeyEvent event) {
+		if (super.keyPressed(event)) {
+			return true;
+		}
+		if (mauTombol()) {
 			return false;
 		}
 		int key = scrollKey();
 		if (key < 0) {
-			return true;
+			return false;
 		}
-		SCROLL.put(key, scroll(key) - (float) amount * 14.0F);
+		float page = Math.max(18.0F, scrollY1 - scrollY0 - 18.0F);
+		switch (event.key()) {
+			case InputConstants.KEY_PAGEDOWN -> SCROLL.put(key, scroll(key) + page);
+			case InputConstants.KEY_PAGEUP -> SCROLL.put(key, Math.max(0.0F, scroll(key) - page));
+			case InputConstants.KEY_HOME -> SCROLL.put(key, 0.0F);
+			case InputConstants.KEY_END -> SCROLL.put(key, Float.MAX_VALUE / 4.0F);
+			default -> {
+				return false;
+			}
+		}
 		return true;
 	}
 
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button) {
-		if (super.mouseClicked(mouseX, mouseY, button)) {
+	public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+		if (modal()) {
 			return true;
 		}
-		if (button != InputConstants.MOUSE_BUTTON_LEFT) {
+		if (!inside(mouseX, mouseY)) {
 			return false;
 		}
-		for (int i = hits.size() - 1; i >= 0; i--) {
-			Hit hit = hits.get(i);
-			if (hit.action() != null && mouseX >= hit.x0() && mouseX < hit.x1() && mouseY >= hit.y0() && mouseY < hit.y1()) {
-				UiSound.press();
-				hit.action().run();
-				return true;
-			}
+		if (super.mouseScrolled(mouseX, mouseY, scrollX, scrollY)) {
+			return true;
 		}
-		if (renaming >= 0) {
-			renaming = -1;
+		int key = scrollKey();
+		if (key >= 0 && mouseX >= scrollX0 && mouseX < scrollX1 && mouseY >= scrollY0 && mouseY < scrollY1) {
+			SCROLL.put(key, scroll(key) - (float) scrollY * 18.0F);
 		}
-		return false;
+		return true;
 	}
 
 	// ================================================================== drawing
 
 	@Override
 	protected void drawBehind(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
-		hits.clear();
+	}
+
+	@Override
+	protected void lukis(Lukis l) {
+		this.l = l;
+		hitCount = 0;
+		scrollArea(0, 0, 0, 0);
 		takeNodeMap();
-		drawHeader(g, mouseX, mouseY);
-		int px = x;
-		int py = y + HEADER_H;
-		int pw = w - SEAL_W - 3;
-		int ph = h - HEADER_H;
-		if (nodeMapFrom >= 0) {
-			NodeMap.draw(this, g, x, py, w, ph, mouseX, mouseY, nodeMapFrom);
+		GuiGraphicsExtractor g = l.g;
+		if (HallClient.version() == 0L || !info().contains("formasi")) {
+			l.samar(Component.translatable("kultivator.gui43.m07.memuat"), x + 4, y + 4, w - 8);
+			this.l = null;
 			return;
 		}
-		drawSeals(g, mouseX, mouseY, py, ph);
+		drawHeader(l);
+		int py = y + HEADER_H;
+		int ph = h - HEADER_H;
+		if (nodeMapFrom >= 0) {
+			NodeMap.draw(this, g, x, py, w, ph, l.mx, l.my, nodeMapFrom);
+			this.l = null;
+			return;
+		}
 		if (slipCore >= 0 || slipSpec != null) {
 			FormationSpec kitab = slipSpec == null ? null : FormationRegistry.byId(slipSpec);
 			CompoundTag core = slipCore >= 0 ? core(slipCore) : null;
 			if (core == null && kitab == null) {
 				closeSlip();
 			} else {
-				g.enableScissor(px, py, px + pw, py + ph);
-				FormationSlip.draw(this, g, px, py, pw, ph, mouseX, mouseY, core, kitab);
-				g.disableScissor();
+				klip(x, py, x + w, py + ph);
+				FormationSlip.draw(this, g, x, py, w, ph, l.mx, l.my, core, kitab);
+				lepasKlip();
+				this.l = null;
 				return;
 			}
 		}
-		g.enableScissor(px, py, px + pw, py + ph);
+		klip(x, py, x + w, py + ph);
 		switch (panel) {
-			case 0 -> CorePanel.draw(this, g, px, py, pw, ph, mouseX, mouseY);
-			case 1 -> CodexPanel.draw(this, g, px, py, pw, ph, mouseX, mouseY);
-			case 2 -> FieldPanel.draw(this, g, px, py, pw, ph, mouseX, mouseY);
-			case 3 -> NodePanel.draw(this, g, px, py, pw, ph, mouseX, mouseY);
-			default -> LogPanel.draw(this, g, px, py, pw, ph, mouseX, mouseY);
+			case 0 -> CorePanel.draw(this, g, x, py, w, ph, l.mx, l.my);
+			case 1 -> CodexPanel.draw(this, g, x, py, w, ph, l.mx, l.my, l);
+			case 2 -> FieldPanel.draw(this, g, x, py, w, ph, l.mx, l.my);
+			case 3 -> NodePanel.draw(this, g, x, py, w, ph, l.mx, l.my);
+			default -> LogPanel.draw(this, g, x, py, w, ph, l.mx, l.my, l);
 		}
-		g.disableScissor();
-	}
-
-	@Override
-	protected void drawAbove(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
-		for (Hit hit : hits) {
-			if (hit.tip() != null && mouseX >= hit.x0() && mouseX < hit.x1() && mouseY >= hit.y0() && mouseY < hit.y1()) {
-				screen.showTooltip(hit.tip());
-				break;
-			}
-		}
+		lepasKlip();
+		this.l = null;
 	}
 
 	/** Kas Daya, slots and limits, and the two talismans. */
-	private void drawHeader(GuiGraphicsExtractor g, int mouseX, int mouseY) {
+	private void drawHeader(Lukis l) {
 		CompoundTag f = f();
 		CompoundTag kas = f.getCompoundOrEmpty("kas");
 		long a = kas.getLongOr("a", 0L);
 		long s = kas.getLongOr("s", 0L);
 		CompoundTag slots = f.getCompoundOrEmpty("slots");
 		CompoundTag lim = f.getCompoundOrEmpty("lim");
-		int buttonsW = Math.min(150, Math.round(w * 0.42F));
-		float textW = w - buttonsW - 6.0F;
-		Brush.rect(g, x, y, x + 4.0F, y + 4.0F, Palette.SEAL);
-		Brush.fit(g, font, Brush.bold(Component.translatable("kultivator.formasiui.header.kas", daya(a + s), daya(a), daya(s))), x + 6.0F, y,
-				textW - 6.0F, Palette.SEAL_DARK, 0.68F, 0.42F, false);
-		Brush.fit(g, font, Component.translatable("kultivator.formasiui.header.slots", slots.getIntOr("active", 0), slots.getIntOr("max", 0),
-				lim.getIntOr("used", 0), lim.getIntOr("cores", 0), hallLevel()), x + 6.0F, y + 9.0F, textW - 6.0F, Palette.INK_SOFT, TEXT, 0.4F, false);
-		Brush.rect(g, x, y + HEADER_H - 3.0F, x + w, y + HEADER_H - 2.4F, Palette.argb(0xB0, Palette.GOLD));
-		float bx = x + w - buttonsW;
-		float half = (buttonsW - 3.0F) / 2.0F;
-		talisman(g, bx, y, half, 11.0F, Component.translatable("kultivator.formasiui.deposit"), canDeposit(), () -> send("deposit:all"), mouseX, mouseY,
-				List.of(Component.translatable("kultivator.formasiui.deposit"), Component.translatable("kultivator.formasiui.deposit.tip")));
-		talisman(g, bx + half + 3.0F, y, half, 11.0F, Component.translatable("kultivator.formasiui.fill_all"), canEdit(), () -> send("fillall"), mouseX,
-				mouseY, List.of(Component.translatable("kultivator.formasiui.fill_all"), Component.translatable("kultivator.formasiui.fill_all.tip")));
-	}
-
-	/** The seal column on the right edge. */
-	private void drawSeals(GuiGraphicsExtractor g, int mouseX, int mouseY, int top, int height) {
-		int sx = x + w - SEAL_W;
-		int count = PANELS.length;
-		int sealH = Math.max(14, Math.min(24, (height - 2) / count));
-		for (int i = 0; i < count; i++) {
-			int sy = top + i * sealH;
-			boolean active = panel == i && slipCore < 0 && slipSpec == null;
-			boolean over = mouseX >= sx && mouseX < sx + SEAL_W && mouseY >= sy && mouseY < sy + sealH - 1;
-			int base = active ? Palette.SEAL : over ? Palette.mix(Palette.SEAL, Palette.SEAL_GLOW, 0.3F) : Palette.argb(0xC0, Palette.SEAL_DARK);
-			int out = active ? -2 : 0;
-			g.fill(sx + out, sy, sx + SEAL_W, sy + sealH - 1, base);
-			Brush.frame(g, sx + out + 1, sy + 1, sx + SEAL_W - 1, sy + sealH - 2, Palette.argb(0xB0, Palette.TALISMAN));
-			Glyphs.tab(g, PANEL_ICONS[i], sx + out / 2.0F + SEAL_W / 2.0F, sy + (sealH - 1) / 2.0F, Math.min(8.0F, sealH - 6.0F), Palette.TALISMAN);
-			int index = i;
-			hit(sx - 2, sy, sx + SEAL_W, sy + sealH - 1, () -> {
-				panel = index;
-				closeSlip();
-				UiSound.tab();
-			}, List.of(Component.translatable("kultivator.formasiui.panel." + PANELS[i]),
-					Component.translatable("kultivator.formasiui.panel." + PANELS[i] + ".tip")));
-		}
+		int buttonsW = Math.max(2 * TalismanButton.MIN_W + 3, Math.min(160, Math.round(w * 0.42F)));
+		int textW = w - buttonsW - 6;
+		Brush.rect(l.g, x, y + 2.0F, x + 4.0F, y + 6.0F, Palette.SEAL);
+		Component kasLine = Component.translatable("kultivator.formasiui.header.kas", daya(a + s), daya(a), daya(s));
+		l.teks(Brush.bold(kasLine), x + 6, y, textW - 6, Palette.SEAL_DARK);
+		l.teks(Component.translatable("kultivator.formasiui.header.slots", slots.getIntOr("active", 0), slots.getIntOr("max", 0),
+				lim.getIntOr("used", 0), lim.getIntOr("cores", 0), hallLevel()), x + 6, y + LINE, textW - 6, l.gaya.teksSamar);
+		l.g.fill(x, y + HEADER_H - 3, x + w, y + HEADER_H - 2, Palette.argb(0xB0, Palette.GOLD));
+		int bx = x + w - buttonsW;
+		int half = (buttonsW - 3) / 2;
+		talisman(l.g, bx, y + 2, half, BUTTON_H, Component.translatable("kultivator.formasiui.deposit"), canDeposit(), () -> send("deposit:all"),
+				l.mx, l.my, List.of(Component.translatable("kultivator.formasiui.deposit"), Component.translatable("kultivator.formasiui.deposit.tip")));
+		talisman(l.g, bx + half + 3, y + 2, buttonsW - half - 3, BUTTON_H, Component.translatable("kultivator.formasiui.fill_all"), canEdit(),
+				() -> send("fillall"), l.mx, l.my,
+				List.of(Component.translatable("kultivator.formasiui.fill_all"), Component.translatable("kultivator.formasiui.fill_all.tip")));
 	}
 
 	// ================================================================== shared drawing helpers (panels, slip, map)
 
-	/** A heading in seal red with a gold rule under it. */
+	/** A heading: seal stamp, bold text in seal red (1.0) and a gold rule under it; 12 px high. */
 	void title(GuiGraphicsExtractor g, Component text, float hx, float hy, float width, float scale) {
-		heading(g, text, hx, hy, width, scale);
-	}
-
-	/** A faint parchment box with a thin gold frame. */
-	static void box(GuiGraphicsExtractor g, int x0, int y0, int x1, int y1) {
-		panel(g, x0, y0, x1, y1);
+		if (l != null) {
+			l.kepala(text, Math.round(hx), Math.round(hy), Math.round(hx + width));
+		}
 	}
 
 	/**
-	 * A talisman strip (paper, red seal stamp, ink label) registered as a hit; greyed when disabled. Returns the height.
+	 * A talisman of the kit ({@link TalismanButton#gambar}, at least 16×12), disabled when {@code enabled} is false. Returns
+	 * its height.
 	 */
 	float talisman(GuiGraphicsExtractor g, float bx, float by, float bw, float bh, Component label, boolean enabled, Runnable action, int mouseX,
 			int mouseY, @Nullable List<Component> tip) {
-		boolean over = mouseX >= bx && mouseX < bx + bw && mouseY >= by && mouseY < by + bh;
+		if (l == null) {
+			return bh;
+		}
+		String key = "ft" + panelKey() + ":" + hitCount++;
 		int x0 = Math.round(bx);
 		int y0 = Math.round(by);
-		int x1 = Math.round(bx + bw);
-		int y1 = Math.round(by + bh);
-		g.fill(x0 + 1, y0 + 2, x1 + 1, y1 + 1, 0x40000000);
-		int top = enabled ? Palette.lighten(Palette.TALISMAN, over ? 0.12F : 0.0F) : Palette.grey(Palette.TALISMAN, 0.7F);
-		int bottom = enabled ? Palette.TALISMAN_LOW : Palette.grey(Palette.TALISMAN_LOW, 0.7F);
-		g.fillGradient(x0, y0, x1, y1, top, bottom);
-		Brush.frame(g, x0, y0, x1, y1, enabled ? Palette.TALISMAN_EDGE : Palette.grey(Palette.TALISMAN_EDGE, 0.8F));
-		int size = Math.max(5, Math.round(bh) - 5);
-		int sx = x0 + 2;
-		int sy = y0 + (y1 - y0 - size) / 2;
-		int seal = enabled ? (over ? Palette.mix(Palette.SEAL, Palette.SEAL_GLOW, 0.5F) : Palette.SEAL) : Palette.grey(Palette.SEAL, 0.75F);
-		g.fill(sx, sy, sx + size, sy + size, seal);
-		Brush.frame(g, sx + 1, sy + 1, sx + size - 1, sy + size - 1, Palette.argb(0xB0, Palette.TALISMAN));
-		float room = x1 - sx - size - 5;
-		float scale = Brush.fitScale(font, label, room, 0.8F, 0.45F);
-		Brush.fit(g, font, label, sx + size + 3, y0 + (bh - 8.0F * scale) / 2.0F, room, enabled ? Palette.INK : Palette.INK_FAINT, 0.8F, 0.45F, false);
-		hit(bx, by, bx + bw, by + bh, enabled ? action : () -> UiSound.denied(), tip);
-		return bh;
+		int w0 = Math.max(TalismanButton.MIN_W, Math.round(bw));
+		int h0 = Math.max(TalismanButton.MIN_H, Math.round(bh));
+		boolean over = TalismanButton.gambar(l, key, x0, y0, w0, h0, label, enabled, enabled ? null : Component.translatable("kultivator.gui43.m07.baca_saja"),
+				action);
+		if (over && tip != null) {
+			l.tip(tip);
+		}
+		return h0;
 	}
 
-	/** A round jade coin (on/off toggle) with its label, registered as a hit. */
+	/** Per-key state of an immediate jade coin. */
+	private static final class Koin {
+		Component label = Component.empty();
+		boolean on;
+		boolean aktif = true;
+		@Nullable Runnable aksi;
+		final JadeCoin widget;
+
+		Koin() {
+			widget = new JadeCoin(0, 0, TalismanButton.MIN_W, TalismanButton.MIN_H, () -> label, () -> on);
+			widget.enabledWhen(() -> aktif);
+			widget.onPress(() -> {
+				if (aksi != null) {
+					aksi.run();
+				}
+			});
+		}
+	}
+
+	/** A jade coin of the kit (on/off), drawn immediately and kept in the Tab ring. */
 	void coin(GuiGraphicsExtractor g, float cx0, float cy0, float cw, float ch, Component label, boolean on, boolean enabled, Runnable action, int mouseX,
 			int mouseY, @Nullable List<Component> tip) {
-		float r = ch / 2.0F - 0.5F;
-		float cx = cx0 + ch / 2.0F;
-		float cy = cy0 + ch / 2.0F;
-		boolean over = mouseX >= cx0 && mouseX < cx0 + cw && mouseY >= cy0 && mouseY < cy0 + ch;
-		if (over && enabled) {
-			Brush.halo(g, cx, cy, r, 2.5F, 0x9CFFD0, 0.8F);
+		if (l == null) {
+			return;
 		}
-		Brush.disc(g, cx, cy, r, on ? Palette.GOLD : Palette.JADE_DULL);
-		Brush.disc(g, cx, cy, r - 1.0F, on ? Palette.JADE_LIGHT : 0xFFA9B5AE);
-		float hole = Math.max(1.0F, r * 0.35F);
-		Brush.rect(g, cx - hole, cy - hole, cx + hole, cy + hole, on ? Palette.GOLD_LIGHT : Palette.PAPER_SHADE);
-		float tx = cx0 + ch + 3.0F;
-		Brush.fit(g, font, label, tx, cy0 + (ch - 8.0F * 0.7F) / 2.0F, cx0 + cw - tx, enabled ? Palette.INK : Palette.INK_FAINT, 0.7F, 0.42F, false);
-		hit(cx0, cy0, cx0 + cw, cy0 + ch, enabled ? () -> {
-			UiSound.toggle(!on);
-			action.run();
-		} : () -> UiSound.denied(), tip);
+		String key = "fc" + panelKey() + ":" + hitCount++;
+		Koin koin = fokusRing.simpan("koin:" + key, Koin::new);
+		koin.label = label;
+		koin.on = on;
+		koin.aktif = enabled;
+		koin.aksi = action;
+		koin.widget.x = Math.round(cx0);
+		koin.widget.y = Math.round(cy0);
+		koin.widget.w = Math.max(TalismanButton.MIN_W, Math.round(cw));
+		koin.widget.h = Math.max(TalismanButton.MIN_H, Math.round(ch));
+		l.widget(key, koin.widget);
+		if (tip != null && l.di(koin.widget.x, koin.widget.y, koin.widget.x + koin.widget.w, koin.widget.y + koin.widget.h)) {
+			l.tip(tip);
+		}
+	}
+
+	/** Body text at 1.0, cut with "…" (the whole text then becomes the tooltip). */
+	void line(Component text, float tx, float ty, float width, int color) {
+		if (l != null) {
+			l.teks(text, tx, ty, width, color);
+		}
+	}
+
+	/** Wrapped body text at 1.0; returns its height. */
+	float wrap(Component text, float tx, float ty, float width, int color) {
+		return l == null ? 0.0F : l.bungkus(text, tx, ty, width, color);
+	}
+
+	/** Wrapped body text kept inside {@code maxHeight} (the last line cut with "…", the whole text as tooltip). */
+	float wrap(Component text, float tx, float ty, float width, int color, float maxHeight) {
+		return l == null ? 0.0F : l.bungkus(text, tx, ty, width, color, maxHeight);
 	}
 
 	/** A thin labelled bar (Daya, fill). */
@@ -513,12 +617,11 @@ public class FormasiPage extends HallPage {
 		return dev.kultivator.formasi.core.CoreState.byOrdinal(state).label();
 	}
 
-	/** A small round seal with a word. */
+	/** A small round state seal (colour only; the state's name is written beside it or in the tooltip, 43.0.5). */
 	static void seal(GuiGraphicsExtractor g, Font font, Component word, float cx, float cy, float r, int color) {
 		Brush.disc(g, cx, cy, r, Palette.argb(0xD8, color & 0xFFFFFF));
 		Brush.ring(g, cx, cy, r - 1.2F, r - 0.6F, Palette.argb(0xA0, 0xFFF4D6));
-		float scale = Brush.fitScale(font, word, r * 1.7F, 0.45F, 0.3F);
-		Brush.centered(g, font, word, cx, cy - 4.0F * scale, 0xFFFFF4D6, scale, false);
+		Brush.disc(g, cx, cy, Math.max(1.0F, r * 0.3F), 0xFFFFF4D6);
 	}
 
 	/** A scroll bead on the right edge of a list. */
@@ -529,10 +632,5 @@ public class FormasiPage extends HallPage {
 		float bead = y0 + 3.0F + (y1 - y0 - 6.0F) * (offset / maxScroll);
 		g.fill(x1 - 2, y0, x1 - 1, y1, Palette.CORD);
 		Brush.disc(g, x1 - 1.5F, bead, 2.0F, Palette.JADE);
-	}
-
-	/** The list of legacy rows (Pelindung, Agung) written by module A. */
-	ListTag legacy() {
-		return f().getListOrEmpty("legacy");
 	}
 }

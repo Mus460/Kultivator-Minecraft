@@ -1,0 +1,33 @@
+{
+  "pembicara": [
+    "peran:tetua_sekte"
+  ],
+  "prioritas": 95,
+  "syarat": [
+    "gabung.soal gabung_wawancara_pelayan_2"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "310",
+      "pilihan": [
+        {
+          "akibat": [
+            "gabung.jawab 10 teguh"
+          ]
+        },
+        {
+          "akibat": [
+            "gabung.jawab 5 jujur"
+          ]
+        },
+        {
+          "akibat": [
+            "gabung.jawab -5 licik"
+          ]
+        }
+      ]
+    }
+  ]
+}

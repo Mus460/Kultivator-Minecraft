@@ -84,11 +84,7 @@ public final class CodexClient {
 	private static void endTick(Minecraft minecraft) {
 		boolean connected = Keys.connected();
 		boolean free = connected && minecraft.gui.screen() == null && minecraft.player != null;
-		while (Keys.CODEX.consumeClick()) {
-			if (free) {
-				Codex.open(-1);
-			}
-		}
+		// K (Keys.CODEX) is a section key: Keys.tick consumes it first and opens Teknik › Kodeks (43.4.2).
 		KeyMapping[] seals = {Keys.SEAL_1, Keys.SEAL_2, Keys.SEAL_3, Keys.SEAL_4};
 		for (int i = 0; i < seals.length; i++) {
 			while (seals[i].consumeClick()) {

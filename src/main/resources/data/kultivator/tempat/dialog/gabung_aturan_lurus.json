@@ -1,0 +1,142 @@
+{
+  "pembicara": [
+    "tokoh:gabung_aturan"
+  ],
+  "prioritas": -100,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "teks": "kultivator.gabung.aturan.dialog.mulai.lurus",
+      "gestur": "311",
+      "prop": "155",
+      "pilihan": [
+        {
+          "teks": "kultivator.gabung.aturan.dialog.dengar",
+          "ke": "a1"
+        }
+      ]
+    },
+    {
+      "id": "a1",
+      "teks": "kultivator.gabung.aturan.dialog.a1",
+      "gestur": "311",
+      "prop": "155",
+      "pilihan": [
+        {
+          "teks": "kultivator.gabung.aturan.dialog.paham",
+          "ke": "a2"
+        }
+      ]
+    },
+    {
+      "id": "a2",
+      "teks": "kultivator.gabung.aturan.dialog.a2",
+      "gestur": "311",
+      "prop": "155",
+      "pilihan": [
+        {
+          "teks": "kultivator.gabung.aturan.dialog.paham",
+          "ke": "a3"
+        }
+      ]
+    },
+    {
+      "id": "a3",
+      "teks": "kultivator.gabung.aturan.dialog.a3",
+      "gestur": "311",
+      "prop": "155",
+      "pilihan": [
+        {
+          "teks": "kultivator.gabung.aturan.dialog.paham",
+          "ke": "a4"
+        }
+      ]
+    },
+    {
+      "id": "a4",
+      "teks": "kultivator.gabung.aturan.dialog.a4",
+      "gestur": "311",
+      "prop": "155",
+      "pilihan": [
+        {
+          "teks": "kultivator.gabung.aturan.dialog.paham",
+          "ke": "a5"
+        }
+      ]
+    },
+    {
+      "id": "a5",
+      "teks": "kultivator.gabung.aturan.dialog.a5",
+      "gestur": "311",
+      "prop": "155",
+      "pilihan": [
+        {
+          "teks": "kultivator.gabung.aturan.dialog.paham",
+          "ke": "a6"
+        }
+      ]
+    },
+    {
+      "id": "a6",
+      "teks": "kultivator.gabung.aturan.dialog.a6",
+      "gestur": "311",
+      "prop": "155",
+      "pilihan": [
+        {
+          "teks": "kultivator.gabung.aturan.dialog.paham",
+          "ke": "a7"
+        }
+      ]
+    },
+    {
+      "id": "a7",
+      "teks": "kultivator.gabung.aturan.dialog.a7",
+      "gestur": "311",
+      "prop": "155",
+      "pilihan": [
+        {
+          "teks": "kultivator.gabung.aturan.dialog.paham",
+          "ke": "a8"
+        }
+      ]
+    },
+    {
+      "id": "a8",
+      "teks": "kultivator.gabung.aturan.dialog.a8",
+      "gestur": "311",
+      "prop": "155",
+      "pilihan": [
+        {
+          "teks": "kultivator.gabung.aturan.dialog.paham",
+          "ke": "a9"
+        }
+      ]
+    },
+    {
+      "id": "a9",
+      "teks": "kultivator.gabung.aturan.dialog.a9",
+      "gestur": "311",
+      "prop": "155",
+      "pilihan": [
+        {
+          "teks": "kultivator.gabung.aturan.dialog.paham",
+          "ke": "sumpah"
+        }
+      ]
+    },
+    {
+      "id": "sumpah",
+      "teks": "kultivator.gabung.aturan.dialog.sumpah.lurus",
+      "gestur": "310",
+      "pilihan": [
+        {
+          "teks": "kultivator.gabung.aturan.dialog.bersumpah",
+          "akibat": [
+            "bendera gabung.aturan_dibaca"
+          ]
+        }
+      ]
+    }
+  ]
+}

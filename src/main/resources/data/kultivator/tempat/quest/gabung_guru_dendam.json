@@ -1,0 +1,42 @@
+{
+  "pemberi": "peran:tetua_sekte",
+  "tempat": "gabung_sekte",
+  "tahap": [
+    {
+      "id": "dendam",
+      "tujuan": [
+        "pergi pos/kemah_begal"
+      ],
+      "akibat_masuk": [
+        "gabung.cerita guru_dendam dendam shifu"
+      ]
+    },
+    {
+      "id": "buru",
+      "tujuan": [
+        "kalahkan elit"
+      ],
+      "akibat_masuk": [
+        "gabung.cerita guru_dendam buru"
+      ]
+    },
+    {
+      "id": "lapor",
+      "tujuan": [
+        "gabung temu:shifu"
+      ],
+      "akibat_masuk": [
+        "gabung.cerita guru_dendam lapor"
+      ],
+      "akibat": [
+        "gabung.cerita guru_dendam selesai shifu",
+        "gabung.ikatan 15",
+        "gabung.sikap shifu 15",
+        "gabung.infami 2",
+        "gabung.pk 80"
+      ],
+      "ke": "selesai",
+      "arah": "sekte/kompleks"
+    }
+  ]
+}

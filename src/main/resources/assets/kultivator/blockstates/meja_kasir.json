@@ -1,0 +1,19 @@
+{
+ "variants": {
+  "facing=north": {
+   "model": "kultivator:block/kota42/meja_kasir"
+  },
+  "facing=east": {
+   "model": "kultivator:block/kota42/meja_kasir",
+   "y": 90
+  },
+  "facing=south": {
+   "model": "kultivator:block/kota42/meja_kasir",
+   "y": 180
+  },
+  "facing=west": {
+   "model": "kultivator:block/kota42/meja_kasir",
+   "y": 270
+  }
+ }
+}

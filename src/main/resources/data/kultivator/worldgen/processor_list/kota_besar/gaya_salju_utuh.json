@@ -799,6 +799,32 @@
             "block_state": {
               "id": "minecraft:dark_oak_fence_gate",
               "properties": {
+                "facing": "east",
+                "in_wall": "false",
+                "open": "false",
+                "powered": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:spruce_fence_gate",
+            "properties": {
+              "facing": "east",
+              "in_wall": "false",
+              "open": "false",
+              "powered": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:dark_oak_fence_gate",
+              "properties": {
                 "facing": "north",
                 "in_wall": "false",
                 "open": "false",
@@ -1624,6 +1650,46 @@
             "id": "minecraft:stripped_spruce_log",
             "properties": {
               "axis": "z"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:stripped_dark_oak_wood",
+              "properties": {
+                "axis": "x"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:stripped_spruce_wood",
+            "properties": {
+              "axis": "x"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:stripped_dark_oak_wood",
+              "properties": {
+                "axis": "y"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:stripped_spruce_wood",
+            "properties": {
+              "axis": "y"
             }
           }
         }

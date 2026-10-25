@@ -40,6 +40,24 @@
     },
     {
       "dx": -48,
+      "dz": 58,
+      "pool": "kultivator:kota_tema/gunung/hidup42/kavling_barat",
+      "putar": 0
+    },
+    {
+      "dx": 0,
+      "dz": 58,
+      "pool": "kultivator:kota_tema/gunung/hidup42/jalan_malam",
+      "putar": 0
+    },
+    {
+      "dx": -108,
+      "dz": 0,
+      "pool": "kultivator:kota_tema/gunung/hidup42/makam",
+      "putar": 0
+    },
+    {
+      "dx": -48,
       "dz": 48,
       "pool": "kultivator:kota_tema/gunung/tembok/lurus",
       "putar": 0

@@ -1,0 +1,18 @@
+package dev.kultivator.client.codex;
+
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+
+/**
+ * The old Kitab Teknik frame (DESIGN 22.12), merged into the Gulungan Utama by DESIGN 43 (G01, R28): its tablets are now
+ * Teknik › Kodeks / Cincin Segel / Kehancuran ({@link Codex#daftarHalaman}) and its Bantuan stub is gone. Kept only as an
+ * empty type until the last importer ({@code goals/GoalsClient}) drops it; nothing can open it. P1 renames this file
+ * {@code .deactivation} (43.15).
+ */
+@Deprecated
+public final class CodexScreen extends Screen {
+
+	private CodexScreen() {
+		super(Component.empty());
+	}
+}

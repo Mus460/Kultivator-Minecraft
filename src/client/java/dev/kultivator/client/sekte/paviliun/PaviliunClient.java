@@ -5,9 +5,9 @@ import dev.kultivator.client.epic.SekteScenes;
 import dev.kultivator.client.epic.sky.SkyDirector;
 import dev.kultivator.client.epic.sound.MusicCue;
 import dev.kultivator.client.fx.qi.Qi;
-import dev.kultivator.client.hub.HubCards;
 import dev.kultivator.client.hub.HubNav;
-import dev.kultivator.client.screen.ui.Glyphs;
+import dev.kultivator.client.hub.Tujuan;
+import dev.kultivator.client.hub.Urutan;
 import dev.kultivator.disciple.DiscipleEntity;
 import dev.kultivator.epic.EpicIds;
 import dev.kultivator.sekte.SekteIds;
@@ -19,13 +19,14 @@ import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.Util;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.AABB;
 
 /**
- * The client of module A (DESIGN 36.2.5, 36.4): the receivers of A's payloads (the Paviliun &amp; Makam screen and the
- * world picture of the master's own sect), the hub card SEKTE "Paviliun &amp; Makam" (one card, both pages inside, so
- * the section keeps fitting its grid), the poses of activities 13 and 14 ({@link PaviliunPoses}), the world renderer
+ * The client of module A (DESIGN 36.2.5, 36.4): the receivers of A's payloads (the data of the Rak Kitab and Makam subs of
+ * Sekte › Kas &amp; Toko, DESIGN 43.5, and the world picture of the master's own sect), the poses of activities 13 and 14 ({@link PaviliunPoses}), the world renderer
  * ({@link PaviliunRenderer}), four scenes of beats 140-143 through the lead's {@code SekteScenes} (every 7b camera guard
  * applies), and the reader's motes: a golden glyph-mote rising from each floating sutra every 1.5 s (two on Maksimal,
  * none on Minimal), only for readers within 24 blocks.
@@ -37,8 +38,14 @@ public final class PaviliunClient {
 	public static final int BEAT_ENSHRINE = EpicIds.EXTRA_SEKTE_FIRST + 42;
 	public static final int BEAT_LEARNED = EpicIds.EXTRA_SEKTE_FIRST + 43;
 
+	/** How long a page's own request waits for its answer before an "open" counts as a click in the world. */
+	private static final long MINTA_MS = 3000L;
+
 	private static boolean initialised;
 	private static long ticks;
+	/** The last data per page ({@code PAGE_RAK}, {@code PAGE_MAKAM}); empty until the server sends it. */
+	private static final CompoundTag[] DATA = {new CompoundTag(), new CompoundTag()};
+	private static final long[] DIMINTA = {Long.MIN_VALUE / 2, Long.MIN_VALUE / 2};
 
 	public static void init() {
 		if (initialised || !dev.kultivator.sekte.SekteContent.on(SekteIds.A)) {
@@ -50,17 +57,31 @@ public final class PaviliunClient {
 		ClientPlayNetworking.registerGlobalReceiver(PaviliunPayloads.Places.TYPE, (p, context) -> PaviliunWorld.set(p.data()));
 		ClientTickEvents.END_CLIENT_TICK.register(PaviliunClient::tick);
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+			DATA[0] = new CompoundTag();
+			DATA[1] = new CompoundTag();
 			PaviliunWorld.clear();
 			PaviliunRenderer.clear();
 		});
 		LevelRenderEvents.COLLECT_SUBMITS.register(PaviliunRenderer::collect);
 		PaviliunPoses.init();
 		scenes();
-		// Hub › Sekte › "Paviliun & Makam": the Rak Kitab, the readers, the graves, the Kitab Silsilah and the altar.
-		HubCards.register(HubNav.SEKTE, "sekte_paviliun", Glyphs.CODEX, null, () -> {
-			HubNav.expectChild(PaviliunScreen.class, HubNav.SEKTE);
-			send(PaviliunPayloads.OP_OPEN_RAK, "");
-		});
+	}
+
+	/** True when module A runs (its subs Rak Kitab and Makam exist). */
+	public static boolean aktif() {
+		return initialised;
+	}
+
+	/** The last data of page {@code page} (never null; empty until it arrives). */
+	static CompoundTag data(int page) {
+		return DATA[page == PaviliunPayloads.PAGE_RAK ? 0 : 1];
+	}
+
+	/** A shown sub asks for its page (the answer refreshes it in place, 43.0.12: only while shown). */
+	static void minta(int page) {
+		int i = page == PaviliunPayloads.PAGE_RAK ? 0 : 1;
+		DIMINTA[i] = Util.getMillis();
+		send(i == 0 ? PaviliunPayloads.OP_OPEN_RAK : PaviliunPayloads.OP_OPEN_MAKAM, "");
 	}
 
 	static void send(String op, String arg) {
@@ -69,12 +90,15 @@ public final class PaviliunClient {
 		}
 	}
 
+	/**
+	 * A page from the server: kept for the sub that draws it. An "open" that no sub asked for is a click in the world (the
+	 * pavilion, the altar, a grave): the Gulungan opens on Sekte › Kas &amp; Toko › Rak Kitab or Makam (43.4.4).
+	 */
 	private static void onView(PaviliunPayloads.View p) {
-		Minecraft minecraft = Minecraft.getInstance();
-		if (minecraft.gui.screen() instanceof PaviliunScreen screen) {
-			screen.update(p.page(), p.data());
-		} else if (p.open()) {
-			minecraft.gui.setScreen(new PaviliunScreen(p.page(), p.data()));
+		int i = p.page() == PaviliunPayloads.PAGE_RAK ? 0 : 1;
+		DATA[i] = p.data() == null ? new CompoundTag() : p.data();
+		if (p.open() && Util.getMillis() - DIMINTA[i] > MINTA_MS) {
+			HubNav.buka(Tujuan.of(HubNav.SEKTE, Urutan.ID_KAS).sub(i == 0 ? "rak" : "makam"));
 		}
 	}
 

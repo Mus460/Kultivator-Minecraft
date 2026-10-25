@@ -549,6 +549,7 @@ final class MandiriUji {
 		UUID owner = murid.ownerId();
 		if (owner != null) {
 			TempatCache.lepas(owner, murid.soulId());
+			MandiriData.get(ctx.getSource().getServer()).lupakan(owner, murid.soulId());
 		}
 		murid.data().extra().remove(MandiriIds.EXTRA);
 		SosokApi.setJalan(murid, null);

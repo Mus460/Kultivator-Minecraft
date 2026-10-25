@@ -1,0 +1,194 @@
+{
+  "id": "sapa_dialek_kampung",
+  "jenis": "realisasi",
+  "_catatan": "SAPA in dialect kampung across the day (register biasa); steps share the anti-repeat ring.",
+  "benih_dunia": 42,
+  "masukan": {
+    "niat": "SAPA",
+    "pembicara": 106,
+    "hari": 120,
+    "now": 2880000,
+    "cuaca": "cerah",
+    "musim": "semi",
+    "situasi": {
+      "jam": "pagi",
+      "cuaca": "cerah",
+      "musim": "semi",
+      "kelompok": "pekerja",
+      "watak": "ramah",
+      "kebiasaan": [],
+      "sifat": {
+        "H": 10,
+        "E": 0,
+        "X": 20,
+        "A": 30,
+        "C": 10,
+        "O": 0
+      },
+      "wajah": "netral",
+      "tempat": "kampung"
+    },
+    "pendengar": {
+      "nama": "Han",
+      "kelamin": "l",
+      "tahap": "dewasa",
+      "pemain": true
+    },
+    "kesan": "kenal",
+    "tahu_nama": false,
+    "register": "biasa",
+    "dialek": "kampung",
+    "kelamin": "p"
+  },
+  "langkah": [
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "subuh",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kampung"
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.obrol.ajar.0.kampung",
+        "a": []
+      },
+      "aturan": "sapa.obrol.ajar",
+      "gestur": "hormat",
+      "seru": null,
+      "tik": null,
+      "id_id": "Pak! Hari ini belajar apa lagi?",
+      "en_us": "Sir! What are we learning today?"
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kampung"
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.pekerja.pagi.2",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.kakak.kampung",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "sapa.pekerja.pagi",
+      "gestur": "lambai",
+      "seru": null,
+      "tik": null,
+      "id_id": "Pagi, Kang. Kalau mau sesuatu dibuat, pagi begini aku masih segar.",
+      "en_us": "Morning, Big Brother. If you want something made, I'm still fresh this early."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "siang",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kampung"
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.kenal.0",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.kakak.kampung",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "sapa.kenal",
+      "gestur": "lambai",
+      "seru": null,
+      "tik": null,
+      "id_id": "Oh, Kang, datang lagi.",
+      "en_us": "Oh, Big Brother, back again."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "malam",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "kampung"
+        },
+        "pendengar": {
+          "nama": "Mei",
+          "kelamin": "p",
+          "tahap": "dewasa",
+          "pemain": true
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.kenal.2",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.kakak.kampung.p",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "sapa.kenal",
+      "gestur": "lambai",
+      "seru": null,
+      "tik": null,
+      "id_id": "Salam, Yu. Senang melihatmu lagi.",
+      "en_us": "Greetings, Big Sister. Good to see you again."
+    }
+  ]
+}

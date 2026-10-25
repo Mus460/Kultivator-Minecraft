@@ -91,11 +91,11 @@ public final class LayarBukuKas extends LayarTempatDasar {
 	private int[] kolom(Lukis l, int x0, int y, int x1, Component kiri) {
 		int nbX = x1 - 4;
 		int pkX = x1 - Math.max(90, (x1 - x0) / 3);
-		l.teks(Brush.bold(kiri), x0, y, pkX - x0 - 50, gaya.aksen, 0.85F);
+		l.teks(Brush.bold(kiri), x0, y, pkX - x0 - 50, gaya.aksen);
 		IkonTempat.gambar(l.g, LembarKunci.Ikon.PK, pkX - 28, y - 1, 10, 0xFFFFFFFF);
-		l.kanan(Brush.bold(TeksTempat.k("kas.pk")), pkX, y, gaya.aksen, 0.85F);
+		l.kanan(Brush.bold(TeksTempat.k("kas.pk")), pkX, y, gaya.aksen, 1.0F);
 		IkonTempat.gambar(l.g, LembarKunci.Ikon.NB, nbX - 50, y - 1, 10, 0xFFFFFFFF);
-		l.kanan(Brush.bold(TeksTempat.k("kas.batu")), nbX, y, gaya.aksen, 0.85F);
+		l.kanan(Brush.bold(TeksTempat.k("kas.batu")), nbX, y, gaya.aksen, 1.0F);
 		PanelTempat.garis(l.g, gaya, x0, x1, y + 10);
 		return new int[] {pkX, nbX};
 	}
@@ -114,35 +114,35 @@ public final class LayarBukuKas extends LayarTempatDasar {
 					lk.g.fill(rx0, ry0, rx1, ry1, gaya.kartuSorot);
 				}
 				Component nama = e.ada(LembarKunci.NAMA) ? e.teks(LembarKunci.NAMA) : TeksTempat.k("kas.sumber." + e.s(BukuKas.SUMBER));
-				lk.teks(nama, rx0 + 2, ry0 + 2, k[0] - rx0 - 60, gaya.teks, 0.85F);
+				lk.teks(nama, rx0 + 2, ry0 + 2, k[0] - rx0 - 60, gaya.teks);
 				int pk = e.i(LembarKunci.PK, 0);
 				if (pk != 0) {
-					LabelHarga.pk(lk, pk, k[0], ry0 + 2, true, 0.8F, pk > 0 ? 0xFF2E7A4E : TempatWarna.BAHAYA);
+					LabelHarga.pk(lk, pk, k[0], ry0 + 2, true, 1.0F, pk > 0 ? 0xFF2E7A4E : TempatWarna.BAHAYA);
 				}
 				long nb = e.l(LembarKunci.NB, 0L);
 				int w = 0;
 				if (nb != 0) {
-					w = LabelHarga.nbBertanda(lk, nb, k[1], ry0 + 2, true, 0.8F);
+					w = LabelHarga.nbBertanda(lk, nb, k[1], ry0 + 2, true, 1.0F);
 				}
 				Component cat = e.teksAtau(LembarKunci.CATATAN);
 				if (cat != null) {
-					lk.keterangan(cat, k[0] + 6, ry0 + 2.5F, k[1] - w - k[0] - 10, gaya.teksSamar);
+					lk.teks(cat, k[0] + 6, ry0 + 2, k[1] - w - k[0] - 10, gaya.teksSamar);
 				}
 			}, null, null);
 		}
 		// net line + sparkline
 		int ny = y1 - 22;
 		PanelTempat.garis(l.g, gaya, x0, x1, ny);
-		l.teks(Brush.bold(TeksTempat.k("kas.bersih")), x0 + 2, ny + 5, 60, gaya.teks, 0.9F);
+		l.teks(Brush.bold(TeksTempat.k("kas.bersih")), x0 + 2, ny + 5, 60, gaya.teks);
 		int bpk = lembar.i(BukuKas.BERSIH_PK, 0);
-		LabelHarga.pk(l, bpk, k[0], ny + 5, true, 0.9F, bpk >= 0 ? 0xFF2E7A4E : TempatWarna.BAHAYA);
-		LabelHarga.nbBertanda(l, lembar.l(BukuKas.BERSIH_NB, 0L), k[1], ny + 5, true, 0.9F);
+		LabelHarga.pk(l, bpk, k[0], ny + 5, true, 1.0F, bpk >= 0 ? 0xFF2E7A4E : TempatWarna.BAHAYA);
+		LabelHarga.nbBertanda(l, lembar.l(BukuKas.BERSIH_NB, 0L), k[1], ny + 5, true, 1.0F);
 		int sx0 = x0 + 64;
 		int sx1 = Math.min(k[0] - 70, sx0 + 90);
 		if (sx1 - sx0 > 30) {
 			sparkline(l, lembar.la(BukuKas.GRAFIK_NB), sx0, ny + 3, sx1, ny + 18, 0xFF3E78C0);
 			sparkline(l, toLong(lembar.ia(BukuKas.GRAFIK_PK)), sx0, ny + 3, sx1, ny + 18, 0xFFB98F34);
-			l.keterangan(TeksTempat.k("kas.tujuh_hari"), sx1 + 3, ny + 7, 40, gaya.teksSamar);
+			l.teks(TeksTempat.k("kas.tujuh_hari"), sx1 + 3, ny + 5, 40, gaya.teksSamar);
 		}
 	}
 
@@ -199,7 +199,7 @@ public final class LayarBukuKas extends LayarTempatDasar {
 			if (y + rowH > y1) {
 				break;
 			}
-			l.keterangan(TeksTempat.k("kas.hari", r.i(LembarKunci.HARI, 0)), x0 + 2, y + 3, 42, gaya.teksLemah);
+			l.teks(TeksTempat.k("kas.hari", r.i(LembarKunci.HARI, 0)), x0 + 2, y + 2, 42, gaya.teksLemah);
 			int pk = r.i(LembarKunci.PK, 0);
 			long nb = r.l(LembarKunci.NB, 0L);
 			int mid = (barX0 + barX1) / 2;
@@ -213,8 +213,8 @@ public final class LayarBukuKas extends LayarTempatDasar {
 				l.g.fill(pk >= 0 ? mid + 1 : mid - pkLen, y + 2, pk >= 0 ? mid + 1 + pkLen : mid, y + 5, pkCol);
 				l.g.fill(nb >= 0 ? mid + 1 : mid - nbLen, y + 6, nb >= 0 ? mid + 1 + nbLen : mid, y + 9, nbCol);
 			}
-			LabelHarga.pk(l, pk, k[0], y + 3, true, 0.8F, pk >= 0 ? 0xFF2E7A4E : TempatWarna.BAHAYA);
-			LabelHarga.nbBertanda(l, nb, k[1], y + 3, true, 0.8F);
+			LabelHarga.pk(l, pk, k[0], y + 2, true, 1.0F, pk >= 0 ? 0xFF2E7A4E : TempatWarna.BAHAYA);
+			LabelHarga.nbBertanda(l, nb, k[1], y + 2, true, 1.0F);
 			y += rowH;
 		}
 	}
@@ -230,18 +230,18 @@ public final class LayarBukuKas extends LayarTempatDasar {
 			Lembar e = rows.get(i);
 			PanelTempat.kartu(lk.g, gaya, rx0, ry0, rx1, ry1, sorot ? 1.0F : 0.0F, false);
 			Component nama = e.ada(LembarKunci.NAMA) ? e.teks(LembarKunci.NAMA) : TeksTempat.k("kas.sumber." + e.s(BukuKas.SUMBER));
-			lk.teks(nama, rx0 + 3, ry0 + 2, k[0] - rx0 - 60, gaya.teks, 0.85F);
+			lk.teks(nama, rx0 + 3, ry0 + 1, k[0] - rx0 - 60, gaya.teks);
 			Component cat = e.teksAtau(LembarKunci.CATATAN);
 			if (cat != null) {
-				lk.keterangan(cat, rx0 + 3, ry0 + 11, k[0] - rx0 - 60, gaya.teksSamar);
+				lk.teks(cat, rx0 + 3, ry0 + 10, k[0] - rx0 - 60, gaya.teksSamar);
 			}
 			int pk = e.i(LembarKunci.PK, 0);
 			if (pk != 0) {
-				LabelHarga.pk(lk, pk, k[0], ry0 + 6, true, 0.85F, pk > 0 ? 0xFF2E7A4E : TempatWarna.BAHAYA);
+				LabelHarga.pk(lk, pk, k[0], ry0 + 5, true, 1.0F, pk > 0 ? 0xFF2E7A4E : TempatWarna.BAHAYA);
 			}
 			long nb = e.l(LembarKunci.NB, 0L);
 			if (nb != 0) {
-				LabelHarga.nbBertanda(lk, nb, k[1], ry0 + 6, true, 0.85F);
+				LabelHarga.nbBertanda(lk, nb, k[1], ry0 + 5, true, 1.0F);
 			}
 		}, null, null);
 	}
@@ -263,10 +263,10 @@ public final class LayarBukuKas extends LayarTempatDasar {
 		int y = y0;
 		Component kios = lp.teks(BukuKas.KIOS);
 		l.teks(Brush.bold(kios), x0, y, (x1 - x0) / 2.0F, gaya.teks);
-		l.kanan(TeksTempat.k("kas.sewa_sisa", lp.i(BukuKas.SEWA_SISA_HARI, 0)), x1, y, gaya.teksLemah, 0.8F);
+		l.kanan(TeksTempat.k("kas.sewa_sisa", lp.i(BukuKas.SEWA_SISA_HARI, 0)), x1, y, gaya.teksLemah, 1.0F);
 		y += 10;
 		Component penjaga = lp.teksAtau(BukuKas.PENJAGA);
-		l.keterangan(penjaga == null ? TeksTempat.k("kas.tanpa_penjaga") : TeksTempat.k("kas.penjaga", penjaga), x0, y, (x1 - x0) / 2.0F,
+		l.teks(penjaga == null ? TeksTempat.k("kas.tanpa_penjaga") : TeksTempat.k("kas.penjaga", penjaga), x0, y, (x1 - x0) / 2.0F,
 				penjaga == null ? TempatWarna.BAHAYA : gaya.teksSamar);
 		long kas = lp.l(BukuKas.KAS, 0L);
 		tombolOp(l, "kas", x1 - 96, y - 1, 96, 13, TeksTempat.k("kas.ambil_kas", TeksTempat.singkat(kas)), kas > 0, TeksTempat.k("kas.kas_kosong"),
@@ -312,17 +312,17 @@ public final class LayarBukuKas extends LayarTempatDasar {
 			PanelTempat.kartu(l.g, gaya, ex0, ey, x1, ey + 3 * cell - 2, 0.0F, false);
 			int tx = ex0 + 4;
 			if (sel == null) {
-				l.bungkus(slotDipilih < 0 ? TeksTempat.k("kas.pilih_slot") : TeksTempat.k("kas.slot_kosong"), tx, ey + 4, x1 - tx - 4, gaya.teksSamar, 0.8F,
+				l.bungkus(slotDipilih < 0 ? TeksTempat.k("kas.pilih_slot") : TeksTempat.k("kas.slot_kosong"), tx, ey + 4, x1 - tx - 4, gaya.teksSamar, 1.0F,
 						3 * cell - 8 - (slotDipilih >= 0 ? 20 : 0));
 				if (slotDipilih >= 0) {
 					tombolOp(l, "isi", tx, ey + 3 * cell - 20, x1 - tx - 4, 14, TeksTempat.k("kas.isi_tangan"), true, null, BukuKas.OP_LAPAK_ISI);
 				}
 			} else {
-				l.teks(sel.teks(LembarKunci.NAMA), tx, ey + 3, x1 - tx - 4, gaya.teks, 0.85F);
+				l.teks(sel.teks(LembarKunci.NAMA), tx, ey + 3, x1 - tx - 4, gaya.teks);
 				long harga = sel.l(LembarKunci.HARGA, 0L);
 				long nilai = Math.max(1L, sel.l(LembarKunci.NILAI, harga));
 				LabelHarga.gambar(l, harga, -1L, tx, ey + 14, false, 1.0F, false);
-				l.keterangan(TeksTempat.k("kas.peluang", sel.i(LembarKunci.PELUANG, 0), TeksTempat.angka(nilai)), tx, ey + 25, x1 - tx - 4, gaya.teksSamar);
+				l.teks(TeksTempat.k("kas.peluang", sel.i(LembarKunci.PELUANG, 0), TeksTempat.angka(nilai)), tx, ey + 25, x1 - tx - 4, gaya.teksSamar);
 				int bw = (x1 - tx - 8) / 2;
 				long turun = Math.max(1L, Math.round(harga * 0.9D));
 				long naik = Math.max(harga + 1, Math.round(harga * 1.1D));
@@ -334,8 +334,8 @@ public final class LayarBukuKas extends LayarTempatDasar {
 						LembarKunci.op(BukuKas.OP_LAPAK_AMBIL, slotDipilih));
 			}
 		}
-		l.keterangan(TeksTempat.k("kas.volume", TeksTempat.angka(lp.l(BukuKas.VOLUME_MAKS, 0L))), x0, y + 3 * cell + 2, x1 - x0, gaya.teksSamar);
-		l.keterangan(TeksTempat.k("kas.legenda_peluang"), x0, y + 3 * cell + 11, x1 - x0, gaya.teksSamar);
+		l.teks(TeksTempat.k("kas.volume", TeksTempat.angka(lp.l(BukuKas.VOLUME_MAKS, 0L))), x0, y + 3 * cell + 2, x1 - x0, gaya.teksSamar);
+		l.teks(TeksTempat.k("kas.legenda_peluang"), x0, y + 3 * cell + 12, x1 - x0, gaya.teksSamar);
 	}
 
 	private void kafilah(Lukis l, int x0, int y0, int x1, int y1) {
@@ -344,18 +344,18 @@ public final class LayarBukuKas extends LayarTempatDasar {
 		Kotak[] k = bagi(x0, y0, x1, y1);
 		Kotak kiri = k[0];
 		int y = kiri.y0();
-		l.keterangan(TeksTempat.k("kas.laba_minggu", TeksTempat.angka(kf.l(BukuKas.LABA_MINGGU, 0L)), TeksTempat.angka(kf.l(BukuKas.LABA_BATAS, 0L))),
+		l.teks(TeksTempat.k("kas.laba_minggu", TeksTempat.angka(kf.l(BukuKas.LABA_MINGGU, 0L)), TeksTempat.angka(kf.l(BukuKas.LABA_BATAS, 0L))),
 				kiri.x0(), y, kiri.w(), gaya.teksLemah);
 		y += 10;
 		if (jalan.isEmpty()) {
-			l.keterangan(TeksTempat.k("kas.kafilah_kosong"), kiri.x0(), y + 4, kiri.w(), gaya.teksSamar);
+			l.teks(TeksTempat.k("kas.kafilah_kosong"), kiri.x0(), y + 4, kiri.w(), gaya.teksSamar);
 		} else {
-			daftarKafilah.gambar(l, "kafilah", kiri.x0(), y, kiri.x1(), kiri.y1(), jalan.size(), 44, (lk, i, rx0, ry0, rx1, ry1, sorot, pilih) -> {
+			daftarKafilah.gambar(l, "kafilah", kiri.x0(), y, kiri.x1(), kiri.y1(), jalan.size(), 48, (lk, i, rx0, ry0, rx1, ry1, sorot, pilih) -> {
 				Lembar e = jalan.get(i);
 				PanelTempat.kartu(lk.g, gaya, rx0, ry0, rx1, ry1, sorot ? 1.0F : 0.0F, pilih);
 				IkonTempat.gambar(lk.g, LembarKunci.Ikon.KAFILAH, rx0 + 3, ry0 + 3, 14, 0xFFFFFFFF);
-				lk.teks(Brush.bold(e.teks(LembarKunci.TUJUAN)), rx0 + 20, ry0 + 4, rx1 - rx0 - 70, gaya.teks, 0.85F);
-				lk.kanan(TeksTempat.hari(e.i(LembarKunci.SISA_HARI, 0)), rx1 - 3, ry0 + 4, gaya.teksLemah, 0.75F);
+				lk.teks(Brush.bold(e.teks(LembarKunci.TUJUAN)), rx0 + 20, ry0 + 4, rx1 - rx0 - 70, gaya.teks);
+				lk.kanan(TeksTempat.hari(e.i(LembarKunci.SISA_HARI, 0)), rx1 - 3, ry0 + 4, gaya.teksLemah, 1.0F);
 				// mini map: start, goal and the caravan along the line
 				int mx0 = rx0 + 6;
 				int mx1 = rx1 - 6;
@@ -367,7 +367,7 @@ public final class LayarBukuKas extends LayarTempatDasar {
 				Brush.disc(lk.g, mx1, my + 0.5F, 2.0F, TempatWarna.SEGEL);
 				IkonTempat.gambar(lk.g, LembarKunci.Ikon.KAFILAH, Math.round(mx0 + (mx1 - mx0) * p - 5), my - 9, 10, 0xFFFFFFFF);
 				int risiko = e.i(LembarKunci.RISIKO, 0);
-				lk.keterangan(TeksTempat.k("kas.risiko_laba", risiko, TeksTempat.angka(e.l(BukuKas.LABA_KIRA, 0L))), rx0 + 6, ry0 + 29, rx1 - rx0 - 12,
+				lk.teks(TeksTempat.k("kas.risiko_laba", risiko, TeksTempat.angka(e.l(BukuKas.LABA_KIRA, 0L))), rx0 + 6, ry0 + 27, rx1 - rx0 - 12,
 						risiko >= 20 ? TempatWarna.BAHAYA : gaya.teksSamar);
 				List<Lembar> pengawal = e.daftar(BukuKas.PENGAWAL);
 				if (!pengawal.isEmpty()) {
@@ -375,7 +375,7 @@ public final class LayarBukuKas extends LayarTempatDasar {
 					for (Lembar pw : pengawal) {
 						nama.add(pw.teks(LembarKunci.NAMA).getString());
 					}
-					lk.keterangan(TeksTempat.k("kas.pengawal", String.join(", ", nama)), rx0 + 6, ry0 + 36, rx1 - rx0 - 12, gaya.teksSamar);
+					lk.teks(TeksTempat.k("kas.pengawal", String.join(", ", nama)), rx0 + 6, ry0 + 37, rx1 - rx0 - 12, gaya.teksSamar);
 				}
 			}, null, null);
 		}
@@ -394,7 +394,7 @@ public final class LayarBukuKas extends LayarTempatDasar {
 		List<Lembar> muatan = r.daftar(BukuKas.MUATAN);
 		Component alasanKunci = kf.teksAtau(LembarKunci.ALASAN);
 		if (tujuan.isEmpty()) {
-			l.bungkus(alasanKunci != null ? alasanKunci : TeksTempat.k("kas.tak_ada_tujuan"), x0, y, x1 - x0, gaya.teksSamar, 0.8F, k.y1() - y - 4);
+			l.bungkus(alasanKunci != null ? alasanKunci : TeksTempat.k("kas.tak_ada_tujuan"), x0, y, x1 - x0, gaya.teksSamar, 1.0F, k.y1() - y - 4);
 			return;
 		}
 		// destinations, escorts and loads share the card above the button; each is a list that scrolls when long
@@ -402,21 +402,22 @@ public final class LayarBukuKas extends LayarTempatDasar {
 		daftarTujuan.gambar(l, "tujuan", x0, y, x1, y + listH, tujuan.size(), 13, (lk, i, rx0, ry0, rx1, ry1, sorot, pilih) -> {
 			Lembar e = tujuan.get(i);
 			lk.g.fill(rx0, ry0, rx1, ry1, pilih ? Palette.argb(0x70, TempatWarna.EMAS & 0xFFFFFF) : sorot ? gaya.kartuSorot : 0);
-			lk.teks(e.teks(LembarKunci.NAMA), rx0 + 2, ry0 + 2, rx1 - rx0 - 70, gaya.teks, 0.8F);
-			lk.kanan(TeksTempat.k("kas.jarak_hari", e.i(LembarKunci.JARAK, 0), e.i(LembarKunci.HARI, 0), Math.round(e.f(BukuKas.PERMINTAAN, 1.0F) * 100)),
-					rx1 - 2, ry0 + 2.5F, gaya.teksSamar, 0.7F);
+			Component jarak = TeksTempat.k("kas.jarak_hari", e.i(LembarKunci.JARAK, 0), e.i(LembarKunci.HARI, 0), Math.round(e.f(BukuKas.PERMINTAAN, 1.0F) * 100));
+			int jw = Math.min((rx1 - rx0) / 2, font.width(jarak));
+			lk.teks(e.teks(LembarKunci.NAMA), rx0 + 2, ry0 + 2, rx1 - rx0 - jw - 8, gaya.teks);
+			lk.teks(jarak, rx1 - 2 - jw, ry0 + 2, jw, gaya.teksSamar);
 		}, null, null);
 		y += listH + 3;
 		int tombolY = k.y1() - 18;
 		int ruang = Math.max(22, tombolY - 3 - y - 18);
 		int muatanH = Math.min(Math.max(11, muatan.size() * 11), Math.max(11, ruang / 2));
 		int muridH = Math.max(11, Math.min(Math.max(11, murid.size() * 11), ruang - muatanH));
-		l.keterangan(TeksTempat.k("kas.pilih_pengawal", muridDipilih.size() + "/3"), x0, y, x1 - x0, gaya.teksLemah);
-		y += 9;
+		l.teks(TeksTempat.k("kas.pilih_pengawal", muridDipilih.size() + "/3"), x0, y, x1 - x0, gaya.teksLemah);
+		y += 10;
 		pilihan(l, "murid", daftarMurid, murid, muridDipilih, 3, x0, y, x1, y + muridH, BukuKas.RANAH, TeksTempat.k("kas.tanpa_murid"));
 		y += muridH + 2;
-		l.keterangan(TeksTempat.k("kas.pilih_muatan", muatanDipilih.size() + "/2"), x0, y, x1 - x0, gaya.teksLemah);
-		y += 9;
+		l.teks(TeksTempat.k("kas.pilih_muatan", muatanDipilih.size() + "/2"), x0, y, x1 - x0, gaya.teksLemah);
+		y += 10;
 		pilihan(l, "muatan", daftarMuatan, muatan, muatanDipilih, 2, x0, y, x1, y + muatanH, null, TeksTempat.k("kas.tanpa_muatan"));
 		int t = daftarTujuan.pilihan();
 		boolean siap = t >= 0 && !muatanDipilih.isEmpty() && !muridDipilih.isEmpty() && alasanKunci == null;
@@ -432,7 +433,7 @@ public final class LayarBukuKas extends LayarTempatDasar {
 	private void pilihan(Lukis l, String kunci, DaftarGulir d, List<Lembar> daftar, Set<Integer> dipilih, int maks, int x0, int y0, int x1, int y1,
 			String sub, Component kosong) {
 		if (daftar.isEmpty()) {
-			l.keterangan(kosong, x0 + 2, y0 + 1, x1 - x0 - 4, gaya.teksSamar);
+			l.teks(kosong, x0 + 2, y0 + 1, x1 - x0 - 4, gaya.teksSamar);
 			return;
 		}
 		d.gambar(l, kunci, x0, y0, x1, y1, daftar.size(), 11, (lk, i, rx0, ry0, rx1, ry1, sorot, pilih) -> {
@@ -448,10 +449,10 @@ public final class LayarBukuKas extends LayarTempatDasar {
 			int subW = 0;
 			if (sub != null && e.ada(sub)) {
 				Component s = e.teks(sub);
-				subW = Math.round(font.width(s) * 0.65F) + 4;
-				lk.kanan(s, rx1 - 2, ry0 + 3, gaya.teksSamar, 0.65F);
+				subW = Math.min((rx1 - rx0) / 2, font.width(s)) + 4;
+				lk.teks(s, rx1 - subW + 2, ry0 + 1, subW - 4, gaya.teksSamar);
 			}
-			lk.teks(nama, rx0 + 14, ry0 + 2, rx1 - rx0 - 16 - subW, on ? gaya.aksen : gaya.teks, 0.75F);
+			lk.teks(nama, rx0 + 14, ry0 + 1, rx1 - rx0 - 16 - subW, on ? gaya.aksen : gaya.teks);
 			final int idx = i;
 			lk.zona(kunci + "#cek" + i, rx0, ry0, rx1, ry1, () -> {
 				d.setPilih(idx);

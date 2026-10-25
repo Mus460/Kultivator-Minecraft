@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:tempat/kota42_investor",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.tempat.kota42_saudagar_kontrak.description"
+    },
+    "icon": {
+      "id": "minecraft:chest_minecart"
+    },
+    "title": {
+      "translate": "advancement.kultivator.tempat.kota42_saudagar_kontrak.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

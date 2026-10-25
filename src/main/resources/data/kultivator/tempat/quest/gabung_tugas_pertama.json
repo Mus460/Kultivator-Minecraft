@@ -1,0 +1,49 @@
+{
+  "pemberi": "peran:tetua_sekte",
+  "tempat": "gabung_sekte",
+  "tahap": [
+    {
+      "id": "sumur",
+      "tujuan": [
+        "tanda gabung_tugas_pikul_air"
+      ],
+      "akibat": [
+        "gabung.sikap kakak 3"
+      ],
+      "arah": "sekte/kompleks"
+    },
+    {
+      "id": "halaman",
+      "tujuan": [
+        "tanda gabung_tugas_sapu"
+      ],
+      "akibat": [
+        "gabung.pk 5"
+      ]
+    },
+    {
+      "id": "tiga",
+      "tujuan": [
+        "tanda gabung_tugas x3"
+      ],
+      "akibat": [
+        "gabung.pk 15",
+        "gabung.sikap luar 5",
+        "efek minecraft:saturation 10 0"
+      ],
+      "batas_hari": 5,
+      "gagal_ke": "malas",
+      "ke": "selesai"
+    },
+    {
+      "id": "malas",
+      "tujuan": [
+        "tanda gabung_tugas"
+      ],
+      "akibat": [
+        "gabung.pk 3"
+      ],
+      "ke": "selesai"
+    }
+  ]
+}

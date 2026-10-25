@@ -1,0 +1,261 @@
+package dev.kultivator.client.sekte.gabung.ui.layar;
+
+import static dev.kultivator.client.sekte.gabung.ui.layar.LayarGabung2.u;
+
+import dev.kultivator.client.screen.ui.Brush;
+import dev.kultivator.client.screen.ui.Palette;
+import dev.kultivator.client.sekte.gabung.ui.IkonGabung;
+import dev.kultivator.client.tempat.ui.kit.CincinWaktu;
+import dev.kultivator.client.tempat.ui.kit.DaftarGulir;
+import dev.kultivator.client.tempat.ui.kit.KeadaanKosong;
+import dev.kultivator.client.tempat.ui.kit.Lembar;
+import dev.kultivator.client.tempat.ui.kit.Lukis;
+import dev.kultivator.client.tempat.ui.kit.PanelTempat;
+import dev.kultivator.client.tempat.ui.kit.Potret;
+import dev.kultivator.client.tempat.ui.kit.TabLentera;
+import dev.kultivator.client.tempat.ui.kit.TeksTempat;
+import dev.kultivator.client.tempat.ui.kit.TempatWarna;
+import dev.kultivator.dunia.tempat.ui.LembarKunci;
+import dev.kultivator.sekte.gabung.ui.GabungLembar;
+import dev.kultivator.sekte.gabung.ui.GabungLembar.Hukum;
+import dev.kultivator.sekte.gabung.ui.LembarHukum;
+import net.minecraft.ChatFormatting;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.util.Util;
+
+import java.util.List;
+
+/**
+ * {@code gabung_hukum} (DESIGN 41.6.11, 41.10.9): a hearing of the Balai Hukum. The Discipline Elder presides (live
+ * portrait); the record is a black-and-vermilion meter with the five thresholds (reprimand, fine, confinement,
+ * demotion, expulsion); the charge, the witnesses and the sentence asked; the offences on record. "Terima hukuman",
+ * "Bela diri" (one Ujian Hati question; keys 1-3 answer) and "Minta Shifu membela" (bond &ge; 50). An A2 trial (a fellow
+ * member killed) offers only to accept the expulsion or to flee as a deserter (asks twice). A running confinement shows
+ * its countdown ring and "Tebus" (PK per 10 seconds).
+ */
+public final class LayarHukum extends LayarGabungDasar {
+
+	/** The record thresholds of 41.6.11 ({@code Aturan.TEGURAN..USIR}). */
+	private static final int[] AMBANG = {10, 20, 35, 50, 60};
+
+	private final DaftarGulir catatan = new DaftarGulir();
+
+	public LayarHukum(int npcId, CompoundTag lembar) {
+		super(Hukum.LAYAR, npcId, lembar, u("hukum.judul"), TempatWarna.Gaya.BATU);
+	}
+
+	@Override
+	protected List<TabLentera.Tab> tabs() {
+		return List.of();
+	}
+
+	@Override
+	protected KeadaanKosong.Gambar gambarKosong() {
+		return KeadaanKosong.Gambar.GULUNGAN;
+	}
+
+	@Override
+	protected void setelahLembar(boolean buka) {
+		if (buka) {
+			catatan.mulaiUlang(Util.getMillis());
+		}
+	}
+
+	@Override
+	public boolean angka(int n) {
+		Lembar soal = lembar.sub(Hukum.SOAL);
+		List<Lembar> pilihan = soal.daftar(Hukum.PILIHAN);
+		if (n >= 1 && n <= pilihan.size()) {
+			kirim(LembarKunci.op(Hukum.OP_JAWAB, pilihan.get(n - 1).i(LembarKunci.NO, n - 1)));
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	protected Component petunjuk() {
+		return lembar.ada(Hukum.SOAL) ? u("hukum.petunjuk_soal") : null;
+	}
+
+	@Override
+	protected void isiGabung(Lukis l, int x0, int y0, int x1, int y1) {
+		int y = kepalaSekte(l, x0, y0, x1);
+		y = hakim(l, x0, y, x1);
+		y = meter(l, x0, y, x1);
+		int by = y1 - 16;
+		boolean sidang = lembar.b(LembarHukum.SIDANG);
+		Lembar tebus = lembar.sub(Hukum.TEBUS);
+		Lembar soal = lembar.sub(Hukum.SOAL);
+		int kanan = tata == Tata.SEMPIT ? x1 : x0 + (x1 - x0) * 11 / 20;
+		// left: the case
+		int ly = y;
+		if (sidang) {
+			Component perkara = lembar.teksAtau(LembarHukum.PERKARA);
+			if (perkara != null) {
+				ly += Math.round(l.bungkus(u("hukum.perkara", perkara), x0, ly, kanan - x0, gaya.teks, 0.8F, 18)) + 2;
+			}
+			List<Lembar> saksi = lembar.daftar(Hukum.SAKSI);
+			MutableComponent s = Component.empty();
+			for (int i = 0; i < saksi.size(); i++) {
+				if (i > 0) {
+					s.append(", ");
+				}
+				s.append(saksi.get(i).teks(LembarKunci.NAMA));
+			}
+			l.keterangan(saksi.isEmpty() ? u("hukum.tanpa_saksi") : u("hukum.saksi", s), x0, ly, kanan - x0, gaya.teksLemah);
+			ly += 10;
+			l.teks(Brush.bold(u("hukum.vonis", lembar.teks(Hukum.HUKUMAN))), x0, ly, kanan - x0, 0xFFE07060, 0.85F);
+			ly += 12;
+		} else {
+			l.teks(u("hukum.tidak_ada"), x0, ly, kanan - x0, TempatWarna.OK, 0.85F);
+			ly += 12;
+		}
+		subjudul(l, u("hukum.catatan"), x0, ly, kanan);
+		ly += 13;
+		List<Lembar> list = lembar.daftar(Hukum.CATATAN_HUKUM);
+		int listBawah = by - 4;
+		if (list.isEmpty()) {
+			l.keterangan(u("hukum.catatan_bersih"), x0, ly, kanan - x0, gaya.teksSamar);
+		} else {
+			catatan.gambar(l, "catatan", x0, ly, kanan, listBawah, list.size(), 12, (lk, i, rx0, ry0, rx1, ry1, sorot, pilih) -> {
+				Lembar e = list.get(i);
+				int poin = e.i(GabungLembar.Kartu.POIN, 0);
+				Component kiri = u("hukum.hari", e.l(LembarKunci.HARI, 0L));
+				int kw = Math.round(font.width(kiri) * 0.7F) + 4;
+				lk.keterangan(kiri, rx0, ry0 + 2, kw, gaya.teksSamar);
+				lk.teks(e.teks(LembarKunci.TEKS), rx0 + kw, ry0 + 2, rx1 - rx0 - kw - 26, gaya.teks, 0.75F);
+				lk.kanan(Component.literal("+" + poin), rx1 - 2, ry0 + 2, 0xFFE07060, 0.75F);
+			}, null, null);
+		}
+		// right: the question, the confinement, or the elder's line
+		if (tata != Tata.SEMPIT) {
+			Kotak k = new Kotak(kanan + 6, y, x1, by - 4);
+			if (!soal.kosongSemua()) {
+				soal(l, k, soal);
+			} else if (!tebus.kosongSemua()) {
+				tebus(l, k, tebus);
+			} else {
+				nasihat(l, k, sidang);
+			}
+		}
+		tombolBawah(l, x0, by, x1, sidang, tebus);
+	}
+
+	/** The presiding elder: portrait, name and office. Returns the y under it. */
+	private int hakim(Lukis l, int x0, int y, int x1) {
+		Lembar npc = lembar.sub(LembarKunci.NPC);
+		int foto = 22;
+		Potret.gambar(l, x0, y, foto, npc.i(LembarKunci.POTRET, -1), Potret.IKON_BAWAAN, false, 0.0F);
+		IkonGabung.gambar(l.g, IkonGabung.HUKUM, x0 + foto + 4, y + 1, 10);
+		l.teks(Brush.bold(npc.teks(LembarKunci.NAMA)), x0 + foto + 17, y + 2, x1 - x0 - foto - 20, gaya.teks, 0.9F);
+		l.keterangan(npc.teks(LembarKunci.GELAR), x0 + foto + 4, y + 13, x1 - x0 - foto - 8, gaya.teksLemah);
+		return y + foto + 4;
+	}
+
+	/** The record meter 0-100 with the five thresholds. Returns the y under it. */
+	private int meter(Lukis l, int x0, int y, int x1) {
+		int nilai = lembar.i(Hukum.PELANGGARAN, 0);
+		Component label = u("hukum.pelanggaran", nilai);
+		int lw = Math.round(font.width(label) * 0.8F) + 6;
+		l.teks(label, x0, y, lw, nilai >= 35 ? 0xFFE07060 : gaya.teks, 0.8F);
+		int bx0 = x0 + lw;
+		int bw = x1 - bx0;
+		l.g.fill(bx0, y + 1, x1, y + 8, Palette.argb(0x70, 0x000000));
+		int isi = Math.round(bw * Math.min(1.0F, nilai / 100.0F));
+		l.g.fillGradient(bx0, y + 2, bx0 + isi, y + 7, 0xFF8A1A1A, 0xFFD03A2A);
+		for (int i = 0; i < AMBANG.length; i++) {
+			int tx = bx0 + Math.round(bw * AMBANG[i] / 100.0F);
+			boolean lewat = nilai >= AMBANG[i];
+			l.g.fill(tx, y, tx + 1, y + 9, lewat ? 0xFFFFE0A0 : 0x80FFFFFF);
+			if (l.di(tx - 3, y - 1, tx + 4, y + 10)) {
+				l.tip(u("hukum.ambang." + i, AMBANG[i]));
+			}
+		}
+		PanelTempat.garis(l.g, gaya, x0, x1, y + 12);
+		return y + 16;
+	}
+
+	private void soal(Lukis l, Kotak k, Lembar soal) {
+		sumur(l, k);
+		int teks = gaya.teksSumur();
+		int x0 = k.x0() + 5;
+		int x1 = k.x1() - 5;
+		int y = k.y0() + 4;
+		IkonGabung.gambar(l.g, IkonGabung.HATI, x0, y, 12);
+		l.teks(Brush.bold(u("hukum.soal_judul")), x0 + 15, y + 2, x1 - x0 - 15, teks, 0.85F);
+		y += 15;
+		y += Math.round(l.bungkus(soal.teks(LembarKunci.TEKS).copy().withStyle(ChatFormatting.ITALIC), x0, y, x1 - x0, teks, 0.8F, 40)) + 4;
+		List<Lembar> pilihan = soal.daftar(Hukum.PILIHAN);
+		int bh = Math.max(14, Math.min(24, (k.y1() - y - 4) / Math.max(1, pilihan.size()) - 3));
+		for (int i = 0; i < pilihan.size(); i++) {
+			Lembar p = pilihan.get(i);
+			Component label = Component.literal((i + 1) + ". ").append(p.teks(LembarKunci.TEKS));
+			tombolOp(l, "jawab" + i, x0, y, x1 - x0, bh, label, true, null, LembarKunci.op(Hukum.OP_JAWAB, p.i(LembarKunci.NO, i)));
+			y += bh + 3;
+		}
+	}
+
+	private void tebus(Lukis l, Kotak k, Lembar t) {
+		sumur(l, k);
+		int teks = gaya.teksSumur();
+		float cx = (k.x0() + k.x1()) / 2.0F;
+		int y = k.y0() + 4;
+		Brush.fitCentered(l.g, font, Brush.bold(u("hukum.kurungan")), cx, y, k.w() - 10, teks, 0.9F, 0.6F, false);
+		y += 12;
+		float r = Math.min(20.0F, (k.y1() - y - 40) / 2.0F);
+		if (r >= 8.0F) {
+			CincinWaktu.gambar(l, cx, y + r, r, t.l(LembarKunci.SISA_TICK, 0L), 0L, diterima, CincinWaktu.DALAM);
+			y += Math.round(r * 2) + 4;
+		}
+		Brush.fitCentered(l.g, font, u("hukum.tebus_harga", t.i(LembarKunci.HARGA, 5)), cx, y, k.w() - 10, Palette.argb(0xB0, teks & 0xFFFFFF), 0.75F, 0.6F,
+				false);
+		y += 10;
+		int biaya = t.i(LembarKunci.BIAYA, 0);
+		int bw = Math.min(150, k.w() - 10);
+		tombolOp(l, "tebus", Math.round(cx - bw / 2.0F), Math.min(y, k.y1() - 17), bw, 15, u("hukum.tebus", TeksTempat.angka(biaya)), t.b(LembarKunci.BISA),
+				t.teksAtau(LembarKunci.ALASAN), Hukum.OP_TEBUS);
+	}
+
+	private void nasihat(Lukis l, Kotak k, boolean sidang) {
+		sumur(l, k);
+		int teks = gaya.teksSumur();
+		int x0 = k.x0() + 5;
+		int y = k.y0() + 4;
+		IkonGabung.gambar(l.g, IkonGabung.HUKUM, x0, y, 16);
+		y += 20;
+		Component isi = lembar.b(LembarHukum.A2) ? u("hukum.nasihat.a2") : sidang ? u("hukum.nasihat.sidang") : u("hukum.nasihat.bersih");
+		y += Math.round(l.bungkus(isi.copy().withStyle(ChatFormatting.ITALIC), x0, y, k.w() - 10, teks, 0.8F, k.y1() - y - 30)) + 4;
+		if (lembar.b(Hukum.SHIFU) && lembar.ada(GabungLembar.Kartu.SHIFU)) {
+			l.keterangan(u("hukum.shifu_siap", lembar.teks(GabungLembar.Kartu.SHIFU), lembar.i(GabungLembar.IKATAN, 0)), x0, y, k.w() - 10,
+					TempatWarna.OK);
+		} else if (lembar.ada(GabungLembar.IKATAN)) {
+			l.keterangan(u("hukum.ikatan", lembar.i(GabungLembar.IKATAN, 0)), x0, y, k.w() - 10, Palette.argb(0xB0, teks & 0xFFFFFF));
+		}
+	}
+
+	private void tombolBawah(Lukis l, int x0, int by, int x1, boolean sidang, Lembar tebus) {
+		if (!sidang) {
+			if (!tebus.kosongSemua() && tata == Tata.SEMPIT) {
+				tombolOp(l, "tebusS", x0, by, Math.min(180, x1 - x0), 15, u("hukum.tebus", TeksTempat.angka(tebus.i(LembarKunci.BIAYA, 0))),
+						tebus.b(LembarKunci.BISA), tebus.teksAtau(LembarKunci.ALASAN), Hukum.OP_TEBUS);
+			}
+			return;
+		}
+		if (lembar.b(LembarHukum.A2)) {
+			int bw = (x1 - x0 - 4) / 2;
+			tombolYakin(l, "terimaA2", x0, by, bw, 15, u("hukum.terima_usir"), true, null, Hukum.OP_TERIMA);
+			tombolYakin(l, "lari", x0 + bw + 4, by, bw, 15, u("hukum.lari"), true, null, LembarHukum.OP_LARI);
+			return;
+		}
+		int bw = (x1 - x0 - 8) / 3;
+		tombolYakin(l, "terima", x0, by, bw, 15, u("hukum.terima"), true, null, Hukum.OP_TERIMA);
+		boolean bela = lembar.b(LembarHukum.BELA) && !lembar.ada(Hukum.SOAL);
+		tombolOp(l, "bela", x0 + bw + 4, by, bw, 15, u("hukum.bela"), bela, lembar.ada(Hukum.SOAL) ? u("hukum.jawab_dulu") : u("hukum.bela_habis"),
+				Hukum.OP_BELA);
+		boolean shifu = lembar.b(Hukum.SHIFU);
+		tombolOp(l, "shifu", x0 + (bw + 4) * 2, by, bw, 15, u("hukum.minta_shifu"), shifu, u("hukum.shifu_tidak", lembar.i(GabungLembar.IKATAN, 0)),
+				Hukum.OP_MINTA_SHIFU);
+	}
+}

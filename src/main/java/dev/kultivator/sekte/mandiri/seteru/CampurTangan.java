@@ -56,6 +56,11 @@ final class CampurTangan {
 		if (!f.aktif()) {
 			return Teks.t("alasan.selesai");
 		}
+		// a forbidden-love record takes only Restui/Pisahkan (they clear both hearts); a feud never takes those
+		boolean lover = SeteruIds.TERLARANG.equals(f.status);
+		if (lover != (aksi >= SeteruIds.AKSI_RESTUI)) {
+			return Teks.t(lover ? "alasan.kekasih" : "alasan.bukan_kekasih");
+		}
 		if (!f.bolehAksi(aksi, today)) {
 			return Teks.t("alasan.sudah_hari_ini");
 		}

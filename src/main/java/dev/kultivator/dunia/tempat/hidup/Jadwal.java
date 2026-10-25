@@ -6,6 +6,9 @@ import dev.kultivator.sosok.GerakId;
 import dev.kultivator.sosok.PropId;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * The daily round of every resident (DESIGN 38.N.3): a pure function of the world clock, the day, the season, the
  * weather, the sky and the place's event. No tick per resident: the caller asks when it needs an answer (a body every
@@ -42,6 +45,74 @@ public final class Jadwal {
 	 */
 	public record Cuaca(boolean hujan, boolean badai, boolean salju, boolean dingin, boolean kabut, @Nullable SkyKind langit) {
 		public static final Cuaca CERAH = new Cuaca(false, false, false, false, false, null);
+	}
+
+	// ================================================================== overriders (DESIGN 42.4.14, 42.4A.2)
+
+	/**
+	 * A module's say over one resident's activity (42: ceremonies, habits, the daily plan of 42S). Asked by
+	 * {@link TempatHuni#kegiatan} after the place's event and danger ({@link HidupApi#timpaJadwal}; while one runs no
+	 * overrider is asked) and before {@link #ramai} and the role's round, so the full order is: event/danger &gt; overriders
+	 * by {@link #addPenimpa(int, PenimpaJadwal) urutan} (ceremony {@value #URUT_UPACARA}, habit {@value #URUT_KEBIASAAN},
+	 * daily plan {@value #URUT_RENCANA}) &gt; {@code ramai} &gt; the role's round. The first non-null answer wins and is final:
+	 * neither {@code ramai} nor the life-state bending of {@link TempatHuni} touch it (read
+	 * {@link TempatHuni#keadaanDari} to honour a state). Fixed lives ({@link NpcRole.Kelompok#KHUSUS}, captives) are never
+	 * asked. Called for every resident every place cycle: keep it cheap and deterministic for the same inputs.
+	 */
+	@FunctionalInterface
+	public interface PenimpaJadwal {
+		/**
+		 * @param waktu overworld clock time (absolute ticks) the resident lives
+		 * @param jam   the resident's own hour ({@link #saat})
+		 * @param now   game time
+		 * @return the activity instead of the round, or null to leave it
+		 */
+		@Nullable Kegiatan timpa(TempatHuni huni, Penduduk p, long waktu, int jam, long now);
+	}
+
+	/** Order of the ceremony overrider (weddings, funerals, births; 42D). */
+	public static final int URUT_UPACARA = 100;
+	/** Order of the habit overrider (42A-2 {@code Kebiasaan}). */
+	public static final int URUT_KEBIASAAN = 200;
+	/** Order of the daily-plan overrider (42S {@code RencanaHarian}). */
+	public static final int URUT_RENCANA = 300;
+	/** Order of an overrider registered without one. */
+	public static final int URUT_LAIN = 400;
+
+	private record Penimpa(int urutan, PenimpaJadwal penimpa) {
+	}
+
+	/** Registered overriders, sorted by order (stable for equal orders). */
+	private static final List<Penimpa> PENIMPA = new ArrayList<>();
+
+	/** Registers an overrider at {@link #URUT_LAIN}. */
+	public static void addPenimpa(PenimpaJadwal penimpa) {
+		addPenimpa(URUT_LAIN, penimpa);
+	}
+
+	/** Registers an overrider; lower {@code urutan} is asked first. Call once at init. */
+	public static synchronized void addPenimpa(int urutan, PenimpaJadwal penimpa) {
+		int i = 0;
+		while (i < PENIMPA.size() && PENIMPA.get(i).urutan() <= urutan) {
+			i++;
+		}
+		PENIMPA.add(i, new Penimpa(urutan, penimpa));
+	}
+
+	/** The first overrider's answer for {@code p}, or null (always null when none is registered). */
+	static @Nullable Kegiatan timpa(TempatHuni huni, Penduduk p, long waktu, int jam, long now) {
+		for (Penimpa each : PENIMPA) {
+			Kegiatan k = each.penimpa().timpa(huni, p, waktu, jam, now);
+			if (k != null) {
+				return k;
+			}
+		}
+		return null;
+	}
+
+	/** True when at least one overrider is registered. */
+	static boolean adaPenimpa() {
+		return !PENIMPA.isEmpty();
 	}
 
 	/** Hour and minute of a resident (after its shifts), the day and the season. */

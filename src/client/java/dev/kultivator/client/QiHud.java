@@ -6,7 +6,6 @@ import dev.kultivator.client.goals.GoalsClient;
 import dev.kultivator.client.goals.HudDemo;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Eased;
-import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.cultivation.Enlightenment;
 import dev.kultivator.cultivation.ImmortalPerks;
@@ -50,11 +49,11 @@ import java.util.Map;
 /**
  * The cultivation HUD in the bottom-left corner, in the strip under the chat and left of the offhand slot (DESIGN 5):
  * a dantian orb whose qi rises from the bottom in the root's colour, wrapped in a gold ring that fills clockwise with
- * the cultivation bar, a white-jade Perisai Qi arc, and violet beads while Stored Qi waits; the selected technique spec
- * as a seal tile (glyph, grade ribbon, cooldown sweep, mastery beads, scaled qi cost, charge pips, the red KEHANCURAN
- * tag, DESIGN 22.12.8); countdown arcs of lasting forms, domains and fields above the orb; and the realm, qi and
- * warnings beside it. Every value glides to its new number. Hidden with F1, F3, the HUD setting, an open chat, or
- * before the server sent any data. The quick seals, wheel, charge bar and toasts are {@code codex.CodexHud}.
+ * the cultivation bar, a white-jade Perisai Qi arc, and violet beads while Stored Qi waits; room for the selected
+ * technique's seal tile, which {@code codex.CodexHud} draws (DESIGN 43.9, G32: one seal tile); countdown arcs of
+ * lasting forms, domains and fields above the orb; and the realm, qi and warnings beside it. Every value glides to its
+ * new number. Hidden with F1, F3, the HUD setting, an open chat, or before the server sent any data. The seal tile,
+ * quick seals, wheel and charge bar are {@code codex.CodexHud}; notices go to {@code hud.Kabar}.
  * <p>
  * Phase 7 (DESIGN 19.3.15): the flying-sword gauge (amber below 15 s, red below 10 s with chimes at 10/5/3 s, "Turun!"
  * below 2 s), the enlightenment timer, Cloud Step pips while airborne, the optional cooldown ping, the toxicity meter
@@ -75,7 +74,6 @@ public final class QiHud implements HudElement {
 	private static final int[] FLY_CHIMES = {10, 5, 3};
 	/** A cooldown at least this long pings when it ends (setting "Pengingat cooldown"). */
 	private static final int PING_COOLDOWN_TICKS = 200;
-	private static final long PING_FLASH_MILLIS = 700L;
 	/** Fuel stone colours by grade (Low, Mid, High, Supreme). */
 	private static final int[] STONE_COLORS = {0xFF9FD8C8, 0xFF6FB8FF, 0xFFB98CFF, 0xFFFFD54A};
 
@@ -90,7 +88,6 @@ public final class QiHud implements HudElement {
 	private static long enlightenedAt = -1L;
 	private static double lastFlySeconds = Double.MAX_VALUE;
 	private static final Map<String, Long> COOLDOWNS = new HashMap<>();
-	private static long pingFlashUntil;
 
 	private final Eased qi = new Eased(5.0F);
 	private final Eased bar = new Eased(5.0F);
@@ -209,7 +206,7 @@ public final class QiHud implements HudElement {
 			if (before != null && before > 0L && left <= 0L && SpecInfo.cooldown(data, spec) >= PING_COOLDOWN_TICKS) {
 				ping = true;
 				if (id.equals(data.selectedId())) {
-					pingFlashUntil = Util.getMillis() + PING_FLASH_MILLIS;
+					dev.kultivator.client.codex.CodexHud.kilatUbin();
 				}
 			}
 		}
@@ -252,26 +249,30 @@ public final class QiHud implements HudElement {
 
 		drawOrb(g, data, rank, cx, cy, (float) (qiShown / maxQi), barShown, storedShown, nowMillis);
 
-		// Everything stays left of the offhand slot (on the left for right-handed players), and for left-handed players
-		// left of the hotbar attack indicator when it is shown there.
-		boolean right = minecraft.player.getMainArm() == HumanoidArm.RIGHT;
-		int limit = right ? width / 2 - 91 - 29 - 4
-				: minecraft.options.attackIndicator().get() == AttackIndicatorStatus.HOTBAR ? width / 2 - 91 - 22 - 4 : width / 2 - 91 - 4;
-		int textX = 40;
-		TechniqueSpec selected = data.selectedId().isEmpty() ? null : TechniqueRegistry.byId(data.selectedId());
-		if (selected != null && 40 + 18 <= limit) {
-			drawSeal(g, font, data, selected, 40, Math.round(cy) - 13, deltaTracker.getGameTimeDeltaPartialTick(false));
-			textX = 62;
-		} else if (TeknikSession.breakerOn() && 40 + 18 <= limit) {
-			kehancuranTag(g, font, 49.0F, Math.round(cy) - 3.0F);
-			textX = 62;
-		}
+		int limit = limit(minecraft, width);
+		// the seal tile itself is drawn by CodexHud (DESIGN 43.9, G32); the text keeps clear of it
+		int textX = sealTile(data, limit) ? 62 : 40;
 		drawLasting(g, nowMillis, height);
 		drawCloudPips(g, minecraft.player, data, height);
 		int room = limit - textX;
 		if (room >= 24) {
 			drawText(g, font, data, rank, textX, room, cy, height, qiShown, maxQi, barShown, storedNumber, nowMillis);
 		}
+	}
+
+	/**
+	 * The right end of the bottom-left strip: everything stays left of the offhand slot (on the left for right-handed
+	 * players), and for left-handed players left of the hotbar attack indicator when it is shown there.
+	 */
+	public static int limit(Minecraft minecraft, int width) {
+		boolean right = minecraft.player == null || minecraft.player.getMainArm() == HumanoidArm.RIGHT;
+		return right ? width / 2 - 91 - 29 - 4
+				: minecraft.options.attackIndicator().get() == AttackIndicatorStatus.HOTBAR ? width / 2 - 91 - 22 - 4 : width / 2 - 91 - 4;
+	}
+
+	/** True when the seal tile (a selected technique, or the Kehancuran mark) has room at x 40..58 of the strip. */
+	public static boolean sealTile(CultivationData data, int limit) {
+		return 40 + 18 <= limit && (!data.selectedId().isEmpty() && TechniqueRegistry.byId(data.selectedId()) != null || TeknikSession.breakerOn());
 	}
 
 	/** Root tested and revealed (not still inside its testing ceremony). */
@@ -352,72 +353,6 @@ public final class QiHud implements HudElement {
 		}
 	}
 
-	// ================================================================== technique seal
-
-	/**
-	 * The selected spec as a seal tile (DESIGN 22.12.8): glyph, grade ribbon, cooldown sweep, four mastery beads, the qi
-	 * cost after mastery and the realm gap, charge pips above it and the red KEHANCURAN tag under it while the switch is on.
-	 */
-	private static void drawSeal(GuiGraphicsExtractor g, Font font, CultivationData data, TechniqueSpec spec, int x, int y, float partialTick) {
-		int size = 18;
-		int qi = SpecInfo.qi(data, spec);
-		boolean affordable = data.qi() + 1.0E-6D >= qi;
-		g.fill(x - 1, y - 1, x + size + 1, y + size + 1, 0xA0101824);
-		int paper = affordable ? Palette.TALISMAN : Palette.grey(Palette.TALISMAN, 0.6F);
-		g.fill(x, y, x + size, y + size, paper);
-		long left = SpecInfo.cooldownLeft(spec);
-		int total = SpecInfo.cooldown(data, spec);
-		if (left > 0L && total > 0) {
-			float fraction = Math.min(1.0F, Math.max(0.0F, (left - partialTick) / total));
-			g.enableScissor(x, y, x + size, y + size);
-			Brush.pie(g, x + size / 2.0F, y + size / 2.0F, size * 0.75F, 1.0F - fraction, 1.0F, Palette.mix(paper, 0xFF1A2230, 0.6F));
-			g.disableScissor();
-		}
-		int seal = affordable ? Palette.SEAL : 0xFF6A6A6A;
-		Brush.frame(g, x, y, x + size, y + size, seal);
-		Brush.frame(g, x + 1, y + 1, x + size - 1, y + size - 1, Palette.argb(0x70, seal));
-		int ribbon = SpecInfo.ribbon(spec.grade());
-		for (int i = 0; i < 5; i++) {
-			g.fill(x + size - 5 + i, y + i, x + size, y + i + 1, ribbon);
-		}
-		int ink = SpecInfo.ink(spec);
-		Glyphs.spec(g, spec, x + size / 2.0F, y + size / 2.0F - 1.0F, 10.0F, left > 0L ? Palette.fade(ink, 0.55F) : ink);
-		int mastery = data.knows(spec.id()) ? SpecInfo.mastery(data, spec) : 0;
-		for (int i = 0; i < 4; i++) {
-			Brush.dot(g, x + size / 2.0F + (i - 1.5F) * 2.6F, y + size - 2.2F, 0.7F, i < mastery ? Palette.GOLD : Palette.argb(0x60, 0x3A2D12));
-		}
-		if (left > 0L) {
-			Component secs = Component.literal(String.valueOf((left + 19L) / 20L));
-			Brush.centered(g, font, secs, x + size / 2.0F, y + size / 2.0F - 2.5F, 0xFFFFFFFF, 0.6F, true);
-		}
-		long flash = pingFlashUntil - Util.getMillis();
-		if (flash > 0L) {
-			// The cooldown ping (DESIGN 19.3.15): a short gold flash over the seal.
-			int alpha = Math.round(160 * flash / (float) PING_FLASH_MILLIS);
-			g.fill(x - 1, y - 1, x + size + 1, y + size + 1, Palette.argb(alpha, 0xFFE07A));
-		}
-		Component cost = Component.literal(SpecInfo.compact(qi));
-		Brush.centered(g, font, cost, x + size / 2.0F, y + size + 2.0F, affordable ? Palette.QI_LIGHT : 0xFFFF7A6A, 0.6F, true);
-		CompoundTag charges = TeknikSession.charges(spec.id());
-		if (charges != null) {
-			int max = Math.max(1, Math.min(8, charges.getIntOr("max", 1)));
-			int have = Math.max(0, Math.min(max, charges.getIntOr("n", max)));
-			for (int i = 0; i < max; i++) {
-				Brush.dot(g, x + size / 2.0F + (i - (max - 1) / 2.0F) * 3.0F, y - 2.5F, 0.9F, i < have ? Palette.QI_LIGHT : Palette.argb(0x70, 0x3A4A5A));
-			}
-		}
-		if (TeknikSession.breakerOn()) {
-			kehancuranTag(g, font, x + size / 2.0F, y + size + 7.5F);
-		}
-	}
-
-	/** The red "KEHANCURAN" tag (Mode Kehancuran on and allowed). */
-	private static void kehancuranTag(GuiGraphicsExtractor g, Font font, float cx, float y) {
-		float pulse = 0.6F + 0.4F * (float) Math.sin(Util.getMillis() / 250.0D);
-		Component tag = Component.translatable("kultivator.codex.hud.kehancuran").withStyle(net.minecraft.ChatFormatting.BOLD);
-		Brush.centered(g, font, tag, cx, y, Palette.mix(0xFFB3281D, 0xFFFF5B3A, pulse), 0.42F, true);
-	}
-
 	/** Countdown arcs for forms, domains, auras, toggles and fields above the orb, in their Dao colour. */
 	private static void drawLasting(GuiGraphicsExtractor g, long now, int height) {
 		List<TeknikSession.Lasting> lasting = TeknikSession.lasting();
@@ -475,6 +410,7 @@ public final class QiHud implements HudElement {
 		Line meditatingLine = null;
 		Line veinLine = null;
 		Line enlightenLine = null;
+		Line readyLine = null;
 		boolean demo = HudDemo.active();
 		CompoundTag session = data.sessionExtra();
 		addRankLines(lines, font, rank, room);
@@ -485,10 +421,10 @@ public final class QiHud implements HudElement {
 		float pulse = 0.5F + 0.5F * (float) Math.sin(now / 200.0D);
 		if (untested) {
 			Component text = Component.translatable("kultivator.hud.hint_root", Keys.INFO.getTranslatedKeyMessage());
-			List<FormattedCharSequence> hint = font.split(text, Math.max(10, (int) (room / 0.75F)));
+			List<FormattedCharSequence> hint = font.split(text, Math.max(10, room));
 			int hintColor = Palette.mix(Palette.JADE_PALE, Palette.GOLD_LIGHT, pulse * 0.5F);
 			for (int i = 0; i < Math.min(2, hint.size()); i++) {
-				lines.add(new Line(null, hint.get(i), hintColor, 0.75F, -1));
+				lines.add(new Line(null, hint.get(i), hintColor, 1.0F, -1));
 			}
 		} else {
 			MutableComponent qiLine = Component.translatable("kultivator.hud.qi", Msg.number(qiShown), Msg.number(maxQi)).withColor(Palette.QI_LIGHT);
@@ -499,17 +435,18 @@ public final class QiHud implements HudElement {
 			if (stars > 0) {
 				qiLine.append(Component.literal("  ★" + stars).withColor(Palette.GOLD_LIGHT));
 			}
-			lines.add(Line.of(qiLine, Palette.QI_LIGHT, 0.75F));
+			lines.add(Line.of(qiLine, Palette.QI_LIGHT, 1.0F));
 			if (data.storedQi() > 0.5D) {
 				storedLine = Line.of(Component.translatable(rank.isMax() ? "kultivator.hud.stored_immortal" : "kultivator.hud.stored",
-						Msg.number(storedNumber)), Palette.STORED_LIGHT, 0.75F);
+						Msg.number(storedNumber)), Palette.STORED_LIGHT, 1.0F);
 				lines.add(storedLine);
 			}
 		}
 		if (data.breakingThrough()) {
-			lines.add(Line.of(Component.translatable("kultivator.hud.breaking_through"), Palette.mix(Palette.GOLD, Palette.GOLD_LIGHT, pulse), 0.75F));
+			lines.add(Line.of(Component.translatable("kultivator.hud.breaking_through"), Palette.mix(Palette.GOLD, Palette.GOLD_LIGHT, pulse), 1.0F));
 		} else if (data.barFull() && rank.nextIsBreakthrough() && !unknown) {
-			lines.add(Line.of(Component.translatable("kultivator.hud.ready"), Palette.mix(Palette.GOLD, Palette.GOLD_LIGHT, pulse), 0.75F));
+			readyLine = Line.of(Component.translatable("kultivator.hud.ready"), Palette.mix(Palette.GOLD, Palette.GOLD_LIGHT, pulse), 1.0F);
+			lines.add(readyLine);
 		}
 		// The flying-sword gauge: seconds of flight the qi still pays for.
 		double fly = demo ? 42.0D - 41.0D * HudDemo.progress() : flySeconds(data);
@@ -517,19 +454,19 @@ public final class QiHud implements HudElement {
 			int color = fly < FLY_RED ? Palette.mix(0xFFFF4A3A, 0xFFFF9A8A, pulse) : fly < FLY_AMBER ? 0xFFFFB347 : Palette.JADE_PALE;
 			Component text = fly < FLY_LAND ? Component.translatable("kultivator.goals.hud.fly_land")
 					: Component.translatable("kultivator.goals.hud.fly", Math.round(fly));
-			lines.add(Line.of(text, color, 0.75F));
+			lines.add(Line.of(text, color, 1.0F));
 		}
 		int deviation = deviationTicksNow();
 		if (deviation > 0) {
 			int seconds = deviation / 20;
 			String clock = String.format(Locale.ROOT, "%d:%02d", seconds / 60, seconds % 60);
-			lines.add(Line.of(Component.translatable("kultivator.hud.deviation", clock), Palette.mix(0xFFFF4A3A, 0xFFFF9A8A, pulse), 0.75F));
+			lines.add(Line.of(Component.translatable("kultivator.hud.deviation", clock), Palette.mix(0xFFFF4A3A, 0xFFFF9A8A, pulse), 1.0F));
 		}
 		// The enlightenment timer.
 		if (demo || data.enlightened() && enlightenedAt >= 0L) {
 			long left = demo ? 140L : Math.max(0L, Enlightenment.DURATION_TICKS - (ClientCultivation.serverGameTime() - enlightenedAt));
 			enlightenLine = Line.of(Component.translatable("kultivator.goals.hud.enlightenment", clock(left)),
-					Palette.mix(Palette.GOLD, Palette.GOLD_LIGHT, pulse), 0.75F);
+					Palette.mix(Palette.GOLD, Palette.GOLD_LIGHT, pulse), 1.0F);
 			lines.add(enlightenLine);
 		}
 		// Toxicity from 40 (amber), a warning above 80.
@@ -537,7 +474,7 @@ public final class QiHud implements HudElement {
 		if (toxicity >= TOXICITY_SHOWN) {
 			boolean warn = toxicity > TOXICITY_WARN;
 			toxicityLine = Line.of(Component.translatable(warn ? "kultivator.hud.toxicity" : "kultivator.goals.hud.toxicity", Msg.number(toxicity)),
-					warn ? Palette.WARN : 0xFFE0C070, 0.75F);
+					warn ? Palette.WARN : 0xFFE0C070, 1.0F);
 			lines.add(toxicityLine);
 		}
 		if (data.meditating() || demo) {
@@ -552,7 +489,7 @@ public final class QiHud implements HudElement {
 			if (data.formationTier() > 0) {
 				line.append(Component.literal(" · ")).append(Component.translatable("kultivator.hud.formation." + Math.min(3, data.formationTier())));
 			}
-			meditatingLine = Line.of(line, Palette.JADE_PALE, 0.75F);
+			meditatingLine = Line.of(line, Palette.JADE_PALE, 1.0F);
 			lines.add(meditatingLine);
 			// Closed-door seclusion and the spirit stone burning as fuel.
 			MutableComponent extra = Component.empty();
@@ -591,15 +528,16 @@ public final class QiHud implements HudElement {
 				any = true;
 			}
 			if (any) {
-				veinLine = Line.of(extra, Palette.JADE_PALE, 0.7F);
+				veinLine = Line.of(extra, Palette.JADE_PALE, 1.0F);
 				lines.add(veinLine);
 			}
 		}
 
 		// The vanilla chat starts 40 px above the bottom: keep the block below it by dropping the least important lines
-		// (the phase-7 vein line first, then the enlightenment timer, the meditation details, Stored Qi, toxicity).
+		// (the phase-7 vein line first, then the enlightenment timer, the meditation details, Stored Qi, toxicity, and
+		// "ready", which the orb's halo also shows). Text is 1.0 (43.0.5), so at most four lines fit; past that the last go.
 		float total = linesHeight(lines);
-		for (Line droppable : new Line[]{veinLine, enlightenLine, meditatingLine, storedLine, toxicityLine}) {
+		for (Line droppable : new Line[]{veinLine, enlightenLine, meditatingLine, storedLine, toxicityLine, readyLine}) {
 			if (total <= MAX_TEXT_HEIGHT) {
 				break;
 			}
@@ -607,13 +545,17 @@ public final class QiHud implements HudElement {
 				total = linesHeight(lines);
 			}
 		}
+		while (total > MAX_TEXT_HEIGHT && lines.size() > rankLines + 1) {
+			lines.remove(lines.size() - 1);
+			total = linesHeight(lines);
+		}
 		float y = total <= 34.0F ? cy - total / 2.0F : height - 3.0F - total;
 		int[] dots = dailyDots(data, demo);
 		for (int i = 0; i < lines.size(); i++) {
 			Line line = lines.get(i);
 			float drawn;
 			if (line.text() != null) {
-				drawn = Brush.fit(g, font, line.text(), x, y, room, line.color(), line.scale(), line.scale() * 0.65F, true);
+				drawn = Brush.fit(g, font, line.text(), x, y, room, line.color(), line.scale(), line.scale(), true);
 			} else if (line.row() != null) {
 				Brush.text(g, font, line.row(), x, y, line.color(), line.scale(), true);
 				drawn = font.width(line.row()) * line.scale();
@@ -656,30 +598,20 @@ public final class QiHud implements HudElement {
 	}
 
 	/**
-	 * The realm and stage: the full "Golden Core, Late" when it fits, else the realm name with four stage pips, else the
-	 * realm name over two small lines (narrow windows, long names).
+	 * The realm and stage at text 1.0 (43.0.5): the full "Golden Core, Late" when it fits, else the realm name with four
+	 * stage pips (cut with "…" in very narrow windows).
 	 */
 	private static void addRankLines(List<Line> lines, Font font, Rank rank, int room) {
 		int color = Palette.opaque(rank.realm().color());
 		Component full = rank.displayName();
-		float fullScale = Brush.fitScale(font, full, room, 1.0F, 0.5F);
-		if (fullScale >= 0.7F || rank.realm().isMortal()) {
-			lines.add(Line.of(full, color, Math.max(0.6F, fullScale)));
+		if (font.width(full) <= room || rank.realm().isMortal()) {
+			lines.add(Line.of(full, color, 1.0F));
 			return;
 		}
 		Component realm = rank.realm().layers() > 1
 				? Component.translatable("kultivator.hud.realm_layer", rank.realm().displayName(), rank.layer() + 1)
 				: rank.realm().displayName();
-		float realmScale = Brush.fitScale(font, realm, room - PIP_ROOM, 0.85F, 0.5F);
-		if (realmScale >= 0.6F) {
-			lines.add(new Line(realm, null, color, realmScale, rank.stage()));
-			return;
-		}
-		List<FormattedCharSequence> rows = font.split(realm, Math.max(10, (int) (room / 0.65F)));
-		int count = Math.min(2, rows.size());
-		for (int i = 0; i < count; i++) {
-			lines.add(new Line(null, rows.get(i), color, 0.65F, i == count - 1 ? rank.stage() : -1));
-		}
+		lines.add(new Line(realm, null, color, 1.0F, rank.stage()));
 	}
 
 	private static float linesHeight(List<Line> lines) {

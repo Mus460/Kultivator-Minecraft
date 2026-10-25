@@ -1,27 +1,41 @@
 package dev.kultivator.client.hall;
 
-import dev.kultivator.client.screen.ui.Brush;
-import dev.kultivator.client.screen.ui.Eased;
+import dev.kultivator.client.screen.Page;
 import dev.kultivator.client.screen.ui.Glyphs;
+import dev.kultivator.client.screen.ui.Kronik;
+import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
+import dev.kultivator.client.screen.ui.Saring;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 /**
- * The Catatan tablet (DESIGN 20.3.1): the hall's last 50 log lines, newest first, each stamped with its day index on a
- * little red seal, written down the scroll like a sect's annals. Scrolls with the wheel.
+ * Sekte › Ikhtisar › Catatan (DESIGN 20.3.1, 43.11 G37): the one chronicle of the sect, newest first under day headings
+ * ({@code Kronik}, 50 entries): the hall's own log plus the chronicles other modules add with
+ * {@link HallClient#sumberCatatan} (kabar murid, langit, diplomasi, formasi). A {@code Saring} row filters by text and by
+ * kind (one chip per source, only when there is more than one). The hall's lines are kind {@code aula}.
  */
-public class LogPage extends HallPage {
+public class LogPage extends Page {
 
-	private final Eased scrollShown = new Eased(14.0F);
-	private float scroll;
-	private float contentH;
+	static final String JENIS_AULA = "aula";
 
-	public LogPage(HallScreen screen) {
-		super(screen);
+	private final Saring saring = new Saring(() -> kronik().mulaiUlang(net.minecraft.util.Util.getMillis()));
+	private @Nullable Kronik kronik;
+	private int jenisTerpasang = -1;
+
+	private Kronik kronik() {
+		if (kronik == null) {
+			kronik = new Kronik(saring);
+		}
+		return kronik;
 	}
 
 	@Override
@@ -35,8 +49,13 @@ public class LogPage extends HallPage {
 	}
 
 	@Override
-	public int icon() {
+	public int glyph() {
 		return Glyphs.HELP;
+	}
+
+	@Override
+	public String helpTopic() {
+		return "aula";
 	}
 
 	@Override
@@ -44,58 +63,56 @@ public class LogPage extends HallPage {
 	}
 
 	@Override
-	protected void drawBehind(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
-		ListTag log = info().getListOrEmpty("log");
-		float maxScroll = Math.max(0.0F, contentH - h);
-		scroll = Math.max(0.0F, Math.min(maxScroll, scroll));
-		float offset = scrollShown.to(scroll, seconds);
-		float scale = w >= 280 ? 0.62F : 0.56F;
-		float stampW = 30.0F;
-		float textX = x + stampW + 6.0F;
-		float textW = w - stampW - 12.0F;
-		g.enableScissor(x, y, x + w, y + h);
-		float cursor = y + 2.0F - offset;
-		if (log.isEmpty()) {
-			Brush.wrap(g, font, Component.translatable("kultivator.hall.ui.log_empty"), x + 6.0F, cursor + 4.0F, w - 12.0F, Palette.INK_SOFT, 0.7F, false);
-		}
-		long today = info().getLongOr("day", 0L);
-		long lastDay = Long.MIN_VALUE;
-		for (int i = log.size() - 1; i >= 0; i--) {
-			CompoundTag entry = log.getCompoundOrEmpty(i);
-			Component text = entry.read("text", ComponentSerialization.CODEC).orElse(Component.empty());
-			long day = entry.getLongOr("day", 0L);
-			float height = Math.max(9.0F * scale, Brush.wrapHeight(font, text, textW, scale));
-			if (cursor + height >= y && cursor <= y + h) {
-				if (day != lastDay) {
-					// A seal with the day index where a new day begins.
-					Component stamp = day == today ? Component.translatable("kultivator.hall.ui.log_today") : Component.translatable("kultivator.hall.ui.log_day", day);
-					g.fill(x + 2, Math.round(cursor), x + 2 + Math.round(stampW), Math.round(cursor + 8.0F), Palette.argb(0xD0, Palette.SEAL));
-					Brush.fitCentered(g, font, stamp, x + 2.0F + stampW / 2.0F, cursor + 1.0F, stampW - 2.0F, Palette.TALISMAN, 0.5F, 0.35F, false);
-				} else {
-					Brush.rect(g, x + 2.0F + stampW / 2.0F - 0.5F, cursor - 1.0F, x + 2.0F + stampW / 2.0F + 0.5F, cursor + 7.0F,
-							Palette.argb(0x70, Palette.SEAL));
-				}
-				Brush.wrap(g, font, text, textX, cursor, textW, Palette.INK, scale, false);
-			}
-			lastDay = day;
-			cursor += height + 3.0F;
-			Brush.rect(g, textX, cursor - 1.8F, x + w - 6.0F, cursor - 1.3F, Palette.argb(0x30, Palette.GOLD_DARK));
-		}
-		contentH = cursor + offset - y + 2.0F;
-		g.disableScissor();
-		if (maxScroll > 0.0F) {
-			float bead = y + 3.0F + (h - 6.0F) * (offset / maxScroll);
-			g.fill(x + w - 2, y, x + w - 1, y + h, Palette.CORD);
-			Brush.disc(g, x + w - 1.5F, bead, 2.2F, Palette.JADE);
-		}
+	public void onShow(@Nullable CompoundTag fokus) {
+		HallClient.minta();
+		// the disciples' news source reads the independent-disciple board
+		dev.kultivator.client.sekte.mandiri.MandiriBoardScreen.minta();
+		super.onShow(fokus);
 	}
 
 	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-		if (inside(mouseX, mouseY)) {
-			scroll -= (float) amount * 16.0F;
-			return true;
+	protected void drawBehind(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
+	}
+
+	@Override
+	protected void lukis(Lukis l) {
+		List<HallClient.SumberCatatan> sumber = HallClient.sumberCatatan();
+		boolean aula = HallClient.adaAula();
+		int jenis = sumber.size() + (aula ? 1 : 0);
+		if (jenis != jenisTerpasang) {
+			jenisTerpasang = jenis;
+			List<Saring.Pilihan> chips = new ArrayList<>();
+			if (jenis > 1) {
+				if (aula) {
+					chips.add(new Saring.Pilihan(JENIS_AULA, Component.translatable("kultivator.gui43.m05.catatan.aula")));
+				}
+				for (HallClient.SumberCatatan s : sumber) {
+					chips.add(new Saring.Pilihan(s.jenis(), s.nama()));
+				}
+			}
+			saring.jenis(chips);
 		}
-		return false;
+		CompoundTag info = HallClient.info();
+		List<Kronik.Entri> entri = new ArrayList<>();
+		if (aula) {
+			ListTag log = info.getListOrEmpty("log");
+			for (int i = 0; i < log.size(); i++) {
+				CompoundTag e = log.getCompoundOrEmpty(i);
+				entri.add(new Kronik.Entri(e.read("text", ComponentSerialization.CODEC).orElse(Component.empty()), e.getLongOr("day", 0L), JENIS_AULA,
+						Palette.SEAL));
+			}
+		}
+		for (HallClient.SumberCatatan s : sumber) {
+			try {
+				entri.addAll(s.entri().get());
+			} catch (RuntimeException ignored) {
+				// a broken source must not blank the whole chronicle
+			}
+		}
+		// oldest first by day (stable: within a day each source keeps its own order)
+		entri.sort(Comparator.comparingLong(Kronik.Entri::hari));
+		long today = info.getLongOr("day", net.minecraft.client.Minecraft.getInstance().level == null ? 0L
+				: Math.floorDiv(net.minecraft.client.Minecraft.getInstance().level.getOverworldClockTime(), 24000L));
+		kronik().gambar(l, "catatan", entri, today, x, y, x + w, y + h);
 	}
 }

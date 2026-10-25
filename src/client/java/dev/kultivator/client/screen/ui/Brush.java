@@ -20,7 +20,8 @@ public final class Brush {
 	public static final int FINE = 2;
 	private static final float INV = 1.0F / FINE;
 	private static final float TAU = (float) (Math.PI * 2.0D);
-	private static final String CUT = "..";
+	/** The cut mark of {@link #fit} (DESIGN 43.0.5: "…", the whole text in the tooltip). */
+	public static final String CUT = "…";
 
 	// ================================================================== round shapes
 
@@ -236,18 +237,24 @@ public final class Brush {
 		text(g, font, text, cx - font.width(text) * scale / 2.0F, y, color, scale, shadow);
 	}
 
-	/** The scale (between {@code min} and {@code max}) at which {@code text} fits into {@code width}. */
+	/**
+	 * The scale at which {@code text} is drawn into {@code width}. Since DESIGN 43.0.5 text is never shrunk to fit: a
+	 * scale above 1.0 may come down to 1.0 (and to {@code min} when that is higher), never below {@code min(max, 1.0)};
+	 * text that is still too wide is cut by {@link #fit}.
+	 */
 	public static float fitScale(Font font, Component text, float width, float max, float min) {
 		int w = font.width(text);
+		float floor = Math.max(min, Math.min(max, 1.0F));
 		if (w <= 0) {
 			return max;
 		}
-		return Math.max(min, Math.min(max, width / w));
+		return Math.max(floor, Math.min(max, width / w));
 	}
 
 	/**
-	 * Text shrunk (down to {@code min}) to fit {@code width}; if it still does not fit it is cut with "..". Returns the
-	 * width actually drawn.
+	 * Text at its scale ({@link #fitScale}: never shrunk below 1.0 or the caller's {@code max}); when it does not fit
+	 * {@code width} it is cut with "…" and, while the mouse is over the cut text on a screen, the whole text is offered to
+	 * {@link SlipTooltip} (DESIGN 43.0.5). Returns the width actually drawn.
 	 */
 	public static float fit(GuiGraphicsExtractor g, Font font, Component text, float x, float y, float width, int color, float max,
 							float min, boolean shadow) {
@@ -263,7 +270,156 @@ public final class Brush {
 		String cut = font.plainSubstrByWidth(text.getString(), Math.max(0, room - font.width(CUT))) + CUT;
 		Component shortened = Component.literal(cut).withStyle(text.getStyle());
 		text(g, font, shortened, x, y, color, scale, shadow);
+		offerFull(g, text, x, y, x + width, y + 9.0F * scale);
 		return font.width(shortened) * scale;
+	}
+
+	/** The mouse in GUI coordinates while a screen is open (null otherwise). */
+	private static float[] mouse() {
+		net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
+		if (mc.gui.screen() == null) {
+			return null;
+		}
+		return new float[] {(float) mc.mouseHandler.getScaledXPos(mc.getWindow()), (float) mc.mouseHandler.getScaledYPos(mc.getWindow())};
+	}
+
+	/** Offers {@code full} as a weak tooltip when the mouse is over the box (local coordinates under the current pose). */
+	private static void offerFull(GuiGraphicsExtractor g, Component full, float x0, float y0, float x1, float y1) {
+		float[] m = mouse();
+		if (m == null) {
+			return;
+		}
+		org.joml.Vector2f a = g.pose().transformPosition(x0, y0, new org.joml.Vector2f());
+		org.joml.Vector2f b = g.pose().transformPosition(x1, y1, new org.joml.Vector2f());
+		if (m[0] >= Math.min(a.x, b.x) && m[0] < Math.max(a.x, b.x) && m[1] >= Math.min(a.y, b.y) && m[1] < Math.max(a.y, b.y)
+				&& g.containsPointInScissor(Math.round(m[0]), Math.round(m[1]))) {
+			SlipTooltip.antreLemah(List.of(full));
+		}
+	}
+
+	// ================================================================== numbers and time (were TeksTempat, DESIGN 43.7)
+
+	private static final String TK = "kultivator.tempat_ui.";
+	/** Nilai Batu per stone tier (NilaiBatu.VALUE {1, 9, 81, 729}). */
+	private static final long[] NILAI = {1L, 9L, 81L, 729L};
+	private static final String[] TINGKAT = {"rendah", "menengah", "tinggi", "agung"};
+
+	private static String ribu() {
+		return Component.translatable(TK + "angka.ribu").getString();
+	}
+
+	private static String desimal() {
+		return Component.translatable(TK + "angka.desimal").getString();
+	}
+
+	/** Full number with the language's thousands mark: 1234567 -> "1.234.567" (id) / "1,234,567" (en). */
+	public static String angka(long n) {
+		String digits = Long.toString(Math.abs(n));
+		StringBuilder out = new StringBuilder();
+		String mark = ribu();
+		int lead = digits.length() % 3;
+		for (int i = 0; i < digits.length(); i++) {
+			if (i > 0 && (i - lead) % 3 == 0) {
+				out.append(mark);
+			}
+			out.append(digits.charAt(i));
+		}
+		return (n < 0 ? "−" : "") + out;
+	}
+
+	/** Short number: under 10 000 full, then "12,5 rb", "1,2 jt", "3,4 M". */
+	public static String singkat(long n) {
+		long a = Math.abs(n);
+		String sign = n < 0 ? "−" : "";
+		if (a < 10_000L) {
+			return sign + angka(a);
+		}
+		String unit;
+		double v;
+		if (a < 1_000_000L) {
+			v = a / 1000.0D;
+			unit = Component.translatable(TK + "angka.rb").getString();
+		} else if (a < 1_000_000_000L) {
+			v = a / 1_000_000.0D;
+			unit = Component.translatable(TK + "angka.jt").getString();
+		} else {
+			v = a / 1_000_000_000.0D;
+			unit = Component.translatable(TK + "angka.m").getString();
+		}
+		String mark = desimal();
+		String body = v >= 100.0D ? Long.toString(Math.round(v)) : String.format(java.util.Locale.ROOT, "%.1f", v).replace(".", mark);
+		if (body.endsWith(mark + "0")) {
+			body = body.substring(0, body.length() - 1 - mark.length());
+		}
+		return sign + body + " " + unit;
+	}
+
+	/** One decimal with the language's mark: 9.6 -> "9,6". */
+	public static String desimal1(float v) {
+		return String.format(java.util.Locale.ROOT, "%.1f", v).replace(".", desimal());
+	}
+
+	/** Signed amount "+214" / "−60" (0 = "·"). */
+	public static String bertanda(long n) {
+		return n == 0L ? "·" : (n > 0 ? "+" : "") + angka(n);
+	}
+
+	/** "1.234 NB" (full) or the short form. */
+	public static Component nb(long n, boolean pendek) {
+		return Component.translatable(TK + "nb", pendek ? singkat(n) : angka(n));
+	}
+
+	/** The fewest-stones breakdown of {@code nb}: "1 Tinggi · 4 Menengah · 3 Rendah" (agung first). */
+	public static Component rincianBatu(long nb) {
+		long rest = Math.max(0L, nb);
+		int[] count = new int[4];
+		for (int t = NILAI.length - 1; t >= 0; t--) {
+			count[t] = (int) Math.min(Integer.MAX_VALUE, rest / NILAI[t]);
+			rest -= count[t] * NILAI[t];
+		}
+		return batuDiTas(count);
+	}
+
+	/** Stones by tier [rendah, menengah, tinggi, agung] -> "3 Tinggi · 5 Menengah · 12 Rendah" (none: "tanpa batu"). */
+	public static Component batuDiTas(int[] batu) {
+		net.minecraft.network.chat.MutableComponent out = Component.empty();
+		boolean any = false;
+		for (int t = Math.min(batu.length, 4) - 1; t >= 0; t--) {
+			if (batu[t] <= 0) {
+				continue;
+			}
+			if (any) {
+				out.append(" · ");
+			}
+			out.append(Component.translatable(TK + "batu." + TINGKAT[t], angka(batu[t])));
+			any = true;
+		}
+		return any ? out : Component.translatable(TK + "batu.nol");
+	}
+
+	/** Countdown of game ticks: "m:ss" below one hour, "2 j 10 m" below two game days, then "3 hari". */
+	public static Component waktu(long ticks) {
+		long t = Math.max(0L, ticks);
+		long seconds = (t + 19L) / 20L;
+		if (seconds < 3600L) {
+			return Component.literal(String.format(java.util.Locale.ROOT, "%d:%02d", seconds / 60L, seconds % 60L));
+		}
+		if (t < 24000L * 2L) {
+			long minutes = seconds / 60L;
+			return Component.translatable(TK + "waktu.jam_menit", minutes / 60L, minutes % 60L);
+		}
+		return Component.translatable(TK + "waktu.hari", t / 24000L);
+	}
+
+	/** "hari ini" / "besok" / "3 hari". */
+	public static Component hari(int n) {
+		return n <= 0 ? Component.translatable(TK + "waktu.hari_ini") : n == 1 ? Component.translatable(TK + "waktu.besok")
+				: Component.translatable(TK + "waktu.hari", n);
+	}
+
+	/** Percent 0..1 -> "45 %". */
+	public static String persen(float f) {
+		return Math.round(f * 100.0F) + " %";
 	}
 
 	/** Like {@link #fit} but centred on {@code cx}. */

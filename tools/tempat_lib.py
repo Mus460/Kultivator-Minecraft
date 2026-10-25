@@ -42,6 +42,20 @@ TEPI = 3            # edge road width per lot (two lots -> 6-block street)
 MAKS_TITIK = 96     # points per template (38.C.10)
 MAKS_JANGKAR = 6    # anchors per template (34.2.4 / 38.B.2.5)
 MAKS_JANGKAR_DISTRIK = 40
+# DESIGN 41.11.2: a sect compound lot carries the named titik of 41 as kompleks/<titik> anchors (the training ground
+# alone: arena, ujian_corak, pilar_0..4, kandang, lorong). They never tick; the spine walks loaded anchors in turn.
+MAKS_JANGKAR_FOLDER = {"kompleks_sekte": 12}
+
+
+def maks_jangkar(folder_or_path):
+    """Anchors allowed in one template of a structure folder (or template path / id inside it)."""
+    s = str(folder_or_path).replace("\\", "/")
+    for f, n in MAKS_JANGKAR_FOLDER.items():
+        if s == f or s.startswith(f + "/") or ("/" + f + "/") in s or s.startswith("kultivator:" + f + "/"):
+            return n
+    return MAKS_JANGKAR
+
+
 KODE_SISI = ("J", "K", "T", "A", "G", "B")   # 38.T.2.4: road, canal, wall, open water, stairs, free border
 SISI = ("n", "e", "s", "w")
 
@@ -317,8 +331,8 @@ class Lot(Piece):
 
     def jangkar(self, x, y, z, kind, **data):
         """A service/site anchor (DuniaAnchor entity). At most MAKS_JANGKAR per template."""
-        if self.jangkar_n >= MAKS_JANGKAR:
-            raise ValueError("%s: more than %d anchors in one template" % (self.id, MAKS_JANGKAR))
+        if self.jangkar_n >= maks_jangkar(self.folder):
+            raise ValueError("%s: more than %d anchors in one template" % (self.id, maks_jangkar(self.folder)))
         self.jangkar_n += 1
         self.anchor(x, y, z, kind, **{k: str(v) for k, v in data.items()})
 
@@ -483,8 +497,9 @@ def cek_lot(t, where=""):
     if sx > LOT or sz > LOT:
         errs.append("%s: %dx%d exceeds %dx%d" % (where, sx, sz, LOT, LOT))
     anchors = [e for e in t.entities if e[3].get("id") == "kultivator:dunia_anchor"]
-    if len(anchors) > MAKS_JANGKAR:
-        errs.append("%s: %d anchors > %d" % (where, len(anchors), MAKS_JANGKAR))
+    limit = maks_jangkar(getattr(t, "folder", "") or where)
+    if len(anchors) > limit:
+        errs.append("%s: %d anchors > %d" % (where, len(anchors), limit))
     pts = getattr(t, "titik_list", [])
     if len(pts) > MAKS_TITIK:
         errs.append("%s: %d titik > %d" % (where, len(pts), MAKS_TITIK))

@@ -1,15 +1,21 @@
 package dev.kultivator.client.kehancuran;
 
 import dev.kultivator.Kultivator;
-import dev.kultivator.client.disciple.DiscipleScreen;
-import dev.kultivator.client.hall.HallScreen;
+import dev.kultivator.client.Keys;
+import dev.kultivator.client.codex.Codex;
+import dev.kultivator.client.hub.HubNav;
+import dev.kultivator.client.hub.Tujuan;
+import dev.kultivator.client.hub.Urutan;
+import dev.kultivator.client.screen.CultivationScreen;
+import dev.kultivator.client.screen.ui.SegelKonfirmasi;
+import dev.kultivator.kehancuran.Kehancuran;
+import dev.kultivator.network.Actions;
 import dev.kultivator.network.Payloads;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Util;
@@ -17,11 +23,12 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Client side of Mode Kehancuran (DESIGN 20.3.21, module D): the server's caps for the blood-red warning screen
- * ({@link KehancuranConfirmScreen}), the red sky of a dimension-wide countdown (a HUD tint, {@link RedSkyHud}, plus ash
- * from {@link KehancuranFx}), the shape preview kept for the confirm window, and the details of the disciple whose red
- * seal is being released (stashed by the Jalan tab). {@link #init()} is called once from {@code KultivatorClient};
- * {@link #openConfirm(int)} when the server sends {@code OpenScreen.KEHANCURAN_CONFIRM}.
+ * Client side of Mode Kehancuran (DESIGN 20.3.21, module D; 43.4.4): the server's caps for the heavy confirm (a blood-red
+ * {@code SegelKonfirmasi} on Teknik › Kehancuran, was {@code KehancuranConfirmScreen}), the red sky of a dimension-wide
+ * countdown (a HUD tint, {@link RedSkyHud}, plus ash from {@link KehancuranFx}), the shape preview kept for the confirm window, and the details of the disciple whose red
+ * seal is being released (stashed by the Jalan tab). {@link #init()} is called once from {@code KultivatorClient} and also
+ * registers the Teknik pages ({@link Codex#daftarHalaman}: {@code CodexClient} belongs to the HUD wave);
+ * {@link #openConfirm(int)} runs when the server sends {@code OpenScreen.KEHANCURAN_CONFIRM}.
  */
 public final class KehancuranClient {
 
@@ -50,6 +57,13 @@ public final class KehancuranClient {
 	static Vec3 previewPos = Vec3.ZERO;
 	static Vec3 previewTarget = Vec3.ZERO;
 
+	/** A heavy confirm waiting for the Kehancuran page ({@link #ambilKonfirmasi}). */
+	public record Konfirmasi(SegelKonfirmasi.Tingkat tingkat, Component teks, Runnable ya) {
+	}
+
+	private static @Nullable Konfirmasi pending;
+	private static long pendingSince;
+
 	// ---- the disciple being released (from the Jalan tab)
 	private static int stashedId = -1;
 	private static CompoundTag stashedPath = new CompoundTag();
@@ -59,33 +73,87 @@ public final class KehancuranClient {
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> clear());
 		ClientTickEvents.END_CLIENT_TICK.register(KehancuranFx::tick);
 		HudElementRegistry.attachElementAfter(VanillaHudElements.MISC_OVERLAYS, Kultivator.id("kehancuran_sky"), new RedSkyHud());
+		Codex.daftarHalaman();
 	}
 
-	/** Opens the warning: {@code arg} 0 = the player's own oath, otherwise the disciple's entity id. */
+	/**
+	 * The heavy confirm (43.4.4): {@code arg} 0 = the player's own oath (5 s hold), otherwise the disciple's entity id (3 s).
+	 * The Gulungan moves to Teknik › Kehancuran, whose page shows a blood-red {@code SegelKonfirmasi} listing exactly what
+	 * will happen; "Ya" sends the confirming action. A release asked from another page returns there afterwards.
+	 */
 	public static void openConfirm(int arg) {
 		Minecraft minecraft = Minecraft.getInstance();
 		if (minecraft.player == null) {
 			return;
 		}
-		Screen current = minecraft.gui.screen();
-		if (current instanceof KehancuranConfirmScreen) {
-			return;
-		}
 		CompoundTag path = new CompoundTag();
 		Component name = Component.empty();
 		if (arg != 0) {
-			if (current instanceof DiscipleScreen disciple && disciple.entityId() == arg) {
-				path = disciple.info().getCompoundOrEmpty("path");
-				name = disciple.entity() != null ? disciple.entity().getName() : Component.literal(disciple.info().getStringOr("name", "?"));
-			} else if (stashedId == arg) {
+			if (stashedId == arg) {
 				path = stashedPath;
 				name = stashedName;
 			} else if (minecraft.level != null && minecraft.level.getEntity(arg) != null) {
 				name = minecraft.level.getEntity(arg).getName();
 			}
 		}
-		Screen back = current instanceof DiscipleScreen || current instanceof HallScreen ? current : null;
-		minecraft.gui.setScreen(new KehancuranConfirmScreen(arg, name, path, back));
+		Tujuan back = arg != 0 && minecraft.gui.screen() instanceof CultivationScreen hub ? hub.tempat() : null;
+		long hold = (arg == 0 ? Kehancuran.OATH_HOLD_TICKS : Kehancuran.RELEASE_HOLD_TICKS) * 50L;
+		// BERAT_LAMA holds 5 s, BERAT 3 s: the same holds as the server's oath / release (Kehancuran.*_HOLD_TICKS).
+		SegelKonfirmasi.Tingkat tingkat = hold >= 5000L ? SegelKonfirmasi.Tingkat.BERAT_LAMA : SegelKonfirmasi.Tingkat.BERAT;
+		int target = arg;
+		pending = new Konfirmasi(tingkat, confirmText(arg, name, path), () -> {
+			Keys.send(new Payloads.Action(Actions.KEHANCURAN, target, target == 0 ? "oath_confirm" : "release_confirm"));
+			if (back != null && !Urutan.ID_KEHANCURAN.equals(back.halaman())) {
+				HubNav.buka(back);
+			}
+		});
+		pendingSince = Util.getMillis();
+		HubNav.buka(Tujuan.of(HubNav.TEKNIK, Urutan.ID_KEHANCURAN).sub("murid"));
+	}
+
+	/** The waiting confirm, once (null when none or older than the server's 15 s window). */
+	public static @Nullable Konfirmasi ambilKonfirmasi() {
+		Konfirmasi k = pending;
+		pending = null;
+		return k != null && Util.getMillis() - pendingSince <= PREVIEW_MILLIS ? k : null;
+	}
+
+	/** What will happen, most important first (the card cuts the tail on small screens). */
+	private static Component confirmText(int target, Component name, CompoundTag path) {
+		String p = "kultivator.kehancuran.ui.";
+		java.util.List<Component> lines = new java.util.ArrayList<>();
+		if (target == 0) {
+			lines.add(Component.translatable(p + "oath_sub"));
+			lines.add(Component.translatable(p + "shape_any", maxRadius));
+		} else {
+			lines.add(Component.translatable(p + "release_sub", name));
+			String kind = path.getStringOr("art_kind", "");
+			String art = path.getStringOr("art", "");
+			Component artName = art.isEmpty() ? Component.literal("?") : Component.translatable("kultivator.dpath.art." + art);
+			if ("trench".equals(kind)) {
+				lines.add(Component.translatable(p + "shape_trench", artName, path.getIntOr("art_length", 0), 3, path.getIntOr("art_depth", 0)));
+			} else if (!kind.isEmpty()) {
+				lines.add(Component.translatable(p + "shape", artName, Component.translatable("kultivator.kehancuran.shape." + kind),
+						path.getIntOr("art_radius", 0)));
+			} else {
+				lines.add(Component.translatable(p + "shape_any", maxRadius));
+			}
+		}
+		lines.add(Component.translatable(p + "blocks", maxBlocks, perTick));
+		lines.add(dropsPct <= 0 ? Component.translatable(p + "no_drops") : Component.translatable(p + "drops", dropsPct));
+		lines.add(dropsPct <= 0 && undoMinutes > 0 ? Component.translatable(p + "restore", undoMinutes) : Component.translatable(p + "no_restore"));
+		lines.add(Component.translatable(p + "zones", hallSafe, playerSafe));
+		lines.add(Component.translatable(p + "never"));
+		lines.add(Component.translatable(p + "order", warningSeconds));
+		lines.add(Component.translatable(p + "close"));
+		net.minecraft.network.chat.MutableComponent all = Component.empty();
+		for (int i = 0; i < lines.size(); i++) {
+			if (i > 0) {
+				all.append("\n");
+			}
+			all.append(lines.get(i));
+		}
+		return all;
 	}
 
 	/** The Jalan tab remembers the disciple before asking to release its seal (the warning lists its art). */
@@ -158,6 +226,7 @@ public final class KehancuranClient {
 		stashedId = -1;
 		stashedPath = new CompoundTag();
 		stashedName = Component.empty();
+		pending = null;
 	}
 
 	private KehancuranClient() {

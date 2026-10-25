@@ -1,0 +1,50 @@
+{
+  "_catatan": "Kebiasaan #21 penjudi (DESIGN 42.4.12); ilham: Guanpu",
+  "nomor": 21,
+  "siapa": {
+    "umur": [
+      18,
+      200
+    ],
+    "bukan": [
+      "rahib"
+    ],
+    "tahap": [
+      "dewasa"
+    ]
+  },
+  "bobot": 0.7,
+  "sesi": [
+    {
+      "jam": [
+        20,
+        24
+      ],
+      "peluang": 0.7,
+      "tujuan": [
+        "meja_dadu",
+        "@kedai",
+        "kursi"
+      ],
+      "klip": "kota42:lempar_dadu",
+      "kanan": "kota42:dadu_cawan",
+      "ganti": [
+        {
+          "klip": "kota42:lempar_dadu"
+        },
+        {
+          "klip": "sorak_arena",
+          "kanan": ""
+        },
+        {
+          "klip": "kota42:lempar_dadu"
+        },
+        {
+          "klip": "kota42:menepuk_jidat",
+          "kanan": ""
+        }
+      ],
+      "ganti_menit": 9
+    }
+  ]
+}

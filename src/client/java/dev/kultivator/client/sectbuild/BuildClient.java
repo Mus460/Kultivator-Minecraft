@@ -2,7 +2,14 @@ package dev.kultivator.client.sectbuild;
 
 import dev.kultivator.Kultivator;
 import dev.kultivator.KultivatorConfig;
+import com.mojang.blaze3d.platform.InputConstants;
 import dev.kultivator.client.Keys;
+import dev.kultivator.client.hub.HubNav;
+import dev.kultivator.client.hud.Kabar;
+import dev.kultivator.client.hub.HubPages;
+import dev.kultivator.client.hub.Tujuan;
+import dev.kultivator.client.hub.Urutan;
+import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.network.Actions;
 import dev.kultivator.network.Payloads;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -10,15 +17,20 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.PauseScreen;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.Util;
 
 /**
  * Client side of Pembangunan Sekte (DESIGN 21.12, 21.16, 21.21): keeps the last footprint preview (for the hologram, the
  * HUD and the template screen), the last status push (the open component's wireframe, the work mist, the HUD's "Masih
  * kurang" line) and the template catalog, all three arriving as a {@code BuildPreview} (status and catalog carry a
- * {@code kind} key, a footprint preview has none, an empty tag clears the preview). Opens the template screen, sends the
- * {@code Actions.SECT_BUILD} actions, draws the hologram every client tick and reports a low frame rate (the FPS hint).
+ * {@code kind} key, a footprint preview has none, an empty tag clears the preview). Registers Sekte › Bangun of the Gulungan
+ * Utama (DESIGN 43), opens its Templat sub when the server asks, sends the {@code Actions.SECT_BUILD} actions, draws the
+ * hologram every client tick, runs "Lihat di dunia" (the Gulungan steps aside while a footprint preview is walked around;
+ * Enter or Esc brings Bangun › Templat back) and reports a low frame rate (the FPS hint).
  */
 public final class BuildClient {
 
@@ -41,12 +53,17 @@ public final class BuildClient {
 	private static int scrubTier = 9;
 	private static long lowSince = -1L;
 	private static boolean lowSent;
+	/** "Lihat di dunia": the Gulungan is closed so the footprint hologram can be walked around. */
+	private static boolean lihat;
+	private static boolean enterWasDown;
 
 	/** Called once from {@code KultivatorClient}. */
 	public static void init() {
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> clear());
 		HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, Kultivator.id("sect_build_hud"), new BuildHud());
 		ClientTickEvents.END_CLIENT_TICK.register(BuildClient::tick);
+		// Sekte › Bangun of the Gulungan Utama (DESIGN 43.5, 43.12.2).
+		HubPages.daftar(HubNav.SEKTE, Urutan.ID_BANGUN, Urutan.BANGUN, BuildPage::new);
 	}
 
 	/** A {@code BuildPreview} arrived: a footprint preview, a status push, the catalog, or an empty tag (clear). */
@@ -70,24 +87,59 @@ public final class BuildClient {
 		}
 	}
 
-	/** The server asks for the template screen; {@code arg} = the template to select first (0 = none). */
+	/** The server asks for the template catalog ({@code OpenScreen.SECT_TEMPLATE}); {@code arg} = the template to select first (0 = none). */
 	public static void openScreen(int arg) {
-		Minecraft minecraft = Minecraft.getInstance();
-		if (minecraft.player == null) {
-			return;
-		}
-		if (minecraft.gui.screen() instanceof TemplateScreen screen) {
-			screen.select(arg);
-			return;
-		}
-		minecraft.gui.setScreen(new TemplateScreen(arg, false, minecraft.gui.screen()));
+		lihat = false;
+		HubNav.buka(templat(arg));
 	}
 
-	/** Opens the template screen from the Bangun tablet ({@code upgrade}: only larger templates, "Naik Templat"). */
-	public static void openTemplates(int select, boolean upgrade) {
-		Minecraft minecraft = Minecraft.getInstance();
-		send(0, "catalog");
-		minecraft.gui.setScreen(new TemplateScreen(select, upgrade, minecraft.gui.screen()));
+	/** Sekte › Bangun › Templat with {@code select} chosen (0 keeps the last choice). */
+	private static Tujuan templat(int select) {
+		CompoundTag focus = new CompoundTag();
+		focus.putInt("templat", select);
+		return Tujuan.of(HubNav.SEKTE, Urutan.ID_BANGUN).sub("templat").fokus(focus);
+	}
+
+	/** "Lihat di dunia": closes the Gulungan while the footprint preview stays; Enter or Esc brings the catalog back. */
+	static void lihatDiDunia() {
+		lihat = true;
+		enterWasDown = true;
+		HubNav.tutupSemua();
+		Kabar.kirim(Kabar.kartu(null, Component.translatable("kultivator.gui43.m07.lihat_kembali")).ikon(Kabar.glyph(Glyphs.BUILD))
+				.kunci("bangun.lihat").hidup(() -> lihat).lama(600_000L));
+	}
+
+	/** Runs "Lihat di dunia" each tick (its hint is a Kabar card that lives while it runs): Enter or the pause menu (Esc) returns, a gone preview ends it. */
+	private static void lihatTick(Minecraft minecraft) {
+		if (!lihat) {
+			return;
+		}
+		if (!previewActive()) {
+			lihat = false;
+			return;
+		}
+		Screen screen = minecraft.gui.screen();
+		if (screen instanceof PauseScreen) {
+			lihat = false;
+			HubNav.buka(templat(0));
+			return;
+		}
+		if (screen instanceof dev.kultivator.client.screen.CultivationScreen) {
+			// The Gulungan came back some other way (V, a key): the look is over.
+			lihat = false;
+			return;
+		}
+		if (screen != null) {
+			enterWasDown = true;
+			return;
+		}
+		boolean enter = InputConstants.isKeyDown(InputConstants.KEY_RETURN) || InputConstants.isKeyDown(InputConstants.KEY_NUMPADENTER);
+		if (enter && !enterWasDown) {
+			lihat = false;
+			HubNav.buka(templat(0));
+			return;
+		}
+		enterWasDown = enter;
 	}
 
 	/** The last preview tag (never null, empty when none or expired). */
@@ -162,6 +214,7 @@ public final class BuildClient {
 			return;
 		}
 		SiteHologram.tick(minecraft);
+		lihatTick(minecraft);
 		fpsHint(minecraft);
 	}
 
@@ -202,6 +255,7 @@ public final class BuildClient {
 		catalog = new CompoundTag();
 		lowSince = -1L;
 		lowSent = false;
+		lihat = false;
 	}
 
 	private BuildClient() {

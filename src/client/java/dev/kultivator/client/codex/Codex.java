@@ -1,39 +1,52 @@
 package dev.kultivator.client.codex;
 
-import dev.kultivator.data.TechniqueRegistry;
+import dev.kultivator.client.hub.HubNav;
+import dev.kultivator.client.hub.HubPages;
+import dev.kultivator.client.hub.Tujuan;
+import dev.kultivator.client.hub.Urutan;
 import dev.kultivator.data.TechniqueSpec;
 import net.minecraft.client.Minecraft;
+import net.minecraft.nbt.CompoundTag;
+import org.jetbrains.annotations.Nullable;
 
 /**
- * The client codex contract (DESIGN 22.18.3): opening the Kitab Teknik and feeding the Roda Segel with mouse movement
- * and the mouse wheel ({@code MouseHandlerMixin}).
+ * The client codex contract (DESIGN 22.18.3, 43.5): the Teknik section of the Gulungan Utama (Kodeks, Cincin Segel,
+ * Kehancuran) and feeding the Roda Segel with mouse movement and the mouse wheel ({@code MouseHandlerMixin}).
  */
 public final class Codex {
 
-	/** Opens the Kitab Teknik, focused on the spec with net id {@code focusNetId} (−1 = none). */
-	public static void open(int focusNetId) {
-		Minecraft minecraft = Minecraft.getInstance();
-		if (minecraft.player == null) {
-			return;
-		}
-		TechniqueSpec spec = focusNetId < 0 ? null : TechniqueRegistry.byNet(focusNetId);
-		SealWheel.close(false);
-		if (minecraft.gui.screen() instanceof CodexScreen codex) {
-			if (spec != null) {
-				codex.focus(spec);
-			}
-			return;
-		}
-		minecraft.gui.setScreen(new CodexScreen(spec, -1));
+	/** Registers the three Teknik pages (43.5); called once from {@code KehancuranClient.init}. */
+	public static void daftarHalaman() {
+		HubPages.daftar(HubNav.TEKNIK, Urutan.ID_KODEKS, Urutan.KODEKS, KodeksPage::new);
+		HubPages.daftar(HubNav.TEKNIK, Urutan.ID_CINCIN_SEGEL, Urutan.CINCIN_SEGEL, LoadoutPage::new);
+		HubPages.daftar(HubNav.TEKNIK, Urutan.ID_KEHANCURAN, Urutan.KEHANCURAN, KehancuranPage::new);
 	}
 
-	/** Opens the Kitab Teknik on a tablet ({@link CodexScreen#TAB_KODEKS} ...). */
-	public static void openTab(int tab) {
-		Minecraft minecraft = Minecraft.getInstance();
-		if (minecraft.player != null) {
-			SealWheel.close(false);
-			minecraft.gui.setScreen(new CodexScreen(null, tab));
+	/** Opens Teknik › Kodeks, focused on the spec with net id {@code focusNetId} (−1 = none). */
+	public static void open(int focusNetId) {
+		if (Minecraft.getInstance().player == null) {
+			return;
 		}
+		SealWheel.close(false);
+		Tujuan t = Tujuan.of(HubNav.TEKNIK, Urutan.ID_KODEKS);
+		if (focusNetId >= 0) {
+			CompoundTag f = new CompoundTag();
+			f.putInt("spec", focusNetId);
+			t = t.fokus(f);
+		}
+		HubNav.buka(t);
+	}
+
+	/** Opens Teknik › Kehancuran on sub {@code sub} ("diri" / "murid"). */
+	public static void kehancuran(String sub) {
+		SealWheel.close(false);
+		HubNav.buka(Tujuan.of(HubNav.TEKNIK, Urutan.ID_KEHANCURAN).sub(sub));
+	}
+
+	/** "Pasang ke Cincin" (G48): Teknik › Cincin Segel with {@code spec} carried, the next socket clicked takes it. */
+	public static void pasang(@Nullable TechniqueSpec spec) {
+		LoadoutPage.bawa(spec);
+		HubNav.buka(Tujuan.of(HubNav.TEKNIK, Urutan.ID_CINCIN_SEGEL));
 	}
 
 	/** Mouse movement while the seal wheel is open; true when consumed (the camera does not turn). */

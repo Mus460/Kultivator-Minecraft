@@ -1,8 +1,13 @@
 package dev.kultivator.dunia.tempat.tema.bersama;
 
+import dev.kultivator.sosok.SosokApi;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
@@ -20,6 +25,9 @@ import java.util.List;
  * nodes of the theme) at a walking pace as a pure function of time since the procession began (no path finding;
  * the client interpolates); it turns smoothly toward the next node, sways while carried and is set down at the last
  * node (or loops). One seat: a VIP NPC or a player may ride. The bearers (NPCs with clip 106) are the theme's.
+ * <p>
+ * DESIGN 42.7.7 (weddings, 42D): {@link #warna()} is a synced cloth colour over the variant; 0 keeps the variant's own
+ * colours, {@link #WARNA_PENGANTIN} is the red bridal sedan chair. The renderer tints curtains and roof cloth with it.
  */
 public class TanduEntity extends TemaMekanismeEntity {
 
@@ -35,6 +43,13 @@ public class TanduEntity extends TemaMekanismeEntity {
 	/** Dipikul berjalan. */
 	public static final int KEADAAN_PIKUL = 1;
 
+	/** {@link #warna()}: no tint, the variant's own colours. */
+	public static final int WARNA_ASLI = 0;
+	/** {@link #warna()}: the red of a bridal sedan chair (42.7.7). */
+	public static final int WARNA_PENGANTIN = 0xB3121B;
+
+	private static final EntityDataAccessor<Integer> DATA_WARNA = SynchedEntityData.defineId(TanduEntity.class, EntityDataSerializers.INT);
+
 	/** Default procession pace (blocks per tick; a slow solemn walk). */
 	public static final double LANGKAH = 0.06D;
 
@@ -45,6 +60,21 @@ public class TanduEntity extends TemaMekanismeEntity {
 
 	public TanduEntity(EntityType<? extends TanduEntity> type, Level level) {
 		super(type, level);
+	}
+
+	@Override
+	protected void defineSynchedData(SynchedEntityData.Builder builder) {
+		super.defineSynchedData(builder);
+		builder.define(DATA_WARNA, WARNA_ASLI);
+	}
+
+	/** The cloth tint 0xRRGGBB, or {@link #WARNA_ASLI} (0) for the variant's own colours. */
+	public int warna() {
+		return this.entityData.get(DATA_WARNA);
+	}
+
+	public void setWarna(int rgb) {
+		this.entityData.set(DATA_WARNA, rgb & 0xFFFFFF);
 	}
 
 	/**
@@ -68,6 +98,64 @@ public class TanduEntity extends TemaMekanismeEntity {
 		setKeadaan(KEADAAN_PIKUL);
 		Vec3 first = jalur.getFirst();
 		pindah(first, arahKe(first, jalur.get(1)));
+	}
+
+	/** Makes this the red bridal sedan chair of a wedding (42.7.7): the cloth turns {@link #WARNA_PENGANTIN}. */
+	public void jadikanPengantin() {
+		setWarna(WARNA_PENGANTIN);
+	}
+
+	/** True when it is the red bridal chair. */
+	public boolean pengantin() {
+		return warna() == WARNA_PENGANTIN;
+	}
+
+	/** True when a procession reached its last node and the chair was set down (never for a looping one). */
+	public boolean sampai() {
+		return !jalur.isEmpty() && !ulang && keadaan() == KEADAAN_DIAM;
+	}
+
+	/**
+	 * Where bearer {@code i} walks: 0 front-left, 1 front-right, 2 back-left, 3 back-right, at the pole ends 2.6 blocks
+	 * ahead of and behind the cabin and 0.7 blocks to the side (the {@code HariDewiLaut} spacing); 4 and more stand in a
+	 * second pair further out (eight bearers of a heavy chair).
+	 */
+	public Vec3 titikPemikul(int i) {
+		double r = Math.toRadians(getYRot());
+		Vec3 maju = new Vec3(-Math.sin(r), 0.0D, Math.cos(r));
+		Vec3 sisi = new Vec3(Math.cos(r), 0.0D, Math.sin(r));
+		int k = Math.floorMod(i, 4);
+		double jauh = i >= 4 ? 3.4D : 2.6D;
+		double f = k < 2 ? jauh : -jauh;
+		double s = k % 2 == 0 ? 0.7D : -0.7D;
+		return position().add(maju.scale(f)).add(sisi.scale(s));
+	}
+
+	/**
+	 * Keeps the bearers at their poles (server, every tick while carried is smooth; every few ticks is enough) and in
+	 * step: each plays the looping clip {@code klip} from the procession's start so every shoulder rises together.
+	 */
+	public void bawaPemikul(List<? extends LivingEntity> pemikul, int klip) {
+		if (isRemoved()) {
+			return;
+		}
+		for (int i = 0; i < pemikul.size(); i++) {
+			LivingEntity e = pemikul.get(i);
+			if (e == null || e.isRemoved()) {
+				continue;
+			}
+			Vec3 at = titikPemikul(i);
+			e.teleportTo(at.x, at.y, at.z);
+			e.setYRot(getYRot());
+			e.setYHeadRot(getYRot());
+			if (dipikul()) {
+				if (SosokApi.gerakSekarang(e) != klip) {
+					SosokApi.gerakSinkron(e, klip, mulai());
+				}
+			} else if (SosokApi.gerakSekarang(e) == klip) {
+				SosokApi.henti(e);
+			}
+		}
 	}
 
 	/** Sets the palanquin down where it is. */

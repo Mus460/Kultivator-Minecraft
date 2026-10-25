@@ -27,6 +27,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from sosok_lib import LIN, SRGB, RESEP, ROOT, UV_RAMBUT, UV_BUSANA  # noqa: E402
+import copy  # noqa: E402
 from gen_sosok_bagian_busana import GAYA  # noqa: E402
 from gen_sosok_bagian_rambut import HAIR_STYLES  # noqa: E402
 
@@ -133,6 +134,14 @@ GAYA_BUSANA = {
     "GURUN": {"kubus": ["rok_panjang", "jubah_luar_bahu"], "kaki": "jerami", "kepala": "kerudung"},
     "KAFAN": {"kubus": ["rok_panjang", "lengan_lebar"], "kaki": "telanjang", "kain": ["#E8E6E0", "#D8D4CC", "#C8C4BC", "perak"]},
     "HAKIM_BAWAH": {"kubus": ["rok_panjang", "lengan_lebar", "sabuk"], "kaki": "bot", "buzi": "harimau_hitam", "kain": ["#5A1418", "#1A1618", "#C9A24A", "emas"]},
+    # DESIGN 42.12.4 (42V-B): the groom, the bride, mourning, winter, the troupe, the dancer, the pickpocket
+    "PENGANTIN_L": {"kubus": ["rok_panjang", "lengan_lebar", "sabuk"], "kaki": "bot", "kain": ["#B01E24", "#D8B04A", "#E8C860", "emas"]},
+    "PENGANTIN_P": {"kubus": ["rok_panjang", "lengan_lebar", "pita_sabuk"], "kaki": "kain", "kain": ["#B01E24", "#E8C860", "#D8B04A", "emas"]},
+    "BERKABUNG": {"kubus": ["rok_panjang"], "kaki": "jerami", "kain": ["#E6E2D6", "#D0C8B4", "#B8AE94", "-"]},
+    "MANTEL_KAPAS": {"kubus": ["rok_pendek", "sabuk"], "kaki": "bot", "kain": ["#3A4A6E", "#E8E2D2", "#8A6A40", "perunggu"]},
+    "AKROBAT": {"kubus": ["sabuk"], "kaki": "kain", "kain": ["#C8303A", "#E8B830", "#F0D070", "-"]},
+    "PENARI": {"kubus": ["rok_panjang", "lengan_lebar", "pita_sabuk"], "kaki": "kain", "kain": ["#E8A8B8", "#F4EFE2", "#C9A24A", "emas"]},
+    "PENCOPET": {"kubus": ["sabuk"], "kaki": "jerami", "kain": ["#3E3832", "#5A5248", "#2A2622", "-"]},
 }
 
 # cube groups -> cube ids (40.3.7)
@@ -550,6 +559,144 @@ P["murid.saingan"] = row("C40", "M", "TEMPUR", ["hitam", "dao_kain", "emas", "be
                          tambahan=["jubah_luar"], kubus=["ikat_dahi_ekor"], hiasan_p="buyao_perak", mata=[["tajam", 1]],
                          sikap="lipat_tangan", jalan="", kelas="kultivator", murid=True)
 
+# ---------------------------------------------------------------------- DESIGN 41 (41.11.5, 41V-M): NPC sect members
+# by style. Keys: murid.<rank 0-5>.<corak>, tetua_sekte.<corak>, ketua_sekte.<corak> (corak = Corak.id(), word A of the
+# sect name), biksu_perunggu (the bronze men of the Lorong Perunggu test), pemburu_sekte (the hunters of a deserter).
+# The uniform colour stays "sekte" (the sect's LambangCache uniform), the trim "pangkat"; the style adds the 41.4.3 cut
+# and ornament (Corak.gayaJubah / Corak.hiasan): sword belt, rosary, fur collar, scholar's pouch, sash, furnace apron,
+# bare arms, blood tassels, poison pouches, hood.
+import copy  # noqa: E402
+
+CORAK_RUPA = {
+    "pedang": {"gaya": "HANFU", "kubus": ["pelindung_lengan"], "mata": [["tajam", 1]], "prop": "pedang_kayu",
+               "sikap": "gagang", "tetua_prop": "pedang_kayu"},
+    "buddha": {"gaya": "TAO", "tambahan": [], "prop": "tasbih_tangan", "sikap": "doa", "jalan": "rahib",
+               "tetua_gaya": "KASAYA", "ketua_gaya": "KASAYA", "tetua_buddha": True},
+    "binatang": {"gaya": "TEMPUR", "tambahan": ["kerah_bulu"], "tanda": {"bekas_cakar": 60}, "prop": "tali_kekang",
+                 "sikap": "berkacak", "jalan": "gagah"},
+    "formasi": {"gaya": "HANFU", "kubus": ["kantong"], "tanda": {"tinta_jari": 100}, "prop": "bendera_formasi",
+                "sikap": "tangan_lengan", "tetua_prop": "piringan_formasi"},
+    "unsur": {"gaya": "HANFU", "tambahan": ["selendang"], "prop": "kebut", "sikap": "tangan_belakang"},
+    "alkimia": {"gaya": "PENDEK", "tambahan": ["celemek"], "kubus": ["labu"], "tanda": {"coreng_jelaga": 100},
+                "prop": "kipas_tungku", "sikap": "tangan_lengan", "tetua_prop": "labu_pil"},
+    "tubuh": {"gaya": "TEMPUR", "kubus": ["pelindung_lengan"], "lengan_telanjang": True, "tanda": {"bekas_luka": 40},
+              "prop": "tombak", "sikap": "berkacak", "jalan": "gagah"},
+    "darah": {"gaya": "TEMPUR", "kubus": ["rumbai_iblis"], "iris": "#A01A1A", "sikap": "lipat_tangan", "jalan": "iblis",
+              "kelas": "iblis", "ketua_gaya": "IBLIS"},
+    "racun": {"gaya": "HANFU", "kubus": ["kantong", "labu"], "mata": [["tajam", 1]], "prop": "labu_pil",
+              "sikap": "tangan_lengan"},
+    "bayangan": {"gaya": "PENDEK", "tambahan": ["kerudung"], "mata": [["tajam", 1]], "sikap": "lipat_tangan",
+                 "kelas": "kultivator"},
+}
+
+
+def _gaya_corak(row, gaya):
+    row["gaya"] = [[gaya, 100]]
+    row.pop("gaya_p", None)
+
+
+def _hias_corak(row, st, prop_key="prop"):
+    """Adds the style's extras to a copied row (lists merged without repeats)."""
+    for key in ("tambahan", "kubus"):
+        merged = list(row.get(key, []))
+        for v in st.get(key, []):
+            if v not in merged:
+                merged.append(v)
+        if merged:
+            row[key] = merged
+    if st.get("tanda"):
+        tanda = dict(row.get("tanda", {}))
+        tanda.update(st["tanda"])
+        row["tanda"] = tanda
+    for key in ("mata", "iris", "lengan_telanjang", "kelas"):
+        if key in st:
+            row[key] = st[key]
+    if st.get(prop_key):
+        row["prop"] = PROP[st[prop_key]]
+    if st.get("sikap"):
+        row["sikap"] = SIKAP[st["sikap"]]
+        row.pop("sikap_l", None)
+        row.pop("sikap_p", None)
+    if "jalan" in st:
+        row["jalan"] = st["jalan"]
+
+
+for _corak, _st in CORAK_RUPA.items():
+    for _n in range(6):
+        _r = copy.deepcopy(P["murid.%d" % _n])
+        _r["kain"] = ["sekte"] + list(_r["kain"][1:])
+        if _n >= 1:
+            _gaya_corak(_r, _st["gaya"] if _n < 5 else "BANGSAWAN")
+        _hias_corak(_r, _st, "prop" if _n >= 2 else "-")
+        P["murid.%d.%s" % (_n, _corak)] = _r
+    _t = copy.deepcopy(P["tetua_sekte"])
+    _gaya_corak(_t, _st.get("tetua_gaya", "HANFU" if _st["gaya"] in ("HANFU", "PENDEK") else _st["gaya"]))
+    _hias_corak(_t, _st, "tetua_prop" if "tetua_prop" in _st else "prop")
+    if _st.get("tetua_buddha"):
+        _t["buddha"] = True
+        _t["rambut_l"] = ["L5"]  # shaven head with the ordination dots
+    P["tetua_sekte." + _corak] = _t
+    _k = copy.deepcopy(P["ketua_sekte"])
+    _gaya_corak(_k, _st.get("ketua_gaya", "BANGSAWAN"))
+    _hias_corak(_k, {k: v for k, v in _st.items() if k not in ("prop", "lengan_telanjang")})
+    if _st.get("tetua_buddha"):
+        _k["buddha"] = True
+        _k["rambut_l"] = ["L5"]
+        _k["hiasan_l"] = ""
+    P["ketua_sekte." + _corak] = _k
+
+# the Eighteen Bronze Men of the Lorong Perunggu test: bald monks lacquered in bronze, bare-armed, in a bronze kasaya
+P["biksu_perunggu"] = row("L", "M/D", "KASAYA", ["perunggu", "perunggu", "emas", "perunggu"], ["L5"], ["L5"], buddha=True,
+                          lengan_telanjang=True, kulit_gelap=100, mata=[["tajam", 1]], mulut=[["tegas", 1]],
+                          tanda={"tanda_dao": 100}, sikap="doa", jalan="rahib", kelas="rahib")
+# the sect's hunters of a deserter: dark travelling coat and hood over the sect colours, bracers, a scarred, hard look
+P["pemburu_sekte"] = row("C20", "M/D", "TEMPUR", ["hitam", "sekte", "sekte", "besi"], ["L3", "L1"], ["P4"],
+                         tambahan=["penyamaran"], kubus=["pelindung_lengan", "kantong"], mata=[["tajam", 1]],
+                         mulut=[["tegas", 1]], tanda={"bekas_luka": 60}, sikap="gagang", jalan="militer",
+                         kelas="kultivator")
+
+# ---------------------------------------------------------------------- DESIGN 42.12.2/42.12.4 (42V-B): Kota yang Hidup roles
+# Headwear and tools of these rows are KotaGear kinds 61-79 (topi = the gear name); the garments are the 42 styles.
+P["pencopet"] = row("C25", "M/D", "PENCOPET", ["kasar_kotor", "abu", "-", "-"], ["L4", "L8"], ["P5"], mata=[["tajam", 1]],
+                    mulut=[["senyum_tipis", 1]], ekspresi={"menyeringai": 30}, tanda={"bekas_luka": 20}, topi="ikat_pencopet",
+                    sikap="santai", jalan="tergesa")
+P["penjaga_malam"] = row("C10", {"D": 50, "T": 50}, "MANTEL_KAPAS", ["nila", "kasar", "lak", "besi"], ["L7"], ["P4"],
+                         rw={"jenggot_kambing": 40}, mata=[["tua", 40], ["almond", 60]], topi="topi_penjaga_malam",
+                         topi_menutup=True, prop="lentera_tangan", sikap="santai", jalan="tua")
+P["mak_comblang"] = row("P", {"D": 40, "T": 60}, "HANFU", ["lak", "merah_muda", "emas", "emas"], None, ["P7", "P1"],
+                        hiasan_p="bunga_peony", tanda={"tahi_lalat": 100}, mulut=[["senyum_tipis", 1]], bentuk=[["bulat", 1]],
+                        topi="bunga_comblang", prop="kipas_lipat", sikap="tangan_depan", jalan="santai")
+P["pendongeng"] = row("L", "T", "SARJANA", ["cokelat", "gading", "tinta", "perunggu"], ["L6"], None, mata=[["tua", 1]],
+                      rw={"jenggot_kambing": 100}, mulut=[["senyum_tipis", 1]], topi="topi_pendongeng", topi_menutup=True,
+                      prop="kipas_lipat", sikap="tangan_belakang", jalan="tua")
+P["pengamen"] = row("C40", {"M": 40, "D": 40, "T": 20}, "PENDEK", ["abu", "kasar", "cokelat", "-"], ["L4", "L8"], ["P6", "P5"],
+                    tambalan=True, mata=[["lembut", 1]], topi="topi_pengamen", topi_menutup=True, prop="seruling",
+                    sikap="santai", jalan="santai")
+P["akrobat"] = row("C45", "M", "AKROBAT", ["#C8303A", "#E8B830", "emas", "-"], ["L3", "L8"], ["P4", "P2"],
+                   mulut=[["senyum_tipis", 1]], topi="ikat_akrobat", sikap="berkacak", jalan="gagah")
+P["penjual_obat"] = row("C20", "D/T", "PENDEK", ["teh", "gading", "lak", "perunggu"], ["L1", "L7"], ["P3"],
+                        rw={"kumis_tipis": 60}, mulut=[["senyum_tipis", 1]], topi="panji_obat", prop="labu_pil",
+                        sikap="tangan_lengan", jalan="pedagang")
+P["guru_sekolah"] = row("C30", "D/T", "SARJANA", ["nila", "gading", "tinta", "perunggu"], ["L1"], ["P1", "P3"],
+                        mata=[["almond", 60], ["tua", 40]], rw={"jenggot_kambing": 40}, topi="topi_guru", topi_menutup=True,
+                        prop="kitab", sikap="tangan_belakang", jalan="santai")
+P["pengurus_duka"] = row("L", "T", "BERKABUNG", ["#E6E2D6", "#D0C8B4", "#B8AE94", "-"], ["L6"], None, mata=[["tua", 1]],
+                         rw={"jenggot_panjang": 60}, mulut=[["datar", 1]], topi="topi_pengurus_duka", topi_menutup=True,
+                         prop="dupa", sikap="doa", jalan="rahib", kelas="rahib")
+P["penjaga_gudang"] = row("C40", "D/T", "PENDEK", ["cokelat", "gading", "kayu", "perunggu"], ["L7"], ["P3"], tambahan=["kerja"],
+                          mata=[["almond", 1]], topi="kunci_gudang", prop="kunci_kamar", sikap="tangan_lengan", jalan="santai")
+P["pialang"] = row("C25", "D", "SAUDAGAR", ["teal", "gading", "emas", "emas"], ["L1"], ["P1"], mata=[["almond", 1]],
+                   mulut=[["senyum_tipis", 1]], tanda={"tahi_lalat": 30}, topi="topi_pialang", topi_menutup=True, prop="sempoa",
+                   sikap="tangan_lengan", jalan="pedagang", kelas="bangsawan")
+P["penari"] = row("C85", "M", "PENARI", ["merah_muda", "putih", "emas", "emas"], ["L3"], ["P6", "P3"], hiasan_p="bunga_plum",
+                  mata=[["phoenix", 1]], alis_p=[["daun_willow", 1]], tanda_p={"huadian": 100}, topi="selendang_penari",
+                  sikap="tangan_depan", jalan="penari")
+P["pemusik"] = row("C20", "M/D", "PENDEK", ["lak", "gading", "emas", "perunggu"], ["L7"], ["P2"], topi="topi_pemusik",
+                   topi_menutup=True, prop="seruling", sikap="santai", jalan="santai")
+# the Ghost Market's masked sellers (42.6.7, SosokApi.setRupa(npc, "topeng_kertas")): dark robes and a paper mask
+P["topeng_kertas"] = row("C35", "M/D", "HANFU", ["hitam", "abu", "ungu_tua", "perak"], ["L4"], ["P6"], tambahan=["jubah_luar"],
+                         mata=[["tajam", 1]], topi="topeng_kertas", sikap="lipat_tangan", jalan="santai")
+
 # ---------------------------------------------------------------------- schedule-group fallbacks (38.N.2)
 P["kelompok.PEKERJA"] = row("C40", {"M": 30, "D": 50, "T": 20}, [["PENDEK", 50], ["PETANI", 50]],
                             ["kasar", "gading", "cokelat", "besi"], ["L7", "L8"], ["P4", "P5"], tambahan=["kerja"],
@@ -575,6 +722,78 @@ P["kelompok.KHUSUS"] = row("C40", "M/D", "HANFU", ["sutra_biru", "gading", "emas
 P["kelompok.SIPIL"] = row("C50", {"M": 25, "D": 55, "T": 20}, [["HANFU", 50], ["PENDEK", 30], ["PETANI", 20]],
                           ["kasar", "gading", "cokelat", "perunggu"], ["L1", "L7"], ["P2", "P3", "P5"], sikap="",
                           jalan="")
+
+# ---------------------------------------------------------------------- DESIGN 42.12.4 (42V-B): states of town life
+# Look keys "<base>.pengantin", "<base>.berkabung" and "<base>.dingin" for every NpcRole and schedule group, plus the bare
+# "pengantin"/"berkabung"/"dingin": the server (SosokGen.kebijakan) strips the suffix, so sex and age stay the person's;
+# the client recipe has no suffix fallback, so every row is written out. A wedding dresses the couple in the red robes
+# (groom PENGANTIN_L, bride PENGANTIN_P; the crown, hat and flower are KotaGear), mourning in raw white hemp (children too),
+# winter in the padded coat over the person's own colours.
+NPCROLE = os.path.join(ROOT, "src", "main", "java", "dev", "kultivator", "dunia", "kota", "NpcRole.java")
+_PERAN = re.findall(r"^\t([A-Z][A-Z0-9_]*)\(.*?Kelompok\.([A-Z_]+)", open(NPCROLE, encoding="utf-8").read(), re.M)
+_TANPA_ACARA = {"kerja", "celemek", "zirah", "selendang", "pelindung_lengan", "bahu_zirah", "bahu_kiri", "rumbai_iblis", "pesta",
+                "penyamaran", "caping", "kerah_tinggi"}
+
+
+def _keadaan(base, keadaan):
+    r = copy.deepcopy(base)
+    for k in ("sikap_l", "sikap_p", "gaya_anak", "prop_acak", "tambahan_acak"):
+        r.pop(k, None)
+    r["kubus"] = [c for c in r.get("kubus", []) if c in UV_RAMBUT]
+    r["kubus_p"] = [c for c in r.get("kubus_p", []) if c in UV_RAMBUT]
+    r["tambahan"] = [t for t in r.get("tambahan", []) if t not in _TANPA_ACARA]
+    r["buzi"] = ""
+    r["topi"] = ""
+    r["topi_menutup"] = False
+    tanda = dict(r.get("tanda", {}))
+    if keadaan == "pengantin":
+        tanda.pop("coreng_jelaga", None)  # washed for the wedding
+        r["gaya"] = [["PENGANTIN_L", 100]]
+        r["gaya_p"] = [["PENGANTIN_P", 100]]
+        r["kain"] = ["#B01E24", "#D8B04A", "#E8C860", "emas"]
+        r["tambahan"] = []
+        r["prop"] = 0
+        r["sikap"] = SIKAP["tangan_depan"]
+        r["ekspresi"] = {"senyum": 60}
+        r["tanda_p"] = {"huadian": 100}
+        r["hiasan_p"] = "buyao_emas"
+    elif keadaan == "berkabung":
+        tanda.pop("coreng_jelaga", None)
+        r["gaya"] = [["BERKABUNG", 100]]
+        r.pop("gaya_p", None)
+        r["gaya_anak"] = [["BERKABUNG", 100]]
+        r["kain"] = ["#E6E2D6", "#D0C8B4", "#B8AE94", "-"]
+        r["tambahan"] = []
+        r["prop"] = 0
+        r["sikap"] = SIKAP["tunduk"]
+        r["ekspresi"] = {"sedih": 100}
+        r["hiasan_l"] = "kain" if r.get("hiasan_l") else ""
+        r["hiasan_p"] = ""
+        r["tanda_p"] = {}
+    else:
+        r["gaya"] = [["MANTEL_KAPAS", 100]]
+        r.pop("gaya_p", None)
+        r["gaya_anak"] = [["MANTEL_KAPAS", 100]]
+        kain = list(r["kain"])
+        if kain[0] in ("-", "sekte", "sekte_pudar", "dao", "kelompok"):
+            kain[0] = "nila"
+        r["kain"] = kain
+        r["tambahan"] = [t for t in r["tambahan"] if t in ("bepergian", "bepergian_kota", "kantong", "labu", "buntalan")]
+    r["tanda"] = tanda
+    r["kelas"] = "sipil" if r.get("kelas") in ("penjaga", "kultivator", "iblis") else r.get("kelas", "sipil")
+    return r
+
+
+_DASAR = {}
+for _nama, _kel in _PERAN:
+    _id = _nama.lower()
+    _DASAR[_id] = P.get(_id) or P["kelompok." + _kel]
+for _k in [k for k in P if k.startswith("kelompok.")]:
+    _DASAR[_k] = P[_k]
+_DASAR[""] = P["kelompok.SIPIL"]
+for _id, _b in _DASAR.items():
+    for _keadaan_id in ("pengantin", "berkabung", "dingin"):
+        P[(_id + "." if _id else "") + _keadaan_id] = _keadaan(_b, _keadaan_id)
 
 # ---------------------------------------------------------------------- life paths (40.4.3), added on top of rank rows
 J = {

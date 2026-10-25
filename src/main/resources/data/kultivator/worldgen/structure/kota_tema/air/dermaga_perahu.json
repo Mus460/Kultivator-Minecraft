@@ -65,6 +65,18 @@
       "dz": 48,
       "pool": "kultivator:kota_tema/air/tembok/dermaga_perahu_sudut",
       "putar": 0
+    },
+    {
+      "dx": -48,
+      "dz": 58,
+      "pool": "kultivator:kota_tema/air/hidup42/kantor_rekrut",
+      "putar": 0
+    },
+    {
+      "dx": 0,
+      "dz": 58,
+      "pool": "kultivator:kota_tema/air/hidup42/kavling_timur",
+      "putar": 0
     }
   ],
   "gaya": [

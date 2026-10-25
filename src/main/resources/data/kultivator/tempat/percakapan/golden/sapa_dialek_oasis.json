@@ -1,0 +1,194 @@
+{
+  "id": "sapa_dialek_oasis",
+  "jenis": "realisasi",
+  "_catatan": "SAPA in dialect oasis across the day (register biasa); steps share the anti-repeat ring.",
+  "benih_dunia": 42,
+  "masukan": {
+    "niat": "SAPA",
+    "pembicara": 102,
+    "hari": 120,
+    "now": 2880000,
+    "cuaca": "cerah",
+    "musim": "semi",
+    "situasi": {
+      "jam": "pagi",
+      "cuaca": "cerah",
+      "musim": "semi",
+      "kelompok": "pekerja",
+      "watak": "ramah",
+      "kebiasaan": [],
+      "sifat": {
+        "H": 10,
+        "E": 0,
+        "X": 20,
+        "A": 30,
+        "C": 10,
+        "O": 0
+      },
+      "wajah": "netral",
+      "tempat": "tema_oasis"
+    },
+    "pendengar": {
+      "nama": "Han",
+      "kelamin": "l",
+      "tahap": "dewasa",
+      "pemain": true
+    },
+    "kesan": "kenal",
+    "tahu_nama": false,
+    "register": "biasa",
+    "dialek": "oasis",
+    "kelamin": "p"
+  },
+  "langkah": [
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "subuh",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "tema_oasis"
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.kenal.4",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.kakak.oasis",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "sapa.kenal",
+      "gestur": "lambai",
+      "seru": null,
+      "tik": null,
+      "id_id": "Saudara Tua. Sudah lama juga, ya.",
+      "en_us": "Elder Brother. It's been a while, hasn't it."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "tema_oasis"
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.pekerja.4",
+        "a": []
+      },
+      "aturan": "sapa.pekerja",
+      "gestur": "seka_keringat",
+      "seru": null,
+      "tik": null,
+      "id_id": "Salam! Jangan berdiri di situ, nanti kena serbuk kayu.",
+      "en_us": "Greetings! Don't stand there; you'll get sawdust on you."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "siang",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "tema_oasis"
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.pekerja.1",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.kakak.oasis",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "sapa.pekerja",
+      "gestur": "seka_keringat",
+      "seru": null,
+      "tik": null,
+      "id_id": "Salam, Saudara Tua. Kerjaan menumpuk, tapi untukmu ada waktu sebentar.",
+      "en_us": "Greetings, Elder Brother. Work's piling up, but I've a moment for you."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "malam",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "tema_oasis"
+        },
+        "pendengar": {
+          "nama": "Mei",
+          "kelamin": "p",
+          "tahap": "dewasa",
+          "pemain": true
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.pekerja.0",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.kakak.oasis.p",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "sapa.pekerja",
+      "gestur": "seka_keringat",
+      "seru": null,
+      "tik": null,
+      "id_id": "Oh, Saudari Tua. Maaf, tanganku kotor. Salam!",
+      "en_us": "Oh, Elder Sister. Sorry, my hands are dirty. Greetings!"
+    }
+  ]
+}

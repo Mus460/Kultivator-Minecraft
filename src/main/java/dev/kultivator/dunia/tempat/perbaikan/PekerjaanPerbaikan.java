@@ -37,6 +37,12 @@ import java.util.UUID;
  * </ul>
  * Failures are planned again with the block the world holds now; a filled container in the way blocks its operation
  * until it is emptied; an operation that keeps failing is given up. Server thread only.
+ * <p>
+ * Growth jobs (42F, DESIGN 42.9.4, {@link PerbaikanApi#kerjakan}) ride the same crews: a cluster whose operations carry
+ * the cause {@link #TUMBUH}. They are never reported, billed or told as damage; their batches go out with the reason
+ * {@code "tumbuh"}; a placed block enters the blueprint at once (so the scanner never "repairs" it away); a failure is
+ * never planned again over a foreign block (the expected state stays the recorded one): a player block or a filled
+ * container in the way gives the operation up, and the plot owner sees the gap.
  */
 public final class PekerjaanPerbaikan {
 
@@ -46,6 +52,8 @@ public final class PekerjaanPerbaikan {
 	public static final int BATCH = 64;
 	/** Failures before an operation is given up. */
 	public static final int MAKS_GAGAL = 12;
+	/** Cause of the operations of a growth job (42F); also the restore reason. */
+	public static final String TUMBUH = "tumbuh";
 
 	/** Place key -> positions with open operations (the scanner skips them). */
 	private static final Map<Long, LongOpenHashSet> DIKETAHUI = new HashMap<>();
@@ -77,6 +85,47 @@ public final class PekerjaanPerbaikan {
 	static boolean diketahui(long kunci, long pos) {
 		LongOpenHashSet set = DIKETAHUI.get(kunci);
 		return set != null && set.contains(pos);
+	}
+
+	/** True for a growth job (42F) rather than a repair. */
+	static boolean tumbuh(Gugus g) {
+		return !g.ops.isEmpty() && TUMBUH.equals(g.ops.get(0).sebab);
+	}
+
+	/**
+	 * Makes a growth job of place {@code t} (42F): one operation per position whose expected state differs from its
+	 * target, already reported and decided (no bill, no rumour), so the crews take it on the next second. Returns the job id
+	 * or 0 when nothing is left to place.
+	 */
+	static long tumbuhBaru(ServerLevel level, TempatRawat t, long[] pos, BlockState[] target, BlockState[] expected) {
+		PerbaikanData data = PerbaikanData.get(level.getServer());
+		long time = level.getGameTime();
+		Gugus g = null;
+		for (int i = 0; i < pos.length; i++) {
+			if (target[i] == null || expected[i] == null || target[i] == expected[i]) {
+				continue;
+			}
+			BlockPos at = BlockPos.of(pos[i]);
+			if (g == null) {
+				g = new Gugus(data.id(), t.kunci, t.situsId, new BoundingBox(at), time);
+				g.dilaporkan = true;
+				g.tagihanId = -1L;
+			}
+			if (g.ops.size() >= Gugus.MAKS_OP) {
+				break;
+			}
+			g.tambah(new Gugus.Op(pos[i], target[i], expected[i], null, TUMBUH, null, Banding.urut(target[i], expected[i], at, t.kotak.minY())));
+		}
+		if (g == null || g.ops.isEmpty()) {
+			return 0L;
+		}
+		data.gugus.put(g.id, g);
+		LongOpenHashSet known = DIKETAHUI.computeIfAbsent(t.kunci, k -> new LongOpenHashSet());
+		for (Gugus.Op op : g.ops) {
+			known.add(op.pos);
+		}
+		data.kotor();
+		return g.id;
 	}
 
 	/** Blocks put back by repairs this session (for {@code uji tempat gugus}). */
@@ -201,9 +250,12 @@ public final class PekerjaanPerbaikan {
 		if (Bantu.membantu(g)) {
 			mult *= 1.5D;
 		}
+		// 42F: a rebuild project (donations, office funds, migrant crews) or the growth speed; also widens the place cap
+		double extra = PerbaikanApi.pengali(t.situsId, tumbuh(g));
+		mult *= extra;
 		double rate = crew / (double) Math.max(1, config.detikPerBlok) * mult;
 		double used = JATAH.getOrDefault(t.situsId, 0.0D);
-		rate = Math.max(0.0D, Math.min(rate, MAKS_PER_DETIK - used));
+		rate = Math.max(0.0D, Math.min(rate, MAKS_PER_DETIK * Math.max(1.0D, Math.min(extra, 3.0D)) - used));
 		JATAH.put(t.situsId, used + rate);
 		g.kemajuan = Math.min(g.kemajuan + rate, 8.0D);
 		List<Gugus.Op> waiting = new ArrayList<>();
@@ -312,7 +364,7 @@ public final class PekerjaanPerbaikan {
 		}
 		final List<Gugus.Op> sent = List.copyOf(batch);
 		boolean queued = WorldBreaker.submitRestore(new WorldBreaker.RestoreRequest(level.dimension(), positions, targets, expected, anyTag ? tags : null,
-				"perbaikan:" + t.struktur, result -> selesaiBatch(level, t, g, sent, result)));
+				tumbuh(g) ? TUMBUH : "perbaikan:" + t.struktur, result -> selesaiBatch(level, t, g, sent, result)));
 		if (!queued) {
 			for (Gugus.Op op : batch) {
 				op.status = Gugus.SIAP;
@@ -323,6 +375,11 @@ public final class PekerjaanPerbaikan {
 	private static void selesaiBatch(ServerLevel level, TempatRawat t, Gugus g, List<Gugus.Op> sent, boolean[] result) {
 		PerbaikanData data = PerbaikanData.get(level.getServer());
 		LongOpenHashSet known = DIKETAHUI.get(t.kunci);
+		if (tumbuh(g)) {
+			selesaiTumbuh(level, t, sent, result, known);
+			data.kotor();
+			return;
+		}
 		for (int i = 0; i < sent.size(); i++) {
 			Gugus.Op op = sent.get(i);
 			if (op.status != Gugus.TERKIRIM) {
@@ -364,6 +421,48 @@ public final class PekerjaanPerbaikan {
 		data.kotor();
 	}
 
+	/** A growth batch came back: placed blocks enter the blueprint; foreign blocks in the way are never replaced. */
+	private static void selesaiTumbuh(ServerLevel level, TempatRawat t, List<Gugus.Op> sent, boolean[] result, @Nullable LongOpenHashSet known) {
+		for (int i = 0; i < sent.size(); i++) {
+			Gugus.Op op = sent.get(i);
+			if (op.status != Gugus.TERKIRIM) {
+				continue;
+			}
+			BlockPos pos = BlockPos.of(op.pos);
+			if (!level.isLoaded(pos)) {
+				op.status = Gugus.SIAP;
+				continue;
+			}
+			BlockState now = level.getBlockState(pos);
+			if (i < result.length && result[i] || now == op.target) {
+				op.status = Gugus.SELESAI;
+				dipulihkan++;
+				TempatRawat holder = Rekam.tempatDi(level, pos);
+				terimaCetak(holder != null ? holder : t, pos, now);
+			} else if (now.isAir() || now == op.ditemukan) {
+				// a body or an item stood in the way: try again later, still only over the recorded state
+				op.gagal++;
+				op.status = op.gagal > MAKS_GAGAL ? Gugus.BATAL : Gugus.SIAP;
+			} else {
+				// a player's block or a filled chest: never replaced (42.9.4); the plot shows it as blocked
+				op.status = Gugus.BATAL;
+			}
+			if (!op.terbuka() && known != null) {
+				known.remove(op.pos);
+			}
+		}
+	}
+
+	/** The blueprint takes the block now at {@code pos} (a growth block, a finished plot). */
+	static boolean terimaCetak(TempatRawat t, BlockPos pos, BlockState now) {
+		Cetak c = Rekam.cetak(t, net.minecraft.world.level.ChunkPos.pack(pos));
+		if (c != null && c.terima(pos, now)) {
+			CetakStore.put(t.dimensi, c);
+			return true;
+		}
+		return false;
+	}
+
 	/** Rule 4: a foreign block taken away goes to the place's seized goods in its placer's name. */
 	private static void seized(ServerLevel level, TempatRawat t, Gugus.Op op) {
 		BlockState found = op.ditemukan;
@@ -380,7 +479,7 @@ public final class PekerjaanPerbaikan {
 
 	private static void tuntas(ServerLevel level, TempatRawat t, Gugus g) {
 		Tukang.bubar(level, g, true);
-		if (g.ops.size() >= 12) {
+		if (g.ops.size() >= 12 && !tumbuh(g)) {
 			CeritaApi.kabar(level, t.situsId, "perbaikan.selesai", g.selesai());
 		}
 		hapus(level.getServer(), g);

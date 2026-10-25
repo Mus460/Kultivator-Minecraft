@@ -1,0 +1,41 @@
+{
+  "pemberi": "peran:tetua_sekte",
+  "tempat": "gabung_sekte",
+  "tahap": [
+    {
+      "id": "surat",
+      "tujuan": [
+        "pergi kota/kota_besar"
+      ],
+      "akibat_masuk": [
+        "gabung.cerita guru_surat surat shifu"
+      ]
+    },
+    {
+      "id": "sahabat",
+      "tujuan": [
+        "bicara peran:pustakawan"
+      ],
+      "akibat_masuk": [
+        "gabung.cerita guru_surat sahabat"
+      ]
+    },
+    {
+      "id": "balasan",
+      "tujuan": [
+        "gabung temu:shifu"
+      ],
+      "akibat_masuk": [
+        "gabung.cerita guru_surat balasan"
+      ],
+      "akibat": [
+        "gabung.cerita guru_surat selesai shifu",
+        "gabung.ikatan 15",
+        "gabung.sikap shifu 10",
+        "gabung.pk 40"
+      ],
+      "ke": "selesai",
+      "arah": "sekte/kompleks"
+    }
+  ]
+}

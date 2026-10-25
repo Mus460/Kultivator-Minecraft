@@ -3,26 +3,22 @@ package dev.kultivator.client.sekte.misi;
 import dev.kultivator.client.epic.SekteScenes;
 import dev.kultivator.client.epic.sky.SkyDirector;
 import dev.kultivator.client.epic.sound.MusicCue;
-import dev.kultivator.client.hub.HubCards;
-import dev.kultivator.client.hub.HubNav;
-import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.client.sectevent.MissionPage;
 import dev.kultivator.client.sekte.SektePoses;
 import dev.kultivator.sekte.SekteIds;
 import dev.kultivator.sekte.misi.Misi;
 import dev.kultivator.sekte.misi.MisiPayloads;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Util;
 
 import java.util.List;
 
 /**
- * Module X on the client (DESIGN 36.2.7): the cache of the story tabs ({@code MisiPayloads.Keadaan}), the report screen
- * ({@code MisiPayloads.Laporan} opens {@link MisiLaporanScreen}), the line-up pose of activity {@code ACT_MUSTER} with the
- * travel bundle, the two homecoming scenes (beats 160 and 161) and the hub card "Misi Cerita" (SEKTE section: opens the
- * Misi tablet of the hall on the story tab). Reads only X's own payloads and the shared constants.
+ * Module X on the client (DESIGN 36.2.7, 43.5): the cache of the story sections ({@code MisiPayloads.Keadaan}), the
+ * report ({@code MisiPayloads.Laporan} opens as the detail of Sekte › Kegiatan › Misi, R14), the line-up pose of activity
+ * {@code ACT_MUSTER} with the travel bundle and the two homecoming scenes (beats 160 and 161). The story board lives on
+ * Kegiatan › Misi (no hub card). Reads only X's own payloads and the shared constants.
  */
 public final class MisiClient {
 
@@ -48,20 +44,14 @@ public final class MisiClient {
 			state = fresh;
 			version++;
 		});
-		ClientPlayNetworking.registerGlobalReceiver(MisiPayloads.Laporan.TYPE, (payload, context) -> {
-			Minecraft minecraft = Minecraft.getInstance();
-			minecraft.gui.setScreen(new MisiLaporanScreen(payload.report(), minecraft.gui.screen()));
-		});
+		// R14: the report is the detail of Sekte › Kegiatan › Misi, shown in the Gulungan (never over another screen)
+		ClientPlayNetworking.registerGlobalReceiver(MisiPayloads.Laporan.TYPE, (payload, context) -> MissionPage.laporan(payload.report()));
 		SektePoses.register(SekteIds.ACT_MUSTER, MisiPose::apply, List.of(new SektePoses.Prop("sekte_misi_bundle", true, 0.75F, 0.0F)));
 		SekteScenes.register(Misi.BEAT_HOME, new SekteScenes.Recipe("kultivator.sekte.misi.adegan.pulang", SekteScenes.Arg.SUBJECT_NAME,
 				null, "帰", 0x7FD8C0, false, 60, SekteScenes.Move.PUSH, 4.0F, MusicCue.Cue.M_GENTLE, 8, null, -1, 100));
 		SekteScenes.register(Misi.BEAT_LEGEND, new SekteScenes.Recipe("kultivator.sekte.misi.adegan.gemilang", SekteScenes.Arg.SUBJECT_NAME,
 				"kultivator.sekte.misi.adegan.gemilang.sub", "凱", 0xFFD76A, true, 80, SekteScenes.Move.LOW_HERO, 5.0F,
 				MusicCue.Cue.M_TRIUMPH, 10, SkyDirector.Grade.SK_DAWN, 0xFFE9A8, 160));
-		HubCards.register(HubNav.SEKTE, "sekte_misi_cerita", Glyphs.PATH, null, () -> {
-			MissionPage.selectStory();
-			HubNav.openHall(MissionPage.PAGE);
-		});
 	}
 
 	/** The last state from the server (never null; empty before the first answer). */

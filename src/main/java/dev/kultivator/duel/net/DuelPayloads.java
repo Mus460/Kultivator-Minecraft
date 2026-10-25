@@ -1,9 +1,11 @@
 package dev.kultivator.duel.net;
 
 import dev.kultivator.Kultivator;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 
@@ -84,6 +86,11 @@ public final class DuelPayloads {
 
 	/** An answer to a challenge or a running duel (6 B): {@code answer} {@code DuelIds.ANSWER_*}. */
 	public record DuelAnswer(int challengeId, int answer, int arg) implements CustomPacketPayload {
+		/**
+		 * Asks for the sender's own duel record (DESIGN 43.14 S2): answered with a {@link DuelCatatan}, never handed to
+		 * {@code DuelChallenges}. Next to {@code DuelIds.ANSWER_TERIMA..ANSWER_TUNDA} (0..4).
+		 */
+		public static final int ANSWER_CATATAN = 5;
 		public static final Type<DuelAnswer> TYPE = new Type<>(Kultivator.id("duel_answer"));
 		public static final StreamCodec<RegistryFriendlyByteBuf, DuelAnswer> CODEC = StreamCodec.of(
 				(buf, p) -> {
@@ -377,6 +384,25 @@ public final class DuelPayloads {
 
 		@Override
 		public Type<DuelResult> type() {
+			return TYPE;
+		}
+	}
+
+	/**
+	 * The player's duel record for Gulungan › Dunia › Duel › Catatan (DESIGN 43.14 S2), the answer to
+	 * {@link DuelAnswer#ANSWER_CATATAN}: the same data {@code /kultivasi duel catatan} prints. Keys: {@code ada} (has
+	 * fought), {@code menang}, {@code kalah}, {@code seri}, {@code kehormatan}, {@code gelar} (the {@code DuelRecords.titleId}),
+	 * {@code sempurna}, {@code penentu}, {@code kunci}, {@code rantai}, and {@code baru}: a list of {@code nama},
+	 * {@code hasil} (1 won, -1 lost, 0 draw), {@code hari} (days ago).
+	 */
+	public record DuelCatatan(CompoundTag data) implements CustomPacketPayload {
+		public static final Type<DuelCatatan> TYPE = new Type<>(Kultivator.id("duel_catatan"));
+		public static final StreamCodec<RegistryFriendlyByteBuf, DuelCatatan> CODEC = StreamCodec.of(
+				(buf, p) -> ByteBufCodecs.TRUSTED_COMPOUND_TAG.encode(buf, p.data),
+				buf -> new DuelCatatan(ByteBufCodecs.TRUSTED_COMPOUND_TAG.decode(buf)));
+
+		@Override
+		public Type<DuelCatatan> type() {
 			return TYPE;
 		}
 	}

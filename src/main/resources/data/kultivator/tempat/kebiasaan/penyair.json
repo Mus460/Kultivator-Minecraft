@@ -1,0 +1,78 @@
+{
+  "_catatan": "Kebiasaan #8 penyair (DESIGN 42.4.12); ilham: Li Bai",
+  "nomor": 8,
+  "siapa": {
+    "umur": [
+      16,
+      200
+    ],
+    "kelompok": [
+      "cendekia"
+    ],
+    "peran": [
+      "sastrawan",
+      "pustakawan",
+      "guru_sekolah"
+    ],
+    "tahap": [
+      "dewasa",
+      "tua"
+    ]
+  },
+  "bobot": 1.5,
+  "sesi": [
+    {
+      "jam": [
+        10,
+        12
+      ],
+      "peluang": 0.7,
+      "tujuan": [
+        "pandang",
+        "meja_tulis",
+        "kursi",
+        "obrol"
+      ],
+      "klip": "menulis",
+      "kanan": "kuas",
+      "ganti": [
+        {
+          "klip": "menulis",
+          "kanan": "kuas"
+        },
+        {
+          "klip": "tatap_langit",
+          "kanan": ""
+        },
+        {
+          "klip": "kota42:deklamasi",
+          "kanan": "gulungan"
+        }
+      ],
+      "ganti_menit": 12
+    },
+    {
+      "jam": [
+        20,
+        21
+      ],
+      "peluang": 0.6,
+      "kegiatan": "kb_penyair_kedai",
+      "tujuan": [
+        "@kedai",
+        "kursi"
+      ],
+      "klip": "kota42:deklamasi",
+      "kanan": "cawan_arak",
+      "ganti": [
+        {
+          "klip": "kota42:deklamasi"
+        },
+        {
+          "klip": "minum_arak"
+        }
+      ],
+      "ganti_menit": 10
+    }
+  ]
+}

@@ -2,10 +2,9 @@ package dev.kultivator.client.duel.ui;
 
 import dev.kultivator.client.ClientCultivation;
 import dev.kultivator.client.duel.DuelClient;
-import dev.kultivator.client.screen.ui.Brush;
-import dev.kultivator.client.screen.ui.JadeCoin;
-import dev.kultivator.client.screen.ui.JadeSlider;
+import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
+import dev.kultivator.client.screen.ui.PemilihJumlah;
 import dev.kultivator.client.screen.ui.TalismanButton;
 import dev.kultivator.duel.DuelIds;
 import dev.kultivator.duel.net.DuelPayloads;
@@ -13,39 +12,39 @@ import dev.kultivator.harta.HartaItems;
 import dev.kultivator.technique.source.JadeSlips;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.Mth;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.IntSupplier;
+import java.util.function.Consumer;
 
 /**
- * The challenge screen (DESIGN 35.2, 35.9 module U): the rules of a formal duel before it is sent as a
- * {@code DuelChallenge}. Each rule is a talisman that steps through its values, with a tooltip saying what it does:
- * realm difference (Bebas / Handicap / Tekan Ranah, suggested when the realms are two or more apart), techniques
- * (sword only / free), victory (the 10% line only / Deathblow decides), ring radius 6/9/12, time limit, the stake (none,
- * spirit stones of one grade with a count slider and the player's own count, one jade slip from the inventory by name,
- * Honour) limited by the pair (a disciple only plays for nothing or Honour; a watched disciple duel for nothing), and
- * the intro film and crowd switches. The server checks everything again and answers in the chat.
+ * The challenge form (DESIGN 35.2, 43.5 Dunia › Duel › tantang, shown as the page's detail view: G82, no screen of its
+ * own any more). The rules of a formal duel before it is sent as a {@code DuelChallenge}, each a talisman stepping
+ * through its values with what it does in the tooltip: realm difference (Bebas / Handicap / Tekan Ranah, suggested when
+ * the realms are two or more apart), techniques, victory, ring radius 6/9/12, time limit, the stake (none, spirit stones
+ * of one grade with a count picker and the player's own count, one jade slip from the inventory, Honour) limited by the
+ * pair, and the intro film and crowd. Laid out in two columns from 240 px, so it fits the 289 × 148 content box of GUI
+ * scale 4 without a scroll. Back is the page header's back control / Esc. The server checks everything again.
  */
-public final class ChallengeScreen extends DuelScrollScreen {
+final class ChallengeScreen {
 
+	private static final String K = "kultivator.gui43.m14.";
+	private static final String C = "kultivator.duel.ui.challenge.";
 	private static final int[] RADII = {6, 9, 12};
 	private static final int[] MINUTES = {1, 2, 3, 5};
-	private static final float[] COUNTS = {1, 2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 24, 32, 40, 48, 64};
+	private static final int MAX_COUNT = 64;
+	private static final int ROW = 14;
+	private static final int STEP = 16;
 
 	private final int targetId;
 	private final int secondId;
 	private final Component targetName;
 	private final int pair;
-	private final int targetRealm;
 
 	private int realmRule = DuelIds.REALM_BEBAS;
 	private int jurusRule = DuelIds.JURUS_PEDANG_SAJA;
@@ -54,33 +53,36 @@ public final class ChallengeScreen extends DuelScrollScreen {
 	private int minutesIndex = 2;
 	private int stake = DuelIds.STAKE_TANPA;
 	private int grade = 1;
-	private int countIndex = 7;
+	private final PemilihJumlah count = new PemilihJumlah();
 	private int slipIndex;
 	private boolean introFilm;
 	private boolean crowd;
 	private boolean suggested;
-	private @Nullable JadeSlider slider;
 
 	/**
 	 * @param targetId    the challenged entity (the first disciple of a watched duel)
 	 * @param secondId    the second disciple of a watched duel ({@code PAIR_TONTON}), else -1
-	 * @param pair        {@code DuelIds.PAIR_*} as the duel screen guessed it (the server decides)
+	 * @param pair        {@code DuelIds.PAIR_*} as the page guessed it (the server decides)
 	 * @param targetRealm the target's realm ordinal when the client knows it, else -1
 	 */
-	public ChallengeScreen(@Nullable Screen parent, int targetId, int secondId, Component targetName, int pair, int targetRealm) {
-		super(Component.translatable("kultivator.duel.ui.challenge.title"), parent);
+	ChallengeScreen(int targetId, int secondId, Component targetName, int pair, int targetRealm) {
 		this.targetId = targetId;
 		this.secondId = secondId;
 		this.targetName = targetName;
 		this.pair = pair;
-		this.targetRealm = targetRealm;
 		this.introFilm = DuelSettings.intro() && pair != DuelIds.PAIR_TONTON;
 		this.crowd = pair == DuelIds.PAIR_TONTON;
+		this.count.set(8);
 		int own = ClientCultivation.received() ? ClientCultivation.data().realm().ordinal() : -1;
 		if (own >= 0 && targetRealm >= 0 && Math.abs(own - targetRealm) >= 2 && pair != DuelIds.PAIR_TONTON) {
 			this.realmRule = DuelIds.REALM_TEKAN_RANAH;
 			this.suggested = true;
 		}
+	}
+
+	/** The challenged entity (the page closes the form when it goes away). */
+	int targetId() {
+		return targetId;
 	}
 
 	// ================================================================== options
@@ -91,6 +93,17 @@ public final class ChallengeScreen extends DuelScrollScreen {
 			case DuelIds.PAIR_TONTON, DuelIds.PAIR_UJI, DuelIds.PAIR_LATIH -> new int[]{DuelIds.STAKE_TANPA};
 			default -> new int[]{DuelIds.STAKE_TANPA, DuelIds.STAKE_BATU_ROH, DuelIds.STAKE_GULUNGAN, DuelIds.STAKE_KEHORMATAN};
 		};
+	}
+
+	private void nextStake() {
+		int[] options = stakes();
+		int at = 0;
+		for (int i = 0; i < options.length; i++) {
+			if (options[i] == stake) {
+				at = i;
+			}
+		}
+		stake = options[(at + 1) % options.length];
 	}
 
 	private static Item stone(int grade) {
@@ -107,14 +120,14 @@ public final class ChallengeScreen extends DuelScrollScreen {
 		if (player == null) {
 			return 0;
 		}
-		int count = 0;
+		int n = 0;
 		for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
 			ItemStack stack = player.getInventory().getItem(i);
 			if (stack.is(item)) {
-				count += stack.getCount();
+				n += stack.getCount();
 			}
 		}
-		return count;
+		return n;
 	}
 
 	/** The jade slips with a technique in the inventory, in slot order. */
@@ -135,125 +148,144 @@ public final class ChallengeScreen extends DuelScrollScreen {
 
 	private @Nullable ItemStack slip() {
 		List<ItemStack> list = slips();
-		if (list.isEmpty()) {
-			return null;
-		}
-		return list.get(Math.floorMod(slipIndex, list.size()));
-	}
-
-	private int count() {
-		return Math.round(COUNTS[Mth.clamp(countIndex, 0, COUNTS.length - 1)]);
+		return list.isEmpty() ? null : list.get(Math.floorMod(slipIndex, list.size()));
 	}
 
 	/** Why the challenge cannot be sent as it stands (null: it can). */
 	private @Nullable Component problem() {
-		if (stake == DuelIds.STAKE_BATU_ROH && owned(stone(grade)) < count()) {
-			return Component.translatable("kultivator.duel.ui.challenge.short_stones", owned(stone(grade)), count());
+		if (stake == DuelIds.STAKE_BATU_ROH && owned(stone(grade)) < count.nilai()) {
+			return Component.translatable(C + "short_stones", owned(stone(grade)), count.nilai());
 		}
 		if (stake == DuelIds.STAKE_GULUNGAN && slip() == null) {
-			return Component.translatable("kultivator.duel.ui.challenge.no_slip");
+			return Component.translatable(C + "no_slip");
 		}
 		if (!DuelClient.connected()) {
-			return Component.translatable("kultivator.duel.ui.challenge.offline");
+			return Component.translatable(C + "offline");
 		}
 		return null;
 	}
 
-	// ================================================================== layout
+	private static Component yaTidak(boolean on) {
+		return Component.translatable(on ? K + "ya" : K + "tidak");
+	}
 
-	@Override
-	protected void build() {
-		int labelW = Math.round((right - left) * 0.30F);
-		int vx = left + labelW;
-		int vw = Math.min(150, right - vx - 4);
-		int y = top + 26;
-		int h = 13;
-		int step = h + 3;
-		boolean tonton = pair == DuelIds.PAIR_TONTON;
-		add(choice(vx, y, vw, h, "realm", () -> realmRule, () -> realmRule = (realmRule + 1) % 3));
-		y += step;
-		add(choice(vx, y, vw, h, "jurus", () -> jurusRule, () -> jurusRule = (jurusRule + 1) % 2));
-		y += step;
-		add(choice(vx, y, vw, h, "win", () -> winRule, () -> winRule = (winRule + 1) % 2));
-		y += step;
-		add(valueButton(vx, y, vw, h, () -> Component.translatable("kultivator.duel.ui.rule.radius", RADII[radiusIndex]),
-				() -> radiusIndex = (radiusIndex + 1) % RADII.length, "radius"));
-		y += step;
-		add(valueButton(vx, y, vw, h, () -> Component.translatable("kultivator.duel.ui.challenge.minutes", MINUTES[minutesIndex]),
-				() -> minutesIndex = (minutesIndex + 1) % MINUTES.length, "time"));
-		y += step;
-		int[] options = stakes();
-		add(valueButton(vx, y, vw, h, () -> Component.translatable("kultivator.duel.ui.stake." + stake), () -> {
-			int at = 0;
-			for (int i = 0; i < options.length; i++) {
-				if (options[i] == stake) {
-					at = i;
-				}
-			}
-			stake = options[(at + 1) % options.length];
-			rebuildWidgets();
-		}, "stake").enabledWhen(() -> options.length > 1));
-		y += step;
-		slider = null;
+	/** "Label: value". */
+	private static Component aturan(String label, Component value) {
+		return Component.translatable(K + "aturan", Component.translatable(C + "label." + label), value);
+	}
+
+	// ================================================================== drawing
+
+	/**
+	 * Draws the form into the box; {@code terkirim} gets the footer line once the challenge is sent (the page then closes
+	 * the form).
+	 */
+	void gambar(Lukis l, int x0, int y0, int x1, int y1, Consumer<Component> terkirim) {
+		Component who = Component.translatable(C + "against", targetName, Component.translatable("kultivator.duel.ui.pair." + pair));
+		int y = y0 + l.kepala(who, x0, y0, x1);
+		boolean dua = x1 - x0 >= 240;
+		int cw = dua ? (x1 - x0 - 4) / 2 : x1 - x0;
+
+		// the six rules, two per row from 240 px
+		int i = 0;
+		rule(l, "realm", colX(dua, x0, cw, i), y + rowY(dua, i++), cw,
+				aturan("realm", Component.translatable("kultivator.duel.ui.rule.realm." + realmRule)),
+				Component.translatable("kultivator.duel.ui.rule.realm." + realmRule + ".tip"), true, null, () -> realmRule = (realmRule + 1) % 3);
+		rule(l, "jurus", colX(dua, x0, cw, i), y + rowY(dua, i++), cw,
+				aturan("jurus", Component.translatable("kultivator.duel.ui.rule.jurus." + jurusRule)),
+				Component.translatable("kultivator.duel.ui.rule.jurus." + jurusRule + ".tip"), true, null, () -> jurusRule = (jurusRule + 1) % 2);
+		rule(l, "win", colX(dua, x0, cw, i), y + rowY(dua, i++), cw,
+				aturan("win", Component.translatable("kultivator.duel.ui.rule.win." + winRule)),
+				Component.translatable("kultivator.duel.ui.rule.win." + winRule + ".tip"), true, null, () -> winRule = (winRule + 1) % 2);
+		rule(l, "radius", colX(dua, x0, cw, i), y + rowY(dua, i++), cw,
+				aturan("radius", Component.translatable(K + "blok", RADII[radiusIndex])),
+				Component.translatable(C + "radius.tip"), true, null, () -> radiusIndex = (radiusIndex + 1) % RADII.length);
+		rule(l, "time", colX(dua, x0, cw, i), y + rowY(dua, i++), cw,
+				aturan("time", Component.translatable(C + "minutes", MINUTES[minutesIndex])),
+				Component.translatable(C + "time.tip"), true, null, () -> minutesIndex = (minutesIndex + 1) % MINUTES.length);
+		boolean pilihan = stakes().length > 1;
+		rule(l, "stake", colX(dua, x0, cw, i), y + rowY(dua, i), cw,
+				aturan("stake", Component.translatable("kultivator.duel.ui.stake." + stake)),
+				Component.translatable(C + "stake.tip"), pilihan, pilihan ? null : Component.translatable(K + "taruhan_terkunci"), this::nextStake);
+		y += rowY(dua, i) + STEP;
+
+		// the stake's own row
 		if (stake == DuelIds.STAKE_BATU_ROH) {
-			int half = (vw - 4) / 2;
-			add(valueButton(vx, y, half, h, () -> Component.translatable("kultivator.duel.ui.grade." + grade), () -> grade = (grade + 1) % 4, "grade"));
-			IntSupplier max = () -> COUNTS.length - 1;
-			JadeSlider countSlider = new JadeSlider(vx + half + 4, y - 4, vw - half - 4, 18, COUNTS, countIndex,
-					value -> Component.translatable("kultivator.duel.ui.challenge.count", Math.round(value)), index -> countIndex = index).limit(max);
-			slider = addRenderableWidget(countSlider);
-			y += step + 4;
+			int gw = dua ? cw : Math.max(TalismanButton.MIN_W, (x1 - x0) / 2 - 2);
+			rule(l, "grade", x0, y, gw, Component.translatable(K + "mutu", Component.translatable("kultivator.duel.ui.grade." + grade)),
+					Component.translatable(C + "grade.tip"), true, null, () -> grade = (grade + 1) % 4);
+			int px = x0 + gw + 4;
+			int pw = count.gambar(l, "duel#jumlah", px, y, MAX_COUNT);
+			int have = owned(stone(grade));
+			l.teks(Component.translatable(C + "have", have), px + pw + 4, y + 3, x1 - px - pw - 4,
+					have >= count.nilai() ? l.gaya.teksLemah : Palette.DANGER);
+			y += STEP;
 		} else if (stake == DuelIds.STAKE_GULUNGAN) {
-			add(valueButton(vx, y, vw, h, () -> {
-				ItemStack s = slip();
-				return s == null ? Component.translatable("kultivator.duel.ui.challenge.no_slip") : s.getHoverName();
-			}, () -> slipIndex++, "slip"));
-			y += step;
+			ItemStack s = slip();
+			Component name = s == null ? Component.translatable(C + "no_slip") : s.getHoverName();
+			int sw = Math.max(TalismanButton.MIN_W, x1 - x0 - (s == null ? 0 : 20));
+			rule(l, "slip", x0, y, sw, aturan("slip", name), Component.translatable(C + "slip.tip"), s != null, s == null ? name : null,
+					() -> slipIndex++);
+			if (s != null) {
+				l.g.item(s, x1 - 17, y - 1);
+			}
+			y += STEP;
 		}
-		int cw = (vw - 4) / 2;
+
+		// intro film and crowd
+		boolean tonton = pair == DuelIds.PAIR_TONTON;
+		int fx = x0;
 		if (!tonton) {
-			add(flag(vx, y, cw, "film", () -> introFilm, () -> introFilm = !introFilm));
+			rule(l, "film", fx, y, cw, Component.translatable(K + "aturan", Component.translatable(C + "film"), yaTidak(introFilm)),
+					Component.translatable(C + "film.tip"), true, null, () -> introFilm = !introFilm);
+			fx = dua ? x0 + cw + 4 : x0;
+			if (!dua) {
+				y += STEP;
+			}
 		}
-		add(flag(tonton ? vx : vx + cw + 4, y, cw, "crowd", () -> crowd, () -> crowd = !crowd));
+		rule(l, "crowd", fx, y, cw, Component.translatable(K + "aturan", Component.translatable(C + "crowd"), yaTidak(crowd)),
+				Component.translatable(C + "crowd.tip"), true, null, () -> crowd = !crowd);
+		y += STEP + 2;
 
-		int bw = Math.min(110, (right - left - 8) / 2);
-		int by = bottom - 18;
-		add(new TalismanButton((left + right) / 2 - bw - 4, by, bw, 15, () -> Component.translatable("kultivator.duel.ui.challenge.send"))
-				.urgentWhen(() -> problem() == null)
-				.enabledWhen(() -> problem() == null)
-				.onPress(this::send)
-				.tooltip(() -> {
-					Component p = problem();
-					return p == null ? List.of(Component.translatable("kultivator.duel.ui.challenge.send"),
-							Component.translatable("kultivator.duel.ui.challenge.send.tip").withStyle(ChatFormatting.GRAY))
-							: List.of(Component.translatable("kultivator.duel.ui.challenge.send"), p.copy().withStyle(ChatFormatting.RED));
-				}));
-		add(new TalismanButton((left + right) / 2 + 4, by, bw, 15, () -> Component.translatable("kultivator.duel.ui.challenge.back"))
-				.onPress(this::onClose));
+		// what the chosen realm rule means; the suggestion when the realms are far apart
+		int sendY = y1 - ROW;
+		float room = sendY - 3 - y;
+		if (room >= 9.0F) {
+			float used = l.bungkus(Component.translatable("kultivator.duel.ui.rule.realm." + realmRule + ".tip"), x0, y, x1 - x0, l.gaya.teksSamar,
+					suggested && realmRule == DuelIds.REALM_TEKAN_RANAH ? room - 10.0F : room);
+			if (suggested && realmRule == DuelIds.REALM_TEKAN_RANAH && room - used >= 10.0F) {
+				l.teks(Component.translatable(C + "suggested"), x0, y + used + 1, x1 - x0, l.gaya.aksen);
+			}
+		}
+
+		// send
+		Component p = problem();
+		Component label = Component.translatable(C + "send");
+		int bw = TalismanButton.lebar(l.font, label, 90, x1 - x0);
+		boolean over = TalismanButton.gambar(l, "duel#kirim", x1 - bw, sendY, bw, ROW, label, p == null, p, () -> send(terkirim), p == null, false);
+		if (over) {
+			l.tip(p == null ? List.of(label, Component.translatable(C + "send.tip").withStyle(ChatFormatting.GRAY))
+					: List.of(label, p.copy().withStyle(ChatFormatting.RED)));
+		}
 	}
 
-	private TalismanButton choice(int x, int y, int w, int h, String rule, IntSupplier value, Runnable next) {
-		TalismanButton button = new TalismanButton(x, y, w, h, () -> Component.translatable("kultivator.duel.ui.rule." + rule + "." + value.getAsInt()));
-		button.onPress(next).tooltip(() -> List.of(Component.translatable("kultivator.duel.ui.rule." + rule + "." + value.getAsInt()),
-				Component.translatable("kultivator.duel.ui.rule." + rule + "." + value.getAsInt() + ".tip").withStyle(ChatFormatting.GRAY)));
-		return button;
+	private static int colX(boolean dua, int x0, int cw, int i) {
+		return dua ? x0 + (i % 2) * (cw + 4) : x0;
 	}
 
-	private TalismanButton valueButton(int x, int y, int w, int h, java.util.function.Supplier<Component> label, Runnable next, String tip) {
-		TalismanButton button = new TalismanButton(x, y, w, h, label);
-		button.onPress(next).tooltip(() -> List.of(label.get(),
-				Component.translatable("kultivator.duel.ui.challenge." + tip + ".tip").withStyle(ChatFormatting.GRAY)));
-		return button;
+	private static int rowY(boolean dua, int i) {
+		return (dua ? i / 2 : i) * STEP;
 	}
 
-	private JadeCoin flag(int x, int y, int w, String key, java.util.function.BooleanSupplier on, Runnable toggle) {
-		JadeCoin coin = new JadeCoin(x, y, w, 10, () -> Component.translatable("kultivator.duel.ui.challenge." + key), on);
-		coin.onPress(toggle).tooltip(() -> List.of(Component.translatable("kultivator.duel.ui.challenge." + key),
-				Component.translatable("kultivator.duel.ui.challenge." + key + ".tip").withStyle(ChatFormatting.GRAY)));
-		return coin;
+	/** One rule talisman with its tooltip. */
+	private static void rule(Lukis l, String kunci, int x, int y, int w, Component label, Component tip, boolean aktif, @Nullable Component alasan,
+			Runnable next) {
+		if (TalismanButton.gambar(l, "duel#" + kunci, x, y, w, ROW, label, aktif, alasan, next)) {
+			l.tip(List.of(label, tip.copy().withStyle(ChatFormatting.GRAY)));
+		}
 	}
 
-	private void send() {
+	private void send(Consumer<Component> terkirim) {
 		if (problem() != null) {
 			return;
 		}
@@ -264,59 +296,9 @@ public final class ChallengeScreen extends DuelScrollScreen {
 			slipSpec = spec == null ? "" : spec.length() > 64 ? spec.substring(0, 64) : spec;
 		}
 		int flags = (introFilm ? DuelIds.RF_INTRO_FILM : 0) | (crowd ? DuelIds.RF_CROWD : 0);
-		int count = stake == DuelIds.STAKE_BATU_ROH ? count() : 0;
+		int n = stake == DuelIds.STAKE_BATU_ROH ? count.nilai() : 0;
 		DuelClient.challenge(new DuelPayloads.DuelChallenge(targetId, secondId, realmRule, jurusRule, winRule, RADII[radiusIndex],
-				MINUTES[minutesIndex] * 60 * 20, stake, stake == DuelIds.STAKE_BATU_ROH ? grade : 0, count, slipSpec, flags));
-		LocalPlayer player = Minecraft.getInstance().player;
-		if (player != null) {
-			player.sendOverlayMessage(Component.translatable("kultivator.duel.ui.challenge.sent", targetName));
-		}
-		onClose();
-	}
-
-	// ================================================================== drawing
-
-	@Override
-	protected void drawPaper(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
-		Brush.fitCentered(g, font, Brush.bold(title), (left + right) / 2.0F, top, right - left, Palette.INK, 1.0F, 0.6F, false);
-		Component who = Component.translatable("kultivator.duel.ui.challenge.against", targetName,
-				Component.translatable("kultivator.duel.ui.pair." + pair));
-		Brush.fitCentered(g, font, who, (left + right) / 2.0F, top + 11.0F, right - left, Palette.SEAL_DARK, 0.75F, 0.45F, false);
-		int labelW = Math.round((right - left) * 0.30F);
-		float y = top + 28.0F;
-		String[] labels = {"realm", "jurus", "win", "radius", "time", "stake"};
-		for (String label : labels) {
-			Brush.fit(g, font, Component.translatable("kultivator.duel.ui.challenge.label." + label), left, y, labelW - 6.0F, Palette.INK_SOFT, 0.7F, 0.5F,
-					false);
-			y += 16.0F;
-		}
-		if (stake == DuelIds.STAKE_BATU_ROH) {
-			Component have = Component.translatable("kultivator.duel.ui.challenge.have", owned(stone(grade)));
-			Brush.fit(g, font, have, left, y, labelW - 6.0F, owned(stone(grade)) >= count() ? Palette.INK_SOFT : Palette.DANGER, 0.6F, 0.45F, false);
-			y += 20.0F;
-		} else if (stake == DuelIds.STAKE_GULUNGAN) {
-			Brush.fit(g, font, Component.translatable("kultivator.duel.ui.challenge.label.slip"), left, y, labelW - 6.0F, Palette.INK_SOFT, 0.7F, 0.5F,
-					false);
-			y += 16.0F;
-		}
-		// what the chosen realm rule means, in a short note; the suggestion when realms are far apart
-		float noteY = y + 16.0F;
-		if (noteY < bottom - 34.0F) {
-			Component note = Component.translatable("kultivator.duel.ui.rule.realm." + realmRule + ".tip");
-			Brush.wrap(g, font, note, left, noteY, right - left, Palette.INK_FAINT, 0.55F, false);
-			if (suggested && realmRule == DuelIds.REALM_TEKAN_RANAH) {
-				float nh = Brush.wrapHeight(font, note, right - left, 0.55F);
-				if (noteY + nh + 8.0F < bottom - 22.0F) {
-					Brush.fit(g, font, Component.translatable("kultivator.duel.ui.challenge.suggested"), left, noteY + nh + 1.0F, right - left,
-							Palette.JADE_DARK, 0.55F, 0.42F, false);
-				}
-			}
-		}
-		if (stake == DuelIds.STAKE_GULUNGAN) {
-			ItemStack s = slip();
-			if (s != null) {
-				g.item(s, right - 18, top + 28 + 6 * 16 - 2);
-			}
-		}
+				MINUTES[minutesIndex] * 60 * 20, stake, stake == DuelIds.STAKE_BATU_ROH ? grade : 0, n, slipSpec, flags));
+		terkirim.accept(Component.translatable(C + "sent", targetName));
 	}
 }

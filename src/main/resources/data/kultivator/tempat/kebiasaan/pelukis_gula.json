@@ -1,0 +1,45 @@
+{
+  "_catatan": "Kebiasaan #25 pelukis_gula (DESIGN 42.4.12); ilham: tanghua",
+  "nomor": 25,
+  "siapa": {
+    "umur": [
+      25,
+      200
+    ],
+    "tahap": [
+      "dewasa"
+    ]
+  },
+  "bobot": 0.6,
+  "sesi": [
+    {
+      "jam": [
+        16,
+        18
+      ],
+      "hari": [
+        0,
+        6
+      ],
+      "peluang": 0.9,
+      "syarat": [
+        "tidak_hujan"
+      ],
+      "tujuan": [
+        "panggung",
+        "lapak",
+        "obrol"
+      ],
+      "klip": "kota42:lukis_gula",
+      "kanan": "kota42:sendok_gula",
+      "undang": {
+        "umur": [
+          4,
+          12
+        ],
+        "maks": 4,
+        "klip": "kota42:antre"
+      }
+    }
+  ]
+}

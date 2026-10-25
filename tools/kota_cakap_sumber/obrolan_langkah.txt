@@ -1,0 +1,151 @@
+# obrolan_langkah: corpus of the conversation engine (42K-C, DESIGN 42.5A.8). Source format: gen_kota_hidup_cakap.py.
+# Steps of the NPC-NPC scripts (obrolan/*.json) asked with topik = chat kind: greetings per kind, agreement in MERAYU and
+# CURHAT, jokes in CANDA, and slot-free haggling lines for DAGANG (chats carry no goods or price slots).
+@kelompok obrolan_langkah
+
+== sapa.obrol.gosip
+niat: SAPA
+topik: gosip
+gestur: lambai
+$lawan: tipe=nama_warga dari=lawan
+- [3] {$lawan}! Sini, sini, duduk dulu. || {$lawan}! Over here, sit a moment.
+  ~ kasar: Hei, {$lawan}. Punya waktu? || Hey, {$lawan}. Got a minute?
+  ~ kuno: Salam, {$lawan}. Ada waktu sejenak untuk bercakap? || Greetings, {$lawan}. A moment to talk?
+  ~ kampung: {$lawan}! Mampir, mampir. Pas sekali kau lewat. || {$lawan}! Come, come. Perfect timing.
+  ~ pelabuhan: {$lawan}! Turun dulu dari perahu, ada yang mau kuceritakan. || {$lawan}! Off the boat a moment, I've something to tell.
+- [2] Eh, {$lawan}! Kebetulan sekali. Aku baru mau mencarimu. || Oh, {$lawan}! What luck. I was just about to look for you.
+  ~ p: Eh, {$lawan}! Ember sudah penuh? Duduk sebentar, ada cerita. || Oh, {$lawan}! Bucket full? Sit a moment, I've a story.
+- {$lawan}, sudah dengar belum? Oh, belum ya. Duduk dulu. || {$lawan}, have you heard? Oh, not yet. Sit down first.
+
+== sapa.obrol.merayu
+niat: SAPA
+topik: merayu
+gestur: lambai
+$lawan: tipe=nama_warga dari=lawan
+- [3] O-oh, {$lawan}. Kebetulan sekali kita bertemu di sini. || O-oh, {$lawan}. What a coincidence meeting you here.
+  ~ kasar: {$lawan}. Kau... lewat sini juga, ya. || {$lawan}. You... pass this way too, huh.
+  ~ kuno: Pertemuan ini terasa seperti takdir, {$lawan}. || This meeting feels like fate, {$lawan}.
+  ~ air: {$lawan}... kau datang juga ke jembatan ini... || {$lawan}... you came to this bridge too...
+- [2] {$lawan}! Kau kelihatan... berbeda hari ini. Baik, maksudku. || {$lawan}! You look... different today. Good, I mean.
+  ~ kampung: {$lawan}, mau ke sawah? Aku juga. Bareng, yuk. || {$lawan}, off to the paddies? Me too. Let's walk together.
+- Hai, {$lawan}. Aku tidak sengaja lewat, sungguh. || Hi, {$lawan}. I'm not passing on purpose, honestly.
+
+== sapa.obrol.dagang
+niat: SAPA
+topik: dagang
+gestur: seru_dagang
+$lawan: tipe=nama_warga dari=lawan
+- [3] Mari, {$lawan}! Lihat dulu daganganku, baru datang pagi ini! || Come, {$lawan}! Look at my goods, just in this morning!
+  ~ kasar: {$lawan}. Mau beli atau lewat saja? || {$lawan}. Buying or just passing?
+  ~ kuno: Selamat datang, {$lawan}. Silakan melihat-lihat. || Welcome, {$lawan}. Please have a look.
+  ~ pelabuhan: {$lawan}! Muatan baru, langsung dari kapal! || {$lawan}! Fresh cargo, straight off the boat!
+  ~ oasis: Mari, {$lawan}! Rempah dari tiga gurun! || Come, {$lawan}! Spices from three deserts!
+- [2] Ah, {$lawan}. Kau langganan setia. Ada barang bagus untukmu. || Ah, {$lawan}. A loyal regular. I've something good for you.
+  ~ kampung: {$lawan}, mampir. Sayur pagi masih segar-segar. || {$lawan}, drop by. The morning greens are still fresh.
+- {$lawan}, cari apa hari ini? || {$lawan}, looking for what today?
+
+== sapa.obrol.ajar
+niat: SAPA
+topik: ajar
+gestur: hormat
+$lawan: tipe=nama_warga dari=lawan
+- [3] Guru! Selamat pagi, Guru. || Master! Good morning, Master.
+  ~ kasar: Pelajaran lagi, Guru? Kakiku masih pegal dari kemarin. || Another lesson, Master? My legs still ache from yesterday.
+  ~ kuno: Murid memberi hormat kepada Guru. || The disciple pays respects to the Master.
+  ~ kampung: Pak! Hari ini belajar apa lagi? || Sir! What are we learning today?
+- [2] Guru {$lawan}, aku sudah datang. Hari ini belajar apa? || Master {$lawan}, I'm here. What do we learn today?
+  ~ gunung: Murid sudah menyapu halaman, Guru {$lawan}. Mohon petunjuk hari ini. || I've swept the yard, Master {$lawan}. Pray guide me today.
+- Guru, kemarin aku berlatih sampai malam! Lihat, tanganku lecet. || Master, I practised till night yesterday! Look, my hands are blistered.
+
+== sapa.obrol.curhat
+niat: SAPA
+topik: curhat
+gestur: tepuk_bahu
+$lawan: tipe=nama_warga dari=lawan
+- [3] {$lawan}... kau ada waktu? Aku ingin bicara. || {$lawan}... do you have time? I need to talk.
+  ~ kasar: {$lawan}. Duduk. Aku butuh teman bicara. || {$lawan}. Sit. I need someone to talk to.
+  ~ kuno: {$lawan}, sahabatku. Hati ini sedang berat. || {$lawan}, my friend. This heart is heavy.
+  ~ kampung: {$lawan}, sini. Temani aku sebentar, ya. || {$lawan}, come here. Keep me company a while.
+- [2] Oh, {$lawan}. Untung kau datang. || Oh, {$lawan}. Thank goodness you came.
+  ~ p: {$lawan}... sini, duduk di sampingku. || {$lawan}... come, sit beside me.
+- {$lawan}, wajahmu murung. Ada apa? || {$lawan}, you look glum. What's wrong?
+
+== sapa.obrol.canda
+niat: SAPA
+topik: canda
+gestur: tertawa
+$lawan: tipe=nama_warga dari=lawan
+- [3] Hahaha, {$lawan}! Masih hidup juga kau! || Hahaha, {$lawan}! Still alive, then!
+  ~ kasar: Oi, {$lawan}! Muka jelekmu muncul lagi! Hahaha! || Oi, {$lawan}! Your ugly mug again! Hahaha!
+  ~ kuno: Ho ho, {$lawan}. Wajahmu berseri, pertanda ada cerita lucu. || Ho ho, {$lawan}. Your face is bright; a sign of a funny tale.
+  ~ pelabuhan: {$lawan}, kawan lama! Belum tenggelam juga kau! || {$lawan}, old pal! Haven't drowned yet!
+  ~ kampung: Lho, {$lawan}! Kok kurusan? Istrimu mogok masak? Hehe. || Hey, {$lawan}! Thinner? Wife on a cooking strike? Hehe.
+- [2] {$lawan}! Pas sekali, aku punya cerita lucu. || {$lawan}! Perfect, I've got a funny one.
+- Hei, {$lawan}! Kemarin kau jatuh di selokan, ya? Satu gang lihat! || Hey, {$lawan}! You fell in the gutter yesterday, right? The whole lane saw!
+
+== rayu.sepakat
+niat: SEPAKAT
+topik: merayu
+gestur: sikap_tunduk
+$lawan: tipe=nama_warga dari=lawan
+- [3] I-iya... aku datang. Tapi jangan bilang siapa-siapa, ya. || Y-yes... I'll come. But don't tell anyone.
+  ~ kasar: Ya sudah. Jangan telat. || Fine. Don't be late.
+  ~ kuno: Bila {$lawan} yang mengundang, hamba tidak akan menolak. || If {$lawan} invites, this one won't refuse.
+  ~ air: Iya... aku tunggu di jembatan, ya... || Yes... I'll wait at the bridge...
+- [2] Hehe... baiklah. Aku pakai baju terbaikku. || Hehe... all right. I'll wear my best clothes.
+  ~ kampung: Iya, iya. Tapi ibu jangan sampai tahu. || Yes, yes. But Mother mustn't find out.
+- Boleh. Tapi kau yang traktir tanghulu. || All right. But you're buying the candied haws.
+
+== curhat.sepakat
+niat: SEPAKAT
+topik: curhat
+gestur: tepuk_bahu
+$lawan: tipe=nama_warga dari=lawan
+- [3] Tentu, {$lawan}. Untuk apa sahabat kalau tidak saling membantu? || Of course, {$lawan}. What are friends for if not helping each other?
+  ~ kasar: Ya. Kubantu. Berhenti menangis. || Yes. I'll help. Stop crying.
+  ~ kuno: Bebanmu adalah bebanku juga, {$lawan}. || Your burden is mine too, {$lawan}.
+  ~ kampung: Iya, {$lawan}. Besok pagi aku ke rumahmu. || Yes, {$lawan}. I'll come to your house tomorrow morning.
+- [2] Jangan khawatir. Kita urus bersama-sama. || Don't worry. We'll sort it out together.
+  ~ p: Sudah, sudah. Besok kubawakan beras dan sayur. || There, there. Tomorrow I'll bring rice and greens.
+- Serahkan padaku. Aku kenal orang yang bisa membantu. || Leave it to me. I know someone who can help.
+
+== canda.cerita
+niat: CERITA
+topik: canda
+gestur: tertawa
+seru: tawa
+$lawan: tipe=nama_warga dari=lawan
+$tetangga: tipe=nama_warga dari=konteks.tetangga
+- [3] {$lawan}, tahu tidak? Kemarin ayam {$tetangga} masuk kedai dan memesan teh. Pemiliknya melayani! || {$lawan}, know what? Yesterday {$tetangga}'s hen walked into the teahouse and ordered tea. The owner served it!
+  ~ kasar: Dengar, {$lawan}. Pemabuk itu tidur di kandang lagi. Kali ini kambingnya yang pindah. || Listen, {$lawan}. That drunk slept in the pen again. This time the goat moved out.
+  ~ kuno: Ada kisah lucu, {$lawan}: seorang kultivator bersemedi di atas atap, lalu dikira jemuran. || A funny tale, {$lawan}: a cultivator meditated on a roof and was taken for laundry.
+  ~ pelabuhan: {$lawan}, nakhoda kapal hijau mabuk dan memberi salam pada tiang. Tiangnya tidak menjawab! || {$lawan}, the green ship's captain got drunk and saluted the mast. The mast didn't answer!
+- [2] Kemarin aku menawar ikan sampai penjualnya menangis, {$lawan}. Lalu dia menawar balik sampai aku yang menangis! || Yesterday I haggled a fishmonger to tears, {$lawan}. Then he haggled back till I cried!
+  ~ kampung: {$lawan}, kerbau Pak Lurah masuk sekolah lagi. Gurunya sampai mengabsen dia! || {$lawan}, the headman's buffalo walked into school again. The teacher even took its attendance!
+- Tebak, {$lawan}: apa bedanya penjaga gerbang dan patung? Patung tidak minta uang lewat! || Guess, {$lawan}: what's the difference between a gate guard and a statue? The statue doesn't charge a toll!
+
+== dagang.tawar.obrol
+niat: TAWAR
+topik: dagang
+gestur: tawar
+- [3] Mahal sekali! Kurangi sedikit, dong. || So dear! Knock a bit off.
+  ~ kasar: Itu harga rampok. Turunkan. || That's robbery. Lower it.
+  ~ kuno: Harga itu terlalu tinggi bagi kantong orang kecil seperti hamba. || That price is too high for a small purse like mine.
+  ~ kampung: Aduh, mahal, Pak. Kurangi, ya, buat langganan. || Oh, dear, sir. A bit off, for a regular.
+  ~ oasis: Demi mata air, itu terlalu mahal, Saudara! Separuhnya saja! || By the spring, that's too dear, friend! Half that!
+- [2] Kemarin di pasar sebelah lebih murah. Samakan saja, ya. || Yesterday the next market was cheaper. Match it.
+  ~ pelabuhan: Di dermaga sebelah lebih murah, Bung. Jangan kira aku orang baru. || Cheaper at the next dock, mate. Don't take me for a newcomer.
+- Aku beli dua kalau harganya turun. Bagaimana? || I'll take two if the price drops. How's that?
+
+== dagang.tawar_balik.obrol
+niat: TAWAR_BALIK
+topik: dagang
+gestur: hitung_koin
+$lawan: tipe=nama_warga dari=lawan
+- [3] Aduh, kalau segitu aku rugi! Tambah sedikit lagi, ya. || Oh, at that I'd lose! A little more.
+  ~ kasar: Tidak. Itu harga akhir. Ambil atau pergi. || No. That's final. Take it or go.
+  ~ kuno: Hamba hanya mengambil untung setipis kulit bawang. || This one takes a profit thin as an onion skin.
+  ~ iblis: Kau menawar segitu? Lucu. Orang terakhir yang begitu tidak pulang utuh. || You offer that? Funny. The last one who did didn't go home whole.
+- [2] Baiklah, kita bertemu di tengah. Tapi jangan bilang siapa-siapa. || Fine, let's meet in the middle. But tell no one.
+  ~ p: Anakku tiga, {$lawan}. Kasihanilah aku sedikit. || I have three children, {$lawan}. Have a little pity.
+- Barang begini di ibu kota dua kali lipat. Ini sudah murah sekali. || Goods like this cost double in the capital. This is already very cheap.

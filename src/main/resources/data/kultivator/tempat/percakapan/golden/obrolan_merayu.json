@@ -1,0 +1,116 @@
+{
+  "id": "obrolan_merayu",
+  "jenis": "realisasi",
+  "_catatan": "NPC-NPC MERAYU: praise, shyness, invitation to meet.",
+  "benih_dunia": 42,
+  "masukan": {
+    "niat": "PUJI_RAYU",
+    "pembicara": 620,
+    "hari": 120,
+    "now": 2880000,
+    "cuaca": "cerah",
+    "musim": "semi",
+    "situasi": {
+      "jam": "pagi",
+      "cuaca": "cerah",
+      "musim": "semi",
+      "kelompok": "pekerja",
+      "watak": "ramah",
+      "kebiasaan": [],
+      "sifat": {
+        "H": 10,
+        "E": 0,
+        "X": 20,
+        "A": 30,
+        "C": 10,
+        "O": 0
+      },
+      "wajah": "netral",
+      "tempat": "kota_besar"
+    },
+    "pendengar": null,
+    "kesan": "kenal",
+    "tahu_nama": false,
+    "register": "biasa",
+    "dialek": "air",
+    "label": "gembira",
+    "nilai": {
+      "lawan": {
+        "orang": {
+          "nama": "Ah Ling",
+          "kelamin": "p",
+          "tahap": "dewasa"
+        }
+      }
+    },
+    "topik": "merayu"
+  },
+  "langkah": [
+    {
+      "ubah": {},
+      "harap": {
+        "k": "kultivator.cakap.rayu.puji.2",
+        "a": [
+          {
+            "t": "Ah Ling"
+          }
+        ]
+      },
+      "aturan": "rayu.puji",
+      "gestur": "bicara_tangan",
+      "seru": null,
+      "tik": null,
+      "id_id": "Aku memetik bunga ini di jalan. Entah kenapa aku ingat Ah Ling.",
+      "en_us": "I picked this flower on the way. Somehow it made me think of Ah Ling."
+    },
+    {
+      "ubah": {
+        "niat": "MALU_MALU",
+        "pembicara": 621,
+        "kelamin": "p",
+        "nilai": {
+          "lawan": {
+            "orang": {
+              "nama": "Wen Bo",
+              "kelamin": "l",
+              "tahap": "dewasa"
+            }
+          }
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.rayu.malu.1",
+        "a": [
+          {
+            "t": "Wen Bo"
+          }
+        ]
+      },
+      "aturan": "rayu.malu",
+      "gestur": "sikap_tunduk",
+      "seru": null,
+      "tik": null,
+      "id_id": "Hihi... kau ini. Ada-ada saja.",
+      "en_us": "Hehe... you. The things you say."
+    },
+    {
+      "ubah": {
+        "niat": "JANJI_TEMU"
+      },
+      "harap": {
+        "k": "kultivator.cakap.rayu.ajak.0.air",
+        "a": [
+          {
+            "t": "Ah Ling"
+          }
+        ]
+      },
+      "aturan": "rayu.ajak",
+      "gestur": "bisik",
+      "seru": null,
+      "tik": null,
+      "id_id": "Besok sore, naik perahu bersamaku, ya, Ah Ling...? Aku yang mendayung...",
+      "en_us": "Tomorrow evening, take a boat with me, Ah Ling...? I'll row..."
+    }
+  ]
+}

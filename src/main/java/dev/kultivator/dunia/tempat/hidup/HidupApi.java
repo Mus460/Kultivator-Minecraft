@@ -143,7 +143,7 @@ public final class HidupApi {
 	}
 
 	/** Realm ordinal of a 38 body by role tier (two stages of spread from the look seed). */
-	static int realmFor(NpcRole peran, int look) {
+	public static int realmFor(NpcRole peran, int look) {
 		if (peran.immortal()) {
 			return Realm.IMMORTAL_ASCENSION.ordinal();
 		}

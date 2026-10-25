@@ -1,0 +1,110 @@
+{
+  "_catatan": "Kebiasaan #2 kakek_catur (DESIGN 42.4.12); ilham: xiangqi di taman",
+  "nomor": 2,
+  "siapa": {
+    "umur": [
+      55,
+      200
+    ],
+    "kelamin": "pria",
+    "tahap": [
+      "tua"
+    ]
+  },
+  "bobot": 1.4,
+  "sesi": [
+    {
+      "jam": [
+        9,
+        11
+      ],
+      "peluang": 0.8,
+      "syarat": [
+        "tidak_hujan"
+      ],
+      "tujuan": [
+        "catur",
+        "kursi",
+        "obrol"
+      ],
+      "klip": "catur",
+      "kanan": "papan_catur",
+      "pemain": 2,
+      "penonton": {
+        "klip": "kota42:tonton_catur",
+        "kanan": ""
+      },
+      "penonton_ganti": [
+        {
+          "klip": "kota42:tonton_catur"
+        },
+        {
+          "klip": "kota42:tonton_catur"
+        },
+        {
+          "klip": "tunjuk"
+        },
+        {
+          "klip": "tertawa"
+        }
+      ],
+      "ganti_menit": 7
+    },
+    {
+      "jam": [
+        14,
+        16
+      ],
+      "peluang": 0.8,
+      "syarat": [
+        "tidak_hujan"
+      ],
+      "tujuan": [
+        "catur",
+        "kursi",
+        "obrol"
+      ],
+      "klip": "catur",
+      "kanan": "papan_catur",
+      "pemain": 2,
+      "penonton": {
+        "klip": "kota42:tonton_catur",
+        "kanan": ""
+      },
+      "penonton_ganti": [
+        {
+          "klip": "kota42:tonton_catur"
+        },
+        {
+          "klip": "angguk_dengar"
+        },
+        {
+          "klip": "tunjuk"
+        }
+      ],
+      "ganti_menit": 7
+    },
+    {
+      "jam": [
+        11,
+        16
+      ],
+      "syarat": [
+        "tidak_hujan"
+      ],
+      "peluang": 0.35,
+      "kegiatan": "kb_kakek_catur_teh",
+      "tujuan": [
+        "@kedai",
+        "kursi"
+      ],
+      "klip": "catur",
+      "kanan": "papan_catur",
+      "pemain": 2,
+      "penonton": {
+        "klip": "minum_teh",
+        "kanan": "cangkir"
+      }
+    }
+  ]
+}

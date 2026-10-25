@@ -1,0 +1,109 @@
+{
+  "id": "obrolan_canda",
+  "jenis": "realisasi",
+  "_catatan": "NPC-NPC CANDA: a joke about the neighbour, teasing, laughter.",
+  "benih_dunia": 42,
+  "masukan": {
+    "niat": "OLOK",
+    "pembicara": 660,
+    "hari": 120,
+    "now": 2880000,
+    "cuaca": "cerah",
+    "musim": "semi",
+    "situasi": {
+      "jam": "pagi",
+      "cuaca": "cerah",
+      "musim": "semi",
+      "kelompok": "pekerja",
+      "watak": "ramah",
+      "kebiasaan": [],
+      "sifat": {
+        "H": 0,
+        "E": 0,
+        "X": 60,
+        "A": 40,
+        "C": 0,
+        "O": 20
+      },
+      "wajah": "netral",
+      "tempat": "kota_besar"
+    },
+    "pendengar": null,
+    "kesan": "kenal",
+    "tahu_nama": false,
+    "register": "biasa",
+    "dialek": "kampung",
+    "label": "gembira",
+    "nilai": {
+      "lawan": {
+        "orang": {
+          "nama": "Lao Wu",
+          "kelamin": "l",
+          "tahap": "dewasa"
+        }
+      },
+      "konteks.tetangga": {
+        "orang": {
+          "nama": "Pak Gu",
+          "kelamin": "l",
+          "tahap": "dewasa"
+        }
+      }
+    },
+    "topik": "canda"
+  },
+  "langkah": [
+    {
+      "ubah": {},
+      "harap": {
+        "k": "kultivator.cakap.canda.olok.1",
+        "a": [
+          {
+            "t": "Lao Wu"
+          }
+        ]
+      },
+      "aturan": "canda.olok",
+      "gestur": "tunjuk",
+      "seru": null,
+      "tik": null,
+      "id_id": "Lao Wu, kudengar kau kalah main catur dengan anak tujuh tahun?",
+      "en_us": "Lao Wu, I hear you lost at chess to a seven-year-old?"
+    },
+    {
+      "ubah": {
+        "niat": "OLOK",
+        "pembicara": 661
+      },
+      "harap": {
+        "k": "kultivator.cakap.canda.olok.0.kampung",
+        "a": [
+          {
+            "t": "Lao Wu"
+          }
+        ]
+      },
+      "aturan": "canda.olok",
+      "gestur": "tunjuk",
+      "seru": null,
+      "tik": null,
+      "id_id": "Lao Wu, kau mandi lumpur atau mandi air tadi? Hihi.",
+      "en_us": "Lao Wu, did you bathe in water or mud this morning? Hehe."
+    },
+    {
+      "ubah": {
+        "niat": "TAWA"
+      },
+      "harap": {
+        "k": "kultivator.cakap.canda.tawa.0",
+        "a": []
+      },
+      "aturan": "canda.tawa",
+      "gestur": "tertawa",
+      "seru": "kota42.seru.tawa_l",
+      "tik": null,
+      "id_id": "Hahaha! Kau ini ada-ada saja!",
+      "en_us": "Hahaha! The things you come up with!"
+    }
+  ]
+}

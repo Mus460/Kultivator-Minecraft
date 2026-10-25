@@ -1,0 +1,194 @@
+{
+  "id": "sapa_dialek_air",
+  "jenis": "realisasi",
+  "_catatan": "SAPA in dialect air across the day (register sopan); steps share the anti-repeat ring.",
+  "benih_dunia": 42,
+  "masukan": {
+    "niat": "SAPA",
+    "pembicara": 103,
+    "hari": 120,
+    "now": 2880000,
+    "cuaca": "cerah",
+    "musim": "semi",
+    "situasi": {
+      "jam": "pagi",
+      "cuaca": "cerah",
+      "musim": "semi",
+      "kelompok": "pekerja",
+      "watak": "ramah",
+      "kebiasaan": [],
+      "sifat": {
+        "H": 10,
+        "E": 0,
+        "X": 20,
+        "A": 30,
+        "C": 10,
+        "O": 0
+      },
+      "wajah": "netral",
+      "tempat": "tema_air"
+    },
+    "pendengar": {
+      "nama": "Han",
+      "kelamin": "l",
+      "tahap": "dewasa",
+      "pemain": true
+    },
+    "kesan": "kenal",
+    "tahu_nama": false,
+    "register": "sopan",
+    "dialek": "air",
+    "kelamin": "l"
+  },
+  "langkah": [
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "subuh",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "tema_air"
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.kenal.0",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.tuan.air",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "sapa.kenal",
+      "gestur": "lambai",
+      "seru": null,
+      "tik": null,
+      "id_id": "Oh, Kakak, datang lagi.",
+      "en_us": "Oh, Dear Sir, back again."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "tema_air"
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.pagi.0",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.tuan.air",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "sapa.pagi",
+      "gestur": "lambai",
+      "seru": null,
+      "tik": null,
+      "id_id": "Selamat pagi, Kakak!",
+      "en_us": "Good morning, Dear Sir!"
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "siang",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "tema_air"
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.dialek.air.1",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.tuan.air",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "sapa.dialek.air",
+      "gestur": "lambai",
+      "seru": null,
+      "tik": null,
+      "id_id": "Halo, Kakak... airnya jernih hari ini, ya...",
+      "en_us": "Hello, Dear Sir... the water's so clear today..."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "malam",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "tema_air"
+        },
+        "pendengar": {
+          "nama": "Mei",
+          "kelamin": "p",
+          "tahap": "dewasa",
+          "pemain": true
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.dialek.air.0",
+        "a": []
+      },
+      "aturan": "sapa.dialek.air",
+      "gestur": "lambai",
+      "seru": null,
+      "tik": null,
+      "id_id": "Kakak... selamat datang, ya. Mau naik perahu?",
+      "en_us": "Welcome, dear... want a boat ride?"
+    }
+  ]
+}

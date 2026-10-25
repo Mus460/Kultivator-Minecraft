@@ -223,7 +223,7 @@ public final class BuildMissions {
 					total += each;
 				}
 			}
-			int count = 3 + (template - 1) / 3;
+			int count = 3 + (SectTemplates.rank(template) - 1) / 3;
 			for (int i = 0; i < count && total > 0L; i++) {
 				long pick = (long) (random.nextDouble() * total);
 				Bahan cat = Bahan.BATU;

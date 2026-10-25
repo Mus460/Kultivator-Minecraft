@@ -15,7 +15,7 @@ import java.util.Locale;
  *
  * <p>Ordinals are synced and saved inside one world, so constants are only ever appended at the end: the 15 roles of 34,
  * then the 49 roles of 38.N.2, then the 38 themed-city roles of 38.T.14.3 ({@code MAKELAR_GELAP} of that list is the
- * existing broker, reused).
+ * existing broker, reused), then the 13 town-life roles of 42.12.2.
  */
 public enum NpcRole {
 	// ===================================================================================== 34 (kota lama, Kota Abadi)
@@ -241,7 +241,36 @@ public enum NpcRole {
 	/** Warga Iblis (rumah, kedai, arena): dark robe; not townsfolk (38.T.14.3). */
 	WARGA_IBLIS(0x3A2A30, false, 1, 1, -1, Kelompok.PEKERJA, Tema.IBLIS),
 	/** Pemburu Lurus (pos pemburu, penyerbuan lurus only): righteous-sect emblem robe, sword; tier 3-4. */
-	PEMBURU_LURUS(0xEDE6D6, false, 3, 4, -1, Kelompok.KULTIVATOR, Tema.IBLIS);
+	PEMBURU_LURUS(0xEDE6D6, false, 3, 4, -1, Kelompok.KULTIVATOR, Tema.IBLIS),
+
+	// ===================================================================================== 42.12.2 Kota yang Hidup (42A)
+
+	/** Pencopet (pasar, jalan ramai; 42D Copet): patched grey jacket, cap; not townsfolk for Nama Baik. */
+	PENCOPET(0x5A5650, false, 1, -1, Kelompok.PEKERJA),
+	/** Penjaga Malam (ronda 42D): kentongan, paper lantern on a pole, padded coat. */
+	PENJAGA_MALAM(0x2E3A4C, false, 1, -1, Kelompok.PENJAGA),
+	/** Mak Comblang (matchmaker, 42.4.6): red flower in the hair, red fan. */
+	MAK_COMBLANG(0xB0303A, false, 0, -1, Kelompok.TETUA),
+	/** Pendongeng (storyteller at the tea house / square, Lao Shuo): folding fan, clapper. */
+	PENDONGENG(0x6A5A3A, true, 1, -1, Kelompok.CENDEKIA),
+	/** Pengamen (street musician): erhu or pipa, worn hat. */
+	PENGAMEN(0x7A6A4A, false, 0, -1, Kelompok.PEDAGANG),
+	/** Akrobat (travelling troupe 42.7.1): sash, tight trousers, plates on sticks. */
+	AKROBAT(0xC8503A, false, 1, -1, Kelompok.PEKERJA),
+	/** Penjual Obat (medicine hawker with a banner pole and gourd). */
+	PENJUAL_OBAT(0x5C7C3A, false, 1, -1, Kelompok.PEDAGANG),
+	/** Guru Sekolah (village school, children's lessons): scholar's cap, cane, scroll. */
+	GURU_SEKOLAH(0x3A4A6A, false, 1, -1, Kelompok.CENDEKIA),
+	/** Pengurus Duka (funeral master, 42.7.7): white hemp robe, bell. */
+	PENGURUS_DUKA(0xE6E2D6, false, 1, -1, Kelompok.RAHIB),
+	/** Penjaga Gudang (town warehouse, 42.6.5): ledger, keys on the belt. */
+	PENJAGA_GUDANG(0x6A5A40, true, 1, -1, Kelompok.PEDAGANG),
+	/** Pialang (trading house broker, 42.6.4-42.6.5): silk vest, abacus. */
+	PIALANG(0x2E5A4A, true, 2, -1, Kelompok.PEDAGANG),
+	/** Penari (troupe and festival dancer): long water sleeves. */
+	PENARI(0xE07A9A, false, 0, -1, Kelompok.PEKERJA),
+	/** Pemusik (wedding / funeral / troupe musician): suona or drum. */
+	PEMUSIK(0xA0603A, false, 0, -1, Kelompok.PEKERJA);
 
 	/** Theme ids of 38.T (same strings as {@code kota_tema/<id>} and {@code KotaTema}). */
 	public static final class Tema {
@@ -342,7 +371,7 @@ public enum NpcRole {
 	 */
 	public boolean townsfolk() {
 		return switch (this) {
-			case PENGEMBARA, SAINGAN, JUARA_SEKTE, PERTAPA, SISA_JIWA, TAWANAN, PEMBURU_LURUS -> false;
+			case PENGEMBARA, SAINGAN, JUARA_SEKTE, PERTAPA, SISA_JIWA, TAWANAN, PEMBURU_LURUS, PENCOPET -> false;
 			default -> !iblis();
 		};
 	}

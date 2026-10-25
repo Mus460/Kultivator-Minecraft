@@ -1,0 +1,25 @@
+{
+  "pemberi": "peran:tetua_sekte",
+  "tempat": "gabung_sekte",
+  "tahap": [
+    {
+      "id": "nyala",
+      "tujuan": [
+        "tanda gabung_tugas_tungku x2"
+      ],
+      "akibat": [
+        "gabung.sikap obat 5"
+      ]
+    },
+    {
+      "id": "embun",
+      "tujuan": [
+        "tanda gabung_tugas_kebun"
+      ],
+      "akibat": [
+        "gabung.pk 20",
+        "efek minecraft:fire_resistance 1200 0"
+      ]
+    }
+  ]
+}

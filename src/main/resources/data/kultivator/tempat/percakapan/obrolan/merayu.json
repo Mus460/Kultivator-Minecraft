@@ -1,0 +1,110 @@
+{
+  "_catatan": "MERAYU 42.5A.9: puji > malu-malu > canda > janji bertemu. 42K-C.",
+  "jenis": "merayu",
+  "syarat": {},
+  "mulai": {
+    "dasar": 0.3,
+    "X": 300,
+    "hubungan": 400
+  },
+  "jeda_tick": [
+    50,
+    90
+  ],
+  "langkah": [
+    {
+      "id": "sapa",
+      "oleh": "A",
+      "niat": "SAPA",
+      "lanjut": [
+        "puji"
+      ]
+    },
+    {
+      "id": "puji",
+      "oleh": "A",
+      "niat": "PUJI_RAYU",
+      "lanjut": [
+        "malu"
+      ]
+    },
+    {
+      "id": "malu",
+      "oleh": "B",
+      "niat": "MALU_MALU",
+      "lanjut": [
+        "canda_a",
+        "puji_b"
+      ]
+    },
+    {
+      "id": "puji_b",
+      "oleh": "B",
+      "niat": "PUJI_RAYU",
+      "syarat": {
+        "sifat": {
+          "X": ">0"
+        }
+      },
+      "lanjut": [
+        "malu_a"
+      ]
+    },
+    {
+      "id": "malu_a",
+      "oleh": "A",
+      "niat": "MALU_MALU",
+      "lanjut": [
+        "canda_a"
+      ]
+    },
+    {
+      "id": "canda_a",
+      "oleh": "A",
+      "niat": "CANDA_RAYU",
+      "lanjut": [
+        "tawa_b",
+        "malu_lagi"
+      ]
+    },
+    {
+      "id": "tawa_b",
+      "oleh": "B",
+      "niat": "TAWA",
+      "lanjut": [
+        "janji"
+      ]
+    },
+    {
+      "id": "malu_lagi",
+      "oleh": "B",
+      "niat": "MALU_MALU",
+      "syarat": {
+        "ronde_maks": 1
+      },
+      "lanjut": [
+        "janji"
+      ]
+    },
+    {
+      "id": "janji",
+      "oleh": "A",
+      "niat": "JANJI_TEMU",
+      "lanjut": [
+        "sepakat"
+      ]
+    },
+    {
+      "id": "sepakat",
+      "oleh": "B",
+      "niat": "SEPAKAT"
+    }
+  ],
+  "efek": {
+    "hubungan": [
+      3,
+      6
+    ],
+    "emosi": "dirayu_diterima"
+  }
+}

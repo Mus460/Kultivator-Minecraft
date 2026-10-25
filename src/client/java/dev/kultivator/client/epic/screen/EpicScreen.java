@@ -17,7 +17,8 @@ import net.minecraft.util.Util;
 
 /**
  * The {@code kultivator:epic_screen} HUD element, right after {@code MISC_OVERLAYS} (DESIGN 23.8.1, 23.11.1): the sky dim
- * and tint (23.9.4), the grey wash, the ink edge and vignette, the chromatic fringe and the letterbox bars, in that order;
+ * and tint (23.9.4), the grey wash, the ink edge, the chromatic fringe and the letterbox bars, in that order (the
+ * vignette is asked of the one edge painter {@code ScreenFlash.tepi}, DESIGN 43.9);
  * the boss bars, health, the Qi HUD and the tribulation HUD draw above it. Every effect is a HUD effect (no post chain).
  * Also the frame guard's one {@code System.nanoTime()} per frame. F1 hides it.
  * <p>
@@ -27,7 +28,6 @@ import net.minecraft.util.Util;
  */
 public final class EpicScreen implements HudElement {
 
-	private static final Identifier VIGNETTE = Kultivator.id("textures/gui/epic/vignette.png");
 	private static final Identifier INK_EDGE = Kultivator.id("textures/gui/epic/ink_edge.png");
 	public static final float MAX_FLASH = 0.35F;
 	public static final long LUMINANCE_GAP = 500L;
@@ -174,8 +174,8 @@ public final class EpicScreen implements HudElement {
 		}
 		if (now < vignetteEnd) {
 			float a = envelope(now, vignetteStart, vignetteEnd) * vignetteAlpha * Math.max(0.4F, effect);
-			g.blit(RenderPipelines.GUI_TEXTURED, VIGNETTE, 0, 0, 0.0F, 0.0F, width, height, 256, 256, 256, 256,
-					Palette.argb(Math.round(a * 255.0F), vignetteRgb));
+			// the one edge painter of the HUD (DESIGN 43.9): the strongest edge of the frame shows
+			ScreenFlash.tepi(vignetteRgb, a);
 		}
 		if (now < chromaEnd && effect > 0.0F) {
 			float a = (1.0F - (now - chromaStart) / (float) Math.max(1L, chromaEnd - chromaStart)) * 0.22F * effect;

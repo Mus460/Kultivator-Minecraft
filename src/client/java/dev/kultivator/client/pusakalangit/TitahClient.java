@@ -12,6 +12,10 @@ import dev.kultivator.client.epic.EpicSettings;
 import dev.kultivator.client.epic.Scene;
 import dev.kultivator.client.epic.camera.CinematicDirector;
 import dev.kultivator.client.epic.camera.ShotGuard;
+import dev.kultivator.client.hub.HubNav;
+import dev.kultivator.client.hub.HubPages;
+import dev.kultivator.client.hub.Tujuan;
+import dev.kultivator.client.hub.Urutan;
 import dev.kultivator.client.pusakalangit.cinema.PusakaFilm;
 import dev.kultivator.data.TechniqueRegistry;
 import dev.kultivator.data.TechniqueSpec;
@@ -144,6 +148,8 @@ public final class TitahClient {
 			}
 		});
 		ClientTickEvents.END_CLIENT_TICK.register(minecraft -> ticks++);
+		// Keabadian › Titah (DESIGN 43.5, M16)
+		HubPages.daftar(HubNav.KEABADIAN, Urutan.ID_TITAH, Urutan.TITAH, TitahScreen::new);
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> clear());
 		try {
 			dev.kultivator.client.pusakalangit.world.TitahWorld.init();
@@ -428,12 +434,14 @@ public final class TitahClient {
 
 	// ================================================================ the screen
 
-	/** {@code OpenScreen.TITAH}: opens the jade-scroll menu ({@code arg} = the decree to show, else the selected one). */
+	/**
+	 * {@code OpenScreen.TITAH}: Keabadian › Titah in the Gulungan Utama (DESIGN 43.4.4; {@code arg} = the decree to show, else
+	 * the selected one). The page asks for a fresh sync when it comes on screen.
+	 */
 	public static void openScreen(int arg) {
-		Minecraft minecraft = Minecraft.getInstance();
-		int skill = arg >= 0 && arg <= 3 ? arg : selected;
-		minecraft.gui.setScreen(new TitahScreen(skill));
-		requestSync();
+		CompoundTag fokus = new CompoundTag();
+		fokus.putInt("titah", arg >= 0 && arg <= 3 ? arg : selected);
+		HubNav.buka(Tujuan.of(HubNav.KEABADIAN, Urutan.ID_TITAH).fokus(fokus));
 	}
 
 	// ================================================================ /sinematik pusaka (29.11)

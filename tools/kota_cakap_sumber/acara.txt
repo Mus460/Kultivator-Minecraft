@@ -1,0 +1,244 @@
+# acara: corpus of the conversation engine (42K-C, DESIGN 42.5A.8). Source format: gen_kota_hidup_cakap.py.
+# Talk during town events (syarat acara = kota_suasana ids, 42.13.2): BERI_KABAR on the event's topic.
+@kelompok acara
+
+== acara.festival
+niat: BERI_KABAR
+topik: acara
+syarat: acara=festival
+lanjut: acara keluarga
+gestur: tepuk_tangan
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Festival! Sudah lihat barongsai di alun-alun? Ekornya tadi jatuh, hahaha! || Festival! Seen the lion dance in the square? The tail end fell over, hahaha!
+  ~ kasar: Ramai sekali. Copet pasti pesta juga hari ini. Jaga dompetmu. || So crowded. The pickpockets are feasting too. Mind your purse.
+  ~ kuno: Lentera merah, genderang, tawa anak-anak. Hari seperti ini menyuburkan hati. || Red lanterns, drums, children's laughter. Days like this nourish the heart.
+  ~ kampung: Hajatan desa, Nak! Ada wayang semalam suntuk. Bawa tikar! || Village feast, child! A puppet show all night. Bring a mat!
+  ~ pelabuhan: Perahu-perahu berhias semua, Bung! Nanti malam lomba dayung! || Every boat is decked out, mate! Rowing race tonight!
+- [2] Coba tanghulu di lapak ujung. Gulanya tebal, buahnya segar. || Try the candied haws at the end stall. Thick sugar, fresh fruit.
+  ~ oasis: Kurma madu dan susu unta gratis di festival, Saudara! Minum sebanyaknya! || Honey dates and free camel milk at the festival, friend! Drink your fill!
+  ~ air: Lentera teratai mulai dihanyutkan, Kakak... ayo, buat permohonan... || They're floating the lotus lanterns, dear... come, make a wish...
+- Anak-anak sudah menunggu kembang api sejak sore. Aku juga, sebenarnya. Hehe. || The kids have waited for the fireworks since afternoon. So have I, really. Heh.
+  ~ p: Aku pakai baju baru hari ini. Bagus, kan? Jahit sendiri tiga malam. || New dress today. Nice, isn't it? Sewed it myself over three nights.
+- Ada panggung opera di dekat kuil. Lakonnya tentang jenderal setia. Aku menangis tiap tahun. || There's an opera stage by the temple. A play about a loyal general. I cry every year.
+- Setahun sekali kota ini lupa susahnya. Nikmati, {$sebutan}! || Once a year this town forgets its troubles. Enjoy it, {$sebutan}!
+
+== acara.nikah
+niat: BERI_KABAR
+topik: acara
+syarat: acara=nikah
+lanjut: keluarga asmara
+gestur: tertawa
+$doa: aturan=frag.doa opsional=0.4
+- [3] Ada pernikahan hari ini! Dengar suona-nya? Pengantin sudah di jalan. || There's a wedding today! Hear the suona? The bride is on her way.
+  ~ kasar: Pernikahan. Ribut. Tapi makanannya gratis. || Wedding. Noisy. But the food's free.
+  ~ kuno: Dua keluarga menjadi satu hari ini. Langit tersenyum. || Two families become one today. Heaven smiles.
+  ~ kampung: Kawinan, Nak! Ayo ikut makan, semua orang diundang. || A wedding, child! Come eat, everyone's invited.
+- [2] Tandu merahnya cantik sekali. Pengantin perempuannya pasti gugup. || The red sedan is so pretty. The bride must be nervous.
+  ~ p: Dulu aku juga duduk di tandu merah seperti itu. Gemetar sepanjang jalan. Hihi. || I sat in a red sedan like that once. Trembled all the way. Hehe.
+  ~ pelabuhan: Mereka menikah di dermaga, Bung. Semua kapal membunyikan lonceng. || They're marrying on the dock, mate. Every ship rings its bell.
+- Jangan lupa angpao kalau mau ikut masuk. Yang penting niatnya. || Don't forget a red envelope if you go in. It's the thought that counts.
+- Semoga mereka bahagia sampai rambut putih. {$doa} || May they be happy until their hair turns white. {$doa}
+
+== acara.makam
+niat: BERI_KABAR
+topik: duka
+syarat: acara=makam
+lanjut: duka
+gestur: sikap_doa
+$keluh: aturan=seru.keluh opsional=0.5
+- [3] Ada pemakaman hari ini. Pelankan suaramu, ya. || There's a funeral today. Keep your voice low.
+  ~ kasar: Pemakaman. Jangan tertawa di dekat sini. || A funeral. Don't laugh around here.
+  ~ kuno: Satu jiwa kembali ke langit hari ini. Mari kita hormati. || A soul returns to heaven today. Let us honour it.
+  ~ kampung: Ada lelayu, Nak. Sekampung ikut mengantar ke kuburan. || There's a death, child. The whole village walks to the grave.
+- [2] Uang kertas berterbangan di jalan. Keluarganya ingin almarhum tidak kekurangan di sana. || Spirit money flutters down the road. The family wants the departed to lack nothing there.
+  ~ pelabuhan: Mereka melarung abu ke laut, Bung. Semua perahu diam. || They're scattering the ashes at sea, mate. Every boat is still.
+- Aku mengenalnya. Orang baik. Dunia makin sepi saja. {$keluh} || I knew them. A good soul. The world grows lonelier. {$keluh}
+- Kalau lewat rombongan duka, minggir dan tundukkan kepala. Itu adat di sini. || If you pass a funeral procession, step aside and bow your head. That's the custom here.
+
+== acara.lahir
+niat: BERI_KABAR
+topik: keluarga
+syarat: acara=lahir
+lanjut: keluarga
+gestur: tertawa
+$musim: tipe=musim dari=konteks.musim
+- [3] Ada bayi lahir di gang ini! Telur merah dibagikan, ambil satu! || A baby was born in this lane! Red eggs are going round; take one!
+  ~ kasar: Bayi baru. Malam ini pasti berisik. || New baby. Tonight's going to be loud.
+  ~ kuno: Kehidupan baru hadir di antara kita. Semoga tumbuh dengan akar yang kuat. || A new life has come among us. May it grow with strong roots.
+  ~ kampung: Ada yang lairan, Nak! Bayinya laki-laki, gemuk sekali! || Someone gave birth, child! A boy, so chubby!
+- [2] Neneknya sudah memilih nama dari kitab tua. Katanya nama yang membawa keberuntungan. || The grandmother picked a name from an old book. A lucky name, she says.
+  ~ p: Aku membantu persalinannya semalam. Lelah, tapi bahagia. || I helped with the birth last night. Tired, but happy.
+- Bayi lahir di musim {$musim}, kata orang tua, akan berwatak {$musim}. Hehe, entahlah. || Babies born in {$musim}, the elders say, take a {$musim} temper. Heh, who knows.
+
+== acara.serangan
+niat: BERI_KABAR
+topik: bahaya
+syarat: acara=serangan,perang
+lanjut: bahaya sekte
+gestur: lari_takut
+seru: takut
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+$doa: aturan=frag.doa opsional=0.4
+- [3] Masuk ke rumah! Binatang-binatang itu sudah di luar tembok! || Get inside! The beasts are outside the walls!
+  ~ kasar: Jangan bengong! Lari atau bertarung! || Don't gawk! Run or fight!
+  ~ kuno: Musuh di gerbang! Yang punya kekuatan, bantu pertahankan kota! || Foes at the gate! Those with strength, help defend the town!
+  ~ kampung: Kentongan bertalu-talu! Ayo, anak-anak, ke balai desa! Cepat! || The drums are pounding! Come, children, to the village hall! Quick!
+- [2] {$sebutan}, kau kultivator, kan? Tolong, penjaga tidak akan sanggup sendiri! || {$sebutan}, you're a cultivator, aren't you? Please, the guards can't hold alone!
+  ~ pelabuhan: Bajak laut! Semua perahu ke dalam teluk, Bung! || Pirates! Every boat into the bay, mate!
+  ~ iblis: Serangan. Bagus. Waktunya melihat siapa yang benar-benar kuat di kota ini. || An attack. Good. Time to see who's truly strong in this city.
+- Anakku masih di luar! Ada yang lihat anakku? || My child is still out there! Has anyone seen my child?
+  ~ p: Anakku! Anakku masih di sumur! Tolong! || My child! My child is still at the well! Help!
+- Semoga formasi kota bertahan. {$doa} || May the town's ward formation hold. {$doa}
+
+== acara.kebakaran
+niat: BERI_KABAR
+topik: bahaya
+syarat: acara=kebakaran
+lanjut: bahaya tetangga
+gestur: oper_ember
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+$keluh: aturan=seru.keluh opsional=0.5
+- [3] Api! Ambil ember, cepat! Ke sumur, ke sumur! || Fire! Grab a bucket, quick! To the well, to the well!
+  ~ kasar: Jangan berdiri saja! Bawa air! || Don't just stand there! Bring water!
+  ~ kuno: Api melahap rumah-rumah! {$sebutan}, bila punya teknik air, sekaranglah waktunya! || Fire devours the houses! {$sebutan}, if you have a water art, now is the time!
+  ~ kampung: Kebakaran! Ayo, semua bawa ember! Tolong, tolong! || Fire! Come, everyone bring buckets! Help, help!
+- [2] Rumah tukang roti terbakar. Asapnya sampai ke pasar. {$keluh} || The baker's house is burning. The smoke reaches the market. {$keluh}
+  ~ air: Untung ada kanal! Semua mengambil air dari kanal, Kakak! || Lucky there's the canal! Everyone's drawing water from it, dear!
+- Semoga tidak ada yang terjebak di dalam. || I hope no one's trapped inside.
+- Kemarin malam lentera jatuh, kata orang. Satu lentera, satu gang terbakar. || A lantern fell last night, they say. One lantern, one lane burned.
+
+== acara.copet
+niat: BERI_KABAR
+topik: kejahatan
+syarat: acara=copet_tertangkap
+lanjut: kejahatan
+gestur: tunjuk
+$senang: aturan=seru.senang opsional=0.5
+- [3] Copetnya tertangkap! Lihat, diikat di tiang pasar! || The pickpocket's caught! Look, tied to the market post!
+  ~ kasar: Rasakan! Biar kapok tangannya. || Serves them right! Let their hands learn.
+  ~ kuno: Keadilan kecil di pasar hari ini. Semoga dia bertobat. || A small justice in the market today. May the thief repent.
+- [2] Dompetku kembali! Tiga hari aku kira hilang selamanya. {$senang} || My purse came back! For three days I thought it was gone forever. {$senang}
+  ~ p: Giwangku kembali! Hadiah dari ibuku! Aduh, syukurlah! || My earrings are back! A gift from my mother! Oh, thank heaven!
+- Ternyata copetnya anak muda. Kasihan juga, tapi tetap salah. || The thief turned out to be a youngster. A bit sad, but still wrong.
+- Pasar akan tenang beberapa hari. Sampai copet berikutnya datang. || The market will be calm a few days. Until the next thief comes.
+
+== acara.pasar_hantu
+niat: BERI_KABAR
+topik: pasar_hantu
+syarat: acara=pasar_hantu
+lanjut: pasar_hantu dunia
+gestur: bisik
+seru: bisik
+- [3] Sst... malam ini Pasar Hantu buka. Jangan menoleh kalau namamu dipanggil. || Shh... the Ghost Market opens tonight. Don't turn if someone calls your name.
+  ~ kasar: Pasar Hantu. Orang bodoh pergi, orang bodoh hilang. || Ghost Market. Fools go, fools vanish.
+  ~ kuno: Malam ini batas dunia menipis. Pasar para arwah terbuka. || Tonight the boundary of worlds thins. The spirits' market opens.
+- [2] Lentera putih sudah dipasang di jalan lama. Kalau lewat, jangan injak bayangan sendiri. || White lanterns hang on the old road. If you pass, don't step on your own shadow.
+  ~ air: Perahu-perahu tanpa pendayung terlihat di kanal, Kakak... aku tidak mau keluar... || Boats without rowers on the canal, dear... I won't go out...
+- Kakekku bilang, di Pasar Hantu jangan pernah menawar. Bayar apa yang diminta, lalu pergi. || My grandfather said: at the Ghost Market, never haggle. Pay what's asked, then leave.
+- Ada yang membeli umur panjang di sana, katanya. Bayarannya kenangan. || Someone bought a long life there, they say. Paid for it in memories.
+
+== acara.rombongan
+niat: BERI_KABAR
+topik: kafilah
+syarat: acara=rombongan
+lanjut: kafilah dagang
+gestur: tunjuk
+$arah: tipe=arah dari=konteks.arah
+- [3] Rombongan datang! Lihat kudanya, besar-besar! || A train's arrived! Look at the horses, huge!
+  ~ kasar: Rombongan. Penginapan penuh, harga naik. || A train. Inns full, prices up.
+  ~ kuno: Rombongan dari negeri jauh singgah di kota kita. Ada kabar dunia luar. || A train from far lands stops in our town. News of the wider world.
+  ~ oasis: Kafilah besar, Saudara! Seratus unta lebih! || A great caravan, friend! Over a hundred camels!
+- [2] Mereka membawa rempah yang belum pernah kucium. Pasar harum seperti dapur dewa. || They brought spices I've never smelt. The market smells like a god's kitchen.
+  ~ pelabuhan: Armada dagang berlabuh, Bung! Dermaga penuh sampai ke ujung! || A trading fleet has docked, mate! The pier's full to the end!
+- Kepala rombongan mencari pemandu ke {$arah}. Bayarannya bagus. || The train master seeks a guide to the {$arah}. Good pay.
+
+== acara.harga_pangan
+niat: BERI_KABAR
+topik: harga
+syarat: acara=harga_pangan
+lanjut: harga kafilah
+gestur: geleng
+seru: aduh
+$keluh: aturan=seru.keluh opsional=0.5
+- [3] Beras naik lagi. Kata orang kafilah dari selatan tertahan begal. {$keluh} || Rice is up again. They say the caravan from the south is held by bandits. {$keluh}
+  ~ kasar: Harga gila. Orang miskin makan apa? Rumput? || Mad prices. What are the poor to eat? Grass?
+  ~ kuno: Ketika lumbung kosong, hati rakyat ikut kosong. || When the granaries empty, the people's hearts empty too.
+  ~ kampung: Beras mahal, Nak. Sekarang makan singkong dulu. Tidak apa, sehat. || Rice is dear, child. Cassava for now. It's fine, healthy.
+- [2] Antrean di lumbung kota panjang sekali sejak subuh. || The queue at the town granary has been long since dawn.
+  ~ ibukota: Istana membuka lumbung darurat. Semoga cukup sampai panen. || The palace opened the emergency granary. May it last till harvest.
+- Kalau terus begini, orang mulai mencuri. Perut kosong tidak kenal hukum. || If this goes on, people will steal. An empty belly knows no law.
+
+== acara.bangun
+niat: BERI_KABAR
+topik: kota
+syarat: acara=kavling_jadi,pembangunan
+lanjut: kota
+gestur: tunjuk
+- [3] Tukang-tukang bekerja sejak subuh. Bunyi palu tidak berhenti. || The builders have worked since dawn. The hammering never stops.
+  ~ kasar: Berisik. Tapi kota butuh rumah. || Noisy. But the town needs houses.
+  ~ kuno: Kota ini membangun kembali dirinya. Seperti bambu yang tumbuh setelah api. || This town rebuilds itself. Like bamboo growing after fire.
+  ~ kampung: Gotong royong, Nak! Ayo bantu angkat bambu! || Working together, child! Come help lift bamboo!
+- [2] Atap baru dipasang hari ini. Pemiliknya menyiapkan babi panggang untuk tukang. || A new roof goes up today. The owner's preparing roast pork for the builders.
+  ~ ibukota: Petugas pekerjaan umum mengawasi setiap balok. Ibu kota tidak boleh miring. || The works officer watches every beam. The capital may not lean.
+- Rumah yang dulu rusak sekarang lebih bagus dari sebelumnya. || The house that was damaged is now better than before.
+
+== acara.pelindung
+niat: BERI_KABAR
+topik: sekte
+syarat: acara=pelindung_baru
+lanjut: sekte kota
+gestur: hormat
+$sekte_pelindung: tipe=tempat dari=konteks.sekte_pelindung
+- [3] Panji sekte baru dipasang di gerbang hari ini. Kota kita punya pelindung! || A new sect banner went up at the gate today. Our town has a protector!
+  ~ kasar: Pelindung baru. Semoga lebih berguna dari yang lama. || New protector. Hope they're more use than the last.
+  ~ kuno: {$sekte_pelindung} kini menaungi kota ini. Semoga Dao mereka panjang. || {$sekte_pelindung} now shelters this town. May their Dao be long.
+- [2] Murid-murid {$sekte_pelindung} tadi berbaris lewat pasar. Gagah sekali. || {$sekte_pelindung}'s disciples marched through the market. Very dashing.
+  ~ kampung: Anak-anak kampung ikut berbaris di belakang murid {$sekte_pelindung}. Lucu sekali. || The village kids marched behind {$sekte_pelindung}'s disciples. So sweet.
+- Kepala kota mengadakan jamuan untuk utusan sekte. Bau masakannya sampai ke sini. || The town head is holding a banquet for the sect envoys. You can smell it from here.
+
+== acara.tahun_baru
+niat: BERI_KABAR
+topik: acara
+syarat: acara=tahun_baru
+lanjut: keluarga acara
+gestur: ucap_selamat
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+$tahun: tipe=angka dari=konteks.tahun
+- [3] Selamat tahun baru, {$sebutan}! Semoga rezekimu melimpah tahun ini! || Happy new year, {$sebutan}! May your fortune overflow this year!
+  ~ kasar: Tahun baru. Utang lama. Selamat. || New year. Old debts. Cheers.
+  ~ kuno: Tahun baru menghapus debu tahun lama. Semoga Dao-mu maju, {$sebutan}. || The new year sweeps away the old year's dust. May your Dao advance, {$sebutan}.
+  ~ kampung: Sugeng warsa enggal, Nak! Eh, selamat tahun baru! Sudah dapat angpao? || Happy new year, child! Got your red envelope yet?
+- [2] Kuplet merah sudah kutempel di pintu. Tahun ini harus lebih baik. || I've pasted the red couplets on my door. This year must be better.
+  ~ p: Semalam aku membuat pangsit sampai jariku keriting. Tahun baru harus makan pangsit! || I made dumplings all night till my fingers wrinkled. New year means dumplings!
+  ~ pelabuhan: Tahun baru, Bung! Semua kapal pulang, semua pelaut mabuk! || New year, mate! Every ship home, every sailor drunk!
+- Petasan membuat setan takut. Dan anjingku juga. Kasihan dia. || Firecrackers scare off demons. And my dog. Poor thing.
+- Tahun {$tahun} sudah tiba. Cepat sekali waktu berlari. || The year {$tahun} is here. How fast time runs.
+
+== acara.panen
+niat: BERI_KABAR
+topik: musim
+syarat: acara=panen
+lanjut: harga musim
+gestur: menari_panen
+- [3] Panen raya! Lumbung penuh, perut kenyang, hati senang! || Harvest home! Full granaries, full bellies, glad hearts!
+  ~ kasar: Panen. Akhirnya bisa bayar utang. || Harvest. Finally I can pay my debts.
+  ~ kuno: Bumi telah memberi. Mari bersyukur kepada langit dan leluhur. || The earth has given. Let us thank heaven and the ancestors.
+  ~ kampung: Panen, Nak! Malam ini ada tari panen di lapangan. Jangan sampai ketinggalan! || Harvest, child! Harvest dance on the field tonight. Don't miss it!
+- [2] Gabah tahun ini bernas semua. Kerja keras setahun terbayar. || Every grain is plump this year. A year's toil repaid.
+  ~ gunung: Para biksu menerima persembahan panen pertama. Berkah dibagi untuk semua. || The monks receive the first harvest offering. The blessing is shared by all.
+- Harga beras pasti turun setelah panen. Akhirnya! || Rice will surely drop after the harvest. At last!
+
+== acara.qingming
+niat: BERI_KABAR
+topik: duka
+syarat: acara=qingming
+lanjut: keluarga duka
+gestur: sapu_makam
+- [3] Hari ini Qingming. Aku mau menyapu makam orang tuaku. || It's Qingming today. I'm going to sweep my parents' grave.
+  ~ kasar: Qingming. Makam penuh orang. Jalan macet. || Qingming. The graves are packed. Roads jammed.
+  ~ kuno: Hari ini kita mengenang leluhur. Akar pohon tidak boleh dilupakan. || Today we remember the ancestors. A tree must never forget its roots.
+  ~ kampung: Nyekar, Nak. Bawa bunga sama air buat makam simbah. || Visiting the graves, child. Bring flowers and water for grandpa's grave.
+- [2] Aku membawa kue kesukaan ayahku. Semoga dia mencicipinya di sana. || I brought my father's favourite cakes. May he taste them there.
+  ~ p: Aku membawa bedak kesukaan ibuku. Dia selalu ingin tampil cantik. || I brought my mother's favourite face powder. She always wanted to look lovely.
+- Hujan rintik-rintik di hari Qingming. Seperti langit ikut menangis. || A drizzle on Qingming. As if heaven weeps too.
+- Cabang dedalu di pintu menolak roh jahat. Sudah pasang? || A willow sprig at the door wards off evil spirits. Put yours up?

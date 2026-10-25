@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:sekte/gabung_sumpah",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "kultivator.gabung.adv.bela_gerbang.desc"
+    },
+    "icon": {
+      "id": "minecraft:shield"
+    },
+    "title": {
+      "translate": "kultivator.gabung.adv.bela_gerbang.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

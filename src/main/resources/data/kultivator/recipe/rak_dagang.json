@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "P": "#minecraft:planks",
+    "S": "minecraft:stick",
+    "I": "minecraft:iron_ingot"
+  },
+  "pattern": [
+    "PPP",
+    "SIS",
+    "PPP"
+  ],
+  "result": {
+    "id": "kultivator:rak_dagang"
+  }
+}

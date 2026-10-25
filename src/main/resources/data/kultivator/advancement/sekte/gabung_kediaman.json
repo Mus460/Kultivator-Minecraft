@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:sekte/gabung_sumpah",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "kultivator.gabung.adv.kediaman.desc"
+    },
+    "icon": {
+      "id": "minecraft:campfire"
+    },
+    "title": {
+      "translate": "kultivator.gabung.adv.kediaman.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

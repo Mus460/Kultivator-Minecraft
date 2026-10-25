@@ -25218,3 +25218,32 @@ kultivator; NPC lain sesuai pekerjaan atau jabatannya.
   opsional `PropKatalog.TEGAK`; prop di depan kaki tetap di lantai saat duduk/jongkok. Belum: lapisan "drape" untuk lembar
   tambahan (bepergian, kerja, zirah, tidur), kain kepala dan alas kaki; kilau rambut hitam masih biru-abu; varian lari anak
   `lari_riang`.
+
+## 43. Satu Gulungan (satu GUI untuk semua fitur)
+
+Kontrak lengkap: **`docs/rancangan/43-satu-gui.md`** (43.0-43.18). Daftar uji `docs/uji/FASE-43.md`. Dibangun sebelum sisa
+42 (43.16.6); lembar kota 42 (`KotaLembar`) belum dipetakan dan dibangun nanti langsung sebagai halaman Gulungan.
+
+Permintaan pengguna (2026-10-25): sederhanakan semua GUI menjadi satu GUI yang mencakup semua fitur; jangan pernah ada dua
+GUI berbeda dengan fungsi yang sama.
+
+* `screen/CultivationScreen` menjadi **Gulungan Utama**, satu-satunya layar mod (`extends Screen`); semua pembuka lewat
+  `HubNav.buka(Tujuan)` (`hub/Tujuan`: bagian, halaman, sub, fokus NBT). Tersisa hanya dua layar wadah vanilla
+  (`ForgeScreen`, `RingScreen`, kembali ke Gulungan lewat `HubNav.kembaliSetelah`) dan `ChatScreen`/`KeyBindsScreen`.
+* Rel kiri 8 bagian (Diri, Teknik, Murid, Sekte, Dunia, Keabadian, Panduan, Pengaturan) + tablet **Di Sini**
+  (`hub/DiSini`, `Konteks`) saat ada NPC/blok/item hidup; paling banyak tiga tingkat: bagian > halaman (koin) > sub.
+  Pohon final dan id `HubPages` di 43.5 (`hub/Urutan`).
+* Satu basis halaman `screen/Page` (publik; `HallPage`, `DuniaPage`, `CodexPage`, `DiscipleTab`, `KotaPage` dan tujuh layar
+  bingkai lama `.deactivation`), satu kit `screen/ui` (Lukis/Fokus, `SegelKonfirmasi`, `Saring`, `DaftarGulir`,
+  `PemilihJumlah`, `KeadaanKosong`/`KeadaanTerkunci`, `SlipTooltip`); lembar 38/41 dibuka di halaman rumahnya
+  (`HubPages.daftarLembar`) atau di Di Sini. Kit 38 tersisa hanya di basis `LayarTempatDasar`/`LayarTemaDasar`/
+  `LayarGabungDasar` dan lembar yang masih menggambar dengannya (lihat `docs/progres/m2-F43-END.md`).
+* Tombol: 1-8 bagian (9 Di Sini; angka memilih pilihan saat Di Sini menampilkan dialog, K3), Q/E halaman, Tab fokus,
+  ←/→ sub, `/` cari, Enter/Spasi jalankan (tahan pada segel), Esc mundur satu langkah, V tutup; bawaan baru K Kitab
+  Teknik, N Peta, J Panduan (`hub/KeyLayout`, hanya bila bebas). Konfirmasi tunggal: ringan klik, sedang tahan 1,5 s,
+  berat centang + tahan.
+* Teks hanya 1.0 dan 1.5 (`Brush.fit` memotong dengan "…"); muat 1366×768 skala GUI 4 (341×192).
+* HUD: `hud/Kabar` (semua toast) dan `hud/SlotSisi` (satu gulungan sisi); Pengaturan menyerap Langit visual, duel dan
+  peringatan cahaya; Pengaturan › Kontrol mengubah tombol di tempat.
+* Server hanya S1-S3 dari 43.14 (`OpenScreen.DUNIA_DUEL`, jawaban duel `ANSWER_CATATAN` → `DuelCatatan`, daftar
+  `saudara` di `HallInfo`); semua payload, registri dan kunci lembar lain tetap. Lang di `lang-src/gui43*.{id_id,en_us}.json`.

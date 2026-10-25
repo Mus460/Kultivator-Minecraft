@@ -1,0 +1,189 @@
+{
+  "id": "sapa_dialek_iblis",
+  "jenis": "realisasi",
+  "_catatan": "SAPA in dialect iblis across the day (register kasar); steps share the anti-repeat ring.",
+  "benih_dunia": 42,
+  "masukan": {
+    "niat": "SAPA",
+    "pembicara": 105,
+    "hari": 120,
+    "now": 2880000,
+    "cuaca": "cerah",
+    "musim": "semi",
+    "situasi": {
+      "jam": "pagi",
+      "cuaca": "cerah",
+      "musim": "semi",
+      "kelompok": "pekerja",
+      "watak": "ramah",
+      "kebiasaan": [],
+      "sifat": {
+        "H": 10,
+        "E": 0,
+        "X": 20,
+        "A": 30,
+        "C": 10,
+        "O": 0
+      },
+      "wajah": "netral",
+      "tempat": "tema_iblis"
+    },
+    "pendengar": {
+      "nama": "Han",
+      "kelamin": "l",
+      "tahap": "dewasa",
+      "pemain": true
+    },
+    "kesan": "kenal",
+    "tahu_nama": false,
+    "register": "kasar",
+    "dialek": "iblis",
+    "kelamin": "l"
+  },
+  "langkah": [
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "subuh",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "tema_iblis"
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.dialek.iblis.1.kasar",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.kawan.iblis",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "sapa.dialek.iblis",
+      "gestur": "sikap_berkacak",
+      "seru": null,
+      "tik": null,
+      "id_id": "Kota tanpa ampun. Jaga sikapmu.",
+      "en_us": "Merciless city. Mind yourself."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "pagi",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "tema_iblis"
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.pekerja.4.kasar",
+        "a": []
+      },
+      "aturan": "sapa.pekerja",
+      "gestur": "seka_keringat",
+      "seru": null,
+      "tik": null,
+      "id_id": "Minggir. Serbuk kayu.",
+      "en_us": "Move. Sawdust."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "siang",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "tema_iblis"
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.pekerja.0.kasar",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.kawan.iblis",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "sapa.pekerja",
+      "gestur": "seka_keringat",
+      "seru": null,
+      "tik": null,
+      "id_id": "Tanganku kotor. Salam saja dari situ.",
+      "en_us": "Hands are dirty. Greet from there."
+    },
+    {
+      "ubah": {
+        "situasi": {
+          "jam": "malam",
+          "cuaca": "cerah",
+          "musim": "semi",
+          "kelompok": "pekerja",
+          "watak": "ramah",
+          "kebiasaan": [],
+          "sifat": {
+            "H": 10,
+            "E": 0,
+            "X": 20,
+            "A": 30,
+            "C": 10,
+            "O": 0
+          },
+          "wajah": "netral",
+          "tempat": "tema_iblis"
+        },
+        "pendengar": {
+          "nama": "Mei",
+          "kelamin": "p",
+          "tahap": "dewasa",
+          "pemain": true
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.dialek.iblis.2.kasar",
+        "a": []
+      },
+      "aturan": "sapa.dialek.iblis",
+      "gestur": "sikap_berkacak",
+      "seru": null,
+      "tik": null,
+      "id_id": "Kau belum pernah ditusuk, ya? Kelihatan.",
+      "en_us": "Never been stabbed, eh? Shows."
+    }
+  ]
+}

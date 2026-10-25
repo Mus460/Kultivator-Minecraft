@@ -743,7 +743,9 @@ public final class Disciples {
 			// Already gone (the caller and Halls.storeAway may both call this): the same tag again.
 			return disciple.departure().copy();
 		}
-		if (disciple.role() != DiscipleEntity.Role.DISCIPLE || disciple.isRemoved() || !(disciple.level() instanceof ServerLevel level)) {
+		// isReleasing: mid release bow, departing would undo the release.
+		if (disciple.role() != DiscipleEntity.Role.DISCIPLE || disciple.isRemoved() || disciple.isReleasing()
+				|| !(disciple.level() instanceof ServerLevel level)) {
 			return new CompoundTag();
 		}
 		boolean fled = false;
@@ -1031,7 +1033,9 @@ public final class Disciples {
 			// Not a listed disciple, or it just left with Disciples.depart (its entry is already marked away).
 			return;
 		}
-		if (disciple.isAlive() && !disciple.isReleasing()) {
+		// A removed body is never isAlive(): judge it by why it was removed (unloaded/dimension change kept, killed/discarded not).
+		Entity.RemovalReason removal = disciple.getRemovalReason();
+		if ((removal == null ? disciple.isAlive() : !removal.shouldDestroy()) && !disciple.isReleasing()) {
 			// Unloaded with its chunk: remember its name, rank and order for the list.
 			ServerPlayer player = level.getServer().getPlayerList().getPlayer(owner);
 			if (player != null) {
@@ -1567,14 +1571,16 @@ public final class Disciples {
 
 	/** The disciple an operator looks at within 16 blocks, else the nearest one within 16 blocks. */
 	private static @Nullable DiscipleEntity debugTarget(ServerPlayer player) {
-		DiscipleEntity looked = lookedAt(player, disciple -> true);
+		// Only real disciples: never a candidate, rival or clone (as DisciplePaths.debugTarget).
+		DiscipleEntity looked = lookedAt(player, disciple -> disciple.role() == DiscipleEntity.Role.DISCIPLE);
 		if (looked != null) {
 			return looked;
 		}
 		AABB box = player.getBoundingBox().inflate(ACTION_RANGE);
 		DiscipleEntity best = null;
 		double bestSq = ACTION_RANGE * ACTION_RANGE;
-		for (DiscipleEntity disciple : player.level().getEntitiesOfClass(DiscipleEntity.class, box, DiscipleEntity::isAlive)) {
+		for (DiscipleEntity disciple : player.level().getEntitiesOfClass(DiscipleEntity.class, box,
+				each -> each.isAlive() && each.role() == DiscipleEntity.Role.DISCIPLE)) {
 			double distanceSq = disciple.distanceToSqr(player);
 			if (distanceSq <= bestSq) {
 				bestSq = distanceSq;

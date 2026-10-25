@@ -1,0 +1,134 @@
+{
+  "id": "tik_gagap",
+  "jenis": "realisasi",
+  "_catatan": "A very emotional speaker (E 80) stammers (lex.gagap), aroused: chance x1.5.",
+  "benih_dunia": 42,
+  "masukan": {
+    "niat": "SAPA",
+    "pembicara": 701,
+    "hari": 120,
+    "now": 2880000,
+    "cuaca": "cerah",
+    "musim": "semi",
+    "situasi": {
+      "jam": "pagi",
+      "cuaca": "cerah",
+      "musim": "semi",
+      "kelompok": "pekerja",
+      "watak": "ramah",
+      "kebiasaan": [],
+      "sifat": {
+        "H": 20,
+        "E": 80,
+        "X": -30,
+        "A": 20,
+        "C": 0,
+        "O": 0
+      },
+      "wajah": "netral",
+      "tempat": "kota_besar"
+    },
+    "pendengar": {
+      "nama": "Han",
+      "kelamin": "l",
+      "tahap": "dewasa",
+      "pemain": true
+    },
+    "kesan": "kenal",
+    "tahu_nama": false,
+    "register": "sopan",
+    "dialek": "kampung",
+    "kelamin": "p",
+    "tik": [
+      "gagap",
+      "anu"
+    ],
+    "arousal": 0.7,
+    "label": "cemas"
+  },
+  "langkah": [
+    {
+      "ubah": {},
+      "harap": {
+        "k": "kultivator.cakap.sapa.kenal.1.kampung",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.tuan.kampung",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "sapa.kenal",
+      "gestur": "lambai",
+      "seru": null,
+      "tik": null,
+      "id_id": "Lho, Pak! Sehat, Nak?",
+      "en_us": "Well, Mister! Keeping well, child?"
+    },
+    {
+      "ubah": {},
+      "harap": {
+        "k": "kultivator.cakap.sapa.cemas.2",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.tuan.kampung",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "sapa.cemas",
+      "gestur": "lihat_sekeliling",
+      "seru": null,
+      "tik": null,
+      "id_id": "S-salam, Pak. Maaf, pikiranku sedang ke mana-mana.",
+      "en_us": "G-greetings, Mister. Sorry, my mind is all over the place."
+    },
+    {
+      "ubah": {},
+      "harap": {
+        "k": "kultivator.cakap.bungkus.awal",
+        "a": [
+          {
+            "k": "kultivator.cakap.tik.anu",
+            "a": []
+          },
+          {
+            "k": "kultivator.cakap.sapa.kenal.0",
+            "a": [
+              {
+                "k": "kultivator.cakap.lex.tuan.kampung",
+                "a": []
+              }
+            ]
+          }
+        ]
+      },
+      "aturan": "sapa.kenal",
+      "gestur": "lambai",
+      "seru": null,
+      "tik": "anu",
+      "id_id": "Anu... Oh, Pak, datang lagi.",
+      "en_us": "Um... Oh, Mister, back again."
+    },
+    {
+      "ubah": {
+        "tik_terakhir": "gagap"
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.pagi.1.kampung",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.tuan.kampung",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "sapa.pagi",
+      "gestur": "lambai",
+      "seru": null,
+      "tik": null,
+      "id_id": "Pagi, Nak. Sudah makan? Jangan jalan dengan perut kosong.",
+      "en_us": "Morning, child. Eaten? Don't walk on an empty belly."
+    }
+  ]
+}

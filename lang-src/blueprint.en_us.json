@@ -156,6 +156,7 @@
   "kultivator.blueprint.error.upgrade_smaller": "Choose a larger template to upgrade to.",
   "kultivator.blueprint.error.no_test_site": "Set a test template first (uji sekte templat).",
   "kultivator.blueprint.error.restoring": "The old test site is still being restored; confirm again in a moment.",
+  "kultivator.blueprint.error.busy": "The sect is being dismantled or restored; wait until it is done.",
 
   "kultivator.blueprint.repair.none": "Inspection done: every finished part is whole.",
   "kultivator.blueprint.repair.found": "Inspection done: %s missing cells are being repaired (at the normal cost).",

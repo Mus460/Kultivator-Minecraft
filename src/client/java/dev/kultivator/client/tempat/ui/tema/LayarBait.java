@@ -1,14 +1,15 @@
 package dev.kultivator.client.tempat.ui.tema;
 
 import dev.kultivator.client.screen.ui.Brush;
+import dev.kultivator.client.screen.ui.DaftarPilihan;
+import dev.kultivator.client.screen.ui.Glyphs;
+import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.UiSound;
-import dev.kultivator.client.tempat.ui.kit.IkonTempat;
 import dev.kultivator.client.tempat.ui.kit.Lembar;
-import dev.kultivator.client.tempat.ui.kit.Lukis;
-import dev.kultivator.client.tempat.ui.kit.PanelTempat;
 import dev.kultivator.client.tempat.ui.kit.TabLentera;
 import dev.kultivator.client.tempat.ui.kit.TempatWarna;
+import java.util.ArrayList;
 import dev.kultivator.dunia.tempat.tema.bersama.TemaLayar.Bait;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import java.util.List;
@@ -21,9 +22,10 @@ import net.minecraft.util.Util;
  * scrolls: the first line brushed on the left one, the right one waiting for its answer. Three candidate second lines lie
  * below as slips of paper (keys 1-3). A fitting answer is brushed onto the right scroll for a moment and a plum blossom
  * opens on the branch (three in a row win the day's reward); a poor one leaves an ink blot and the branch bare again.
- * When today's reward is already given the game stays playable for its own sake (a ribbon says so).
+ * When today's reward is already given the game stays playable for its own sake (a ribbon says so). The slips are the
+ * kit's {@link DaftarPilihan} (G59): ↑↓ Enter, a click, or the number keys under Di Sini (43.17 K3).
  */
-public final class LayarBait extends LayarTemaDasar {
+public final class LayarBait extends TemaHalaman {
 
 	private int benarLalu = -1;
 	private Component baitLalu = Component.empty();
@@ -72,16 +74,6 @@ public final class LayarBait extends LayarTemaDasar {
 		benarLalu = benar;
 	}
 
-	@Override
-	protected boolean angka(int n) {
-		List<Lembar> p = lembar.daftar(Bait.PILIHAN);
-		if (n >= 1 && n <= p.size()) {
-			pilih(p.get(n - 1));
-			return true;
-		}
-		return false;
-	}
-
 	private void pilih(Lembar e) {
 		if (!tulisBoleh()) {
 			return;
@@ -92,19 +84,20 @@ public final class LayarBait extends LayarTemaDasar {
 	}
 
 	@Override
-	protected void gambar(Lukis l, int x0, int y0, int x1, int y1) {
+	protected void lukisTema(Lukis l, int x0, int y0, int x1, int y1) {
 		int y = y0;
 		if (lembar.b(Bait.HARI_INI)) {
 			int w = Math.min(x1 - x0, 260);
 			int px = (x0 + x1 - w) / 2;
-			IkonTempat.pita(l.g, false, px, y, w, 12, 0xFFFFFFFF);
-			Brush.fitCentered(l.g, font, TemaUi.k("bait.hari_ini"), (x0 + x1) / 2.0F, y + 2, w - 16, 0xFF3A3A3A, 0.7F, 0.55F, false);
+			Glyphs.Atlas.pita(l.g, false, px, y, w, 12, 0xFFFFFFFF);
+			l.tengah(TemaUi.k("bait.hari_ini"), (x0 + x1) / 2.0F, y + 2, w - 16, 0xFF3A3A3A);
 			y += 15;
 		}
 		long sejak = hasilSejak >= 0L ? l.kini - hasilSejak : Long.MAX_VALUE;
 		boolean tampilHasil = sejak < 1800L;
-		int pilihH = 3 * 19 + 4;
-		int gulungH = Math.max(50, y1 - y - pilihH - 18);
+		List<Lembar> p = lembar.daftar(Bait.PILIHAN);
+		int pilihH = DaftarPilihan.tinggi(Math.min(3, p.size()), 1, 15) + 2;
+		int gulungH = Math.max(46, y1 - y - pilihH - 15);
 		// the two scrolls and the plum branch between them
 		int mid = (x0 + x1) / 2;
 		int gw = Math.min(110, (x1 - x0) / 2 - 26);
@@ -120,22 +113,15 @@ public final class LayarBait extends LayarTemaDasar {
 		// streak
 		int maks = Math.max(1, lembar.i(LembarKunci.MAKS, 3));
 		int benar = lembar.i(Bait.BENAR, 0);
-		Brush.fitCentered(l.g, font, TemaUi.k("bait.beruntun", benar, maks), mid, y, x1 - x0, gaya.teksLemah, 0.75F, 0.6F, false);
-		y += 12;
-		// the three answer slips
-		List<Lembar> p = lembar.daftar(Bait.PILIHAN);
+		l.tengah(TemaUi.k("bait.beruntun", benar, maks), mid, y, x1 - x0, gaya.teksLemah);
+		y += 11;
+		// the three answer slips (G59)
+		Component kunci = tulisBoleh() ? null : alasanBaca();
+		List<DaftarPilihan.Pilihan> pilihan = new ArrayList<>(3);
 		for (int i = 0; i < p.size() && i < 3; i++) {
-			Lembar e = p.get(i);
-			int sy = y + i * 19;
-			boolean over = l.di(x0 + 10, sy, x1 - 10, sy + 17);
-			PanelTempat.kartu(l.g, gaya, x0 + 10, sy, x1 - 10, sy + 17, over ? 1.0F : 0.0F, l.difokus("jawab" + i));
-			l.g.fill(x0 + 10, sy, x0 + 13, sy + 17, Palette.argb(0xC0, TempatWarna.SEGEL & 0xFFFFFF));
-			Brush.text(l.g, font, Component.literal(Integer.toString(i + 1)), x0 + 17, sy + 5, TempatWarna.SEGEL, 0.8F, false);
-			l.teks(e.teks(LembarKunci.TEKS), x0 + 28, sy + 5, x1 - x0 - 46, gaya.teks, 0.85F);
-			boolean bisa = tulisBoleh();
-			l.zona("jawab" + i, x0 + 10, sy, x1 - 10, sy + 17, () -> pilih(e), bisa, bisa ? null : alasanBaca(), true);
-			l.fokusCincin("jawab" + i, x0 + 10, sy, x1 - 10, sy + 17);
+			pilihan.add(new DaftarPilihan.Pilihan(i + 1, p.get(i).teks(LembarKunci.TEKS), kunci, false));
 		}
+		DaftarPilihan.gambar(l, "jawab", pilihan, x0 + 6, y, x1 - 6, y1, false, c -> pilih(p.get(c.no() - 1)));
 	}
 
 	/** A hanging scroll: rods, silk border, paper, and the line brushed top to bottom in wrapped rows. */
@@ -150,7 +136,7 @@ public final class LayarBait extends LayarTemaDasar {
 		int cx = (x0 + x1) / 2;
 		if (teks.getString().isEmpty()) {
 			if (jawab) {
-				Brush.fitCentered(l.g, font, TemaUi.k("bait.menunggu"), cx, (y0 + y1) / 2.0F - 4, x1 - x0 - 10, 0x60403020, 0.7F, 0.5F, false);
+				l.tengah(TemaUi.k("bait.menunggu"), cx, (y0 + y1) / 2.0F - 4, x1 - x0 - 10, 0x60403020);
 			}
 			return;
 		}
@@ -158,7 +144,7 @@ public final class LayarBait extends LayarTemaDasar {
 		if (alfa <= 8) {
 			return;
 		}
-		l.bungkus(teks, x0 + 8, y0 + 14, x1 - x0 - 16, Palette.argb(alfa, 0x1B1A16), 0.85F);
+		l.bungkus(teks, x0 + 7, y0 + 11, x1 - x0 - 14, Palette.argb(alfa, 0x1B1A16), y1 - y0 - 34);
 		capPenyair(l, x1 - 14, y1 - 22, alfa);
 	}
 

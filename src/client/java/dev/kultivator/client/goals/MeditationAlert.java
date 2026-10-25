@@ -3,6 +3,7 @@ package dev.kultivator.client.goals;
 import dev.kultivator.Kultivator;
 import dev.kultivator.client.ClientCultivation;
 import dev.kultivator.client.EffectQuality;
+import dev.kultivator.client.fx.spec.ScreenFlash;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.elite.EliteData;
@@ -151,32 +152,11 @@ public final class MeditationAlert implements HudElement {
 		float fade = demo ? 1.0F : Math.min(1.0F, (shownUntil - now) / 600.0F);
 		int width = g.guiWidth();
 		int height = g.guiHeight();
-		int edge = Math.max(12, Math.min(40, width / 12));
-		int strong = Palette.argb(Math.round(110 * fade), 0xC0201A);
-		int clear = Palette.argb(0, 0xC0201A);
+		// the edge it comes from, through the one edge painter (DESIGN 43.9)
 		double a = Math.abs(side);
-		if (a < Math.PI / 4.0D) {
-			g.fillGradient(0, 0, width, edge, strong, clear);
-		} else if (a > Math.PI * 3.0D / 4.0D) {
-			g.fillGradient(0, height - edge, width, height, clear, strong);
-		} else if (side > 0.0D) {
-			sideGradient(g, width - edge, width, height, false, strong, clear);
-		} else {
-			sideGradient(g, 0, edge, height, true, strong, clear);
-		}
+		int sisi = a < Math.PI / 4.0D ? ScreenFlash.ATAS : a > Math.PI * 3.0D / 4.0D ? ScreenFlash.BAWAH : side > 0.0D ? ScreenFlash.KANAN : ScreenFlash.KIRI;
+		ScreenFlash.tepi(0xC0201A, 110.0F / 255.0F * fade, sisi);
 		// Above the action bar, which meditation uses.
-		Brush.centered(g, minecraft.font, Brush.bold(line), width / 2.0F, height - 82.0F, Palette.argb(Math.round(255 * fade), 0xFF6A5A), 0.9F, true);
-	}
-
-	/** A horizontal gradient made of thin vertical strips (the GUI fills only grade vertically). */
-	private static void sideGradient(GuiGraphicsExtractor g, int x0, int x1, int height, boolean fromLeft, int strong, int clear) {
-		int span = Math.max(1, x1 - x0);
-		int strips = Math.min(12, span);
-		for (int i = 0; i < strips; i++) {
-			int sx0 = x0 + span * i / strips;
-			int sx1 = x0 + span * (i + 1) / strips;
-			float t = (i + 0.5F) / strips;
-			g.fill(sx0, 0, sx1, height, Palette.mix(strong, clear, fromLeft ? t : 1.0F - t));
-		}
+		Brush.centered(g, minecraft.font, Brush.bold(line), width / 2.0F, height - 82.0F, Palette.argb(Math.round(255 * fade), 0xFF6A5A), 1.0F, true);
 	}
 }

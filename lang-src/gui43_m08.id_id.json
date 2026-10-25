@@ -1,0 +1,20 @@
+{
+  "kultivator.gui43.hal.sekte.kas": "Kas & Toko",
+  "kultivator.gui43.sub.kas.kas": "Kas",
+  "kultivator.gui43.sub.kas.toko_pk": "Toko PK",
+  "kultivator.gui43.sub.kas.rak": "Rak Kitab",
+  "kultivator.gui43.sub.kas.makam": "Makam",
+  "kultivator.gui43.sub.kas.kafilah": "Kafilah",
+  "kultivator.gui43.m08.v.kantor": "Kantor Misi",
+  "kultivator.gui43.m08.v.hari_ini": "Hari Ini",
+  "kultivator.gui43.m08.v.minggu": "7 Hari",
+  "kultivator.gui43.m08.v.sumber": "Sumber",
+  "kultivator.gui43.m08.v.politik": "Politik Kas",
+  "kultivator.gui43.m08.v.mandiri": "Kas Mandiri",
+  "kultivator.gui43.m08.sumber.aulaku": "Aulaku",
+  "kultivator.gui43.m08.sumber.perguruanku": "Perguruanku",
+  "kultivator.gui43.m08.toko_aula": "Toko PK Aula",
+  "kultivator.gui43.m08.tanpa_aula": "Kamu belum punya aula sekte. Dirikan aula di prasasti sekte untuk membuka Kantor Misi dan Toko PK Aula.",
+  "kultivator.gui43.m08.rak.ambil.tanya": "Ambil kembali %s dari Rak Kitab?",
+  "kultivator.gui43.m08.makam.abadikan.tanya": "Abadikan %s di altar seharga %s PK?"
+}

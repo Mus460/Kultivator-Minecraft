@@ -1,0 +1,116 @@
+{
+  "id": "sapa_anak",
+  "jenis": "realisasi",
+  "_catatan": "A child greets a woman player and an old man: Bibi, Kakek, Kakak.",
+  "benih_dunia": 42,
+  "masukan": {
+    "niat": "SAPA",
+    "pembicara": 213,
+    "hari": 120,
+    "now": 2880000,
+    "cuaca": "cerah",
+    "musim": "semi",
+    "situasi": {
+      "jam": "pagi",
+      "cuaca": "cerah",
+      "musim": "semi",
+      "kelompok": "anak",
+      "watak": "ramah",
+      "kebiasaan": [],
+      "sifat": {
+        "H": 10,
+        "E": 0,
+        "X": 20,
+        "A": 30,
+        "C": 10,
+        "O": 0
+      },
+      "wajah": "netral",
+      "tempat": "kota_besar"
+    },
+    "pendengar": {
+      "nama": "Han",
+      "kelamin": "l",
+      "tahap": "dewasa",
+      "pemain": true
+    },
+    "kesan": "kenal",
+    "tahu_nama": false,
+    "register": "biasa",
+    "dialek": "kampung",
+    "tahap": "anak",
+    "kelamin": "p"
+  },
+  "langkah": [
+    {
+      "ubah": {
+        "pendengar": {
+          "nama": "Mei",
+          "kelamin": "p",
+          "tahap": "dewasa",
+          "pemain": true
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.pagi.5",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.bibi.kampung",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "sapa.pagi",
+      "gestur": "lambai",
+      "seru": null,
+      "tik": null,
+      "id_id": "Pagi, Bulik. Mau ke mana sepagi ini?",
+      "en_us": "Morning, Auntie. Where are you off to so early?"
+    },
+    {
+      "ubah": {
+        "pendengar": {
+          "nama": "Lao Zhou",
+          "kelamin": "l",
+          "tahap": "tua",
+          "pemain": false
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.kenal.3",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.kakek.kampung",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "sapa.kenal",
+      "gestur": "lambai",
+      "seru": null,
+      "tik": null,
+      "id_id": "Ah, kau rupanya, Mbah. Mampir?",
+      "en_us": "Ah, it's you, Gramps. Dropping by?"
+    },
+    {
+      "ubah": {
+        "pendengar": {
+          "nama": "Ah Bao",
+          "kelamin": "l",
+          "tahap": "remaja",
+          "pemain": false
+        }
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.anak.2.kampung",
+        "a": []
+      },
+      "aturan": "sapa.anak",
+      "gestur": "lari_lambai",
+      "seru": null,
+      "tik": null,
+      "id_id": "Hehe, halo! Kata Mak jangan ngomong sama orang asing... tapi Kakak baik, kan?",
+      "en_us": "Hehe, hi! Ma says don't talk to strangers... but you're nice, right?"
+    }
+  ]
+}

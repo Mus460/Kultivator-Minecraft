@@ -6,6 +6,9 @@ import dev.kultivator.data.Realm;
 import dev.kultivator.dunia.DuniaAnchorEntity;
 import dev.kultivator.dunia.DuniaAnchors;
 import dev.kultivator.dunia.DuniaBudget;
+import dev.kultivator.dunia.kota42.api.Kategori;
+import dev.kultivator.dunia.kota42.ekonomi.HargaKota;
+import dev.kultivator.dunia.tempat.tema.bersama.DagangItems;
 import dev.kultivator.fx.Fx;
 import dev.kultivator.fx.FxType;
 import dev.kultivator.musuh.MusuhFxIds;
@@ -48,8 +51,13 @@ import java.util.UUID;
  * fight at; audit R13: it no longer grows with the player's realm) ends it. The broker buys at most 16 stacks per player
  * and day, like the town shops (audit R18). Reputasi Gelap (−100..100) rises with trade and falls with guard kills; below
  * −50 the broker turns the player away.
+ * <p>
+ * DESIGN 42.6.7 (42C-2): the day office of the Ghost Market. {@link #dagangan} is public (the masked sellers of
+ * {@code PasarHantu} lay out the same wares at night), every price carries one {@code HargaKota.faktor}, the broker also
+ * fences smuggled trade goods ({@code DagangItems.Barang#selundupan}), and the Razia, its bribe and the Reputasi Gelap are
+ * public so the night market raids with the same rules.
  */
-final class PasarGelap {
+public final class PasarGelap {
 
 	static final double MARKUP = 1.5D;
 	static final double BUYBACK = 0.6D;
@@ -60,7 +68,7 @@ final class PasarGelap {
 	static final String SALES = "gjual";
 
 	/** The bribe that ends a raid: 20 NB × the raid guards' band (audit R13). */
-	static long bribePrice(ServerPlayer player) {
+	public static long bribePrice(ServerPlayer player) {
 		return BRIBE_PER_BAND * guardBand(player);
 	}
 
@@ -83,11 +91,11 @@ final class PasarGelap {
 		return raid != null && raid.town() == town && player.level().getGameTime() < raid.until();
 	}
 
-	static int shadowReputation(ServerPlayer player) {
+	public static int shadowReputation(ServerPlayer player) {
 		return Mth.clamp(KotaData.get(player.level().getServer()).getInt(player, "gelap_rep", 0), -100, 100);
 	}
 
-	static void addShadowReputation(ServerPlayer player, int delta) {
+	public static void addShadowReputation(ServerPlayer player, int delta) {
 		if (delta == 0) {
 			return;
 		}
@@ -120,37 +128,57 @@ final class PasarGelap {
 
 	// ================================================================== the broker
 
-	record Offer(int index, Harga.Ware ware, ItemStack stack, long price) {
+	/** One ware on the mat: index (the action argument), the ware, a fresh stack and its price in NB. */
+	public record Offer(int index, Harga.Ware ware, ItemStack stack, long price) {
 	}
 
 	static List<Offer> offers(ServerPlayer player, KultivatorNpc npc) {
-		long day = Kota.day(player.level().getServer());
+		return dagangan(player.level().getServer(), npc.anchorSite(), Kota.day(player.level().getServer()),
+				player.level() instanceof ServerLevel level ? level : null);
+	}
+
+	/**
+	 * The broker's wares at site {@code situs} on world day {@code hari} (42.6.7 {@code PasarGelap.dagangan}): 5-7 of
+	 * {@code Harga.SHADOW} by a fixed seed, 1.5 x base x the Gerhana Darah surcharge x {@code HargaKota.faktor} of the
+	 * ware's category. The Ghost Market of {@code PasarHantu} lays out this same list.
+	 */
+	public static List<Offer> dagangan(MinecraftServer server, long situs, long hari) {
+		return dagangan(server, situs, hari, server.overworld());
+	}
+
+	private static List<Offer> dagangan(MinecraftServer server, long situs, long day, @Nullable ServerLevel here) {
 		List<Harga.Ware> pool = new ArrayList<>();
 		for (Harga.Ware ware : Harga.SHADOW) {
 			if ("king_core".equals(ware.id()) || Harga.exists(ware.id())) {
 				pool.add(ware);
 			}
 		}
-		RandomSource random = RandomSource.create(npc.anchorSite() * 131L + day * 7L);
+		RandomSource random = RandomSource.create(situs * 131L + day * 7L);
 		int count = Math.min(pool.size(), 5 + random.nextInt(3));
 		List<Offer> offers = new ArrayList<>();
 		for (int i = 0; i < count && !pool.isEmpty(); i++) {
 			Harga.Ware ware = pool.remove(random.nextInt(pool.size()));
-			ItemStack stack = ware.make().make(RandomSource.create(npc.anchorSite() ^ day * 31L ^ i), 8);
+			ItemStack stack = ware.make().make(RandomSource.create(situs ^ day * 31L ^ i), 8);
 			if (stack.isEmpty()) {
 				continue;
 			}
 			// a Gerhana Darah makes the smugglers lie low: x1.25 while it lasts (34.4.3, K listens to SKY_EVENT through the sky service)
-			double eclipse = KabarDunia.shadowFactor(player.level() instanceof net.minecraft.server.level.ServerLevel level ? level : null);
-			long price = Math.max(1L, Math.round(Harga.priceOf(ware, stack) * MARKUP * eclipse * Kota.config().priceScale));
+			double eclipse = KabarDunia.shadowFactor(here);
+			double town = HargaKota.faktor(server, situs, Kategori.dari(stack));
+			long price = Math.max(1L, Math.round(Harga.priceOf(ware, stack) * MARKUP * eclipse * town * Kota.config().priceScale));
 			offers.add(new Offer(i, ware, stack, price));
 		}
 		return offers;
 	}
 
-	static boolean buys(ItemStack stack) {
+	/** True for what the broker (and the Ghost Market fence) buys: loot pouches, demonic banners, smuggled trade goods. */
+	public static boolean buys(ItemStack stack) {
 		if (stack.isEmpty()) {
 			return false;
+		}
+		DagangItems.Barang dagang = DagangItems.barang(stack.getItem());
+		if (dagang != null && dagang.selundupan()) {
+			return true;
 		}
 		String id = BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath();
 		return "loot_pouch".equals(id) || "demonic_loot_pouch".equals(id) || "demonic_banner".equals(id) || "kantong_saingan".equals(id);
@@ -216,7 +244,7 @@ final class PasarGelap {
 			return;
 		}
 		data.addDaily(player.getUUID(), day, SALES, 1);
-		long each = Math.max(1L, (long) Math.floor(Harga.value(hand) * BUYBACK * Kota.config().priceScale));
+		long each = buyback(player.level().getServer(), npc.town(), hand);
 		int count = hand.getCount();
 		Component name = hand.getHoverName();
 		hand.shrink(count);
@@ -225,10 +253,30 @@ final class PasarGelap {
 		Msg.actionBar(player, Component.translatable("kultivator.kota.toko.dijual", count, name, NilaiBatu.text(each * count)).withStyle(ChatFormatting.DARK_PURPLE));
 	}
 
+	/** Stacks the player may still sell to the broker or the Ghost Market fence today (one shared limit, audit R18). */
+	public static int sisaJual(ServerPlayer player) {
+		long day = Kota.day(player.level().getServer());
+		return Math.max(0, Toko.SALES_PER_DAY - KotaData.get(player.level().getServer()).dailyCount(player.getUUID(), day, SALES));
+	}
+
+	/** Counts one sold stack against {@link #sisaJual}. */
+	public static void catatJual(ServerPlayer player) {
+		KotaData.get(player.level().getServer()).addDaily(player.getUUID(), Kota.day(player.level().getServer()), SALES, 1);
+	}
+
+	/** What the broker pays for one of {@code stack}: 0.6 x value x {@code HargaKota.faktor} (42.6.3). */
+	public static long buyback(MinecraftServer server, long town, ItemStack stack) {
+		double faktor = HargaKota.faktor(server, town, Kategori.dari(stack));
+		return Math.max(1L, (long) Math.floor(Harga.value(stack) * BUYBACK * faktor * Kota.config().priceScale));
+	}
+
 	// ================================================================== Razia
 
-	/** The guard sect raids the market: the door is barred for 60 s and three guards come for {@code player}. */
-	static void raid(ServerPlayer player, @Nullable KultivatorNpc broker) {
+	/**
+	 * The guard sect raids the market: the door is barred for 60 s and three guards come for {@code player} (also the
+	 * Ghost Market's Razia, 42.6.7, with {@code broker} null).
+	 */
+	public static void raid(ServerPlayer player, @Nullable KultivatorNpc broker) {
 		ServerLevel level = (ServerLevel) player.level();
 		long town = broker != null ? broker.town() : Towns.near(level, player.blockPosition(), 96);
 		long until = level.getGameTime() + RAID_TICKS;
@@ -372,7 +420,7 @@ final class PasarGelap {
 		ItemStack hand = player.getMainHandItem();
 		if (buys(hand)) {
 			tag.store("hand", ComponentSerialization.CODEC, hand.getHoverName());
-			tag.putLong("hand_price", Math.max(1L, (long) Math.floor(Harga.value(hand) * BUYBACK * Kota.config().priceScale)) * hand.getCount());
+			tag.putLong("hand_price", buyback(player.level().getServer(), npc.town(), hand) * hand.getCount());
 		}
 		tag.putInt("rep", shadowReputation(player));
 		tag.putDouble("raid", Kota.config().raidChance * (shadowReputation(player) >= 50 ? 0.5D : 1.0D));

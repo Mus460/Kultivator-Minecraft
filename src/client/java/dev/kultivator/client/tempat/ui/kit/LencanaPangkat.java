@@ -52,14 +52,14 @@ public final class LencanaPangkat {
 			default -> 0xFFE0C070;
 		};
 		Component angka = TeksTempat.k("nama_baik.nilai", nilai);
-		int w1 = Math.round(l.font.width(nama) * 0.75F);
-		int w2 = Math.round(l.font.width(angka) * 0.75F);
+		int w1 = l.font.width(nama);
+		int w2 = l.font.width(angka);
 		int w = w1 + w2 + 14;
 		int x = xKanan - w;
 		Brush.disc(l.g, x + 4.0F, y + 4.0F, 4.0F, warna);
 		Brush.ring(l.g, x + 4.0F, y + 4.0F, 2.6F, 3.4F, Palette.argb(0xC0, 0xFFF4E0));
-		Brush.text(l.g, l.font, angka, x + 10, y + 1, l.gaya.teks, 0.75F, false);
-		Brush.text(l.g, l.font, nama, x + 12 + w2, y + 1, warna, 0.75F, false);
+		Brush.text(l.g, l.font, angka, x + 10, y, l.gaya.teks, 1.0F, false);
+		Brush.text(l.g, l.font, nama, x + 12 + w2, y, warna, 1.0F, false);
 		if (l.di(x, y, xKanan, y + 9)) {
 			l.tip(java.util.List.of(TeksTempat.k("nama_baik.judul"), nama, TeksTempat.k("nama_baik.tip")));
 		}

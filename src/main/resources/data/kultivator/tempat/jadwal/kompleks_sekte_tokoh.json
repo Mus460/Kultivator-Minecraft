@@ -1,0 +1,96 @@
+{
+  "jenis": "sekte/kompleks",
+  "kelompok": {},
+  "peran": {
+    "murid_sekte_luar": {
+      "4": {"kegiatan": "meditasi", "tujuan": "meditasi", "klip": "meditasi_napas"},
+      "5": {"kegiatan": "sapu", "tujuan": "kerja:sapu", "klip": "sapu", "kanan": "sapu"},
+      "6-7": {"kegiatan": "latihan_pagi", "tujuan": "latihan", "klip": "tai_chi_pagi"},
+      "8-9": {"kegiatan": "tugas", "tujuan": "kerja:sapu", "klip": "sapu", "kanan": "sapu"},
+      "10-11": {"kegiatan": "pikul_air", "tujuan": "@kerja", "klip": "angkat_air", "kanan": "ember", "kiri": "ember", "jalan": "angkat_air"},
+      "12": {"kegiatan": "makan", "tujuan": "meja_makan", "klip": "makan", "kanan": "sumpit", "kiri": "mangkuk"},
+      "13-14": {"kegiatan": "tugas", "tujuan": "kerja:cangkul", "klip": "mencangkul", "kanan": "cangkul"},
+      "15-16": {"kegiatan": "meditasi", "tujuan": "meditasi", "klip": "meditasi_napas"},
+      "17": {"kegiatan": "latihan_senja", "tujuan": "latihan", "klip": "latihan_pedang_2", "kanan": "pedang_kayu"},
+      "18": {"kegiatan": "makan", "tujuan": "meja_makan", "klip": "makan", "kanan": "sumpit", "kiri": "mangkuk"},
+      "19-20": {"kegiatan": "obrol", "tujuan": "obrol", "klip": "bicara_tangan"},
+      "21-3": {"kegiatan": "tidur", "tujuan": "@kasur", "klip": "tidur", "dalam": true}
+    },
+    "murid_sekte_dalam": {
+      "4-5": {"kegiatan": "meditasi", "tujuan": "meditasi", "klip": "sirkulasi_qi"},
+      "6-7": {"kegiatan": "latihan_pagi", "tujuan": "latihan", "klip": "latihan_pedang_3", "kanan": "pedang_kayu"},
+      "8-9": {"kegiatan": "membaca", "tujuan": "meja_tulis", "klip": "membaca", "kanan": "kitab"},
+      "10-11": {"kegiatan": "menulis", "tujuan": "meja_tulis", "klip": "menulis", "kanan": "kuas"},
+      "12": {"kegiatan": "makan", "tujuan": "meja_makan", "klip": "makan", "kanan": "sumpit", "kiri": "mangkuk"},
+      "13-16": {"kegiatan": "meditasi", "tujuan": "meditasi", "klip": "meditasi_napas"},
+      "17": {"kegiatan": "latihan_senja", "tujuan": "latihan", "klip": "latihan_tombak", "kanan": "tombak"},
+      "18-20": {"kegiatan": "jaga_malam", "tujuan": "jaga", "klip": "berdiri_jaga", "kanan": "tombak"},
+      "21-3": {"kegiatan": "tidur", "tujuan": "@kasur", "klip": "tidur", "dalam": true}
+    },
+    "pelayan_sekte": {
+      "4": {"kegiatan": "bangun", "tujuan": "@rumah", "klip": "menguap_peregangan"},
+      "5-7": {"kegiatan": "kerja", "tujuan": "kerja:kuali", "klip": "masak", "kanan": "sendok_sayur"},
+      "8-11": {"kegiatan": "sapu", "tujuan": "kerja:sapu", "klip": "sapu", "kanan": "sapu"},
+      "12": {"kegiatan": "makan", "tujuan": "meja_makan", "klip": "makan", "kanan": "sumpit", "kiri": "mangkuk"},
+      "13-16": {"kegiatan": "kipas_tungku", "tujuan": "kerja:tungku", "klip": "kipas_tungku", "kanan": "kipas_tungku"},
+      "17-19": {"kegiatan": "kerja", "tujuan": "kerja:kuali", "klip": "masak", "kanan": "sendok_sayur"},
+      "20-3": {"kegiatan": "tidur", "tujuan": "@kasur", "klip": "tidur", "dalam": true}
+    },
+    "tetua_sekte": {
+      "4-5": {"kegiatan": "meditasi", "tujuan": "meditasi", "klip": "sirkulasi_qi"},
+      "6-7": {"kegiatan": "pimpin_latihan", "tujuan": "latihan", "klip": "sikap_tangan_belakang"},
+      "8-11": {"kegiatan": "kuliah", "tujuan": "meja_tulis", "klip": "mengajar", "kanan": "kitab"},
+      "12": {"kegiatan": "makan", "tujuan": "meja_makan", "klip": "makan", "kanan": "sumpit", "kiri": "mangkuk"},
+      "13-16": {"kegiatan": "membaca", "tujuan": "meja_tulis", "klip": "membaca", "kanan": "gulungan"},
+      "17": {"kegiatan": "doa_senja", "tujuan": "dupa", "klip": "sujud_dupa", "kanan": "dupa"},
+      "18-20": {"kegiatan": "minum_teh", "tujuan": "kursi", "klip": "minum_teh", "kanan": "cangkir", "kiri": "lepek"},
+      "21-3": {"kegiatan": "meditasi_malam", "tujuan": "meditasi", "klip": "meditasi_napas"}
+    }
+  },
+  "tokoh": {
+    "agung": {
+      "5": {"titik": "tetua", "klip": "sirkulasi_qi"},
+      "6-7": {"titik": "arena", "klip": "sikap_tangan_belakang"},
+      "8-11": {"titik": "aula", "klip": "mengajar", "kanan": "kitab"},
+      "12-13": {"titik": "tetua", "klip": "minum_teh", "kanan": "cangkir", "kiri": "lepek"},
+      "14-17": {"titik": "aula", "klip": "membaca", "kanan": "gulungan"},
+      "18-20": {"titik": "tetua", "klip": "catur"}
+    },
+    "hukum": {
+      "6-11": {"titik": "hukum", "klip": "membaca", "kanan": "gulungan_aturan"},
+      "13-16": {"titik": "hukum", "klip": "menulis", "kanan": "kuas"},
+      "17-20": {"titik": "gerbang", "klip": "sikap_tangan_belakang"}
+    },
+    "luar": {
+      "6-7": {"titik": "arena", "klip": "tai_chi_pagi"},
+      "8-11": {"titik": "papan_misi", "klip": "sikap_lipat_tangan"},
+      "13-16": {"titik": "papan_misi", "klip": "menulis", "kanan": "papan_catatan"},
+      "17-20": {"titik": "gerbang", "klip": "sikap_tangan_belakang"}
+    },
+    "ajar": {
+      "7-11": {"titik": "jasa", "klip": "hitung_sempoa", "kanan": "sempoa"},
+      "13-19": {"titik": "jasa", "klip": "membaca", "kanan": "kitab"}
+    },
+    "obat": {
+      "6-7": {"titik": "tetua", "klip": "tumbuk_herba", "kanan": "alu"},
+      "8-11": {"titik": "tetua", "klip": "racik_herba", "kanan": "labu_pil"},
+      "13-16": {"titik": "dalam", "klip": "periksa_nadi"},
+      "17-19": {"titik": "tetua", "klip": "gulung_pil", "kanan": "pil"}
+    },
+    "pusaka": {
+      "8-11": {"titik": "jasa_meja", "klip": "hitung_sempoa", "kanan": "sempoa"},
+      "13-17": {"titik": "dalam", "klip": "sikap_tangan_belakang", "kanan": "kunci_kamar"}
+    },
+    "penerimaan": {
+      "7-11": {"titik": "gerbang", "klip": "sikap_tangan_depan"},
+      "13-17": {"titik": "altar_sumpah", "klip": "menulis", "kanan": "kuas"}
+    },
+    "ketua": {
+      "4-7": {"titik": "puncak", "klip": "meditasi_napas"},
+      "8-11": {"titik": "aula", "klip": "sikap_tangan_belakang", "kanan": "kebut"},
+      "12-16": {"titik": "puncak", "klip": "membaca", "kanan": "gulungan"},
+      "17-20": {"titik": "puncak", "klip": "minum_teh", "kanan": "cangkir", "kiri": "lepek"},
+      "21-3": {"titik": "puncak", "klip": "meditasi_napas"}
+    }
+  }
+}

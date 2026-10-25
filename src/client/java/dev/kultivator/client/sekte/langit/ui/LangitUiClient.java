@@ -3,26 +3,46 @@ package dev.kultivator.client.sekte.langit.ui;
 import dev.kultivator.client.epic.SekteScenes;
 import dev.kultivator.client.epic.sky.SkyDirector;
 import dev.kultivator.client.epic.sound.MusicCue;
-import dev.kultivator.client.hub.HubCards;
+import dev.kultivator.client.hall.HallClient;
 import dev.kultivator.client.hub.HubNav;
-import dev.kultivator.client.screen.ui.Glyphs;
+import dev.kultivator.client.hub.Tujuan;
+import dev.kultivator.client.hub.Urutan;
+import dev.kultivator.client.screen.ui.Kronik;
+import dev.kultivator.client.sekte.wilayah.WilayahPage;
 import dev.kultivator.sekte.langit.main.LangitBajak;
 import dev.kultivator.sekte.langit.main.LangitPeristiwa;
 import dev.kultivator.sekte.langit.main.LangitUiPayloads;
 import dev.kultivator.sekte.langit.main.LangitUtusan;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.client.Minecraft;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
+import net.minecraft.util.Util;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Module 37G on the client (DESIGN 37.7.9): the "Sekte Langit" card of the hub's Sekte section (its id starts with
- * {@code sekte_}, so it sits in the Perguruan sub-coin with the hall lock, audit 4.6; no 18th top-level card), the
- * {@link LangitScreen} it opens (also from {@code /kultivasi langit}), and the seven story beats of the sky events (beats
- * 193-199 of the sekte range, through {@code SekteScenes}: every 7b camera guard applies, Kamera sinematik
- * Penuh/Singkat/Mati, Backspace, real danger). Reads only its own payload. One line in {@code LangitClient} (37V).
+ * Module 37G on the client (DESIGN 37.7.9, 43.5): keeps the last sky-sect board ({@code LangitUi}) for the page
+ * Sekte › Wilayah › Langit ({@link LangitScreen}) and for any other page that shows a part of it ({@link #data()},
+ * {@link #versi()}, {@link #minta}: the sky chronicle for Sekte › Ikhtisar › Catatan, the NPC sky sects for Sekte › Luar),
+ * opens the Gulungan on that page when the server asks ({@code /kultivasi langit}), and registers the seven story beats
+ * of the sky events (beats 193-199 of the sekte range, through {@code SekteScenes}: every 7b camera guard applies, Kamera
+ * sinematik Penuh/Singkat/Mati, Backspace, real danger). Reads only its own payload. One line in {@code LangitClient} (37V).
  */
 public final class LangitUiClient {
 
+	/** The filter id and colour of the sky chronicle in Catatan. */
+	private static final String JENIS_KRONIK = "langit";
+	private static final int WARNA_KRONIK = 0xFF3E6FB0;
+
 	private static boolean initialised;
+	private static @Nullable CompoundTag data;
+	private static long versi;
+	private static long kronikDiminta = Long.MIN_VALUE / 2;
 
 	public static void init() {
 		if (initialised) {
@@ -30,13 +50,60 @@ public final class LangitUiClient {
 		}
 		initialised = true;
 		ClientPlayNetworking.registerGlobalReceiver(LangitUiPayloads.Papan.TYPE, (payload, context) -> {
-			if (payload.data().getBooleanOr("buka", false) && !(Minecraft.getInstance().gui.screen() instanceof LangitScreen)) {
-				HubNav.openChild(new LangitScreen(), HubNav.SEKTE);
+			data = payload.data().copy();
+			versi++;
+			if (payload.data().getBooleanOr("buka", false) && !LangitScreen.ditampilkan()) {
+				HubNav.buka(Tujuan.of(HubNav.SEKTE, Urutan.ID_WILAYAH).sub(WilayahPage.SUB_LANGIT));
 			}
-			LangitScreen.onData(payload.data());
 		});
-		HubCards.register(HubNav.SEKTE, "sekte_langit", Glyphs.BUILD, null, () -> HubNav.openChild(new LangitScreen(), HubNav.SEKTE));
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+			data = null;
+			versi++;
+		});
+		// the sky chronicle lives in the one Kronik of Sekte › Ikhtisar › Catatan (43.11 G37), not in a tab of its own
+		HallClient.sumberCatatan(JENIS_KRONIK, Component.translatable("kultivator.sekte_langit.layar.kronik"), LangitUiClient::kronik);
 		scenes();
+	}
+
+	/**
+	 * The sky chronicle as chronicle entries, oldest first (the board keeps it newest first). Called while Catatan is drawn;
+	 * asks for a fresh board at most every 30 s then (43.0.12: only while shown).
+	 */
+	private static List<Kronik.Entri> kronik() {
+		long now = Util.getMillis();
+		if (now - kronikDiminta >= 30000L) {
+			kronikDiminta = now;
+			minta(LangitUiPayloads.Minta.ASK, "");
+		}
+		CompoundTag d = data;
+		if (d == null) {
+			return List.of();
+		}
+		ListTag list = d.getListOrEmpty("kronik");
+		List<Kronik.Entri> out = new ArrayList<>(list.size());
+		for (int i = list.size() - 1; i >= 0; i--) {
+			CompoundTag entry = list.getCompoundOrEmpty(i);
+			out.add(new Kronik.Entri(entry.read("text", ComponentSerialization.CODEC).orElse(Component.empty()), entry.getLongOr("day", 0L), JENIS_KRONIK,
+					WARNA_KRONIK));
+		}
+		return out;
+	}
+
+	/** The last sky-sect board (null before the first answer); read-only. */
+	public static @Nullable CompoundTag data() {
+		return data;
+	}
+
+	/** Grows with every board that arrives. */
+	public static long versi() {
+		return versi;
+	}
+
+	/** Asks the server ({@code LangitUiPayloads.Minta.*}: {@code ASK} for a fresh board, or an action with its argument). */
+	public static void minta(int action, String arg) {
+		if (ClientPlayNetworking.canSend(LangitUiPayloads.Minta.TYPE)) {
+			ClientPlayNetworking.send(new LangitUiPayloads.Minta(action, arg == null ? "" : arg));
+		}
 	}
 
 	private static void scenes() {

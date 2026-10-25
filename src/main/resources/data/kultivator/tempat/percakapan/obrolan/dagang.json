@@ -1,0 +1,193 @@
+{
+  "_catatan": "DAGANG 42.5A.9: tawaran pedagang > tawar 1-3 putaran (pelit: 3) > sepakat/batal. 42K-C.",
+  "jenis": "dagang",
+  "syarat": {},
+  "mulai": {
+    "dasar": 0.3,
+    "X": 300,
+    "hubungan": 400
+  },
+  "jeda_tick": [
+    40,
+    70
+  ],
+  "langkah": [
+    {
+      "id": "sapa",
+      "oleh": "A",
+      "niat": "SAPA",
+      "lanjut": [
+        "tawaran_a",
+        "tawaran_b"
+      ]
+    },
+    {
+      "id": "tawaran_a",
+      "oleh": "A",
+      "niat": "TAWARAN",
+      "syarat": {
+        "kelompok": [
+          "pedagang"
+        ]
+      },
+      "lanjut": [
+        "tawar_b"
+      ]
+    },
+    {
+      "id": "tawaran_b",
+      "oleh": "B",
+      "niat": "TAWARAN",
+      "syarat": {
+        "kelompok": [
+          "pedagang"
+        ]
+      },
+      "lanjut": [
+        "tawar_a"
+      ]
+    },
+    {
+      "id": "tawar_b",
+      "oleh": "B",
+      "niat": "TAWAR",
+      "lanjut": [
+        "balik_a"
+      ]
+    },
+    {
+      "id": "balik_a",
+      "oleh": "A",
+      "niat": "TAWAR_BALIK",
+      "lanjut": [
+        "tawar_b2",
+        "sepakat_b",
+        "batal_b"
+      ]
+    },
+    {
+      "id": "tawar_b2",
+      "oleh": "B",
+      "niat": "TAWAR",
+      "syarat": {
+        "ronde_maks": 1
+      },
+      "lanjut": [
+        "balik_a2"
+      ]
+    },
+    {
+      "id": "balik_a2",
+      "oleh": "A",
+      "niat": "TAWAR_BALIK",
+      "syarat": {
+        "ronde_maks": 1
+      },
+      "lanjut": [
+        "tawar_b3",
+        "sepakat_b",
+        "batal_b"
+      ]
+    },
+    {
+      "id": "tawar_b3",
+      "oleh": "B",
+      "niat": "TAWAR",
+      "syarat": {
+        "ronde_maks": 1,
+        "kebiasaan": [
+          "pelit",
+          "penabung"
+        ]
+      },
+      "lanjut": [
+        "sepakat_a",
+        "batal_a"
+      ]
+    },
+    {
+      "id": "sepakat_b",
+      "oleh": "B",
+      "niat": "SEPAKAT"
+    },
+    {
+      "id": "batal_b",
+      "oleh": "B",
+      "niat": "BATAL"
+    },
+    {
+      "id": "tawar_a",
+      "oleh": "A",
+      "niat": "TAWAR",
+      "lanjut": [
+        "balik_b"
+      ]
+    },
+    {
+      "id": "balik_b",
+      "oleh": "B",
+      "niat": "TAWAR_BALIK",
+      "lanjut": [
+        "tawar_a2",
+        "sepakat_a",
+        "batal_a"
+      ]
+    },
+    {
+      "id": "tawar_a2",
+      "oleh": "A",
+      "niat": "TAWAR",
+      "syarat": {
+        "ronde_maks": 1
+      },
+      "lanjut": [
+        "balik_b2"
+      ]
+    },
+    {
+      "id": "balik_b2",
+      "oleh": "B",
+      "niat": "TAWAR_BALIK",
+      "syarat": {
+        "ronde_maks": 1
+      },
+      "lanjut": [
+        "tawar_a3",
+        "sepakat_a",
+        "batal_a"
+      ]
+    },
+    {
+      "id": "tawar_a3",
+      "oleh": "A",
+      "niat": "TAWAR",
+      "syarat": {
+        "ronde_maks": 1,
+        "kebiasaan": [
+          "pelit",
+          "penabung"
+        ]
+      },
+      "lanjut": [
+        "sepakat_b",
+        "batal_b"
+      ]
+    },
+    {
+      "id": "sepakat_a",
+      "oleh": "A",
+      "niat": "SEPAKAT"
+    },
+    {
+      "id": "batal_a",
+      "oleh": "A",
+      "niat": "BATAL"
+    }
+  ],
+  "efek": {
+    "hubungan": [
+      0,
+      1
+    ]
+  }
+}

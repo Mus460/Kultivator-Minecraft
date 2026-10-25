@@ -1,0 +1,248 @@
+# kabar: corpus of the conversation engine (42K-C, DESIGN 42.5A.8). Source format: gen_kota_hidup_cakap.py.
+# BERI_KABAR about the town and the world (predicates of golongan "kota" and "dunia"). {$subjek} = the place;
+# {$barang} = goods of HARGA_*; {$angka} = percent; {$waktu_depan} = day of an event.
+@kelompok kabar
+
+== kabar.harga_naik
+niat: BERI_KABAR
+topik: harga
+syarat: fakta=HARGA_NAIK
+lanjut: kafilah begal
+gestur: geleng
+seru: aduh
+$barang: tipe=barang dari=fakta.objek fitur=jamak
+$waktu_lalu: tipe=waktu_lalu dari=fakta.hariKejadian
+$sebab_harga: aturan=frag.sebab_harga opsional=0.5
+$keluh: aturan=seru.keluh opsional=0.5
+$angka: tipe=angka dari=fakta.nilai
+$kaget: aturan=seru.kaget opsional=0.5
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+$katanya: aturan=frag.katanya
+$ragu: aturan=seru.ragu opsional=0.5
+- [3] {$barang} naik lagi sejak {$waktu_lalu}. {$sebab_harga} {$keluh} || {$barang} went up again {$waktu_lalu}. {$sebab_harga} {$keluh}
+  ~ kasar: {$barang} naik lagi. Pedagang rakus semua. || {$barang} up again. Greedy merchants, the lot.
+  ~ kuno: Harga {$barang} melambung. Bahkan batu roh pun terasa ringan di kantong. || The price of {$barang} soars. Even spirit stones feel light in the purse.
+  ~ pelabuhan: {$barang} naik seperti air pasang, Bung. {$sebab_harga} || {$barang} rising like the tide, mate. {$sebab_harga}
+  ~ oasis: Demi mata air, {$barang} makin mahal. Kafilah pun mengeluh, Saudara. || By the spring, {$barang} costs more and more. Even caravans complain, friend.
+- [2] Kau tahu harga {$barang} sekarang? Naik {$angka} bagian dari seratus! {$kaget} || Know what {$barang} costs now? Up {$angka} percent! {$kaget}
+  ~ kampung: {$barang} naik {$angka} persen, Nak. Dulu sekeping dapat sekarung. || {$barang} is up {$angka} percent, child. Once a coin bought a sackful.
+  ~ ibukota: Di distrik pasar, {$barang} naik {$angka} persen. Para pejabat bilang ini sementara. || In the market district {$barang} rose {$angka} percent. The officials call it temporary.
+- [sopan] Mohon maaf, {$sebutan}, harga {$barang} sedang tinggi. {$sebab_harga} || My apologies, {$sebutan}, {$barang} is dear right now. {$sebab_harga}
+  ~ kuno: Mohon dimaklumi, {$sebutan}, {$barang} sedang langka di dunia fana ini. || Kindly understand, {$sebutan}, {$barang} is scarce in this mortal world.
+- Anak-anakku sudah tiga hari makan bubur encer. {$barang} terlalu mahal sekarang. || My children have eaten thin gruel for three days. {$barang} is too dear now.
+  ~ p: Aku sampai menjual giwang untuk beli {$barang}. Harganya gila. || I even sold my earrings to buy {$barang}. The price is mad.
+- [biasa,kasar] {$katanya} ada yang menimbun {$barang}. Makanya naik terus. {$ragu} || {$katanya} someone is hoarding {$barang}. That's why it keeps rising. {$ragu}
+
+== kabar.harga_turun
+niat: BERI_KABAR
+topik: harga
+syarat: fakta=HARGA_TURUN
+lanjut: kafilah dagang
+gestur: tertawa
+$barang: tipe=barang dari=fakta.objek fitur=jamak
+$angka: tipe=angka dari=fakta.nilai
+$waktu_lalu: tipe=waktu_lalu dari=fakta.hariKejadian
+$senang: aturan=seru.senang opsional=0.5
+- [3] Kabar baik! {$barang} turun {$angka} persen sejak {$waktu_lalu}. {$senang} || Good news! {$barang} dropped {$angka} percent {$waktu_lalu}. {$senang}
+  ~ kasar: {$barang} murah sekarang. Borong sebelum naik lagi. || {$barang} is cheap now. Buy it up before it rises again.
+  ~ kuno: Harga {$barang} telah turun. Langit menurunkan rahmat bagi rakyat kecil. || The price of {$barang} has fallen. Heaven sends mercy to the small folk.
+  ~ kampung: {$barang} lagi murah, Nak. Panen raya di hulu, katanya. || {$barang} is cheap, child. A bumper crop upstream, they say.
+- [2] Kafilah besar datang membawa {$barang}. Harganya jatuh, pedagang lama menangis. || A big caravan came with {$barang}. Prices crashed; the old merchants weep.
+  ~ pelabuhan: Kapal dari seberang penuh {$barang}, Bung. Dermaga sampai bau barang dagangan. || The ships from across the sea are full of {$barang}, mate. The dock reeks of cargo.
+  ~ oasis: Kafilah tiba dengan unta penuh {$barang}, Saudara. Sekarang murah seperti pasir. || The caravan came with camels laden with {$barang}, friend. Cheap as sand now.
+- Akhirnya bisa beli {$barang} lagi. Dua minggu aku menahan diri. || At last I can buy {$barang} again. I held back for two weeks.
+- Pedagang {$barang} sekarang ramah-ramah. Kalau harga turun, mulutnya manis. Hehe. || The {$barang} sellers are all smiles now. When prices fall, their mouths turn sweet. Hehe.
+
+== kabar.acara
+niat: BERI_KABAR
+topik: acara
+syarat: fakta=ACARA
+lanjut: acara
+gestur: bicara_tangan
+$subjek: tipe=tempat dari=fakta.subjek
+$waktu_depan: tipe=waktu_depan dari=fakta.nilai
+$ajakan: aturan=frag.ajakan opsional=0.35
+- [3] Ada perayaan di {$subjek} {$waktu_depan}! Jangan lupa datang. {$ajakan} || There's a celebration at {$subjek} {$waktu_depan}! Don't forget to come. {$ajakan}
+  ~ kasar: Ada pesta {$waktu_depan}. Arak gratis, katanya. Itu saja yang penting. || Party {$waktu_depan}. Free wine, they say. That's all that matters.
+  ~ kuno: Perayaan akan digelar di {$subjek} {$waktu_depan}. Semoga membawa keberuntungan. || A celebration will be held at {$subjek} {$waktu_depan}. May it bring good fortune.
+  ~ kampung: {$waktu_depan} ada hajatan di {$subjek}, Nak. Sekampung masak bersama. || {$waktu_depan} there's a feast at {$subjek}, child. The whole village cooks together.
+- [2] Panitia sudah memasang lentera di {$subjek}. Acaranya {$waktu_depan}. || The organisers have hung lanterns at {$subjek}. It's {$waktu_depan}.
+  ~ air: Lentera air sudah disiapkan untuk {$waktu_depan}, Kakak... kanal pasti cantik sekali... || Water lanterns are ready for {$waktu_depan}, dear... the canals will be so pretty...
+  ~ pelabuhan: Perahu hias sudah dicat untuk acara {$waktu_depan}, Bung. Ramai nanti di dermaga. || The festival boats are painted for {$waktu_depan}, mate. The dock will be packed.
+- Anak-anak tidak bisa tidur menunggu acara {$waktu_depan}. Aku juga, sebenarnya. Hehe. || The children can't sleep waiting for {$waktu_depan}. Neither can I, truth be told. Hehe.
+- Semua penjual makanan bersiap. Acara {$waktu_depan} berarti dagangan habis. || Every food seller is getting ready. {$waktu_depan} means a sell-out.
+
+== kabar.bahaya
+niat: BERI_KABAR
+topik: bahaya
+syarat: fakta=BAHAYA
+lanjut: bahaya sekte
+gestur: lihat_sekeliling
+$subjek: tipe=tempat dari=fakta.subjek
+$katanya: aturan=frag.katanya
+$waktu_lalu: tipe=waktu_lalu dari=fakta.hariKejadian
+$kaget: aturan=seru.kaget opsional=0.5
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Hati-hati di jalan dekat {$subjek}. {$katanya} ada bahaya di sana sejak {$waktu_lalu}. || Be careful on the road near {$subjek}. {$katanya} there's danger there since {$waktu_lalu}.
+  ~ kasar: Jangan ke {$subjek}. Kalau mati, jangan salahkan aku. || Don't go to {$subjek}. If you die, don't blame me.
+  ~ kuno: Aura jahat terasa dari arah {$subjek}. Bahkan orang fana pun merinding. || A wicked aura comes from {$subjek}. Even mortals shiver.
+  ~ kampung: Jangan main ke {$subjek}, Nak. Ada yang lihat makhluk aneh di sana. || Don't go playing at {$subjek}, child. Someone saw a strange creature there.
+- [2] Pemburu pulang dari {$subjek} dengan luka cakar. Katanya binatang roh mengamuk. {$kaget} || A hunter came back from {$subjek} with claw wounds. Says a spirit beast is rampaging. {$kaget}
+  ~ gunung: Jalan setapak ke {$subjek} ditutup para biksu. Ada yang mengintai dari kabut. || The monks closed the path to {$subjek}. Something watches from the mist.
+  ~ pelabuhan: Jangan berlayar dekat {$subjek}, Bung. Dua perahu tidak kembali. || Don't sail near {$subjek}, mate. Two boats never came back.
+  ~ iblis: Ada bahaya di {$subjek}. Bagi kami itu kabar baik: lebih sedikit saingan. || Danger at {$subjek}. For us that's good news: fewer rivals.
+- Penjaga gerbang menambah ronda sejak kabar dari {$subjek}. Malam jadi tegang. || The gate guards doubled their rounds since word from {$subjek}. Nights are tense.
+- [sopan] Bila {$sebutan} hendak lewat {$subjek}, mohon berhati-hati. Banyak yang terluka. || If you mean to pass {$subjek}, {$sebutan}, please take care. Many have been hurt.
+  ~ kuno: Bila {$sebutan} hendak menumpas bahaya di {$subjek}, seluruh kota akan berutang budi. || If you would purge the danger at {$subjek}, {$sebutan}, the whole town would be in your debt.
+
+== kabar.kafilah
+niat: BERI_KABAR
+topik: kafilah
+syarat: fakta=KAFILAH_TIBA
+lanjut: harga dagang
+gestur: tunjuk
+$subjek: tipe=tempat dari=fakta.subjek
+$waktu_lalu: tipe=waktu_lalu dari=fakta.hariKejadian
+$senang: aturan=seru.senang opsional=0.5
+- [3] Kafilah tiba di {$subjek} {$waktu_lalu}! Kain, rempah, bahkan kuda hitam dari utara. || A caravan reached {$subjek} {$waktu_lalu}! Cloth, spices, even black horses from the north.
+  ~ kasar: Kafilah datang. Harga turun sebentar, lalu naik lagi. Begitu terus. || Caravan's in. Prices dip a bit, then rise again. Same as ever.
+  ~ kuno: Rombongan dagang dari negeri jauh singgah di {$subjek}. Kabar dunia luar ikut dibawa. || A trading train from distant lands stops at {$subjek}. They bring news of the world too.
+  ~ oasis: Unta-unta sudah minum di mata air, Saudara. Kafilah besar dari timur tiba di {$subjek}. || The camels have drunk at the spring, friend. A great caravan from the east reached {$subjek}.
+- [2] Pasar jadi ramai sejak kafilah sampai. Pedagang asing bicara dengan logat lucu. {$senang} || The market's busy since the caravan arrived. Foreign traders speak in funny accents. {$senang}
+  ~ pelabuhan: Bukan kafilah, Bung, kapal! Tiga kapal dagang berlabuh di {$subjek}. Kuli sibuk semua. || Not a caravan, mate, ships! Three merchantmen docked at {$subjek}. Every porter's busy.
+  ~ ibukota: Rombongan dagang membawa upeti untuk istana. Jalan utama ditutup sebentar. || The trade train brought tribute for the palace. The main road was closed a while.
+- Kepala kafilah mencari pengawal untuk perjalanan pulang. Bayarannya lumayan, katanya. || The caravan master seeks guards for the return trip. Good pay, they say.
+- Aku membeli sutra dari kafilah. Lihat, warnanya seperti matahari terbenam. || I bought silk from the caravan. Look, the colour of a sunset.
+
+== kabar.kavling
+niat: BERI_KABAR
+topik: kota
+syarat: fakta=KAVLING_JADI
+lanjut: kota
+gestur: tunjuk
+$subjek: tipe=tempat dari=fakta.subjek
+$waktu_lalu: tipe=waktu_lalu dari=fakta.hariKejadian
+- [2] Bangunan baru di {$subjek} sudah jadi {$waktu_lalu}. Atapnya masih bau cat. || The new building at {$subjek} was finished {$waktu_lalu}. The roof still smells of paint.
+  ~ kasar: Bangunan baru lagi. Pajak naik lagi, pasti. || Another new building. Taxes up again, surely.
+  ~ kuno: Sebidang tanah di {$subjek} kini berdiri bangunan baru. Kota ini tumbuh. || On a plot at {$subjek} a new building now stands. This town grows.
+  ~ kampung: Rumah baru di {$subjek} sudah berdiri, Nak. Tukangnya kerja siang malam. || The new house at {$subjek} is up, child. The builders worked day and night.
+- Kau sudah lihat bangunan baru di {$subjek}? Tukang kayunya teman sepupuku. || Seen the new building at {$subjek}? The carpenter's a friend of my cousin.
+  ~ ibukota: Bangunan di {$subjek} dibangun menurut aturan menteri pekerjaan. Rapi sekali. || The building at {$subjek} was raised to the works minister's code. Very neat.
+- Dulu {$subjek} cuma tanah kosong penuh ilalang. Sekarang lihat. Kota ini berubah cepat. || {$subjek} was once empty ground full of weeds. Look now. This town changes fast.
+- Pemiliknya mengundang tetangga makan bersama waktu atap dipasang. Aku dapat bakpao. || The owner invited the neighbours to eat when the roof went on. I got a bun.
+
+== kabar.pelindung
+niat: BERI_KABAR
+topik: sekte
+syarat: fakta=PELINDUNG_BARU
+lanjut: sekte kota
+gestur: hormat
+$subjek: tipe=tempat dari=fakta.subjek
+$sekte_fakta: tipe=tempat dari=fakta.objek
+$senang: aturan=seru.senang opsional=0.5
+$ragu: aturan=seru.ragu opsional=0.5
+- [3] {$subjek} sekarang di bawah perlindungan {$sekte_fakta}! Panjinya dipasang di gerbang. || {$subjek} is now under the protection of {$sekte_fakta}! Its banner hangs at the gate.
+  ~ kasar: {$sekte_fakta} melindungi kita sekarang. Semoga upetinya tidak lebih mahal dari begal. || {$sekte_fakta} protects us now. Hope the tribute costs less than the bandits did.
+  ~ kuno: {$sekte_fakta} telah menebarkan sayapnya di atas {$subjek}. Kota ini aman. || {$sekte_fakta} has spread its wings over {$subjek}. This town is safe.
+- [2] Sejak panji {$sekte_fakta} berkibar di gerbang, anakku berani main sampai sore. {$senang} || Since {$sekte_fakta}'s banner flew at the gate, my child dares to play till evening. {$senang}
+  ~ kampung: Murid {$sekte_fakta} sudah dua kali ronda di kampung. Maling ayam pada kabur. || Disciples of {$sekte_fakta} have patrolled the village twice. The chicken thieves fled.
+  ~ pelabuhan: Bajak laut tidak berani dekat sejak {$sekte_fakta} menjaga {$subjek}, Bung. || Pirates won't come near since {$sekte_fakta} guards {$subjek}, mate.
+- Ada yang senang, ada yang curiga. {$sekte_fakta} baru, aturan baru. {$ragu} || Some are glad, some suspicious. New sect, {$sekte_fakta}, new rules. {$ragu}
+- Kepala desa mengadakan jamuan untuk utusan {$sekte_fakta}. Babi panggangnya enak sekali. || The headman held a banquet for the envoys of {$sekte_fakta}. The roast pig was splendid.
+
+== kabar.pasar_hantu
+niat: BERI_KABAR
+topik: pasar_hantu
+syarat: fakta=PASAR_HANTU_DI
+lanjut: pasar_hantu dunia
+gestur: bisik
+$tempat_fakta: tipe=tempat dari=fakta.objek
+$waktu_depan: tipe=waktu_depan dari=fakta.nilai
+$penutup_kecil: aturan=frag.penutup_kecil opsional=0.4
+- [3] Sst... Pasar Hantu buka di {$tempat_fakta} {$waktu_depan}. Bawa lentera putih, jangan bicara keras. || Shh... the Ghost Market opens at {$tempat_fakta} {$waktu_depan}. Bring a white lantern and keep your voice down.
+  ~ kasar: Pasar Hantu di {$tempat_fakta}. Kalau mau mati penasaran, silakan. || Ghost Market at {$tempat_fakta}. Want to die curious, go ahead.
+  ~ kuno: Pasar para arwah akan terbuka di {$tempat_fakta} {$waktu_depan}. Barang langka dan bahaya datang bersamaan. || The market of spirits opens at {$tempat_fakta} {$waktu_depan}. Rare goods and danger come together.
+- [2] Jangan bilang kau dengar dariku. {$tempat_fakta}, {$waktu_depan}, tengah malam. Pasar Hantu. || Don't say you heard it from me. {$tempat_fakta}, {$waktu_depan}, midnight. The Ghost Market.
+  ~ iblis: Pasar Hantu di {$tempat_fakta}. Di sana nyawa pun ada harganya. Bawa yang banyak. || Ghost Market at {$tempat_fakta}. There even lives have a price. Bring plenty.
+  ~ air: Kakak... katanya Pasar Hantu muncul di {$tempat_fakta}... perahu-perahu tanpa pendayung... aku takut... || Dear... they say the Ghost Market appears at {$tempat_fakta}... boats with no rowers... I'm scared...
+- Kakekku pernah ke Pasar Hantu. Pulang membawa cermin yang memantulkan wajah orang lain. || My grandfather went to the Ghost Market once. Came home with a mirror that shows other faces.
+- Para pedagang malam berbisik-bisik soal {$tempat_fakta}. Aku sih tidak berani. {$penutup_kecil} || The night traders whisper about {$tempat_fakta}. Me, I wouldn't dare. {$penutup_kecil}
+
+== kabar.copet
+niat: BERI_KABAR
+topik: kejahatan
+syarat: fakta=COPET_TERTANGKAP
+lanjut: kejahatan pemain
+gestur: tunjuk
+$subjek: tipe=tempat dari=fakta.subjek
+$waktu_lalu: tipe=waktu_lalu dari=fakta.hariKejadian
+$objek: tipe=nama_warga dari=fakta.objek
+$kaget: aturan=seru.kaget opsional=0.5
+$angka: tipe=angka dari=fakta.nilai
+- [3] Copet di {$subjek} akhirnya tertangkap {$waktu_lalu}! {$objek} yang menangkapnya. || The pickpocket at {$subjek} was finally caught {$waktu_lalu}! {$objek} caught them.
+  ~ kasar: Copetnya ketangkap. Mampus. Semoga tangannya dipotong. || The pickpocket got caught. Serves them right. Hope they lose a hand.
+  ~ kuno: Pencuri kecil di {$subjek} telah diringkus oleh {$objek}. Keadilan berjalan. || The petty thief at {$subjek} was seized by {$objek}. Justice moves.
+  ~ kampung: {$objek} tangkap copet di {$subjek}, Nak! Dikejar sampai nyebur kali. || {$objek} caught the pickpocket at {$subjek}, child! Chased them right into the river.
+- [2] Satu pasar membicarakan {$objek}. Copet itu lari seperti angin, tapi tetap tertangkap. {$kaget} || The whole market talks of {$objek}. The thief ran like the wind but got caught all the same. {$kaget}
+  ~ pelabuhan: {$objek} melompati tiga perahu untuk menangkap copet itu, Bung! Hebat sekali! || {$objek} leapt three boats to catch that thief, mate! Marvellous!
+  ~ ibukota: Penjaga istana pun memuji {$objek}. Copet di {$subjek} kini mendekam di penjara. || Even the palace guard praised {$objek}. The thief from {$subjek} now sits in jail.
+- Dompet yang hilang dikembalikan semua. Ada {$angka} dompet di kantong copet itu! || Every lost purse was returned. There were {$angka} purses in that thief's pockets!
+- Sejak copet tertangkap, pasar jadi tenang. Ibu-ibu berani membawa dompet lagi. || Since the thief was caught, the market's calm. The mothers dare carry purses again.
+
+== kabar.tempat_ada
+niat: BERI_KABAR
+topik: dunia
+syarat: fakta=TEMPAT_ADA
+lanjut: dunia bahaya
+gestur: tunjuk
+$subjek: tipe=tempat dari=fakta.subjek
+$arah: tipe=arah dari=konteks.arah
+$jarak: tipe=jarak dari=konteks.jarak
+$katanya: aturan=frag.katanya
+- [2] Kau pernah dengar tentang {$subjek}? Katanya ada di {$arah}, {$jarak} dari sini. || Heard of {$subjek}? They say it's to the {$arah}, {$jarak} from here.
+  ~ kasar: Ada tempat namanya {$subjek} di {$arah}. Jangan tanya aku jalannya. || There's a place called {$subjek} to the {$arah}. Don't ask me the way.
+  ~ kuno: Di arah {$arah}, kira-kira {$jarak}, berdiri {$subjek}. Para pengembara menyebutnya tempat bertuah. || To the {$arah}, roughly {$jarak}, stands {$subjek}. Wanderers call it a blessed place.
+- {$katanya} {$subjek} di {$arah} menyimpan rahasia lama. Pengembara sering hilang di sana. || {$katanya} {$subjek} in the {$arah} keeps old secrets. Wanderers often vanish there.
+  ~ pelabuhan: Pelaut tua bilang {$subjek} kelihatan dari laut kalau kabut tipis, Bung. Di {$arah}. || Old sailors say {$subjek} can be seen from sea when the fog is thin, mate. To the {$arah}.
+  ~ oasis: Penunjuk jalan unta tahu jalan ke {$subjek}, Saudara. Di {$arah}, melewati bukit pasir merah. || The camel guides know the way to {$subjek}, friend. To the {$arah}, past the red dunes.
+- Kakekku pernah ke {$subjek}. Pulang-pulang rambutnya putih semua. Katanya karena angin. || My grandfather went to {$subjek} once. Came home white-haired. Says it was the wind.
+
+== kabar.harta
+niat: BERI_KABAR
+topik: dunia
+syarat: fakta=HARTA_LAHIR
+lanjut: dunia sekte
+gestur: kagum
+$subjek: tipe=tempat dari=fakta.subjek
+$waktu_lalu: tipe=waktu_lalu dari=fakta.hariKejadian
+$arah: tipe=arah dari=konteks.arah
+$kaget: aturan=seru.kaget opsional=0.5
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Cahaya harta muncul di dekat {$subjek} {$waktu_lalu}! Para kultivator berbondong-bondong ke sana. || A treasure light appeared near {$subjek} {$waktu_lalu}! Cultivators are flocking there.
+  ~ kasar: Harta muncul di {$subjek}. Sebentar lagi ada yang saling bunuh. Selalu begitu. || Treasure showed up at {$subjek}. Soon someone will kill for it. Always the way.
+  ~ kuno: Pusaka telah lahir di {$subjek}. Langit dan bumi bergetar menyambutnya. || A treasure is born at {$subjek}. Heaven and earth tremble to greet it.
+- [2] Aku lihat pilar cahaya dari arah {$arah} {$waktu_lalu}. Kata orang, harta lahir di {$subjek}! {$kaget} || I saw a pillar of light to the {$arah} {$waktu_lalu}. People say treasure was born at {$subjek}! {$kaget}
+  ~ gunung: Para biksu bilang cahaya dari {$subjek} adalah pertanda. Harta selalu membawa godaan. || The monks say the light from {$subjek} is an omen. Treasure always brings temptation.
+  ~ iblis: Harta di {$subjek}. Sekte-sekte lurus akan datang. Kita juga. Siapkan pisau. || Treasure at {$subjek}. The righteous sects will come. So will we. Ready your knives.
+- Penginapan penuh kultivator asing sejak kabar harta di {$subjek}. Harga kamar naik tiga kali. || The inn is full of foreign cultivators since word of the treasure at {$subjek}. Room prices tripled.
+- Kalau {$sebutan} mau ke {$subjek}, hati-hati. Harta tanpa pemilik selalu dijaga sesuatu. || If you're going to {$subjek}, {$sebutan}, beware. An unowned treasure is always guarded by something.
+
+== kabar.perang
+niat: BERI_KABAR
+topik: sekte
+syarat: fakta=SEKTE_PERANG
+lanjut: sekte bahaya
+gestur: geleng
+$subjek: tipe=tempat dari=fakta.subjek
+$sekte_fakta: tipe=tempat dari=fakta.objek
+$waktu_lalu: tipe=waktu_lalu dari=fakta.hariKejadian
+$keluh: aturan=seru.keluh opsional=0.5
+$doa: aturan=frag.doa opsional=0.4
+- [3] {$subjek} dan {$sekte_fakta} berperang sejak {$waktu_lalu}. Langit di utara merah setiap malam. || {$subjek} and {$sekte_fakta} have been at war since {$waktu_lalu}. The northern sky glows red every night.
+  ~ kasar: Sekte-sekte berperang lagi. Yang mati tetap orang kecil. || The sects are at war again. Small folk still do the dying.
+  ~ kuno: Pertikaian antara {$subjek} dan {$sekte_fakta} telah pecah menjadi perang. Darah membasahi gunung. || The strife between {$subjek} and {$sekte_fakta} has broken into war. Blood wets the mountains.
+- [2] Jalan dagang ditutup karena perang {$subjek} melawan {$sekte_fakta}. Harga pasti naik. {$keluh} || The trade road is shut by the war of {$subjek} against {$sekte_fakta}. Prices will surely rise. {$keluh}
+  ~ kampung: Anak-anak muda kampung dipanggil jadi kuli perang. {$subjek} lawan {$sekte_fakta}. Ibu-ibu menangis. || The village youths were called up as war porters. {$subjek} against {$sekte_fakta}. The mothers weep.
+  ~ iblis: {$subjek} dan {$sekte_fakta} saling bantai. Bagus. Biar mereka lemah, kita yang kuat. || {$subjek} and {$sekte_fakta} slaughter each other. Good. Let them weaken while we grow strong.
+- Pengungsi mulai datang dari arah perang. Penginapan dan kuil penuh. || Refugees have started coming from the war. Inns and temples are full.
+- Semoga perang {$subjek} dan {$sekte_fakta} tidak sampai ke sini. {$doa} || May the war of {$subjek} and {$sekte_fakta} never reach us. {$doa}

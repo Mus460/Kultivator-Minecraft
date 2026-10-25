@@ -80,8 +80,8 @@ public final class SekteNpc {
 		s.lambang = Lambang.seeded(e.lambangSeed()).pack();
 		s.blockX = e.blockX();
 		s.blockZ = e.blockZ();
-		s.tier = e.tier();
-		s.sumber = 20 * e.tier();
+		s.tier = DiplomasiGabung.tingkatAwal(e);
+		s.sumber = 20 * s.tier;
 		return s;
 	}
 

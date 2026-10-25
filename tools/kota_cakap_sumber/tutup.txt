@@ -1,0 +1,185 @@
+# tutup: corpus of the conversation engine (42K-C, DESIGN 42.5A.8). Source format: gen_kota_hidup_cakap.py.
+# Closing, interruptions and resuming (42.5A.6): TUTUP (topik pamit | sabar_habis), POTONG (rule id potong.<sebab>:
+# bahaya pelanggan gong dipanggil anak sibuk), KEMBALI (back to the topic after an interruption).
+@kelompok tutup
+
+== tutup.sabar_habis
+niat: TUTUP
+topik: sabar_habis
+gestur: pamit_lambai
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+$alasan_pergi: aturan=frag.alasan_pergi
+$doa: aturan=frag.doa opsional=0.4
+- [3] Maaf, {$sebutan}, {$alasan_pergi}. Lain kali kita sambung, ya. || Sorry, {$sebutan}, {$alasan_pergi}. We'll continue another time.
+  ~ kasar: Sudah, ya. {$alasan_pergi}. || That's enough. {$alasan_pergi}.
+  ~ kuno: Mohon pamit, {$sebutan}. Urusan duniawi memanggil hamba. || Pray excuse me, {$sebutan}. Worldly matters call this humble one.
+  ~ pelabuhan: Sudah dulu, Bung. Ombak tidak menunggu. || That's it for now, mate. The tide won't wait.
+  ~ oasis: Aku harus pergi, Saudara. {$alasan_pergi}. || I must go, friend. {$alasan_pergi}.
+  ~ air: Maaf, Kakak... {$alasan_pergi}... nanti kita mengobrol lagi, ya... || Sorry, dear... {$alasan_pergi}... we'll chat again later...
+  ~ kampung: Wis, Nak, aku pamit dulu. {$alasan_pergi}. || Well, child, I'll be off. {$alasan_pergi}.
+- [2] Aduh, {$alasan_pergi}! Hati-hati di jalan, {$sebutan}. || Oh, {$alasan_pergi}! Safe travels, {$sebutan}.
+  ~ iblis: {$alasan_pergi}. Jangan ikuti aku. || {$alasan_pergi}. Don't follow me.
+  ~ gunung: Amitaba. {$alasan_pergi}. Semoga {$sebutan} damai. || Amitabha. {$alasan_pergi}. Peace be with you, {$sebutan}.
+- [2] Wah, sudah selarut ini? {$alasan_pergi}. || Oh, is it that late? {$alasan_pergi}.
+- Senang mengobrol, tapi {$alasan_pergi}. {$doa} || Lovely chatting, but {$alasan_pergi}. {$doa}
+  ~ ibukota: Sungguh percakapan yang menyenangkan, {$sebutan}. Sayang sekali, {$alasan_pergi}. || Truly a pleasant conversation, {$sebutan}. Alas, {$alasan_pergi}.
+
+== tutup.malam
+niat: TUTUP
+topik: sabar_habis
+syarat: jam=malam,larut
+gestur: menguap_peregangan
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Sudah malam, {$sebutan}. Jangan berkeliaran terlalu larut, banyak begal. || It's night, {$sebutan}. Don't wander too late; plenty of bandits.
+  ~ kasar: Pulang sana. Sudah malam. || Go home. It's night.
+  ~ kuno: Malam telah turun. Semoga mimpi {$sebutan} tenang. || Night has fallen. May your dreams be calm, {$sebutan}.
+  ~ kampung: Sudah malam, Nak. Pulang, nanti dicari ibumu. || It's night, child. Go home, your mother will be looking.
+- [2] Mataku sudah berat. Selamat malam, {$sebutan}. || My eyes are heavy. Good night, {$sebutan}.
+  ~ pelabuhan: Lentera dermaga sudah dinyalakan, Bung. Waktunya tidur. || The dock lanterns are lit, mate. Time to sleep.
+  ~ air: Lentera kanal sudah menyala, Kakak... selamat malam, ya... || The canal lanterns are lit, dear... good night...
+- Bulan sudah tinggi. Aku pulang dulu. || The moon is high. I'm off home.
+- Selamat malam. Kunci pintumu baik-baik. || Good night. Lock your door well.
+
+== tutup.akrab
+niat: TUTUP
+topik: pamit
+syarat: kesan=akrab,sahabat
+gestur: tepuk_bahu
+- [3] Mampir lagi kapan-kapan, ya! Pintuku selalu terbuka untukmu. || Drop by again some time! My door's always open for you.
+  ~ kasar: Jangan lama-lama menghilang lagi. Hmph. || Don't vanish so long again. Hmph.
+  ~ kuno: Pertemuan kita selalu menghangatkan hati. Sampai jumpa, sahabatku. || Our meetings always warm the heart. Until next time, my friend.
+  ~ kampung: Sering-sering mampir, Nak. Nanti kumasakkan sayur asem. || Come by often, child. I'll cook you sour soup.
+- [2] Hati-hati di jalan, ya. Jangan lupa makan. || Mind yourself on the road. Don't forget to eat.
+  ~ p: Hati-hati, ya. Kalau sakit, cepat ke sini, kubuatkan jamu. || Take care. If you fall ill, come quick; I'll brew you tonic.
+  ~ pelabuhan: Angin baik untukmu, kawan. Kembali dengan selamat. || Fair winds to you, friend. Come back safe.
+- Tadi senang sekali. Besok mampir lagi? || That was lovely. Drop by tomorrow?
+- Bawa kabar dari luar sana kalau kembali, ya! || Bring news from out there when you return!
+
+== tutup.dingin
+niat: TUTUP
+topik: sabar_habis
+syarat: kesan=musuh
+gestur: sikap_lipat_tangan
+- [3] Sudah selesai? Pergilah. || Done? Then go.
+  ~ kasar: Pergi. Jangan kembali. || Get out. Don't come back.
+  ~ kuno: Urusan kita sudah selesai. Silakan melanjutkan jalanmu. || Our business is concluded. Pray continue your road.
+  ~ iblis: Pergi sebelum aku berubah pikiran. || Leave before I change my mind.
+- [2] Hmph. Jangan berdiri di depan lapakku lagi. || Hmph. Don't stand in front of my stall again.
+  ~ kampung: Wis, sana. Nanti anak-anak takut. || Off you go. You'll scare the children.
+- Aku tidak punya urusan lagi denganmu. || I've nothing more to do with you.
+- Semoga jalan kita tidak bertemu lagi. || May our roads not cross again.
+
+== tutup.pamit_balas
+niat: TUTUP
+topik: pamit
+gestur: lambai
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+$doa: aturan=frag.doa opsional=0.4
+- [3] Baik, sampai jumpa, {$sebutan}! || All right, see you, {$sebutan}!
+  ~ kasar: Ya. Pergi sana. || Yeah. Off you go.
+  ~ kuno: Sampai berjumpa lagi, {$sebutan}. Semoga Dao menyertaimu. || Until we meet again, {$sebutan}. May the Dao go with you.
+  ~ pelabuhan: Sampai jumpa, Bung! Jangan tenggelam! || See you, mate! Don't drown!
+  ~ oasis: Semoga mata air selalu menantimu, Saudara. || May a spring always await you, friend.
+  ~ air: Sampai jumpa, Kakak... hati-hati, ya... || See you, dear... take care...
+  ~ kampung: Ya, Nak. Hati-hati di jalan. Salam buat keluargamu. || Yes, child. Careful on the road. Regards to your family.
+  ~ iblis: Hm. Masih hidup lain kali, semoga. || Hm. Still alive next time, hopefully.
+  ~ gunung: Amitaba. Pergilah dengan damai. || Amitabha. Go in peace.
+  ~ ibukota: Selamat jalan, {$sebutan}. Semoga urusan {$sebutan} di ibu kota lancar. || Farewell, {$sebutan}. May your business in the capital go smoothly.
+- [2] Hati-hati, {$sebutan}. {$doa} || Take care, {$sebutan}. {$doa}
+- Iya, iya. Mampir lagi kalau lewat. || Yes, yes. Drop by when you pass.
+- Sampai nanti. Jangan lupa pesanku tadi. || Till later. Don't forget what I said.
+
+== potong.bahaya
+niat: POTONG
+gestur: lari_takut
+seru: takut
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Astaga, apa itu?! Lari, {$sebutan}, lari! || Good heavens, what's that?! Run, {$sebutan}, run!
+  ~ kasar: Sial! Minggir! || Damn! Out of the way!
+  ~ kuno: Aura membunuh! {$sebutan}, waspadalah! || Killing intent! {$sebutan}, be on guard!
+  ~ pelabuhan: Badai datang! Ke darat, semua ke darat! || Storm coming! Ashore, everyone ashore!
+  ~ kampung: Ada apa itu?! Anak-anak, masuk rumah! Cepat! || What's that?! Children, inside! Quick!
+- [2] Masuk! Cepat masuk! Binatang-binatang itu sudah di luar tembok! || Inside! Get inside! The beasts are outside the wall!
+  ~ air: Kakak, ke perahu! Cepat! || Dear, to the boat! Quick!
+- Dengar itu? Gong tanda bahaya! Aku harus pergi! || Hear that? The alarm gong! I have to go!
+- Tolong! Ada yang terluka di sana! || Help! Someone's hurt over there!
+
+== potong.pelanggan
+niat: POTONG
+syarat: kelompok=pedagang,pekerja
+gestur: seru_dagang
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Oh, sebentar, ada pembeli. Silakan, silakan! || Oh, one moment, a customer. Come in, come in!
+  ~ kasar: Tunggu. Ada yang mau bayar. || Wait. Someone wants to pay.
+  ~ kuno: Mohon maaf sejenak, {$sebutan}. Ada tamu yang harus hamba layani. || Pardon me a moment, {$sebutan}. There's a guest I must serve.
+  ~ pelabuhan: Tunggu, Bung, ada yang mau beli ikan! || Hold on, mate, someone wants fish!
+- [2] Sebentar ya, {$sebutan}... Ya, Bu? Yang mana? Itu? Baik! || One moment, {$sebutan}... Yes, ma'am? Which one? That? Right!
+  ~ p: Sebentar, ya... Iya, Pak? Dua? Baik, kubungkus! || One moment... Yes, sir? Two? Right, I'll wrap them!
+- Aduh, antreannya panjang. Tunggu sebentar, ya. || Oh, the queue's long. Wait a moment.
+
+== potong.gong
+niat: POTONG
+gestur: lihat_sekeliling
+- [3] Itu bunyi gong ronda. Sudah jam segini rupanya. || That's the watch gong. Is it that late already?
+  ~ kasar: Gong lagi. Berisik. || The gong again. Racket.
+  ~ kuno: Gong jaga berbunyi. Waktu berlalu tanpa terasa. || The watch gong sounds. Time slips by unnoticed.
+  ~ kampung: Kentongan sudah dipukul, Nak. Sudah malam. || The slit drum's been struck, child. It's night.
+- [2] Dengar? Gong dari menara. Penjaga ganti giliran. || Hear that? The gong from the tower. The guard is changing.
+  ~ gunung: Lonceng biara berbunyi. Waktu berdoa. || The monastery bell rings. Time for prayer.
+  ~ pelabuhan: Lonceng mercusuar, Bung. Kapal masuk. || The lighthouse bell, mate. A ship's coming in.
+- Ah, gong. Aku hampir lupa waktu. || Ah, the gong. I nearly lost track of time.
+
+== potong.dipanggil
+niat: POTONG
+gestur: lihat_sekeliling
+$pasangan: tipe=nama_warga dari=konteks.pasangan
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Ya, ya, aku datang! ...Maaf, itu {$pasangan} memanggil. || Yes, yes, coming! ...Sorry, that's {$pasangan} calling.
+  ~ kasar: Iya! Sabar! ...Bawel sekali. || Yes! Hold on! ...Such a nag.
+  ~ kuno: Sepertinya hamba dipanggil. Mohon maaf, {$sebutan}. || It seems I am being called. Forgive me, {$sebutan}.
+  ~ l: Iya, Sayang, sebentar! ...Istriku. Kalau tidak cepat, aku tidur di luar. || Yes, dear, a moment! ...My wife. If I'm not quick, I sleep outside.
+  ~ p: Iya, sebentar! ...Suamiku mencari kunci lagi. Selalu begitu. || Yes, a moment! ...My husband's lost the key again. Always.
+- [2] Oh, majikanku melambai. Aku harus ke sana. || Oh, my master's waving. I must go.
+  ~ kampung: Bapak manggil, Nak. Tunggu sebentar. || Father's calling, child. Wait a moment.
+- Ada yang memanggil namaku. Sebentar, ya. || Someone's calling my name. One moment.
+
+== potong.anak
+niat: POTONG
+syarat: tahap=dewasa,tua
+gestur: lari_lambai
+$anak: tipe=nama_warga dari=konteks.anak
+- [3] Aduh, itu anakku menangis! Sebentar! || Oh, that's my child crying! One moment!
+  ~ kasar: Anak itu jatuh lagi. Tunggu. || The kid fell again. Wait.
+  ~ kuno: Tangis kecil itu memanggil hamba. Mohon maaf sejenak. || That small cry calls me. Pardon me a moment.
+  ~ kampung: Hei, {$anak}! Jangan naik pohon itu! ...Maaf, Nak, anakku nakal. || Hey, {$anak}! Don't climb that tree! ...Sorry, child, my little one's naughty.
+- [2] {$anak}! Jangan main dekat sumur! ...Maaf, anak-anak zaman sekarang. || {$anak}! Don't play near the well! ...Sorry, children these days.
+  ~ p: {$anak}! Sudah kubilang jangan ganggu ayam! ...Aduh, maaf, ya. || {$anak}! I told you not to bother the hens! ...Oh, sorry.
+- Cucuku jatuh. Sebentar, aku lihat dulu. || My grandchild fell. Wait, let me look.
+
+== potong.sibuk
+niat: POTONG
+syarat: kelompok=penjaga,pejabat,pekerja
+gestur: berdiri_jaga
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Tunggu. Ada yang mencurigakan di sana. || Wait. Something suspicious over there.
+  ~ kasar: Diam sebentar. Aku sedang bertugas. || Quiet a moment. I'm on duty.
+  ~ kuno: Tugas memanggil, {$sebutan}. Sejenak saja. || Duty calls, {$sebutan}. Just a moment.
+- [2] Hei, kau! Jangan dorong-dorong! ...Maaf, {$sebutan}, pekerjaan. || Hey, you! No shoving! ...Sorry, {$sebutan}, work.
+  ~ ibukota: Petugas! Gerobak itu melanggar jalur! ...Maaf, {$sebutan}, aturan ibu kota. || Officer! That cart broke the lane! ...Forgive me, {$sebutan}, capital rules.
+- Mandor melihat ke sini. Aku harus pura-pura sibuk. Hehe. || The foreman's looking this way. I'd better look busy. Hehe.
+
+== kembali
+niat: KEMBALI
+gestur: bicara_tangan
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3] Nah, tadi sampai mana? Oh ya, yang tadi itu. || Now, where were we? Oh yes, what we were saying.
+  ~ kasar: Jadi. Tadi apa? || So. What was it?
+  ~ kuno: Maafkan gangguan tadi. Mari kita lanjutkan. || Forgive the interruption. Let us continue.
+  ~ pelabuhan: Nah, Bung, kembali ke cerita tadi. || Right, mate, back to the story.
+  ~ air: Maaf, Kakak... tadi kita bicara apa, ya...? Oh, iya... || Sorry, dear... what were we saying...? Oh, yes...
+  ~ kampung: Wis, Nak. Tadi sampai mana? || Right, child. Where were we?
+- [2] Maaf, maaf. Jadi begini, soal tadi... || Sorry, sorry. So, about that...
+  ~ ibukota: Mohon maaf atas jeda tadi, {$sebutan}. Mari kita teruskan. || My apologies for the pause, {$sebutan}. Let us go on.
+- Aduh, aku sampai lupa. Oh, iya, iya. || Oh, I nearly forgot. Ah, yes, yes.
+  ~ p: Aduh, anak-anak. Tadi apa, ya? Oh, iya! || Oh, children. What was it? Ah, yes!
+- Hah, akhirnya tenang lagi. Lanjut, ya. || Hah, calm again at last. Let's go on.

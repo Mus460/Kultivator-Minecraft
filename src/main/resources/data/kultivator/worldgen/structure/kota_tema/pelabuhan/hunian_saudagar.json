@@ -65,6 +65,18 @@
       "dz": 46,
       "pool": "kultivator:kota_tema/pelabuhan/tembok/sudut",
       "putar": 2
+    },
+    {
+      "dx": -48,
+      "dz": 62,
+      "pool": "kultivator:kota_tema/pelabuhan/hidup42/kantor_rekrut",
+      "putar": 0
+    },
+    {
+      "dx": 0,
+      "dz": 62,
+      "pool": "kultivator:kota_tema/pelabuhan/hidup42/kavling_timur",
+      "putar": 0
     }
   ],
   "gaya": [

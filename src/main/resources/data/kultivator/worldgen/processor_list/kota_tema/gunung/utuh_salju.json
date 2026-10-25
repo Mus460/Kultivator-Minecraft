@@ -682,6 +682,84 @@
           "input_predicate": {
             "predicate_type": "minecraft:blockstate_match",
             "block_state": {
+              "id": "minecraft:dark_oak_fence_gate",
+              "properties": {
+                "facing": "east",
+                "in_wall": "false",
+                "open": "false",
+                "powered": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:spruce_fence_gate",
+            "properties": {
+              "facing": "east",
+              "in_wall": "false",
+              "open": "false",
+              "powered": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:dark_oak_fence_gate",
+              "properties": {
+                "facing": "north",
+                "in_wall": "false",
+                "open": "false",
+                "powered": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:spruce_fence_gate",
+            "properties": {
+              "facing": "north",
+              "in_wall": "false",
+              "open": "false",
+              "powered": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:dark_oak_fence_gate",
+              "properties": {
+                "facing": "west",
+                "in_wall": "false",
+                "open": "false",
+                "powered": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:spruce_fence_gate",
+            "properties": {
+              "facing": "west",
+              "in_wall": "false",
+              "open": "false",
+              "powered": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
               "id": "minecraft:dark_oak_log",
               "properties": {
                 "axis": "y"
@@ -695,6 +773,26 @@
             "id": "minecraft:spruce_log",
             "properties": {
               "axis": "y"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:dark_oak_log",
+              "properties": {
+                "axis": "z"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:spruce_log",
+            "properties": {
+              "axis": "z"
             }
           }
         },
@@ -752,6 +850,32 @@
             "block_state": {
               "id": "minecraft:dark_oak_shelf",
               "properties": {
+                "facing": "east",
+                "powered": "false",
+                "side_chain": "unconnected",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:spruce_shelf",
+            "properties": {
+              "facing": "east",
+              "powered": "false",
+              "side_chain": "unconnected",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:dark_oak_shelf",
+              "properties": {
                 "facing": "north",
                 "powered": "false",
                 "side_chain": "unconnected",
@@ -766,6 +890,32 @@
             "id": "minecraft:spruce_shelf",
             "properties": {
               "facing": "north",
+              "powered": "false",
+              "side_chain": "unconnected",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:dark_oak_shelf",
+              "properties": {
+                "facing": "south",
+                "powered": "false",
+                "side_chain": "unconnected",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:spruce_shelf",
+            "properties": {
+              "facing": "south",
               "powered": "false",
               "side_chain": "unconnected",
               "waterlogged": "false"
@@ -1162,6 +1312,34 @@
             "block_state": {
               "id": "minecraft:dark_oak_trapdoor",
               "properties": {
+                "facing": "east",
+                "half": "top",
+                "open": "false",
+                "powered": "false",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:spruce_trapdoor",
+            "properties": {
+              "facing": "east",
+              "half": "top",
+              "open": "false",
+              "powered": "false",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:dark_oak_trapdoor",
+              "properties": {
                 "facing": "north",
                 "half": "bottom",
                 "open": "true",
@@ -1291,6 +1469,34 @@
               "facing": "west",
               "half": "bottom",
               "open": "true",
+              "powered": "false",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:dark_oak_trapdoor",
+              "properties": {
+                "facing": "west",
+                "half": "top",
+                "open": "false",
+                "powered": "false",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:spruce_trapdoor",
+            "properties": {
+              "facing": "west",
+              "half": "top",
+              "open": "false",
               "powered": "false",
               "waterlogged": "false"
             }

@@ -42,6 +42,8 @@ public final class DuniaContent {
 		dev.kultivator.dunia.kapal.Kapal.init();
 		// DESIGN 38 Kota Besar dan Tempat (38W spine + every 38 package, 38.T themed cities):
 		dev.kultivator.dunia.tempat.Tempat.init();
+		// DESIGN 42 Kota yang Hidup (42A owns this line; after the 38 places it builds on):
+		dev.kultivator.dunia.kota42.KotaHidup.init();
 	}
 
 	private DuniaContent() {

@@ -48,7 +48,7 @@ public final class PitaJadwal {
 			boolean major = hr % 6 == 0;
 			Brush.rect(g, tx - 0.25F, y + h, tx + 0.25F, y + h + (major ? 2.5F : 1.5F), Palette.argb(0xA0, Palette.INK_SOFT));
 			if (major && hr < 24) {
-				Brush.text(g, font, Component.literal(String.format("%02d", hr)), tx + 0.5F, y + h + 2.5F, Palette.INK_FAINT, 0.45F, false);
+				Brush.text(g, font, Component.literal(String.format("%02d", hr)), tx + 0.5F, y + h + 3.0F, Palette.INK_FAINT, 1.0F, false);
 			}
 		}
 		// the needle at the current hour
@@ -60,7 +60,8 @@ public final class PitaJadwal {
 			Brush.rect(g, nx - 0.5F, y - 2.0F, nx + 0.5F, y + h + 2.0F, Palette.SEAL);
 			Brush.rect(g, nx - 1.5F, y - 3.0F, nx + 1.5F, y - 2.0F, Palette.SEAL);
 		}
-		float ky0 = y + h + 7.0F;
+		// under the hour labels (1.0, DESIGN 43.0.5)
+		float ky0 = y + h + 13.0F;
 		float ky1 = ky0 + hk;
 		if (hk > 0.0F && kemarin != null) {
 			Brush.rect(g, x0 - 1.0F, ky0 - 1.0F, x1 + 1.0F, ky1 + 1.0F, Palette.argb(0x40, Palette.INK_SOFT));

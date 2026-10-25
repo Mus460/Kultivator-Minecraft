@@ -15,6 +15,50 @@ import java.util.List;
 public final class SlipTooltip {
 
 	private static final int MAX_WIDTH = 190;
+	/** A queued tooltip older than this is from a frame that never drew its queue (an old screen): ignored. */
+	private static final long BASI_MS = 150L;
+
+	// One tooltip per frame (DESIGN 43.7): a strong one (a widget, a zone) wins over a weak one (text cut by Brush.fit).
+	private static List<Component> kuat = List.of();
+	private static long kuatSejak;
+	private static List<Component> lemah = List.of();
+	private static long lemahSejak;
+
+	/** Asks for {@code lines} as this frame's tooltip (the last strong request of the frame wins). */
+	public static void antre(List<Component> lines) {
+		if (lines != null && !lines.isEmpty()) {
+			kuat = lines;
+			kuatSejak = net.minecraft.util.Util.getMillis();
+		}
+	}
+
+	/** A weak request (the whole text of a cut label): shown only when nothing asked strongly this frame. */
+	public static void antreLemah(List<Component> lines) {
+		if (lines != null && !lines.isEmpty()) {
+			lemah = lines;
+			lemahSejak = net.minecraft.util.Util.getMillis();
+		}
+	}
+
+	/** Start of a host frame: forgets last frame's requests. */
+	public static void mulaiBingkai() {
+		kuat = List.of();
+		lemah = List.of();
+	}
+
+	/** True when a tooltip waits for this frame. */
+	public static boolean ada() {
+		long now = net.minecraft.util.Util.getMillis();
+		return !kuat.isEmpty() && now - kuatSejak < BASI_MS || !lemah.isEmpty() && now - lemahSejak < BASI_MS;
+	}
+
+	/** Draws this frame's tooltip (strong over weak) and clears the queue. Call last in the host frame. */
+	public static void gambarAntrean(GuiGraphicsExtractor g, Font font, int mouseX, int mouseY, int screenWidth, int screenHeight) {
+		long now = net.minecraft.util.Util.getMillis();
+		List<Component> lines = !kuat.isEmpty() && now - kuatSejak < BASI_MS ? kuat : !lemah.isEmpty() && now - lemahSejak < BASI_MS ? lemah : List.of();
+		mulaiBingkai();
+		draw(g, font, lines, mouseX, mouseY, screenWidth, screenHeight);
+	}
 
 	public static void draw(GuiGraphicsExtractor g, Font font, List<Component> lines, int mouseX, int mouseY, int screenWidth, int screenHeight) {
 		if (lines.isEmpty()) {

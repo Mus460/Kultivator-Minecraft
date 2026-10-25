@@ -29,6 +29,7 @@
   "kultivator.sekte.seragam.cmd.reset": "Sect design reset to the default.",
   "kultivator.sekte.seragam.cmd.set": "Test emblem saved: shape %s, symbol %s, colours %s/%s/%s.",
   "kultivator.sekte.seragam.ui.title": "Sect Emblem & Uniform",
+  "kultivator.sekte.seragam.ui.mati": "Sect emblems and uniforms are switched off on this server.",
   "kultivator.sekte.seragam.ui.tab.lambang": "Emblem",
   "kultivator.sekte.seragam.ui.tab.lambang.tip": "Shape, symbol, three colours and the sect's motto.",
   "kultivator.sekte.seragam.ui.tab.seragam": "Uniform",

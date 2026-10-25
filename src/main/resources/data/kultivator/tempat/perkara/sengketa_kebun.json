@@ -1,0 +1,64 @@
+{
+  "nama": "kultivator.kota42.perkara.t.sengketa_kebun.nama",
+  "teks": "kultivator.kota42.perkara.t.sengketa_kebun.teks",
+  "penggugat": {
+    "klaim": "kultivator.kota42.perkara.t.sengketa_kebun.klaim_a",
+    "peran": [
+      "petani"
+    ]
+  },
+  "tergugat": {
+    "klaim": "kultivator.kota42.perkara.t.sengketa_kebun.klaim_b",
+    "peran": [
+      "petani"
+    ]
+  },
+  "benar": "acak",
+  "saksi": 2,
+  "kesaksian": {
+    "penggugat": [
+      "kultivator.kota42.perkara.t.sengketa_kebun.saksi_a1",
+      "kultivator.kota42.perkara.t.sengketa_kebun.saksi_a2"
+    ],
+    "tergugat": [
+      "kultivator.kota42.perkara.t.sengketa_kebun.saksi_b1",
+      "kultivator.kota42.perkara.t.sengketa_kebun.saksi_b2"
+    ]
+  },
+  "dusta": "kultivator.kota42.perkara.t.sengketa_kebun.dusta",
+  "bukti": [
+    {
+      "jenis": "barang",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.sengketa_kebun.bukti1_a",
+        "tergugat": "kultivator.kota42.perkara.t.sengketa_kebun.bukti1_b"
+      },
+      "barang": "minecraft:oak_fence"
+    },
+    {
+      "jenis": "catatan",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.sengketa_kebun.bukti2_a",
+        "tergugat": "kultivator.kota42.perkara.t.sengketa_kebun.bukti2_b"
+      }
+    }
+  ],
+  "putusan": [
+    {
+      "untuk": "penggugat",
+      "teks": "kultivator.kota42.perkara.t.sengketa_kebun.putusan1",
+      "akibat": "kultivator.kota42.perkara.t.sengketa_kebun.putusan1_akibat"
+    },
+    {
+      "untuk": "tergugat",
+      "teks": "kultivator.kota42.perkara.t.sengketa_kebun.putusan2",
+      "akibat": "kultivator.kota42.perkara.t.sengketa_kebun.putusan2_akibat"
+    },
+    {
+      "untuk": "damai",
+      "teks": "kultivator.kota42.perkara.t.sengketa_kebun.putusan3",
+      "akibat": "kultivator.kota42.perkara.t.sengketa_kebun.putusan3_akibat"
+    }
+  ],
+  "suap": 0.25
+}

@@ -8,6 +8,9 @@ import dev.kultivator.dunia.kota.Kota;
 import dev.kultivator.dunia.kota.KotaData;
 import dev.kultivator.dunia.kota.KultivatorNpc;
 import dev.kultivator.dunia.kota.NpcRole;
+import dev.kultivator.dunia.kota42.api.WargaApi;
+import dev.kultivator.dunia.kota42.sekte.KotaSekte;
+import dev.kultivator.dunia.kota42.warga.Warga;
 import dev.kultivator.dunia.tempat.Kandidat;
 import dev.kultivator.dunia.tempat.cerita.CeritaApi;
 import dev.kultivator.dunia.tempat.ekonomi.Barang;
@@ -51,7 +54,7 @@ import java.util.UUID;
  * ({@link Halls#addCandidates}, source {@code kotabesar}). Hopefuls are rolled from the city and the day, so the sheet and
  * the invitation always talk about the same youth.
  */
-final class HariGerbang implements KotaBesarKalender.Acara {
+public final class HariGerbang implements KotaBesarKalender.Acara {
 
 	static final String ID = LembarKunci.Acara.ACARA_HARI_GERBANG;
 	static final long SEWA = 30L;
@@ -59,6 +62,18 @@ final class HariGerbang implements KotaBesarKalender.Acara {
 	static final int LEVEL_AULA = 2;
 
 	private final Map<Long, List<UUID>> perekrut = new HashMap<>();
+
+	/**
+	 * 42E ({@code KantorRekrut}): true while the NPC sects' recruiters stand on the Reception Square of capital {@code town}
+	 * (a player's recruitment office there draws half the applicants that day).
+	 */
+	public static boolean perekrutHadir(MinecraftServer server, long town) {
+		try {
+			return Hukum.ibuKota(server, town) && KotaBesarKalender.berjalan(server, town, ID);
+		} catch (RuntimeException exception) {
+			return false;
+		}
+	}
 
 	HariGerbang() {
 		TempatLayar.daftar(LembarKunci.LapakRekrut.LAYAR, this::aksiRekrut, this::bangunRekrut);
@@ -161,21 +176,40 @@ final class HariGerbang implements KotaBesarKalender.Acara {
 
 	// ================================================================== hopefuls
 
-	/** One youth of the day: data, name, seed. */
-	private record Calon(int no, DiscipleData data, MutableComponent nama, int tekad) {
+	/** One youth of the day: data, name, seed; {@code warga} the gifted resident it is (0 = a youth of the day only). */
+	private record Calon(int no, DiscipleData data, MutableComponent nama, int tekad, int warga) {
 	}
+
+	/** Residents with a root come first (42.4.9 via {@code WargaApi.berbakat}, at most 4, row number 1000 + id). */
+	static final int NO_WARGA = 1000;
+	static final int WARGA_MAKS = 4;
 
 	private static List<Calon> calon(long town, long day) {
 		RandomSource count = RandomSource.create(town * 31L + day);
 		int n = 8 + count.nextInt(5);
 		List<Calon> out = new ArrayList<>();
 		List<Component> taken = new ArrayList<>();
+		List<Warga> berbakat = new ArrayList<>(WargaApi.berbakat(town));
+		berbakat.sort((a, b) -> a.akar != b.akar ? Integer.compare(b.akar, a.akar) : Integer.compare(a.id, b.id));
+		for (Warga w : berbakat) {
+			if (out.size() >= WARGA_MAKS) {
+				break;
+			}
+			RandomSource r = RandomSource.create(w.id * 0x9E3779B97F4A7C15L ^ day);
+			DiscipleData data = DiscipleData.fresh(r);
+			dev.kultivator.data.RootGrade[] g = dev.kultivator.data.RootGrade.values();
+			data.setRootGrade(g[Mth.clamp(w.akar - 1, 0, g.length - 1)]);
+			MutableComponent nama = WargaApi.nama(w).copy();
+			taken.add(nama);
+			out.add(new Calon(NO_WARGA + w.id, data, nama, 50 + Math.floorMod(w.id, 31), w.id));
+		}
+		n = Math.max(out.size(), n - out.size());
 		for (int i = 0; i < n; i++) {
 			RandomSource r = RandomSource.create(town ^ (day * 0x9E3779B97F4A7C15L) ^ (i * 0xC2B2AE3D27D4EB4FL));
 			DiscipleData data = DiscipleData.fresh(r);
 			MutableComponent nama = DiscipleNames.pick(r, taken);
 			taken.add(nama);
-			out.add(new Calon(i, data, nama, 20 + r.nextInt(81)));
+			out.add(new Calon(i, data, nama, 20 + r.nextInt(81), 0));
 		}
 		return out;
 	}
@@ -317,8 +351,13 @@ final class HariGerbang implements KotaBesarKalender.Acara {
 			}
 			case LembarKunci.LapakRekrut.OP_UNDANG -> {
 				int no = LembarKunci.argInt(parts, 1, -1);
-				List<Calon> all = calon(town, day);
-				if (!me.getBooleanOr("sewa", false) || no < 0 || no >= all.size() || me.getIntOr("undang", 0) >= UNDANG_MAKS) {
+				Calon c = null;
+				for (Calon each : calon(town, day)) {
+					if (each.no() == no) {
+						c = each;
+					}
+				}
+				if (!me.getBooleanOr("sewa", false) || c == null || me.getIntOr("undang", 0) >= UNDANG_MAKS) {
 					return;
 				}
 				String key = Integer.toString(no);
@@ -328,15 +367,23 @@ final class HariGerbang implements KotaBesarKalender.Acara {
 					return;
 				}
 				me.putInt("undang", me.getIntOr("undang", 0) + 1);
-				Calon c = all.get(no);
 				boolean yes = p.getRandom().nextDouble() < peluang(p, town);
+				Halls.CandidateSpec wargaSpec = null;
+				if (yes && c.warga() != 0) {
+					// a gifted resident of the capital: 42A-2 converts it (family consent, its job, the archive)
+					Warga w = WargaApi.byId(c.warga());
+					wargaSpec = w == null ? null : KotaSekte.tandai(WargaApi.jadikanCalon(w, p.getUUID(), "kotabesar:" + town), w);
+					if (wargaSpec == null) {
+						yes = false;
+					}
+				}
 				done.putBoolean(key, yes);
 				me.put("jawab", done);
 				if (yes) {
 					taken.putBoolean(key, true);
 					data.putBagian(town, "calon_" + day, taken);
-					Halls.addCandidates(p.getUUID(), List.of(new Halls.CandidateSpec(c.data(), c.tekad(), -1.0D, -1.0D, false, "kotabesar",
-							"kultivator.kota_besar.rekrut.asal", 5)));
+					Halls.addCandidates(p.getUUID(), List.of(wargaSpec != null ? wargaSpec : new Halls.CandidateSpec(c.data(), c.tekad(), -1.0D, -1.0D,
+							false, "kotabesar", "kultivator.kota_besar.rekrut.asal", 5)));
 					pesan = Component.translatable("kultivator.kota_besar.rekrut.terima", c.nama());
 				} else {
 					pesan = Component.translatable("kultivator.kota_besar.rekrut.menolak", c.nama());

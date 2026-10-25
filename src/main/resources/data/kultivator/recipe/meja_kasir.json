@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "L": "#minecraft:wooden_slabs",
+    "D": "minecraft:red_dye",
+    "P": "#minecraft:planks",
+    "I": "minecraft:iron_ingot"
+  },
+  "pattern": [
+    "LLL",
+    "DID",
+    "P P"
+  ],
+  "result": {
+    "id": "kultivator:meja_kasir"
+  }
+}

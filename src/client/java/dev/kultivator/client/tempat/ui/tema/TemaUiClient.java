@@ -2,16 +2,18 @@ package dev.kultivator.client.tempat.ui.tema;
 
 import dev.kultivator.Kultivator;
 import dev.kultivator.client.tempat.ui.UiTempatClient;
+import dev.kultivator.client.tempat.ui.layar.LayarKafilah;
 import dev.kultivator.dunia.tempat.tema.bersama.TemaLayar;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
  * Screen part of the themed towns (DESIGN 38.T.13.3, module 38TV-U), called by {@code TemaClient.init()}: registers one
- * screen factory per id of {@link TemaLayar#SEMUA} with {@link UiTempatClient#daftar}. Every screen draws the sheet keys
- * {@link TemaLayar} documents (C38.T3) on the 38UI kit "Pasar Giok" ({@code client/tempat/ui/kit/**}, read-only here) and
- * is usable by keyboard at GUI scale 2/3/4. All twenty factories are always registered; whether a screen opens is the
- * server's decision (builders in {@code dunia/tempat/tema/<tema>/}).
+ * page factory per id of {@link TemaLayar#SEMUA} with {@link UiTempatClient#daftar}. Every page draws the sheet keys
+ * {@link TemaLayar} documents (C38.T3) with the single kit {@code screen/ui} through {@link TemaHalaman} (DESIGN 43.7) and
+ * opens under the Di Sini tablet of the Gulungan (43.8.3; {@code tema_dagang} has its home in Dunia › Dagang). All twenty
+ * factories are always registered; whether a sheet opens is the server's decision (builders in
+ * {@code dunia/tempat/tema/<tema>/}).
  */
 public final class TemaUiClient {
 
@@ -28,7 +30,7 @@ public final class TemaUiClient {
 		semua.put(TemaLayar.Dagang.LAYAR, LayarBukuDagang::new);
 		semua.put(TemaLayar.Kapal.LAYAR, LayarKapal::new);
 		semua.put(TemaLayar.Galangan.LAYAR, LayarGalangan::new);
-		semua.put(TemaLayar.Kafilah.LAYAR, LayarKafilahTema::new);
+		semua.put(TemaLayar.Kafilah.LAYAR, LayarKafilah::tema);
 		semua.put(TemaLayar.Mural.LAYAR, LayarMural::new);
 		semua.put(TemaLayar.Sutra.LAYAR, LayarSutra::new);
 		semua.put(TemaLayar.Teh.LAYAR, LayarTeh::new);

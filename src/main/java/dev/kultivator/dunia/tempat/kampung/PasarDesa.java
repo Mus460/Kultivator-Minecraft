@@ -3,6 +3,8 @@ package dev.kultivator.dunia.tempat.kampung;
 import dev.kultivator.dunia.DuniaAnchorEntity;
 import dev.kultivator.dunia.DuniaAnchors;
 import dev.kultivator.dunia.kota.Kota;
+import dev.kultivator.dunia.kota42.api.Kategori;
+import dev.kultivator.dunia.kota42.ekonomi.HargaKota;
 import dev.kultivator.dunia.tempat.ekonomi.EkonomiApi;
 import dev.kultivator.dunia.tempat.kompleks.Kartu;
 import dev.kultivator.harta.HerbKind;
@@ -28,7 +30,8 @@ import java.util.UUID;
 import java.util.function.Function;
 
 /**
- * The village market (pasar desa, DESIGN 38.C.2.3, prices 38.M.2.2: {@code Harga.value x kampung.hargaPasar} (0.9),
+ * The village market (pasar desa, DESIGN 38.C.2.3, prices 38.M.2.2: {@code Harga.value x kampung.hargaPasar} (0.9)
+ * x one {@code HargaKota.faktor} of the ware's category (42.6.3),
  * stock 4-6 wares a day): the four stalls of a {@code desa} or {@code desa_besar} (anchor {@code kampung/pasar}). It sells
  * what mortals grow and make: bread, baked potatoes, pies, honey, the style's own food (salted fish in the snow, mutton
  * on the savanna, dates of the oasis as dried kelp...), young spirit herbs from the edge of the fields (10-40 years), and
@@ -107,7 +110,9 @@ final class PasarDesa {
 			}
 			// food and tools from the village table; a young herb at its own herb value (Harga.herbValue by age)
 			long base = b.dasar() > 0L ? b.dasar() * stack.getCount() : Math.max(1L, EkonomiApi.harga(stack));
-			long price = Math.max(1L, Math.round(base * factor));
+			// one HargaKota.faktor per price (42.6.3), by the ware's category
+			double town = HargaKota.faktor(level.getServer(), d.situs, Kategori.dari(stack));
+			long price = Math.max(1L, Math.round(base * factor * town));
 			int stock = 1 + roll.nextInt(4);
 			int left = Math.max(0, stock - TERJUAL.getOrDefault(kunci(d.situs, day, i), 0));
 			out.add(new Tawaran(i, stack, price, left));
@@ -194,7 +199,8 @@ final class PasarDesa {
 			return 0;
 		}
 		TERJUAL.merge(kunci(d.situs, Kota.day(level.getServer()), no), 1, Integer::sum);
-		ItemStack stack = pick.barang().copy();
+		HargaKota.catatBeli(level.getServer(), d.situs, Kategori.dari(pick.barang()), pick.barang().getCount());
+		ItemStack stack = dev.kultivator.dunia.tempat.ekonomi.Barang.tandaiAsal(pick.barang().copy(), Kota.day(level.getServer()));
 		Component item = stack.getHoverName();
 		int count = stack.getCount();
 		player.getInventory().add(stack);
