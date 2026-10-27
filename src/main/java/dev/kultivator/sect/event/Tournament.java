@@ -9,6 +9,8 @@ import dev.kultivator.disciple.DuelRules;
 import dev.kultivator.disciple.path.DisciplePaths;
 import dev.kultivator.sect.hall.Halls;
 import dev.kultivator.sect.hall.SectRanks;
+import dev.kultivator.sosok.GerakId;
+import dev.kultivator.sosok.SosokApi;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
 import dev.kultivator.util.Targeting;
@@ -642,7 +644,25 @@ public final class Tournament {
 			BlazingTower.stop(run.owner, entrant.soul, false);
 			VoidRealm.dequeue(run.owner, entrant.soul);
 			disciple.setTarget(null);
-			disciple.setActivity(DiscipleEntity.ACTIVITY_SPECTATOR, seat);
+			spectate(run, disciple, seat);
+		}
+	}
+
+	/** Back to the seat (or free when it has none), watching the ring. */
+	private static void spectate(Run run, DiscipleEntity disciple, @Nullable BlockPos seat) {
+		disciple.setActivity(seat != null ? DiscipleEntity.ACTIVITY_SPECTATOR : DiscipleEntity.ACTIVITY_NONE, seat);
+		if (seat != null) {
+			disciple.setActivityFocus(BlockPos.containing(run.center));
+		}
+	}
+
+	/** The seated disciples cheer a decided bout (a body clip over the seat pose). */
+	private static void cheerCrowd(Run run) {
+		for (UUID soul : run.seats.keySet()) {
+			DiscipleEntity disciple = EventUtil.bySoul(run.owner, soul);
+			if (disciple != null && disciple.activity() == DiscipleEntity.ACTIVITY_SPECTATOR) {
+				SosokApi.gerak(disciple, GerakId.SORAK_ARENA, 0, 80);
+			}
 		}
 	}
 
@@ -795,6 +815,9 @@ public final class Tournament {
 		announce(run, Component.translatable("kultivator.sectevent.tourney.result", winner.name, loser == null ? Component.empty() : loser.name)
 				.withStyle(winner.disciple() ? ChatFormatting.AQUA : ChatFormatting.GRAY));
 		run.current = null;
+		if (!quiet) {
+			cheerCrowd(run);
+		}
 		Extension ext = extension;
 		if (loser != null && (winner.disciple() || loser.disciple())) {
 			boolean upset = winner.data.realm().ordinal() < loser.data.realm().ordinal();
@@ -826,8 +849,7 @@ public final class Tournament {
 			} else {
 				body.setHealth(body.getMaxHealth());
 				body.setTarget(null);
-				BlockPos seat = run.seats.get(body.soulId());
-				body.setActivity(seat != null ? DiscipleEntity.ACTIVITY_SPECTATOR : DiscipleEntity.ACTIVITY_NONE, seat);
+				spectate(run, body, run.seats.get(body.soulId()));
 			}
 		}
 		run.bodyA = null;
@@ -838,8 +860,7 @@ public final class Tournament {
 		if (body != null && !entrant.disciple() && !body.isRemoved()) {
 			body.discard();
 		} else if (body != null && entrant.disciple()) {
-			BlockPos seat = run.seats.get(body.soulId());
-			body.setActivity(seat != null ? DiscipleEntity.ACTIVITY_SPECTATOR : DiscipleEntity.ACTIVITY_NONE, seat);
+			spectate(run, body, run.seats.get(body.soulId()));
 		}
 	}
 

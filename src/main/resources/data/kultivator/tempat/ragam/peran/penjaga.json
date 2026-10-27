@@ -264,7 +264,7 @@
       "kunci": "rg_periksa_gerbang",
       "blok": "kerja",
       "tujuan": "pintu",
-      "klip": "memandang",
+      "klip": "sikap_tombak",
       "kanan": "tombak",
       "durasi": [
         10,

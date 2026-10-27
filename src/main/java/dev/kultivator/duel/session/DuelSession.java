@@ -310,6 +310,8 @@ public final class DuelSession {
 			BlockPos spot = BlockPos.containing(at.x, at.y + 0.1D, at.z);
 			seats.add(new Seat(disciple, disciple.activity(), disciple.activitySpot()));
 			disciple.setActivity(DiscipleEntity.ACTIVITY_SPECTATOR, spot);
+			// it watches the ring from its seat
+			disciple.setActivityFocus(BlockPos.containing(center));
 		}
 	}
 

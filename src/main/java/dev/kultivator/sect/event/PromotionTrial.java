@@ -103,6 +103,8 @@ public final class PromotionTrial {
 		BlazingTower.stop(owner, disciple.soulId(), false);
 		BlockPos spot = disciple.blockPosition();
 		disciple.setActivity(DiscipleEntity.ACTIVITY_FORMATION_GUARD, spot);
+		// it stands the trial with its spear facing the hall's heart, where the waves come from
+		disciple.setActivityFocus(BlockPos.containing(center));
 		extra.putLong("trial_spot", spot.asLong());
 		Trial trial = new Trial(owner, disciple, level, center);
 		TRIALS.put(owner, trial);

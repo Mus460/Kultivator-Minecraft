@@ -895,6 +895,8 @@ public final class PeristiwaJalan {
 		final List<ApiKecilEntity> api = new ArrayList<>();
 		final List<BlockPos> calon = new ArrayList<>();
 		final List<Warga> rantai = new ArrayList<>();
+		/** Set once the fire is out: the scrubbing tasks of {@link #padam} then outlive the event (they expire by themselves). */
+		boolean menggosok;
 		final List<BlockPos> rantaiPos = new ArrayList<>();
 		final Set<UUID> penolong = new HashSet<>();
 		final Map<UUID, Long> oper = new HashMap<>();
@@ -1172,6 +1174,21 @@ public final class PeristiwaJalan {
 				HidupApi.klip(owner, GerakId.HORMAT_DALAM, 0, 60);
 				seru(owner, "kota42.api_padam", "api.terima_kasih");
 			}
+			// the fire is out: the owner and up to two of the bucket chain scrub the soot off the scorched wall for a minute
+			long sekarang = level.getGameTime();
+			BlockPos dinding = BlockPos.containing(at);
+			menggosok = true;
+			List<Warga> penggosok = new ArrayList<>();
+			if (pemilik != null) {
+				penggosok.add(pemilik);
+			}
+			for (int i = 0; i < rantai.size() && penggosok.size() < 3; i++) {
+				penggosok.add(rantai.get(i));
+			}
+			for (int i = 0; i < penggosok.size(); i++) {
+				BlockPos spot = berdiri(level, dinding.offset(i * 2 - 2, 0, 0));
+				tugas(penggosok.get(i), situs, di("gosok_jelaga", spot == null ? dinding : spot, KotaGerakId.GOSOK_DINDING, 0), sekarang + 1200L);
+			}
 			for (UUID id : penolong) {
 				ServerPlayer p = server.getPlayerList().getPlayer(id);
 				if (p == null) {
@@ -1215,6 +1232,9 @@ public final class PeristiwaJalan {
 				if (!e.isRemoved() && e.keadaan() != ApiKecilEntity.KEADAAN_PADAM) {
 					e.padamkan();
 				}
+			}
+			if (menggosok) {
+				return;
 			}
 			for (Warga w : rantai) {
 				lepas(w);

@@ -363,6 +363,8 @@ public final class PemburuSekte {
 			DuniaBudget.track(GabungEntities.ANGGARAN, body);
 			TechniquePower.markRealmFoe(body);
 			SosokApi.tatap(body, player);
+			// blocks the way, fists on the hips, until the player has chosen (pilih releases it)
+			SosokApi.gerak(body, GerakId.SIKAP_BERKACAK, 0, 0);
 			level.sendParticles(ParticleTypes.LARGE_SMOKE, at.x, at.y + 0.8D, at.z, 10, 0.3D, 0.5D, 0.3D, 0.02D);
 			b.regu.add(body);
 			b.roster.add(rosterId);
@@ -431,6 +433,9 @@ public final class PemburuSekte {
 			case "lawan" -> {
 				b.tahap = Tahap.DUEL;
 				b.duelPada = b.level.getGameTime() + 40L;
+				for (DiscipleEntity body : b.regu) {
+					SosokApi.henti(body);
+				}
 				player.sendSystemMessage(Component.translatable("kultivator.gabung.pemburu.lawan").withStyle(ChatFormatting.RED));
 			}
 			case "lari" -> {
@@ -440,6 +445,7 @@ public final class PemburuSekte {
 				player.sendSystemMessage(Component.translatable("kultivator.gabung.pemburu.lari", (int) LARI_JARAK, LARI_TICKS / 20)
 						.withStyle(ChatFormatting.AQUA));
 				for (DiscipleEntity body : b.regu) {
+					SosokApi.henti(body);
 					SosokApi.gerak(body, GerakId.MARAH_TUNJUK, 0, 30);
 				}
 			}

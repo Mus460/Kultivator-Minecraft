@@ -8,6 +8,8 @@ import dev.kultivator.duel.clash.Fighter;
 import dev.kultivator.duel.clash.Fighters;
 import dev.kultivator.duel.session.DuelSession;
 import dev.kultivator.musuh.RogueCultivatorEntity;
+import dev.kultivator.sosok.GerakId;
+import dev.kultivator.sosok.SosokApi;
 import dev.kultivator.voice.Voice;
 import dev.kultivator.voice.VoiceDisciples;
 import dev.kultivator.voice.VoiceEvents;
@@ -31,7 +33,8 @@ import java.util.List;
  * ({@code grunt.*.attack}), and the gasp of a broken posture ({@code grunt.*.hurt}). A player only shouts when his
  * client chose a kiai voice ({@code DuelPrefs.kiai}, read from his {@code Fighter}); a disciple uses its own grunt; an
  * NPC the {@code voiceKiai} of its profile. One shout per 1.5 s per fighter.</li>
- * <li>{@link #cheer}: one or two seated disciples of the sect arena cheer ({@code disciple.<voice>.cheer}).</li>
+ * <li>{@link #cheer}: one or two seated disciples of the sect arena cheer ({@code disciple.<voice>.cheer}), and the whole
+ * seated crowd claps or cheers as a Sosok body clip (the one place here that moves a body, still no gameplay).</li>
  * <li>{@link #npcLine}: a disciple's or NPC's spoken line at the opening, victory or defeat of a duel.</li>
  * </ul>
  */
@@ -113,7 +116,12 @@ public final class DuelVoices {
 			if (crowd.isEmpty()) {
 				return;
 			}
-			int count = moment == DuelIds.CHEER_END ? 2 : 1 + RANDOM.nextInt(2);
+			// the whole crowd applauds from its seats (a win: they cheer with a raised arm); the voices below stay one or two
+			boolean end = moment == DuelIds.CHEER_END;
+			for (DiscipleEntity disciple : crowd) {
+				SosokApi.gerak(disciple, end ? GerakId.SORAK_ARENA : GerakId.TEPUK_TANGAN, 0, end ? 80 : 30);
+			}
+			int count = end ? 2 : 1 + RANDOM.nextInt(2);
 			for (int i = 0; i < count && !crowd.isEmpty(); i++) {
 				DiscipleEntity disciple = crowd.remove(RANDOM.nextInt(crowd.size()));
 				VoiceDisciples.line(disciple, "cheer", CHEER_GAP);

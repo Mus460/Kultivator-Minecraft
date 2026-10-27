@@ -786,11 +786,11 @@ public final class TempatHuni {
 		return switch (state) {
 			case PendudukData.PULIH -> {
 				if (pokok(k)) {
-					yield k.berjalan(GerakId.PINCANG);
+					yield k.berjalan(KotaGerakId.PINCANG);
 				}
 				yield (h + (int) (p.benih() & 1L)) % 3 == 0
-						? new Kegiatan("pulih", "kursi", GerakId.LENGAN_DIGENDONG, 0, 0, 0, 0, GerakId.PINCANG, false)
-						: new Kegiatan("pulih", Kegiatan.RUMAH, GerakId.LENGAN_DIGENDONG, 0, 0, 0, 0, GerakId.PINCANG, false);
+						? new Kegiatan("pulih", "kursi", GerakId.LENGAN_DIGENDONG, 0, 0, 0, 0, KotaGerakId.PINCANG, false)
+						: new Kegiatan("pulih", Kegiatan.RUMAH, GerakId.LENGAN_DIGENDONG, 0, 0, 0, 0, KotaGerakId.PINCANG, false);
 			}
 			case PendudukData.DUKA -> {
 				if (pokok(k)) {

@@ -1263,6 +1263,7 @@ public final class Forging {
 		}
 		BlockPos post = post(level, menu.pos);
 		pick.setActivity(DiscipleEntity.ACTIVITY_FORGE_ASSIST, post);
+		pick.setActivityFocus(menu.pos);
 		CompoundTag section = pick.data().extraSection(NatalTreasureSelf.DUNIA);
 		section.putString("activity", "forge");
 		section.putLong("ref", menu.pos.asLong());
@@ -1312,7 +1313,10 @@ public final class Forging {
 		if (!level.dimension().identifier().toString().equals(section.getStringOr("dim", "")) || level.isLoaded(forge)
 				&& !level.getBlockState(forge).is(TempaItems.EARTHFIRE_FORGE)) {
 			releaseAssistant(disciple);
+			return;
 		}
+		// it hammers and fans facing the forge (the animation rule: at its work and turned to it)
+		disciple.setActivityFocus(forge);
 	}
 
 	/** A standing spot within 2 blocks of the forge (air with a solid floor), or the forge's side. */

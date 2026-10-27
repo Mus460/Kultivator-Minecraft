@@ -10,6 +10,7 @@ import dev.kultivator.sekte.mandiri.MandiriConfig;
 import dev.kultivator.sekte.mandiri.api.JenisLuka;
 import dev.kultivator.sekte.mandiri.api.MandiriApi;
 import dev.kultivator.sosok.Gaya;
+import dev.kultivator.sosok.GerakId;
 import dev.kultivator.sosok.Sosok;
 import dev.kultivator.sosok.SosokApi;
 import dev.kultivator.sosok.SosokUsia;
@@ -33,6 +34,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
@@ -305,6 +307,12 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity, Soso
 	/** GUARD_HALL: the hall stele (refreshed every 2 s), and the tick until which it rests between patrol legs. */
 	private @Nullable BlockPos hallAnchor;
 	private int patrolRestUntil;
+	/** The clip {@link #animateDuty} started (0 none), where the activity's work is, and whether it faces it now (session state). */
+	private int dutyClip;
+	private @Nullable BlockPos activityFocus;
+	private boolean facingWork;
+	/** A formation guard that sits in meditation (the grand formation's core keeper) instead of standing guard. */
+	private boolean guardSits;
 	/** Timers of the timed Sosok clips, moods and function activities (DESIGN 40, session state). */
 	private final SosokApi.Waktu sosokWaktu = new SosokApi.Waktu();
 
@@ -355,8 +363,19 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity, Soso
 		this.goalSelector.addGoal(5, new DiscipleAi.FollowMasterGoal(this));
 		this.goalSelector.addGoal(6, new DiscipleAi.PatrolHallGoal(this));
 		this.goalSelector.addGoal(6, new DiscipleAi.CandidateStrollGoal(this));
-		this.goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 8.0F));
-		this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
+		// the head stays on the work while it faces it (animateDuty)
+		this.goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 8.0F) {
+			@Override
+			public boolean canUse() {
+				return !facingWork && super.canUse();
+			}
+		});
+		this.goalSelector.addGoal(8, new RandomLookAroundGoal(this) {
+			@Override
+			public boolean canUse() {
+				return !facingWork && super.canUse();
+			}
+		});
 		this.targetSelector.addGoal(1, new DiscipleAi.ChooseTargetGoal(this));
 		for (BiConsumer<DiscipleEntity, GoalSelector> installer : GOAL_INSTALLERS) {
 			try {
@@ -524,6 +543,10 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity, Soso
 			}
 			return;
 		}
+		if (next != this.activity) {
+			this.activityFocus = null;
+			this.guardSits = false;
+		}
 		this.activity = next;
 		this.activitySpot = holdsActivitySpot() ? (spot != null ? spot : this.blockPosition()) : spot;
 		this.entityData.set(DATA_ACTIVITY, (byte) this.activity);
@@ -532,6 +555,28 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity, Soso
 		}
 		this.ownerStillTicks = 0;
 		this.getNavigation().stop();
+	}
+
+	/**
+	 * Where the current activity's work is (the forge, the building site, a core's eye, the ring a spectator watches): the
+	 * disciple faces it while it works or sits at its spot. Forgotten when the activity changes; null clears it.
+	 */
+	public void setActivityFocus(@Nullable BlockPos focus) {
+		this.activityFocus = focus == null ? null : focus.immutable();
+	}
+
+	/** A formation guard (activity 5) that sits in meditation instead of standing guard; forgotten when the activity changes. */
+	public void setGuardSits(boolean sits) {
+		this.guardSits = sits;
+	}
+
+	/**
+	 * {@link #isMeditatingNow} or standing at a guard or forge post, where it does not sit but keeps cultivating (the
+	 * forge assistant's half-rate meditation XP, DESIGN 25.5.8). Server side.
+	 */
+	public boolean cultivatesNow() {
+		return isMeditatingNow() || dutyClip != 0 && (activity == ACTIVITY_FORMATION_GUARD || activity == ACTIVITY_FORGE_ASSIST
+				|| activity == ACTIVITY_NONE && mode == Mode.STAY);
 	}
 
 	/**
@@ -1442,6 +1487,8 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity, Soso
 			}
 		}
 
+		animateDuty();
+
 		regenTimer += STATE_INTERVAL;
 		if (regenTimer >= REGEN_INTERVAL) {
 			regenTimer = 0;
@@ -1459,6 +1506,98 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity, Soso
 		syncFlags();
 	}
 
+	/** How close to its spot (squared) it counts as at its work. */
+	private static final double AT_WORK_SQ = 9.0D;
+	/** Forge assistant: ticks of one hammering or fanning spell. */
+	private static final int FORGE_SPELL = 100;
+
+	/**
+	 * Sosok (DESIGN 40, the animation rule): every 10 ticks the body clip (with the clip's own prop) of what it does at its
+	 * spot or under its order, and the turn to face the work. A formation guard stands with the spear (BERDIRI_JAGA), a
+	 * forge assistant alternates hammer and bellows (PALU_LANDASAN, KIPAS_TUNGKU), a builder carries a plank on the way
+	 * (ANGKAT_PAPAN) and mends with the hammer at the site (PERBAIKI_PALU), GUARD_HALL marches the spear (BARIS_JAGA) and
+	 * stands guard between legs; spectators and keepers keep their seat and only face their focus (their cheer and seal
+	 * are played by the modules owning them). Only the clip started here is stopped here, and no other module's clip is
+	 * ever replaced.
+	 */
+	private void animateDuty() {
+		int clip = 0;
+		BlockPos face = null;
+		boolean free = role == Role.DISCIPLE && releaseTicks == 0 && !data.breakingThrough() && this.onGround() && !this.isInWater()
+				&& !this.isPassenger() && !inCombat() && !castHold() && !DuelRules.inDuel(this);
+		if (free) {
+			boolean moving = !this.getNavigation().isDone();
+			boolean atWork = holdsActivitySpot() && activitySpot != null
+					&& this.distanceToSqr(activitySpot.getX() + 0.5D, activitySpot.getY(), activitySpot.getZ() + 0.5D) <= AT_WORK_SQ;
+			switch (activity) {
+				case ACTIVITY_NONE -> {
+					if (!meditating) {
+						if (mode == Mode.GUARD_HALL) {
+							clip = moving ? GerakId.BARIS_JAGA : GerakId.BERDIRI_JAGA;
+						} else if (mode == Mode.STAY && !moving) {
+							clip = GerakId.BERDIRI_JAGA;
+						}
+					}
+				}
+				case ACTIVITY_FORMATION_GUARD -> {
+					if (atWork && !moving && !meditating) {
+						clip = GerakId.BERDIRI_JAGA;
+						face = activityFocus != null ? activityFocus : activitySpot;
+					}
+				}
+				case ACTIVITY_FORGE_ASSIST -> {
+					if (atWork && !moving) {
+						clip = (this.tickCount / FORGE_SPELL + this.getId()) % 2 == 0 ? GerakId.PALU_LANDASAN : GerakId.KIPAS_TUNGKU;
+						face = activityFocus;
+					}
+				}
+				case ACTIVITY_BUILD -> {
+					if (atWork) {
+						clip = GerakId.PERBAIKI_PALU;
+						face = activityFocus;
+					} else if (moving) {
+						clip = GerakId.ANGKAT_PAPAN;
+					}
+				}
+				case ACTIVITY_SPECTATOR, ACTIVITY_FORMATION_KEEPER -> face = atWork && !moving ? activityFocus : null;
+				default -> {
+				}
+			}
+		}
+		facingWork = face != null;
+		if (face != null) {
+			double dx = face.getX() + 0.5D - this.getX();
+			double dz = face.getZ() + 0.5D - this.getZ();
+			float yaw = (float) (Mth.atan2(dz, dx) * Mth.RAD_TO_DEG) - 90.0F;
+			if (dx * dx + dz * dz >= 0.36D && Math.abs(Mth.wrapDegrees(yaw - this.getYRot())) > 8.0F) {
+				this.setYRot(yaw);
+				this.setYHeadRot(yaw);
+				this.setYBodyRot(yaw);
+			}
+		}
+		int now = SosokApi.gerakSekarang(this);
+		if (clip != 0) {
+			if (now == 0 || now == dutyClip) {
+				SosokApi.gerak(this, clip, 0, 0);
+				dutyClip = clip;
+			}
+		} else if (dutyClip != 0) {
+			if (now == dutyClip) {
+				if (GerakId.dariAktivitas(activity) != GerakId.TIDAK_ADA) {
+					// henti would also end the function activity (13-27) of another module
+					this.setGerakData(0, 0);
+					this.setPropData(dev.kultivator.sosok.PropId.TIDAK_ADA);
+				} else {
+					SosokApi.henti(this);
+				}
+				dutyClip = 0;
+			} else if (now != GerakId.BICARA) {
+				// another module's clip took over: it is theirs now (a spoken line plays over ours and ends by itself)
+				dutyClip = 0;
+			}
+		}
+	}
+
 	private boolean computeMeditating(@Nullable ServerPlayer owner, boolean sameLevel) {
 		if (releaseTicks > 0 || data.breakingThrough() || this.getTarget() != null || !this.onGround() || this.isInWater()
 				|| this.isPassenger() || this.tickCount - lastHurtTick < 60 || this.tickCount - lastAttackTick < 40
@@ -1466,12 +1605,13 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity, Soso
 			return false;
 		}
 		if (holdsActivitySpot()) {
-			// Formation guard, tower, spirit body and spectators sit at their spot; duties and builders loop their own pose instead.
+			// Tower, spirit body, spectators, formation keepers and a grand formation's core keeper sit at their spot; duties,
+			// builders, forge assistants and the other formation guards stand and loop their own clip instead (animateDuty).
 			// Of Sekte yang Hidup's activities only the pavilion reader sits (the others loop their own pose); of Murid
 			// Mandiri's 40-60 only seclusion, absorbing stones and self-chosen meditation sit (DESIGN 39.4.2).
 			boolean mandiri = dev.kultivator.sekte.SekteIds.mandiriActivity(activity);
-			return activity >= ACTIVITY_FORMATION_GUARD && activity != ACTIVITY_BUILD
-					&& (!sekteHolding(activity) || activity == dev.kultivator.sekte.SekteIds.ACT_STUDY)
+			return activity >= ACTIVITY_FORMATION_GUARD && activity != ACTIVITY_BUILD && activity != ACTIVITY_FORGE_ASSIST
+					&& (activity != ACTIVITY_FORMATION_GUARD || guardSits) && (!sekteHolding(activity) || activity == dev.kultivator.sekte.SekteIds.ACT_STUDY)
 					&& (!mandiri || dev.kultivator.sekte.SekteIds.mandiriSits(activity))
 					&& activitySpot != null && this.getNavigation().isDone()
 					&& this.distanceToSqr(activitySpot.getX() + 0.5D, activitySpot.getY(), activitySpot.getZ() + 0.5D) <= 2.25D;
@@ -1481,8 +1621,8 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity, Soso
 		}
 		return switch (mode) {
 			case MEDITATE -> post != null && this.distanceToSqr(post.getX() + 0.5D, post.getY(), post.getZ() + 0.5D) <= 2.25D;
-			case STAY -> post != null && this.distanceToSqr(post.getX() + 0.5D, post.getY(), post.getZ() + 0.5D) <= 4.0D
-					&& this.getNavigation().isDone();
+			// STAY holds its point standing on guard (BERDIRI_JAGA, animateDuty); it keeps cultivating (cultivatesNow)
+			case STAY -> false;
 			// Between two patrol legs it sits down where it stopped.
 			case GUARD_HALL -> this.getNavigation().isDone() && this.tickCount < patrolRestUntil;
 			case FOLLOW, ASSIST -> {

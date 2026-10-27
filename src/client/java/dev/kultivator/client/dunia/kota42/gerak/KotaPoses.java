@@ -1240,6 +1240,32 @@ public final class KotaPoses {
 				.wajahPada(66, -1, Wajah.MULUT_SENYUM)
 				.prop(PropId.SUMPIT, 0, 0)
 				.pasang(PROP_KANTONG_KUE, Klip.Titik.PANGKUAN, 0, 0, 0, 0, 0, 0, 1.0F));
+
+		// 460: chopping on the board: the knife lifted and brought down twice per loop, the left hand steadying, eyes on the cut
+		d(b(POTONG_TALENAN, 16).loop().bendera(KERJA | LIRIK_BAWAH).wajah(Wajah.MATA_SETENGAH, -1)
+				.kunci(0, LEAN, 18, HX, 28, RAX, -110, RAY, -6, LAX, -50, LAY, 12)
+				.kunciE(4, Easing.CUBIC_IN, RAX, -50).kunci(8, RAX, -110).kunciE(12, Easing.CUBIC_IN, RAX, -50).kunci(16, RAX, -110)
+				.suara(4, "block.wood.hit", 0.15F, 1.6F).suara(12, "block.wood.hit", 0.15F, 1.5F)
+				.prop(PropId.PISAU_GANDA, 0, 0));
+
+		// 461: kneading dough: both fists pressed down and away, folded back toward the body, a puff of flour
+		d(b(ULENI_ADONAN, 30).loop().bendera(KERJA | LIRIK_BAWAH).wajah(Wajah.MATA_SETENGAH, Wajah.MULUT_DIAM)
+				.kunci(0, LEAN, 28, HX, 24, RAX, -55, LAX, -55, RAZ, 6, LAZ, -6)
+				.kunciE(8, Easing.CUBIC_OUT, LEAN, 36, RAX, -75, LAX, -75)
+				.kunci(16, LEAN, 24, RAX, -45, LAX, -45, RAZ, 12, LAZ, -12)
+				.kunci(24, RAZ, -6, LAZ, 6)
+				.kunci(30, LEAN, 28, RAX, -55, LAX, -55, RAZ, 6, LAZ, -6)
+				.partikel(8, "debu", 1, 0));
+
+		// 462: sawing a plank: the blade pushed away and pulled back across the board, the left hand holding it down
+		d(b(GERGAJI_KAYU, 24).loop().bendera(KERJA | LIRIK_BAWAH).wajah(Wajah.MATA_SETENGAH, -1)
+				.kunci(0, LEAN, 14, HX, 26, RAX, -85, RAY, -8, LAX, -60, LAY, 14)
+				.kunci(12, LEAN, 26, RAX, -40)
+				.kunci(24, LEAN, 14, RAX, -85)
+				.osc(TWIST, 3.0F, 24.0F)
+				.suara(6, "block.wood.step", 0.08F, 0.7F).suara(18, "block.wood.step", 0.08F, 0.7F)
+				.partikel(12, "debu", 1, 0)
+				.prop(PropId.PAPAN_KAYU, 0, 0));
 	}
 
 	// ================================================================== effect hooks (NPC bodies)

@@ -13,8 +13,8 @@
       "kunci": "kerja",
       "blok": "kerja",
       "tujuan": "@kerja",
-      "klip": "masak",
-      "kanan": "sendok_sayur",
+      "klip": "potong_talenan",
+      "kanan": "pisau_ganda",
       "durasi": [
         20,
         50
@@ -241,8 +241,7 @@
       "kunci": "kerja",
       "blok": "kerja",
       "tujuan": "@kerja",
-      "klip": "tumbuk_herba",
-      "kanan": "alu",
+      "klip": "uleni_adonan",
       "durasi": [
         20,
         40

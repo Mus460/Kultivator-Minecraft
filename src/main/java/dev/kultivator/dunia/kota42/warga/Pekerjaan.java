@@ -4,6 +4,7 @@ import dev.kultivator.dunia.kota.NpcRole;
 import dev.kultivator.dunia.kota42.KotaBus;
 import dev.kultivator.dunia.kota42.KotaConfig;
 import dev.kultivator.dunia.kota42.api.JenisHubungan;
+import dev.kultivator.dunia.kota42.api.KotaGerakId;
 import dev.kultivator.dunia.kota42.api.WargaApi;
 import dev.kultivator.dunia.tempat.Titik;
 import dev.kultivator.dunia.tempat.hidup.Jadwal;
@@ -200,8 +201,10 @@ public final class Pekerjaan {
 		Direction sisi = titik.hadap().getAxis().isHorizontal() ? titik.hadap().getClockWise() : Direction.EAST;
 		BlockPos at = titik.pos().relative(sisi, 1 + Math.floorMod(w.id, 2));
 		Kegiatan kerja = KerjaPeran.untuk(gp.peran(), gp.benih()).kegiatan();
-		return new Kegiatan("magang", Kegiatan.XZ + at.getX() + "," + at.getZ(), kerja.klip(), kerja.varian(), kerja.propKanan(),
-				kerja.propKiri(), kerja.propPunggung(), 0, false);
+		// one hour in three the apprentice only watches and copies the master's stroke (a beat late, eyes on him: TIRU)
+		boolean tiru = Math.floorMod(jam + w.id, 3) == 0;
+		return new Kegiatan("magang", Kegiatan.XZ + at.getX() + "," + at.getZ(), tiru ? KotaGerakId.TIRU : kerja.klip(), tiru ? 0 : kerja.varian(),
+				kerja.propKanan(), kerja.propKiri(), kerja.propPunggung(), 0, false);
 	}
 
 	// ================================================================== Hari Warga

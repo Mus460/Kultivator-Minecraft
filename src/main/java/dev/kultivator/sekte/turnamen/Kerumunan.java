@@ -10,6 +10,8 @@ import dev.kultivator.sekte.api.DiplomasiService;
 import dev.kultivator.sekte.api.Lambang;
 import dev.kultivator.sekte.api.SekteApi;
 import dev.kultivator.sekte.api.Sikap;
+import dev.kultivator.sosok.GerakId;
+import dev.kultivator.sosok.SosokApi;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -74,6 +76,7 @@ final class Kerumunan {
 				continue;
 			}
 			disciple.setActivity(DiscipleEntity.ACTIVITY_SPECTATOR, seats.get(next++));
+			disciple.setActivityFocus(BlockPos.containing(venue));
 			crowd.seated.add(disciple.soulId());
 			disciples++;
 		}
@@ -172,6 +175,12 @@ final class Kerumunan {
 		for (Penonton body : crowd.visitors) {
 			if (body.isAlive()) {
 				body.cheer();
+			}
+		}
+		// the seated disciples cheer too (a body clip over the seat pose)
+		for (DiscipleEntity disciple : Disciples.loaded(owner)) {
+			if (crowd.seated.contains(disciple.soulId()) && disciple.activity() == DiscipleEntity.ACTIVITY_SPECTATOR) {
+				SosokApi.gerak(disciple, GerakId.SORAK_ARENA, 0, 80);
 			}
 		}
 	}

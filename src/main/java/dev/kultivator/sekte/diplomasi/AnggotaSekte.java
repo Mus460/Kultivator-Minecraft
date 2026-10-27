@@ -5,6 +5,8 @@ import dev.kultivator.dunia.AnchorHandler;
 import dev.kultivator.dunia.DuniaAnchorEntity;
 import dev.kultivator.dunia.DuniaSites;
 import dev.kultivator.sekte.api.Sikap;
+import dev.kultivator.sosok.GerakId;
+import dev.kultivator.sosok.SosokApi;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -181,9 +183,12 @@ final class AnggotaSekte implements AnchorHandler {
 			name = Component.translatable(GeneratorNama.KEY + "anggota.nama", GeneratorNama.member(sect.lambang, slot), sect.name());
 		}
 		BlockPos at = anchor.blockPosition();
-		DiscipleEntity body = Tubuh.spawn(level, Vec3.atBottomCenterOf(at), sect, sect.memberRankStep(slot), slot, name, at,
-				anchor.data().getBooleanOr("panji", slot % 3 == 0));
+		boolean panji = anchor.data().getBooleanOr("panji", slot % 3 == 0);
+		DiscipleEntity body = Tubuh.spawn(level, Vec3.atBottomCenterOf(at), sect, sect.memberRankStep(slot), slot, name, at, panji);
 		if (body != null) {
+			// the anchor's yaw turns with the structure (the template's south = the court, facing the visitor)
+			Tubuh.hadap(body, anchor.getYRot());
+			Tubuh.kerja(body, slot, panji);
 			BY_ANCHOR.put(anchor.getUUID(), body);
 			MEMBERS.put(body.getUUID(), new Member(anchor.getUUID(), sect.id));
 		}
@@ -192,10 +197,12 @@ final class AnggotaSekte implements AnchorHandler {
 	private static void master(ServerLevel level, DuniaAnchorEntity anchor, SekteNpc sect) {
 		DiscipleEntity old = BY_ANCHOR.get(anchor.getUUID());
 		if (old != null && !old.isRemoved()) {
+			// back on the throne after a duel or a walk
+			KetuaSekte.duduk(old, anchor.blockPosition());
 			return;
 		}
 		BlockPos at = anchor.blockPosition();
-		DiscipleEntity body = KetuaSekte.spawnAtGate(level, Vec3.atBottomCenterOf(at), sect, at);
+		DiscipleEntity body = KetuaSekte.spawnAtGate(level, Vec3.atBottomCenterOf(at), sect, at, anchor.getYRot());
 		if (body != null) {
 			BY_ANCHOR.put(anchor.getUUID(), body);
 		}
@@ -216,6 +223,8 @@ final class AnggotaSekte implements AnchorHandler {
 		Sikap sikap = DiplomasiData.get(server).relasi(player.getUUID(), sect).sikap();
 		int line = Math.floorMod(body.getUUID().hashCode(), 3);
 		body.getLookControl().setLookAt(player);
+		SosokApi.tatap(body, player);
+		SosokApi.gerak(body, sikap == Sikap.PERANG || sikap == Sikap.BERMUSUHAN ? GerakId.ANCAM : GerakId.HORMAT, 0, 40);
 		player.sendSystemMessage(Component.translatable(GeneratorNama.KEY + "anggota.sapa." + sikap.id() + "." + line, body.getDisplayName(),
 				sect.name(), sect.master()).withStyle(ChatFormatting.WHITE));
 		Tubuh.say(body, switch (sikap) {

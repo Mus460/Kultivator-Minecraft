@@ -5,7 +5,11 @@ import dev.kultivator.disciple.DiscipleEntity;
 import dev.kultivator.disciple.DiscipleItems;
 import dev.kultivator.disciple.Disciples;
 import dev.kultivator.sect.hall.Halls;
+import dev.kultivator.sekte.mandiri.jalan.Jelmaan;
+import dev.kultivator.sosok.GerakId;
+import dev.kultivator.sosok.PropId;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
@@ -148,6 +152,7 @@ final class AwayTeams {
 		}
 		long now = EventUtil.gameTime();
 		ServerPlayer player = EventUtil.player(owner);
+		tampilkan(owner, hall, teams, now);
 		boolean changed = false;
 		for (int i = teams.size() - 1; i >= 0; i--) {
 			if (!(teams.get(i) instanceof CompoundTag team)) {
@@ -181,6 +186,50 @@ final class AwayTeams {
 		}
 		if (changed) {
 			EventUtil.dirty();
+		}
+	}
+
+	/**
+	 * M2-ANIM: a team away on an expedition or as the recruiting envoy is pure data, so while a player is within 128 blocks of its
+	 * site (a fixed spot 140 to 159 blocks from the stele, one per team) each member is shown by a {@code Jelmaan} stage body doing
+	 * the errand's work: herbs picked on the cliff with the sickle, a patrol or caravan guard at its post with the spear, the hunt
+	 * as a sword routine, the envoy reading its roll. The forbidden ground and the Ark are another realm (no place here).
+	 */
+	private static void tampilkan(UUID owner, @Nullable Halls.HallView hall, ListTag teams, long now) {
+		ServerLevel level = hall == null ? null : EventUtil.hallLevel(hall);
+		if (level == null || !Jelmaan.dekatPemain(level, hall.pos(), 300.0D)) {
+			return;
+		}
+		for (Tag tag : teams) {
+			if (!(tag instanceof CompoundTag team) || team.getBooleanOr("resolved", false) || team.getBooleanOr("recalled", false)
+					|| team.getLongOr("return_at", 0L) <= now) {
+				continue;
+			}
+			String kind = team.getStringOr("kind", "");
+			int type = team.getIntOr("type", 0);
+			Jelmaan.Adegan work = switch (kind) {
+				case KIND_EXPEDITION -> switch (type) {
+					case Expeditions.TYPE_HERBS -> Jelmaan.Adegan.diam(GerakId.PETIK_HERBA_TEBING, 0, PropId.SABIT_HERBA);
+					case Expeditions.TYPE_HUNT -> Jelmaan.Adegan.diam(GerakId.LATIH_JURUS, 0, 0);
+					case Expeditions.TYPE_SECRET -> null;
+					default -> Jelmaan.Adegan.diam(GerakId.BERDIRI_JAGA, 0, PropId.TOMBAK);
+				};
+				case KIND_ENVOY -> Jelmaan.Adegan.diam(GerakId.MEMBACA, 0, PropId.GULUNGAN);
+				default -> null;
+			};
+			int id = team.getIntOr("id", 0);
+			BlockPos site = work == null ? null : Jelmaan.titikLuar(level, hall.pos(), owner.getLeastSignificantBits() * 31L + id, 140);
+			if (site == null) {
+				continue;
+			}
+			ListTag members = team.getListOrEmpty("members");
+			for (int m = 0; m < members.size(); m++) {
+				CompoundTag member = members.getCompoundOrEmpty(m);
+				UUID soul = soul(member);
+				if (soul != null && !member.getBooleanOr("as_tablet", false)) {
+					Jelmaan.tunjukkan(level, "tim:" + owner + ":" + id + ":" + soul, owner, soul, member, Jelmaan.sekitar(level, site, m), site, work, 100);
+				}
+			}
 		}
 	}
 

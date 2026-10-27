@@ -13,6 +13,9 @@ import dev.kultivator.sekte.api.Perlakuan;
 import dev.kultivator.sekte.api.SekteApi;
 import dev.kultivator.sekte.api.SekteBus;
 import dev.kultivator.sekte.kebun.Kebun.Aula;
+import dev.kultivator.sekte.mandiri.jalan.Jelmaan;
+import dev.kultivator.sosok.Gaya;
+import dev.kultivator.sosok.GerakId;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.sekte.SekteSuara;
 import net.minecraft.ChatFormatting;
@@ -54,6 +57,7 @@ public final class GiliranTambang {
 
 	/** Works the mine by {@code elapsed} ticks. */
 	static void work(Aula aula, long elapsed) {
+		showHurt(aula);
 		int level = TambangRoh.level(aula.owner());
 		if (level <= 0) {
 			return;
@@ -132,6 +136,26 @@ public final class GiliranTambang {
 			KebunPayloads.fx(aula.level(), KebunPayloads.FX_INTI, at, 0xFFD27A);
 			Pertumbuhan.scene(aula, Kebun.BEAT_CORE, coreFinder, at, level);
 			SekteSuara.line(coreFinder, "ore_found", "cheer", 200);
+		}
+	}
+
+	/**
+	 * M2-ANIM: a miner hurt in a cave-in rests, wounded and sitting, at the mouth of the mine for the day it is away: a
+	 * {@code Jelmaan} stage body, shown while a player is within 128 blocks of the mouth and gone when the real miner is back.
+	 */
+	static void showHurt(Aula aula) {
+		BlockPos mouth = TambangRoh.mouth(aula.owner());
+		if (mouth == null) {
+			return;
+		}
+		int i = 0;
+		for (Halls.AwayView away : Halls.away(aula.owner())) {
+			if (!Kebun.REASON_HURT.equals(away.reason())) {
+				continue;
+			}
+			long left = away.returnAt() - aula.now();
+			Jelmaan.tunjukkan(aula.level(), "tambang_luka:" + away.soul(), aula.owner(), away.soul(), null, Jelmaan.sekitar(aula.level(), mouth, i++),
+					mouth, Jelmaan.Adegan.diam(GerakId.DUDUK_LANTAI, 0, 0).terluka(Gaya.LUKA_LENGAN), (int) Math.max(40L, Math.min(24000L, left)));
 		}
 	}
 
@@ -316,6 +340,7 @@ public final class GiliranTambang {
 		CompoundTag info = new CompoundTag();
 		info.putString("cause", "runtuh");
 		Halls.storeAway(aula.owner(), hurt, aula.now() + 24000L, Kebun.REASON_HURT, info);
+		showHurt(aula);
 		Component line = Component.translatable("kultivator.sekte.kebun.log.cave_in", name);
 		Kebun.note(aula.owner(), line, true);
 		Kebun.tell(aula.player(), line, ChatFormatting.RED);

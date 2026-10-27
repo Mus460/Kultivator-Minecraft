@@ -12,6 +12,8 @@ import dev.kultivator.sect.hall.Halls;
 import dev.kultivator.util.Sibuk;
 import dev.kultivator.voice.Voice;
 import dev.kultivator.sekte.SekteSuara;
+import dev.kultivator.sosok.GerakId;
+import dev.kultivator.sosok.SosokApi;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -65,15 +67,26 @@ final class KetuaSekte {
 		FIGHTS.clear();
 	}
 
-	/** The master at its throne anchor (from {@link AnggotaSekte}). */
-	static @Nullable DiscipleEntity spawnAtGate(ServerLevel level, Vec3 pos, SekteNpc sect, BlockPos anchor) {
+	/** The master at its throne anchor (from {@link AnggotaSekte}), seated and facing {@code yaw} (the throne faces the court). */
+	static @Nullable DiscipleEntity spawnAtGate(ServerLevel level, Vec3 pos, SekteNpc sect, BlockPos anchor, float yaw) {
 		DiscipleEntity body = Tubuh.spawn(level, pos, sect, sect.masterRankStep(), 99,
 				Component.translatable(GeneratorNama.KEY + "ketua.plat", sect.master(), sect.name()), anchor, false);
 		if (body != null) {
+			Tubuh.hadap(body, yaw);
+			duduk(body, anchor);
 			BOSSES.put(body.getUUID(), new Boss(sect.id, null, Long.MAX_VALUE));
 			ENTITIES.put(body.getUUID(), body);
 		}
 		return body;
+	}
+
+	/** The master sits on its throne (DUDUK_KURSI) while it stays on it; off it (a duel, a walk) it stands. */
+	static void duduk(DiscipleEntity body, BlockPos throne) {
+		if (body.distanceToSqr(Vec3.atBottomCenterOf(throne)) < 4.0D) {
+			SosokApi.gerak(body, GerakId.DUDUK_KURSI, 0, 0);
+		} else if (SosokApi.gerakSekarang(body) == GerakId.DUDUK_KURSI) {
+			SosokApi.henti(body);
+		}
 	}
 
 	/** The master accepted to come to the hall: it appears by the stele when its master is there. */
@@ -115,6 +128,8 @@ final class KetuaSekte {
 					BOSSES.put(body.getUUID(), new Boss(sect.id, entry.getKey(), level.getGameTime() + HALL_WAIT));
 					ENTITIES.put(body.getUUID(), body);
 					body.getLookControl().setLookAt(player);
+					Tubuh.hadap(body, Tubuh.menuju(body.position(), player.position()));
+					SosokApi.gerak(body, GerakId.SIKAP_LIPAT_TANGAN, 0, 0);
 					SekteSuara.say(body, "boss.sect_master", "boss.awaken");
 					player.sendSystemMessage(Component.translatable(GeneratorNama.KEY + "pesan.ketua_tiba", sect.master()).withStyle(ChatFormatting.DARK_RED));
 				}
@@ -194,6 +209,7 @@ final class KetuaSekte {
 			return;
 		}
 		FIGHTS.put(body.getUUID(), new Fight(player.getUUID(), sect.id));
+		SosokApi.henti(body); // rises from the throne for the duel
 		Voice.say(body, "boss.taunt", null);
 		player.sendSystemMessage(Component.translatable(GeneratorNama.KEY + "pesan.ketua_duel", sect.master()).withStyle(ChatFormatting.GOLD));
 	}

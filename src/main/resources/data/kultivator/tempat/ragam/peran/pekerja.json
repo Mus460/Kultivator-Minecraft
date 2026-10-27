@@ -181,7 +181,7 @@
       "kunci": "rg_periksa_kerja",
       "blok": "kerja",
       "tujuan": "@kerja",
-      "klip": "memandang",
+      "klip": "sikap_tangan_belakang",
       "durasi": [
         10,
         15

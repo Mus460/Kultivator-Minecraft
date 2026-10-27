@@ -11,6 +11,9 @@ import dev.kultivator.sekte.api.Jabatan;
 import dev.kultivator.sekte.api.SekteApi;
 import dev.kultivator.sekte.api.SekteBus;
 import dev.kultivator.sekte.SekteSuara;
+import dev.kultivator.sekte.mandiri.jalan.Jelmaan;
+import dev.kultivator.sosok.GerakId;
+import dev.kultivator.sosok.SosokApi;
 import dev.kultivator.voice.VoiceDisciples;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -64,6 +67,8 @@ final class Utusan {
 
 	private static final Map<UUID, Envoy> BODIES = new HashMap<>();
 	private static final Map<UUID, DiscipleEntity> ENTITIES = new HashMap<>();
+	/** Envoy bodies that already bowed to their master when it came near. */
+	private static final java.util.Set<UUID> BOWED = new java.util.HashSet<>();
 	/** Returned envoys whose memory is written when their body is back in the world: soul → sect id. */
 	private static final Map<UUID, String> RETURNED = new HashMap<>();
 
@@ -80,6 +85,7 @@ final class Utusan {
 		}
 		BODIES.clear();
 		ENTITIES.clear();
+		BOWED.clear();
 		RETURNED.clear();
 	}
 
@@ -154,6 +160,11 @@ final class Utusan {
 		BODIES.put(body.getUUID(), new Envoy(owner, offerId, sect.id, leaveAt));
 		ENTITIES.put(body.getUUID(), body);
 		body.getLookControl().setLookAt(player);
+		// M2-ANIM: it arrives standing at its post (flag in hand), turned to the master, and bows
+		Tubuh.kerja(body, 0, true);
+		Tubuh.hadap(body, Tubuh.menuju(body.position(), player.position()));
+		SosokApi.tatap(body, player);
+		SosokApi.gerak(body, GerakId.HORMAT, GerakId.V_HORMAT_BAOQUAN, 60);
 		SekteSuara.say(body, "elder.envoy", "disciple." + VoiceDisciples.voiceOf(body) + ".greet");
 	}
 
@@ -292,12 +303,37 @@ final class Utusan {
 					remove(entry.getKey(), true);
 				} else if (master.distanceToSqr(body) < 12.0D * 12.0D) {
 					body.getLookControl().setLookAt(master);
+					if (BOWED.add(entry.getKey())) {
+						// M2-ANIM: the master comes up to it: the bow of a messenger, eyes on the master
+						SosokApi.tatap(body, master);
+						SosokApi.gerak(body, GerakId.HORMAT, GerakId.V_HORMAT_BAOQUAN, 60);
+					}
 				}
 			}
 		}
+		tampilkan(server);
 		if (!RETURNED.isEmpty()) {
 			for (Map.Entry<UUID, String> entry : List.copyOf(RETURNED.entrySet())) {
 				remembered(server, entry.getKey(), entry.getValue());
+			}
+		}
+	}
+
+	/**
+	 * M2-ANIM: the hall's own envoy (away, pure data) stands bowing at the gate of the sect it was sent to, turned to the gate, as a
+	 * {@code Jelmaan} stage body while a player is within 128 blocks of that gate. (With module X the same envoy travels as the
+	 * story mission {@code utusan}, shown by {@code TimMisi}.)
+	 */
+	private static void tampilkan(MinecraftServer server) {
+		for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+			UUID owner = player.getUUID();
+			for (Halls.AwayView away : Halls.away(owner)) {
+				BlockPos gate = REASON.equals(away.reason()) ? SekteApi.diplomasi().gate(away.info().getStringOr("sect", "")) : null;
+				if (gate != null) {
+					ServerLevel level = server.overworld();
+					Jelmaan.tunjukkan(level, "utusan:" + owner + ":" + away.soul(), owner, away.soul(), null, Jelmaan.sekitar(level, gate, 0), gate,
+							Jelmaan.Adegan.diam(GerakId.HORMAT, GerakId.V_HORMAT_BAOQUAN, 0).berulang(160), 100);
+				}
 			}
 		}
 	}
@@ -316,6 +352,7 @@ final class Utusan {
 
 	private static void remove(UUID id, boolean fx) {
 		BODIES.remove(id);
+		BOWED.remove(id);
 		DiscipleEntity body = ENTITIES.remove(id);
 		if (body != null) {
 			if (fx) {

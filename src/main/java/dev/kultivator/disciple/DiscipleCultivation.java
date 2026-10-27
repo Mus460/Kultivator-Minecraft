@@ -179,7 +179,7 @@ public final class DiscipleCultivation {
 			}
 		}
 
-		boolean meditating = entity.isMeditatingNow() && !data.breakingThrough();
+		boolean meditating = entity.cultivatesNow() && !data.breakingThrough();
 		double max = maxQi(data);
 		if (data.qi() > max) {
 			data.setQi(max);
@@ -623,6 +623,7 @@ public final class DiscipleCultivation {
 		}
 		data.setPillCooldown(choice.key(), PILL_COOLDOWN);
 		consume(master, stack, choice);
+		dev.kultivator.sosok.SosokApi.gerak(entity, dev.kultivator.sosok.GerakId.MAKAN_PIL, 0, 0);
 
 		Vec3 pos = entity.position();
 		// Common effects anchored on the disciple (the PILL effect would swirl around the nearest player: the master).
@@ -1667,6 +1668,7 @@ public final class DiscipleCultivation {
 		}
 		data.setPillCooldown(choice.key(), PILL_COOLDOWN);
 		stack.shrink(1);
+		dev.kultivator.sosok.SosokApi.gerak(entity, dev.kultivator.sosok.GerakId.MAKAN_PIL, 0, 0);
 		Vec3 pos = entity.position();
 		int rgb = choice.strength() == 0 ? 0x5A6B3A : choice.color();
 		Fx.burst(level, pos.add(0.0D, 1.0D, 0.0D), rgb, 8 + 6 * choice.strength(), 0.7F);
@@ -1819,7 +1821,7 @@ public final class DiscipleCultivation {
 		DiscipleData data = entity.data();
 		CompoundTag tag = data.save();
 		Rank rank = data.rank();
-		boolean meditating = entity.isMeditatingNow();
+		boolean meditating = entity.cultivatesNow();
 		tag.putDouble("max_qi", maxQi(data));
 		tag.putDouble("qi_regen", regenPerSecond(data, meditating));
 		tag.putDouble("xp_required", rank.xpRequired());

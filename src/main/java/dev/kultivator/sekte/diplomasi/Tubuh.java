@@ -8,6 +8,8 @@ import dev.kultivator.disciple.DiscipleData;
 import dev.kultivator.disciple.DiscipleEntity;
 import dev.kultivator.disciple.Disciples;
 import dev.kultivator.sekte.api.Lambang;
+import dev.kultivator.sosok.GerakId;
+import dev.kultivator.sosok.SosokApi;
 import dev.kultivator.voice.Voice;
 import dev.kultivator.voice.VoiceDisciples;
 import net.minecraft.core.BlockPos;
@@ -157,6 +159,39 @@ final class Tubuh {
 			}
 		}
 		return best;
+	}
+
+	/** Turns the body and its head to {@code yaw} at once: a body put at a post faces its work, not a random way. */
+	static void hadap(DiscipleEntity body, float yaw) {
+		body.setYRot(yaw);
+		body.yRotO = yaw;
+		body.setYHeadRot(yaw);
+		body.yHeadRotO = yaw;
+		body.setYBodyRot(yaw);
+		body.yBodyRotO = yaw;
+	}
+
+	/** The yaw (degrees) that looks from {@code from} toward {@code to} along the ground. */
+	static float menuju(Vec3 from, Vec3 to) {
+		return (float) Math.toDegrees(Math.atan2(from.x - to.x, to.z - from.z));
+	}
+
+	/**
+	 * A gate member's job by its slot (the clips and props of {@code KerjaPeran}'s MURID_SEKTE_LUAR/DALAM and PELAYAN_SEKTE): the
+	 * flag-bearer stands guard holding its banner (a real held item keeps the clip's spear away), the others drill with the
+	 * sword, breathe in meditation, sweep or carry water on the yoke. The clip loops until replaced.
+	 */
+	static void kerja(DiscipleEntity body, int slot, boolean panji) {
+		if (panji) {
+			SosokApi.gerak(body, GerakId.BERDIRI_JAGA, 0, 0);
+			return;
+		}
+		SosokApi.gerak(body, switch (Math.floorMod(slot, 6)) {
+			case 2 -> GerakId.NAPAS_MEDITASI;
+			case 4 -> GerakId.SAPU;
+			case 5 -> GerakId.JALAN_PIKUL;
+			default -> GerakId.LATIHAN_PEDANG_1;
+		}, 0, 0);
 	}
 
 	private Tubuh() {

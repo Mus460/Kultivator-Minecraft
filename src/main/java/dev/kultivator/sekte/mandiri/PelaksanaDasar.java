@@ -9,6 +9,10 @@ import dev.kultivator.sekte.mandiri.api.Kegiatan;
 import dev.kultivator.sekte.mandiri.api.MandiriApi;
 import dev.kultivator.sekte.mandiri.api.MandiriIds;
 import dev.kultivator.sekte.mandiri.api.Pelaksana;
+import dev.kultivator.dunia.kota42.api.KotaGerakId;
+import dev.kultivator.sosok.GerakId;
+import dev.kultivator.sosok.PropId;
+import dev.kultivator.sosok.SosokApi;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.particles.SimpleParticleType;
@@ -201,7 +205,11 @@ public final class PelaksanaDasar {
 
 	// ================================================================== BERMAIN
 
-	/** Snow, harvest or festival play in the courtyard: the talk pose, snowflakes in snow, happy sparks otherwise. */
+	/**
+	 * Snow, harvest or festival play in the courtyard: no body activity (the tea pose of 18 would swallow a loop clip), the
+	 * two play with a real clip, a chase (MAIN_KEJAR) and in dry weather kicking the cuju ball (MAIN_CUJU, ball prop), turned
+	 * towards each other, with snowflakes in snow and happy sparks otherwise.
+	 */
 	static final class Bermain implements Pelaksana {
 		@Override
 		public boolean bisa(DiscipleEntity murid, Konteks konteks) {
@@ -210,25 +218,40 @@ public final class PelaksanaDasar {
 
 		@Override
 		public void mulai(DiscipleEntity murid, Konteks konteks) {
-			murid.setActivity(Kegiatan.BERMAIN.act(), konteks.tempat());
+			// no body activity: the walk to the place is the executor's own (jalan)
 		}
 
 		@Override
 		public boolean jalan(DiscipleEntity murid, Konteks konteks) {
-			if (murid.activity() != Kegiatan.BERMAIN.act()) {
+			if (murid.activity() != DiscipleEntity.ACTIVITY_NONE) {
 				return false;
+			}
+			BlockPos tempat = konteks.tempat();
+			if (tempat != null && !murid.mode().guardsPost() && murid.tickCount % 20 == 0
+					&& murid.distanceToSqr(tempat.getX() + 0.5D, tempat.getY(), tempat.getZ() + 0.5D) > 9.0D) {
+				murid.getNavigation().moveTo(tempat.getX() + 0.5D, tempat.getY(), tempat.getZ() + 0.5D, 1.0D);
 			}
 			if (murid.tickCount % 40 == 0 && murid.level() instanceof ServerLevel level && murid.getNavigation().isDone()) {
 				boolean snow = Irama.salju(level, murid.blockPosition());
 				SimpleParticleType type = snow ? ParticleTypes.SNOWFLAKE : ParticleTypes.HAPPY_VILLAGER;
 				level.sendParticles(type, murid.getX(), murid.getY() + 1.4D, murid.getZ(), snow ? 4 : 2, 0.4D, 0.3D, 0.4D, 0.02D);
+				DiscipleEntity teman = konteks.teman() == null ? null : Perencana.cari(konteks.owner(), konteks.teman());
+				if (teman != null && !teman.isRemoved() && teman.distanceToSqr(murid) < 100.0D) {
+					murid.getLookControl().setLookAt(teman, 30.0F, 30.0F);
+				}
+				// 80-tick turns of chasing and (dry) kicking; a base clip, so it only restarts when it changes
+				if (!snow && murid.tickCount / 80 % 2 == 0) {
+					SosokApi.gerak(murid, KotaGerakId.MAIN_CUJU, 0, 0, KotaGerakId.PROP_BOLA_CUJU, PropId.TIDAK_ADA, PropId.TIDAK_ADA);
+				} else {
+					SosokApi.gerak(murid, GerakId.MAIN_KEJAR, 0, 0);
+				}
 			}
 			return true;
 		}
 
 		@Override
 		public void selesai(DiscipleEntity murid, Konteks konteks, boolean batal) {
-			lepasAktivitas(murid, Kegiatan.BERMAIN.act());
+			SosokApi.henti(murid);
 		}
 	}
 

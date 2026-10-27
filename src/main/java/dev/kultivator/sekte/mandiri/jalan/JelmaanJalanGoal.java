@@ -86,7 +86,11 @@ final class JelmaanJalanGoal extends Goal {
 		recalc = this.adjustedTickDelay(20);
 		boolean jelmaan = body.role() == DiscipleEntity.Role.JELMAAN;
 		Jelmaan.Tubuh scene = jelmaan ? Jelmaan.dari(body) : null;
-		double speed = scene != null && scene.jenis == Jelmaan.Jenis.KOTA ? SANTAI : JALAN;
+		double speed = scene == null ? JALAN : switch (scene.jenis) {
+			case KOTA -> SANTAI;
+			case PENTAS -> scene.laju;
+			default -> JALAN;
+		};
 		boolean moving = body.getNavigation().moveTo(t.getX() + 0.5D, t.getY(), t.getZ() + 0.5D, speed);
 		if (moving) {
 			gagal = 0;

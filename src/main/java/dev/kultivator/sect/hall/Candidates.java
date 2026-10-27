@@ -152,7 +152,8 @@ public final class Candidates {
 		}
 	}
 
-	private static final int ACCEPT_BOW_TICKS = 30;
+	/** As long as the SUJUD_GURU clip (110 ticks): the youth stays put while it plays. */
+	private static final int ACCEPT_BOW_TICKS = 110;
 	private static final Map<UUID, Map<Integer, DiscipleEntity>> VIEWS = new HashMap<>();
 	private static final Map<UUID, Ref> BY_ENTITY = new HashMap<>();
 	private static final List<Test> TESTS = new ArrayList<>();
@@ -543,6 +544,7 @@ public final class Candidates {
 			}
 			if (night && entity.activity() == DiscipleEntity.ACTIVITY_NONE) {
 				entity.setActivity(DiscipleEntity.ACTIVITY_SPECTATOR, entity.blockPosition());
+				entity.setActivityFocus(stele);
 			} else if (!night && entity.activity() == DiscipleEntity.ACTIVITY_SPECTATOR) {
 				entity.setActivity(DiscipleEntity.ACTIVITY_NONE, null);
 			}
@@ -945,10 +947,8 @@ public final class Candidates {
 					it.remove();
 					continue;
 				}
-				// Down to 45 degrees and back up, then the new disciple follows its master.
-				int done = ACCEPT_BOW_TICKS - bowing.ticks;
+				// The SUJUD_GURU clip does the bowing; then the new disciple follows its master.
 				entity.getNavigation().stop();
-				entity.setXRot(done < ACCEPT_BOW_TICKS / 2 ? done * 3.0F : bowing.ticks * 3.0F);
 			}
 		}
 		if (!LEAVING.isEmpty()) {
@@ -1200,6 +1200,13 @@ public final class Candidates {
 		remove(core, id);
 		forgetRetry(owner, id);
 		BOWING.add(new Bowing(entity));
+		// Three kowtows to the master (clip SUJUD_GURU, 110 ticks), turned towards him.
+		Vec3 toMaster = player.position().subtract(entity.position());
+		float faceYaw = (float) (net.minecraft.util.Mth.atan2(toMaster.z, toMaster.x) * net.minecraft.util.Mth.RAD_TO_DEG) - 90.0F;
+		entity.setYRot(faceYaw);
+		entity.setYHeadRot(faceYaw);
+		entity.setYBodyRot(faceYaw);
+		dev.kultivator.sosok.SosokApi.gerak(entity, dev.kultivator.sosok.GerakId.SUJUD_GURU, 0, 0);
 		if (servant) {
 			Halls.spendPool(owner, SERVANT_COST);
 		}

@@ -371,6 +371,17 @@ public final class KotaGerakId {
 	/** Seated on the ground eating from a box (42S picnic). */
 	public static final int PIKNIK_DUDUK = 459;
 
+	// ================================================================== 460: reserve clips taken for the kitchen and the workshop
+
+	/** Chopping on a board: the knife (prop 57) rising and falling in quick strokes, the left hand steadying (cook). */
+	public static final int POTONG_TALENAN = 460;
+
+	/** Kneading dough: both fists pressing down and folding, leaning in (cook, baker). */
+	public static final int ULENI_ADONAN = 461;
+
+	/** Sawing a plank: the blade (a board, prop 32, stands in for it) pushed and pulled in front of the body (carpenter). */
+	public static final int GERGAJI_KAYU = 462;
+
 	// ================================================================== named variants (low 8 bits of DATA_GERAK)
 
 	/** {@link #TARI_YANGGE}: the long silk sash (prop 179) instead of the fan. */
@@ -387,7 +398,7 @@ public final class KotaGerakId {
 	public static final int KLIP_42S_FIRST = 450;
 	public static final int KLIP_42S_LAST = 459;
 	/** Last clip in use. */
-	public static final int KLIP_LAST = 459;
+	public static final int KLIP_LAST = 462;
 	/** Last id reserved for 42 (42S may add 460-469 without touching anyone else). */
 	public static final int KLIP_CADANGAN_LAST = 469;
 
@@ -536,7 +547,7 @@ public final class KotaGerakId {
 	public static final int PROP_FIRST = 170;
 	public static final int PROP_LAST = 239;
 
-	/** Clip names of 350-459 in order (42.12.5, 42.4A.7). */
+	/** Clip names of 350-462 in order (42.12.5, 42.4A.7). */
 	private static final String[] KLIP_NAMA = {
 			"minum_arak", "jalan_mabuk", "tidur_bangku", "tonton_catur", "gantung_sangkar", "main_erhu",
 			"menyulam", "bercermin", "hitung_koin", "beri_koin", "jalan_baca", "beri_makan_kucing",
@@ -556,7 +567,8 @@ public final class KotaGerakId {
 			"layang_naga", "dorong_sangkar_ayam", "sajikan_teh_besar", "tiru", "mengigau", "batuk",
 			"pincang", "main_kucing", "peregangan_pagi", "ucap_selamat", "seka_keringat", "garuk_kepala",
 			"betulkan_topi", "lihat_sekeliling", "menyiangi", "usir_lalat", "tambal_jala", "sembunyi_tong",
-			"tepuk_debu", "piknik_duduk"};
+			"tepuk_debu", "piknik_duduk",
+			"potong_talenan", "uleni_adonan", "gergaji_kayu"};
 	/** Once length per clip (0 = loop or held). */
 	private static final int[] SEKALI = {
 			0, 0, 0, 0, 40, 0, 0, 0, 0, 24, 0, 40, 30, 20, 0, 0, 0, 30, 40, 60,
@@ -564,7 +576,7 @@ public final class KotaGerakId {
 			0, 20, 0, 0, 0, 120, 30, 0, 0, 0, 0, 30, 0, 0, 30, 0, 30, 60, 40, 60,
 			0, 0, 0, 0, 0, 0, 0, 0, 30, 30, 0, 0, 0, 40, 0, 60, 20, 40, 0, 0,
 			0, 60, 0, 40, 0, 0, 0, 30, 30, 0, 0, 0, 0, 0, 0, 20, 0, 0, 60, 30,
-			30, 24, 20, 40, 0, 16, 0, 0, 20, 0};
+			30, 24, 20, 40, 0, 16, 0, 0, 20, 0, 0, 0, 0};
 	/** Default right-hand prop per clip (0 = none). */
 	private static final int[] KANAN = {
 			171, 171, 0, 0, 172, 174, 175, 176, 29, 29, 11, 186, 217, 0, 201, 180, 0, 0, 0, 0,
@@ -572,7 +584,7 @@ public final class KotaGerakId {
 			209, 209, 0, 0, 0, 0, 171, 0, 192, 194, 0, 199, 0, 0, 0, 196, 0, 0, 183, 0,
 			0, 0, 171, 216, 36, 212, 204, 0, 22, 198, 224, 225, 226, 223, 213, 199, 207, 206, 228, 234,
 			236, 237, 13, 0, 0, 188, 231, 198, 198, 185, 208, 238, 239, 0, 0, 0, 13, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 57, 0, 32};
 	/** Default left-hand prop per clip (0 = none). */
 	private static final int[] KIRI = {
 			170, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -580,7 +592,7 @@ public final class KotaGerakId {
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 210, 0, 0, 0,
 			0, 0, 0, 216, 0, 211, 0, 0, 0, 0, 0, 0, 0, 222, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	/** Prop model names of 170-239 in order. */
 	private static final String[] PROP_NAMA = {
 			"guci_arak", "cawan_arak", "sangkar_burung", "guci_jangkrik", "erhu", "bingkai_sulam",
@@ -596,7 +608,7 @@ public final class KotaGerakId {
 			"tikar_zhuazhou", "lentera_kelinci", "layang_kupu", "kue_keranjang", "tanghulu", "kantong_kue",
 			"tempayan_air", "jaring_ikan", "sangkar_ayam", "nampan_teh_besar"};
 
-	/** True for a clip id defined here (350-459). */
+	/** True for a clip id defined here (350-462). */
 	public static boolean klip(int id) {
 		return id >= KLIP_FIRST && id <= KLIP_LAST;
 	}
@@ -606,12 +618,12 @@ public final class KotaGerakId {
 		return id >= KLIP_FIRST && id <= KLIP_CADANGAN_LAST;
 	}
 
-	/** The design name of clip {@code id} ({@code minum_arak}), or null outside 350-459. */
+	/** The design name of clip {@code id} ({@code minum_arak}), or null outside 350-462. */
 	public static @Nullable String klipNama(int id) {
 		return klip(id) ? KLIP_NAMA[id - KLIP_FIRST] : null;
 	}
 
-	/** The client catalog name of clip {@code id} ({@code kota42_minum_arak}), or null outside 350-459. */
+	/** The client catalog name of clip {@code id} ({@code kota42_minum_arak}), or null outside 350-462. */
 	public static @Nullable String namaKatalog(int id) {
 		String nama = klipNama(id);
 		return nama == null ? null : "kota42_" + nama;
@@ -631,7 +643,7 @@ public final class KotaGerakId {
 		return 0;
 	}
 
-	/** Length in ticks of a clip that plays once; 0 for loops, held clips and ids outside 350-459. */
+	/** Length in ticks of a clip that plays once; 0 for loops, held clips and ids outside 350-462. */
 	public static int durasiSekali(int id) {
 		return klip(id) ? SEKALI[id - KLIP_FIRST] : 0;
 	}
@@ -662,7 +674,7 @@ public final class KotaGerakId {
 		return nama == null ? null : "fx/kota42/" + nama;
 	}
 
-	/** Number of clips in use (110). */
+	/** Number of clips in use (113). */
 	public static int jumlahKlip() {
 		return KLIP_NAMA.length;
 	}

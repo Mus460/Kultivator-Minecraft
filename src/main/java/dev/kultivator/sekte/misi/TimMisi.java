@@ -17,9 +17,14 @@ import dev.kultivator.sekte.SekteLog;
 import dev.kultivator.sekte.api.SekteApi;
 import dev.kultivator.sekte.api.SekteBus;
 import dev.kultivator.sekte.api.Sikap;
+import dev.kultivator.sekte.mandiri.jalan.Jelmaan;
+import dev.kultivator.sosok.Gaya;
+import dev.kultivator.sosok.GerakId;
+import dev.kultivator.sosok.PropId;
 import dev.kultivator.util.Msg;
 import dev.kultivator.sekte.SekteSuara;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
@@ -393,6 +398,80 @@ final class TimMisi {
 				tier, leaderName, sent.size()));
 		SekteBus.MISSION_SENT.invoker().onMissionSent(server, owner, tpl.id(), List.copyOf(sent));
 		return true;
+	}
+
+	// ================================================================== the team at its place (M2-ANIM)
+
+	/**
+	 * M2-ANIM, about once a second per online master ({@code Misi.tickOwner}): the members of every running story mission are away
+	 * (pure data), so while a player is within 128 blocks of the place of the mission's current third each member is shown by a
+	 * {@code Jelmaan} stage body. The place: the NPC sect's gate for an envoy or a spy (from the second third, the first is the
+	 * road), the vassal village's bell for a village errand, else a fixed spot 140 to 159 blocks from the stele. The clip follows
+	 * the stage kind: the sword routine in a fight, folded arms in a scheme, the bow of an envoy at a gate (talking hands elsewhere),
+	 * the spear at its post when scouting, the herb sickle on a cliff for the herb mission. A wounded member wears the bandage.
+	 */
+	static void tampilkan(MinecraftServer server, UUID owner) {
+		Halls.HallView hall = Halls.hallOf(owner);
+		ServerLevel hallLevel = hall == null || hall.dim() == null ? null : server.getLevel(hall.dim());
+		if (hallLevel == null) {
+			return;
+		}
+		long now = server.overworld().getGameTime();
+		for (CompoundTag mission : MisiData.active(owner)) {
+			TemplatMisi tpl = TemplatMisi.byId(mission.getStringOr("tpl", ""));
+			long start = mission.getLongOr("start", now);
+			long len = Math.max(60L, mission.getLongOr("len", 24000L));
+			if (tpl == null || mission.getBooleanOr("finished", false) || mission.getBooleanOr("ditarik", false) || now >= start + len) {
+				continue;
+			}
+			int stage = (int) Math.max(0L, Math.min(2L, (now - start) * 3L / len));
+			TemplatMisi.Jenis kind = tpl.stage(stage);
+			int id = mission.getIntOr("id", 0);
+			ServerLevel level = hallLevel;
+			BlockPos site = null;
+			boolean gate = false;
+			String sect = mission.getStringOr("sect", "");
+			if (!sect.isEmpty() && (tpl == TemplatMisi.UTUSAN || tpl == TemplatMisi.SAMAR)) {
+				site = SekteApi.diplomasi().gate(sect);
+				if (site != null) {
+					gate = true;
+					level = server.overworld();
+				}
+			} else if (tpl.has(TemplatMisi.Flags.VILLAGE)) {
+				for (VillageView village : Vassals.views(owner)) {
+					if (village.name().equals(mission.getStringOr("village", ""))) {
+						site = village.bell();
+					}
+				}
+			}
+			if (gate && kind == TemplatMisi.Jenis.JELAJAH) {
+				continue; // still on the road to the gate
+			}
+			if (site == null && Jelmaan.dekatPemain(hallLevel, hall.pos(), 300.0D)) {
+				site = Jelmaan.titikLuar(hallLevel, hall.pos(), owner.getLeastSignificantBits() * 31L + id, 140);
+			}
+			if (site == null || !Jelmaan.dekatPemain(level, site, 140.0D)) {
+				continue;
+			}
+			Jelmaan.Adegan work = switch (kind) {
+				case TEMPUR -> Jelmaan.Adegan.diam(GerakId.LATIH_JURUS, 0, 0);
+				case LICIK -> Jelmaan.Adegan.diam(gate ? GerakId.SIKAP_TUNDUK : GerakId.SIKAP_LIPAT_TANGAN, 0, 0);
+				case DAMAI -> gate ? Jelmaan.Adegan.diam(GerakId.HORMAT, GerakId.V_HORMAT_BAOQUAN, 0).berulang(160)
+						: Jelmaan.Adegan.diam(GerakId.BICARA_TANGAN, 0, 0);
+				case JELAJAH -> tpl == TemplatMisi.HERBA ? Jelmaan.Adegan.diam(GerakId.PETIK_HERBA_TEBING, 0, PropId.SABIT_HERBA)
+						: Jelmaan.Adegan.diam(GerakId.BERDIRI_JAGA, 0, PropId.TOMBAK);
+			};
+			List<CompoundTag> team = MisiData.team(mission);
+			for (int i = 0; i < team.size(); i++) {
+				CompoundTag member = team.get(i);
+				UUID soul = MisiData.soul(member);
+				if (soul == null || member.getBooleanOr("back", false) || member.getBooleanOr("left", false)) {
+					continue;
+				}
+				Jelmaan.Adegan shown = member.getIntOr("hurt_at", -1) >= 0 && stage >= member.getIntOr("hurt_at", -1) ? work.terluka(Gaya.LUKA_LENGAN) : work;
+				Jelmaan.tunjukkan(level, "misi:" + owner + ":" + id + ":" + soul, owner, soul, null, Jelmaan.sekitar(level, site, i), site, shown, 100);
+			}
+		}
 	}
 
 	/** What the stage rolls read of a member, taken when it leaves (it is pure data while away). */

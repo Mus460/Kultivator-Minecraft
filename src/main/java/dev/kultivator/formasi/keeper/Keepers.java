@@ -12,6 +12,8 @@ import dev.kultivator.formasi.core.CoreTicker;
 import dev.kultivator.formasi.spec.FormationSpec;
 import dev.kultivator.formasi.spec.Grade;
 import dev.kultivator.sect.hall.SectRanks;
+import dev.kultivator.sosok.GerakId;
+import dev.kultivator.sosok.SosokApi;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Targeting;
 import net.minecraft.core.BlockPos;
@@ -55,6 +57,8 @@ public final class Keepers {
 	public static final double UPKEEP_FLOOR = 0.25D;
 	/** Perkuat keepers gain only this share of their own meditation XP while keeping. */
 	public static final double PERKUAT_OWN_XP = 0.5D;
+	/** A keeper at its post seals its hands once every this many seconds. */
+	private static final int SEAL_EVERY = 12;
 
 	/** Assigns {@code disciple} to core {@code coreId} with {@code order}; null on success, else why not. */
 	public static @Nullable Component assign(ServerPlayer master, int coreId, DiscipleEntity disciple, KeeperOrder order) {
@@ -348,6 +352,11 @@ public final class Keepers {
 					DiscipleData data = disciple.data();
 					int rank = SectRanks.rank(data);
 					atPost++;
+					// the keeper sits facing the core's eye and seals its hands now and then (the seat is DiscipleEntity's)
+					disciple.setActivityFocus(record.eye);
+					if (Math.floorMod(server.getTickCount() / 20 + disciple.getId(), SEAL_EVERY) == 0) {
+						SosokApi.gerak(disciple, GerakId.SEGEL_TANGAN, 0, 70);
+					}
 					double[] mod = modifiers(spec, keeper.order, data.realm(), rank, data.dao(), data.rootElements(), jaga);
 					if (keeper.order == KeeperOrder.JAGA) {
 						jaga++;

@@ -53,8 +53,8 @@ public enum Kegiatan {
 	TIBA("tiba", MandiriKegiatan.ACT_BAWA, IzinKegiatan.BELANJA, 0.0D, 200, 600, "39C"),
 	/** Away from the hall (the body is in {@code AwayStore}); length from the plan. */
 	PERJALANAN("perjalanan", 0, IzinKegiatan.BERKELANA, 0.8D, 6000, 120000, "39C"),
-	/** Snow, harvest or festival play in the courtyard (shown with 18 or 53). */
-	BERMAIN("bermain", 18, IzinKegiatan.SOSIAL, 0.2D, 1000, 1000, "39A"),
+	/** Snow, harvest or festival play in the courtyard: no body activity, the executor plays the play clips (chase, cuju). */
+	BERMAIN("bermain", 0, IzinKegiatan.SOSIAL, 0.2D, 1000, 1000, "39A"),
 	/** 39.F T1 quarrel (57). */
 	CEKCOK("cekcok", MandiriKegiatan.ACT_CEKCOK, IzinKegiatan.SOSIAL, 0.0D, 300, 600, "39F"),
 	/** 39.F T2 fist-and-palm salute before the honour duel (58). */

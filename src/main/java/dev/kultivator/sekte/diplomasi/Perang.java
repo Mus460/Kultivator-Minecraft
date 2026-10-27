@@ -9,6 +9,8 @@ import dev.kultivator.musuh.SectRaids;
 import dev.kultivator.sect.hall.Halls;
 import dev.kultivator.sekte.SekteIds;
 import dev.kultivator.sekte.api.AksiSekte;
+import dev.kultivator.sosok.GerakId;
+import dev.kultivator.sosok.SosokApi;
 import dev.kultivator.util.Advancements;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -440,8 +442,11 @@ public final class Perang {
 				double angle = level.getRandom().nextDouble() * Math.PI * 2.0D;
 				BlockPos at = Tubuh.ground(level, hall.pos().offset((int) Math.round(Math.cos(angle) * 4.0D), 0, (int) Math.round(Math.sin(angle) * 4.0D)));
 				DiscipleEntity guard = Tubuh.spawn(level, Vec3.atBottomCenterOf(at), sect, sect.memberRankStep(i) + 2, 40 + i,
-						Component.translatable(GeneratorNama.KEY + "penjaga.nama", GeneratorNama.member(sect.lambang, 40 + i), sect.name()), at, true);
+						Component.translatable(GeneratorNama.KEY + "penjaga.nama", GeneratorNama.member(sect.lambang, 40 + i), sect.name()), at, i == 0);
 				if (guard != null) {
+					// on watch: faces away from the hall, spear in hand (the first guard of a sect carries its banner instead)
+					Tubuh.hadap(guard, Tubuh.menuju(Vec3.atCenterOf(hall.pos()), guard.position()));
+					SosokApi.gerak(guard, GerakId.BERDIRI_JAGA, 0, 0);
 					guards.add(guard);
 				}
 			}
@@ -482,6 +487,7 @@ public final class Perang {
 				if (DuelRules.inDuel(guard)) {
 					continue;
 				}
+				SosokApi.gerak(guard, GerakId.BERDIRI_JAGA, 0, 0);
 				RogueCultivatorEntity best = null;
 				double bestD = 32.0D * 32.0D;
 				for (RogueCultivatorEntity raider : raiders) {
@@ -503,6 +509,7 @@ public final class Perang {
 						foe.vanish(true);
 					}
 				})) {
+					SosokApi.henti(guard);
 					guard.setTarget(foe);
 				}
 			}

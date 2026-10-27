@@ -6,6 +6,7 @@ import dev.kultivator.dunia.api.SkyKind;
 import dev.kultivator.dunia.kota.KotaData;
 import dev.kultivator.dunia.kota.KultivatorNpc;
 import dev.kultivator.dunia.kota.NpcRole;
+import dev.kultivator.dunia.kota42.api.KotaGerakId;
 import dev.kultivator.dunia.tempat.Titik;
 import dev.kultivator.dunia.tempat.kotabesar.KotaBesarApi;
 import dev.kultivator.dunia.tempat.perbaikan.PerbaikanApi;
@@ -543,14 +544,16 @@ public final class TubuhPenduduk {
 	/** Clips during which the body stays put at its titik and is not pushed (38.N.5.1 sitting, sleeping, kneeling). */
 	private static final Set<Integer> KLIP_DIAM = Set.of(GerakId.TIDUR, GerakId.TIDUR_DUDUK, GerakId.DUDUK_KURSI, GerakId.DUDUK_LANTAI,
 			GerakId.CATUR, GerakId.CERITA, GerakId.NAPAS_MEDITASI, GerakId.MEDITASI_NAPAS, GerakId.BERLUTUT, GerakId.BERLUTUT_RANTAI,
-			GerakId.SEMEDI_DARAH, GerakId.TENUN, GerakId.SUJUD_DUPA, GerakId.MEMANCING, GerakId.ASAH_PISAU, GerakId.TAKUT_SEMBUNYI);
+			GerakId.SEMEDI_DARAH, GerakId.TENUN, GerakId.SUJUD_DUPA, GerakId.MEMANCING, GerakId.ASAH_PISAU, GerakId.TAKUT_SEMBUNYI,
+			KotaGerakId.MENGIGAU);
 	/** Clips whose eyes stay on the work in front (38.N.5.4: the gaze target is the work object). */
 	private static final Set<Integer> KLIP_FOKUS = Set.of(GerakId.MENULIS, GerakId.MEMBACA, GerakId.MASAK, GerakId.PALU_LANDASAN,
 			GerakId.TUMBUK_HERBA, GerakId.HITUNG_SEMPOA, GerakId.SAPU, GerakId.TENUN, GerakId.LUKIS_DINDING, GerakId.PETIK_TEH,
 			GerakId.PETIK_HERBA_TEBING, GerakId.PALU_LUNAS, GerakId.IKAT_TALI, GerakId.JEMUR_IKAN, GerakId.MENCANGKUL, GerakId.MEMANEN,
 			GerakId.TANAM_BIBIT, GerakId.PERBAIKI_PALU, GerakId.PERBAIKI_PLESTER, GerakId.ASAH_PISAU, GerakId.HITUNG_KOIN_GELAP,
 			GerakId.RAK_SUSUN, GerakId.TIMBA_SUMUR, GerakId.PUTAR_KATROL, GerakId.CATUR, GerakId.MEMANCING, GerakId.TARIK_JALA,
-			GerakId.SEDUH_TEH, GerakId.TUANG_TEH, GerakId.BASUH_PAKAIAN, GerakId.GANTI_TANAH, GerakId.TANAM_ULANG);
+			GerakId.SEDUH_TEH, GerakId.TUANG_TEH, GerakId.BASUH_PAKAIAN, GerakId.GANTI_TANAH, GerakId.TANAM_ULANG,
+			KotaGerakId.POTONG_TALENAN, KotaGerakId.ULENI_ADONAN, KotaGerakId.GERGAJI_KAYU, KotaGerakId.GOSOK_DINDING);
 
 	/** True while the body sleeps, sits or kneels at its titik. */
 	static boolean diam(KultivatorNpc npc) {
@@ -615,6 +618,7 @@ public final class TubuhPenduduk {
 			// asleep in its own bed; sheltering ones crouch inside; the rest wait indoors until they are out of sight
 			int klip = kasur && k.kunci().equals("tidur") ? GerakId.TIDUR
 					: k.kunci().equals("berlindung") ? GerakId.TAKUT_SEMBUNYI
+					: kasur && k.kunci().equals("sakit") ? KotaGerakId.MENGIGAU
 					: kasur ? GerakId.DUDUK_KURSI : GerakId.SIKAP_TANGAN_BELAKANG;
 			int varian = klip == GerakId.TIDUR && (p.benih() >>> 27 & 1L) == 1L ? GerakId.V_TIDUR_MIRING : 0;
 			SosokApi.gerak(npc, klip, varian, 0, 0, 0, 0);

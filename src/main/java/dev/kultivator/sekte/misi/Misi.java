@@ -165,6 +165,7 @@ public final class Misi implements MisiService {
 			}
 		}
 		Kepulangan.tick(server, owner, master);
+		TimMisi.tampilkan(server, owner);
 	}
 
 	/** The stage news in the master's chat and the hall log. */

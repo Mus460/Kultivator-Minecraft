@@ -157,6 +157,7 @@ public final class VillageGuards {
 					RESTING.remove(village.guard);
 					village.guardTag = new CompoundTag();
 					body.setActivity(DiscipleEntity.ACTIVITY_FORMATION_GUARD, village.plaque);
+					body.setActivityFocus(player.blockPosition());
 					Vassals.changed();
 				}
 			}
@@ -168,8 +169,14 @@ public final class VillageGuards {
 		}
 		if (far) {
 			store(owner, village, body);
-		} else if (body.activity() != DiscipleEntity.ACTIVITY_FORMATION_GUARD) {
-			body.setActivity(DiscipleEntity.ACTIVITY_FORMATION_GUARD, village.plaque);
+		} else {
+			if (body.activity() != DiscipleEntity.ACTIVITY_FORMATION_GUARD) {
+				body.setActivity(DiscipleEntity.ACTIVITY_FORMATION_GUARD, village.plaque);
+			}
+			// it stands at its post (spear, BERDIRI_JAGA) turned to the owner it keeps watch for
+			if (player != null) {
+				body.setActivityFocus(player.blockPosition());
+			}
 		}
 	}
 

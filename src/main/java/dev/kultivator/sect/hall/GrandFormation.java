@@ -115,11 +115,14 @@ public final class GrandFormation {
 				boolean spotNear = spot != null && Vec3.atBottomCenterOf(spot).distanceToSqr(lodestone) <= (GUARD_RANGE + 1.5D) * (GUARD_RANGE + 1.5D);
 				if (guard == null && canGuard(disciple) && spotNear) {
 					guard = disciple;
+					// the core keeper sits and channels (the other formation guards stand with the spear)
+					disciple.setGuardSits(true);
 				} else if (spotNear) {
 					disciple.setActivity(DiscipleEntity.ACTIVITY_NONE, null);
 				}
 			} else if (guard == null && qualifies && disciple.activity() == DiscipleEntity.ACTIVITY_NONE) {
 				disciple.setActivity(DiscipleEntity.ACTIVITY_FORMATION_GUARD, disciple.blockPosition());
+				disciple.setGuardSits(true);
 				guard = disciple;
 				ServerPlayer master = disciple.owner();
 				if (master != null) {
@@ -168,6 +171,8 @@ public final class GrandFormation {
 		}
 		if (!keep) {
 			disciple.setActivity(DiscipleEntity.ACTIVITY_NONE, null);
+		} else {
+			disciple.setGuardSits(true);
 		}
 	}
 

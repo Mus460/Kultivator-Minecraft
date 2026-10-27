@@ -12,8 +12,10 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.kultivator.Kultivator;
 import dev.kultivator.dunia.kota.KultivatorNpc;
 import dev.kultivator.dunia.kota.NilaiBatu;
+import dev.kultivator.dunia.kota.NpcRole;
 import dev.kultivator.dunia.kota42.KotaHidup;
 import dev.kultivator.dunia.kota42.KotaTitik;
+import dev.kultivator.dunia.kota42.api.KotaGerakId;
 import dev.kultivator.dunia.kota42.api.WargaApi;
 import dev.kultivator.dunia.kota42.cakap.Kepribadian;
 import dev.kultivator.dunia.kota42.warga.Suasana;
@@ -476,17 +478,18 @@ public final class Perkara {
 		KotaHidup.tandaiSibuk(player, KotaHidup.SIBUK_SIDANG, 1200);
 		Kasus k = dari(situs, c);
 		Warga w = WargaApi.byId(wargaId);
-		tubuhSaksi(player, situs, k, w);
+		tubuhSaksi(player, situs, k, w, KotaGerakId.BERSAKSI, 0);
 		Msg.chat(player, Component.translatable("kultivator.kota42.perkara.kesaksian", w == null ? Component.literal("?") : WargaApi.nama(w),
 				kesaksian(server, k, index)).withStyle(ChatFormatting.AQUA));
-		tawarAmplop(player, situs, c);
+		tawarAmplop(player, situs, k, c);
 		KotaEkonomiData.get(server).ubah();
 		return null;
 	}
 
-	private static void tubuhSaksi(ServerPlayer player, long situs, Kasus k, @Nullable Warga w) {
+	/** Stands the body of {@code w} at the hall and plays {@code klip} (the witness testifies, the briber slides his envelope); null when none. */
+	private static @Nullable KultivatorNpc tubuhSaksi(ServerPlayer player, long situs, Kasus k, @Nullable Warga w, int klip, int tick) {
 		if (w == null || !(player.level() instanceof ServerLevel level) || !KotaHidup.duniaKota(level)) {
-			return;
+			return null;
 		}
 		List<Titik> halls = KotaTitik.titik(level, situs, KotaTitik.SIDANG);
 		Titik hall = null;
@@ -496,7 +499,7 @@ public final class Perkara {
 			}
 		}
 		if (hall == null) {
-			return;
+			return null;
 		}
 		String key = situs + ":" + k.id();
 		List<KultivatorNpc> bodies = SAKSI.computeIfAbsent(key, x -> new ArrayList<>());
@@ -506,12 +509,14 @@ public final class Perkara {
 			body.setLonely(64.0D, SAKSI_TICK);
 			body.memory().putBoolean("saksi", true);
 			HidupApi.tatap(body, player);
+			HidupApi.klip(body, klip, 0, tick);
 			bodies.add(body);
 			SAKSI_SAMPAI.put(key, level.getGameTime() + SAKSI_TICK);
 		}
+		return body;
 	}
 
-	private static void tawarAmplop(ServerPlayer player, long situs, CompoundTag c) {
+	private static void tawarAmplop(ServerPlayer player, long situs, Kasus k, CompoundTag c) {
 		if (!c.getBooleanOr("suapMau", false) || c.getLongOr("amp", 0L) > 0L) {
 			return;
 		}
@@ -520,6 +525,7 @@ public final class Perkara {
 		Warga wrong = WargaApi.byId(c.getIntOr("benar", 0) == 0 ? c.getIntOr("b", 0) : c.getIntOr("a", 0));
 		Msg.chat(player, Component.translatable("kultivator.kota42.perkara.amplop", wrong == null ? Component.literal("?") : WargaApi.nama(wrong),
 				NilaiBatu.text(nb)).withStyle(ChatFormatting.DARK_RED, ChatFormatting.ITALIC));
+		tubuhSaksi(player, situs, k, wrong, KotaGerakId.SODOR_AMPLOP, 40);
 	}
 
 	/** Traces evidence {@code indeks} of case {@code id}: its text (and a gossip's chain of spreaders) is revealed. */
@@ -547,7 +553,7 @@ public final class Perkara {
 			line.append(Component.literal(" ")).append(Component.translatable("kultivator.kota42.perkara.rantai", chain));
 		}
 		Msg.chat(player, line.withStyle(ChatFormatting.GRAY));
-		tawarAmplop(player, situs, c);
+		tawarAmplop(player, situs, k, c);
 		return null;
 	}
 
@@ -631,6 +637,7 @@ public final class Perkara {
 		Jabatan.catatTugasMinggu(server, situs, player.getUUID(), "perkara");
 		Jabatan.catatTugas(player, situs);
 		KotaHidup.lepasSibuk(player, KotaHidup.SIBUK_SIDANG);
+		ketukPalu(player);
 		bubarkanSaksi(situs + ":" + id);
 		Msg.chat(player, Component.translatable("kultivator.kota42.perkara.putus", nama(k), putusanTeks(k, no)[0]).withStyle(ChatFormatting.GOLD));
 		Msg.chat(player, result.copy().withStyle(mood > 0 ? ChatFormatting.GREEN : mood < 0 ? ChatFormatting.RED : ChatFormatting.YELLOW));
@@ -689,6 +696,15 @@ public final class Perkara {
 			if (SAKSI_SAMPAI.get(key) <= now) {
 				bubarkanSaksi(key);
 			}
+		}
+	}
+
+	/** The magistrate of the hall brings the gavel down on the verdict (the clerk-judge nearest the bench, if one stands within 24 blocks). */
+	private static void ketukPalu(ServerPlayer player) {
+		for (KultivatorNpc n : player.level().getEntitiesOfClass(KultivatorNpc.class, player.getBoundingBox().inflate(24.0D), x -> x.role() == NpcRole.HAKIM)) {
+			HidupApi.tatap(n, player);
+			HidupApi.klip(n, KotaGerakId.PALU_PUTUSAN, 0, 40);
+			return;
 		}
 	}
 

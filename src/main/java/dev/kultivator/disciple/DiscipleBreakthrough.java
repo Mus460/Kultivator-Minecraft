@@ -403,6 +403,7 @@ public final class DiscipleBreakthrough {
 		sound(level, pos, SoundEvents.PLAYER_LEVELUP, 1.0F, 0.8F);
 		sound(level, pos, SoundEvents.BEACON_ACTIVATE, 1.0F, 1.1F);
 		sound(level, pos, SoundEvents.BELL_RESONATE, 0.8F, 1.2F);
+		dev.kultivator.sosok.SosokApi.gerak(entity, dev.kultivator.sosok.GerakId.TEROBOSAN_BERHASIL, 0, 0);
 		DiscipleHooks.breakthroughEnded(entity, true, t.kind);
 
 		ServerPlayer master = entity.owner();
@@ -445,6 +446,8 @@ public final class DiscipleBreakthrough {
 		Fx.send(level, pos, FxType.DEVIATION, 0, 0, 1.0F);
 		sound(level, pos, SoundEvents.WITHER_AMBIENT, 0.5F, 1.4F);
 		sound(level, pos, SoundEvents.LIGHTNING_BOLT_THUNDER, 0.8F, 0.4F);
+		// the failure clip is a held pose: give it a time so the disciple gets up again
+		dev.kultivator.sosok.SosokApi.gerak(entity, dev.kultivator.sosok.GerakId.TEROBOSAN_GAGAL, 0, 100);
 		entity.refreshSynced();
 		DiscipleHooks.breakthroughEnded(entity, false, t.kind);
 		ServerPlayer master = entity.owner();

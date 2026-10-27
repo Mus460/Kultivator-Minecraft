@@ -41,7 +41,7 @@
       "kunci": "kerja",
       "blok": "kerja",
       "tujuan": "@kerja",
-      "klip": "angkat_papan",
+      "klip": "gergaji_kayu",
       "kanan": "papan_kayu",
       "durasi": [
         20,
@@ -118,8 +118,9 @@
       "kunci": "kerja",
       "blok": "kerja",
       "tujuan": "@kerja",
-      "klip": "lukis_dinding",
-      "kanan": "pahat",
+      "klip": "palu_lunas",
+      "kanan": "palu_dempul",
+      "kiri": "pahat",
       "durasi": [
         20,
         45
@@ -144,7 +145,7 @@
       "kunci": "rg_periksa_hasil",
       "blok": "kerja",
       "tujuan": "@kerja",
-      "klip": "memandang",
+      "klip": "lihat_barang",
       "durasi": [
         10,
         20

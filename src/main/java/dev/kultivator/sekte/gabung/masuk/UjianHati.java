@@ -25,6 +25,7 @@ import dev.kultivator.sekte.gabung.api.SyaratMasuk;
 import dev.kultivator.sekte.gabung.dunia.TitikGabung;
 import dev.kultivator.sekte.gabung.dunia.TokohAnchors;
 import dev.kultivator.sekte.gabung.dunia.TokohSekte;
+import dev.kultivator.sosok.GerakId;
 import dev.kultivator.tempa.ArtifactItem;
 import dev.kultivator.util.Msg;
 import net.minecraft.ChatFormatting;
@@ -438,6 +439,7 @@ public final class UjianHati {
 		npc.memory().putBoolean("hold", true);
 		npc.setPlate(tokoh != null ? namaTokoh(server, tokoh) : Masuk.t(tamu ? "hati.plat_tamu" : "hati.plat_penerimaan"));
 		Masuk.rupa(npc, TokohAnchors.RUPA_TETUA, s.sekte);
+		HidupApi.klip(npc, GerakId.SIKAP_TANGAN_BELAKANG, 0, 0);
 		if (tokoh != null) {
 			s.data.putString("tokoh", tokoh.id());
 		}

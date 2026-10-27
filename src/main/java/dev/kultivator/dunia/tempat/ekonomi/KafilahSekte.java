@@ -10,6 +10,9 @@ import dev.kultivator.dunia.kota.Towns;
 import dev.kultivator.dunia.tempat.tema.TemaApi;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import dev.kultivator.sect.hall.Halls;
+import dev.kultivator.sekte.mandiri.jalan.Jelmaan;
+import dev.kultivator.sosok.GerakId;
+import dev.kultivator.sosok.PropId;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
 import net.minecraft.ChatFormatting;
@@ -528,6 +531,7 @@ public final class KafilahSekte {
 					continue;
 				}
 				Vec3 pos = posisi(caravan, now);
+				kawal(level, player, caravan, pos);
 				if (Math.hypot(player.getX() - pos.x, player.getZ() - pos.z) > KafilahJalan.TUBUH_JARAK
 						|| !level.isPositionEntityTicking(BlockPos.containing(pos.x, player.getY(), pos.z))) {
 					continue;
@@ -561,6 +565,34 @@ public final class KafilahSekte {
 			}
 			return false;
 		});
+	}
+
+	/**
+	 * M2-ANIM: the escorts of a travelling caravan are away (pure data), so while a player is within 128 blocks each one is shown
+	 * by a {@code Jelmaan} stage body: it marches beside the cart with its spear (the guard march clip), at the cart's pace, and
+	 * goes when the caravan arrives or the real disciple is back. They never drop loot and never count as disciples.
+	 */
+	private static void kawal(ServerLevel level, ServerPlayer player, CompoundTag caravan, Vec3 pos) {
+		ListTag guards = caravan.getListOrEmpty("pengawal");
+		int bx = Mth.floor(pos.x);
+		int bz = Mth.floor(pos.z);
+		if (guards.isEmpty() || Math.hypot(player.getX() - pos.x, player.getZ() - pos.z) > 128.0D || !level.hasChunk(bx >> 4, bz >> 4)) {
+			return;
+		}
+		long id = caravan.getLongOr("id", 0L);
+		GerobakEntity cart = TUBUH.get(id);
+		BlockPos base = cart != null && !cart.isRemoved() ? cart.blockPosition()
+				: new BlockPos(bx, level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, bx, bz), bz);
+		for (int i = 0; i < guards.size(); i++) {
+			UUID soul;
+			try {
+				soul = UUID.fromString(guards.getCompoundOrEmpty(i).getStringOr("jiwa", ""));
+			} catch (IllegalArgumentException exception) {
+				continue;
+			}
+			Jelmaan.tunjukkan(level, "kafilah:" + id + ":" + soul, player.getUUID(), soul, null, Jelmaan.sekitar(level, base, i), null,
+					Jelmaan.Adegan.diam(GerakId.BARIS_JAGA, 0, PropId.TOMBAK).berjalan(0.35D), 100);
+		}
 	}
 
 	// ---------------------------------------------------------------------------------------------------------------

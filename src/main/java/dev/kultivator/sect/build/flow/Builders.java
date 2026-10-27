@@ -14,6 +14,8 @@ import dev.kultivator.sect.build.api.SiteView;
 import dev.kultivator.sect.event.Duties;
 import dev.kultivator.sect.hall.Halls;
 import dev.kultivator.sect.hall.SectRanks;
+import dev.kultivator.sosok.GerakId;
+import dev.kultivator.sosok.SosokApi;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
 import dev.kultivator.util.Targeting;
@@ -29,8 +31,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
@@ -274,6 +274,8 @@ public final class Builders {
 			if (spot != null) {
 				BlockPos target = spread(spot, index);
 				body.setActivity(DiscipleEntity.ACTIVITY_BUILD, target);
+				// it faces the layer being built; DiscipleEntity plays the mending hammer there and the plank carry on the way
+				body.setActivityFocus(spot);
 				worker.activitySet = DiscipleEntity.ACTIVITY_BUILD;
 				double distance = Math.sqrt(body.distanceToSqr(Vec3.atBottomCenterOf(target)));
 				if (distance <= WORK_RANGE) {
@@ -294,6 +296,7 @@ public final class Builders {
 				if (activity != DiscipleEntity.ACTIVITY_SPECTATOR) {
 					body.setActivity(DiscipleEntity.ACTIVITY_SPECTATOR, plaza);
 				}
+				body.setActivityFocus(site.stele());
 				worker.activitySet = DiscipleEntity.ACTIVITY_SPECTATOR;
 				worker.bestDistance = Double.MAX_VALUE;
 			}
@@ -325,10 +328,10 @@ public final class Builders {
 				continue;
 			}
 			worker.nextSwing = tick + 15 + body.getRandom().nextInt(11);
-			if (body.getTarget() != null) {
+			// the hammer blow is the body clip's (PERBAIKI_PALU, DiscipleEntity.animateDuty); the dust and sound follow it
+			if (body.getTarget() != null || SosokApi.gerakSekarang(body) != GerakId.PERBAIKI_PALU) {
 				continue;
 			}
-			body.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, false);
 			BlockPos spot = body.activitySpot();
 			Vec3 hand = body.position().add(body.getLookAngle().scale(0.6D)).add(0.0D, 0.9D, 0.0D);
 			Vec3 layer = spot == null ? hand : Vec3.atCenterOf(spot);

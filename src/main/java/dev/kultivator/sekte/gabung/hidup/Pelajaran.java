@@ -29,6 +29,8 @@ import dev.kultivator.sekte.gabung.api.KelasSekte;
 import dev.kultivator.sekte.gabung.dunia.TitikGabung;
 import dev.kultivator.sekte.gabung.dunia.TokohAnchors;
 import dev.kultivator.sekte.gabung.dunia.TokohSekte;
+import dev.kultivator.sosok.GerakId;
+import dev.kultivator.sosok.PropId;
 import dev.kultivator.sosok.SosokApi;
 import dev.kultivator.technique.spec.run.Mastery;
 import dev.kultivator.util.Advancements;
@@ -646,6 +648,8 @@ public final class Pelajaran {
 		npc.setPlate(shifu.nama());
 		npc.memory().putString("tokoh", shifu.id());
 		npc.memory().putBoolean("hold", true);
+		// teaches with the fly-whisk between the lines (TETUA_MENILAI plays over it)
+		HidupApi.klip(npc, GerakId.MENGAJAR, PropId.KEBUT, 0);
 		SEMENTARA.put(npc, level.getGameTime() + ticks);
 		return npc;
 	}

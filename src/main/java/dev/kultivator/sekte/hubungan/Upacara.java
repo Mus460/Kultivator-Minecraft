@@ -11,6 +11,10 @@ import dev.kultivator.sekte.api.Perlakuan;
 import dev.kultivator.sekte.api.SekteBus;
 import dev.kultivator.util.Msg;
 import dev.kultivator.sekte.SekteSuara;
+import dev.kultivator.dunia.kota42.api.KotaGerakId;
+import dev.kultivator.sosok.GerakId;
+import dev.kultivator.sosok.SosokApi;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
@@ -19,9 +23,12 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -207,6 +214,7 @@ final class Upacara {
 		}
 		SekteSuara.line(a, "oath", "loyal", 600);
 		SekteSuara.line(b, "oath", "loyal", 600);
+		finale(a, b);
 		scene(owner, a, b, BEAT_OATH);
 	}
 
@@ -246,6 +254,7 @@ final class Upacara {
 		SekteBus.honored(server, owner, b.soulId(), SekteIds.R + ".restu", 4);
 		SekteSuara.line(a, "beloved", "thanks", 600);
 		SekteSuara.line(b, "beloved", "thanks", 600);
+		finale(a, b);
 		scene(owner, a, b, BEAT_WEDDING);
 	}
 
@@ -273,6 +282,66 @@ final class Upacara {
 		Component line = Component.translatable("kultivator.sekte.hubungan.larang.selesai", TabelPasangan.name(owner, a), TabelPasangan.name(owner, b));
 		Msg.chat(master, line.copy().withColor(0xC08080));
 		SekteLog.log(server, owner, SekteIds.R, line);
+	}
+
+	// ================================================================== the finale clips
+
+	/** HORMAT lasts 30 ticks, the toast 70; the two stand still (before the stele, facing each other) for both. */
+	private static final int BOW_TICKS = 30;
+	private static final int TOAST_TICKS = 70;
+	private static final List<Finale> FINALES = new ArrayList<>();
+	private static boolean finaleRegistered;
+
+	private record Finale(DiscipleEntity a, DiscipleEntity b, long toast, long end) {
+	}
+
+	/**
+	 * The rite's end: the two stand where they sat (before the stele), turn to face each other, bow (HORMAT) and then raise
+	 * the cup (BERSULANG, KotaGerakId 396).
+	 */
+	private static void finale(DiscipleEntity a, DiscipleEntity b) {
+		if (a.isRemoved() || b.isRemoved()) {
+			return;
+		}
+		if (!finaleRegistered) {
+			finaleRegistered = true;
+			ServerTickEvents.END_SERVER_TICK.register(server -> tickFinale());
+		}
+		hadap(a, b);
+		hadap(b, a);
+		SosokApi.gerak(a, GerakId.HORMAT, 0, BOW_TICKS);
+		SosokApi.gerak(b, GerakId.HORMAT, 0, BOW_TICKS);
+		long now = a.level().getGameTime();
+		FINALES.add(new Finale(a, b, now + BOW_TICKS, now + BOW_TICKS + TOAST_TICKS));
+	}
+
+	private static void tickFinale() {
+		for (java.util.Iterator<Finale> it = FINALES.iterator(); it.hasNext(); ) {
+			Finale f = it.next();
+			long now = f.a().level().getGameTime();
+			if (f.a().isRemoved() || f.b().isRemoved() || now >= f.end()) {
+				it.remove();
+				continue;
+			}
+			f.a().getNavigation().stop();
+			f.b().getNavigation().stop();
+			if (now == f.toast()) {
+				SosokApi.gerak(f.a(), KotaGerakId.BERSULANG, 0, TOAST_TICKS);
+				SosokApi.gerak(f.b(), KotaGerakId.BERSULANG, 0, TOAST_TICKS);
+			}
+		}
+	}
+
+	private static void hadap(DiscipleEntity d, DiscipleEntity to) {
+		double dx = to.getX() - d.getX();
+		double dz = to.getZ() - d.getZ();
+		if (dx * dx + dz * dz < 1.0E-4D) {
+			return;
+		}
+		float yaw = (float) (Mth.atan2(dz, dx) * Mth.RAD_TO_DEG) - 90.0F;
+		d.setYRot(yaw);
+		d.setYHeadRot(yaw);
+		d.setYBodyRot(yaw);
 	}
 
 	// ================================================================== shared

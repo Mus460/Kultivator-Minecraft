@@ -1,6 +1,7 @@
 package dev.kultivator.dunia.tempat.hidup;
 
 import dev.kultivator.dunia.kota.NpcRole;
+import dev.kultivator.dunia.kota42.api.KotaGerakId;
 import dev.kultivator.sosok.GerakId;
 import dev.kultivator.sosok.PropId;
 import org.jetbrains.annotations.Nullable;
@@ -247,7 +248,16 @@ public final class KerjaPeran {
 				k("lapak", GerakId.HITUNG_KOIN_GELAP, PropId.KANTONG_UANG));
 		put(NpcRole.PEMBURU_LURUS, k("jaga", GerakId.BERDIRI_JAGA, 0).sel(GerakId.ASAH_PEDANG, 0));
 
-		// ---------------------------------------------------------------- 42 resident roles (troupe bodies PENGAMEN/AKROBAT/PENARI/PEMUSIK/PENCOPET are event-driven)
+		// ---------------------------------------------------------------- 42 resident roles (the troupe roles play their act here when no Rombongan runs)
+		put(NpcRole.PENGAMEN, k("obrol", KotaGerakId.MAIN_ERHU, KotaGerakId.PROP_ERHU), k("obrol", GerakId.MAIN_SERULING, PropId.SERULING));
+		put(NpcRole.AKROBAT, k("panggung", KotaGerakId.AKROBAT_PIRING, KotaGerakId.PROP_PIRING_AKROBAT, KotaGerakId.PROP_PIRING_AKROBAT, 0, 0),
+				k("panggung", KotaGerakId.AKROBAT_SIMPAI, KotaGerakId.PROP_SIMPAI));
+		put(NpcRole.PENARI, k("panggung", KotaGerakId.TARI_YANGGE, KotaGerakId.PROP_KIPAS_TARI),
+				k("panggung", KotaGerakId.TARI_YANGGE, KotaGerakId.PROP_SELENDANG).v(KotaGerakId.V_YANGGE_SELENDANG));
+		put(NpcRole.PEMUSIK, k("obrol", KotaGerakId.PUKUL_GONG, KotaGerakId.PROP_GONG_TANGAN),
+				k("obrol", KotaGerakId.TABUH_GENDERANG_KECIL, KotaGerakId.PROP_GENDERANG_KECIL),
+				k("obrol", KotaGerakId.TIUP_SUONA, KotaGerakId.PROP_SUONA));
+		put(NpcRole.PENCOPET, k("obrol", GerakId.BERSANDAR, 0).sel(GerakId.SIKAP_LIPAT_TANGAN, 0));
 		put(NpcRole.PENJAGA_MALAM, k("jaga", GerakId.BERDIRI_JAGA, PropId.LENTERA_TANGAN).sel(GerakId.SIKAP_TANGAN_BELAKANG, 0));
 		put(NpcRole.MAK_COMBLANG, k("obrol", GerakId.BICARA_TANGAN, PropId.KIPAS_LIPAT, 0, 0, GerakId.ANGGUK_DENGAR));
 		put(NpcRole.PENDONGENG, k("panggung", GerakId.BICARA_TANGAN, PropId.KIPAS_LIPAT));

@@ -20,6 +20,8 @@ import dev.kultivator.sekte.gabung.api.KelasSekte;
 import dev.kultivator.sekte.gabung.api.Pintu;
 import dev.kultivator.sekte.gabung.api.StatusAnggota;
 import dev.kultivator.sekte.gabung.dunia.TitikGabung;
+import dev.kultivator.sosok.GerakId;
+import dev.kultivator.sosok.PropId;
 import dev.kultivator.technique.FlightLease;
 import dev.kultivator.technique.FlyingSword;
 import dev.kultivator.util.Msg;
@@ -835,6 +837,8 @@ public final class HariUjian {
 		if (npc != null) {
 			npc.memory().putString(Masuk.MEM_SEKTE, sekte);
 			Masuk.rupa(npc, "murid.dalam", sekte);
+			// on watch at the gate with the spear (a town's own gate guard keeps its schedule)
+			HidupApi.klip(npc, GerakId.BERDIRI_JAGA, PropId.TOMBAK, 0);
 		}
 		return npc;
 	}

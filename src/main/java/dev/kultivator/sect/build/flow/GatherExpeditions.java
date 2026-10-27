@@ -7,6 +7,7 @@ import dev.kultivator.disciple.DiscipleEntity;
 import dev.kultivator.disciple.Disciples;
 import dev.kultivator.disciple.DuelRules;
 import dev.kultivator.disciple.path.DisciplePaths;
+import dev.kultivator.dunia.kota42.api.KotaGerakId;
 import dev.kultivator.fx.Fx;
 import dev.kultivator.sect.build.api.Bahan;
 import dev.kultivator.sect.build.api.EngineApi;
@@ -14,10 +15,15 @@ import dev.kultivator.sect.build.api.SectTemplates;
 import dev.kultivator.sect.event.Duties;
 import dev.kultivator.sect.hall.Halls;
 import dev.kultivator.sect.hall.SectRanks;
+import dev.kultivator.sekte.SekteIds;
+import dev.kultivator.sekte.mandiri.jalan.Jelmaan;
+import dev.kultivator.sosok.GerakId;
+import dev.kultivator.sosok.PropId;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -230,6 +236,7 @@ public final class GatherExpeditions {
 		}
 		long now = server.overworld().getGameTime();
 		ServerPlayer master = server.getPlayerList().getPlayer(owner);
+		tampilkan(server, owner, list, now);
 		for (int i = list.size() - 1; i >= 0; i--) {
 			if (!(list.get(i) instanceof CompoundTag party) || party.getLongOr("return_at", 0L) > now) {
 				continue;
@@ -253,6 +260,53 @@ public final class GatherExpeditions {
 				FlowData.dirty();
 			}
 		}
+	}
+
+	/**
+	 * M2-ANIM: a party on a trip is away (pure data), so while a player is within 128 blocks of its gathering site (a fixed spot
+	 * 140 to 159 blocks from the stele, one per party) each member is shown by a {@code Jelmaan} stage body working the category
+	 * with its tool, around the site and facing it. The bodies go when the party is due or the real member is back.
+	 */
+	private static void tampilkan(MinecraftServer server, UUID owner, ListTag list, long now) {
+		Halls.HallView hall = Halls.hallOf(owner);
+		ServerLevel level = hall == null || hall.dim() == null ? null : server.getLevel(hall.dim());
+		if (level == null || !Jelmaan.dekatPemain(level, hall.pos(), 300.0D)) {
+			return;
+		}
+		for (Tag tag : list) {
+			if (!(tag instanceof CompoundTag party) || party.getBooleanOr("resolved", false) || party.getLongOr("return_at", 0L) <= now) {
+				continue;
+			}
+			int id = party.getIntOr("id", 0);
+			BlockPos site = Jelmaan.titikLuar(level, hall.pos(), owner.getLeastSignificantBits() * 31L + id, 140);
+			if (site == null) {
+				continue;
+			}
+			Jelmaan.Adegan work = adegan(Bahan.byId(party.getStringOr("cat", "")));
+			ListTag members = party.getListOrEmpty("members");
+			for (int m = 0; m < members.size(); m++) {
+				UUID soul = members.get(m) instanceof CompoundTag stored ? stored.read("soul", UUIDUtil.CODEC).orElse(null) : null;
+				if (soul != null) {
+					Jelmaan.tunjukkan(level, "gather:" + owner + ":" + id + ":" + soul, owner, soul, members.getCompoundOrEmpty(m),
+							Jelmaan.sekitar(level, site, m), site, work, 100);
+				}
+			}
+		}
+	}
+
+	/** What the party does at its site: the herb picker's sickle, the miner's pick (the mine duty pose), the spade, the saw, the sap blade. */
+	private static Jelmaan.Adegan adegan(@Nullable Bahan cat) {
+		if (cat == null) {
+			return Jelmaan.Adegan.diam(GerakId.BERDIRI_JAGA, 0, PropId.TOMBAK);
+		}
+		return switch (cat) {
+			case FLORA -> Jelmaan.Adegan.diam(GerakId.PETIK_HERBA_TEBING, 0, PropId.SABIT_HERBA);
+			case BATU, KAPUR, LOGAM, PERMATA -> Jelmaan.Adegan.kerja(SekteIds.ACT_MINE, GerakId.MENCANGKUL, 0, PropId.CANGKUL);
+			case TANAH -> Jelmaan.Adegan.diam(GerakId.MENCANGKUL, 0, PropId.CANGKUL);
+			case KAYU -> Jelmaan.Adegan.diam(KotaGerakId.GERGAJI_KAYU, 0, 0);
+			case GENTENG -> Jelmaan.Adegan.diam(GerakId.ANGKAT_PAPAN, 0, 0);
+			case PERNIS -> Jelmaan.Adegan.diam(GerakId.MEMANEN, GerakId.V_MEMANEN_SABIT, PropId.SABIT_HERBA);
+		};
 	}
 
 	/** The success roll, the materials and every member's reward (changed in the stored tags). */

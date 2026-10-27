@@ -247,7 +247,8 @@ public final class SosokApi {
 	 * given props (0 = the clip's default for that slot). {@code tick > 0} plays it for that long, then what ran before
 	 * returns; {@code tick <= 0} plays a once clip for {@link GerakId#durasiSekali} and anything else until replaced or
 	 * {@link #henti}. Ids 150-164 set disciple activity 13-27 instead (only for a master's disciple that is not busy with
-	 * another module's activity, and only while the module owning that activity runs). Clip 0 stops.
+	 * another module's activity, and only while the module owning that activity runs); on any other body 164 plays
+	 * {@link GerakId#TATAP_LANGIT} (the gaze) and the other function ids do nothing. Clip 0 stops.
 	 */
 	public static void gerak(LivingEntity e, int klip, int varian, int tick, int propKanan, int propKiri,
 			int propPunggung) {
@@ -255,8 +256,13 @@ public final class SosokApi {
 			return;
 		}
 		if (GerakId.fungsi(klip)) {
-			fungsi(e, klip, tick);
-			return;
+			if (klip != GerakId.MEMANDANG || fungsiMurid(e)) {
+				fungsi(e, klip, tick);
+				return;
+			}
+			// a townsperson or sect NPC gazing (MEMANDANG is only a disciple activity): the sky-gazing clip stands in
+			klip = GerakId.TATAP_LANGIT;
+			varian = 0;
 		}
 		Pemegang p = pemegang(e);
 		if (p == null) {
@@ -427,15 +433,20 @@ public final class SosokApi {
 		return e instanceof Pemegang p ? p : null;
 	}
 
+	private static boolean fungsiMurid(LivingEntity e) {
+		return e instanceof DiscipleEntity murid && murid.role() == DiscipleEntity.Role.DISCIPLE;
+	}
+
 	/**
 	 * Function pose ids 150-164 -> disciple activity 13-27 (40.5.12). Only a master's disciple that is free (or still in
 	 * an activity this API gave it), and only while the module that owns the activity runs (36 modules through
 	 * {@link SekteIds#activityRuns}, Sekte Langit through {@link LangitConfig#on()}).
 	 */
 	private static void fungsi(LivingEntity e, int klip, int tick) {
-		if (!(e instanceof DiscipleEntity murid) || murid.role() != DiscipleEntity.Role.DISCIPLE) {
+		if (!fungsiMurid(e)) {
 			return;
 		}
+		DiscipleEntity murid = (DiscipleEntity) e;
 		int aktivitas = GerakId.aktivitasFungsi(klip);
 		boolean jalan = aktivitas <= SekteIds.ACT_LAST ? SekteIds.activityRuns(aktivitas) : LangitConfig.on();
 		if (aktivitas < 0 || !jalan) {

@@ -25,6 +25,7 @@ import dev.kultivator.sekte.gabung.api.Pintu;
 import dev.kultivator.sekte.gabung.dunia.TitikGabung;
 import dev.kultivator.sekte.gabung.dunia.TokohAnchors;
 import dev.kultivator.sekte.gabung.dunia.TokohSekte;
+import dev.kultivator.sosok.GerakId;
 import dev.kultivator.technique.source.JadeSlips;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
@@ -417,6 +418,7 @@ public final class UpacaraSumpah {
 		if (npc != null) {
 			npc.memory().putBoolean(Masuk.MEM_CALON, true);
 			npc.memory().putBoolean("hold", true);
+			HidupApi.klip(npc, GerakId.SIKAP_TANGAN_BELAKANG, 0, 0);
 			if (tetua != null) {
 				Component n = TokohSekte.nama(server, tetua.id());
 				if (n != null) {
@@ -450,6 +452,7 @@ public final class UpacaraSumpah {
 			npc.memory().putBoolean(Masuk.MEM_CALON, true);
 			npc.memory().putBoolean("hold", true);
 			Masuk.rupa(npc, i < 4 ? "murid.luar" : "murid.dalam", u.sekte);
+			HidupApi.klip(npc, GerakId.SIKAP_TANGAN_BELAKANG, 0, 0);
 			HidupApi.klip(npc, GabungGerakId.SALAM_SEKTE, 0, 40);
 			u.tubuh.add(npc.getUUID());
 		}

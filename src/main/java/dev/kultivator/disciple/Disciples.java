@@ -837,6 +837,23 @@ public final class Disciples {
 	 * is already in the world, or its master forgot it); the caller keeps the record and tries again later.
 	 */
 	public static @Nullable DiscipleEntity arrive(ServerLevel level, Vec3 pos, CompoundTag tag, UUID owner) {
+		DiscipleEntity back = arriveBody(level, pos, tag, owner);
+		if (back != null) {
+			for (java.util.function.Consumer<UUID> listener : ON_ARRIVE) {
+				listener.accept(back.soulId());
+			}
+		}
+		return back;
+	}
+
+	/** The soul of every disciple that {@link #arrive} brought back is handed to {@code listener} (a stage body of its errand goes). */
+	public static void addArriveListener(java.util.function.Consumer<UUID> listener) {
+		ON_ARRIVE.add(listener);
+	}
+
+	private static final List<java.util.function.Consumer<UUID>> ON_ARRIVE = new ArrayList<>();
+
+	private static @Nullable DiscipleEntity arriveBody(ServerLevel level, Vec3 pos, CompoundTag tag, UUID owner) {
 		UUID soul = tag.read("soul", UUIDUtil.CODEC).orElse(null);
 		if (soul == null || owner == null || tag.getCompoundOrEmpty("disciple").isEmpty()) {
 			return null;

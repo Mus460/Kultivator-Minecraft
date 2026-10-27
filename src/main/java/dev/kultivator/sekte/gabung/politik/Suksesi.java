@@ -19,6 +19,7 @@ import dev.kultivator.sekte.gabung.api.GabungGerakId;
 import dev.kultivator.sekte.gabung.api.KelasSekte;
 import dev.kultivator.sekte.gabung.api.Pangkat;
 import dev.kultivator.sekte.gabung.dunia.TokohSekte;
+import dev.kultivator.sosok.GerakId;
 import dev.kultivator.sosok.SosokApi;
 import dev.kultivator.util.Sibuk;
 import net.minecraft.ChatFormatting;
@@ -384,6 +385,8 @@ public final class Suksesi {
 				nama == null ? Component.literal("?") : nama, false);
 		if (ketua != null) {
 			ketua.getLookControl().setLookAt(player);
+			// presides standing, hands behind the back (the bowl gesture of beat 6 plays over it)
+			SosokApi.gerak(ketua, GerakId.SIKAP_TANGAN_BELAKANG, 0, 0);
 		}
 		UPACARA.put(player.getUUID(), new Upacara(player.getUUID(), sekte, level.getGameTime(), ketua));
 		GabungApi.sibuk(player, Gabung.SIBUK_SUKSESI, 20 * (UPACARA_DETIK + 10));
