@@ -2,6 +2,7 @@ package dev.kultivator.client.tempat.ui;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.kultivator.client.dunia.tempat.model.PapanHidupRenderer;
+import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.tempat.ui.kit.TeksTempat;
 import dev.kultivator.client.tempat.ui.kit.TempatWarna;
@@ -184,7 +185,7 @@ public class PapanHidupTeksRenderer extends PapanHidupRenderer<PapanHidupEntity>
 		Component judul = isi.judul[0] != null && !isi.judul[0].getString().isEmpty() ? isi.judul[0] : Component.literal(nama);
 		y = judul(poseStack, collector, judul, lebar, y, TINTA, light);
 		if (isi.hadiah > 0L) {
-			Component hadiah = TeksTempat.k("papan.hadiah", TeksTempat.angka(isi.hadiah));
+			Component hadiah = TeksTempat.k("papan.hadiah", Brush.angka(isi.hadiah));
 			float th = Math.min(0.8F, lebar / Math.max(1, TeksDunia.lebar(hadiah)) * TeksDunia.BARIS);
 			TeksDunia.baris(poseStack, collector, hadiah, 0.0F, y + 0.1F, th, TeksDunia.Rata.TENGAH, -1.0F, MERAH, light);
 			y += th + 0.2F;

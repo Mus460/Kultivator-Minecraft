@@ -40,7 +40,7 @@
   "kultivator.titah_client.screen.pick": "Pilih",
   "kultivator.titah_client.screen.pick.tip": "Pasang titah ini pada segel: klik kanan dengan segel memanggilnya ke crosshair.",
   "kultivator.titah_client.screen.reset": "Bawaan",
-  "kultivator.titah_client.screen.reset.tip": "Kembali ke ukuran, kerusakan, kecepatan dan film bawaan titah ini.",
+  "kultivator.titah_client.screen.reset.tip": "Kembali ke ukuran, kerusakan dan kecepatan bawaan titah ini. Film titah diatur di Pengaturan › Kamera & Film.",
   "kultivator.titah_client.screen.warning": "Peringatan cahaya",
   "kultivator.titah_client.screen.warning.tip": "Baca peringatan fotosensitif dan pilih apakah bingkai dampak penuh boleh berkilat.",
   "kultivator.titah_client.screen.hint": "Backspace: lewati film · Gerak: hentikan kamera",

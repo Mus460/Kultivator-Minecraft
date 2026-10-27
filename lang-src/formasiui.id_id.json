@@ -77,7 +77,6 @@
 	"kultivator.formasiui.nodes.rename.tip": "Ketik nama (paling banyak 24 huruf) lalu tekan Enter.",
 
 	"kultivator.formasiui.map.title": "Peta simpul · %s",
-	"kultivator.formasiui.map.close": "Tutup",
 	"kultivator.formasiui.map.lost": "Simpul ini sudah hilang. Buka peta lagi dari sebuah simpul.",
 	"kultivator.formasiui.map.north": "U",
 	"kultivator.formasiui.map.here": "%s (di sini)",
@@ -99,7 +98,6 @@
 	"kultivator.formasiui.alarm_kind.elite": "elit",
 	"kultivator.formasiui.alarm_kind.boss": "bos",
 
-	"kultivator.formasiui.slip.back": "‹ Kembali",
 	"kultivator.formasiui.slip.line": "%s %s · %s · %s",
 	"kultivator.formasiui.slip.scope.core": "di sekitar mata formasi",
 	"kultivator.formasiui.slip.scope.territory": "seluruh wilayah",

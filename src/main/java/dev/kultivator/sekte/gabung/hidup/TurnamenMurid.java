@@ -300,6 +300,43 @@ public final class TurnamenMurid {
 		return id.isEmpty() ? null : id;
 	}
 
+	/**
+	 * The member's tournament card for the sect board ({@code gabung_papan} key {@code turnamen}; Sekte › Kegiatan › Arena
+	 * of an NPC-sect member, DESIGN 43.5): {@code hari} L the next tournament day (today until it ends; absent without a
+	 * compound), {@code berjalan} B, {@code juara} T the last champion and {@code juara_hari} L (absent none),
+	 * {@code terbaik} I the member's best placement ({@link #JUARA} .. {@link #PESERTA}, 0 never entered).
+	 */
+	public static CompoundTag lembar(ServerPlayer player, String sekte) {
+		MinecraftServer server = player.level().getServer();
+		CompoundTag out = new CompoundTag();
+		long hari = GabungApi.hari(server);
+		boolean jalan = berjalan(sekte);
+		GabungData.DataSekteGabung d = GabungData.get(server).peekSekte(sekte);
+		GerbangPlan.Entry e = GabungApi.entry(server, sekte);
+		if (e != null) {
+			// today counts while it has not ended (not past its hours, not already fought)
+			boolean usaiHariIni = !jalan && (d != null && d.turnamenHari == hari || dev.kultivator.dunia.kota.Kota.timeOfDay(server) >= AKHIR_TICK);
+			long periode = Math.max(5, dev.kultivator.sekte.gabung.GabungConfig.get().turnamenHari);
+			for (long i = usaiHariIni ? 1L : 0L; i <= periode; i++) {
+				if (hariTurnamen(e.index(), hari + i)) {
+					out.putLong("hari", hari + i);
+					break;
+				}
+			}
+		}
+		out.putBoolean("berjalan", jalan);
+		if (d != null) {
+			CompoundTag bagian = d.bagian(BAGIAN);
+			Tag nama = bagian.get("juaraNama");
+			if (nama != null) {
+				out.store("juara", ComponentSerialization.CODEC, bacaKomponen(server, nama));
+				out.putLong("juara_hari", bagian.getLongOr("juaraHari", -1L));
+			}
+		}
+		out.putInt("terbaik", terbaik(GabungApi.anggota(player)));
+		return out;
+	}
+
 	/** True while the tournament of {@code sekte} runs. */
 	public static boolean berjalan(String sekte) {
 		return LAGA.containsKey(sekte);

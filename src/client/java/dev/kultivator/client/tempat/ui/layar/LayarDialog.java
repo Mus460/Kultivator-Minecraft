@@ -252,17 +252,22 @@ public final class LayarDialog extends LayarInti {
 	private void quest(Lukis l, int x0, int y0, int x1, int y1) {
 		List<Lembar> quest = lembar.daftar(Dialog.QUEST);
 		y0 += l.kepala(k("dialog.quest_judul"), x0, y0, x1);
-		daftarQuest.gambar(l, "quest", x0, y0, x1, y1, quest.size(), 34, (lk, i, rx0, ry0, rx1, ry1, sorot, pilih) -> {
+		// G22: the one active list with stages is Dunia › Perjalanan; here only the matters this NPC can discuss
+		int by = y1 - TOMBOL_H;
+		dev.kultivator.client.screen.ui.TalismanButton.gambar(l, "quest_perjalanan", x0, by, x1 - x0, TOMBOL_H, k("dialog.perjalanan"), true, null,
+				() -> dev.kultivator.client.hub.HubNav.buka(dev.kultivator.client.hub.Tujuan.of(dev.kultivator.client.hub.HubNav.DUNIA,
+						dev.kultivator.client.hub.Urutan.ID_PERJALANAN)));
+		y1 = by - 3;
+		daftarQuest.gambar(l, "quest", x0, y0, x1, y1, quest.size(), 22, (lk, i, rx0, ry0, rx1, ry1, sorot, pilih) -> {
 			Lembar e = quest.get(i);
 			lk.kartu(rx0, ry0, rx1, ry1, sorot ? 1.0F : 0.0F, pilih);
-			Glyphs.Atlas.ikon(lk.g, Glyphs.Atlas.SURAT, rx0 + 4, ry0 + 8, 16, 0xFFFFFFFF);
+			Glyphs.Atlas.ikon(lk.g, Glyphs.Atlas.SURAT, rx0 + 4, ry0 + 3, 16, 0xFFFFFFFF);
 			if (e.b(LembarKunci.BARU)) {
-				Brush.disc(lk.g, rx0 + 19, ry0 + 8, 2.5F, Palette.SEAL);
+				Brush.disc(lk.g, rx0 + 19, ry0 + 4, 2.5F, Palette.SEAL);
 			}
 			int bw = Math.min(80, (rx1 - rx0) / 3);
 			int tw = rx1 - rx0 - 30 - bw;
-			lk.teks(Brush.bold(e.teks(LembarKunci.NAMA)), rx0 + 24, ry0 + 3, tw, lk.gaya.teks);
-			lk.bungkus(e.teks(LembarKunci.TEKS), rx0 + 24, ry0 + 13, tw, lk.gaya.teksLemah, ry1 - ry0 - 14);
+			lk.teks(Brush.bold(e.teks(LembarKunci.NAMA)), rx0 + 24, ry0 + (ry1 - ry0 - 8) / 2, tw, lk.gaya.teks);
 			tombolOp(lk, "quest_buka" + i, rx1 - bw - 4, ry0 + (ry1 - ry0 - TOMBOL_H) / 2, bw, TOMBOL_H, k("dialog.bicarakan"), true, null,
 					LembarKunci.op(Dialog.OP_QUEST, e.id()));
 		}, () -> {

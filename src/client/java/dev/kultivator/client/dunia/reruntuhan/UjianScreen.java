@@ -107,10 +107,9 @@ public class UjianScreen extends Page {
 		// The Gulungan closed with the question still open: it waits on the tablet (43.8.1.5), it never reopens itself.
 		if (!selesai && aktif == this && !CultivationScreen.adaKonteks()) {
 			CultivationScreen.konteks(this, judul(), Glyphs.HATI);
-			Minecraft minecraft = Minecraft.getInstance();
-			if (minecraft.player != null) {
-				minecraft.player.sendOverlayMessage(Component.translatable(M + "menunggu").withStyle(ChatFormatting.GOLD));
-			}
+			// The same waiting card DiSini.buka sends (one key, one notice).
+			dev.kultivator.client.hud.Kabar.kirim(dev.kultivator.client.hud.Kabar.kartu(
+					Component.translatable("kultivator.gui43.konteks.menunggu"), Component.translatable(M + "menunggu")).kunci("di_sini.menunggu"));
 		} else if (aktif != this) {
 			DiSini.lepas(this);
 		}

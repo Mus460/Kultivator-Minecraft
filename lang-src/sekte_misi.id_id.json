@@ -1,7 +1,5 @@
 {
   "item.kultivator.gulungan_laporan": "Gulungan Laporan",
-  "kultivator.hub.card.sekte_misi_cerita": "Misi Cerita",
-  "kultivator.hub.card.sekte_misi_cerita.tip": "Kirim tim murid ke dunia luar dan baca laporan kepulangan mereka.",
   "kultivator.sekte.misi.adegan.gemilang": "Kepulangan Gemilang",
   "kultivator.sekte.misi.adegan.gemilang.sub": "%s memimpin timnya pulang dengan kemenangan",
   "kultivator.sekte.misi.adegan.pulang": "Tim Misi Kembali — %s",
@@ -71,7 +69,6 @@
   "kultivator.sekte.misi.lapor.hasil": "Dibawa pulang",
   "kultivator.sekte.misi.lapor.item": "%1$s× %2$s",
   "kultivator.sekte.misi.lapor.judul": "Laporan Misi: %1$s (tingkat %2$s)",
-  "kultivator.sekte.misi.lapor.judul_layar": "Gulungan Laporan",
   "kultivator.sekte.misi.lapor.kosong": "Tidak ada yang dibawa pulang.",
   "kultivator.sekte.misi.lapor.kutip": "Dari ingatan %1$s: \"%2$s\"",
   "kultivator.sekte.misi.lapor.lagi": "dan %s barang lain",

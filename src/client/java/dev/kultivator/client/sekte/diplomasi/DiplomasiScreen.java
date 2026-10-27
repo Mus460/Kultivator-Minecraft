@@ -20,7 +20,7 @@ import dev.kultivator.client.screen.ui.TombolKembali;
 import dev.kultivator.client.screen.ui.UiSound;
 import dev.kultivator.client.sekte.gabung.GabungClient;
 import dev.kultivator.client.sekte.gabung.ui.IkonGabung;
-import dev.kultivator.client.sekte.wilayah.GulirIsi;
+import dev.kultivator.client.screen.ui.GulirIsi;
 import dev.kultivator.sekte.api.Lambang;
 import dev.kultivator.sekte.diplomasi.DiplomasiPayloads;
 import dev.kultivator.sekte.gabung.ui.GabungLembar;
@@ -42,7 +42,7 @@ import java.util.Set;
 /**
  * Diplomasi Sekte (DESIGN 36.2.9) as pages of Sekte › Luar (43.5, 43.12.1: one class, three uses):
  * <ul>
- * <li>{@link Mode#PERANG}: the hall's wars and hostile sects (war facts, score, Tawarkan Damai / Tuntut Upeti) with the chip
+ * <li>{@link Mode#PERANG}: the hall's wars and hostile sects (war facts and score; the actions are in Sekte Dunia, "Lihat di Sekte Dunia") with the chip
  * Sumber Aulaku / Perguruanku; Perguruanku is tab Perang of the NPC sect's politics sheet ({@code gabung_politik});</li>
  * <li>{@link Mode#UTUSAN}: the envoys' open offers with Terima / Tolak;</li>
  * <li>{@link #blokDiplomasi}: the diplomacy block of one sect in the detail of Sekte Dunia (standing gauge, strength, facts,
@@ -67,7 +67,6 @@ public final class DiplomasiScreen extends Page {
 	private static final int A_TUNTUT = 7;
 	private static final int A_TANTANG = 8;
 	private static final int A_PERANG = 9;
-	private static final int A_DAMAI = 10;
 	/** Offer kinds of {@link DiplomasiPayloads#OFFER_KINDS}. */
 	private static final int O_TANTANG = 3;
 	private static final int O_DAMAI = 4;
@@ -541,10 +540,8 @@ public final class DiplomasiScreen extends Page {
 			y += Bilah.baris(l, Component.translatable(M + "perang.kalah"), Math.min(3, s.getIntOr("kalah", 0)), 3, cx0, y, cx1, null, Palette.SEAL) + 3;
 		}
 		y += kekuatan(l, sheet, s, cx0, y, cx1);
-		// the war actions of this sect (the rest of the diplomacy is in Sekte Dunia)
+		// war facts only: declare / tribute / peace are the actions of Sekte Dunia (one place, audit ulang sekte #4)
 		y += 3;
-		int[] aksi = s.getBooleanOr("perang", false) ? new int[] {A_DAMAI, A_TUNTUT} : new int[] {A_PERANG, A_TUNTUT};
-		y += tombolAksi(l, sheet, s, aksi, cx0, y, cx1);
 		Component lihat = Component.translatable(M + "lihat_sekte");
 		int lw = TalismanButton.lebar(l.font, lihat, 60, cx1 - cx0);
 		TalismanButton.gambar(l, "lihat", cx0, y, lw, TOMBOL_H, lihat, true, null, () -> LuarPage.bukaSekte(id));

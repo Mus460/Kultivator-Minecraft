@@ -26,6 +26,11 @@ public final class SlotSisi {
 	}
 
 	private static final Isi[] ISI = new Isi[PANDUAN + 1];
+	/** The Pengaturan › HUD switch of each content ({@code SettingsRows.HUD_SAKLAR}; the guide keeps its own coin). */
+	private static final String[] SAKLAR = {"ujian", "lei_tai", "tangga", "gerbang", null};
+	/** The height of the slip drawn last and when ({@link #tinggiAktif}: the Kabar stack stops its rows above it). */
+	private static int tinggiTerakhir;
+	private static long tinggiSejak;
 
 	/** Registers the content of priority {@code prioritas} (0 is the highest). */
 	public static void daftar(int prioritas, Isi isi) {
@@ -35,11 +40,16 @@ public final class SlotSisi {
 	/** True when the content of {@code prioritas} is active and no content above it is. */
 	public static boolean giliran(int prioritas) {
 		for (int i = 0; i < prioritas; i++) {
-			if (ISI[i] != null && ISI[i].aktif()) {
+			if (aktif(i)) {
 				return false;
 			}
 		}
-		return ISI[prioritas] != null && ISI[prioritas].aktif();
+		return aktif(prioritas);
+	}
+
+	/** A switched-off content gives up its turn. */
+	private static boolean aktif(int i) {
+		return ISI[i] != null && (SAKLAR[i] == null || dev.kultivator.client.screen.SettingsRows.hud(SAKLAR[i])) && ISI[i].aktif();
 	}
 
 	/** The right edge of the column. */
@@ -52,8 +62,15 @@ public final class SlotSisi {
 	 * into the hotbar row.
 	 */
 	public static int atas(int guiHeight, int tinggi) {
+		tinggiTerakhir = tinggi;
+		tinggiSejak = net.minecraft.util.Util.getMillis();
 		int y = Math.max(Kabar.bawah() + 4, Math.round(guiHeight * 0.2F));
 		return Math.max(6, Math.min(y, guiHeight - 44 - tinggi));
+	}
+
+	/** The height of the slip shown now (drawn in the last 250 ms), else 0. */
+	public static int tinggiAktif() {
+		return net.minecraft.util.Util.getMillis() - tinggiSejak <= 250L ? tinggiTerakhir : 0;
 	}
 
 	private SlotSisi() {

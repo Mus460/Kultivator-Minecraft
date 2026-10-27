@@ -420,7 +420,7 @@ bertahan (`Widget`) dan gambar imediat (`Lukis`), satu pelukis.
 | Bilah kemajuan | `Bilah` (baru) | bilah giok `KotaPage`, `PetaUi` nilai, `TemaUi` meter, `BandingStat` (mode banding), bilah dendam Saingan, kemajuan Menara, bilah batas harian Treasury | label, tanda, mode banding |
 | Hitung mundur | `CincinWaktu` (+ teks m:ss dari `TeksTempat`) | m:ss `KotaPage`, sapuan LelangPage/AlamPage/TitahScreen | cincin / teks |
 | Kartu barang | `KartuBarang` | `KotaPage.Card`, `HubCardsPage.Card` (peluncur, hilang) | ikon item, harga, stok, kunci |
-| Pemilih orang | `PemilihOrang` (baru: baris potret + tanda + aktif; mode daftar dan mode sembul) | `sectevent/RosterView`, pemilih pekerja Kebun, pemilih Angkat BalaiTetua, pemilih siklus TreasuryPage, chip pekerja BuildPage, `hall/CandidateCard` (mode kartu), `Potret` dipakai di dalamnya | saring, kolom tambahan, klik buka orang |
+| Pemilih orang | `PemilihOrang` (baru: baris potret + tanda + aktif; mode daftar dan mode sembul) | `sectevent/RosterView`, pemilih pekerja Kebun, pemilih Angkat BalaiTetua, pemilih siklus TreasuryPage, chip pekerja BuildPage, `Potret` dipakai di dalamnya (`hall/CandidateCard` tetap di luar: kartu milik satu halaman, `CalonPage` lewat `DaftarGulir.gambarKisi`; audit ulang K-3) | saring, kolom tambahan, klik buka orang |
 | Daftar sekte | `DaftarSekte` (baru) | daftar Direktori, Diplomasi, Tetangga Langit, sekte di Seteru | segel, pip tingkat, garis sikap, aliran, peringkat |
 | Papan misi | `PapanMisi` (baru, tata `LayarGildaMisi`) | Gilda Misi, LayarPapan, Kota Papan Misi (K), Kontrak Buruan | lencana pangkat, Terima, Tunjuk di peta |
 | Kronik / log | `Kronik` (baru) | `LogPage`, Kabar MandiriBoard, Kronik Langit, kronik per sekte Diplomasi, `formasi/LogPanel`, riwayat MusuhPage | saring jenis, cap waktu, 50 baris |
@@ -571,7 +571,7 @@ halaman/sub (bukan layar); "Pasang" = kelas lembar yang sama dipasang dengan him
 | G06 | Navigasi tingkat dua dalam halaman | 1:F11; 2:3 | koin kepala hub/Aula, koin Jalan, `CodexWidgets.Coin`, kolom segel Bangun/Formasi, `SectionPicker` (PathTab, Bangun Misi, SectEventPage), deretan jimat-tab (Paviliun, Makam, BalaiTetua, Lambang), tab gambar (Kebun, Langit, Seteru, MandiriBoard, JalanHidupTab), `TabLentera` | `TabBar` mendatar (koin + sub) | lebur; tingkat 4 jadi tumpukan judul/`Saring` |
 | G07 | Tombol | 1:F12; 2:5; 3:F14 | `TalismanButton`, `TombolAksi`, `CodexWidgets.Chip/Cycle`, `PetaUi.Button`, vanilla `Button`, `record Hit`, `Sentuh`, `LangitScreen.Seal`, tombol gambar tangan | `TalismanButton` | lebur |
 | G08 | Sakelar dan siklus | 1:F13; 4:4 | `JadeCoin`, `CodexWidgets.Coin`, coin/cycle Duel, Formasi, siklus Ciptaan, jimat aturan Challenge | `JadeCoin` + `TalismanButton` mode siklus | lebur |
-| G09 | Kartu barang / daftar barang toko | 1:F14; 3:F6 | `HubCardsPage.Card`, `KotaPage.Card`, `KartuBarang`, `TitahScreen.DecreeCard`, `CandidateCard` | `KartuBarang` (barang), `SealCard` (teknik/titah), `PemilihOrang` mode kartu (calon) | lebur |
+| G09 | Kartu barang / daftar barang toko | 1:F14; 3:F6 | `HubCardsPage.Card`, `KotaPage.Card`, `KartuBarang`, `TitahScreen.DecreeCard`, `CandidateCard` | `KartuBarang` (barang), `SealCard` (teknik/titah), `CandidateCard` tetap kartu milik `CalonPage` (calon) | lebur |
 | G10 | Kolom teks | 1:F15; 2:7; 3:F15; 4:5 | `InkField`, `InkSearchField`, `NameField`, ganti nama Formasi, `KotakCari`, `EditBox` ×4 | `InkField` | lebur |
 | G11 | Tooltip | 1:F16; 2:23 | `SlipTooltip`, tooltip vanilla ×5, tanpa tooltip ×3 | `SlipTooltip` | lebur |
 | G12 | Daftar gulir | 1:F17; 3:F16 | `DaftarGulir` + 12 gulir tangan, `CodexGrid` | `DaftarGulir` | lebur |
@@ -833,6 +833,8 @@ di `m2-F43-S.md`.
 | S3 | `sect/hall/Halls.java` (pembangun `HallInfo`) | daftar `saudara` (nama anggota grup `/sect` pemilik) di tag `HallInfo` | M05 |
 | S4 | — | tidak ada perubahan lain: semua rute lain klien saja | — |
 | S5 | `TempatLayar` | tidak berubah; hub tetap memakai `OP_LIHAT` dan aturan `JANGKAU` | — |
+| S6 | `sekte/tangga/TanggaCommands.java` | `records` mengirim `soul` (+ `eid` bila dalam jangkauan, aturan papan Mandiri) agar klik murid di Tangga membuka buku hariannya (audit ulang sekte #3) | F43-AU |
+| S7 | `sekte/gabung/hidup/TurnamenMurid.java`, `sekte/gabung/ui/{GabungLembar,LembarPapan}.java` | blok `turnamen` di lembar papan sekte NPC (hari berikut, berjalan, juara terakhir, capaian terbaik; bagan tidak dikirim) untuk tab baca-saja Turnamen dan sub Arena anggota (audit ulang sekte #11) | F43-AU |
 
 ---------------------------------------------------------------------------------------------------------------------
 
@@ -1003,6 +1005,7 @@ Prasyarat (asli): 41 + 42 selesai (jadwal-41-42 F-END) dan di-commit
 | K4 | Tombol bawaan baru | **K Kitab Teknik, N Peta, J Panduan; Q/E pindah halaman** / tanpa tombol bawaan baru (hanya V) | K, N, J, Q/E |
 | K5 | Klik NPC membuka | **Gulungan penuh dengan rel (Di Sini terpilih)** / mode fokus: hanya halaman konteks tanpa rel (rel muncul dengan Tab) | Gulungan penuh |
 | K6 | Ukuran teks | **hanya 1.0 dan 1.5** / izinkan 0.75 untuk catatan kaki pada skala GUI ≥ 3 | 1.0 dan 1.5 |
+| K7 | Kedai Teh, Pasar Gelap, Papan Misi dan Pertemuan modul K (G21/G22/G55; audit ulang 2026-10-27) | **tetap sub Di Sini sendiri (`TownPages.Teh/Gelap/Misi`, `MeetingPage`, keputusan M15; satu-satunya layar untuk warga K, tetapi rupanya beda dari `LayarTeh`/`LayarPasarGelap`/`PapanMisi` 38)** / jembatan per peran seperti `KotaLelang` (KotaNet.Screen → lembar `tema_teh`/`tema_pasar_gelap`/misi, op lembar → KotaNet.Action lewat kait `LelangJembatan.kirim`; Kabar Angin, token, suap jadi baris lembar opsional) | belum diputuskan |
 
 **Diputuskan (orkestrator, 2026-10-25; pengguna: "kerjakan"):** K1, K2, K4, K5, K6 = saran bawaan. **K3 diubah:** angka
 1-9 memilih bagian, **kecuali** saat tablet Di Sini menampilkan dialog atau daftar pilihan: di sana angka memilih pilihan

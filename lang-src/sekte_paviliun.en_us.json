@@ -9,8 +9,6 @@
   "advancement.kultivator.sekte.paviliun_upacara.description": "Lead a rite at the Ancestral Altar: the daily incense or Qingming.",
   "kultivator.blueprint.comp.sx_paviliun_altar": "Ancestral Altar",
   "kultivator.blueprint.comp.sx_paviliun_makam": "Sect Cemetery",
-  "kultivator.hub.card.sekte_paviliun": "Pavilion & Graves",
-  "kultivator.hub.card.sekte_paviliun.tip": "The book rack disciples study from on their own, the graves of the fallen, the Book of Lineage and the Ancestral Altar.",
   "kultivator.sekte.paviliun.no_hall": "You have no sect hall yet.",
   "kultivator.sekte.paviliun.someone": "someone",
   "kultivator.sekte.paviliun.status": "Pavilion: %s books, %s reading · %s graves · blessing +%s%%",

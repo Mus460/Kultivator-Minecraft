@@ -16,12 +16,11 @@ import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.DaftarGulir;
 import dev.kultivator.client.screen.ui.KartuBarang;
 import dev.kultivator.client.screen.ui.KeadaanKosong;
-import dev.kultivator.client.screen.ui.LabelHarga;
 import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.PapanMisi;
 import dev.kultivator.client.screen.ui.TalismanButton;
-import dev.kultivator.client.sekte.wilayah.GulirIsi;
+import dev.kultivator.client.screen.ui.GulirIsi;
 import dev.kultivator.data.Realm;
 import dev.kultivator.dunia.kota.KedaiTeh;
 import dev.kultivator.dunia.kota.NpcRole;
@@ -38,9 +37,8 @@ import java.util.function.Function;
 import java.util.function.IntConsumer;
 
 /**
- * The five subs of a town NPC's Di Sini page (DESIGN 34.5.1, 43.8.4): Toko (the pill or treasure pavilion's wares), Lelang
- * (the dusk auction), Kedai Teh (teas, Kabar Angin, the token), Pasar Gelap (the broker, the raid and its bribe) and Papan
- * Misi (the day's bounties). Each reads its part of {@link KotaClient#data()} and sends the same {@code KotaNet.Action}
+ * The four subs of a town NPC's Di Sini page (DESIGN 34.5.1, 43.8.4): Toko (the pill or treasure pavilion's wares), Kedai
+ * Teh (teas, Kabar Angin, the token), Pasar Gelap (the broker, the raid and its bribe) and Papan Misi (the day's bounties). Each reads its part of {@link KotaClient#data()} and sends the same {@code KotaNet.Action}
  * ops as the old town screen; a service that belongs to another NPC shows where to find it. Drawn with the single kit
  * ({@link KartuBarang} shop rows, {@link PapanMisi}, {@link Bilah}) at text scale 1.0; tall subs scroll.
  */
@@ -148,152 +146,6 @@ final class TownPages {
 					: Component.translatable(M + "jual_habis");
 			TalismanButton.gambar(l, "toko:jual", x0 + half + 4, by, x1 - x0 - half - 4, TOMBOL_H, Component.translatable("kultivator.kota.toko.jual"),
 					jual, jual ? null : alasanJual, () -> kirim("jual"));
-		}
-	}
-
-	// ================================================================== Lelang
-
-	static final class Lelang implements KotaJembatan.Isi {
-		private static final int[] STEPS = {5, 10, 25};
-		private final GulirIsi gulir = new GulirIsi();
-
-		@Override
-		public String id() {
-			return "lelang";
-		}
-
-		@Override
-		public Component nama() {
-			return Component.translatable("kultivator.kota.tab.lelang.short");
-		}
-
-		private static CompoundTag lot() {
-			CompoundTag lelang = tab("lelang");
-			ListTag lots = lelang.getListOrEmpty("lots");
-			int current = lelang.getIntOr("current", -1);
-			return current >= 0 && current < lots.size() && lots.get(current) instanceof CompoundTag lot ? lot : new CompoundTag();
-		}
-
-		/** Why the player cannot bid {@code step} now, or null. */
-		private static Component alasanTawar(int step) {
-			CompoundTag lelang = tab("lelang");
-			CompoundTag lot = lot();
-			if (peran() != NpcRole.JURU_LELANG) {
-				return Component.translatable(M + "lelang.ke_juru");
-			}
-			if (!lelang.getBooleanOr("active", false) || lot.getIntOr("state", 0) != 1 || lot.getLongOr("present", 0L) > 0L) {
-				return Component.translatable("kultivator.kota.lelang.tidak_ada");
-			}
-			if (lot.getBooleanOr("mine", false)) {
-				return Component.translatable(M + "lelang.memimpin");
-			}
-			long offer = lot.getLongOr("offer" + step, Long.MAX_VALUE);
-			long nb = semua().getLongOr("nb", 0L);
-			return nb < offer ? kurang(offer, nb) : null;
-		}
-
-		@Override
-		public void lukis(KotaJembatan.Halaman p, Lukis l, int x0, int y0, int x1, int y1) {
-			CompoundTag lelang = tab("lelang");
-			int r = x1 - 5;
-			int lebar = r - x0;
-			int y = gulir.mulai(l, x0, y0, r, y1);
-			y += judul(l, Component.translatable("kultivator.kota.lelang.judul", teks(semua(), "town")), x0, y, r);
-			Component status;
-			if (!lelang.getBooleanOr("enabled", true)) {
-				status = Component.translatable("kultivator.kota.lelang.mati");
-			} else if (lelang.getBooleanOr("active", false)) {
-				status = Component.translatable("kultivator.kota.lelang.berjalan");
-			} else if (lelang.getBooleanOr("done_today", false)) {
-				status = Component.translatable("kultivator.kota.lelang.sudah_hari_ini");
-			} else {
-				status = Component.translatable("kultivator.kota.lelang.berikut", jam(lelang.getLongOr("next", 0L)));
-			}
-			if (peran() != NpcRole.JURU_LELANG) {
-				status = Component.translatable("kultivator.kota.layar.sep", status, Component.translatable("kultivator.kota.lelang.di_panggung"));
-			}
-			y += Math.round(l.bungkus(status, x0, y, lebar, l.gaya.teksLemah)) + 3;
-			List<CompoundTag> lots = daftar(lelang.getListOrEmpty("lots"));
-			int current = lelang.getIntOr("current", -1);
-			if (lots.isEmpty()) {
-				y += Math.round(l.bungkus(Component.translatable("kultivator.kota.lelang.kosong"), x0, y, lebar, l.gaya.teksSamar)) + 3;
-			}
-			for (int i = 0; i < lots.size() && i < 5; i++) {
-				baris(l, i, lots.get(i), i == current, x0, y, r);
-				y += BARIS + 2;
-			}
-			y += 2;
-			int bw = (lebar - 2 * 3) / 3;
-			for (int i = 0; i < STEPS.length; i++) {
-				int step = STEPS[i];
-				Component alasan = alasanTawar(step);
-				Component label = Component.translatable("kultivator.kota.lelang.langkah", step, Brush.singkat(lot().getLongOr("offer" + step, 0L)));
-				boolean over = TalismanButton.gambar(l, "lelang:tawar" + step, x0 + i * (bw + 3), y, bw, TOMBOL_H, label, alasan == null, alasan,
-						() -> kirim("tawar:" + tab("lelang").getIntOr("current", -1) + ":" + lot().getLongOr("price", 0L) + ":" + step));
-				if (over && alasan == null) {
-					l.tip(Component.translatable("kultivator.kota.lelang.tip_tawar", lot().getLongOr("offer" + step, 0L), semua().getLongOr("nb", 0L)));
-				}
-			}
-			y += TOMBOL_H + 3;
-			boolean titip = peran() == NpcRole.JURU_LELANG && lelang.getBooleanOr("active", false);
-			Component alasanTitip = peran() != NpcRole.JURU_LELANG ? Component.translatable(M + "lelang.ke_juru")
-					: Component.translatable("kultivator.kota.lelang.tidak_ada");
-			boolean over = TalismanButton.gambar(l, "lelang:titip", x0, y, lebar, TOMBOL_H, Component.translatable("kultivator.kota.lelang.titip"), titip,
-					titip ? null : alasanTitip, () -> kirim("titip"));
-			if (over && titip) {
-				l.tip(Component.translatable("kultivator.kota.lelang.tip_titip", lelang.getIntOr("consign_max", 2)));
-			}
-			y += TOMBOL_H + 4;
-			List<CompoundTag> bidders = daftar(lelang.getListOrEmpty("bidders"));
-			if (!bidders.isEmpty()) {
-				y += l.kepala(Component.translatable("kultivator.kota.lelang.penawar"), x0, y, r);
-				for (CompoundTag bidder : bidders) {
-					Brush.rect(l.g, x0 + 2, y + 2, x0 + 7, y + 7, Palette.opaque(bidder.getIntOr("color", 0x808080)));
-					l.teks(teks(bidder, "name"), x0 + 10, y, lebar - 10, l.gaya.teks);
-					y += 10;
-				}
-			}
-			gulir.selesai(l, y);
-		}
-
-		private static void baris(Lukis l, int index, CompoundTag lot, boolean onBlock, int x0, int y, int x1) {
-			int state = lot.getIntOr("state", 0);
-			l.kartu(x0, y, x1, y + BARIS, onBlock && state == 1 ? 1.0F : 0.0F, onBlock && state == 1);
-			l.g.item(ikon(lot.getStringOr("item", "")), x0 + 3, y + 3);
-			int tx = x0 + 22;
-			int hargaW = LabelHarga.gambar(l, lot.getLongOr("price", 0L), -1L, x1 - 3, y + 2, true, true);
-			l.teks(Component.literal((index + 1) + ". ").append(teks(lot, "name")), tx, y + 2, x1 - tx - hargaW - 6, state == 3 ? l.gaya.teksSamar : l.gaya.teks);
-			Component leader = teks(lot, "leader");
-			Component line = switch (state) {
-				case 2 -> Component.translatable("kultivator.kota.lelang.terjual", leader);
-				case 3 -> Component.translatable("kultivator.kota.lelang.tak_laku");
-				case 1 -> {
-					long present = lot.getLongOr("present", 0L);
-					long sell = lot.getLongOr("sell", -1L);
-					if (present > 0L) {
-						yield Component.translatable("kultivator.kota.lelang.dipamerkan", jam(present));
-					} else if (sell >= 0L) {
-						yield Component.translatable("kultivator.kota.lelang.memimpin", leader, jam(sell));
-					}
-					yield Component.translatable("kultivator.kota.lelang.dibuka");
-				}
-				default -> Component.translatable("kultivator.kota.lelang.menunggu");
-			};
-			int color = lot.getBooleanOr("mine", false) ? Palette.JADE_DARK : state == 2 ? Palette.SEAL_DARK : l.gaya.teksLemah;
-			l.teks(line, tx, y + 12, x1 - tx - 3, color);
-			if (l.di(x0, y, x1, y + BARIS)) {
-				l.tip(List.of(teks(lot, "name"), Component.translatable("kultivator.kota.lelang.harga", lot.getLongOr("price", 0L), lot.getLongOr("base", 0L))));
-			}
-		}
-
-		@Override
-		public boolean roda(double mx, double my, double dy) {
-			return gulir.roda(mx, my, dy);
-		}
-
-		@Override
-		public boolean tombol(KeyEvent event) {
-			return gulir.tombol(event);
 		}
 	}
 

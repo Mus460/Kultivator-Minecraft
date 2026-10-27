@@ -5,6 +5,7 @@ import dev.kultivator.client.abadi.AbadiClient;
 import dev.kultivator.client.screen.Page;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Glyphs;
+import dev.kultivator.client.screen.ui.GulirTeks;
 import dev.kultivator.client.screen.ui.KeadaanKosong;
 import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
@@ -36,7 +37,7 @@ public class PurbaPage extends Page {
 
 	private String sub = SUB_BINATANG;
 	private final BencanaPage bencana = new BencanaPage(this);
-	private final AbadiClient.Baris baris = new AbadiClient.Baris();
+	private final GulirTeks baris = new GulirTeks();
 
 	public PurbaPage() {
 	}
@@ -124,7 +125,7 @@ public class PurbaPage extends Page {
 		for (int i = 0; i < 3; i++) {
 			drawSeal(l, i, kills.getIntOr(KINDS[i], 0), data, cardH);
 		}
-		baris.mulai(w);
+		AbadiClient.mulai(baris, w, Payloads.DuniaSync.CH_PURBA);
 		long cd = data.getLongOr("cd", 0L);
 		baris.tambah(cd <= 0L ? Component.translatable("kultivator.purba.ui.cd_ready") : Component.translatable("kultivator.purba.ui.cd", minutes(cd)),
 				Palette.INK);

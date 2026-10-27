@@ -6,18 +6,14 @@ import dev.kultivator.client.hub.LembarHub;
 import dev.kultivator.client.hub.Tujuan;
 import dev.kultivator.client.hub.Urutan;
 import dev.kultivator.client.screen.Page;
+import dev.kultivator.client.screen.PageKomposit;
 import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.client.screen.ui.Lukis;
-import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.sekte.gabung.GabungClient;
 import dev.kultivator.client.sekte.tetua.BalaiTetuaScreen;
 import dev.kultivator.client.sekte.tetua.TetuaClient;
 import dev.kultivator.sect.hall.Halls;
 import dev.kultivator.sekte.gabung.ui.GabungLembar;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.input.CharacterEvent;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Util;
@@ -39,7 +35,7 @@ import java.util.Set;
  * The Perguruanku subs are the 41 sheets mounted read through {@code OP_LIHAT} (41 hub views may act, the server checks).
  * The hall details are asked for while the page is shown and every 4 s, like the old Aula scroll (43.0.12).
  */
-public final class AnggotaPage extends Page {
+public final class AnggotaPage extends PageKomposit {
 
 	public static final String CALON = "calon";
 	public static final String PANGKAT = "pangkat";
@@ -182,27 +178,12 @@ public final class AnggotaPage extends Page {
 		});
 	}
 
-	@Override
-	public boolean rinci() {
-		return isi != null && isi.rinci();
-	}
-
-	@Override
-	public Palette.Gaya gaya() {
-		return isi != null ? isi.gaya() : Palette.Gaya.KERTAS;
-	}
-
-	@Override
-	public boolean lebar() {
-		return isi != null && isi.lebar();
-	}
-
-	@Override
-	public long uang() {
-		return isi != null ? isi.uang() : -1L;
-	}
-
 	// ================================================================== the inner page
+
+	@Override
+	protected @Nullable Page anak() {
+		return isi;
+	}
 
 	/** The page of the current sub and source (the 41 sheets are mounted on first use). */
 	private @Nullable Page halamanSub() {
@@ -312,100 +293,12 @@ public final class AnggotaPage extends Page {
 		}
 	}
 
-	@Override
-	public void onData() {
-		if (isi != null) {
-			isi.onData();
-		}
-	}
-
-	@Override
-	public boolean needsRebuild() {
-		return isi != null && isi.needsRebuild();
-	}
-
-	@Override
-	public void fokus(CompoundTag fokus) {
-		if (isi != null) {
-			isi.fokus(fokus);
-		}
-	}
-
-	@Override
-	public boolean angka(int n) {
-		return isi != null && isi.angka(n);
-	}
-
 	// ================================================================== drawing
-
-	@Override
-	protected void drawBehind(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
-		if (isi != null) {
-			isi.render(g, mouseX, mouseY, seconds);
-		}
-	}
 
 	@Override
 	protected void lukis(Lukis l) {
 		if (isi == null) {
 			l.tengah(Component.translatable(K + "kosong"), x + w / 2.0F, y + h / 2.0F - 4.0F, w - 8, l.gaya.teksSamar);
 		}
-	}
-
-	// ================================================================== input (everything goes to the inner page)
-
-	@Override
-	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-		return isi != null && isi.mouseClicked(event, doubleClick);
-	}
-
-	@Override
-	public boolean mouseReleased(MouseButtonEvent event) {
-		return isi != null && isi.mouseReleased(event);
-	}
-
-	@Override
-	public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
-		return isi != null && isi.mouseDragged(event, dx, dy);
-	}
-
-	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-		return isi != null && isi.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
-	}
-
-	@Override
-	public boolean keyPressed(KeyEvent event) {
-		return isi != null && isi.keyPressed(event);
-	}
-
-	@Override
-	public boolean keyReleased(KeyEvent event) {
-		return isi != null && isi.keyReleased(event);
-	}
-
-	@Override
-	public boolean charTyped(CharacterEvent event) {
-		return isi != null && isi.charTyped(event);
-	}
-
-	@Override
-	public boolean mauTombol() {
-		return isi != null && isi.mauTombol();
-	}
-
-	@Override
-	public boolean modal() {
-		return isi != null && isi.modal();
-	}
-
-	@Override
-	public boolean mundur() {
-		return isi != null && isi.mundur();
-	}
-
-	@Override
-	public boolean fokusTab(boolean back) {
-		return isi != null && isi.fokusTab(back);
 	}
 }

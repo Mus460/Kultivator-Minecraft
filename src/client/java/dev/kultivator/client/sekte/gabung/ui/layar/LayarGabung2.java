@@ -4,7 +4,6 @@ import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.tempat.ui.UiTempatClient;
 import dev.kultivator.client.tempat.ui.kit.IkonTempat;
 import dev.kultivator.client.tempat.ui.kit.Lukis;
-import dev.kultivator.client.tempat.ui.kit.TeksTempat;
 import dev.kultivator.client.tempat.ui.kit.TempatWarna;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import dev.kultivator.sekte.gabung.ui.GabungLembar;
@@ -56,7 +55,7 @@ public final class LayarGabung2 {
 	/** {@link #pk} in ink {@code warna} (inside a light well use {@code gaya.teksSumur()}). */
 	public static int pk(Lukis l, long harga, long punya, float x, float y, boolean kanan, float ukuran, int warna) {
 		boolean kurang = punya >= 0L && harga > punya;
-		Component angka = Component.literal(TeksTempat.angka(harga));
+		Component angka = Component.literal(Brush.angka(harga));
 		int ikon = Math.round(10 * ukuran);
 		int lebar = ikon + 2 + Math.round(l.font.width(angka) * ukuran);
 		int x0 = Math.round(kanan ? x - lebar : x);
@@ -64,8 +63,8 @@ public final class LayarGabung2 {
 		IkonTempat.gambar(l.g, LembarKunci.Ikon.PK, x0, yi, ikon, 0xFFFFFFFF);
 		Brush.text(l.g, l.font, angka, x0 + ikon + 2, y, kurang ? TempatWarna.BAHAYA : warna, ukuran, false);
 		if (l.di(x0, yi, x0 + lebar, yi + Math.max(ikon, Math.round(9 * ukuran)))) {
-			l.tip(kurang ? List.of(u("pk.tip", TeksTempat.angka(harga)), u("pk.kurang", TeksTempat.angka(harga - punya)))
-					: List.of(u("pk.tip", TeksTempat.angka(harga))));
+			l.tip(kurang ? List.of(u("pk.tip", Brush.angka(harga)), u("pk.kurang", Brush.angka(harga - punya)))
+					: List.of(u("pk.tip", Brush.angka(harga))));
 		}
 		return lebar;
 	}

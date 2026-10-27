@@ -116,10 +116,6 @@ public final class TeknikSession {
 		stages = newStages;
 	}
 
-	public static long globalCooldownLeft() {
-		return Math.max(0L, tag().getLongOr("gcd", 0L) - ClientCultivation.serverGameTime());
-	}
-
 	public static long lockoutLeft() {
 		return Math.max(0L, tag().getLongOr("lock", 0L) - ClientCultivation.serverGameTime());
 	}

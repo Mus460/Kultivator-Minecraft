@@ -65,7 +65,9 @@ public final class LangitClient {
 	 * {@link LangitClientConfig#rows()} in Pengaturan › Tampilan &amp; Efek (DESIGN 43.10.1).
 	 */
 	public static void openSettings() {
-		HubNav.buka(Tujuan.of(HubNav.PENGATURAN, Urutan.ID_TAMPILAN));
+		net.minecraft.nbt.CompoundTag fokus = new net.minecraft.nbt.CompoundTag();
+		fokus.putString(dev.kultivator.client.screen.SettingsPage.FOKUS_BARIS, "kultivator.gui43.m10.langit.pengaturan");
+		HubNav.buka(Tujuan.of(HubNav.PENGATURAN, Urutan.ID_TAMPILAN).fokus(fokus));
 	}
 
 	private LangitClient() {

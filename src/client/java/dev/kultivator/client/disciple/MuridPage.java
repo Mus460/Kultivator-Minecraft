@@ -65,12 +65,7 @@ public final class MuridPage extends Page {
 	public static final String SUB_BUKU = "buku_harian";
 	private static final int REFRESH_TICKS = 100;
 	private static final int PEMILIH_H = 14;
-	private static final long TUNDA_MILLIS = 3000L;
 	private static final double RANGE_SQ = Disciples.VIEW_RANGE * Disciples.VIEW_RANGE;
-
-	/** The sub the next disciple focus opens on (the board's "Jalan Hidup" button), and when it was asked. */
-	private static String subTunda = "";
-	private static long subTundaAt;
 
 	private int entityId = -1;
 	/** The soul of a disciple shown only through its diary (not loaded nearby). */
@@ -90,24 +85,11 @@ public final class MuridPage extends Page {
 	public MuridPage() {
 	}
 
-	/** The next disciple focus within 3 s opens on sub {@code id} (one of {@link #SUBS}). */
-	public static void subBerikutnya(String id) {
-		subTunda = id == null ? "" : id;
-		subTundaAt = Util.getMillis();
-	}
-
 	/** The place of disciple {@code entityId} (sub {@code sub}, "" = the last one). */
 	public static Tujuan tujuan(int entityId, String sub) {
 		CompoundTag f = new CompoundTag();
 		f.putInt("murid", entityId);
 		return Tujuan.of(HubNav.MURID, Urutan.ID_MURID).sub(sub).fokus(f);
-	}
-
-	/** The diary of {@code soul} (Murid › Murid › Buku Harian), also for a disciple that is not loaded. */
-	public static Tujuan tujuanBuku(String soul) {
-		CompoundTag f = new CompoundTag();
-		f.putString("jiwa", soul == null ? "" : soul);
-		return Tujuan.of(HubNav.MURID, Urutan.ID_MURID).sub(SUB_BUKU).fokus(f);
 	}
 
 	// ================================================================== identity
@@ -512,10 +494,7 @@ public final class MuridPage extends Page {
 			pilihBuku(soul);
 		}
 		String want = "";
-		if (!subTunda.isEmpty() && Util.getMillis() - subTundaAt <= TUNDA_MILLIS) {
-			want = subTunda;
-			subTunda = "";
-		} else if (kunciSub(sub) != null && kunciSub(SUB_BUKU) == null && berlaku(SUB_BUKU)) {
+		if (kunciSub(sub) != null && kunciSub(SUB_BUKU) == null && berlaku(SUB_BUKU)) {
 			// a far disciple: straight to its diary, the one sub that works (R17)
 			want = SUB_BUKU;
 		}

@@ -50,11 +50,15 @@ public final class TabBar {
 		TABLET, KOIN, SUB
 	}
 
-	private static final int PANAH = 10;
+	/** Overflow arrow click boxes: the kit's 16x12 minimum (wide on a horizontal bar, tall on the rail). */
+	private static final int PANAH = TalismanButton.MIN_W;
+	private static final int PANAH_TEGAK = TalismanButton.MIN_H;
 
 	private final Map<String, Eased> nyala = new HashMap<>();
 	private List<Tab> tabs = new ArrayList<>();
 	private int awal;
+	/** The active id the scroll was last kept around: the arrows' scroll survives until the active tab changes. */
+	private @Nullable String aktifTerakhir;
 	private final List<Tab> terlihat = new ArrayList<>();
 
 	public void setTabs(List<Tab> tabs) {
@@ -144,12 +148,12 @@ public final class TabBar {
 		int per = tinggiTablet(y1 - y0, n);
 		int muat = Math.max(1, (y1 - y0) / per);
 		boolean luap = n > muat;
-		int ruang = luap ? Math.max(1, (y1 - y0 - 2 * PANAH) / per) : n;
+		int ruang = luap ? Math.max(1, (y1 - y0 - 2 * PANAH_TEGAK) / per) : n;
 		jagaAktif(aktif, ruang);
-		int top = luap ? y0 + PANAH : y0;
+		int top = luap ? y0 + PANAH_TEGAK : y0;
 		if (luap) {
-			panah(l, kunci + "#naik", x0, y0, x1, y0 + PANAH, "▲", awal > 0, () -> awal = Math.max(0, awal - 1));
-			panah(l, kunci + "#turun", x0, y1 - PANAH, x1, y1, "▼", awal + ruang < n, () -> awal = Math.min(n - ruang, awal + 1));
+			panah(l, kunci + "#naik", x0, y0, x1, y0 + PANAH_TEGAK, "▲", awal > 0, () -> awal = Math.max(0, awal - 1));
+			panah(l, kunci + "#turun", x0, y1 - PANAH_TEGAK, x1, y1, "▼", awal + ruang < n, () -> awal = Math.min(n - ruang, awal + 1));
 		}
 		for (int k = 0; k < ruang && awal + k < n; k++) {
 			Tab t = terlihat.get(awal + k);
@@ -209,9 +213,9 @@ public final class TabBar {
 		int kiri = luap ? x0 + PANAH : x0;
 		int kanan = luap ? x1 - PANAH : x1;
 		if (luap) {
-			// keep the active tab in view
+			// keep the active tab in view when it changes (not every frame: the arrows would be undone)
 			int ai = indeks(aktif);
-			if (ai >= 0) {
+			if (ai >= 0 && aktifBaru(aktif)) {
 				awal = Math.min(awal, ai);
 				while (awal < ai && lebarDari(lebar, awal, ai) > kanan - kiri) {
 					awal++;
@@ -341,15 +345,21 @@ public final class TabBar {
 
 	private void jagaAktif(String aktif, int ruang) {
 		int ai = indeks(aktif);
-		if (ai < 0) {
-			return;
-		}
-		if (ai < awal) {
-			awal = ai;
-		} else if (ai >= awal + ruang) {
-			awal = ai - ruang + 1;
+		if (ai >= 0 && aktifBaru(aktif)) {
+			if (ai < awal) {
+				awal = ai;
+			} else if (ai >= awal + ruang) {
+				awal = ai - ruang + 1;
+			}
 		}
 		awal = Math.max(0, Math.min(awal, Math.max(0, terlihat.size() - ruang)));
+	}
+
+	/** True once per change of the owner's active id. */
+	private boolean aktifBaru(String aktif) {
+		boolean baru = !aktif.equals(aktifTerakhir);
+		aktifTerakhir = aktif;
+		return baru;
 	}
 
 	private static void panah(Lukis l, String kunci, int x0, int y0, int x1, int y1, String tanda, boolean on, Runnable aksi) {

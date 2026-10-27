@@ -1,6 +1,5 @@
 package dev.kultivator.client.sekte.tetua;
 
-import dev.kultivator.Kultivator;
 import dev.kultivator.client.EffectQuality;
 import dev.kultivator.client.epic.SekteScenes;
 import dev.kultivator.client.epic.sky.SkyDirector;
@@ -19,8 +18,6 @@ import dev.kultivator.sekte.tetua.TetuaPayloads;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
@@ -61,7 +58,6 @@ public final class TetuaClient {
 			TetuaPoses.clear();
 			view = new CompoundTag();
 		});
-		HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, Kultivator.id("sekte_tetua_laporan"), new LaporanCard());
 		TetuaPoses.init();
 		scenes();
 		// Gulungan Utama › Sekte › Anggota (DESIGN 43.5, 43.16.2 M06): candidates, ranks, the Balai Tetua and the heir in one

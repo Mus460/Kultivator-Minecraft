@@ -1,6 +1,7 @@
 package dev.kultivator.client.tempa;
 
 import dev.kultivator.client.Keys;
+import dev.kultivator.client.dunia.DuniaClient;
 import dev.kultivator.client.screen.Page;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.DaftarGulir;
@@ -10,6 +11,7 @@ import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.TalismanButton;
 import dev.kultivator.data.Element;
 import dev.kultivator.network.Actions;
+import dev.kultivator.network.Payloads;
 import dev.kultivator.tempa.ArtifactItem;
 import dev.kultivator.tempa.Forging;
 import dev.kultivator.tempa.WeaponSpirit;
@@ -176,6 +178,9 @@ public class PusakaPage extends Page {
 	protected void lukis(Lukis l) {
 		int colW = x + w - colX;
 		lines.clear();
+		if (DuniaClient.tooBig(Payloads.DuniaSync.CH_TEMPA)) {
+			line(Component.translatable("kultivator.sect_fix_feat.too_big"), Palette.SEAL_DARK, colW);
+		}
 		if (natalArt.isEmpty()) {
 			line(Component.translatable("kultivator.tempa.page.none"), Palette.INK_SOFT, colW);
 			line(Component.translatable("kultivator.tempa.page.how"), Palette.INK_FAINT, colW);

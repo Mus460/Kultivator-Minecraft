@@ -61,33 +61,6 @@ public final class LembarHub {
 		return layar + "|" + String.join(",", new TreeSet<>(tab));
 	}
 
-	/**
-	 * The home page of sheet {@code layar} opened on tab {@code tab} (43.12.4), from the registrations: the page whose tab set
-	 * holds {@code tab}, else one that mounts all tabs, else the first page of that sheet; null when the sheet has no home
-	 * (its function lives only in the world: Di Sini).
-	 */
-	public static @Nullable HubPages.Entri rumah(String layar, String tab) {
-		HubPages.Entri semua = null;
-		HubPages.Entri pertama = null;
-		for (int b = 0; b < HubNav.SECTIONS; b++) {
-			for (HubPages.Entri e : HubPages.dari(b)) {
-				if (!layar.equals(e.layar())) {
-					continue;
-				}
-				if (!tab.isEmpty() && e.tab().contains(tab)) {
-					return e;
-				}
-				if (e.tab().isEmpty() && semua == null) {
-					semua = e;
-				}
-				if (pertama == null) {
-					pertama = e;
-				}
-			}
-		}
-		return semua != null ? semua : pertama;
-	}
-
 	/** The mounted page of registration {@code e} (built now when the host has not built it yet). */
 	public static Halaman dari(HubPages.Entri e) {
 		return (Halaman) halaman(e.layar(), e.tab());
@@ -297,9 +270,10 @@ public final class LembarHub {
 			return isi != null ? isi.uang() : -1L;
 		}
 
+		/** A service opened from a talk keeps the talk one step back (43.8.1.3); this holder is the context page. */
 		@Override
 		public boolean rinci() {
-			return isi != null && isi.rinci();
+			return DiSini.bisaKembali(this) || isi != null && isi.rinci();
 		}
 
 		@Override
@@ -334,7 +308,13 @@ public final class LembarHub {
 
 		@Override
 		public void onHide() {
+			// 43.8.1.4: a page holding this live context was only hidden (another section or sub); the Gulungan closing empties
+			// the host's context first, so then the session does end here.
+			if (konteks && DiSini.halaman() == this && dev.kultivator.client.screen.CultivationScreen.adaKonteks()) {
+				return;
+			}
 			if (isi != null) {
+
 				isi.onHide();
 			}
 			if (konteks) {
@@ -466,7 +446,7 @@ public final class LembarHub {
 
 		@Override
 		public boolean mundur() {
-			return isi != null && isi.mundur();
+			return isi != null && isi.mundur() || DiSini.kembali(this);
 		}
 
 		@Override

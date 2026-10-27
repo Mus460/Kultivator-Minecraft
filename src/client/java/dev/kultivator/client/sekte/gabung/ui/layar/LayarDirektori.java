@@ -16,7 +16,7 @@ import dev.kultivator.client.sekte.diplomasi.DiplomasiScreen;
 import dev.kultivator.client.sekte.gabung.ui.IkonGabung;
 import dev.kultivator.client.sekte.mandiri.seteru.SeteruClient;
 import dev.kultivator.client.sekte.mandiri.seteru.SeteruScreen;
-import dev.kultivator.client.sekte.wilayah.GulirIsi;
+import dev.kultivator.client.screen.ui.GulirIsi;
 import dev.kultivator.client.tempat.ui.kit.IkonTempat;
 import dev.kultivator.client.tempat.ui.kit.Lembar;
 import dev.kultivator.client.tempat.ui.kit.TabLentera;
@@ -50,7 +50,8 @@ import java.util.Set;
  * merges what four screens showed apart: the directory (every sect in live strength order; unknown ones as "?" with a hint),
  * the hall's diplomacy (stance, war, pact, vassal), the hall's feuds and the named disciples of other sects (Seteru), and
  * the strength board with its 7-day trend (old tab Peringkat). Old tabs Lurus / Netral / Iblis are filter chips
- * ({@link Saring}, 43.2.3), Peringkat is a sort order, Sekteku lives in Sekte › Ikhtisar (G45).
+ * ({@link Saring}, 43.2.3), Peringkat is a sort order, Sekteku lives in Sekte › Ikhtisar (G45) except its Papan Jasa,
+ * a stacked heading in your own sect's detail here.
  * <p>
  * The list is {@link DaftarSekte}; the chosen sect's detail is beside it (or in its place in the narrow layout, with
  * "‹ Kembali"): its card, strength and trend, the best door's requirements with Lamar / Kartu Sekte / Tunjuk di peta, the
@@ -376,6 +377,9 @@ public final class LayarDirektori extends LayarGabungDasar {
 			y += 4;
 			int h = DiplomasiScreen.blokDiplomasi(l, e.id(), cx0, y, cx1);
 			y += h > 0 ? h + 4 : 0;
+			if (e.b(Direktori.ANGGOTA) && lembar.ada(Direktori.SEKTEKU)) {
+				y = papanJasa(l, lembar.sub(Direktori.SEKTEKU), cx0, y, cx1);
+			}
 			y = murid(l, e.id(), cx0, y, cx1);
 		}
 		gulir.selesai(l, y + 4);
@@ -504,6 +508,36 @@ public final class LayarDirektori extends LayarGabungDasar {
 			cap.append(t("saran_panah", saran));
 		}
 		return 11 + (int) l.bungkus(cap, x0 + 12, y + 10, x1 - x0 - 12, saran != null ? Palette.WARN : l.gaya.teksSamar, 18) + 1;
+	}
+
+	/**
+	 * This month's Papan Jasa of your own sect (old tab Sekteku, 41:1036): players and roster seniors by PK, your row marked,
+	 * the top three in gold (they earn the quota). Returns the y under it.
+	 */
+	private int papanJasa(Lukis l, Lembar s, int x0, int y, int x1) {
+		List<Lembar> rows = s.daftar(Direktori.PAPAN_JASA);
+		if (rows.isEmpty()) {
+			return y;
+		}
+		y += l.kepala(t("direktori.papan_jasa"), x0, y, x1);
+		l.samar(t("direktori.pk_total", Brush.angka(s.l(GabungLembar.PK_TOTAL, 0L))), x0, y, x1 - x0);
+		y += 12;
+		for (int i = 0; i < rows.size(); i++) {
+			Lembar r = rows.get(i);
+			boolean anda = r.b(LembarKunci.ANDA);
+			if (anda) {
+				l.g.fill(x0 - 1, y - 1, x1 + 1, y + 10, Palette.argb(0x30, Palette.JADE_DARK & 0xFFFFFF));
+			}
+			int warna = i < 3 ? Palette.GOLD_DARK : anda ? Palette.JADE_DARK : l.gaya.teks;
+			Component pk = Component.literal(Brush.angka(r.l(GabungLembar.PK_TOTAL, 0L)) + " PK");
+			int pw = l.font.width(pk);
+			// the server sends the top 10 plus your own row when it is lower down (its place is on the Kartu)
+			String no = i < 10 ? "#" + (i + 1) + " " : "… ";
+			l.teks(Component.literal(no).append(r.teks(LembarKunci.NAMA)), x0, y, x1 - x0 - pw - 4, warna);
+			l.teks(pk, x1 - pw, y, pw, warna);
+			y += 11;
+		}
+		return y + 4;
 	}
 
 	/** The named disciples of the sect (Seteru), two cards a row when there is room; returns the y under them. */

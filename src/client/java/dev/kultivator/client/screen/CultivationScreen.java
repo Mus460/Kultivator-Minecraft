@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import dev.kultivator.Kultivator;
 import dev.kultivator.client.ClientCultivation;
 import dev.kultivator.client.Keys;
+import dev.kultivator.client.hub.DiSini;
 import dev.kultivator.client.hub.HubNav;
 import dev.kultivator.client.hub.HubPages;
 import dev.kultivator.client.hub.Tujuan;
@@ -78,8 +79,8 @@ public class CultivationScreen extends Screen {
 	private static final long PESAN_MILLIS = 6000L;
 	private static final int RAIL_W = 20;
 	private static final int RAIL_W_SEMPIT = 18;
-	/** Rail width with names beside the glyphs (43.3.1: paper at least 230 px tall and room for the full paper). */
-	private static final int RAIL_W_NAMA = 64;
+	/** Widest named rail (43.3.1); the named width itself follows the longest section name ({@link #init}). */
+	private static final int RAIL_W_NAMA_MAKS = 100;
 	private static final int MAX_W = 440;
 	private static final int MAX_H = 284;
 	private static final int WIDE_W = 560;
@@ -155,11 +156,6 @@ public class CultivationScreen extends Screen {
 	private float animFromX0;
 	private float animFromX1;
 	private long animAt;
-
-	/** Opens on a legacy tab id (0 Status, 1 Akar &amp; Dao, 2 Teknik, 3 Pengaturan, 4 Ensiklopedia, 5 Jalan, 6 Alkimia; 43.4.4). */
-	public CultivationScreen(int legacyTab) {
-		this(tujuanDari(legacyTab));
-	}
 
 	private CultivationScreen(Tujuan tujuan) {
 		super(Component.translatable("kultivator.screen.title"));
@@ -251,6 +247,17 @@ public class CultivationScreen extends Screen {
 		return konteks != null;
 	}
 
+	/** The home place of the live context (43.12.4), or null when it lives under the Di Sini tablet itself. */
+	private static @Nullable Tujuan rumahKonteks() {
+		return konteks != null && konteks == DiSini.halaman() ? DiSini.rumah() : null;
+	}
+
+	/** True when the shown page holds the live context (Di Sini, or the context's home page). */
+	private boolean memegangKonteks() {
+		Tujuan rumah = rumahKonteks();
+		return konteks != null && (section == HubNav.DI_SINI || rumah != null && section == rumah.bagian() && pageId.equals(rumah.halaman()));
+	}
+
 	// ================================================================== places
 
 	/** The section shown ({@code HubNav.DIRI} ... {@code HubNav.DI_SINI}). */
@@ -273,11 +280,6 @@ public class CultivationScreen extends Screen {
 			return;
 		}
 		tampilkan(tujuan.bagian(), tujuan.halaman(), tujuan.sub(), tujuan.fokus());
-	}
-
-	/** Legacy: shows {@code newSection} on its last page. */
-	public void showSection(int newSection, int newSub) {
-		tuju(Tujuan.bagian(newSection));
 	}
 
 	/** Panduan › Ensiklopedia on {@code topic}. */
@@ -341,6 +343,12 @@ public class CultivationScreen extends Screen {
 	 * focus tag {@code fokus}. A locked page is not entered (its reason goes to the footer).
 	 */
 	private void tampilkan(int s, String id, String sub, @Nullable CompoundTag fokus) {
+		// 43.8.1.3: a context with a home page lives there only; its Di Sini tablet is the jump to it.
+		Tujuan rumah = rumahKonteks();
+		if (s == HubNav.DI_SINI && rumah != null) {
+			s = rumah.bagian();
+			id = rumah.halaman();
+		}
 		int target = Math.max(0, Math.min(HubNav.DI_SINI, s));
 		if (target == HubNav.DI_SINI && konteks == null) {
 			target = section == HubNav.DI_SINI ? HubNav.lastSection() : section;
@@ -538,6 +546,10 @@ public class CultivationScreen extends Screen {
 			opened = true;
 			openedAt = Util.getMillis();
 			lastFrame = openedAt;
+			// A context that arrived while a container or chat was open (43.8.1.5) pulses once the tablets slide in.
+			if (konteks != null && konteksSejak < openedAt) {
+				konteksSejak = openedAt + 150L;
+			}
 			UiSound.open();
 			Keys.send(Payloads.Action.of(Actions.REQUEST_SYNC));
 		}
@@ -545,8 +557,14 @@ public class CultivationScreen extends Screen {
 		subH = sempit ? SUB_H_SEMPIT : SUB_H;
 		headH = sempit ? HEAD_H_SEMPIT : HEAD_H;
 		int ph = Math.min(MAX_H, height - 8);
-		bernama = !sempit && ph >= NAMED_TABLETS_MIN && width - RAIL_W_NAMA - 12 >= MAX_W;
-		railW = sempit ? RAIL_W_SEMPIT : bernama ? RAIL_W_NAMA : RAIL_W;
+		// Named tablets: glyph and gaps take 24 px (TabBar.tablet), the rest is the longest section name in bold.
+		int nama = 0;
+		for (int i = 0; i < HubNav.SECTIONS; i++) {
+			nama = Math.max(nama, font.width(Brush.bold(sectionName(i))));
+		}
+		int railNama = Math.min(RAIL_W_NAMA_MAKS, nama + 24);
+		bernama = !sempit && ph >= NAMED_TABLETS_MIN && width - railNama - 12 >= MAX_W;
+		railW = sempit ? RAIL_W_SEMPIT : bernama ? railNama : RAIL_W;
 		laid.clear();
 		if (first) {
 			tampilkan(section, pageId, subTunda, fokusTunda);
@@ -632,7 +650,10 @@ public class CultivationScreen extends Screen {
 	public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float a) {
 		long now = Util.getMillis();
 		float fade = backdrop.to(1.0F, Math.min(0.1F, (now - lastFrame) / 1000.0F), 0.0F);
-		g.fillGradient(0, 0, width, height, Palette.argb(Math.round(0xC8 * fade), Palette.NIGHT), Palette.argb(Math.round(0xE0 * fade), Palette.NIGHT_MIST));
+		int tint = warnaLangit();
+		int sky = tint == 0 ? Palette.NIGHT : Palette.mix(Palette.NIGHT, tint, 0.22F);
+		int mist = tint == 0 ? Palette.NIGHT_MIST : Palette.mix(Palette.NIGHT_MIST, tint, 0.32F);
+		g.fillGradient(0, 0, width, height, Palette.argb(Math.round(0xC8 * fade), sky), Palette.argb(Math.round(0xE0 * fade), mist));
 		// Distant ink-wash mountains along the bottom.
 		int base = height;
 		int step = Math.max(2, width / 160);
@@ -654,6 +675,20 @@ public class CultivationScreen extends Screen {
 		Brush.halo(g, width * 0.82F, height * 0.18F, 9.0F, 8.0F, 0xE8EEF5, 0.35F * fade);
 		Brush.disc(g, width * 0.82F, height * 0.18F, 9.0F, Palette.argb(Math.round(0x90 * fade), 0xE8EEF5));
 		minecraft.gui.hud.extractDeferredSubtitles();
+	}
+
+	/**
+	 * 43.3.1: the backdrop varies by colour only: the shown page's own {@code Palette.Gaya} (a lantern-lit town counter, a
+	 * stone ruin), dusk for Titah Langit, the immortal sky for Keabadian; 0 = the plain ink night.
+	 */
+	private int warnaLangit() {
+		if (shown != null && shown.gaya() != Palette.Gaya.KERTAS) {
+			return shown.gaya().aksen;
+		}
+		if (Urutan.ID_TITAH.equals(pageId)) {
+			return 0xFFC8703C;
+		}
+		return section == HubNav.KEABADIAN ? 0xFF6A4CA8 : 0;
 	}
 
 	/** Once per frame: registry or context changes refresh the coins; sub bar / wide paper changes relayout; new data reaches the page. */
@@ -763,7 +798,7 @@ public class CultivationScreen extends Screen {
 		int railX1 = railX0 + railW;
 		int per = TabBar.tinggiTablet(y1 - y0, order.size());
 		boolean muat = per * order.size() <= y1 - y0;
-		if (konteks != null && now - konteksSejak < 900L && muat) {
+		if (konteks != null && now >= konteksSejak && now - konteksSejak < 900L && muat) {
 			float pulse = (float) Math.sin((now - konteksSejak) / 900.0F * Math.PI);
 			Brush.halo(l.g, (railX0 + railX1) / 2.0F, y0 + per / 2.0F, railW / 2.0F, 4.0F, 0xFFE07A, pulse);
 		}
@@ -810,7 +845,8 @@ public class CultivationScreen extends Screen {
 			left += bw + 3;
 		}
 		if (ids.size() <= 1) {
-			Component text = shown == null ? sectionName(section) : Component.translatable(H + "judul", sectionName(section), shown.title());
+			// Di Sini's name already reads "place · NPC" (43.8.1): the page title would repeat it.
+			Component text = shown == null || section == HubNav.DI_SINI ? sectionName(section) : Component.translatable(H + "judul", sectionName(section), shown.title());
 			l.teks(Brush.bold(text), left + 2, textY, end - left - 2, Palette.SEAL_DARK);
 		} else {
 			List<TabBar.Tab> tabs = new ArrayList<>(ids.size());
@@ -850,13 +886,7 @@ public class CultivationScreen extends Screen {
 			boolean over = l.di(x0, y0, x1, y1);
 			Brush.rect(l.g, x0, y0, x1, y1, over ? Palette.argb(0x70, Palette.TALISMAN) : Palette.argb(0x48, Palette.TALISMAN));
 			l.teks(label, x0 + 4, y0 + (subH - 8) / 2.0F, x1 - x0 - 6, Palette.INK);
-			int size = sumber.pilihan().size();
-			l.zona("sumber", x0, y0, x1, y1, () -> {
-				if (size > 1) {
-					UiSound.tab();
-					sumber.pilih().accept(Math.floorMod(sumber.aktif().getAsInt() + 1, size));
-				}
-			}, true, null, false);
+			l.zona("sumber", x0, y0, x1, y1, () -> gantiSumber(1), true, null, false);
 			if (over) {
 				l.tip(Component.translatable(H + "sumber.tip"));
 			}
@@ -869,6 +899,17 @@ public class CultivationScreen extends Screen {
 		subBar.setTabs(tabs);
 		subBar.gambar(l, "sub", contentX, y0, sx1, y1, false, TabBar.Rupa.SUB, true, subId, this::gantiSub);
 		Brush.rect(l.g, contentX, y1 + 0.5F, contentX + contentW, y1 + 1.0F, Palette.argb(0x60, Palette.JADE_DULL));
+	}
+
+	/** Steps the Sumber chip of the shown page by {@code step} (click, Shift+←/→); false when it has no choice. */
+	private boolean gantiSumber(int step) {
+		Page.Sumber sumber = shown == null || !hasSubs ? null : shown.sumber();
+		if (sumber == null || sumber.pilihan() == null || sumber.pilihan().size() < 2) {
+			return false;
+		}
+		UiSound.tab();
+		sumber.pilih().accept(Math.floorMod(sumber.aktif().getAsInt() + step, sumber.pilihan().size()));
+		return true;
 	}
 
 	/** The footer: the last message for 6 s, else the key hints (not in the narrow layout). */
@@ -970,8 +1011,8 @@ public class CultivationScreen extends Screen {
 		int key = event.key();
 		if (key >= InputConstants.KEY_1 && key <= InputConstants.KEY_9 && !event.hasControlDown() && !event.hasAltDown()) {
 			int number = key - InputConstants.KEY_1;
-			// K3 (43.17): under Di Sini a numbered choice the page drew takes the number.
-			if (section == HubNav.DI_SINI && page != null && page.angka(number + 1)) {
+			// K3 (43.17): on the page holding the live context (Di Sini or its home) a numbered choice it drew takes the number.
+			if (memegangKonteks() && page != null && page.angka(number + 1)) {
 				return true;
 			}
 			int target = number == HubNav.DI_SINI ? HubNav.DI_SINI : number;
@@ -999,6 +1040,15 @@ public class CultivationScreen extends Screen {
 			return true;
 		}
 		if (sectionKey(event)) {
+			return true;
+		}
+		// 43.0.7: the "?" seal (F1) and the Sumber chip (Shift+←/→) are reachable from the keyboard too.
+		if (key == InputConstants.KEY_F1 && helpSeal != null) {
+			UiSound.press();
+			bukaBantuan();
+			return true;
+		}
+		if ((event.isLeft() || event.isRight()) && event.hasShiftDown() && gantiSumber(event.isLeft() ? -1 : 1)) {
 			return true;
 		}
 		// 43.8.5: the ring key opens the bound ring from the Gulungan too (RingScreen returns here itself).
@@ -1052,6 +1102,10 @@ public class CultivationScreen extends Screen {
 		if (shown != null) {
 			shown.tick();
 		}
+		// A context out of sight still ticks: its reach check ends it when the player walks away (43.8.1.4).
+		if (konteks != null && !memegangKonteks()) {
+			konteks.tick();
+		}
 	}
 
 	@Override
@@ -1060,7 +1114,13 @@ public class CultivationScreen extends Screen {
 		if (shown != null && shown != konteks) {
 			shown.onHide();
 		}
-		// The Gulungan closed: a world context ends with it (43.8.1.4, OP_TUTUP from the page).
+		// The Gulungan closed: a world context ends with it (43.8.1.4, OP_TUTUP from the page), unless the Gulungan only
+		// gave way to a screen that comes back here (ring, chat: 43.8.5).
+		if (HubNav.menungguKembali()) {
+			shown = null;
+			super.removed();
+			return;
+		}
 		Page ctx = konteks;
 		konteks = null;
 		if (ctx != null) {

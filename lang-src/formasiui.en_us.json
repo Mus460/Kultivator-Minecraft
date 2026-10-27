@@ -77,7 +77,6 @@
 	"kultivator.formasiui.nodes.rename.tip": "Type a name (up to 24 letters) and press Enter.",
 
 	"kultivator.formasiui.map.title": "Node map · %s",
-	"kultivator.formasiui.map.close": "Close",
 	"kultivator.formasiui.map.lost": "This node is gone. Open the map again from a node.",
 	"kultivator.formasiui.map.north": "N",
 	"kultivator.formasiui.map.here": "%s (here)",
@@ -99,7 +98,6 @@
 	"kultivator.formasiui.alarm_kind.elite": "elite",
 	"kultivator.formasiui.alarm_kind.boss": "boss",
 
-	"kultivator.formasiui.slip.back": "‹ Back",
 	"kultivator.formasiui.slip.line": "%s %s · %s · %s",
 	"kultivator.formasiui.slip.scope.core": "around the eye",
 	"kultivator.formasiui.slip.scope.territory": "whole territory",

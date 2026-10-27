@@ -132,7 +132,7 @@ final class LayarAcaraKota {
 		long sisa = u.l(LembarKunci.SISA_TICK, 0L);
 		if (sisa > 0L && y + 10 < cy1) {
 			long left = CincinWaktu.sisa(sisa, s.diterima42(), l.kini);
-			l.keterangan(SketsaKota.t("upacara.mulai_dalam", TeksTempat.waktu(left)), tx, y, tw, lemah);
+			l.keterangan(SketsaKota.t("upacara.mulai_dalam", Brush.waktu(left)), tx, y, tw, lemah);
 			y += 10;
 		}
 		if (u.b(Upacara.HADIR) && y + 10 < cy1) {
@@ -178,15 +178,15 @@ final class LayarAcaraKota {
 			s.tombol42(l, "beri#kurang", x0 + 22, by + 4, 14, 13, Component.literal("−"), nilai > min, () -> s.jumlah42 = Math.max(min, s.jumlah42 - langkah));
 			LabelHarga.gambar(l, nilai, s.uang42(), x0 + 40, by + 7, false, 0.9F, false);
 			s.tombol42(l, "beri#tambah", x0 + 84, by + 4, 14, 13, Component.literal("+"), nilai < maks, () -> s.jumlah42 = Math.min(maks, s.jumlah42 + langkah));
-			l.keterangan(SketsaKota.t("upacara.saran", TeksTempat.angka(beri.l(Upacara.SARAN, min))), x0 + 22, by + 19, 90, gaya.teksSamar);
+			l.keterangan(SketsaKota.t("upacara.saran", Brush.angka(beri.l(Upacara.SARAN, min))), x0 + 22, by + 19, 90, gaya.teksSamar);
 			long uang = s.uang42();
 			boolean cukup = uang < 0 || nilai <= uang;
 			Component alasan = beri.teksAtau(LembarKunci.ALASAN);
 			if (alasan == null && !cukup) {
-				alasan = TeksTempat.k("harga.kurang", TeksTempat.angka(nilai - Math.max(0L, uang)));
+				alasan = TeksTempat.k("harga.kurang", Brush.angka(nilai - Math.max(0L, uang)));
 			}
 			s.op42(l, "beri", x0 + 104, by + 4, Math.max(60, x1 - x0 - 194), 14, SketsaKota.t(angpao ? "upacara.beri_angpao" : "upacara.beri_duka",
-					TeksTempat.angka(nilai)), beri.b(LembarKunci.BISA) && cukup, alasan, LembarKunci.op(Upacara.OP_BERI, nilai));
+					Brush.angka(nilai)), beri.b(LembarKunci.BISA) && cukup, alasan, LembarKunci.op(Upacara.OP_BERI, nilai));
 		}
 		s.op42(l, "tunjuk", x1 - 84, by + 4, 80, 14, SketsaKota.t("tunjuk"), true, null,
 				LembarKunci.op(LembarKunci.OP_TANDAI, u.i(LembarKunci.X, 0), u.i(LembarKunci.Z, 0)));
@@ -287,8 +287,8 @@ final class LayarAcaraKota {
 		s.tombol42(l, "tip#tambah", x0 + 62, by, 14, 14, Component.literal("+"), nilai < maks, () -> s.jumlah42 = Math.min(maks, s.jumlah42 + langkah));
 		long uang = s.uang42();
 		boolean cukup = uang < 0 || nilai <= uang;
-		s.op42(l, "tip", x0 + 82, by, x1 - x0 - 82, 14, SketsaKota.t("rombongan.tip", TeksTempat.angka(nilai)), cukup,
-				TeksTempat.k("harga.kurang", TeksTempat.angka(nilai - Math.max(0L, uang))), LembarKunci.op(Rombongan.OP_TIP, nilai));
+		s.op42(l, "tip", x0 + 82, by, x1 - x0 - 82, 14, SketsaKota.t("rombongan.tip", Brush.angka(nilai)), cukup,
+				TeksTempat.k("harga.kurang", Brush.angka(nilai - Math.max(0L, uang))), LembarKunci.op(Rombongan.OP_TIP, nilai));
 	}
 
 	private LayarAcaraKota() {

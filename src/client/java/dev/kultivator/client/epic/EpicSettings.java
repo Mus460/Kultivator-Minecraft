@@ -136,7 +136,7 @@ public final class EpicSettings {
 	private static final String T = "kultivator.momen.setting.";
 
 	/**
-	 * The rows of the Settings page, in order (Mode Rekam last; {@code epic_pack_geometry} has no row). Empty while the
+	 * The rows of the Settings page, in order (Mode Rekam last). Empty while the
 	 * row texts are not in the language files yet, so the page never shows raw keys.
 	 */
 	public static List<Row> rows() {
@@ -162,6 +162,7 @@ public final class EpicSettings {
 				toggle(SLOWMO, "slowmo"),
 				toggle(GEOMETRY, "geometry"),
 				toggle(SKY, "sky"),
+				toggle(PACK_GEOMETRY, "pack"),
 				new Row(VFX, true, () -> Component.translatable(T + "vfx", vfxText()), EpicSettings::nextVfx,
 						() -> tip("vfx", Component.translatable(T + "vfx", vfxText()))),
 				toggle(RECORD, "record")));

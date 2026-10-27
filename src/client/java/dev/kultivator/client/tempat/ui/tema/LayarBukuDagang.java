@@ -184,7 +184,7 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 				tip.add(k.teks(LembarKunci.NAMA));
 				tip.add(TemaUi.k("tema." + k.s(Dagang.TEMA)));
 				if (k.ada(LembarKunci.JARAK)) {
-					tip.add(TemaUi.k("dagang.jarak", TeksTempat.angka(k.i(LembarKunci.JARAK, 0))));
+					tip.add(TemaUi.k("dagang.jarak", Brush.angka(k.i(LembarKunci.JARAK, 0))));
 				}
 				l.tip(tip);
 			}
@@ -257,7 +257,7 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 			l.g.fill(cx0 + 1, ry0 + 1, cx1 - 1, ry1, Palette.argb(Math.round(0x70 * (1.0F - jenuh) / 0.4F), 0xB03030));
 		}
 		int warna = tua ? TempatWarna.terkunci(gaya.teks) : s.b(Dagang.TERBAIK) ? 0xFF2E7A4E : gaya.teks;
-		Component nb = Component.literal(TeksTempat.desimal1(s.f(LembarKunci.NB, 0.0F)));
+		Component nb = Component.literal(Brush.desimal1(s.f(LembarKunci.NB, 0.0F)));
 		float w = font.width(nb);
 		float tx = (cx0 + cx1) / 2.0F - w / 2.0F - 4;
 		Brush.text(l.g, font, nb, tx, ry0 + 4, warna, 1.0F, false);
@@ -270,7 +270,7 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 		if (l.di(cx0, ry0, cx1, ry1)) {
 			List<Component> tip = new ArrayList<>();
 			tip.add(k.teks(LembarKunci.NAMA));
-			tip.add(TemaUi.k("dagang.sel_harga", TeksTempat.desimal1(s.f(LembarKunci.NB, 0.0F))));
+			tip.add(TemaUi.k("dagang.sel_harga", Brush.desimal1(s.f(LembarKunci.NB, 0.0F))));
 			int umur = s.i(Dagang.UMUR_HARI, 0);
 			tip.add(umur <= 0 ? TemaUi.k("dagang.sel_hari_ini") : TemaUi.k("dagang.sel_umur", umur));
 			if (jenuh < 0.97F) {
@@ -339,8 +339,8 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 		float beda = mahal.f(LembarKunci.NB, 0.0F) - murah.f(LembarKunci.NB, 0.0F);
 		Component a = namaKota(murah.s(Dagang.KOTA));
 		Component b = namaKota(mahal.s(Dagang.KOTA));
-		Component t = TemaUi.k("dagang.rute", e.teks(LembarKunci.NAMA), a, TeksTempat.desimal1(murah.f(LembarKunci.NB, 0.0F)), b,
-				TeksTempat.desimal1(mahal.f(LembarKunci.NB, 0.0F)), TeksTempat.desimal1(beda));
+		Component t = TemaUi.k("dagang.rute", e.teks(LembarKunci.NAMA), a, Brush.desimal1(murah.f(LembarKunci.NB, 0.0F)), b,
+				Brush.desimal1(mahal.f(LembarKunci.NB, 0.0F)), Brush.desimal1(beda));
 		l.teks(t, x0, y, x1 - x0, beda > 0.0F ? 0xFF2E7A4E : gaya.teksLemah);
 	}
 
@@ -361,7 +361,7 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 		long minggu = laba.l(Dagang.MINGGU, 0L);
 		long batas = Math.max(1L, laba.l(Dagang.BATAS, 150L));
 		LabelHarga.gambar(l, minggu, -1L, x, y + 2, false, 1.5F, false);
-		l.kanan(TemaUi.k("dagang.dari_batas", TeksTempat.angka(batas)), kiri.x1(), y + 5, gaya.teksLemah, 1.0F);
+		l.kanan(TemaUi.k("dagang.dari_batas", Brush.angka(batas)), kiri.x1(), y + 5, gaya.teksLemah, 1.0F);
 		y += 18;
 		float frac = minggu / (float) batas;
 		int warna = frac >= 1.0F ? TempatWarna.BAHAYA : frac > 0.8F ? TempatWarna.PERINGATAN : TempatWarna.OK;
@@ -376,14 +376,14 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 		if (y + 24 > kiri.y1()) {
 			// narrow layout (GUI scale 4): no room under the weekly block; the right card follows below
 		} else if (total < SAUDAGAR) {
-			y += barisNilai(l, TemaUi.k("dagang.laba_total"), TeksTempat.nb(total, false), x, y, kiri.x1());
+			y += barisNilai(l, TemaUi.k("dagang.laba_total"), Brush.nb(total, false), x, y, kiri.x1());
 			TemaUi.meter(l, TemaUi.I_TERBAIK, x, y, kiri.x1(), total / (float) SAUDAGAR, TempatWarna.EMAS_TERANG, -1.0F);
 			if (l.di(x, y - 1, kiri.x1(), y + 9)) {
-				l.tip(TemaUi.k("dagang.saudagar_tip", TeksTempat.angka(SAUDAGAR - Math.max(0L, total))));
+				l.tip(TemaUi.k("dagang.saudagar_tip", Brush.angka(SAUDAGAR - Math.max(0L, total))));
 			}
 			y += 12;
 		} else {
-			y += barisNilai(l, TemaUi.k("dagang.laba_total"), TeksTempat.nb(total, false), x, y, kiri.x1());
+			y += barisNilai(l, TemaUi.k("dagang.laba_total"), Brush.nb(total, false), x, y, kiri.x1());
 			TemaUi.chip(l, TemaUi.I_TERBAIK, TemaUi.k("dagang.saudagar"), x, y, TempatWarna.EMAS_TERANG);
 			y += 14;
 		}
@@ -411,7 +411,7 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 					Brush.centered(l.g, font, hariLabel, bx + bw / 2.0F, dasar + 2, gaya.teksSamar, 1.0F, false);
 				}
 				if (l.di(bx, dasar - bh, bx + bw, dasar + 10)) {
-					l.tip(List.of(hariLabel, TemaUi.k("dagang.bar_tip", TeksTempat.bertanda(hari[i]))));
+					l.tip(List.of(hariLabel, TemaUi.k("dagang.bar_tip", Brush.bertanda(hari[i]))));
 				}
 			}
 		}
@@ -460,8 +460,8 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 			PanelTempat.kartu(lk.g, gaya, rx0, ry0, rx1, ry1, sorot ? 1.0F : 0.0F, pilih);
 			TemaUi.ikon(lk.g, e.b(Dagang.KAPAL) ? TemaUi.I_KAPAL : TemaUi.I_KARUNG, rx0 + 3, ry0 + 5, 16);
 			int sisa = e.i(LembarKunci.SISA_HARI, 0);
-			Component hari = TeksTempat.hari(sisa);
-			Component bayar = Component.literal(TeksTempat.angka(e.l(Dagang.BAYAR, 0L)));
+			Component hari = Brush.hari(sisa);
+			Component bayar = Component.literal(Brush.angka(e.l(Dagang.BAYAR, 0L)));
 			int kananW = Math.max(font.width(hari), font.width(bayar) + 12) + 8;
 			lk.teks(e.teks(LembarKunci.NAMA), rx0 + 23, ry0 + 3, rx1 - rx0 - 23 - kananW, gaya.teks);
 			lk.teks(TemaUi.k("dagang.kontrak_ke", e.teks(LembarKunci.TUJUAN), e.i(Dagang.PETI, 0)), rx0 + 23, ry0 + 14, rx1 - rx0 - 23 - kananW,
@@ -483,9 +483,9 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 		ry += subjudul(l, e.teks(LembarKunci.NAMA), rx0, ry, rx1);
 		ry += barisNilai(l, TemaUi.k("dagang.k_tujuan"), e.teks(LembarKunci.TUJUAN), rx0, ry, rx1);
 		ry += barisNilai(l, TemaUi.k("dagang.k_peti"), Component.literal(Integer.toString(e.i(Dagang.PETI, 0))), rx0, ry, rx1);
-		ry += barisNilai(l, TemaUi.k("dagang.k_sisa"), TeksTempat.hari(e.i(LembarKunci.SISA_HARI, 0)), rx0, ry, rx1);
-		ry += barisNilai(l, TemaUi.k("dagang.k_deposit"), TeksTempat.nb(e.l(Dagang.DEPOSIT, 0L), false), rx0, ry, rx1);
-		ry += barisNilai(l, TemaUi.k("dagang.k_bayar"), TeksTempat.nb(e.l(Dagang.BAYAR, 0L), false), rx0, ry, rx1);
+		ry += barisNilai(l, TemaUi.k("dagang.k_sisa"), Brush.hari(e.i(LembarKunci.SISA_HARI, 0)), rx0, ry, rx1);
+		ry += barisNilai(l, TemaUi.k("dagang.k_deposit"), Brush.nb(e.l(Dagang.DEPOSIT, 0L), false), rx0, ry, rx1);
+		ry += barisNilai(l, TemaUi.k("dagang.k_bayar"), Brush.nb(e.l(Dagang.BAYAR, 0L), false), rx0, ry, rx1);
 		if (e.b(Dagang.KAPAL) && ry + 16 <= kanan.y1()) {
 			ry += 2;
 			TemaUi.chip(l, TemaUi.I_KAPAL, TemaUi.k("dagang.k_kapal"), rx0, ry, 0xFF6FA8C8);
@@ -612,7 +612,7 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 					}
 				} else {
 					float j = e.f(Dagang.JENUH, 1.0F);
-					Component nb = TemaUi.k("dagang.pasar.nb_kira", TeksTempat.desimal1(e.f(LembarKunci.NB, 0.0F)));
+					Component nb = TemaUi.k("dagang.pasar.nb_kira", Brush.desimal1(e.f(LembarKunci.NB, 0.0F)));
 					l.kanan(nb, rx1 - 4, ry0 + 2, warnaJenuh(j), 1.0F);
 					TemaUi.meter(l, -1, rx1 - 46, ry0 + 12, rx1 - 4, (j - 0.6F) / 0.4F, warnaJenuh(j), -1.0F);
 				}
@@ -687,7 +687,7 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 				long nb = e.l(LembarKunci.NB, 0L);
 				int stok = e.i(Dagang.STOK, 0);
 				if (ty + 10 <= batas) {
-					ty += barisNilai(l, TemaUi.k("dagang.pasar.satuan"), TeksTempat.nb(nb, false), tx, ty, x1);
+					ty += barisNilai(l, TemaUi.k("dagang.pasar.satuan"), Brush.nb(nb, false), tx, ty, x1);
 				}
 				if (ty + 10 <= batas) {
 					ty += barisNilai(l, TemaUi.k("dagang.pasar.sisa"), Component.literal(stok + " / " + STOK_HARIAN), tx, ty, x1);
@@ -701,7 +701,7 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 				int n = jumlah.nilai();
 				long total = nb * n;
 				Component alasan = stok <= 0 ? TemaUi.k("dagang.pasar.habis") : !mampu(total) ? kurang(total) : null;
-				tombolOp(l, "pasar_beli", x0, by, x1 - x0 - pw, 15, TemaUi.k("toko.beli", TeksTempat.angka(total)), alasan == null, alasan,
+				tombolOp(l, "pasar_beli", x0, by, x1 - x0 - pw, 15, TemaUi.k("toko.beli", Brush.angka(total)), alasan == null, alasan,
 						LembarKunci.op(Dagang.OP_BELI, e.id(), n));
 			}
 			case JUAL -> {
@@ -724,7 +724,7 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 				float nb = e.f(LembarKunci.NB, 0.0F);
 				float j = e.f(Dagang.JENUH, 1.0F);
 				if (ty + 10 <= batas) {
-					ty += barisNilai(l, TemaUi.k("dagang.pasar.unit_berikut"), Component.literal(TeksTempat.desimal1(nb) + " NB"), tx, ty, x1);
+					ty += barisNilai(l, TemaUi.k("dagang.pasar.unit_berikut"), Component.literal(Brush.desimal1(nb) + " NB"), tx, ty, x1);
 				}
 				if (ty + 10 <= batas) {
 					l.teks(TemaUi.k("dagang.pasar.jenuh", Math.round((1.0F - j) * 100.0F)), tx, ty, x1 - tx, warnaJenuh(j));
@@ -739,7 +739,7 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 				int pw = jumlah.gambar(l, "pasar_n", x1 - 50, by + 1, Math.max(1, Math.min(64, bawa))) + 6;
 				int n = jumlah.nilai();
 				// shortcut: the client does not know jenuhPerUnit, so the total shown is next-unit price x n (an upper bound)
-				String kira = TeksTempat.angka(Math.max(1L, Math.round(nb * n)));
+				String kira = Brush.angka(Math.max(1L, Math.round(nb * n)));
 				tombolOp(l, "pasar_jual", x0, by, x1 - x0 - pw, 15, TemaUi.k("dagang.pasar.tombol_jual", kira), true, null,
 						LembarKunci.op(Dagang.OP_JUAL, e.id(), n));
 			}
@@ -766,13 +766,13 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 				}
 				l.bungkus(TemaUi.k("dagang.pasar.segel_jelas", ISI_PETI), x0, ty, x1 - x0, gaya.teksSamar, 1.0F, by - ty - 12);
 				Component alasan = bawa < ISI_PETI ? TemaUi.k("dagang.pasar.segel_kurang", ISI_PETI) : !mampu(nb) ? kurang(nb) : null;
-				tombolOp(l, "pasar_segel", x0, by, x1 - x0, 15, TemaUi.k("dagang.pasar.tombol_segel", TeksTempat.angka(nb)), alasan == null, alasan,
+				tombolOp(l, "pasar_segel", x0, by, x1 - x0, 15, TemaUi.k("dagang.pasar.tombol_segel", Brush.angka(nb)), alasan == null, alasan,
 						LembarKunci.op(Dagang.OP_SEGEL, e.id()));
 			}
 		}
 		long u = uang();
 		if (u >= 0L && by - 10 >= ty) {
-			l.kanan(TemaUi.k("dagang.pasar.uang", TeksTempat.angka(u)), x1, by - 10, gaya.teksSamar, 1.0F);
+			l.kanan(TemaUi.k("dagang.pasar.uang", Brush.angka(u)), x1, by - 10, gaya.teksSamar, 1.0F);
 		}
 	}
 }

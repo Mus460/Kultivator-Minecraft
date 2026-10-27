@@ -4,12 +4,13 @@ import dev.kultivator.client.screen.Page;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.client.screen.ui.KeadaanKosong;
+import dev.kultivator.client.screen.ui.Kronik;
 import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.PemilihOrang;
 import dev.kultivator.client.screen.ui.SegelKonfirmasi;
 import dev.kultivator.client.screen.ui.TalismanButton;
-import dev.kultivator.client.sekte.wilayah.GulirIsi;
+import dev.kultivator.client.screen.ui.GulirIsi;
 import dev.kultivator.sekte.kebun.Kebun;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -52,6 +53,9 @@ public class KebunScreen extends Page {
 
 	private static final String K = "kultivator.sekte.kebun.ui.";
 	private static final String M = "kultivator.gui43.m10.kebun.";
+	/** The board's log: the kit's one chronicle in a fixed box of the stacked column (G37). */
+	private static final Kronik KRONIK = new Kronik(null);
+	private static final int KRONIK_H = 92;
 	private static final String[] STAGE_GLYPH = {"·", "芽", "苗", "蕾", "華"};
 	private static final int SEL_H = 44;
 	private static final int CHIP_H = 26;
@@ -546,22 +550,30 @@ public class KebunScreen extends Page {
 	// ------------------------------------------------------------------ the log
 
 	private int catatan(Lukis l, int x0, int cy, int x1) {
-		ListTag log = data.getListOrEmpty("log");
-		if (!log.isEmpty()) {
+		List<Kronik.Entri> entri = entri();
+		if (!entri.isEmpty()) {
 			cy += l.kepala(Component.translatable(M + "catatan"), x0, cy, x1);
-			for (int i = 0; i < Math.min(8, log.size()); i++) {
-				if (!(log.get(i) instanceof CompoundTag entry)) {
-					continue;
-				}
-				Component text = entry.read("text", ComponentSerialization.CODEC).orElse(Component.empty());
-				Component line = Component.translatable(K + "log_baris", entry.getLongOr("day", 0L), text);
-				cy += Math.round(l.bungkus(line, x0, cy, x1 - x0, i == 0 ? l.gaya.teksLemah : l.gaya.teksSamar)) + 1;
-			}
-			cy += 3;
+			// the store's own day numbers: every heading reads "Hari N" (as the formation log)
+			KRONIK.gambar(l, "kebun:log", entri, Long.MIN_VALUE, x0, cy, x1, cy + KRONIK_H);
+			cy += KRONIK_H + 3;
 		}
 		Component source = Component.translatable(halamanTerakhir == Kebun.PAGE_MINE ? "kultivator.sekte.kebun.sumber.tambang"
 				: "kultivator.sekte.kebun.sumber.kebun").withStyle(ChatFormatting.ITALIC);
 		return cy + Math.round(l.bungkus(source, x0, cy, x1 - x0, l.gaya.teksSamar)) + 2;
+	}
+
+	/** The last board's log as chronicle entries (oldest first, kind kebun); also the Kebun source of Sekte › Ikhtisar › Catatan. */
+	static List<Kronik.Entri> entri() {
+		ListTag log = data.getListOrEmpty("log");
+		List<Kronik.Entri> out = new ArrayList<>(log.size());
+		// the payload is newest first
+		for (int i = log.size() - 1; i >= 0; i--) {
+			if (log.get(i) instanceof CompoundTag entry) {
+				out.add(new Kronik.Entri(entry.read("text", ComponentSerialization.CODEC).orElse(Component.empty()), entry.getLongOr("day", -1L), "kebun",
+						Palette.JADE & 0xFFFFFF));
+			}
+		}
+		return out;
 	}
 
 	// ================================================================== the worker picker

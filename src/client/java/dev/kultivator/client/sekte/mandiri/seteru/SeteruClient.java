@@ -1,6 +1,5 @@
 package dev.kultivator.client.sekte.mandiri.seteru;
 
-import dev.kultivator.Kultivator;
 import dev.kultivator.client.hub.HubNav;
 import dev.kultivator.client.hub.Tujuan;
 import dev.kultivator.client.hub.Urutan;
@@ -9,8 +8,6 @@ import dev.kultivator.sekte.mandiri.seteru.SeteruIds;
 import dev.kultivator.sekte.mandiri.seteru.SeteruPayloads;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -25,8 +22,8 @@ import java.util.List;
  * Perseteruan antar-sekte on the client (DESIGN 39.F.9, 43.5): the entry of module 39F's client package, called from
  * {@code MandiriClient.init}. Keeps the last {@code mandiri_seteru_layar} sheet for the page Sekte › Luar › Seteru
  * ({@link SeteruScreen}) and for the named disciples shown in Sekte Dunia ({@link #rosterUntuk}); a sheet the server opens
- * opens the Gulungan there (R22: no hub card in section Murid any more). Also registers {@code mandiri_seteru_judul}
- * ({@link KartuJudul}, a HUD element) and {@link SeteruPoses} (clips 250-299, props 130-149, activities 57-60).
+ * opens the Gulungan there (R22: no hub card in section Murid any more). The feud title card goes through
+ * {@link KartuJudul} (a {@code TitleCard}); also {@link SeteruPoses} (clips 250-299, props 130-149, activities 57-60).
  */
 public final class SeteruClient {
 
@@ -45,7 +42,6 @@ public final class SeteruClient {
 		initialised = true;
 		ClientPlayNetworking.registerGlobalReceiver(SeteruPayloads.Layar.TYPE, (payload, context) -> lembar(payload));
 		ClientPlayNetworking.registerGlobalReceiver(SeteruPayloads.Judul.TYPE, (payload, context) -> KartuJudul.tampil(payload));
-		HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, Kultivator.id("mandiri_seteru_judul"), new KartuJudul());
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
 			terakhir = null;
 			versi++;

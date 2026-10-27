@@ -5,7 +5,6 @@ import dev.kultivator.client.epic.camera.CinematicDirector;
 import dev.kultivator.client.screen.CultivationScreen;
 import dev.kultivator.network.Actions;
 import dev.kultivator.network.Payloads;
-import dev.kultivator.pusakalangit.TitahSettings;
 import dev.kultivator.sect.hall.Halls;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
@@ -50,10 +49,6 @@ public final class HubNav {
 	public static final int GROUP_SUARA = 2;
 	public static final int GROUP_HUD = 3;
 	public static final int GROUP_KONTROL = 4;
-
-	/** Sub-coins of section {@link #PANDUAN}: the Kitab Panduan card, then the Ensiklopedia. */
-	public static final int SUB_KITAB = 0;
-	public static final int SUB_ENSIKLOPEDIA = 1;
 
 	private static final long EXPECT_MILLIS = 3000L;
 	private static final int ESC_TICKS = 2;
@@ -125,6 +120,11 @@ public final class HubNav {
 		kembaliAt = Util.getMillis();
 	}
 
+	/** True while the Gulungan gave way to a screen that brings it back ({@link #kembaliSetelah}: ring, chat). */
+	public static boolean menungguKembali() {
+		return kembaliKelas != null;
+	}
+
 	/** V / info: closes the Gulungan and any screen over it in one press. */
 	public static void tutupSemua() {
 		closeAll();
@@ -146,11 +146,6 @@ public final class HubNav {
 	/** The context ended (server closed the session, out of reach): the Di Sini tablet goes, with footer {@code pesan}. */
 	public static void tutupKonteks(net.minecraft.network.chat.@Nullable Component pesan) {
 		CultivationScreen.tutupKonteks(pesan);
-	}
-
-	/** True while a Di Sini context lives. */
-	public static boolean adaKonteks() {
-		return CultivationScreen.adaKonteks();
 	}
 
 	// ================================================================== the hub
@@ -185,28 +180,9 @@ public final class HubNav {
 		}
 	}
 
-	/** Legacy: the Gulungan on {@code section} (its last page). */
-	public static void openHub(int section) {
-		buka(Tujuan.bagian(Math.max(0, Math.min(SECTIONS - 1, section))));
-	}
-
-	/**
-	 * Legacy: {@code section} with the old sub-coin index {@code sub}: Pengaturan groups ({@code GROUP_*}) are the subs of
-	 * the Pengaturan page, Panduan's {@link #SUB_ENSIKLOPEDIA} is the Ensiklopedia page; other sections open on their last page.
-	 */
-	public static void openHub(int section, int sub) {
-		if (section == PENGATURAN) {
-			buka(Tujuan.of(PENGATURAN, dev.kultivator.client.screen.SettingsPage.idGrup(sub)));
-		} else if (section == PANDUAN && sub == SUB_ENSIKLOPEDIA) {
-			buka(Tujuan.of(PANDUAN, Urutan.ID_ENSIKLOPEDIA));
-		} else {
-			openHub(section);
-		}
-	}
-
-	/** Opens Pengaturan on {@code group} ({@code GROUP_*}). */
+	/** Opens Pengaturan on {@code group} ({@code GROUP_*}, the Pengaturan pages). */
 	public static void openSettings(int group) {
-		openHub(PENGATURAN, group);
+		buka(Tujuan.of(PENGATURAN, dev.kultivator.client.screen.SettingsPage.idGrup(group)));
 	}
 
 	/** Opens Panduan › Ensiklopedia on {@code topic} (the "?" seal of every page). */
@@ -362,32 +338,20 @@ public final class HubNav {
 	}
 
 	/**
-	 * Opens the place of section key {@code key} (from the world or inside the Gulungan). M asks the server, which picks the
-	 * disciple looked at (else the nearest) and answers with {@code OpenScreen.DISCIPLE} (routed to Murid › Murid).
+	 * Opens the place of section key {@code key} (from the world or inside the Gulungan). M also asks the server, which picks the
+	 * disciple looked at (else the nearest) and answers with {@code OpenScreen.DISCIPLE} (a focus on Murid › Murid).
 	 */
 	public static void bukaKunci(KeyMapping key) {
 		Tujuan t = tujuanKunci(key);
 		if (t == null) {
 			return;
 		}
+		// 43.10.3: M always opens Murid › Murid (R17: a far disciple is a locked sub, not silence); the server's answer
+		// (OpenScreen.DISCIPLE) then only focuses the disciple looked at or the nearest.
+		buka(t);
 		if (key == Keys.MURID) {
 			Keys.send(new Payloads.Action(Actions.DISCIPLE_OPEN, -1, ""));
-		} else {
-			buka(t);
 		}
-	}
-
-	/**
-	 * Opens the player's own Sect Hall on tablet {@code page} ({@code Halls.PAGE_*}) from anywhere (C33.N4,
-	 * {@code Halls.OP_OPEN}). Without an own hall the server answers with an action-bar line and nothing opens.
-	 */
-	public static void openHall(int page) {
-		Keys.send(new Payloads.Action(Actions.HALL, Halls.OP_OPEN, String.valueOf(page)));
-	}
-
-	/** The Titah Langit menu (C33.N4, {@code TitahSettings.OP_OPEN}); the server checks the seal like {@code /kultivasi titah}. */
-	public static void openTitah() {
-		Keys.send(new Payloads.Action(Actions.TITAH, TitahSettings.OP_OPEN << 16, ""));
 	}
 
 	// ================================================================== vanilla screens opened from the Gulungan (43.8.5)

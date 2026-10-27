@@ -6,16 +6,14 @@ import dev.kultivator.client.hub.HubPages;
 import dev.kultivator.client.hub.LembarHub;
 import dev.kultivator.client.hub.Urutan;
 import dev.kultivator.client.screen.Page;
+import dev.kultivator.client.screen.PageKomposit;
 import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.client.screen.ui.Lukis;
-import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.TabBar;
 import dev.kultivator.client.sekte.gabung.GabungClient;
 import dev.kultivator.sect.hall.Halls;
 import dev.kultivator.sekte.gabung.GabungPayloads;
 import dev.kultivator.sekte.gabung.ui.GabungLembar.Papan;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.nbt.CompoundTag;
@@ -33,10 +31,11 @@ import java.util.Set;
  * for a member, with the Sumber chip (Aulaku / Perguruanku) when the player is both; {@code misi} the hall's missions
  * ({@link MissionPage}: daily board, teams, talent scout, forbidden ground, ark, story missions, their news and reports);
  * {@code papan} the NPC sect's mission board ({@code gabung_papan} tabs Papan/Aktif/Perang/Kelompok as kind chips); and
- * {@code arena} the hall's tournaments, Void realm, tower, war and season board ({@link ArenaPage}). A sub that does not
+ * {@code arena} the hall's tournaments, Void realm, tower, war and season board ({@link ArenaPage}), or for a member the
+ * sect's Turnamen Murid (read-only tab Turnamen of {@code gabung_papan}; Sumber chip when both). A sub that does not
  * apply is hidden. The hall details are asked for while shown (every 4 s, as the old hall scroll did).
  */
-public final class KegiatanPage extends Page {
+public final class KegiatanPage extends PageKomposit {
 
 	public static final String TUGAS = "tugas";
 	public static final String MISI = "misi";
@@ -90,6 +89,7 @@ public final class KegiatanPage extends Page {
 		return lencana != null && !lencana.sekte().isEmpty();
 	}
 
+	/** Tugas and Arena show the NPC sect's side (the board sheet) for a member without a hall or on source Perguruanku. */
 	private boolean papanUntukTugas() {
 		return anggota() && (!aula() || sumber == 1);
 	}
@@ -102,13 +102,18 @@ public final class KegiatanPage extends Page {
 		return papan;
 	}
 
+	@Override
+	protected @Nullable Page anak() {
+		return aktif;
+	}
+
 	/** The page under the shown sub. */
-	private @Nullable Page anak() {
+	private @Nullable Page anakSub() {
 		return switch (subTampil()) {
 			case TUGAS -> papanUntukTugas() ? papan() : aula() ? tugas : null;
 			case MISI -> misi;
 			case PAPAN -> papan();
-			case ARENA -> arena;
+			case ARENA -> papanUntukTugas() ? papan() : arena;
 			default -> null;
 		};
 	}
@@ -161,7 +166,7 @@ public final class KegiatanPage extends Page {
 		if (anggota) {
 			subs.add(new Sub(PAPAN, Component.translatable("kultivator.gui43.sub.kegiatan.papan")));
 		}
-		if (aula) {
+		if (aula || anggota) {
 			subs.add(new Sub(ARENA, Component.translatable("kultivator.gui43.sub.kegiatan.arena")));
 		}
 		return subs;
@@ -177,7 +182,8 @@ public final class KegiatanPage extends Page {
 
 	@Override
 	public @Nullable Sumber sumber() {
-		if (!TUGAS.equals(subTampil()) || !aula() || !anggota()) {
+		String s = subTampil();
+		if (!TUGAS.equals(s) && !ARENA.equals(s) || !aula() || !anggota()) {
 			return null;
 		}
 		return new Sumber(List.of(Component.translatable(K + "sumber.aula"), Component.translatable(K + "sumber.perguruan")), () -> sumber, i -> {
@@ -186,33 +192,14 @@ public final class KegiatanPage extends Page {
 		});
 	}
 
-	@Override
-	public boolean rinci() {
-		return aktif != null && aktif.rinci();
-	}
-
-	@Override
-	public boolean lebar() {
-		return aktif != null && aktif.lebar();
-	}
-
-	@Override
-	public long uang() {
-		return aktif != null ? aktif.uang() : -1L;
-	}
-
-	@Override
-	public Palette.Gaya gaya() {
-		return aktif != null ? aktif.gaya() : Palette.Gaya.KERTAS;
-	}
-
 	// ================================================================== life
 
 	/** Shows the page of the current sub (and Sumber); the old one is told it left. */
 	private void pasangAnak() {
-		Page next = anak();
+		Page next = anakSub();
 		if (next == papan && papan != null) {
-			papan.showSub(PAPAN.equals(subTampil()) ? jenisPapan : Papan.TAB_TUGAS);
+			String s = subTampil();
+			papan.showSub(PAPAN.equals(s) ? jenisPapan : ARENA.equals(s) ? Papan.TAB_TURNAMEN : Papan.TAB_TUGAS);
 		}
 		if (next == aktif) {
 			return;
@@ -264,13 +251,6 @@ public final class KegiatanPage extends Page {
 	}
 
 	@Override
-	public void fokus(CompoundTag fokus) {
-		if (aktif != null) {
-			aktif.fokus(fokus);
-		}
-	}
-
-	@Override
 	public void onHide() {
 		if (aktif != null) {
 			aktif.onHide();
@@ -281,7 +261,7 @@ public final class KegiatanPage extends Page {
 	public void tick() {
 		segarkan(false);
 		// roles may change while shown (the hall details arrive, a badge syncs): follow the sub that applies now
-		if (anak() != aktif) {
+		if (anakSub() != aktif) {
 			pasangAnak();
 		}
 		if (aktif != null) {
@@ -298,26 +278,7 @@ public final class KegiatanPage extends Page {
 		}
 	}
 
-	@Override
-	public void onData() {
-		if (aktif != null) {
-			aktif.onData();
-		}
-	}
-
-	@Override
-	public boolean needsRebuild() {
-		return aktif != null && aktif.needsRebuild();
-	}
-
 	// ================================================================== drawing
-
-	@Override
-	protected void drawBehind(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
-		if (aktif != null) {
-			aktif.render(g, mouseX, mouseY, seconds);
-		}
-	}
 
 	@Override
 	protected void lukis(Lukis l) {
@@ -341,7 +302,7 @@ public final class KegiatanPage extends Page {
 
 	@Override
 	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-		if (super.mouseClicked(event, doubleClick)) {
+		if (fokusRing.klik(event.x(), event.y(), event.button())) {
 			return true;
 		}
 		return aktif != null && aktif.mouseClicked(event, doubleClick);
@@ -350,51 +311,21 @@ public final class KegiatanPage extends Page {
 	@Override
 	public boolean mouseReleased(MouseButtonEvent event) {
 		boolean a = aktif != null && aktif.mouseReleased(event);
-		return super.mouseReleased(event) || a;
+		return fokusRing.lepas(event.x(), event.y()) || a;
 	}
 
 	@Override
 	public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
-		return aktif != null && aktif.mouseDragged(event, dx, dy) || super.mouseDragged(event, dx, dy);
-	}
-
-	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-		return aktif != null && aktif.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+		return aktif != null && aktif.mouseDragged(event, dx, dy) || fokusRing.seret(event.x(), event.y(), dx);
 	}
 
 	@Override
 	public boolean keyPressed(KeyEvent event) {
 		// the board-kind chips have the focus: ← → / Enter go to them first (43.4.2)
-		if (!diAnak && fokusRing.kunci() != null && super.keyPressed(event)) {
+		if (!diAnak && fokusRing.kunci() != null && fokusRing.tombol(event)) {
 			return true;
 		}
 		return aktif != null && aktif.keyPressed(event);
-	}
-
-	@Override
-	public boolean keyReleased(KeyEvent event) {
-		return aktif != null && aktif.keyReleased(event);
-	}
-
-	@Override
-	public boolean charTyped(CharacterEvent event) {
-		return aktif != null && aktif.charTyped(event);
-	}
-
-	@Override
-	public boolean mauTombol() {
-		return aktif != null && aktif.mauTombol();
-	}
-
-	@Override
-	public boolean modal() {
-		return aktif != null && aktif.modal();
-	}
-
-	@Override
-	public boolean mundur() {
-		return aktif != null && aktif.mundur();
 	}
 
 	/** Tab walks the board-kind chips (Papan only), then the sub page's ring; Shift+Tab from inside it goes back to the chips. */
@@ -423,8 +354,4 @@ public final class KegiatanPage extends Page {
 		return aktif.fokusTab(back);
 	}
 
-	@Override
-	public boolean angka(int n) {
-		return aktif != null && aktif.angka(n);
-	}
 }

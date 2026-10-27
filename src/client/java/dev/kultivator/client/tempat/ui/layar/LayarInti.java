@@ -3,16 +3,12 @@ package dev.kultivator.client.tempat.ui.layar;
 import com.mojang.blaze3d.platform.InputConstants;
 import dev.kultivator.Kultivator;
 import dev.kultivator.client.screen.ui.Brush;
-import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.client.screen.ui.KeadaanKosong;
-import dev.kultivator.client.screen.ui.KeadaanTerkunci;
-import dev.kultivator.client.screen.ui.LencanaPangkat;
 import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.SegelKonfirmasi;
 import dev.kultivator.client.screen.ui.TalismanButton;
 import dev.kultivator.client.tempat.ui.kit.LayarTempatDasar;
-import dev.kultivator.client.tempat.ui.kit.Lembar;
 import dev.kultivator.client.tempat.ui.kit.TabLentera;
 import dev.kultivator.client.tempat.ui.kit.TempatWarna;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
@@ -25,7 +21,6 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -47,8 +42,6 @@ public abstract class LayarInti extends LayarTempatDasar {
 	public static final String K = "kultivator.tempat_ui.";
 	/** Lang prefix of this module's new texts. */
 	public static final String M = "kultivator.gui43.m19.";
-	/** Height of the info strip. */
-	private static final int STRIP = 12;
 	/** Standard button height (43.3.2: 14 outside the narrow layout). */
 	protected static final int TOMBOL_H = 14;
 
@@ -61,7 +54,6 @@ public abstract class LayarInti extends LayarTempatDasar {
 		return new Tab(id, k(labelKunci), ikon);
 	}
 
-	private long terkunciSejak = -1L;
 
 	protected LayarInti(String layar, int npcId, CompoundTag lembar, Component judul, String gayaId) {
 		super(layar, npcId, lembar, judul, TempatWarna.Gaya.dari(gayaId, TempatWarna.Gaya.KERTAS));
@@ -139,101 +131,16 @@ public abstract class LayarInti extends LayarTempatDasar {
 			// the sheet's own style (red lacquer, stone ...) under its content: its text colours are made for it
 			l.g.fill(x0, y0, x1, y1, l.gaya.dasar);
 		}
-		if (adaStrip()) {
-			strip(l, x0, y0, x1);
-			y0 += STRIP + 3;
-		}
-		if (lembar.ada(LembarKunci.KUNCI_LAYAR)) {
-			long now = Util.getMillis();
-			if (terkunciSejak < 0L) {
-				terkunciSejak = now;
-			}
-			Lembar k = lembar.sub(LembarKunci.KUNCI_LAYAR);
-			KeadaanTerkunci.gambar(l, k.teks(LembarKunci.ALASAN), k.teksAtau(LembarKunci.SYARAT), x0, y0, x1, y1, now - terkunciSejak);
+		y0 += stripInfo(l, x0, y0, x1);
+		if (kunciLayar(l, x0, y0, x1, y1)) {
 			return;
 		}
-		terkunciSejak = -1L;
 		try {
 			isiInti(l, x0 + 2, y0 + 2, x1 - 2, y1 - 2);
 		} catch (RuntimeException ex) {
 			Kultivator.LOGGER.warn("Tempat page {} failed to draw", layar, ex);
 			l.teks(k("galat"), x0 + 4, y0 + 4, x1 - x0 - 8, Palette.BAHAYA);
 		}
-	}
-
-	private boolean adaStrip() {
-		return !lembar.s(LembarKunci.DISTRIK).isEmpty() || lembar.ada(LembarKunci.SUBJUDUL) || lembar.ada(LembarKunci.TEMPAT)
-				|| lembar.ada(LembarKunci.NAMA_BAIK) || lembar.f(LembarKunci.DISKON, 0.0F) > 0.001F || lembar.b(UJI) || hanyaBaca();
-	}
-
-	/**
-	 * The strip over the content (what the old header carried besides title and money): district, subtitle or place,
-	 * then from the right "only viewing", the test ribbon, the discount and the place's Nama Baik.
-	 */
-	private void strip(Lukis l, int x0, int y, int x1) {
-		int x = x0 + 2;
-		int kanan = x1 - 2;
-		String distrik = lembar.s(LembarKunci.DISTRIK);
-		if (!distrik.isEmpty()) {
-			l.g.fill(x - 1, y, x + 12, y + STRIP, Palette.argb(0xC0, warnaDistrik(distrik) & 0xFFFFFF));
-			Glyphs.Atlas.ikon(l.g, LembarKunci.Ikon.distrik(distrik), x, y + 1, 10, 0xFFFFFFFF);
-			x += 15;
-		}
-		if (hanyaBaca()) {
-			Component b = k("hanya_baca.kaki");
-			int bw = Math.min(kanan - x - 20, l.font.width(b) + 6);
-			if (bw > 20) {
-				l.g.fill(kanan - bw, y, kanan, y + STRIP, Palette.argb(0x60, Palette.INK_FAINT & 0xFFFFFF));
-				l.teks(b, kanan - bw + 3, y + 2, bw - 6, l.gaya.teks);
-				kanan -= bw + 4;
-			}
-		}
-		if (lembar.b(UJI) && kanan - x > 60) {
-			Glyphs.Atlas.pita(l.g, true, kanan - 34, y, 32, STRIP, 0xFFFFFFFF);
-			l.tengah(k("uji.pita"), kanan - 18, y + 2, 30, 0xFF5A3A08);
-			kanan -= 38;
-		}
-		float diskon = lembar.f(LembarKunci.DISKON, 0.0F);
-		if (diskon > 0.001F) {
-			Component d = k("diskon", Math.round(diskon * 100));
-			int dw = l.font.width(d) + 6;
-			if (kanan - dw - x > 40) {
-				l.g.fill(kanan - dw, y, kanan, y + STRIP, Palette.SEAL);
-				l.teks(d, kanan - dw + 3, y + 2, dw - 4, 0xFFFFF0E0);
-				kanan -= dw + 4;
-			}
-		}
-		if (lembar.ada(LembarKunci.NAMA_BAIK) && kanan - x > 80) {
-			kanan -= LencanaPangkat.namaBaik(l, lembar.i(LembarKunci.NAMA_BAIK, 0), lembar.i(LembarKunci.PANGKAT_NB, LembarKunci.PANGKAT_ASING), kanan,
-					y + 2) + 4;
-		}
-		Component sub = lembar.teksAtau(LembarKunci.SUBJUDUL);
-		Component baris = sub != null ? sub : lembar.teksAtau(LembarKunci.TEMPAT);
-		if (baris != null && kanan - x > 12) {
-			l.teks(baris, x, y + 2, kanan - x - 2, l.gaya.teksLemah);
-		}
-		Component hint = petunjuk();
-		if (hint != null && l.di(x0, y, x1, y + STRIP)) {
-			l.tip(hint);
-		}
-		l.g.fill(x0, y + STRIP + 1, x1, y + STRIP + 2, Palette.argb(0x70, (l.gaya.gelap() ? Palette.GOLD : l.gaya.teksSamar) & 0xFFFFFF));
-	}
-
-	/** District colour of a {@code DISTRIK_*} id (the palace gold when unknown is the centre's jade). */
-	protected static int warnaDistrik(String id) {
-		return switch (id) {
-			case LembarKunci.DISTRIK_ISTANA -> 0xFFC9A24A;
-			case LembarKunci.DISTRIK_CENDEKIA -> 0xFF2A3A5C;
-			case LembarKunci.DISTRIK_AWAN -> 0xFF6FA8C8;
-			case LembarKunci.DISTRIK_GILDA -> 0xFF8C6A3A;
-			case LembarKunci.DISTRIK_PASAR -> 0xFFD08A2A;
-			case LembarKunci.DISTRIK_HUNIAN -> 0xFF7A5A3A;
-			case LembarKunci.DISTRIK_ARENA -> 0xFF7A1A1A;
-			case LembarKunci.DISTRIK_KUMUH -> 0xFF6A6A60;
-			case LembarKunci.DISTRIK_GERBANG -> 0xFF8E1F1F;
-			case LembarKunci.DISTRIK_LUAR -> 0xFF4F8A3A;
-			default -> 0xFF5FA88C;
-		};
 	}
 
 	// =================================================================== helpers (text 1.0)

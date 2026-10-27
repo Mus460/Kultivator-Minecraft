@@ -17,7 +17,7 @@ import dev.kultivator.client.screen.ui.UiSound;
 import dev.kultivator.client.sekte.diplomasi.DiplomasiScreen;
 import dev.kultivator.client.sekte.diplomasi.LuarPage;
 import dev.kultivator.client.sekte.gabung.ui.IkonGabung;
-import dev.kultivator.client.sekte.wilayah.GulirIsi;
+import dev.kultivator.client.screen.ui.GulirIsi;
 import dev.kultivator.data.Dao;
 import dev.kultivator.data.Rank;
 import dev.kultivator.dunia.kota.KotaNames;

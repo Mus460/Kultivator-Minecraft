@@ -1,7 +1,8 @@
 package dev.kultivator.client.dunia.reruntuhan;
 
+import dev.kultivator.client.screen.ui.Bilah;
 import dev.kultivator.client.screen.ui.Brush;
-import dev.kultivator.client.screen.ui.DaftarGulir;
+import dev.kultivator.client.screen.ui.GulirTeks;
 import dev.kultivator.client.screen.ui.KeadaanKosong;
 import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
@@ -13,12 +14,10 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -38,12 +37,9 @@ public final class MenaraScreen {
 	private static @Nullable CompoundTag data;
 	private static long askedAt;
 
-	/** One line of the scroll: a heading, a wrapped text line, or the progress bar ({@code bar}). */
-	private record Row(@Nullable Component judul, @Nullable FormattedCharSequence teks, int warna, boolean bar) {
-	}
+	private static final float[] TENTHS = {0.1F, 0.2F, 0.3F, 0.4F, 0.5F, 0.6F, 0.7F, 0.8F, 0.9F};
 
-	private final List<Row> rows = new ArrayList<>();
-	private final DaftarGulir daftar = new DaftarGulir().judul(i -> i < rows.size() && rows.get(i).judul() != null, 13);
+	private final GulirTeks gulir = new GulirTeks();
 
 	/** Asks the server for the tower's numbers (the sub came on screen; a quiet no-op while not connected). */
 	public static void request() {
@@ -78,43 +74,29 @@ public final class MenaraScreen {
 		int pagodaW = Mth.clamp((x1 - x0) * 2 / 5, 70, 150);
 		pagoda(l, best, unlocked, x0, y0 + 2, x0 + pagodaW, y1);
 		int lx = x0 + pagodaW + 8;
-		isi(l, d, best, unlocked, x1 - lx - 8);
-		daftar.gambar(l, "menara", lx, y0, x1, y1, rows.size(), 10, (lk, i, rx0, ry0, rx1, ry1, sorot, pilih) -> {
-			Row r = rows.get(i);
-			if (r.judul() != null) {
-				lk.kepala(r.judul(), rx0, ry0, rx1);
-			} else if (r.bar()) {
-				lk.g.fill(rx0, ry0 + 2, rx1 - 2, ry0 + 6, Palette.argb(0x50, Palette.INK_FAINT));
-				lk.g.fill(rx0, ry0 + 2, rx0 + (rx1 - 2 - rx0) * best / 100, ry0 + 6, Palette.GOLD);
-				for (int b = 1; b < 10; b++) {
-					int tx = rx0 + (rx1 - 2 - rx0) * b / 10;
-					lk.g.fill(tx, ry0 + 2, tx + 1, ry0 + 6, Palette.argb(0x80, Palette.PAPER_TOP));
-				}
-			} else if (r.teks() != null) {
-				Brush.text(lk.g, lk.font, r.teks(), rx0, ry0, r.warna(), 1.0F, false);
-			}
-		}, null, null);
+		isi(d, best, unlocked, x1 - lx);
+		gulir.gambar(l, "menara", lx, y0, x1, y1);
 	}
 
-	/** Builds the scroll's rows for {@code lebar}. */
-	private void isi(Lukis l, CompoundTag d, int best, int unlocked, int lebar) {
-		rows.clear();
-		teks(l, Component.translatable(K + "ui.best", best), Palette.INK, lebar);
-		rows.add(new Row(null, null, 0, true));
-		teks(l, Component.translatable(K + "ui.gates", unlocked, unlocked * 10 - 9), Palette.INK_SOFT, lebar);
+	/** Refills the scroll for a column {@code lebar} wide. */
+	private void isi(CompoundTag d, int best, int unlocked, int lebar) {
+		gulir.mulai(lebar);
+		gulir.tambah(Component.translatable(K + "ui.best", best), Palette.INK);
+		gulir.garis((lk, i, rx0, ry0, rx1, ry1, sorot, pilih) -> Bilah.gambar(lk, rx0, ry0 + 2, rx1 - 2, best / 100.0F, 0, TENTHS));
+		gulir.tambah(Component.translatable(K + "ui.gates", unlocked, unlocked * 10 - 9), Palette.INK_SOFT);
 		int luka = d.getIntOr("luka", 0);
 		if (luka > 0) {
-			teks(l, Component.translatable(K + "ui.luka", (luka + 59) / 60), Palette.DANGER, lebar);
+			gulir.tambah(Component.translatable(K + "ui.luka", (luka + 59) / 60), Palette.DANGER);
 		}
 		if (d.getBooleanOr("penakluk", false)) {
-			teks(l, Component.translatable(K + "ui.title_conqueror").withStyle(ChatFormatting.BOLD), Palette.GOLD_DARK, lebar);
+			gulir.tambah(Component.translatable(K + "ui.title_conqueror").withStyle(ChatFormatting.BOLD), Palette.GOLD_DARK);
 		}
 		if (!d.getBooleanOr("tower", true)) {
-			teks(l, Component.translatable(K + "closed"), Palette.LOCKED, lebar);
+			gulir.tambah(Component.translatable(K + "closed"), Palette.LOCKED);
 		}
-		rows.add(new Row(Component.translatable(K + "ui.pattern"), null, 0, false));
-		teks(l, Component.translatable(K + "ui.pattern.text"), Palette.INK_SOFT, lebar);
-		rows.add(new Row(Component.translatable(K + "ui.week"), null, 0, false));
+		gulir.kepala(Component.translatable(K + "ui.pattern"));
+		gulir.tambah(Component.translatable(K + "ui.pattern.text"), Palette.INK_SOFT);
+		gulir.kepala(Component.translatable(K + "ui.week"));
 		int rank = 0;
 		for (Tag t : d.getListOrEmpty("weekly")) {
 			if (t instanceof StringTag entry) {
@@ -123,32 +105,26 @@ public final class MenaraScreen {
 				String name = bar < 0 ? value : value.substring(0, bar);
 				String floor = bar < 0 ? "?" : value.substring(bar + 1);
 				rank++;
-				teks(l, Component.translatable(K + "stele.row", rank, name, floor), rank == 1 ? Palette.GOLD_DARK : Palette.INK, lebar);
+				gulir.tambah(Component.translatable(K + "stele.row", rank, name, floor), rank == 1 ? Palette.GOLD_DARK : Palette.INK);
 			}
 		}
 		if (rank == 0) {
-			teks(l, Component.translatable(K + "stele.empty"), Palette.INK_FAINT, lebar);
+			gulir.tambah(Component.translatable(K + "stele.empty"), Palette.INK_FAINT);
 		}
 		String bestName = d.getStringOr("best_name", "");
 		if (!bestName.isEmpty()) {
-			teks(l, Component.translatable(K + "stele.best", bestName, d.getIntOr("best_floor", 0)), Palette.STORED, lebar);
+			gulir.tambah(Component.translatable(K + "stele.best", bestName, d.getIntOr("best_floor", 0)), Palette.STORED);
 		}
-		rows.add(new Row(Component.translatable(K + "ui.records"), null, 0, false));
+		gulir.kepala(Component.translatable(K + "ui.records"));
 		int ruins = d.getIntOr("ruins", 0);
 		int ruinBest = Mth.clamp(d.getIntOr("ruin_best", 0), 0, 3);
-		teks(l, ruins == 0 ? Component.translatable(K + "ui.ruins_none")
+		gulir.tambah(ruins == 0 ? Component.translatable(K + "ui.ruins_none")
 				: Component.translatable(K + "ui.ruins", ruins, Component.translatable("kultivator.reruntuhan.gua.tier." + Math.max(1, ruinBest))),
-				Palette.INK, lebar);
-		teks(l, Component.translatable(K + "ui.pahala", d.getIntOr("pahala", 0)), Palette.INK, lebar);
+				Palette.INK);
+		gulir.tambah(Component.translatable(K + "ui.pahala", d.getIntOr("pahala", 0)), Palette.INK);
 		int broken = d.getIntOr("prisons_broken", 0);
-		teks(l, Component.translatable(K + "ui.prisons", d.getIntOr("prisons", 0), broken), broken > 0 ? Palette.DANGER : Palette.INK, lebar);
-		teks(l, Component.translatable(K + "source").withStyle(ChatFormatting.ITALIC), Palette.INK_FAINT, lebar);
-	}
-
-	private void teks(Lukis l, Component text, int warna, int lebar) {
-		for (FormattedCharSequence line : l.font.split(text, Math.max(20, lebar))) {
-			rows.add(new Row(null, line, warna, false));
-		}
+		gulir.tambah(Component.translatable(K + "ui.prisons", d.getIntOr("prisons", 0), broken), broken > 0 ? Palette.DANGER : Palette.INK);
+		gulir.tambah(Component.translatable(K + "source").withStyle(ChatFormatting.ITALIC), Palette.INK_FAINT);
 	}
 
 	/** The ten bands as the tiers of a pagoda, the widest at the bottom; lit up to the best floor; a tier's tooltip names its band. */

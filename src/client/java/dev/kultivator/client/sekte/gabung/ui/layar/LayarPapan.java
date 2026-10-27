@@ -14,7 +14,6 @@ import dev.kultivator.client.tempat.ui.kit.Lembar;
 import dev.kultivator.client.tempat.ui.kit.Lukis;
 import dev.kultivator.client.tempat.ui.kit.PanelTempat;
 import dev.kultivator.client.tempat.ui.kit.TabLentera;
-import dev.kultivator.client.tempat.ui.kit.TeksTempat;
 import dev.kultivator.client.tempat.ui.kit.TempatWarna;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import dev.kultivator.sekte.gabung.ui.GabungLembar.Papan;
@@ -33,10 +32,10 @@ import java.util.List;
  * the mission slip (rank, kind, flavour text, PK, "Terima", "Tunjuk di peta"). Aktif: running missions (board and war)
  * with their countdown ring, "Tandai" and "Batal" (asks twice). Perang: the five war missions with the score each wins.
  * Kelompok: group missions with who already joined. Tugas: the daily chores with their place, PK (corak chores x1.5) and
- * "Mulai".
+ * "Mulai". Turnamen (read-only): the sect's Turnamen Murid, its next day, the last champion and the member's best place.
  * <p>
  * Home (DESIGN 43.12.4): Sekte › Kegiatan › papan (tabs Papan/Aktif/Perang/Kelompok as kind chips) and › tugas (tab
- * Tugas), mounted by {@code sectevent.KegiatanPage}. Text 1.0 (43.0.5).
+ * Tugas) and › arena (tab Turnamen, a member's view), mounted by {@code sectevent.KegiatanPage}. Text 1.0 (43.0.5).
  */
 public final class LayarPapan extends LayarGabungDasar {
 
@@ -56,7 +55,8 @@ public final class LayarPapan extends LayarGabungDasar {
 				new TabLentera.Tab(Papan.TAB_AKTIF, u("papan.tab.aktif"), IkonTempat.KOMPAS, null),
 				new TabLentera.Tab(Papan.TAB_PERANG, u("papan.tab.perang"), LembarKunci.Ikon.ARENA, null),
 				new TabLentera.Tab(Papan.TAB_KELOMPOK, u("papan.tab.kelompok"), IkonTempat.OBOR, null),
-				new TabLentera.Tab(Papan.TAB_TUGAS, u("papan.tab.tugas"), IkonTempat.TONGGAK, null));
+				new TabLentera.Tab(Papan.TAB_TUGAS, u("papan.tab.tugas"), IkonTempat.TONGGAK, null),
+				new TabLentera.Tab(Papan.TAB_TURNAMEN, u("papan.tab.turnamen"), IkonTempat.PIALA, null));
 	}
 
 	@Override
@@ -85,6 +85,7 @@ public final class LayarPapan extends LayarGabungDasar {
 		switch (tab) {
 			case Papan.TAB_AKTIF -> aktif(l, x0, y, x1, y1);
 			case Papan.TAB_TUGAS -> tugas(l, x0, y, x1, y1);
+			case Papan.TAB_TURNAMEN -> turnamen(l, x0, y, x1);
 			default -> papan(l, x0, y, x1, y1);
 		}
 	}
@@ -97,7 +98,7 @@ public final class LayarPapan extends LayarGabungDasar {
 		Lembar p = lembar.sub(Papan.PERANG);
 		if (!p.kosongSemua()) {
 			int skor = p.i(LembarKunci.SKOR, 0);
-			Component banner = u("papan.perang_banner", p.teks(Papan.LAWAN), TeksTempat.bertanda(skor), p.i(LembarKunci.SISA_HARI, 0));
+			Component banner = u("papan.perang_banner", p.teks(Papan.LAWAN), Brush.bertanda(skor), p.i(LembarKunci.SISA_HARI, 0));
 			int bw = Math.min(x1 - x0 - 116, font.width(banner) + 22);
 			if (bw > 40) {
 				int bx = x1 - bw;
@@ -179,7 +180,7 @@ public final class LayarPapan extends LayarGabungDasar {
 		} else if (e.ada(Papan.ANGGOTA_MAKS)) {
 			bawah = u("papan.kelompok_isi", e.daftar(Papan.ANGGOTA).size(), e.i(Papan.ANGGOTA_MAKS, 4));
 		} else if (e.ada(LembarKunci.SKOR)) {
-			bawah = u("papan.skor_perang", TeksTempat.bertanda(e.i(LembarKunci.SKOR, 0)));
+			bawah = u("papan.skor_perang", Brush.bertanda(e.i(LembarKunci.SKOR, 0)));
 		} else {
 			bawah = e.teks(LembarKunci.TEKS);
 		}
@@ -213,7 +214,7 @@ public final class LayarPapan extends LayarGabungDasar {
 		rx += font.width(u("papan.imbalan")) + 4;
 		rx += pk(l, e.i(LembarKunci.PK, 0), -1L, rx, y, false, 1.0F) + 6;
 		if (e.ada(LembarKunci.SKOR)) {
-			l.teks(u("papan.skor_perang", TeksTempat.bertanda(e.i(LembarKunci.SKOR, 0))), rx, y, x1 - rx, TempatWarna.EMAS_GELAP);
+			l.teks(u("papan.skor_perang", Brush.bertanda(e.i(LembarKunci.SKOR, 0))), rx, y, x1 - rx, TempatWarna.EMAS_GELAP);
 		}
 		y += 12;
 		if (e.ada(Papan.ANGGOTA_MAKS)) {
@@ -349,5 +350,32 @@ public final class LayarPapan extends LayarGabungDasar {
 			tombolOp(lk, "tandaiT" + i, bx + bw + 3, ry0 + 8, bw, 14, u("papan.tandai"), adaPos, u("papan.tanpa_lokasi"),
 					LembarKunci.op(LembarKunci.OP_TANDAI, e.i(LembarKunci.X, 0), e.i(LembarKunci.Z, 0)));
 		}, null, null);
+	}
+
+	// ================================================================== Turnamen (read-only)
+
+	private void turnamen(Lukis l, int x0, int y0, int x1) {
+		Lembar t = lembar.sub(Papan.TURNAMEN);
+		int w = x1 - x0;
+		int y = y0;
+		l.teks(Brush.bold(u("papan.turnamen.judul")), x0, y, w, gaya.teks);
+		y += 13;
+		if (t.b(Papan.BERJALAN)) {
+			l.teks(u("papan.turnamen.berjalan"), x0, y, w, TempatWarna.OK);
+		} else if (t.ada(Papan.HARI_TURNAMEN)) {
+			l.teks(u("papan.turnamen.berikut", hariKe(t.l(Papan.HARI_TURNAMEN, -1L), hariIni())), x0, y, w, gaya.teks);
+		} else {
+			l.teks(u("papan.turnamen.tanpa_jadwal"), x0, y, w, gaya.teksSamar);
+		}
+		y += 12;
+		Component juara = t.ada(Papan.JUARA) ? u("papan.turnamen.juara", t.teks(Papan.JUARA), t.l(Papan.JUARA_HARI, -1L))
+				: u("papan.turnamen.juara_kosong");
+		l.teks(juara, x0, y, w, t.ada(Papan.JUARA) ? TempatWarna.EMAS_GELAP : gaya.teksSamar);
+		y += 12;
+		int terbaik = t.i(Papan.TERBAIK, 0);
+		l.teks(terbaik >= 1 && terbaik <= 4 ? u("papan.turnamen.capai." + terbaik) : u("papan.turnamen.belum_ikut"), x0, y, w, gaya.teksLemah);
+		y += 14;
+		PanelTempat.garis(l.g, gaya, x0, x1, y);
+		l.bungkus(u("papan.turnamen.ket"), x0, y + 4, w, gaya.teksSamar, 1.0F, 60);
 	}
 }

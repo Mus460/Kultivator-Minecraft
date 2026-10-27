@@ -108,7 +108,7 @@ public final class KehancuranClient {
 			}
 		});
 		pendingSince = Util.getMillis();
-		HubNav.buka(Tujuan.of(HubNav.TEKNIK, Urutan.ID_KEHANCURAN).sub("murid"));
+		HubNav.buka(Tujuan.of(HubNav.TEKNIK, Urutan.ID_KEHANCURAN).sub(arg == 0 ? "diri" : "murid"));
 	}
 
 	/** The waiting confirm, once (null when none or older than the server's 15 s window). */

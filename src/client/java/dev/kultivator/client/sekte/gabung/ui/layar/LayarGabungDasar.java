@@ -193,8 +193,14 @@ public abstract class LayarGabungDasar extends LayarTempatDasar {
 	 */
 	protected boolean tombolYakin(Lukis l, String kunci, int x, int y, int w, int h, Component label, boolean aktif, @Nullable Component alasan,
 			String op) {
+		return tombolYakin(l, kunci, x, y, w, h, label, aktif, alasan, op, SegelKonfirmasi.Tingkat.SEDANG);
+	}
+
+	/** {@link #tombolYakin} with an explicit seal weight ({@code RINGAN}: one press on the seal, no hold). */
+	protected boolean tombolYakin(Lukis l, String kunci, int x, int y, int w, int h, Component label, boolean aktif, @Nullable Component alasan,
+			String op, SegelKonfirmasi.Tingkat tingkat) {
 		return tombol.gambar(l, kunci, x, y, w, h, label, aktif, alasan,
-				() -> konfirmasi(SegelKonfirmasi.Tingkat.SEDANG, Component.translatable("kultivator.gui43.konteks.yakin", label), () -> kirim(op)));
+				() -> konfirmasi(tingkat, Component.translatable("kultivator.gui43.konteks.yakin", label), () -> kirim(op)));
 	}
 
 	/** "hari 44 (2 hari lagi)" from a world day and today. */

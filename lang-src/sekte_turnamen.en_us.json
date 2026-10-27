@@ -1,7 +1,5 @@
 {
   "kultivator.blueprint.comp.sx_turnamen_tribun": "Lei Tai Tribune",
-  "kultivator.hub.card.sekte_turnamen_papan": "Tournament",
-  "kultivator.hub.card.sekte_turnamen_papan.tip": "The season board (Elo), the live bracket, the roll of champions and inter-sect challenges.",
   "entity.kultivator.penonton": "Spectator",
   "advancement.kultivator.sekte.turnamen_juara.title": "Champion of the Lei Tai",
   "advancement.kultivator.sekte.turnamen_juara.description": "One of your disciples wins the sect tournament on the lei tai.",

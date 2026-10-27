@@ -14,7 +14,7 @@ import dev.kultivator.client.screen.ui.InkField;
 import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.TalismanButton;
-import dev.kultivator.client.sekte.wilayah.GulirIsi;
+import dev.kultivator.client.screen.ui.GulirIsi;
 import dev.kultivator.dunia.kapal.KapalClass;
 import dev.kultivator.dunia.kapal.KapalNet;
 import dev.kultivator.dunia.kapal.KapalRohEntity;
@@ -82,7 +82,7 @@ public final class HelmScreen extends Page {
 		}
 		if (payload.open() && Minecraft.getInstance().player != null) {
 			HelmScreen page = new HelmScreen(payload.ship(), payload.info());
-			DiSini.buka(new Konteks(KONTEKS, payload.ship(), null, page.judulKonteks(), Glyphs.PATH), page, null, "");
+			DiSini.buka(new Konteks(KONTEKS, payload.ship(), page.judulKonteks(), Glyphs.PATH), page, null, "");
 		}
 	}
 

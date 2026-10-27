@@ -3,6 +3,7 @@ package dev.kultivator.client.purba;
 import dev.kultivator.client.Keys;
 import dev.kultivator.client.abadi.AbadiClient;
 import dev.kultivator.client.screen.ui.Brush;
+import dev.kultivator.client.screen.ui.GulirTeks;
 import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.TalismanButton;
@@ -33,7 +34,7 @@ final class BencanaPage {
 	private static final int BUTTON_H = 14;
 
 	private final PurbaPage page;
-	private final AbadiClient.Baris baris = new AbadiClient.Baris();
+	private final GulirTeks baris = new GulirTeks();
 
 	BencanaPage(PurbaPage page) {
 		this.page = page;
@@ -134,7 +135,7 @@ final class BencanaPage {
 		int[] gates = c.getIntArray("gates").orElse(new int[COUNT]);
 		int x = page.bx();
 		int w = page.bw();
-		baris.mulai(w);
+		AbadiClient.mulai(baris, w, Payloads.DuniaSync.CH_PURBA);
 		if (!c.getBooleanOr("enabled", true)) {
 			baris.tambah(Component.translatable("kultivator.purba.calamity.disabled"), Palette.INK_FAINT);
 		}

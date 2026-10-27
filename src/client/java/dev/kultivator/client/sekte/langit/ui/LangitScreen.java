@@ -12,7 +12,7 @@ import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.PemilihOrang;
 import dev.kultivator.client.screen.ui.TalismanButton;
 import dev.kultivator.client.sekte.langit.LangitClient;
-import dev.kultivator.client.sekte.wilayah.GulirIsi;
+import dev.kultivator.client.screen.ui.GulirIsi;
 import dev.kultivator.sect.build.api.SectTemplates;
 import dev.kultivator.sekte.langit.main.LangitUiPayloads;
 import net.minecraft.ChatFormatting;

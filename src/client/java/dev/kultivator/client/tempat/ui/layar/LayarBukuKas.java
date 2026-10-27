@@ -254,7 +254,7 @@ public final class LayarBukuKas extends LayarTempatDasar {
 			Component alasan = lp.ada(LembarKunci.ALASAN) ? lp.teks(LembarKunci.ALASAN) : TeksTempat.k("kas.lapak_belum");
 			l.bungkus(alasan, x0 + 10, y0 + 46, x1 - x0 - 20, gaya.teksLemah, 1.0F, lp.ada(BukuKas.SEWA) ? 28 : y1 - y0 - 48);
 			if (lp.ada(BukuKas.SEWA)) {
-				tombolOp(l, "sewa", Math.round(cx - 70), y0 + 76, 140, 15, TeksTempat.k("kas.sewa", TeksTempat.angka(lp.l(BukuKas.SEWA, 0L))), true, null,
+				tombolOp(l, "sewa", Math.round(cx - 70), y0 + 76, 140, 15, TeksTempat.k("kas.sewa", Brush.angka(lp.l(BukuKas.SEWA, 0L))), true, null,
 						BukuKas.OP_LAPAK_SEWA);
 			}
 			return;
@@ -269,7 +269,7 @@ public final class LayarBukuKas extends LayarTempatDasar {
 		l.teks(penjaga == null ? TeksTempat.k("kas.tanpa_penjaga") : TeksTempat.k("kas.penjaga", penjaga), x0, y, (x1 - x0) / 2.0F,
 				penjaga == null ? TempatWarna.BAHAYA : gaya.teksSamar);
 		long kas = lp.l(BukuKas.KAS, 0L);
-		tombolOp(l, "kas", x1 - 96, y - 1, 96, 13, TeksTempat.k("kas.ambil_kas", TeksTempat.singkat(kas)), kas > 0, TeksTempat.k("kas.kas_kosong"),
+		tombolOp(l, "kas", x1 - 96, y - 1, 96, 13, TeksTempat.k("kas.ambil_kas", Brush.singkat(kas)), kas > 0, TeksTempat.k("kas.kas_kosong"),
 				BukuKas.OP_LAPAK_KAS);
 		y += 15;
 		// 18 slots grid (6 x 3) and the selected slot editor on the right
@@ -322,7 +322,7 @@ public final class LayarBukuKas extends LayarTempatDasar {
 				long harga = sel.l(LembarKunci.HARGA, 0L);
 				long nilai = Math.max(1L, sel.l(LembarKunci.NILAI, harga));
 				LabelHarga.gambar(l, harga, -1L, tx, ey + 14, false, 1.0F, false);
-				l.teks(TeksTempat.k("kas.peluang", sel.i(LembarKunci.PELUANG, 0), TeksTempat.angka(nilai)), tx, ey + 25, x1 - tx - 4, gaya.teksSamar);
+				l.teks(TeksTempat.k("kas.peluang", sel.i(LembarKunci.PELUANG, 0), Brush.angka(nilai)), tx, ey + 25, x1 - tx - 4, gaya.teksSamar);
 				int bw = (x1 - tx - 8) / 2;
 				long turun = Math.max(1L, Math.round(harga * 0.9D));
 				long naik = Math.max(harga + 1, Math.round(harga * 1.1D));
@@ -334,7 +334,7 @@ public final class LayarBukuKas extends LayarTempatDasar {
 						LembarKunci.op(BukuKas.OP_LAPAK_AMBIL, slotDipilih));
 			}
 		}
-		l.teks(TeksTempat.k("kas.volume", TeksTempat.angka(lp.l(BukuKas.VOLUME_MAKS, 0L))), x0, y + 3 * cell + 2, x1 - x0, gaya.teksSamar);
+		l.teks(TeksTempat.k("kas.volume", Brush.angka(lp.l(BukuKas.VOLUME_MAKS, 0L))), x0, y + 3 * cell + 2, x1 - x0, gaya.teksSamar);
 		l.teks(TeksTempat.k("kas.legenda_peluang"), x0, y + 3 * cell + 12, x1 - x0, gaya.teksSamar);
 	}
 
@@ -344,7 +344,7 @@ public final class LayarBukuKas extends LayarTempatDasar {
 		Kotak[] k = bagi(x0, y0, x1, y1);
 		Kotak kiri = k[0];
 		int y = kiri.y0();
-		l.teks(TeksTempat.k("kas.laba_minggu", TeksTempat.angka(kf.l(BukuKas.LABA_MINGGU, 0L)), TeksTempat.angka(kf.l(BukuKas.LABA_BATAS, 0L))),
+		l.teks(TeksTempat.k("kas.laba_minggu", Brush.angka(kf.l(BukuKas.LABA_MINGGU, 0L)), Brush.angka(kf.l(BukuKas.LABA_BATAS, 0L))),
 				kiri.x0(), y, kiri.w(), gaya.teksLemah);
 		y += 10;
 		if (jalan.isEmpty()) {
@@ -355,7 +355,7 @@ public final class LayarBukuKas extends LayarTempatDasar {
 				PanelTempat.kartu(lk.g, gaya, rx0, ry0, rx1, ry1, sorot ? 1.0F : 0.0F, pilih);
 				IkonTempat.gambar(lk.g, LembarKunci.Ikon.KAFILAH, rx0 + 3, ry0 + 3, 14, 0xFFFFFFFF);
 				lk.teks(Brush.bold(e.teks(LembarKunci.TUJUAN)), rx0 + 20, ry0 + 4, rx1 - rx0 - 70, gaya.teks);
-				lk.kanan(TeksTempat.hari(e.i(LembarKunci.SISA_HARI, 0)), rx1 - 3, ry0 + 4, gaya.teksLemah, 1.0F);
+				lk.kanan(Brush.hari(e.i(LembarKunci.SISA_HARI, 0)), rx1 - 3, ry0 + 4, gaya.teksLemah, 1.0F);
 				// mini map: start, goal and the caravan along the line
 				int mx0 = rx0 + 6;
 				int mx1 = rx1 - 6;
@@ -367,7 +367,7 @@ public final class LayarBukuKas extends LayarTempatDasar {
 				Brush.disc(lk.g, mx1, my + 0.5F, 2.0F, TempatWarna.SEGEL);
 				IkonTempat.gambar(lk.g, LembarKunci.Ikon.KAFILAH, Math.round(mx0 + (mx1 - mx0) * p - 5), my - 9, 10, 0xFFFFFFFF);
 				int risiko = e.i(LembarKunci.RISIKO, 0);
-				lk.teks(TeksTempat.k("kas.risiko_laba", risiko, TeksTempat.angka(e.l(BukuKas.LABA_KIRA, 0L))), rx0 + 6, ry0 + 27, rx1 - rx0 - 12,
+				lk.teks(TeksTempat.k("kas.risiko_laba", risiko, Brush.angka(e.l(BukuKas.LABA_KIRA, 0L))), rx0 + 6, ry0 + 27, rx1 - rx0 - 12,
 						risiko >= 20 ? TempatWarna.BAHAYA : gaya.teksSamar);
 				List<Lembar> pengawal = e.daftar(BukuKas.PENGAWAL);
 				if (!pengawal.isEmpty()) {

@@ -1,6 +1,5 @@
 package dev.kultivator.client.sekte.tetua;
 
-import com.mojang.blaze3d.platform.InputConstants;
 import dev.kultivator.client.hub.HubNav;
 import dev.kultivator.client.screen.Page;
 import dev.kultivator.client.screen.ui.Brush;
@@ -11,6 +10,7 @@ import dev.kultivator.client.screen.ui.PemilihOrang;
 import dev.kultivator.client.screen.ui.SegelKonfirmasi;
 import dev.kultivator.client.screen.ui.TalismanButton;
 import dev.kultivator.client.screen.ui.UiSound;
+import dev.kultivator.client.screen.ui.GulirIsi;
 import dev.kultivator.data.Realm;
 import dev.kultivator.sect.hall.SectRanks;
 import dev.kultivator.sekte.api.Jabatan;
@@ -53,8 +53,7 @@ public final class BalaiTetuaScreen extends Page {
 	private final PemilihOrang pemilih = new PemilihOrang(0);
 	/** The office whose picker is open, or null. */
 	private @Nullable Jabatan picking;
-	private float scroll;
-	private int contentH;
+	private final GulirIsi gulir = new GulirIsi();
 	private long seenVersion = -1L;
 
 	public BalaiTetuaScreen(boolean penerus) {
@@ -139,20 +138,9 @@ public final class BalaiTetuaScreen extends Page {
 		LaporanCard.seal(l.g, l.font, x + 8, y + 7, 14, "老");
 		l.teks(Brush.bold(Component.translatable("kultivator.sekte.tetua.ui.title.hall", hall)), x + 18, y + 3, w - 20, l.gaya.teks);
 		int top = y + 16;
-		int max = Math.max(0, contentH - (y + h - top));
-		scroll = Math.max(0.0F, Math.min(max, scroll));
-		int off = Math.round(scroll);
-		l.klip(x, top, x + w, y + h);
-		int bottom = penerus ? heir(l, view, top - off) : offices(l, view, top - off);
-		l.lepasKlip();
-		contentH = bottom + off - top;
-		if (max > 0) {
-			int rail = x + w - 2;
-			l.g.fill(rail, top, rail + 2, y + h, Palette.argb(0x40, 0x000000));
-			int len = Math.max(10, (y + h - top) * (y + h - top) / Math.max(1, contentH));
-			int pos = Math.round((y + h - top - len) * (scroll / max));
-			l.g.fill(rail, top + pos, rail + 2, top + pos + len, Palette.JADE);
-		}
+		// content ends at x + w - 4: the scroll bar sits in those 4 px
+		int atas = gulir.mulai(l, x, top, x + w - 4, y + h);
+		gulir.selesai(l, penerus ? heir(l, view, atas) : offices(l, view, atas));
 		if (picking != null) {
 			pemilih.gambarSembul(l, "pilih_tetua", Component.translatable("kultivator.sekte.tetua.ui.pick.title", Component.translatable(picking.key())),
 					orang(picking));
@@ -420,11 +408,7 @@ public final class BalaiTetuaScreen extends Page {
 		if (picking != null && pemilih.terbuka()) {
 			return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
 		}
-		if (inside(mouseX, mouseY)) {
-			scroll -= (float) scrollY * 18.0F;
-			return true;
-		}
-		return false;
+		return gulir.roda(mouseX, mouseY, scrollY);
 	}
 
 	@Override
@@ -435,18 +419,6 @@ public final class BalaiTetuaScreen extends Page {
 		if (picking != null) {
 			return false;
 		}
-		int page = Math.max(20, h - 30);
-		switch (event.key()) {
-			case InputConstants.KEY_UP -> scroll -= 18.0F;
-			case InputConstants.KEY_DOWN -> scroll += 18.0F;
-			case InputConstants.KEY_PAGEUP -> scroll -= page;
-			case InputConstants.KEY_PAGEDOWN -> scroll += page;
-			case InputConstants.KEY_HOME -> scroll = 0.0F;
-			case InputConstants.KEY_END -> scroll = contentH;
-			default -> {
-				return false;
-			}
-		}
-		return true;
+		return gulir.tombol(event);
 	}
 }

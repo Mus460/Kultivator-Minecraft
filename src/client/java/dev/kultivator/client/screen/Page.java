@@ -114,35 +114,13 @@ public abstract class Page {
 		return "jalan";
 	}
 
-	/** The sub bar (empty = none). The default turns the legacy {@link #subNames()} into subs with ids "0", "1", ... */
+	/** The sub bar (empty = none). */
 	public List<Sub> subs() {
-		List<Component> names = subNames();
-		if (names == null || names.isEmpty()) {
-			return List.of();
-		}
-		List<Sub> subs = new ArrayList<>(names.size());
-		for (int i = 0; i < names.size(); i++) {
-			subs.add(new Sub(String.valueOf(i), names.get(i)));
-		}
-		return subs;
-	}
-
-	/** Shows sub {@code id} of {@link #subs()} (the host passes a valid id). The default parses legacy index ids. */
-	public void showSub(String id) {
-		try {
-			showSub(Integer.parseInt(id));
-		} catch (NumberFormatException ignored) {
-			// Not a legacy index: a page with named subs overrides this method.
-		}
-	}
-
-	/** Legacy: sub names by index (Pengaturan groups). New pages override {@link #subs()} instead. */
-	public List<Component> subNames() {
 		return List.of();
 	}
 
-	/** Legacy: shows sub {@code index} of {@link #subNames()}. */
-	public void showSub(int index) {
+	/** Shows sub {@code id} of {@link #subs()} (the host passes a valid id). */
+	public void showSub(String id) {
 	}
 
 	/** True for pages on the wide paper (43.3.2: Kodeks, Cincin Segel, Peta, Buku Harian, Templat, wide Di Sini). */
@@ -337,11 +315,6 @@ public abstract class Page {
 	protected <T extends Widget> T add(T widget) {
 		widgets.add(widget);
 		return widget;
-	}
-
-	/** Where widget tooltips may show (the whole box unless part of it is clipped). */
-	protected boolean hoverable(double mouseX, double mouseY) {
-		return inside(mouseX, mouseY);
 	}
 
 	protected boolean inside(double mouseX, double mouseY) {

@@ -1,12 +1,12 @@
 package dev.kultivator.client.sekte.paviliun;
 
-import com.mojang.blaze3d.platform.InputConstants;
 import dev.kultivator.client.screen.Page;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.SegelKonfirmasi;
+import dev.kultivator.client.screen.ui.GulirIsi;
 import dev.kultivator.sekte.paviliun.PaviliunPayloads;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -28,12 +28,9 @@ import org.jetbrains.annotations.Nullable;
  */
 public final class PaviliunScreen extends Page {
 
-	private static final float LANGKAH = 18.0F;
-
 	final int page;
 	int selectedBook = -1;
-	private float gulir;
-	private float isiTinggi;
+	private final GulirIsi gulir = new GulirIsi();
 
 	public PaviliunScreen(int page) {
 		this.page = page;
@@ -95,19 +92,10 @@ public final class PaviliunScreen extends Page {
 			l.tengah(Component.translatable("kultivator.gui43.konteks.memuat"), x + w / 2.0F, y + h / 2.0F - 4.0F, w - 8, Palette.INK_FAINT);
 			return;
 		}
-		float maks = Math.max(0.0F, isiTinggi - h);
-		gulir = Math.max(0.0F, Math.min(maks, gulir));
-		int atas = y + 2 - Math.round(gulir);
-		int kanan = x + w - (maks > 0.0F ? 6 : 2);
-		l.klip(x, y, x + w, y + h);
+		int atas = gulir.mulai(l, x, y, x + w - 5, y + h) + 2;
+		int kanan = x + w - 7;
 		int bawah = page == PaviliunPayloads.PAGE_RAK ? RakScreen.lukis(this, l, x + 2, atas, kanan) : MakamScreen.lukis(this, l, x + 2, atas, kanan);
-		l.lepasKlip();
-		isiTinggi = bawah - atas + 4;
-		if (maks > 0.0F) {
-			float bead = y + 3.0F + (h - 6.0F) * (gulir / maks);
-			l.g.fill(x + w - 2, y, x + w - 1, y + h, Palette.CORD);
-			Brush.disc(l.g, x + w - 1.5F, bead, 2.0F, Palette.JADE);
-		}
+		gulir.selesai(l, bawah + 2);
 	}
 
 	// ================================================================== input
@@ -117,27 +105,12 @@ public final class PaviliunScreen extends Page {
 		if (super.mouseScrolled(mouseX, mouseY, scrollX, scrollY)) {
 			return true;
 		}
-		if (!inside(mouseX, mouseY) || isiTinggi <= h) {
-			return false;
-		}
-		gulir -= (float) scrollY * LANGKAH;
-		return true;
+		return gulir.roda(mouseX, mouseY, scrollY);
 	}
 
 	@Override
 	public boolean keyPressed(KeyEvent event) {
-		if (super.keyPressed(event)) {
-			return true;
-		}
-		int key = event.key();
-		float step = key == InputConstants.KEY_DOWN ? LANGKAH : key == InputConstants.KEY_UP ? -LANGKAH
-				: key == InputConstants.KEY_PAGEDOWN ? h - LANGKAH : key == InputConstants.KEY_PAGEUP ? LANGKAH - h
-				: key == InputConstants.KEY_END ? isiTinggi : key == InputConstants.KEY_HOME ? -isiTinggi : 0.0F;
-		if (step == 0.0F || isiTinggi <= h) {
-			return false;
-		}
-		gulir += step;
-		return true;
+		return super.keyPressed(event) || gulir.tombol(event);
 	}
 
 	// ================================================================== painters' helpers

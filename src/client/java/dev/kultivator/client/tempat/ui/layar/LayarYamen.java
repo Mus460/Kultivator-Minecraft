@@ -18,7 +18,6 @@ import dev.kultivator.client.sekte.gabung.ui.layar.LayarGabung2;
 import dev.kultivator.client.tempat.ui.kit.IkonTempat;
 import dev.kultivator.client.tempat.ui.kit.Lembar;
 import dev.kultivator.client.tempat.ui.kit.PanelTempat;
-import dev.kultivator.client.tempat.ui.kit.TeksTempat;
 import dev.kultivator.client.tempat.ui.kit.TempatWarna;
 import dev.kultivator.dunia.kota42.ui.KotaLembar;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
@@ -573,7 +572,7 @@ public final class LayarYamen extends LayarInti {
 		l.teks(Brush.bold(j.teks(LembarKunci.GELAR)), tx, sy + 2, kiri.x1() - tx - 4, gaya.teks, 1.0F);
 		long gaji = j.l(KotaLembar.Jabatan.GAJI, 0L);
 		long gajiMaks = j.l(KotaLembar.Jabatan.GAJI_MAKS, 0L);
-		l.keterangan(SketsaKota.t("jabatan.gaji", TeksTempat.angka(gaji), TeksTempat.angka(gajiMaks)), tx, sy + 13, kiri.x1() - tx - 4, gaya.teksLemah);
+		l.keterangan(SketsaKota.t("jabatan.gaji", Brush.angka(gaji), Brush.angka(gajiMaks)), tx, sy + 13, kiri.x1() - tx - 4, gaya.teksLemah);
 		SketsaKota.batang(l, tx, sy + 22, kiri.x1() - tx - 8, 3, gajiMaks <= 0 ? 0.0F : gaji / (float) gajiMaks, Palette.GOLD, -1.0F);
 		int y = sy + ss + 6;
 		if (pangkat > 0) {
@@ -704,7 +703,7 @@ public final class LayarYamen extends LayarInti {
 				festival = p.l(KotaLembar.Jabatan.FESTIVAL, 0L);
 			}
 			int fy = by - 30;
-			l.keterangan(SketsaKota.t("pajak.festival", TeksTempat.angka(festival), TeksTempat.angka(fmaks)), kiri.x0() + 6, fy, kiri.w() - 12, gaya.teksLemah);
+			l.keterangan(SketsaKota.t("pajak.festival", Brush.angka(festival), Brush.angka(fmaks)), kiri.x0() + 6, fy, kiri.w() - 12, gaya.teksLemah);
 			tombol.gambar(l, "fest#kurang", kiri.x0() + 4, fy + 10, 16, 13, Component.literal("−"), festival > 0, null, () -> festival = Math.max(0L, festival - 20L));
 			tombol.gambar(l, "fest#tambah", kiri.x0() + 22, fy + 10, 16, 13, Component.literal("+"), festival < fmaks, null,
 					() -> festival = Math.min(fmaks, festival + 20L));
@@ -739,10 +738,10 @@ public final class LayarYamen extends LayarInti {
 			int bx = x0 + i * (bw + gap);
 			l.g.fillGradient(bx, base - h, bx + bw, base, warna, Palette.darken(warna, 0.35F));
 			if (l.di(bx, base - h - 2, bx + bw, base)) {
-				l.tip(List.of(rows.get(i).teks(LembarKunci.TEKS), Component.literal(TeksTempat.angka(v) + " NB")));
+				l.tip(List.of(rows.get(i).teks(LembarKunci.TEKS), Component.literal(Brush.angka(v) + " NB")));
 			}
 		}
-		l.keterangan(SketsaKota.t("pajak.minggu_ini", TeksTempat.angka(rows.get(0).l(LembarKunci.HARGA, 0L))), x0, base + 1, x1 - x0, gaya.teksLemah);
+		l.keterangan(SketsaKota.t("pajak.minggu_ini", Brush.angka(rows.get(0).l(LembarKunci.HARGA, 0L))), x0, base + 1, x1 - x0, gaya.teksLemah);
 	}
 
 	private void daftarPerkara(dev.kultivator.client.tempat.ui.kit.Lukis l, int x0, int y0, int x1, int y1) {
@@ -948,7 +947,7 @@ public final class LayarYamen extends LayarInti {
 			l.g.fill(x0, y, x1, y + 1, TempatWarna.BAHAYA);
 			l.g.fill(x0 + 4, y + 5, x0 + 26, y + 25, 0xFFB3202A);
 			l.g.fill(x0 + 4, y + 5, x0 + 26, y + 9, 0xFFD4A637);
-			l.teks(SketsaKota.t("perkara.amplop", amplop.teks(KotaLembar.DARI), TeksTempat.angka(amplop.l(LembarKunci.HARGA, 0L))), x0 + 30, y + 4,
+			l.teks(SketsaKota.t("perkara.amplop", amplop.teks(KotaLembar.DARI), Brush.angka(amplop.l(LembarKunci.HARGA, 0L))), x0 + 30, y + 4,
 					x1 - x0 - 150, 0xFFFFE4D0, 0.8F);
 			l.keterangan(SketsaKota.t("perkara.amplop_risiko"), x0 + 30, y + 16, x1 - x0 - 150, 0xFFE0A090);
 			tombolYakin(l, "amplop_terima", x1 - 118, y + 8, 58, 14, SketsaKota.t("perkara.amplop_terima"), true, null, KotaLembar.Perkara.OP_AMPLOP_TERIMA);

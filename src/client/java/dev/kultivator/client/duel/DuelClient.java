@@ -75,7 +75,6 @@ public final class DuelClient {
 	private static final List<Offer> OFFERS = new ArrayList<>();
 	private static final List<Prediction> PREDICTIONS = new ArrayList<>();
 	private static @Nullable DuelPayloads.DuelResult lastResult;
-	private static long lastResultAt = Long.MIN_VALUE / 2;
 	private static int lastPrefsSent = -1;
 	private static int predictedTotal;
 	private static int predictedRight;
@@ -217,7 +216,6 @@ public final class DuelClient {
 
 	private static void onResult(DuelPayloads.DuelResult p) {
 		lastResult = p;
-		lastResultAt = DuelClock.clientTicks();
 		DuelBus.result(p);
 		DuelResultCard.show(p, sessionById(p.sessionId()));
 	}
@@ -546,11 +544,6 @@ public final class DuelClient {
 		return s != null && s.phase() != DuelIds.PHASE_INVITE && s.phase() != DuelIds.PHASE_ENDED;
 	}
 
-	/** The input mode in use now ({@code DuelIds.INPUT_KLASIK}, {@code INPUT_IKUTI_BC} or {@code INPUT_VANILLA}). */
-	public static int localMode() {
-		return DuelInput.resolvedMode();
-	}
-
 	/** Ticks left of a session's phase, counted on from its last sync. */
 	public static int phaseTicksLeft(DuelPayloads.DuelSessionSync s) {
 		long at = SESSION_AT.getOrDefault(s.sessionId(), DuelClock.clientTicks());
@@ -571,11 +564,6 @@ public final class DuelClient {
 
 	public static @Nullable DuelPayloads.DuelResult lastResult() {
 		return lastResult;
-	}
-
-	/** Client ticks since the last result arrived. */
-	public static long sinceResult() {
-		return DuelClock.clientTicks() - lastResultAt;
 	}
 
 	public static boolean isLocal(int entityId) {

@@ -322,8 +322,6 @@
   "kultivator.sekte.diplomasi.uji.gerbang": "To the gate of %s at %s, %s, %s.",
   "kultivator.sekte.diplomasi.uji.gerbang_belum": "The gate of %s is not born; to its planned point %s, %s, %s (it appears only in newly generated chunks).",
   "kultivator.sekte.diplomasi.uji.simulasi": "%s days simulated.",
-  "kultivator.hub.card.sekte_diplomasi_rival": "Sect Diplomacy",
-  "kultivator.hub.card.sekte_diplomasi_rival.tip": "The NPC sects: envoys, gifts, pacts, alliances, war.",
   "advancement.kultivator.sekte.diplomasi_temu.title": "Beyond the Clouds",
   "advancement.kultivator.sekte.diplomasi_temu.description": "Meet an NPC sect for the first time.",
   "advancement.kultivator.sekte.diplomasi_sekutu.title": "Sects United",

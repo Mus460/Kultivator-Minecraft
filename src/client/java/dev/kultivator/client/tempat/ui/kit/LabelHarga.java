@@ -19,7 +19,7 @@ public final class LabelHarga {
 	public static int gambar(Lukis l, long harga, long uang, float x, float y, boolean kanan, float ukuran, boolean pendek) {
 		ukuran = Math.max(1.0F, ukuran); // 43.0.5: no text below 1.0
 		boolean kurang = uang >= 0L && harga > uang;
-		Component angka = Component.literal(pendek ? TeksTempat.singkat(harga) : TeksTempat.angka(harga));
+		Component angka = Component.literal(pendek ? Brush.singkat(harga) : Brush.angka(harga));
 		int ikon = Math.round(10 * ukuran);
 		int lebarTeks = Math.round(l.font.width(angka) * ukuran);
 		int lebar = ikon + 2 + lebarTeks;
@@ -33,10 +33,10 @@ public final class LabelHarga {
 		Brush.text(l.g, l.font, angka, x0 + ikon + 2, y, warna, ukuran, false);
 		if (l.di(x0, yi, x0 + lebar, yi + Math.max(ikon, Math.round(9 * ukuran)))) {
 			List<Component> lines = new java.util.ArrayList<>(3);
-			lines.add(TeksTempat.k("harga.tip", TeksTempat.angka(harga)));
-			lines.add(TeksTempat.rincianBatu(harga));
+			lines.add(TeksTempat.k("harga.tip", Brush.angka(harga)));
+			lines.add(Brush.rincianBatu(harga));
 			if (kurang) {
-				lines.add(TeksTempat.k("harga.kurang", TeksTempat.angka(harga - uang)));
+				lines.add(TeksTempat.k("harga.kurang", Brush.angka(harga - uang)));
 			}
 			l.tip(lines);
 		}
@@ -46,7 +46,7 @@ public final class LabelHarga {
 	/** A signed PK amount with the tally icon (ledgers). */
 	public static int pk(Lukis l, long pk, float x, float y, boolean kanan, float ukuran, int warna) {
 		ukuran = Math.max(1.0F, ukuran);
-		Component angka = Component.literal(TeksTempat.bertanda(pk));
+		Component angka = Component.literal(Brush.bertanda(pk));
 		int ikon = Math.round(10 * ukuran);
 		int lebar = ikon + 2 + Math.round(l.font.width(angka) * ukuran);
 		int x0 = Math.round(kanan ? x - lebar : x);
@@ -60,7 +60,7 @@ public final class LabelHarga {
 		ukuran = Math.max(1.0F, ukuran);
 		int naik = l.gaya.gelap() ? 0xFF9AE0B0 : 0xFF2E7A4E;
 		int turun = l.gaya.gelap() ? 0xFFFF8A7A : TempatWarna.BAHAYA;
-		Component angka = Component.literal(TeksTempat.bertanda(nb));
+		Component angka = Component.literal(Brush.bertanda(nb));
 		int ikon = Math.round(10 * ukuran);
 		int lebar = ikon + 2 + Math.round(l.font.width(angka) * ukuran);
 		int x0 = Math.round(kanan ? x - lebar : x);

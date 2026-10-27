@@ -32,7 +32,7 @@ import java.util.Map;
 /**
  * The client bridge of module K (DESIGN 43.8.4, module M15 of 43.16.2): {@link KotaNet.Screen} (screen kind, tab, data)
  * becomes one page under the Di Sini tablet of the Gulungan Utama instead of the three old screens ({@code KotaScreens}):
- * the town (subs Toko · Lelang · Teh · Gelap · Misi), the Immortal City (Pasar · Kuliah · Persik · Perintah) and the
+ * the town (subs Toko · Teh · Gelap · Misi; the Juru Lelang gets the one auction sheet, {@link KotaLelang}), the Immortal City (Pasar · Kuliah · Persik · Perintah) and the
  * wanderer meeting. Every button sends the same {@link KotaNet.Action} ops as before; the server is unchanged. A live
  * refresh updates the page in place, an open on the same NPC switches its sub, and the context ends when the NPC is gone
  * or the player walked away ({@link #JAUH} blocks; the auction streams to watchers up to 20 blocks from the stage).
@@ -85,7 +85,7 @@ public final class KotaJembatan {
 			return;
 		}
 		Halaman page = new Halaman(jenis, payload.npcId());
-		DiSini.buka(new Konteks(KONTEKS, payload.npcId(), null, page.judulKonteks(), page.glyph()), page, null, page.subDari(payload.tab()));
+		DiSini.buka(new Konteks(KONTEKS, payload.npcId(), page.judulKonteks(), page.glyph()), page, null, page.subDari(payload.tab()));
 	}
 
 	private static int jenis(int screen) {
@@ -175,14 +175,16 @@ public final class KotaJembatan {
 			this.isi = switch (jenis) {
 				case KotaNet.SCREEN_ABADI -> List.of(new AbadiPages.Pasar(), new AbadiPages.Kuliah(), new AbadiPages.Persik(), new AbadiPages.Titah());
 				case KotaNet.SCREEN_PERTEMUAN -> List.of(new MeetingPage());
-				default -> List.of(new TownPages.Toko(), new TownPages.Lelang(), new TownPages.Teh(), new TownPages.Gelap(), new TownPages.Misi());
+				default -> List.of(new TownPages.Toko(), new TownPages.Teh(), new TownPages.Gelap(), new TownPages.Misi());
 			};
 			this.tampil = isi.get(0);
 		}
 
 		/** The sub id of server tab {@code tab} ("" = keep the current one: a refresh sends -1). */
 		String subDari(int tab) {
-			int index = jenis == KotaNet.SCREEN_ABADI ? tab - KotaNet.TAB_PASAR_ABADI : jenis == KotaNet.SCREEN_KOTA ? tab : -1;
+			// the town has no Lelang sub (the Juru Lelang opens the one auction sheet, G20): later tabs shift down one
+		int index = jenis == KotaNet.SCREEN_ABADI ? tab - KotaNet.TAB_PASAR_ABADI
+				: jenis == KotaNet.SCREEN_KOTA ? (tab >= KotaNet.TAB_LELANG ? tab - 1 : tab) : -1;
 			return index >= 0 && index < isi.size() && isi.size() > 1 ? isi.get(index).id() : "";
 		}
 

@@ -16,7 +16,6 @@ import dev.kultivator.client.tempat.ui.kit.Lembar;
 import dev.kultivator.client.tempat.ui.kit.Lukis;
 import dev.kultivator.client.tempat.ui.kit.PanelTempat;
 import dev.kultivator.client.tempat.ui.kit.TabLentera;
-import dev.kultivator.client.tempat.ui.kit.TeksTempat;
 import dev.kultivator.client.tempat.ui.kit.TempatWarna;
 import dev.kultivator.dunia.kota42.ui.KotaLembar;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
@@ -150,8 +149,8 @@ public final class LayarPolitik extends LayarGabungDasar {
 		// resource toward the next class, ranking
 		int sumber = m.i(Politik.SUMBER, 0);
 		int naik = m.i(Politik.NAIK, 0);
-		Component baris = naik > 0 ? u("politik.sumber_naik", TeksTempat.angka(sumber), TeksTempat.angka(naik), m.i(Politik.PERINGKAT, 0))
-				: u("politik.sumber_puncak", TeksTempat.angka(sumber), m.i(Politik.PERINGKAT, 0));
+		Component baris = naik > 0 ? u("politik.sumber_naik", Brush.angka(sumber), Brush.angka(naik), m.i(Politik.PERINGKAT, 0))
+				: u("politik.sumber_puncak", Brush.angka(sumber), m.i(Politik.PERINGKAT, 0));
 		l.teks(baris, x0, y, x1 - x0, gaya.teks, 1.0F);
 		y += 10;
 		if (naik > 0) {
@@ -189,7 +188,7 @@ public final class LayarPolitik extends LayarGabungDasar {
 				int bx = rx1 - bar - 4;
 				batang(lk, bx, ry0 + 8, bar, 5, (sikap + 100) / 200.0F, warnaSikap(sikap), 0.5F);
 				if (lk.di(bx, ry0 + 4, bx + bar, ry0 + 16)) {
-					lk.tip(u("politik.sikap", TeksTempat.bertanda(sikap)));
+					lk.tip(u("politik.sikap", Brush.bertanda(sikap)));
 				}
 			}
 		}, null, null);
@@ -318,7 +317,7 @@ public final class LayarPolitik extends LayarGabungDasar {
 			l.teks(alasan, x0, ly, kolom - x0, gaya.gelap() ? 0xFFFF9A8A : TempatWarna.BAHAYA);
 		}
 		int bw = Math.min(170, kolom - x0);
-		tombolOp(l, "suksesi", x0, by, bw, 15, u("politik.suksesi.lanjut", TeksTempat.angka(s.i(LembarKunci.BIAYA, 0))), s.b(LembarKunci.BISA), alasan,
+		tombolOp(l, "suksesi", x0, by, bw, 15, u("politik.suksesi.lanjut", Brush.angka(s.i(LembarKunci.BIAYA, 0))), s.b(LembarKunci.BISA), alasan,
 				LembarPolitik.OP_SUKSESI);
 		if (calonKetua != null && tata != Tata.SEMPIT && x0 + bw + 70 < kolom) {
 			tombolYakin(l, "tentang", x0 + bw + 4, by, Math.min(80, kolom - x0 - bw - 4), 15, u("politik.tentang"), true, null, LembarPolitik.OP_TENTANG);
@@ -377,7 +376,7 @@ public final class LayarPolitik extends LayarGabungDasar {
 		int ujung = mid + Math.round(bw / 2.0F * Math.max(-1.0F, Math.min(1.0F, skor / 100.0F)));
 		l.g.fill(Math.min(mid, ujung), y + 1, Math.max(mid, ujung), y + 7, skor >= 0 ? 0xFF2E8963 : 0xFFB03030);
 		l.g.fill(mid, y - 1, mid + 1, y + 9, 0xFFFFF0C0);
-		Brush.centered(l.g, font, Component.literal(TeksTempat.bertanda(skor)), mid, y, 0xFFFFFFFF, 1.0F, true);
+		Brush.centered(l.g, font, Component.literal(Brush.bertanda(skor)), mid, y, 0xFFFFFFFF, 1.0F, true);
 		y += 12;
 		Kotak[] k = bagi(x0, y, x1, y1);
 		// missions done in this war
@@ -445,7 +444,7 @@ public final class LayarPolitik extends LayarGabungDasar {
 		l.teks(u("politik.kas.isi"), x0, y + 1.0F, 90, gaya.teksSamar);
 		LabelHarga.gambar(l, kas.l(LembarPolitik.KAS_NB, 0L), -1L, x0 + 92, y, false, 1.0F, false);
 		if (kas.ada(Politik.KAS_KETUA)) {
-			l.kanan(u("politik.kas.bagian_ketua", TeksTempat.angka(kas.i(Politik.KAS_KETUA, 0))), x1, y + 1.0F, TempatWarna.EMAS_GELAP, 1.0F);
+			l.kanan(u("politik.kas.bagian_ketua", Brush.angka(kas.i(Politik.KAS_KETUA, 0))), x1, y + 1.0F, TempatWarna.EMAS_GELAP, 1.0F);
 		}
 		y += 12;
 		Kotak[] k = bagi(x0, y, x1, y1 - 18);
@@ -475,7 +474,7 @@ public final class LayarPolitik extends LayarGabungDasar {
 		}
 		int nilai = kas.i(LembarPolitik.NILAI_TANGAN, 0);
 		Component tangan = kas.teksAtau(LembarKunci.TANGAN);
-		Component label = tangan == null ? u("politik.kas.sumbang_kosong") : u("politik.kas.sumbang", tangan, TeksTempat.angka(nilai));
+		Component label = tangan == null ? u("politik.kas.sumbang_kosong") : u("politik.kas.sumbang", tangan, Brush.angka(nilai));
 		tombolOp(l, "sumbang", x0, y1 - 15, x1 - x0, 15, label, nilai > 0, tangan == null ? u("politik.kas.tangan_kosong") : u("politik.kas.tak_bernilai"),
 				Politik.OP_SUMBANG);
 	}
@@ -507,7 +506,7 @@ public final class LayarPolitik extends LayarGabungDasar {
 			boolean akhir = i == n - 1;
 			l.g.fill(bx0, gy1 - h, bx1, gy1, akhir ? 0xFF2E8963 : Palette.argb(0xB0, 0x2E8963));
 			if (l.di(bx0, gy0, bx1, gy1)) {
-				l.tip(u("politik.kas.hari", n - 1 - i, TeksTempat.angka(g[i])));
+				l.tip(u("politik.kas.hari", n - 1 - i, Brush.angka(g[i])));
 			}
 		}
 		l.g.fill(gx0, gy1, gx1, gy1 + 1, Palette.argb(0x80, teks & 0xFFFFFF));
@@ -563,7 +562,7 @@ public final class LayarPolitik extends LayarGabungDasar {
 		for (int i = 0; i < langkah.length; i++) {
 			boolean done = restu > i;
 			IkonTempat.gambar(l.g, done ? IkonTempat.CENTANG : IkonTempat.SILANG, x0, y, 9, done ? 0xFFFFFFFF : 0x90FFFFFF);
-			Component t = i == 0 ? u(langkah[i], TeksTempat.angka(c.i(LembarPolitik.RESTU_PK, 0))) : u(langkah[i]);
+			Component t = i == 0 ? u(langkah[i], Brush.angka(c.i(LembarPolitik.RESTU_PK, 0))) : u(langkah[i]);
 			l.teks(t, x0 + 12, y + 1, x1 - x0 - 12, done ? teks : lemah, 1.0F);
 			y += 11;
 		}
@@ -658,7 +657,7 @@ public final class LayarPolitik extends LayarGabungDasar {
 			y += 12;
 			long upeti = p.l(KotaLembar.Pakta.UPETI, 0L);
 			boolean siap = p.b(KotaLembar.Pakta.UPETI_SIAP);
-			y += barisNilai(l, SketsaKota.t("pakta.upeti"), Component.literal(TeksTempat.angka(upeti) + " NB" + (siap ? "  ✦" : "")), lx0, y, lx1);
+			y += barisNilai(l, SketsaKota.t("pakta.upeti"), Component.literal(Brush.angka(upeti) + " NB" + (siap ? "  ✦" : "")), lx0, y, lx1);
 			for (Lembar b : p.daftar(KotaLembar.Pakta.BARANG_UPETI)) {
 				if (y + 10 > kiri.y1() - 60) {
 					break;
@@ -740,7 +739,7 @@ public final class LayarPolitik extends LayarGabungDasar {
 		long sisa = b.l(LembarKunci.SISA_TICK, 0L);
 		if (!tenang && sisa > 0L) {
 			long left = Math.max(0L, sisa - (Util.getMillis() - diterima) / 50L);
-			l.kanan(SketsaKota.t("pakta.bela_sisa", TeksTempat.waktu(left)), x1 - 5, y0 + 4, 0xFFFFE0C0, 1.0F);
+			l.kanan(SketsaKota.t("pakta.bela_sisa", Brush.waktu(left)), x1 - 5, y0 + 4, 0xFFFFE0C0, 1.0F);
 		}
 		int y = y0 + 22;
 		Lembar terakhir = b.sub(KotaLembar.Pakta.TERAKHIR);
@@ -910,7 +909,7 @@ public final class LayarPolitik extends LayarGabungDasar {
 					gaya.teks);
 			long nb = r.l("nb", 0L);
 			if (nb != 0L) {
-				l.kanan(Component.literal(TeksTempat.bertanda(nb) + " NB"), kanan.x1(), ry, nb > 0 ? TempatWarna.OK : TempatWarna.BAHAYA, 1.0F);
+				l.kanan(Component.literal(Brush.bertanda(nb) + " NB"), kanan.x1(), ry, nb > 0 ? TempatWarna.OK : TempatWarna.BAHAYA, 1.0F);
 			}
 			ry += 10;
 		}

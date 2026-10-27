@@ -15,9 +15,11 @@ import dev.kultivator.client.tempat.ui.kit.Lembar;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import dev.kultivator.dunia.tempat.ui.LembarKunci.Lelang;
 import java.util.List;
+import java.util.function.Supplier;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Util;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * {@code lelang} (DESIGN 38.U.3.3, G20): the one auction of the mod: the town Balai Lelang, the capital's Lelang Agung and,
@@ -46,9 +48,21 @@ public final class LayarLelang extends LayarInti {
 	private final DaftarGulir daftarHasil = new DaftarGulir();
 	private int lotTerakhir = -1;
 	private long terjualSejak = -1L;
+	private Supplier<Component> kunci = () -> null;
 
 	public LayarLelang(int npcId, CompoundTag lembar) {
 		super(Lelang.LAYAR, npcId, lembar, k("layar.lelang"), LembarKunci.GAYA_KAIN);
+	}
+
+	/** The page lock of a bridged auction (Keabadian › Lelang opens after the ascent, like the old card). */
+	public LayarLelang kunciDari(Supplier<Component> kunci) {
+		this.kunci = kunci;
+		return this;
+	}
+
+	@Override
+	public @Nullable Component kunci() {
+		return kunci.get();
 	}
 
 	@Override

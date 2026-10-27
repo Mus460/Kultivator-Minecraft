@@ -47,6 +47,8 @@ public final class Lukis {
 		public @Nullable InkField kolom;
 		/** Optional group: ↑↓ move the focus between zones of the same group (DaftarPilihan, PemilihOrang). */
 		public @Nullable String grup;
+		/** Scrolled out of a {@link GulirIsi} box: in the Tab ring only (its unclipped box), never hovered or clicked. */
+		public boolean terpotong;
 
 		Zona(String kunci, int x0, int y0, int x1, int y1, @Nullable Runnable aksi, boolean aktif, @Nullable Component alasan, boolean fokus) {
 			this.kunci = kunci;
@@ -61,7 +63,7 @@ public final class Lukis {
 		}
 
 		public boolean berisi(double x, double y) {
-			return x >= x0 && y >= y0 && x < x1 && y < y1;
+			return !terpotong && x >= x0 && y >= y0 && x < x1 && y < y1;
 		}
 	}
 
@@ -116,9 +118,16 @@ public final class Lukis {
 
 	// ---------------------------------------------------------------- zones and focus
 
-	/** Registers a zone; returns it (null when clipped away entirely). */
+	/**
+	 * Registers a zone; returns it (null when clipped away entirely). A zone scrolled out of a {@link GulirIsi} box stays in
+	 * the Tab ring as focus-only (43.18 #2), so Tab reaches it and the box scrolls to it.
+	 */
 	public @Nullable Zona zona(String kunci, int x0, int y0, int x1, int y1, @Nullable Runnable aksi, boolean aktif, @Nullable Component alasan,
 			boolean fokus) {
+		int ax0 = x0;
+		int ay0 = y0;
+		int ax1 = x1;
+		int ay1 = y1;
 		int[] c = klip.peek();
 		if (c != null) {
 			x0 = Math.max(x0, c[0]);
@@ -126,6 +135,11 @@ public final class Lukis {
 			x1 = Math.min(x1, c[2]);
 			y1 = Math.min(y1, c[3]);
 			if (x1 <= x0 || y1 <= y0) {
+				if (fokus && c.length > 4) {
+					Zona tersembunyi = new Zona(kunci, ax0, ay0, ax1, ay1, aksi, aktif, alasan, true);
+					tersembunyi.terpotong = true;
+					zona.add(tersembunyi);
+				}
 				return null;
 			}
 		}
@@ -214,6 +228,13 @@ public final class Lukis {
 		}
 		klip.push(new int[] {x0, y0, Math.max(x0, x1), Math.max(y0, y1)});
 		g.enableScissor(x0, y0, Math.max(x0, x1), Math.max(y0, y1));
+	}
+
+	/** {@link #klip} of a {@link GulirIsi} box: zones scrolled out of it stay focus-only instead of vanishing. */
+	void klipGulir(int x0, int y0, int x1, int y1) {
+		klip(x0, y0, x1, y1);
+		int[] c = klip.pop();
+		klip.push(new int[] {c[0], c[1], c[2], c[3], 1});
 	}
 
 	public void lepasKlip() {

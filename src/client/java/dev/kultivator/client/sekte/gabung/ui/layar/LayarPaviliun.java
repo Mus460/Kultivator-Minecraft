@@ -16,7 +16,6 @@ import dev.kultivator.client.tempat.ui.kit.PanelTempat;
 import dev.kultivator.client.tempat.ui.kit.PemilihJumlah;
 import dev.kultivator.client.tempat.ui.kit.Pratinjau3D;
 import dev.kultivator.client.tempat.ui.kit.TabLentera;
-import dev.kultivator.client.tempat.ui.kit.TeksTempat;
 import dev.kultivator.client.tempat.ui.kit.TempatWarna;
 import dev.kultivator.data.Dao;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
@@ -200,7 +199,7 @@ public final class LayarPaviliun extends LayarGabungDasar {
 		int dasar = e.i(Paviliun.HARGA_DASAR, harga);
 		int pw = pk(l, harga, redup ? -1L : pkPunya(), kanan, y0 + 3, true, 1.0F);
 		if (dasar > harga) {
-			Component coret = Component.literal(TeksTempat.angka(dasar)).withStyle(ChatFormatting.STRIKETHROUGH);
+			Component coret = Component.literal(Brush.angka(dasar)).withStyle(ChatFormatting.STRIKETHROUGH);
 			l.kanan(coret, kanan, y0 + 13, gaya.teksSamar, 1.0F);
 		}
 		if (kunci) {
@@ -305,7 +304,7 @@ public final class LayarPaviliun extends LayarGabungDasar {
 		pk(l, (long) harga * jumlah.nilai(), pkPunya(), x0 + jw + 6, jy + 2, false, 1.0F, teks);
 		boolean cukup = (long) harga * jumlah.nilai() <= pkPunya();
 		Component tolak = !bisa ? (alasan != null ? alasan : u("paviliun.habis")) : !cukup ? u("paviliun.kurang_pk") : null;
-		tombolOp(l, "tukar", x0, by, x1 - x0, 15, u("paviliun.tukar", jumlah.nilai(), TeksTempat.angka((long) harga * jumlah.nilai())), bisa && cukup,
+		tombolOp(l, "tukar", x0, by, x1 - x0, 15, u("paviliun.tukar", jumlah.nilai(), Brush.angka((long) harga * jumlah.nilai())), bisa && cukup,
 				tolak, LembarKunci.op(Paviliun.OP_TUKAR, e.id(), jumlah.nilai()));
 	}
 
@@ -370,7 +369,7 @@ public final class LayarPaviliun extends LayarGabungDasar {
 			Component bawah = bisa ? u("paviliun.ceramah.siap") : e.teks(LembarKunci.ALASAN);
 			lk.teks(bawah, rx0 + 24, ry0 + 14, bx - rx0 - 30, bisa ? TempatWarna.OK : TempatWarna.BAHAYA);
 			int harga = e.i(LembarKunci.HARGA, 0);
-			tombolOp(lk, "ceramah" + i, bx, ry0 + 5, bw, 15, u("paviliun.ceramah.tombol", TeksTempat.angka(harga)), bisa && harga <= pkPunya(),
+			tombolOp(lk, "ceramah" + i, bx, ry0 + 5, bw, 15, u("paviliun.ceramah.tombol", Brush.angka(harga)), bisa && harga <= pkPunya(),
 					bisa ? u("paviliun.kurang_pk") : e.teksAtau(LembarKunci.ALASAN), LembarKunci.op(Paviliun.OP_CERAMAH, e.id()));
 		}, null, null);
 	}

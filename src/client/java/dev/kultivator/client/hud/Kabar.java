@@ -272,6 +272,11 @@ public final class Kabar {
 		int x1 = g.guiWidth() - TEPI;
 		float y = TEPI;
 		int batas = g.guiHeight() - 48;
+		int slip = SlotSisi.tinggiAktif();
+		if (slip > 0) {
+			// shortcut: only the extra rows give way to the side slip; a stack of plain cards taller than the room still meets it
+			batas = Math.min(batas, g.guiHeight() - 44 - slip - 4);
+		}
 		for (Kartu k : TAMPAK) {
 			float in = Math.min(1.0F, (now - k.mulai) / (float) GESER);
 			float out = k.keluar < 0L ? 0.0F : Math.min(1.0F, (now - k.keluar) / (float) GESER);

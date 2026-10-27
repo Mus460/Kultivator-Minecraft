@@ -117,11 +117,6 @@ public final class MandiriBoardScreen extends Page {
 		return terbaru;
 	}
 
-	/** Grows with every board that arrives. */
-	public static long versiPapan() {
-		return versi;
-	}
-
 	/** Asks the server for the board (at most once a second). */
 	public static void minta() {
 		long now = Util.getMillis();
@@ -191,16 +186,6 @@ public final class MandiriBoardScreen extends Page {
 			bukaMurid(soul, row.getIntOr("eid", -1), (row.getIntOr("f", 0) & F_JAUH) != 0, sub);
 		} else {
 			bukaMurid(soul, -1, true, sub);
-		}
-	}
-
-	/** {@link #bukaMurid(String, int, boolean, String)} for a disciple known only by name (the Tangga records). */
-	public static void bukaMuridNama(String nama, String sub) {
-		CompoundTag row = baris(r -> r.read("n", ComponentSerialization.CODEC).map(c -> c.getString().equals(nama)).orElse(false));
-		if (row != null) {
-			bukaMurid(row.getStringOr("soul", ""), row.getIntOr("eid", -1), (row.getIntOr("f", 0) & F_JAUH) != 0, sub);
-		} else {
-			HubNav.buka(Tujuan.of(HubNav.MURID, Urutan.ID_MURID).sub(sub));
 		}
 	}
 

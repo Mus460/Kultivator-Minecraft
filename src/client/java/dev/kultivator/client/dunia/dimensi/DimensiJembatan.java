@@ -96,7 +96,7 @@ public final class DimensiJembatan {
 		LayarDialog page = new LayarDialog(isi.entity, lembar(isi), op -> op(isi, op), isi.sea ? "laut_tanpa_batas" : "dunia_bawah");
 		aktif = isi;
 		halaman = page;
-		DiSini.buka(new Konteks(Dialog.LAYAR, isi.entity, null, judul(isi), Glyphs.HUBUNGAN), page, null, Dialog.TAB_BICARA);
+		DiSini.buka(new Konteks(Dialog.LAYAR, isi.entity, judul(isi), Glyphs.HUBUNGAN), page, null, Dialog.TAB_BICARA);
 		UiSound.open();
 	}
 

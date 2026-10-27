@@ -372,7 +372,6 @@ public final class DuelHud implements HudElement, DuelBus.Listener {
 				warnOnce(exception);
 			}
 		}
-		ChallengeOfferToast.draw(g, font, width, height, partial);
 		if (!film) {
 			DuelResultCard.draw(g, font, width, height, partial);
 		}

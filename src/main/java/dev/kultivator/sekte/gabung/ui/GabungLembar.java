@@ -331,6 +331,8 @@ public final class GabungLembar {
 	 *               score), keadaan S, alasan T, x I, z I, sisa_tick L (running), anggota D [ nama T, anda B ]
 	 *               (group missions), anggota_maks I
 	 * tugas     D   tab Tugas: id S, nama T, teks T, pk I, kemajuan I, maks I, selesai B, corak B (corak bonus), x I, z I
+	 * turnamen  C   tab Turnamen (read-only, Sekte › Kegiatan › Arena of a member): hari L (next tournament day), berjalan B,
+	 *               juara T, juara_hari L, terbaik I ({@code TurnamenMurid.lembar})
 	 * </pre>
 	 * Ops: {@code terima:ID}, {@code gabung:ID} (join a group mission within 32 blocks), {@code batal:ID}, {@code tugas:ID}
 	 * (start a duty), {@code tandai:X:Z}.
@@ -342,7 +344,8 @@ public final class GabungLembar {
 		public static final String TAB_PERANG = "perang";
 		public static final String TAB_KELOMPOK = "kelompok";
 		public static final String TAB_TUGAS = "tugas";
-		public static final List<String> TABS = List.of(TAB_PAPAN, TAB_AKTIF, TAB_PERANG, TAB_KELOMPOK, TAB_TUGAS);
+		public static final String TAB_TURNAMEN = "turnamen";
+		public static final List<String> TABS = List.of(TAB_PAPAN, TAB_AKTIF, TAB_PERANG, TAB_KELOMPOK, TAB_TUGAS, TAB_TURNAMEN);
 
 		public static final String MISI_HARI = "misi_hari";
 		public static final String MISI_MAKS = "misi_maks";
@@ -357,6 +360,12 @@ public final class GabungLembar {
 		public static final String TUGAS = "tugas";
 		public static final String SELESAI = "selesai";
 		public static final String CORAK_BONUS = "corak";
+		public static final String TURNAMEN = "turnamen";
+		public static final String HARI_TURNAMEN = "hari";
+		public static final String BERJALAN = "berjalan";
+		public static final String JUARA = "juara";
+		public static final String JUARA_HARI = "juara_hari";
+		public static final String TERBAIK = "terbaik";
 
 		public static final String OP_TERIMA = "terima";
 		public static final String OP_GABUNG = "gabung";

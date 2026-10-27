@@ -11,7 +11,7 @@ import dev.kultivator.client.screen.ui.DaftarPilihan;
 import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
-import dev.kultivator.client.sekte.wilayah.GulirIsi;
+import dev.kultivator.client.screen.ui.GulirIsi;
 import dev.kultivator.data.Dao;
 import dev.kultivator.data.Realm;
 import net.minecraft.ChatFormatting;

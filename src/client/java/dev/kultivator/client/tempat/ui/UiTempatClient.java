@@ -106,6 +106,7 @@ public final class UiTempatClient {
 			DiSini.reset();
 			LembarHub.reset();
 		});
+		net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.END_CLIENT_TICK.register(DiSini::jaga);
 		LembarHub.init();
 		dev.kultivator.client.tempat.ui.layar.SemuaLayar.daftar();
 		UiHub.init();
@@ -120,10 +121,6 @@ public final class UiTempatClient {
 		if (PEMBUAT.put(layar, pembuat) != null) {
 			Kultivator.LOGGER.warn("Tempat screen factory {} registered twice; the last one wins", layar);
 		}
-	}
-
-	public static boolean terdaftar(String layar) {
-		return PEMBUAT.containsKey(layar);
 	}
 
 	/**
@@ -147,14 +144,6 @@ public final class UiTempatClient {
 		return true;
 	}
 
-	/**
-	 * Transition (old hub cards): asks for the read-only view of {@code layar}; the answer opens its home page (or Di Sini
-	 * read-only until the page is registered). {@code bagian} is no longer needed (the home page knows its section).
-	 */
-	public static void lihatDariHub(String layar, int bagian) {
-		kirim(layar, -1, LembarKunci.OP_LIHAT);
-	}
-
 	/** Called when a sheet page leaves: ends the server session of this sheet. */
 	public static void ditutup(LayarTempat layar) {
 		if (sesiAktif(layar.layar(), layar.npcId())) {
@@ -174,13 +163,8 @@ public final class UiTempatClient {
 	 * are not mapped in 43 (43.16.6): they go to Di Sini until their pages are registered.
 	 */
 	public static @Nullable Tujuan rumah(String layar, String tab) {
-		HubPages.Entri e = LembarHub.rumah(layar, tab == null ? "" : tab);
-		if (e == null) {
-			HubPages.Rumah r = HubPages.rumah(layar, tab);
-			return r == null ? null : tujuan(r, tab);
-		}
-		Tujuan t = Tujuan.of(e.bagian(), e.id());
-		return tab == null || tab.isEmpty() ? t : t.sub(tab);
+		HubPages.Rumah r = HubPages.rumah(layar, tab);
+		return r == null ? null : tujuan(r, tab);
 	}
 
 	/** The place of home {@code r} for a sheet on tab {@code tab}: its sub, or the sheet's tab when the home names none. */
@@ -250,12 +234,6 @@ public final class UiTempatClient {
 				peminta.isiHub(page);
 				return;
 			}
-			HubPages.Entri e = LembarHub.rumah(layar, tab);
-			if (e != null) {
-				LembarHub.dari(e).isiHub(page);
-				HubNav.buka(Tujuan.of(e.bagian(), e.id()));
-				return;
-			}
 			HubPages.Rumah r = HubPages.rumah(layar, tab);
 			if (r != null) {
 				LembarHub.dari(r).isiHub(page);
@@ -270,14 +248,6 @@ public final class UiTempatClient {
 			return;
 		}
 		Konteks k = konteks(layar, npcId, page);
-		HubPages.Entri e = LembarHub.rumah(layar, tab);
-		if (e != null) {
-			LembarHub.Halaman rumah = LembarHub.dari(e);
-			rumah.isiKonteks(page, nama(npcId, k.judul()));
-			Tujuan t = Tujuan.of(e.bagian(), e.id());
-			DiSini.buka(k, rumah, t, tab);
-			return;
-		}
 		HubPages.Rumah r = HubPages.rumah(layar, tab);
 		if (r != null) {
 			LembarHub.Halaman rumah = LembarHub.dari(r);
@@ -318,7 +288,7 @@ public final class UiTempatClient {
 			judul = Component.translatable("kultivator.gui43.konteks.judul", tempat, entity.getName());
 		}
 		int glyph = page.glyph();
-		return new Konteks(layar, npcId, null, judul, glyph < 0 ? Glyphs.HALL : glyph);
+		return new Konteks(layar, npcId, judul, glyph < 0 ? Glyphs.HALL : glyph);
 	}
 
 	/** The speaker of a context for the chip "bersama …": the entity's name, else the context title. */

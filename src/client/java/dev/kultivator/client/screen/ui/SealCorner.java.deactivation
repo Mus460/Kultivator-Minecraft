@@ -1,0 +1,61 @@
+package dev.kultivator.client.screen.ui;
+
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+
+/** Retired (audit ulang kit M-1): was KeyHints.SealCorner, no users since Page.helpTopic. */
+public final class KeyHintsSealCornerRetired {
+
+	/**
+	 * A "?" seal for a plain {@code Screen} that has no widget list of its own (audit M5, S11: the world map, the tower
+	 * card, the realm screen, the helm and the Sword Duel screen). The screen places it in {@code init}, draws it last in
+	 * its frame (the tooltip on top) and passes its left clicks and releases first; a click opens Panduan › Ensiklopedia
+	 * on {@code topic} ({@link HubNav#help}).
+	 */
+	public static final class SealCorner {
+
+		private final HelpSeal seal;
+		private boolean held;
+		private long lastFrame = -1L;
+
+		public SealCorner(String topic) {
+			this.seal = new HelpSeal(0.0F, 0.0F, 10, () -> topic);
+		}
+
+		/** Centres the seal on ({@code cx}, {@code cy}). */
+		public void place(float cx, float cy) {
+			seal.moveTo(cx, cy);
+		}
+
+		/** Draws the seal and, while the mouse is over it, its tooltip. Call at the end of the screen's frame. */
+		public void render(GuiGraphicsExtractor g, Font font, int mouseX, int mouseY, int screenWidth, int screenHeight) {
+			long now = net.minecraft.util.Util.getMillis();
+			float seconds = lastFrame < 0L ? 0.0F : Math.min(0.25F, (now - lastFrame) / 1000.0F);
+			lastFrame = now;
+			seal.render(g, font, mouseX, mouseY, seconds);
+			if (seal.contains(mouseX, mouseY)) {
+				SlipTooltip.draw(g, font, seal.tooltipLines(), mouseX, mouseY, screenWidth, screenHeight);
+			}
+		}
+
+		/** A left click: true (and the press starts) when it hit the seal. */
+		public boolean click(double mouseX, double mouseY) {
+			if (!seal.contains(mouseX, mouseY)) {
+				return false;
+			}
+			seal.press();
+			held = true;
+			return true;
+		}
+
+		/** A release: true when the press started on the seal (it opens the topic when still over it). */
+		public boolean release(double mouseX, double mouseY) {
+			if (!held) {
+				return false;
+			}
+			held = false;
+			seal.release(mouseX, mouseY);
+			return true;
+		}
+	}
+}

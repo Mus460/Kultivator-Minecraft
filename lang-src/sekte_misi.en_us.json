@@ -1,7 +1,5 @@
 {
   "item.kultivator.gulungan_laporan": "Report Scroll",
-  "kultivator.hub.card.sekte_misi_cerita": "Story Missions",
-  "kultivator.hub.card.sekte_misi_cerita.tip": "Send disciple teams into the world and read the reports they bring home.",
   "kultivator.sekte.misi.adegan.gemilang": "A Glorious Homecoming",
   "kultivator.sekte.misi.adegan.gemilang.sub": "%s leads the team home in triumph",
   "kultivator.sekte.misi.adegan.pulang": "The Mission Team Returns — %s",
@@ -71,7 +69,6 @@
   "kultivator.sekte.misi.lapor.hasil": "Brought home",
   "kultivator.sekte.misi.lapor.item": "%1$s× %2$s",
   "kultivator.sekte.misi.lapor.judul": "Mission Report: %1$s (tier %2$s)",
-  "kultivator.sekte.misi.lapor.judul_layar": "Report Scroll",
   "kultivator.sekte.misi.lapor.kosong": "Nothing was brought home.",
   "kultivator.sekte.misi.lapor.kutip": "From the memories of %1$s: \"%2$s\"",
   "kultivator.sekte.misi.lapor.lagi": "and %s more items",

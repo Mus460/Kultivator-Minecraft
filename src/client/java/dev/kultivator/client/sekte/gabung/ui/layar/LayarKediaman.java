@@ -14,7 +14,6 @@ import dev.kultivator.client.tempat.ui.kit.Lembar;
 import dev.kultivator.client.tempat.ui.kit.Lukis;
 import dev.kultivator.client.tempat.ui.kit.PanelTempat;
 import dev.kultivator.client.tempat.ui.kit.TabLentera;
-import dev.kultivator.client.tempat.ui.kit.TeksTempat;
 import dev.kultivator.client.tempat.ui.kit.TempatWarna;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import dev.kultivator.sekte.gabung.ui.GabungLembar;
@@ -131,7 +130,7 @@ public final class LayarKediaman extends LayarGabungDasar {
 		int sewa = h.i(Kediaman.SEWA, 0);
 		int bw = (x1 - x0 - 8) / 3;
 		boolean penuh = sisa >= SEWA_HARI * 2 - 1;
-		tombolOp(l, "perpanjang", x0, by, bw, 15, u("kediaman.perpanjang", TeksTempat.angka(sewa)), !penuh && sewa <= lembar.i(LembarKunci.PK, 0),
+		tombolOp(l, "perpanjang", x0, by, bw, 15, u("kediaman.perpanjang", Brush.angka(sewa)), !penuh && sewa <= lembar.i(LembarKunci.PK, 0),
 				penuh ? u("kediaman.sudah_penuh") : u("kediaman.kurang_pk", sewa), Kediaman.OP_PERPANJANG);
 		tombol.gambar(l, "pindah", x0 + bw + 4, by, bw, 15, u("kediaman.pindah"), true, null, () -> gantiTab(Kediaman.TAB_PILIH, true));
 		tombolYakin(l, "lepas", x0 + (bw + 4) * 2, by, bw, 15, u("kediaman.lepas"), true, null, Kediaman.OP_LEPAS);
@@ -287,7 +286,7 @@ public final class LayarKediaman extends LayarGabungDasar {
 			int harga = e.i(LembarKunci.HARGA, 20);
 			boolean free = e.b(Kediaman.GRATIS);
 			boolean bisa = !terisi && (free || harga <= pkPunya);
-			Component label = free ? u("kediaman.kolam.pesan_gratis") : u("kediaman.kolam.pesan", TeksTempat.angka(harga));
+			Component label = free ? u("kediaman.kolam.pesan_gratis") : u("kediaman.kolam.pesan", Brush.angka(harga));
 			tombolOp(lk, "sesi" + i, bx, ry0 + 5, bw, 15, label, bisa, terisi ? u("kediaman.kolam.sudah_terisi") : u("kediaman.kurang_pk", harga),
 					LembarKunci.op(Kediaman.OP_SESI, e.id()));
 		}, null, null);

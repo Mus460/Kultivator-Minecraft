@@ -4,8 +4,6 @@
   "item.kultivator.inti_roh_gunung": "Mountain Spirit Core",
   "item.kultivator.inti_roh_gunung.tooltip": "Use: +%s PK to the hall pool, +%s sect renown",
   "item.kultivator.inti_roh_gunung.source": "Source: Nüwa's five-coloured stones (Huainanzi ch. 6)",
-  "kultivator.hub.card.sekte_kebun_tambang": "Garden & Mine",
-  "kultivator.hub.card.sekte_kebun_tambang.tip": "The spirit herb beds and their gardeners, the Spirit Mine's depth, the miners' shifts and the finds from the mountain's heart.",
   "kultivator.sekte.kebun.adv.panen.title": "The Hundred Medicine Garden",
   "kultivator.sekte.kebun.adv.panen.desc": "Harvest the sect's spirit herb beds for the first time",
   "kultivator.sekte.kebun.adv.tambang.title": "The Mountain's Heart",
@@ -143,6 +141,5 @@
   "kultivator.sekte.kebun.ui.c_kerja.tugas": "on duty",
   "kultivator.sekte.kebun.ui.c_kerja.lain": "working",
   "kultivator.sekte.kebun.ui.c_beruntun": "%s · %s d",
-  "kultivator.sekte.kebun.ui.batal": "Cancel",
-  "kultivator.sekte.kebun.ui.log_baris": "Day %s: %s"
+  "kultivator.sekte.kebun.ui.batal": "Cancel"
 }

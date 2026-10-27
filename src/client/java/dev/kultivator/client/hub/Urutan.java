@@ -3,23 +3,9 @@ package dev.kultivator.client.hub;
 /**
  * The frozen page tree of the Gulungan Utama (DESIGN 43.5): page ids and their order inside each section. Modules register
  * their page with {@code HubPages.daftar(HubNav.SEKTE, Urutan.ID_KAS, Urutan.KAS, KasPage::new)}; the order constants are the
- * page's position in {@link #POHON} times ten (gaps leave room). Ids are unique over the whole tree.
+ * page's position in the tree of 43.5 times ten (gaps leave room). Ids are unique over the whole tree.
  */
 public final class Urutan {
-
-	/** Page ids per section in tree order (index = {@code HubNav} section). Frozen in 43-S; do not reorder. */
-	public static final String[][] POHON = {
-			{"status", "akar_dao", "jalan", "alkimia", "pusaka", "harta"},
-			{"kodeks", "cincin_segel", "kehancuran"},
-			{"daftar", "murid", "jaring"},
-			{"ikhtisar", "anggota", "bangun", "formasi", "kas", "kegiatan", "wilayah", "luar"},
-			{"peta", "alam", "musuh", "duel", "perjalanan", "kota", "dagang"},
-			{"alam_abadi", "purba", "batin", "ciptaan", "lelang", "titah"},
-			{"kitab", "ensiklopedia"},
-			{"tampilan", "film", "suara", "hud", "kontrol"}};
-
-	/** Order of the transition page "Lainnya" (old launcher cards, 43.16.1); always last. */
-	public static final int LAINNYA = 900;
 
 	// [1] Diri
 	public static final String ID_STATUS = "status";
@@ -109,31 +95,6 @@ public final class Urutan {
 	public static final int SUARA = 30;
 	public static final int HUD = 40;
 	public static final int KONTROL = 50;
-
-	/** The section of page {@code id} in the tree, or {@code HubNav.DIRI} when it is not in the tree. */
-	public static int bagianDari(String id) {
-		for (int s = 0; s < POHON.length; s++) {
-			for (String page : POHON[s]) {
-				if (page.equals(id)) {
-					return s;
-				}
-			}
-		}
-		return HubNav.DIRI;
-	}
-
-	/** The tree order of page {@code id} in section {@code bagian} ({@code 10 * (index + 1)}), or 500 when not in the tree. */
-	public static int urutan(int bagian, String id) {
-		if (bagian >= 0 && bagian < POHON.length) {
-			String[] pages = POHON[bagian];
-			for (int i = 0; i < pages.length; i++) {
-				if (pages[i].equals(id)) {
-					return 10 * (i + 1);
-				}
-			}
-		}
-		return 500;
-	}
 
 	private Urutan() {
 	}

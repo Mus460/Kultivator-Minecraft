@@ -83,10 +83,6 @@ public final class CodexGrid {
 		return hovered;
 	}
 
-	public int cardSize() {
-		return size;
-	}
-
 	private void rebuild() {
 		cells.clear();
 		int usable = Math.max(10, w - 5);

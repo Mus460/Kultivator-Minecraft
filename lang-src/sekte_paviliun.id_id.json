@@ -9,8 +9,6 @@
   "advancement.kultivator.sekte.paviliun_upacara.description": "Pimpin upacara di Altar Leluhur: dupa harian atau Qingming.",
   "kultivator.blueprint.comp.sx_paviliun_altar": "Altar Leluhur",
   "kultivator.blueprint.comp.sx_paviliun_makam": "Pemakaman Sekte",
-  "kultivator.hub.card.sekte_paviliun": "Paviliun & Makam",
-  "kultivator.hub.card.sekte_paviliun.tip": "Rak Kitab tempat murid belajar sendiri, makam murid yang gugur, Kitab Silsilah dan Altar Leluhur.",
   "kultivator.sekte.paviliun.no_hall": "Kamu belum punya aula sekte.",
   "kultivator.sekte.paviliun.someone": "seseorang",
   "kultivator.sekte.paviliun.status": "Paviliun: %s kitab, %s membaca · %s makam · berkah +%s%%",

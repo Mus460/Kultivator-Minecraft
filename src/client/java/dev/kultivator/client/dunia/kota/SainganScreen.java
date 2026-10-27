@@ -3,6 +3,7 @@ package dev.kultivator.client.dunia.kota;
 import dev.kultivator.client.hub.HubNav;
 import dev.kultivator.client.hub.Tujuan;
 import dev.kultivator.client.hub.Urutan;
+import dev.kultivator.client.screen.ui.Bilah;
 import dev.kultivator.client.screen.ui.DaftarGulir;
 import dev.kultivator.client.screen.ui.KeadaanKosong;
 import dev.kultivator.client.screen.ui.Lukis;
@@ -142,8 +143,7 @@ public final class SainganScreen {
 		int barW = Math.min(90, room / 3);
 		int barY = top + 15;
 		int barColor = grudge >= 70 ? Palette.DANGER : grudge >= 35 ? Palette.GOLD_DARK : Palette.JADE_DARK;
-		l.g.fill(left + 9, barY, left + 9 + barW, barY + 3, Palette.argb(0x50, Palette.INK_FAINT));
-		l.g.fill(left + 9, barY, left + 9 + barW * grudge / 100, barY + 3, barColor);
+		Bilah.gambar(l, left + 9, barY - 1, left + 9 + barW, grudge / 100.0F, barColor, null);
 		Component grudgeText = Component.translatable(K + "grudge", grudge);
 		int gx = left + 13 + barW;
 		l.teks(grudgeText, gx, top + 12, l.font.width(grudgeText) + 1, barColor);

@@ -1,21 +1,21 @@
 package dev.kultivator.client.hall;
 
-import com.mojang.blaze3d.platform.InputConstants;
 import dev.kultivator.alchemy.AlchemyComponents;
 import dev.kultivator.alchemy.PillQuality;
-import dev.kultivator.client.hub.DiSini;
 import dev.kultivator.client.hub.HubNav;
 import dev.kultivator.client.hub.HubPages;
 import dev.kultivator.client.hub.LembarHub;
 import dev.kultivator.client.hub.Tujuan;
 import dev.kultivator.client.hub.Urutan;
 import dev.kultivator.client.screen.Page;
+import dev.kultivator.client.screen.PageKomposit;
 import dev.kultivator.client.screen.ui.Bilah;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.client.screen.ui.KeadaanKosong;
 import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
+import dev.kultivator.client.screen.ui.PemilihOrang;
 import dev.kultivator.client.screen.ui.TabBar;
 import dev.kultivator.client.screen.ui.TalismanButton;
 import dev.kultivator.client.screen.ui.UiSound;
@@ -23,6 +23,7 @@ import dev.kultivator.client.sekte.gabung.GabungClient;
 import dev.kultivator.client.sekte.mandiri.MandiriClient;
 import dev.kultivator.client.sekte.paviliun.PaviliunClient;
 import dev.kultivator.client.sekte.paviliun.PaviliunScreen;
+import dev.kultivator.client.screen.ui.GulirIsi;
 import dev.kultivator.client.tempat.ui.kit.LayarTempatDasar;
 import dev.kultivator.data.TechniqueRegistry;
 import dev.kultivator.data.TechniqueSpec;
@@ -75,7 +76,7 @@ import java.util.Set;
  * world context of the same sheet (the ledger counter, the Paviliun Jasa steward) opens live under Di Sini. Data is asked
  * only while shown (43.0.12): the hall details through {@link HallClient#minta} (refreshed every 4 s while Sekte shows).
  */
-public final class TreasuryPage extends Page {
+public final class TreasuryPage extends PageKomposit {
 
 	public static final String SUB_KAS = "kas";
 	public static final String SUB_TOKO = "toko_pk";
@@ -85,6 +86,8 @@ public final class TreasuryPage extends Page {
 	private static final String V_KANTOR = "kantor";
 	private static final String V_POLITIK = "politik";
 	private static final String V_MANDIRI = "mandiri";
+	/** {@link #tujuDunia}: the ledger came from the world (desk, MENTERI); the view follows the sheet's own tab. */
+	private static final String V_BUKU = "buku";
 	private static final String M = "kultivator.gui43.m08.";
 	private static final String CHIP = "kas:chip";
 	private static final int CARD_W = 24;
@@ -92,14 +95,14 @@ public final class TreasuryPage extends Page {
 	private static final int ROW_H = 16;
 	private static final int BTN_H = 14;
 	private static final int CHIP_H = 14;
-	private static final float LANGKAH = 18.0F;
 	private static final String L_MANDIRI = "kultivator.sekte.mandiri.cerita.";
 
 	/** One offerable stack (from the last details). */
 	private record Offer(int slot, ItemStack stack, double unit) {
 	}
 
-	private final LembarHub.Halaman buku = lembar(BukuKas.LAYAR, Set.of(BukuKas.TAB_HARI_INI, BukuKas.TAB_MINGGU, BukuKas.TAB_SUMBER, BukuKas.TAB_KAFILAH));
+	private static final Set<String> TAB_BUKU = Set.of(BukuKas.TAB_HARI_INI, BukuKas.TAB_MINGGU, BukuKas.TAB_SUMBER, BukuKas.TAB_KAFILAH);
+	private final LembarHub.Halaman buku = lembar(BukuKas.LAYAR, TAB_BUKU);
 	private static final Set<String> TAB_JASA = Set.of(GabungLembar.Paviliun.TAB_TEKNIK, GabungLembar.Paviliun.TAB_WARISAN,
 			GabungLembar.Paviliun.TAB_PIL, GabungLembar.Paviliun.TAB_PUSAKA, GabungLembar.Paviliun.TAB_BAHAN, GabungLembar.Paviliun.TAB_KUOTA,
 			GabungLembar.Paviliun.TAB_PESANAN, GabungLembar.Paviliun.TAB_CERAMAH);
@@ -112,6 +115,14 @@ public final class TreasuryPage extends Page {
 	private final PaviliunScreen rak = new PaviliunScreen(PaviliunPayloads.PAGE_RAK);
 	private final PaviliunScreen makam = new PaviliunScreen(PaviliunPayloads.PAGE_MAKAM);
 	private final TabBar chips = new TabBar();
+	/** Toko PK Aulaku: the receiving disciple, picked from a pop-up list (G35, as Balai Tetua / Tugas). */
+	private final PemilihOrang pemilihUntuk = new PemilihOrang(0).onBuka(o -> {
+		targetIndex = Integer.parseInt(o.id());
+		tutupPemilih();
+	});
+	private Component labelKitab = Component.empty();
+	/** Toko PK Aulaku: the jade slip, a cycling talisman (click next, right click / ← back: G08). */
+	private final TalismanButton kitab = siklusKitab();
 	private final List<Offer> offers = new ArrayList<>();
 
 	private String sub = SUB_KAS;
@@ -126,10 +137,19 @@ public final class TreasuryPage extends Page {
 	private int anakW;
 	private int anakH;
 	private long seenInfo = -1L;
-	private float gulir;
-	private float isiTinggi;
+	private final GulirIsi gulir = new GulirIsi();
 	private int targetIndex;
 	private int bookIndex;
+
+	private TalismanButton siklusKitab() {
+		TalismanButton b = new TalismanButton(0, 0, TalismanButton.MIN_W, BTN_H, () -> labelKitab).siklus(() -> bookIndex++, () -> bookIndex--);
+		b.enabledWhen(() -> info().getListOrEmpty("books").size() > 1);
+		return b;
+	}
+
+	private void tutupPemilih() {
+		pemilihUntuk.tutup();
+	}
 
 	/**
 	 * Homes of the NPC-sect sheets mounted here (43.12.4, P5): the Paviliun Jasa NPC lands on Toko PK (Perguruanku) and the
@@ -138,6 +158,13 @@ public final class TreasuryPage extends Page {
 	public static void daftarRumah() {
 		HubPages.daftarRumah(GabungLembar.Paviliun.LAYAR, TAB_JASA, HubNav.SEKTE, Urutan.ID_KAS, SUB_TOKO, () -> tujuDunia = SUB_TOKO);
 		HubPages.daftarRumah(GabungLembar.Politik.LAYAR, TAB_POLITIK, HubNav.SEKTE, Urutan.ID_KAS, SUB_KAS, () -> tujuDunia = V_POLITIK);
+		// the ledger opened in the world (desk, Jasa MENTERI) lands here, not as a second ledger under Di Sini (G38)
+		HubPages.daftarRumah(BukuKas.LAYAR, TAB_BUKU, HubNav.SEKTE, Urutan.ID_KAS, SUB_KAS, () -> tujuDunia = V_BUKU);
+	}
+
+	/** The tab the mounted ledger shows now ("" while it has no sheet). */
+	private String tabBuku() {
+		return buku.isi() instanceof LayarTempatDasar l ? l.tabSekarang() : "";
 	}
 
 	/** Applies {@link #tujuDunia}; true when it changed what the sub shows. */
@@ -150,6 +177,12 @@ public final class TreasuryPage extends Page {
 		}
 		if (SUB_TOKO.equals(t)) {
 			sumber = 1;
+			return true;
+		}
+		if (V_BUKU.equals(t)) {
+			if (bukuView(tabBuku())) {
+				view = tabBuku();
+			}
 			return true;
 		}
 		return false;
@@ -240,13 +273,14 @@ public final class TreasuryPage extends Page {
 	}
 
 	@Override
-	public void showSub(String id) {
+	public void showSub(String diminta) {
+		String id = V_BUKU.equals(tujuDunia) && BukuKas.TAB_KAFILAH.equals(tabBuku()) ? SUB_KAFILAH : diminta;
 		boolean dituju = ambilTuju();
 		if (id == null || id.equals(sub) && !dituju || subs().stream().noneMatch(s -> s.id().equals(id))) {
 			return;
 		}
 		sub = id;
-		gulir = 0.0F;
+		gulir.atas();
 		pasangAnak();
 	}
 
@@ -257,29 +291,9 @@ public final class TreasuryPage extends Page {
 		}
 		return new Sumber(List.of(Component.translatable(M + "sumber.aulaku"), Component.translatable(M + "sumber.perguruanku")), () -> sumber, i -> {
 			sumber = i;
-			gulir = 0.0F;
+			gulir.atas();
 			pasangAnak();
 		});
-	}
-
-	@Override
-	public long uang() {
-		return anak != null ? anak.uang() : -1L;
-	}
-
-	@Override
-	public boolean rinci() {
-		return anak != null && anak.rinci();
-	}
-
-	@Override
-	public Palette.Gaya gaya() {
-		return anak != null ? anak.gaya() : Palette.Gaya.KERTAS;
-	}
-
-	@Override
-	public boolean lebar() {
-		return anak != null && anak.lebar();
 	}
 
 	// ================================================================== the views of sub kas
@@ -335,7 +349,7 @@ public final class TreasuryPage extends Page {
 	private void pilihChip(String id) {
 		if (SUB_KAS.equals(sub)) {
 			view = id;
-			gulir = 0.0F;
+			gulir.atas();
 			pasangAnak();
 			mintaMandiri();
 		} else {
@@ -348,6 +362,11 @@ public final class TreasuryPage extends Page {
 	}
 
 	// ================================================================== the child page of the sub / view
+
+	@Override
+	protected @Nullable Page anak() {
+		return anak;
+	}
 
 	private @Nullable Page anakSekarang() {
 		return switch (sub) {
@@ -372,7 +391,7 @@ public final class TreasuryPage extends Page {
 			return;
 		}
 		if (anak != null && terlihat) {
-			sembunyikan(anak);
+			anak.onHide(); // LembarHub.Halaman.onHide keeps a live Di Sini session (43.8.1.4)
 		}
 		anak = baru;
 		diAnak = false;
@@ -385,13 +404,6 @@ public final class TreasuryPage extends Page {
 			if (terlihat) {
 				anak.onShow(null);
 			}
-		}
-	}
-
-	/** A sheet that is the live Di Sini context keeps its session when this page leaves (43.8.1.4). */
-	private static void sembunyikan(Page p) {
-		if (DiSini.halaman() != p) {
-			p.onHide();
 		}
 	}
 
@@ -441,14 +453,16 @@ public final class TreasuryPage extends Page {
 			anak.onShow(null);
 		}
 		mintaMandiri();
-		super.onShow(fokus);
+		if (fokus != null) {
+			fokus(fokus);
+		}
 	}
 
 	@Override
 	public void onHide() {
 		terlihat = false;
 		if (anak != null) {
-			sembunyikan(anak);
+			anak.onHide(); // LembarHub.Halaman.onHide keeps a live Di Sini session (43.8.1.4)
 		}
 	}
 
@@ -469,18 +483,6 @@ public final class TreasuryPage extends Page {
 		if (anak != null) {
 			anak.tick();
 		}
-	}
-
-	@Override
-	public void onData() {
-		if (anak != null) {
-			anak.onData();
-		}
-	}
-
-	@Override
-	public boolean needsRebuild() {
-		return anak != null && anak.needsRebuild();
 	}
 
 	/** The offerable stacks of the last details. */
@@ -537,6 +539,22 @@ public final class TreasuryPage extends Page {
 		} else {
 			gulirIsi(l, top, bottom, this::kantor);
 		}
+		if (SUB_TOKO.equals(sub)) {
+			pemilihUntuk.gambarSembul(l, "kas:pilih_untuk", Component.translatable("kultivator.hall.ui.for_disciple.judul"), orangUntuk());
+		} else {
+			tutupPemilih();
+		}
+	}
+
+	/** The disciples of {@link #targets()} for the pop-up (id = index in that list). */
+	private static List<PemilihOrang.Orang> orangUntuk() {
+		List<CompoundTag> list = targets();
+		List<PemilihOrang.Orang> out = new ArrayList<>(list.size());
+		for (int i = 0; i < list.size(); i++) {
+			out.add(PemilihOrang.Orang.of(String.valueOf(i), list.get(i).read("name", ComponentSerialization.CODEC)
+					.orElse(Component.translatable("entity.kultivator.disciple")), Palette.GOLD_DARK));
+		}
+		return out;
 	}
 
 	/** A column painter: draws from y between x0 and x1, returns the y under it. */
@@ -547,19 +565,8 @@ public final class TreasuryPage extends Page {
 
 	/** One scrolled column in the body (stacked headings, 43.0.4) with the jade bead of the scroll. */
 	private void gulirIsi(Lukis l, int top, int bottom, Kolom kolom) {
-		int tinggi = bottom - top;
-		float maks = Math.max(0.0F, isiTinggi - tinggi);
-		gulir = Math.max(0.0F, Math.min(maks, gulir));
-		int atas = top + 2 - Math.round(gulir);
-		l.klip(x, top, x + w, bottom);
-		int akhir = kolom.lukis(l, x + 2, atas, x + w - (maks > 0.0F ? 6 : 2));
-		l.lepasKlip();
-		isiTinggi = akhir - atas + 4;
-		if (maks > 0.0F) {
-			float bead = top + 3.0F + (tinggi - 6.0F) * (gulir / maks);
-			l.g.fill(x + w - 2, top, x + w - 1, bottom, Palette.CORD);
-			Brush.disc(l.g, x + w - 1.5F, bead, 2.0F, Palette.JADE);
-		}
+		int atas = gulir.mulai(l, x, top, x + w - 5, bottom) + 2;
+		gulir.selesai(l, kolom.lukis(l, x + 2, atas, x + w - 7) + 2);
 	}
 
 	/** The pool line: the hall's PK and the week's in/out (S28). */
@@ -708,15 +715,18 @@ public final class TreasuryPage extends Page {
 			Component untuk = Component.translatable("kultivator.hall.ui.for_disciple", target == null ? Component.translatable("kultivator.hall.ui.nobody")
 					: target.read("name", ComponentSerialization.CODEC).orElse(Component.translatable("entity.kultivator.disciple")));
 			TalismanButton.gambar(l, "kas:untuk", x0, yy, w0, BTN_H, untuk, targets().size() > 1, Component.translatable("kultivator.hall.ui.for_disciple.tip"),
-					() -> targetIndex++);
+					pemilihUntuk::bukaSembul);
 			if (l.di(x0, yy, x1, yy + BTN_H)) {
 				l.tip(Component.translatable("kultivator.hall.ui.for_disciple.tip"));
 			}
 			yy += BTN_H + 2;
 			TechniqueSpec book = book();
-			Component kitab = Component.translatable("kultivator.hall.ui.for_book", book == null ? Component.literal("-") : book.displayName());
-			TalismanButton.gambar(l, "kas:kitab", x0, yy, w0, BTN_H, kitab, info.getListOrEmpty("books").size() > 1,
-					Component.translatable("kultivator.hall.ui.for_book.tip"), () -> bookIndex++);
+			labelKitab = Component.translatable("kultivator.hall.ui.for_book", book == null ? Component.literal("-") : book.displayName());
+			kitab.x = x0;
+			kitab.y = yy;
+			kitab.w = Math.max(TalismanButton.MIN_W, w0);
+			kitab.h = BTN_H;
+			l.widget("kas:kitab", kitab);
 			if (l.di(x0, yy, x1, yy + BTN_H)) {
 				l.tip(Component.translatable("kultivator.hall.ui.for_book.tip"));
 			}
@@ -930,7 +940,7 @@ public final class TreasuryPage extends Page {
 
 	@Override
 	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-		if (super.mouseClicked(event, doubleClick)) {
+		if (fokusRing.klik(event.x(), event.y(), event.button())) {
 			diAnak = false;
 			return true;
 		}
@@ -944,12 +954,12 @@ public final class TreasuryPage extends Page {
 	@Override
 	public boolean mouseReleased(MouseButtonEvent event) {
 		boolean a = anak != null && anak.mouseReleased(event);
-		return super.mouseReleased(event) || a;
+		return fokusRing.lepas(event.x(), event.y()) || a;
 	}
 
 	@Override
 	public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
-		return anak != null && anak.mouseDragged(event, dx, dy) || super.mouseDragged(event, dx, dy);
+		return anak != null && anak.mouseDragged(event, dx, dy) || fokusRing.seret(event.x(), event.y(), dx);
 	}
 
 	@Override
@@ -957,50 +967,25 @@ public final class TreasuryPage extends Page {
 		if (anak != null) {
 			return anak.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
 		}
-		if (super.mouseScrolled(mouseX, mouseY, scrollX, scrollY)) {
+		if (fokusRing.gulir(mouseX, mouseY, scrollY)) {
 			return true;
 		}
-		if (!inside(mouseX, mouseY) || mouseY < bodyY() || isiTinggi <= y + h - bodyY()) {
-			return false;
-		}
-		gulir -= (float) scrollY * LANGKAH;
-		return true;
+		return gulir.roda(mouseX, mouseY, scrollY);
 	}
 
 	@Override
 	public boolean keyPressed(KeyEvent event) {
 		if (anak != null && (diAnak || anak.mauTombol())) {
-			return anak.keyPressed(event) || super.keyPressed(event);
+			return anak.keyPressed(event) || fokusRing.tombol(event);
 		}
-		if (super.keyPressed(event)) {
+		if (fokusRing.tombol(event)) {
 			return true;
 		}
 		if (anak != null) {
 			return anak.keyPressed(event);
 		}
-		int tinggi = y + h - bodyY();
-		if (isiTinggi <= tinggi) {
-			return false;
-		}
-		// 43.4.2: ↑↓ PgUp PgDn Home End move the stacked column (gulirIsi clamps)
-		float halaman = Math.max(LANGKAH, tinggi - LANGKAH);
-		switch (event.key()) {
-			case InputConstants.KEY_DOWN -> gulir += LANGKAH;
-			case InputConstants.KEY_UP -> gulir -= LANGKAH;
-			case InputConstants.KEY_PAGEDOWN -> gulir += halaman;
-			case InputConstants.KEY_PAGEUP -> gulir -= halaman;
-			case InputConstants.KEY_HOME -> gulir = 0.0F;
-			case InputConstants.KEY_END -> gulir = isiTinggi;
-			default -> {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	@Override
-	public boolean keyReleased(KeyEvent event) {
-		return anak != null && anak.keyReleased(event);
+		// 43.4.2: ↑↓ PgUp PgDn Home End move the stacked column
+		return gulir.tombol(event);
 	}
 
 	@Override
@@ -1008,27 +993,22 @@ public final class TreasuryPage extends Page {
 		if (anak != null && (diAnak || anak.mauTombol())) {
 			return anak.charTyped(event);
 		}
-		return super.charTyped(event);
+		return fokusRing.ketik(event);
 	}
 
 	@Override
 	public boolean mauTombol() {
-		return anak != null && anak.mauTombol() || super.mauTombol();
+		return anak != null && anak.mauTombol() || fokusRing.mauTombol();
 	}
 
 	@Override
 	public boolean modal() {
-		return anak != null && anak.modal() || super.modal();
+		return anak != null && anak.modal() || fokusRing.segel().terbuka();
 	}
 
 	@Override
 	public boolean mundur() {
-		return anak != null && anak.mundur();
-	}
-
-	@Override
-	public boolean angka(int n) {
-		return anak != null && anak.angka(n);
+		return pemilihUntuk.tutup() || super.mundur();
 	}
 
 	/**

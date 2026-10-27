@@ -156,8 +156,6 @@
   "kultivator.sekte.tetua.yes": "ya",
   "kultivator.sekte.tetua.no": "belum",
   "kultivator.sekte.tetua.none": "tidak ada",
-  "kultivator.hub.card.sekte_tetua_balai": "Balai Tetua",
-  "kultivator.hub.card.sekte_tetua_balai.tip": "Angkat tetua untuk enam jabatan, baca laporan pagi, dan serahkan takhta kepada pewarismu.",
   "advancement.kultivator.sekte.tetua_jabatan.title": "Balai Tetua",
   "advancement.kultivator.sekte.tetua_jabatan.description": "Angkat seorang murid ke salah satu jabatan tetua.",
   "advancement.kultivator.sekte.tetua_penerus.title": "Jubah dan Mangkuk",

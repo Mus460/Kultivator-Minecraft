@@ -5,6 +5,7 @@ import dev.kultivator.client.epic.SekteScenes;
 import dev.kultivator.client.epic.sky.SkyDirector;
 import dev.kultivator.client.epic.sound.MusicCue;
 import dev.kultivator.client.fx.qi.Qi;
+import dev.kultivator.client.hall.HallClient;
 import dev.kultivator.client.hub.HubNav;
 import dev.kultivator.client.hub.Tujuan;
 import dev.kultivator.client.hub.Urutan;
@@ -61,6 +62,8 @@ public final class KebunClient {
 		scenes();
 		// Sekte › Wilayah (DESIGN 43.5): Pertahanan, Desa & Pakta, Cabang, Kebun & Tambang, Langit.
 		WilayahPage.daftar();
+		// the board's log in the one chronicle of Sekte › Ikhtisar › Catatan (43.11 G37)
+		HallClient.sumberCatatan("kebun", net.minecraft.network.chat.Component.translatable("kultivator.gui43.m10.kebun.catatan"), KebunScreen::entri);
 	}
 
 	/** A button of the board (the server checks the owner and everything else). */

@@ -167,13 +167,13 @@ public final class TitahScreen extends Page {
 		TalismanButton reset = new TalismanButton(x, by, LEFT_W, BUTTON_H, () -> Component.translatable(K + "reset"));
 		reset.onPress(() -> {
 			TitahClient.reset(current);
-			EpicSettings.setTitahFilm(current, EpicSettings.TitahFilm.PENUH);
 		});
 		reset.tooltip(() -> List.of(Component.translatable(K + "reset.tip").withStyle(ChatFormatting.GRAY)));
 		add(reset);
 		by += BUTTON_H + 2;
 		TalismanButton warning = new TalismanButton(x, by, LEFT_W, BUTTON_H, () -> Component.translatable(K + "warning"));
-		warning.onPress(() -> HubNav.openSettings(HubNav.GROUP_TAMPILAN));
+		// the photosensitivity text again, over Kamera & Film where the impact-frame row lives
+		warning.onPress(dev.kultivator.client.screen.SettingsPage::peringatanDampak);
 		warning.tooltip(() -> List.of(Component.translatable(K + "warning"), Component.translatable(K + "warning.tip").withStyle(ChatFormatting.GRAY)));
 		add(warning);
 
@@ -188,27 +188,27 @@ public final class TitahScreen extends Page {
 				value -> Component.translatable(KT + "t", Math.round(value), scale(Math.round(value))),
 				index -> TitahClient.set(current, TitahClient.FIELD_T, TitahClient.T_STEPS[index]))
 				.limit(() -> TitahClient.tMaxIndex(current)));
-		tSlider.active = open;
+		tSlider.enabledWhen(() -> open);
 		tSlider.tooltip(() -> tierTooltip(current));
 		ry += ROW;
 		kSlider = add(new JadeSlider(rx, ry, rw, 16, TitahClient.K_STEPS, TitahClient.nearest(TitahClient.K_STEPS, decree.k),
 				value -> Component.translatable(K + "k", times(value)),
 				index -> TitahClient.set(current, TitahClient.FIELD_K, TitahClient.K_STEPS[index]))
 				.limit(() -> TitahClient.kMaxIndex(current)));
-		kSlider.active = open;
+		kSlider.enabledWhen(() -> open);
 		kSlider.tooltip(() -> List.of(kSlider.message(), Component.translatable(K + "k.tip").withStyle(ChatFormatting.GRAY),
 				Component.translatable(K + "k.limit", times(TitahClient.K_STEPS[TitahClient.kMaxIndex(current)])).withStyle(ChatFormatting.GRAY)));
 		ry += ROW;
 		dSlider = add(new JadeSlider(rx, ry, rw, 16, TitahClient.D_STEPS, TitahClient.nearest(TitahClient.D_STEPS, decree.d),
 				value -> Component.translatable(K + "d", Math.round(value * 100.0F)),
 				index -> TitahClient.set(current, TitahClient.FIELD_D, TitahClient.D_STEPS[index])));
-		dSlider.active = open;
+		dSlider.enabledWhen(() -> open);
 		dSlider.tooltip(() -> List.of(dSlider.message(), Component.translatable(K + "d.tip").withStyle(ChatFormatting.GRAY)));
 		ry += ROW;
 		vSlider = add(new JadeSlider(rx, ry, rw, 16, TitahClient.V_STEPS, TitahClient.nearest(TitahClient.V_STEPS, decree.v),
 				value -> Component.translatable(K + "v", times(value)),
 				index -> TitahClient.set(current, TitahClient.FIELD_V, TitahClient.V_STEPS[index])));
-		vSlider.active = open;
+		vSlider.enabledWhen(() -> open);
 		vSlider.tooltip(() -> List.of(vSlider.message(), Component.translatable(K + "v.tip").withStyle(ChatFormatting.GRAY)));
 		ry += ROW + 1;
 		if (TitahClient.kehancuranOn()) {

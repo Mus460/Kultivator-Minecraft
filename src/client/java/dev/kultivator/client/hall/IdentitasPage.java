@@ -7,6 +7,7 @@ import dev.kultivator.client.screen.ui.InkField;
 import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.TalismanButton;
+import dev.kultivator.client.screen.ui.GulirIsi;
 import dev.kultivator.client.sekte.mandiri.MandiriClient;
 import dev.kultivator.client.sekte.seragam.LambangPanel;
 import dev.kultivator.client.sekte.seragam.SeragamClient;
@@ -42,7 +43,7 @@ public class IdentitasPage extends Page {
 	private static final int BARIS = 10;
 	private static final long ULANG_MS = 5000L;
 
-	private final GulirKolom kolom = new GulirKolom();
+	private final GulirIsi kolom = new GulirIsi();
 	private final LambangPanel lambang = new LambangPanel();
 	private final InkField nama = new InkField(0, 0, 80, 14, 24, this::ganti);
 	private long mintaPapan = Long.MIN_VALUE / 2;
@@ -114,8 +115,8 @@ public class IdentitasPage extends Page {
 
 	@Override
 	protected void lukis(Lukis l) {
-		int cy = kolom.mulai(l, x, y, x + w, y + h);
-		int x1 = x + kolom.lebar();
+		int cy = kolom.mulai(l, x, y, x + w - 5, y + h);
+		int x1 = x + w - 5;
 		cy = namaAula(l, x, cy, x1);
 		cy += 4;
 		if (lambang.siap()) {
@@ -294,9 +295,6 @@ public class IdentitasPage extends Page {
 
 	@Override
 	public boolean keyPressed(KeyEvent event) {
-		if (!mauTombol() && kolom.tombol(event.key())) {
-			return true;
-		}
-		return super.keyPressed(event);
+		return super.keyPressed(event) || !mauTombol() && kolom.tombol(event);
 	}
 }

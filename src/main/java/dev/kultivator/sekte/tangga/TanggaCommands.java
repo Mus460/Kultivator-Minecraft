@@ -209,6 +209,11 @@ final class TanggaCommands {
 			}
 			CompoundTag row = new CompoundTag();
 			row.putString("name", disciple.getDisplayName().getString());
+			// R18: the click opens this very disciple (same reach rule as the Mandiri board's eid)
+			row.putString("soul", disciple.soulId().toString());
+			if (disciple.level() == player.level() && disciple.distanceToSqr(player) <= Disciples.VIEW_RANGE * Disciples.VIEW_RANGE) {
+				row.putInt("eid", disciple.getId());
+			}
 			CompoundTag mine = disciple.data().extra().getCompound(SekteIds.EXTRA_G).orElse(null);
 			if (mine == null || !mine.contains(Tangga.K_STEPS)) {
 				row.putInt("steps", -1);

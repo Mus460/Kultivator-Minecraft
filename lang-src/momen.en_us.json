@@ -17,6 +17,8 @@
   "kultivator.momen.setting.slowmo.tip": "Only the Epic Moment effects slow down briefly (at most 1.5 s). The world, mobs, vanilla particles and game time never slow down.",
   "kultivator.momen.setting.geometry": "Giant geometry",
   "kultivator.momen.setting.geometry.tip": "Cloud vortices, lightning, light pillars, gates and giant figures are drawn as shapes. Off: everything uses lighter particles.",
+  "kultivator.momen.setting.pack": "Soft shapes under shader packs",
+  "kultivator.momen.setting.pack.tip": "While a shader pack is active, giant geometry is still drawn as soft shapes. Off: replaced by particles.",
   "kultivator.momen.setting.sky": "Sky grades",
   "kultivator.momen.setting.sky.tip": "The sky, fog, clouds and stars change colour during big moments, plus a sky layer on the screen. Weather and time never change.",
   "kultivator.momen.setting.vfx": "Moment VFX scale: %s",

@@ -5,6 +5,7 @@ import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
+import dev.kultivator.client.screen.ui.GulirIsi;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.KeyEvent;
@@ -30,8 +31,8 @@ public class AulaPage extends Page {
 
 	private static final int BARIS = 10;
 
-	private final GulirKolom kiri = new GulirKolom();
-	private final GulirKolom kanan = new GulirKolom();
+	private final GulirIsi kiri = new GulirIsi();
+	private final GulirIsi kanan = new GulirIsi();
 
 	@Override
 	public Component title() {
@@ -71,8 +72,8 @@ public class AulaPage extends Page {
 	protected void lukis(Lukis l) {
 		CompoundTag info = HallClient.info();
 		if (tata() == Tata.SEMPIT) {
-			int cy = kiri.mulai(l, x, y, x + w, y + h);
-			int x1 = x + kiri.lebar();
+			int cy = kiri.mulai(l, x, y, x + w - 5, y + h);
+			int x1 = x + w - 5;
 			cy = aula(l, info, x, cy, x1);
 			cy = bangunan(l, info, x, cy + 4, x1);
 			cy = jadwal(l, info, x, cy + 4, x1);
@@ -81,14 +82,14 @@ public class AulaPage extends Page {
 			return;
 		}
 		int lw = Math.max(140, Math.min(200, Math.round(w * 0.44F)));
-		int cy = kiri.mulai(l, x, y, x + lw - 4, y + h);
+		int cy = kiri.mulai(l, x, y, x + lw - 8, y + h);
 		cy = aula(l, info, x, cy, x + lw - 8);
 		cy = saudara(l, info, x, cy + 4, x + lw - 8);
 		kiri.selesai(l, cy);
 		int px0 = x + lw;
 		l.sumur(px0, y, x + w, y + h);
-		int ry = kanan.mulai(l, px0 + 4, y + 2, x + w - 2, y + h - 2);
-		int rx1 = px0 + 4 + kanan.lebar();
+		int ry = kanan.mulai(l, px0 + 4, y + 2, x + w - 7, y + h - 2);
+		int rx1 = x + w - 7;
 		ry = bangunan(l, info, px0 + 4, ry, rx1);
 		ry = jadwal(l, info, px0 + 4, ry + 4, rx1);
 		kanan.selesai(l, ry);
@@ -326,11 +327,14 @@ public class AulaPage extends Page {
 
 	@Override
 	public boolean keyPressed(KeyEvent event) {
-		// both columns page together (each stops at its own end), so the keyboard reaches the left column too
-		boolean dipakai = kiri.tombol(event.key());
-		if (tata() != Tata.SEMPIT) {
-			dipakai = kanan.tombol(event.key()) || dipakai;
+		if (super.keyPressed(event)) {
+			return true;
 		}
-		return dipakai || super.keyPressed(event);
+		// both columns page together (each stops at its own end), so the keyboard reaches the left column too
+		boolean dipakai = kiri.tombol(event);
+		if (tata() != Tata.SEMPIT) {
+			dipakai = kanan.tombol(event) || dipakai;
+		}
+		return dipakai;
 	}
 }

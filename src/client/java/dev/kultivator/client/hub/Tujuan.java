@@ -26,11 +26,6 @@ public record Tujuan(int bagian, String halaman, String sub, @Nullable CompoundT
 		return new Tujuan(bagian, "", "", null);
 	}
 
-	/** Page {@code halaman} in the section {@link Urutan#bagianDari} names (Diri when unknown). */
-	public static Tujuan of(String halaman) {
-		return of(Urutan.bagianDari(halaman), halaman);
-	}
-
 	/** The same place on sub {@code sub}. */
 	public Tujuan sub(String sub) {
 		return new Tujuan(bagian, halaman, sub, fokus);

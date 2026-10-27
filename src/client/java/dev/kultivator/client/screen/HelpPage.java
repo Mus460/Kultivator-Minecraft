@@ -1,6 +1,7 @@
 package dev.kultivator.client.screen;
 
 import dev.kultivator.client.screen.ui.Glyphs;
+import dev.kultivator.client.screen.ui.GulirTeks;
 import dev.kultivator.client.screen.ui.InkField;
 import dev.kultivator.client.screen.ui.KeyHints;
 import dev.kultivator.client.screen.ui.Lukis;
@@ -80,7 +81,7 @@ final class HelpPage extends Page {
 	/** The topic a "?" seal asked for before this page was laid out (applied on the next frame). */
 	private static @Nullable String pendingFocus;
 
-	private final JalanPage.Gulir gulir = new JalanPage.Gulir();
+	private final GulirTeks gulir = new GulirTeks();
 	private final TabBar indeks = new TabBar();
 	private final List<String> shownTopics = new ArrayList<>();
 	/** Topics by first letter of their title (the index chips). */
@@ -182,7 +183,7 @@ final class HelpPage extends Page {
 		}
 		int top = iy + INDEKS_H + 3;
 		l.g.fill(x + 2, top - 2, x + w - 2, top - 1, Palette.argb(0x90, Palette.GOLD));
-		int lebar = w - JalanPage.Gulir.RUANG_BATANG;
+		int lebar = w - GulirTeks.RUANG_BATANG;
 		if (kotor || lebar != lebarIsi) {
 			kotor = false;
 			lebarIsi = lebar;

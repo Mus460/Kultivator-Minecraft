@@ -4,8 +4,6 @@
   "item.kultivator.inti_roh_gunung": "Inti Roh Gunung",
   "item.kultivator.inti_roh_gunung.tooltip": "Gunakan: +%s PK ke kolam aula, +%s kemasyhuran sekte",
   "item.kultivator.inti_roh_gunung.source": "Sumber: batu lima warna Nüwa (Huainanzi bab 6)",
-  "kultivator.hub.card.sekte_kebun_tambang": "Kebun & Tambang",
-  "kultivator.hub.card.sekte_kebun_tambang.tip": "Petak herba roh dan perawatnya, kedalaman Tambang Roh, giliran penambang dan temuan dari perut gunung.",
   "kultivator.sekte.kebun.adv.panen.title": "Kebun Seratus Obat",
   "kultivator.sekte.kebun.adv.panen.desc": "Panen pertama dari petak herba roh sekte",
   "kultivator.sekte.kebun.adv.tambang.title": "Perut Gunung",
@@ -143,6 +141,5 @@
   "kultivator.sekte.kebun.ui.c_kerja.tugas": "bertugas",
   "kultivator.sekte.kebun.ui.c_kerja.lain": "bekerja",
   "kultivator.sekte.kebun.ui.c_beruntun": "%s · %s hr",
-  "kultivator.sekte.kebun.ui.batal": "Batal",
-  "kultivator.sekte.kebun.ui.log_baris": "Hari %s: %s"
+  "kultivator.sekte.kebun.ui.batal": "Batal"
 }

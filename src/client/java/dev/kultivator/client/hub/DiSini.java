@@ -4,9 +4,11 @@ import dev.kultivator.client.screen.CultivationScreen;
 import dev.kultivator.client.screen.Page;
 import dev.kultivator.client.tempat.ui.UiTempatClient;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
+import dev.kultivator.dunia.tempat.ui.TempatLayar;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -33,6 +35,8 @@ public final class DiSini {
 
 	private static @Nullable Konteks aktif;
 	private static @Nullable Page halaman;
+	/** The home page of the live context (43.12.4), null = it lives under the Di Sini tablet; the tablet jumps there. */
+	private static @Nullable Tujuan rumahAktif;
 	/** The talk a service was opened from (same NPC): one step back. */
 	private static @Nullable Konteks sebelumnya;
 	/** The context {@link #kembali} asked the server for; when it arrives it gets no step back (no ping-pong). */
@@ -57,6 +61,7 @@ public final class DiSini {
 		}
 		aktif = k;
 		halaman = page;
+		rumahAktif = rumah;
 		String s = sub == null ? "" : sub;
 		HubNav.ingatSub(ID_DI_SINI, s);
 		Minecraft minecraft = Minecraft.getInstance();
@@ -79,7 +84,7 @@ public final class DiSini {
 	 * titled {@code judul}. The page answers the server itself; {@link #tutupPrompt} ends it.
 	 */
 	public static void prompt(String id, Page page, Component judul, int glyph) {
-		buka(new Konteks(id, -1, null, judul, glyph), page, null, "");
+		buka(new Konteks(id, -1, judul, glyph), page, null, "");
 	}
 
 	/** Ends the prompt {@code page} (answered or expired) without a footer line. */
@@ -97,6 +102,7 @@ public final class DiSini {
 		Page p = halaman;
 		aktif = null;
 		halaman = null;
+		rumahAktif = null;
 		sebelumnya = null;
 		HubNav.tutupKonteks(pesan);
 		if (p instanceof LembarHub.Halaman rumah) {
@@ -109,7 +115,12 @@ public final class DiSini {
 		if (page != null && page == halaman) {
 			aktif = null;
 			halaman = null;
+			rumahAktif = null;
 			sebelumnya = null;
+			// the host still shows its tablet (the page left on its own): no orphan tablet 9
+			if (CultivationScreen.adaKonteks()) {
+				HubNav.tutupKonteks(null);
+			}
 		}
 	}
 
@@ -129,20 +140,47 @@ public final class DiSini {
 		return UiTempatClient.kirim(s.layar(), s.npcId(), LembarKunci.OP_LIHAT);
 	}
 
-	/** The live context, or null. */
-	public static @Nullable Konteks aktif() {
-		return aktif;
-	}
-
 	/** The page of the live context (a sheet page or a home page holding it), or null. */
 	public static @Nullable Page halaman() {
 		return halaman;
+	}
+
+	/** The home page of the live context, or null when it lives under the Di Sini tablet. */
+	public static @Nullable Tujuan rumah() {
+		return rumahAktif;
+	}
+
+	/**
+	 * Every client tick ({@code UiTempatClient.init}): a sheet whose NPC is gone or out of reach ends here too, so a waiting
+	 * tablet never fails on its first action (the server checks {@link TempatLayar#JANGKAU} only on an action). The helm
+	 * uses the server's 48 blocks; module K checks its own reach ({@code KotaJembatan}).
+	 */
+	public static void jaga(Minecraft minecraft) {
+		Konteks k = aktif;
+		if (k == null || k.npcId() < 0 || minecraft.player == null || minecraft.level == null) {
+			return;
+		}
+		// only the TempatLayar session itself (a dimension talk reuses the dialogue id under its own server)
+		boolean lembar = TempatLayar.idSah(k.layar()) && UiTempatClient.sesiAktif(k.layar(), k.npcId());
+		double jauh = lembar ? TempatLayar.JANGKAU + 2.0D : "kemudi".equals(k.layar()) ? 50.0D : -1.0D;
+		if (jauh < 0.0D) {
+			return;
+		}
+		Entity e = minecraft.level.getEntity(k.npcId());
+		if (e == null || e.isRemoved() || !e.isAlive() || minecraft.player.distanceToSqr(e) > jauh * jauh) {
+			if (lembar) {
+				UiTempatClient.kirim(k.layar(), k.npcId(), LembarKunci.OP_TUTUP);
+			}
+			selesai(Component.translatable("kultivator.gui43.konteks.berakhir"));
+		}
 	}
 
 	/** Forgets everything (disconnect). */
 	public static void reset() {
 		aktif = null;
 		halaman = null;
+		rumahAktif = null;
+
 		sebelumnya = null;
 		kembaliKe = null;
 	}

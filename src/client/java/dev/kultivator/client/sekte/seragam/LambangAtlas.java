@@ -104,11 +104,6 @@ public final class LambangAtlas {
 		return slot.clothId;
 	}
 
-	/** The robe sheet of the preview (after {@link #preview}). */
-	public static Identifier previewRobe() {
-		return SLOTS[PREVIEW_SLOT].robeId;
-	}
-
 	private static @Nullable Slot slotFor(LambangCache.Entry entry) {
 		if (!ensureSource()) {
 			return null;

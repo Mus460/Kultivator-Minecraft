@@ -6,6 +6,7 @@ import dev.kultivator.client.hub.LembarHub;
 import dev.kultivator.client.hub.Tujuan;
 import dev.kultivator.client.hub.Urutan;
 import dev.kultivator.client.screen.Page;
+import dev.kultivator.client.screen.PageKomposit;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.client.screen.ui.Lukis;
@@ -13,10 +14,6 @@ import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.TalismanButton;
 import dev.kultivator.client.sekte.gabung.GabungClient;
 import dev.kultivator.sekte.gabung.ui.GabungLembar;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.input.CharacterEvent;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
@@ -37,7 +34,7 @@ import java.util.Set;
  * without a sect the page shows only "Dirikan atau Bergabung". Each sub is a child page drawn in this page's box; the
  * sheet is a {@code LembarHub.Halaman}, so its read-only view is asked for only while shown (43.0.12).
  */
-public class IkhtisarPage extends Page {
+public class IkhtisarPage extends PageKomposit {
 
 	public static final String AULA = "aula";
 	public static final String IDENTITAS = "identitas";
@@ -79,6 +76,11 @@ public class IkhtisarPage extends Page {
 	public static void buka(String id) {
 		subDiminta = id == null ? "" : id;
 		HubNav.buka(Tujuan.of(HubNav.SEKTE, Urutan.ID_IKHTISAR).sub(subDiminta));
+	}
+
+	@Override
+	protected @Nullable Page anak() {
+		return anak;
 	}
 
 	// ================================================================== subs
@@ -181,7 +183,9 @@ public class IkhtisarPage extends Page {
 		} else {
 			anak.onShow(null);
 		}
-		super.onShow(fokus);
+		if (fokus != null) {
+			fokus(fokus);
+		}
 	}
 
 	@Override
@@ -215,51 +219,7 @@ public class IkhtisarPage extends Page {
 		}
 	}
 
-	@Override
-	public void onData() {
-		if (anak != null) {
-			anak.onData();
-		}
-	}
-
-	@Override
-	public boolean needsRebuild() {
-		return anak != null && anak.needsRebuild();
-	}
-
-	@Override
-	public boolean lebar() {
-		return anak != null && anak.lebar();
-	}
-
-	@Override
-	public long uang() {
-		return anak != null ? anak.uang() : -1L;
-	}
-
-	@Override
-	public boolean rinci() {
-		return anak != null && anak.rinci();
-	}
-
-	@Override
-	public Palette.Gaya gaya() {
-		return anak != null ? anak.gaya() : Palette.Gaya.KERTAS;
-	}
-
-	@Override
-	public boolean angka(int n) {
-		return anak != null ? anak.angka(n) : super.angka(n);
-	}
-
 	// ================================================================== drawing
-
-	@Override
-	protected void drawBehind(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
-		if (anak != null) {
-			anak.render(g, mouseX, mouseY, seconds);
-		}
-	}
 
 	/** Without a hall and without a sect: "Dirikan atau Bergabung" (43.5). */
 	@Override
@@ -287,62 +247,5 @@ public class IkhtisarPage extends Page {
 				() -> HubNav.help("aula"))) {
 			l.tip(Component.translatable(M + "mulai.dirikan.tip"));
 		}
-	}
-
-	// ================================================================== input (to the shown sub)
-
-	@Override
-	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-		return anak != null ? anak.mouseClicked(event, doubleClick) : super.mouseClicked(event, doubleClick);
-	}
-
-	@Override
-	public boolean mouseReleased(MouseButtonEvent event) {
-		return anak != null ? anak.mouseReleased(event) : super.mouseReleased(event);
-	}
-
-	@Override
-	public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
-		return anak != null ? anak.mouseDragged(event, dx, dy) : super.mouseDragged(event, dx, dy);
-	}
-
-	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-		return anak != null ? anak.mouseScrolled(mouseX, mouseY, scrollX, scrollY) : super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
-	}
-
-	@Override
-	public boolean keyPressed(KeyEvent event) {
-		return anak != null ? anak.keyPressed(event) : super.keyPressed(event);
-	}
-
-	@Override
-	public boolean keyReleased(KeyEvent event) {
-		return anak != null && anak.keyReleased(event);
-	}
-
-	@Override
-	public boolean charTyped(CharacterEvent event) {
-		return anak != null ? anak.charTyped(event) : super.charTyped(event);
-	}
-
-	@Override
-	public boolean mauTombol() {
-		return anak != null ? anak.mauTombol() : super.mauTombol();
-	}
-
-	@Override
-	public boolean modal() {
-		return anak != null ? anak.modal() : super.modal();
-	}
-
-	@Override
-	public boolean mundur() {
-		return anak != null && anak.mundur();
-	}
-
-	@Override
-	public boolean fokusTab(boolean back) {
-		return anak != null ? anak.fokusTab(back) : super.fokusTab(back);
 	}
 }

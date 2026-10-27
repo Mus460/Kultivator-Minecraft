@@ -18,7 +18,7 @@ import dev.kultivator.client.screen.ui.KeadaanKosong;
 import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.TalismanButton;
-import dev.kultivator.client.sekte.wilayah.GulirIsi;
+import dev.kultivator.client.screen.ui.GulirIsi;
 import dev.kultivator.dunia.kota.NpcRole;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import net.minecraft.client.input.KeyEvent;

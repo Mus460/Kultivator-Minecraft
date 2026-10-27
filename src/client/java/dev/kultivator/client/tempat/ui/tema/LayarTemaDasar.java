@@ -112,7 +112,7 @@ public abstract class LayarTemaDasar extends LayarTempatDasar {
 
 	/** Reason for "not enough money" for {@code harga}. */
 	protected Component kurang(long harga) {
-		return TeksTempat.k("harga.kurang", TeksTempat.angka(Math.max(0L, harga - Math.max(0L, uang()))));
+		return TeksTempat.k("harga.kurang", Brush.angka(Math.max(0L, harga - Math.max(0L, uang()))));
 	}
 
 	/** A centred caption in the box (placeholders: "pilih ..."). */

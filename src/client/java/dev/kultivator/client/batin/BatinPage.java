@@ -6,6 +6,7 @@ import dev.kultivator.client.abadi.AbadiClient;
 import dev.kultivator.client.screen.Page;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Glyphs;
+import dev.kultivator.client.screen.ui.GulirTeks;
 import dev.kultivator.client.screen.ui.KeadaanKosong;
 import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
@@ -40,7 +41,7 @@ public class BatinPage extends Page {
 	private static final int BURNED = 0xFF5A2418;
 	private static final int FLOODED = 0xFF2C5A8A;
 	private static final int SCORCHED = 0xFF3A3050;
-	private final AbadiClient.Baris baris = new AbadiClient.Baris();
+	private final GulirTeks baris = new GulirTeks();
 	private int lastPlots = -1;
 	private boolean lastBorn;
 
@@ -188,7 +189,7 @@ public class BatinPage extends Page {
 			return;
 		}
 		if (!born()) {
-			baris.mulai(w);
+			AbadiClient.mulai(baris, w, Payloads.DuniaSync.CH_BATIN);
 			baris.tambah(Component.translatable(data.getBooleanOr("ascended", false) ? P + "soon" : P + "unborn"), Palette.INK);
 			baris.jarak();
 			baris.tambah(Component.translatable(P + "about"), Palette.INK_SOFT);
@@ -201,7 +202,7 @@ public class BatinPage extends Page {
 		ListTag plots = data.getListOrEmpty("plots");
 		int panelX = x + cell() * COLS + 4;
 		int panelW = x + w - panelX;
-		baris.mulai(panelW);
+		AbadiClient.mulai(baris, panelW, Payloads.DuniaSync.CH_BATIN);
 		baris.tambah(Brush.bold(Component.translatable(P + "title", Component.translatable("kultivator.batin.grade." + InnerWorld.GRADES[grade]),
 				plots.size(), data.getIntOr("max_plots", InnerWorld.MAX_PLOTS))), Palette.SEAL_DARK);
 		// The land spirit's card: its name and the last three events.

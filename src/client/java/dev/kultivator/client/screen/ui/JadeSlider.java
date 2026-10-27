@@ -1,24 +1,11 @@
 package dev.kultivator.client.screen.ui;
 
-import com.mojang.blaze3d.platform.InputConstants;
 import java.util.function.Function;
 import java.util.function.IntConsumer;
 import java.util.function.IntSupplier;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.components.Renderable;
-import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.gui.narration.NarratableEntry;
-import net.minecraft.client.gui.narration.NarratedElementType;
-import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.gui.navigation.FocusNavigationEvent;
-import net.minecraft.client.gui.navigation.ScreenRectangle;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -28,11 +15,8 @@ import org.jetbrains.annotations.Nullable;
  * handle. Steps above the allowed maximum ({@link #limit}) are drawn in seal red with a red seal at the limit, and the
  * handle never passes it. The value is committed once, when the mouse is released or a key moves it ({@code commit} gets
  * the step index), so dragging sends nothing until the player lets go.
- *
- * <p>Until the old screens that hold it move into pages (43-M1), it also behaves as a vanilla screen child
- * ({@code addRenderableWidget}: click, drag, keys, narration, {@link #active}); P1 drops that bridge.
  */
-public class JadeSlider extends Widget implements Renderable, GuiEventListener, NarratableEntry {
+public class JadeSlider extends Widget {
 
 	private final float[] steps;
 	private final Function<Float, Component> text;
@@ -41,11 +25,6 @@ public class JadeSlider extends Widget implements Renderable, GuiEventListener, 
 	private int index;
 	private int committed;
 	private boolean held;
-	private boolean focused;
-	private boolean hovered;
-	private long lastFrame = -1L;
-	/** Vanilla-compatible switch (old screens set it); a page uses {@link #enabledWhen} as well. */
-	public boolean active = true;
 
 	/**
 	 * @param steps  the step values in order (at least one)
@@ -61,7 +40,6 @@ public class JadeSlider extends Widget implements Renderable, GuiEventListener, 
 		this.maxIndex = () -> this.steps.length - 1;
 		this.index = clampIndex(index);
 		this.committed = this.index;
-		enabledWhen(() -> active);
 		tooltip(() -> java.util.List.of(message()));
 	}
 
@@ -75,18 +53,9 @@ public class JadeSlider extends Widget implements Renderable, GuiEventListener, 
 		return index;
 	}
 
-	public float stepValue() {
-		return steps[index];
-	}
-
 	/** True while the mouse holds the handle. */
 	public boolean held() {
 		return held;
-	}
-
-	/** True while the mouse is over the slider (last frame). */
-	public boolean isHovered() {
-		return hovered;
 	}
 
 	/** The label with the current value. */
@@ -197,9 +166,8 @@ public class JadeSlider extends Widget implements Renderable, GuiEventListener, 
 
 	@Override
 	protected void draw(GuiGraphicsExtractor g, Font font, boolean over, float seconds) {
-		hovered = over;
 		boolean on = isEnabled();
-		boolean lit = on && (over || focused || held);
+		boolean lit = on && (over || held);
 		// the label and the value
 		Brush.fit(g, font, message(), x + 1.0F, y, w - 2.0F, on ? Palette.INK : Palette.INK_FAINT, 1.0F, 1.0F, false);
 		// the groove
@@ -232,78 +200,5 @@ public class JadeSlider extends Widget implements Renderable, GuiEventListener, 
 		Brush.rect(g, handle - 3.0F, gy - 4.0F, handle + 3.0F, gy + 4.0F, on ? Palette.JADE_DARK : Palette.LOCKED);
 		Brush.rect(g, handle - 2.4F, gy - 3.4F, handle + 2.4F, gy + 3.4F, on ? (lit ? Palette.JADE_LIGHT : Palette.JADE) : Palette.LOCKED_PAPER);
 		Brush.rect(g, handle - 1.0F, gy - 1.0F, handle + 1.0F, gy + 1.0F, on ? Palette.SEAL : Palette.INK_FAINT);
-	}
-
-	// ------------------------------------------------------------------ vanilla screen child (bridge until 43-M1)
-
-	@Override
-	public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float a) {
-		long now = Util.getMillis();
-		float seconds = lastFrame < 0L ? 0.0F : Math.min(0.25F, (now - lastFrame) / 1000.0F);
-		lastFrame = now;
-		render(g, Minecraft.getInstance().font, mouseX, mouseY, seconds);
-	}
-
-	@Override
-	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-		if (event.button() != InputConstants.MOUSE_BUTTON_LEFT || !contains(event.x(), event.y())) {
-			return false;
-		}
-		pressAt(event.x(), event.y());
-		return true;
-	}
-
-	@Override
-	public boolean mouseReleased(MouseButtonEvent event) {
-		return held && release(event.x(), event.y());
-	}
-
-	@Override
-	public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
-		return dragTo(event.x(), event.y());
-	}
-
-	@Override
-	public boolean keyPressed(KeyEvent event) {
-		if (focused && (event.isLeft() || event.isRight())) {
-			step(event.isLeft() ? -1 : 1);
-			return true;
-		}
-		return false;
-	}
-
-	@Override
-	public boolean isMouseOver(double mouseX, double mouseY) {
-		return contains(mouseX, mouseY);
-	}
-
-	@Override
-	public void setFocused(boolean focused) {
-		this.focused = focused;
-	}
-
-	@Override
-	public boolean isFocused() {
-		return focused;
-	}
-
-	@Override
-	public @Nullable ComponentPath nextFocusPath(FocusNavigationEvent navigationEvent) {
-		return isEnabled() && !focused ? ComponentPath.leaf(this) : null;
-	}
-
-	@Override
-	public ScreenRectangle getRectangle() {
-		return new ScreenRectangle(x, y, w, h);
-	}
-
-	@Override
-	public NarrationPriority narrationPriority() {
-		return focused ? NarrationPriority.FOCUSED : hovered ? NarrationPriority.HOVERED : NarrationPriority.NONE;
-	}
-
-	@Override
-	public void updateNarration(NarrationElementOutput output) {
-		output.add(NarratedElementType.TITLE, message());
 	}
 }

@@ -48,10 +48,4 @@ public final class Eased {
 		float u = 1.0F - Math.max(0.0F, Math.min(1.0F, t));
 		return 1.0F - u * u * u;
 	}
-
-	/** 0..1 ease-in-out. */
-	public static float inOut(float t) {
-		float k = Math.max(0.0F, Math.min(1.0F, t));
-		return k * k * (3.0F - 2.0F * k);
-	}
 }

@@ -10,8 +10,8 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * The single people picker of the kit (DESIGN 43.7; replaces {@code sectevent/RosterView}, the worker picker of Kebun,
- * the promote picker of BalaiTetua, the cycling picker of TreasuryPage, the worker chips of BuildPage and, in card mode,
- * {@code hall/CandidateCard}). One row per person: a small {@link Potret} (or a seal in the person's colour), the name,
+ * the promote picker of BalaiTetua, the cycling picker of TreasuryPage and the worker chips of BuildPage; the candidate
+ * cards of {@code hall/CalonPage} stay a card owned by that one page, {@code hall/CandidateCard}). One row per person: a small {@link Potret} (or a seal in the person's colour), the name,
  * extra columns (realm, task...) and a short tag on the right; a person that cannot be chosen now is greyed with the
  * reason as tooltip. Two uses:
  * <ul>
@@ -225,7 +225,9 @@ public final class PemilihOrang {
 				Brush.line(l.g, bx + 1.5F, by + 4.5F, bx + 3.8F, by + 7.5F, 1.4F, Palette.JADE);
 				Brush.line(l.g, bx + 3.8F, by + 7.5F, bx + 7.8F, by + 1.5F, 1.4F, Palette.JADE);
 			}
-			l.zona(kunci + "#centang:" + o.id(), bx - 2, y0, bx + KOTAK + 2, y1, () -> centang(o), bisa, o.kunci(), false);
+			// click box at least the kit's 16 px wide (43.7)
+			l.zona(kunci + "#centang:" + o.id(), x0, y0, Math.max(bx + KOTAK + 2, x0 + TalismanButton.MIN_W), y1, () -> centang(o), bisa, o.kunci(),
+					false);
 			x += KOTAK + 4;
 		}
 		int ps = y1 - y0 - 2;

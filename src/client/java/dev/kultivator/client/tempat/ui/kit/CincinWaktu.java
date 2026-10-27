@@ -40,7 +40,7 @@ public final class CincinWaktu {
 		if (left <= 200L && left > 0L) {
 			Brush.halo(l.g, cx, cy, r + 1.0F, 2.0F, TempatWarna.BAHAYA & 0xFFFFFF, l.denyut());
 		}
-		Component t = TeksTempat.waktu(left);
+		Component t = Brush.waktu(left);
 		switch (teks) {
 			case DALAM -> {
 				// 43.0.5: 1.0 or nothing; a ring too small for the time keeps it in the tooltip below

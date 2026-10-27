@@ -40,7 +40,7 @@
   "kultivator.titah_client.screen.pick": "Choose",
   "kultivator.titah_client.screen.pick.tip": "Put this decree on the seal: right-click with the seal casts it at your crosshair.",
   "kultivator.titah_client.screen.reset": "Default",
-  "kultivator.titah_client.screen.reset.tip": "Back to this decree's default size, damage, speed and film.",
+  "kultivator.titah_client.screen.reset.tip": "Back to this decree's default size, damage and speed. The decree film is set in Settings › Kamera & Film.",
   "kultivator.titah_client.screen.warning": "Light warning",
   "kultivator.titah_client.screen.warning.tip": "Read the photosensitivity warning and choose whether full impact frames may flash.",
   "kultivator.titah_client.screen.hint": "Backspace: skip the film · Movement: stop the camera",

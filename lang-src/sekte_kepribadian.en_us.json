@@ -189,8 +189,6 @@
   "kultivator.sekte.kepribadian.uji.pergi": "Departure started: %s.",
   "kultivator.sekte.kepribadian.uji.bujuk": "%s disciples were tempted.",
   "kultivator.sekte.kepribadian.uji.reset": "Cleared the hearts of %s disciples and the list of those who left.",
-  "kultivator.hub.card.sekte_kepribadian_suasana": "Disciples' Moods",
-  "kultivator.hub.card.sekte_kepribadian_suasana.tip": "Every disciple's traits, loyalty and countdown; those who left and how.",
   "kultivator.sekte.kepribadian.suasana.judul": "Disciples' Moods",
   "kultivator.sekte.kepribadian.suasana.memuat": "Reading the disciples' hearts…",
   "kultivator.sekte.kepribadian.suasana.kosong": "No disciple loaded near you.",

@@ -17,7 +17,6 @@ public final class IkonTempat {
 	public static final Identifier LENTERA = Kultivator.id("textures/gui/tempat/lentera.png");
 	public static final Identifier POTRET = Kultivator.id("textures/gui/tempat/potret.png");
 	public static final Identifier STEMPEL = Kultivator.id("textures/gui/tempat/stempel.png");
-	public static final Identifier AWAN = Kultivator.id("textures/gui/tempat/awan.png");
 
 	// 38UI additions (append only, generator list EXTRA)
 	public static final int CENTANG = 112;
@@ -54,11 +53,6 @@ public final class IkonTempat {
 		float u = (slot % 16) * 16.0F;
 		float v = (slot / 16) * 16.0F;
 		g.blit(RenderPipelines.GUI_TEXTURED, IKON, x, y, u, v, size, size, 16, 16, 256, 256, warna);
-	}
-
-	/** Lantern tablet 24 x 28: state 0 unlit, 1 hover, 2 lit, 3 locked; drawn at (x, y) with height {@code h}. */
-	public static void lentera(GuiGraphicsExtractor g, int state, int x, int y, int w, int h, int warna) {
-		g.blit(RenderPipelines.GUI_TEXTURED, LENTERA, x, y, state * 24.0F, 0.0F, w, h, 24, 32, 128, 32, warna);
 	}
 
 	/** The soft lantern glow (32 x 32) stretched over the given box. */

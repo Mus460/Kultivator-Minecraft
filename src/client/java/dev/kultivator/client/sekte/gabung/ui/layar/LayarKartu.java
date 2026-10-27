@@ -3,6 +3,7 @@ package dev.kultivator.client.sekte.gabung.ui.layar;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Eased;
 import dev.kultivator.client.screen.ui.Palette;
+import dev.kultivator.client.screen.ui.SegelKonfirmasi;
 import dev.kultivator.client.sekte.gabung.ui.IkonGabung;
 import dev.kultivator.client.tempat.ui.kit.CincinWaktu;
 import dev.kultivator.client.tempat.ui.kit.DaftarGulir;
@@ -14,7 +15,6 @@ import dev.kultivator.client.tempat.ui.kit.Lukis;
 import dev.kultivator.client.tempat.ui.kit.PanelTempat;
 import dev.kultivator.client.tempat.ui.kit.Potret;
 import dev.kultivator.client.tempat.ui.kit.TabLentera;
-import dev.kultivator.client.tempat.ui.kit.TeksTempat;
 import dev.kultivator.client.tempat.ui.kit.TempatWarna;
 import dev.kultivator.data.Dao;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
@@ -183,7 +183,7 @@ public final class LayarKartu extends LayarGabungDasar {
 			y += BARIS;
 		}
 		int pw = LabelHarga.pk(l, c.i(LembarKunci.PK, 0), tx, y, false, 1.0F, ink);
-		l.teks(t("kartu.pk_total", TeksTempat.angka(c.l(GabungLembar.PK_TOTAL, 0L)), c.i(Kartu.PERINGKAT, 0)), tx + pw + 6, y, tw - pw - 6, lemah);
+		l.teks(t("kartu.pk_total", Brush.angka(c.l(GabungLembar.PK_TOTAL, 0L)), c.i(Kartu.PERINGKAT, 0)), tx + pw + 6, y, tw - pw - 6, lemah);
 		y = Math.max(y + 13, py + foto + 6);
 		int lx = x0 + 9;
 		int lw = x1 - 9 - lx;
@@ -211,7 +211,7 @@ public final class LayarKartu extends LayarGabungDasar {
 			}
 			if (!saingan.kosongSemua()) {
 				int sk = saingan.i(GabungLembar.SIKAP, 0);
-				Component sg = t("kartu.saingan", saingan.teks(LembarKunci.NAMA), Component.literal(TeksTempat.bertanda(sk)).withColor(warnaSikap(sk)));
+				Component sg = t("kartu.saingan", saingan.teks(LembarKunci.NAMA), Component.literal(Brush.bertanda(sk)).withColor(warnaSikap(sk)));
 				baris = kakak.kosongSemua() ? sg : baris.copy().append(" · ").append(sg);
 			}
 			l.teks(baris, lx + 12, y, lw - 12, ink);
@@ -376,7 +376,8 @@ public final class LayarKartu extends LayarGabungDasar {
 			l.teks(namaRanah(e.i(GabungLembar.RANAH, 0)).copy().append(ya ? t("kartu.murid.titipan") : Component.empty()), x0 + 22, ry0 + 2 + 10,
 					x1 - x0 - bw - 30, ya ? TempatWarna.OK : gaya.teksSamar);
 			if (ya) {
-				tombolOp(l, "lepas" + i, x1 - bw - 4, ry0 + 3, bw, 15, t("kartu.murid.lepas"), true, null, LembarKunci.op(Kartu.OP_LEPAS_MURID, e.id()));
+				tombolYakin(l, "lepas" + i, x1 - bw - 4, ry0 + 3, bw, 15, t("kartu.murid.lepas"), true, null, LembarKunci.op(Kartu.OP_LEPAS_MURID, e.id()),
+						SegelKonfirmasi.Tingkat.RINGAN);
 			} else {
 				tombolOp(l, "daftar" + i, x1 - bw - 4, ry0 + 3, bw, 15, t("kartu.murid.daftar"), e.b(LembarKunci.BISA), e.teksAtau(LembarKunci.ALASAN),
 						LembarKunci.op(Kartu.OP_DAFTAR_MURID, e.id()));
@@ -462,7 +463,7 @@ public final class LayarKartu extends LayarGabungDasar {
 		l.g.fill(x0, peringatanY - 1, x0 + 2, peringatanY + 31, TempatWarna.BAHAYA);
 		l.bungkus(peringatan, x0 + 5, peringatanY + 1, x1 - x0 - 8, gaya.gelap() ? 0xFFFFB0A0 : 0xFF8A1A10, 1.0F, 30);
 		int bw = (x1 - x0 - 6) / 3;
-		tombolOp(l, "pamit", x0, by, bw, 15, t("kartu.keluar.pamit"), bisa, t("kartu.keluar.belum_bisa"), Kartu.OP_PAMIT);
+		tombolYakin(l, "pamit", x0, by, bw, 15, t("kartu.keluar.tombol"), bisa, t("kartu.keluar.belum_bisa"), Kartu.OP_PAMIT);
 		tombolYakin(l, "paksa", x0 + bw + 3, by, bw, 15, t("kartu.keluar.paksa"), true, null, Kartu.OP_PAMIT_PAKSA);
 		tombolYakin(l, "belot", x0 + 2 * (bw + 3), by, bw, 15, t("kartu.keluar.belot"), true, null, Kartu.OP_BELOT);
 	}

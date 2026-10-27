@@ -43,7 +43,6 @@ public final class HubPages {
 	private static final List<Entri> ENTRI = new ArrayList<>();
 	private static final List<Rumah> RUMAH = new ArrayList<>();
 	private static @Nullable PembuatLembar pembuatLembar;
-	private static long versi;
 
 	/** Registers page {@code id} in section {@code bagian} at order {@code urutan} ({@link Urutan}). */
 	public static synchronized void daftar(int bagian, String id, int urutan, Supplier<? extends Page> buat) {
@@ -80,18 +79,34 @@ public final class HubPages {
 	}
 
 	/**
-	 * The home of sheet {@code layar} on tab {@code tab} from {@link #daftarRumah}: a tab match first, else an all-tabs home,
-	 * else (sheet opened without a tab) the first home of that sheet; or null.
+	 * The one home lookup of sheet {@code layar} opened on tab {@code tab} (43.12.4). First the pages that mount the sheet
+	 * ({@link #daftarLembar}, in tree order): the one whose tabs hold {@code tab}, else one mounting all tabs, else the first.
+	 * Then the homes of {@link #daftarRumah}: a tab match, else an all-tabs home, else (sheet opened without a tab) the first.
+	 * Null = the function lives in the world only (Di Sini).
 	 */
 	public static synchronized @Nullable Rumah rumah(String layar, String tab) {
-		boolean tanpaTab = tab == null || tab.isEmpty();
+		String t = tab == null ? "" : tab;
+		List<Rumah> lembar = new ArrayList<>();
+		for (int b = 0; b < HubNav.SECTIONS; b++) {
+			for (Entri e : dari(b)) {
+				if (layar.equals(e.layar())) {
+					lembar.add(new Rumah(layar, e.tab(), e.bagian(), e.id(), "", null));
+				}
+			}
+		}
+		Rumah r = pilih(lembar, layar, t, true);
+		return r != null ? r : pilih(RUMAH, layar, t, t.isEmpty());
+	}
+
+	/** A tab match, else an all-tabs home, else (when {@code pertamaBoleh}) the first home of {@code layar}; or null. */
+	private static @Nullable Rumah pilih(List<Rumah> daftar, String layar, String tab, boolean pertamaBoleh) {
 		Rumah semua = null;
 		Rumah pertama = null;
-		for (Rumah r : RUMAH) {
+		for (Rumah r : daftar) {
 			if (!r.layar().equals(layar)) {
 				continue;
 			}
-			if (!tanpaTab && r.tab().contains(tab)) {
+			if (!tab.isEmpty() && r.tab().contains(tab)) {
 				return r;
 			}
 			if (r.tab().isEmpty() && semua == null) {
@@ -101,19 +116,17 @@ public final class HubPages {
 				pertama = r;
 			}
 		}
-		return semua != null ? semua : tanpaTab ? pertama : null;
+		return semua != null ? semua : pertamaBoleh ? pertama : null;
 	}
 
 	/** Installs the builder of sheet pages (called once by 43S-C's {@code LembarHub}). */
 	public static synchronized void pembuatLembar(@Nullable PembuatLembar pembuat) {
 		pembuatLembar = pembuat;
-		versi++;
 	}
 
 	private static void tambah(Entri entri) {
 		ENTRI.removeIf(e -> e.id().equals(entri.id()));
 		ENTRI.add(entri);
-		versi++;
 	}
 
 	/** The pages of section {@code bagian} in order (a copy). */
@@ -136,16 +149,6 @@ public final class HubPages {
 			}
 		}
 		return null;
-	}
-
-	/** True when page {@code id} is registered (in any section). */
-	public static boolean ada(String id) {
-		return cari(id) != null;
-	}
-
-	/** Changes whenever a page is registered or the sheet builder is installed (the host then rebuilds its rail). */
-	public static synchronized long versi() {
-		return versi;
 	}
 
 	private HubPages() {

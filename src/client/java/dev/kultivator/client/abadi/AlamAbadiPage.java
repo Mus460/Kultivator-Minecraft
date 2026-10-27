@@ -5,6 +5,7 @@ import dev.kultivator.client.screen.Page;
 import dev.kultivator.client.screen.ui.Bilah;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Glyphs;
+import dev.kultivator.client.screen.ui.GulirTeks;
 import dev.kultivator.client.screen.ui.KeadaanKosong;
 import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
@@ -32,7 +33,7 @@ public class AlamAbadiPage extends Page {
 
 	private static final int BUTTON_H = 14;
 
-	private final AbadiClient.Baris baris = new AbadiClient.Baris();
+	private final GulirTeks baris = new GulirTeks();
 	private @Nullable TalismanButton ascend;
 	private @Nullable TalismanButton cross;
 	private @Nullable TalismanButton convert;
@@ -43,11 +44,6 @@ public class AlamAbadiPage extends Page {
 	@Override
 	public Component title() {
 		return Component.translatable("kultivator.spine9.tab.alam");
-	}
-
-	@Override
-	public Component shortName() {
-		return Component.translatable("kultivator.spine9.tab.alam.short");
 	}
 
 	@Override
@@ -123,7 +119,7 @@ public class AlamAbadiPage extends Page {
 			return;
 		}
 		int bottom = y + h - BUTTON_H - 4;
-		baris.mulai(w);
+		AbadiClient.mulai(baris, w, Payloads.DuniaSync.CH_ABADI);
 		int top = y;
 		if (!page.getBooleanOr("ascended", false)) {
 			gate(page);

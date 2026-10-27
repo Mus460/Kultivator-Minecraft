@@ -6,7 +6,6 @@ import dev.kultivator.client.hub.Tujuan;
 import dev.kultivator.client.hub.Urutan;
 import dev.kultivator.data.TechniqueSpec;
 import net.minecraft.client.Minecraft;
-import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -20,27 +19,6 @@ public final class Codex {
 		HubPages.daftar(HubNav.TEKNIK, Urutan.ID_KODEKS, Urutan.KODEKS, KodeksPage::new);
 		HubPages.daftar(HubNav.TEKNIK, Urutan.ID_CINCIN_SEGEL, Urutan.CINCIN_SEGEL, LoadoutPage::new);
 		HubPages.daftar(HubNav.TEKNIK, Urutan.ID_KEHANCURAN, Urutan.KEHANCURAN, KehancuranPage::new);
-	}
-
-	/** Opens Teknik › Kodeks, focused on the spec with net id {@code focusNetId} (−1 = none). */
-	public static void open(int focusNetId) {
-		if (Minecraft.getInstance().player == null) {
-			return;
-		}
-		SealWheel.close(false);
-		Tujuan t = Tujuan.of(HubNav.TEKNIK, Urutan.ID_KODEKS);
-		if (focusNetId >= 0) {
-			CompoundTag f = new CompoundTag();
-			f.putInt("spec", focusNetId);
-			t = t.fokus(f);
-		}
-		HubNav.buka(t);
-	}
-
-	/** Opens Teknik › Kehancuran on sub {@code sub} ("diri" / "murid"). */
-	public static void kehancuran(String sub) {
-		SealWheel.close(false);
-		HubNav.buka(Tujuan.of(HubNav.TEKNIK, Urutan.ID_KEHANCURAN).sub(sub));
 	}
 
 	/** "Pasang ke Cincin" (G48): Teknik › Cincin Segel with {@code spec} carried, the next socket clicked takes it. */

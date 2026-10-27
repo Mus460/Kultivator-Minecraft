@@ -35,6 +35,5 @@
   "kultivator.spine6.page.red_seal": "Disciples' Red Seal",
   "kultivator.spine6.page.red_seal.short": "Red Seal",
   "kultivator.spine6.list.away_reason": "%s · %s days left",
-  "kultivator.spine6.tablet.generation": "Heir · generation %s",
-  "kultivator.spine6.ui.section_picker": "Click the left half for the previous section, the right half for the next."
+  "kultivator.spine6.tablet.generation": "Heir · generation %s"
 }

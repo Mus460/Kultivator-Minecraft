@@ -195,9 +195,9 @@ public final class LayarLapakRekrut extends LayarInti {
 		boolean cukup = uang() < 0 || harga <= uang();
 		Component alasan = s.teksAtau(LembarKunci.ALASAN);
 		if (alasan == null && !cukup) {
-			alasan = TeksTempat.k("harga.kurang", TeksTempat.angka(harga - Math.max(0L, uang())));
+			alasan = TeksTempat.k("harga.kurang", Brush.angka(harga - Math.max(0L, uang())));
 		}
-		tombolOp(l, "sewa", x0 + 6, y1 - 19, x1 - x0 - 12, 15, SketsaKota.t("kantor.sewa", TeksTempat.angka(harga)), s.b(LembarKunci.BISA) && cukup, alasan,
+		tombolOp(l, "sewa", x0 + 6, y1 - 19, x1 - x0 - 12, 15, SketsaKota.t("kantor.sewa", Brush.angka(harga)), s.b(LembarKunci.BISA) && cukup, alasan,
 				Kantor.OP_SEWA);
 	}
 
@@ -280,7 +280,7 @@ public final class LayarLapakRekrut extends LayarInti {
 		long restu = e.l(Kantor.RESTU, 0L);
 		int warnaSikap = Kantor.SK_BANGGA.equals(sikap) ? TempatWarna.OK : Kantor.SK_MENOLAK.equals(sikap) ? TempatWarna.BAHAYA : TempatWarna.PERINGATAN;
 		Component restuTeks = restu < 0L ? SketsaKota.t("kantor.restu_ayah") : restu == 0L ? SketsaKota.t("kantor.restu_nol")
-				: SketsaKota.t("kantor.restu", TeksTempat.angka(restu));
+				: SketsaKota.t("kantor.restu", Brush.angka(restu));
 		if (!sikap.isEmpty()) {
 			l.g.fill(lx, y, lx + 2, y + 9, warnaSikap);
 			l.keterangan(SketsaKota.t("kantor.keluarga", SketsaKota.t("kantor.sikap." + sikap), restuTeks), lx + 5, y, lw - 5, warnaSikap);
@@ -299,7 +299,7 @@ public final class LayarLapakRekrut extends LayarInti {
 				pasti ? SketsaKota.t("kantor.sudah_diuji") : TeksTempat.k("harga.kurang", "2"), LembarKunci.op(Kantor.OP_UJI, id));
 		boolean bisaTerima = kuotaAda && e.bisa() && (restu <= 0L || uang() < 0 || uang() >= restu);
 		Component alasan = !kuotaAda ? SketsaKota.t("kantor.kuota_habis") : e.teksAtau(LembarKunci.ALASAN) != null ? e.teks(LembarKunci.ALASAN)
-				: TeksTempat.k("harga.kurang", TeksTempat.angka(Math.max(0L, restu - Math.max(0L, uang()))));
+				: TeksTempat.k("harga.kurang", Brush.angka(Math.max(0L, restu - Math.max(0L, uang()))));
 		tombolOp(l, "terima", kanan.x0() + 7 + w, by, w, 14, SketsaKota.t("kantor.terima"), bisaTerima, alasan, LembarKunci.op(Kantor.OP_TERIMA, id));
 		tombolOp(l, "tolak", kanan.x0() + 10 + 2 * w, by, w, 14, SketsaKota.t("kantor.tolak"), true, null, LembarKunci.op(Kantor.OP_TOLAK, id));
 	}
@@ -338,9 +338,9 @@ public final class LayarLapakRekrut extends LayarInti {
 		boolean cukup = uang() < 0 || biaya <= uang();
 		Component alasan = u.teksAtau(LembarKunci.ALASAN);
 		if (alasan == null && !cukup) {
-			alasan = TeksTempat.k("harga.kurang", TeksTempat.angka(biaya - Math.max(0L, uang())));
+			alasan = TeksTempat.k("harga.kurang", Brush.angka(biaya - Math.max(0L, uang())));
 		}
-		tombolOp(l, "adakan", x0, y1 - 16, x1 - x0, 15, SketsaKota.t("kantor.adakan", TeksTempat.angka(biaya)), u.b(LembarKunci.BISA) && cukup, alasan,
+		tombolOp(l, "adakan", x0, y1 - 16, x1 - x0, 15, SketsaKota.t("kantor.adakan", Brush.angka(biaya)), u.b(LembarKunci.BISA) && cukup, alasan,
 				Kantor.OP_ADAKAN_UJIAN);
 	}
 
@@ -363,8 +363,8 @@ public final class LayarLapakRekrut extends LayarInti {
 		barisNilai(l, SketsaKota.t("kantor.renown"), Component.literal(Integer.toString(s.i(Kantor.RENOWN, 0))), lx0, y, lx1);
 		long sewa = k.l(Kantor.SEWA, 0L);
 		boolean cukup = uang() < 0 || sewa <= uang();
-		tombolOp(l, "perpanjang", kiri.x0() + 4, kiri.y1() - 18, kiri.w() - 8, 14, SketsaKota.t("kantor.perpanjang", TeksTempat.angka(sewa)), cukup,
-				TeksTempat.k("harga.kurang", TeksTempat.angka(sewa - Math.max(0L, uang()))), Kantor.OP_PERPANJANG);
+		tombolOp(l, "perpanjang", kiri.x0() + 4, kiri.y1() - 18, kiri.w() - 8, 14, SketsaKota.t("kantor.perpanjang", Brush.angka(sewa)), cukup,
+				TeksTempat.k("harga.kurang", Brush.angka(sewa - Math.max(0L, uang()))), Kantor.OP_PERPANJANG);
 		Kotak kanan = b[1];
 		int ry = kanan.y0() + subjudul(l, SketsaKota.t("kantor.gosip"), kanan.x0(), kanan.y0(), kanan.x1());
 		List<Lembar> gosip = s.daftar(Kantor.GOSIP);

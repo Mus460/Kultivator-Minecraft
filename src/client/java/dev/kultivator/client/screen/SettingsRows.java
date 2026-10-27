@@ -40,11 +40,11 @@ import java.util.function.Supplier;
  * it is shown changes. Every row appears exactly once (23.17.5): Tampilan & Efek (the quality column is drawn by
  * {@link SettingsPage}; cosmetics, aura, gait, Gabung Sekte, Kota yang Hidup, techniques, impact and world, Langit Sekte),
  * Kamera & Film (the film rows of {@link EpicSettings#rows()} and the Film Titah rows), Suara (cinematic music, aura hum,
- * street music, the voice rows), HUD (HUD, cooldown ping, danger alert, guide tracker) and Kontrol (hold G, release =
+ * street music, the voice rows), HUD (HUD, cooldown ping, danger alert, guide tracker, one coin per mod HUD) and Kontrol (hold G, release =
  * cast, Hardcore, duel input; the live key list rebound in place, "Semua tombol Minecraft…"). The sword-duel rows join
  * their groups. An {@code EpicSettings} row whose key is not in a group table falls into Tampilan & Efek.
  */
-final class SettingsRows {
+public final class SettingsRows {
 
 	/** The group ids (the same values as {@code HubNav.GROUP_*}). */
 	static final int TAMPILAN = 0;
@@ -83,6 +83,13 @@ final class SettingsRows {
 	 */
 	public static final List<String> KOTA42_SAKLAR = List.of("kota42.lentera", "kota42.asap", "kota42.panji", "kota42.petasan",
 			"kota42.merpati", "kota42.wayang", "kota42.jelaga");
+	/**
+	 * The switches of the mod's own HUDs (DESIGN 43.9: every HUD has its coin in Pengaturan › HUD), stored in
+	 * {@code kultivator-client.json} as {@code hud.<key>}, default on. {@code HudHider} gates the elements, {@code SlotSisi}
+	 * skips a switched-off side scroll so the next one gets the turn. The guide tracker keeps its own coin ("Panduan").
+	 */
+	public static final List<String> HUD_SAKLAR = List.of("kabar", "qi", "codex", "aura", "tribulasi", "duel", "ujian", "lei_tai", "tangga",
+			"gerbang", "kapal", "langit", "naga", "dimensi", "tema", "elite", "formasi", "bangun");
 	/** The street music volume in percent (100/75/50/25/0, Suara group), read with {@link #kota42Melodi}. */
 	public static final String KOTA42_MELODI = "kota42.melodi";
 	private static final int[] MELODI_LANGKAH = {100, 75, 50, 25, 0};
@@ -96,7 +103,7 @@ final class SettingsRows {
 			EpicSettings.BULLET, EpicSettings.SLOWMO, EpicSettings.SKYRIDE, EpicSettings.IMPACT_FRAMES, EpicSettings.SILENT_IMPACT,
 			EpicSettings.LETTERBOX, EpicSettings.CARDS, EpicSettings.RECORD);
 	private static final List<String> TAMPILAN_ORDER = List.of(EpicSettings.WORLD_FX, EpicSettings.IMPACT_POWER, EpicSettings.GEOMETRY,
-			EpicSettings.SKY, EpicSettings.VFX);
+			EpicSettings.PACK_GEOMETRY, EpicSettings.SKY, EpicSettings.VFX);
 
 	private final SettingsPage page;
 	/** The key of each key line of the last {@link #group} call (Kontrol). */
@@ -263,6 +270,17 @@ final class SettingsRows {
 				() -> Page.send(Actions.JALAN, 0, Guide.hidden(Page.data()) ? "show" : "hide"),
 				() -> List.of(Component.translatable(G + "guide"), Component.translatable(G + "guide.tip").withStyle(ChatFormatting.GRAY)),
 				() -> !Guide.hidden(Page.data()), Keys::connected, SettingsRows::no, SettingsRows::ink));
+		items.add(heading(M + "hud.judul"));
+		for (String key : HUD_SAKLAR) {
+			String label = M + "hud." + key;
+			items.add(coin(() -> Component.translatable(label), () -> hud(key), on -> EffectQuality.put("hud." + key, new JsonPrimitive(on)),
+					() -> List.of(Component.translatable(label), Component.translatable(M + "hud.tip").withStyle(ChatFormatting.GRAY))));
+		}
+	}
+
+	/** A HUD switch of {@link #HUD_SAKLAR}; default on, also when the file holds something else. */
+	public static boolean hud(String key) {
+		return kota42("hud." + key);
 	}
 
 	private void kontrol(List<Item> items) {
@@ -391,6 +409,7 @@ final class SettingsRows {
 	/** "Semua tombol Minecraft…": vanilla's key binds screen over a new Gulungan on Pengaturan › Kontrol (Done/Esc return there). */
 	private static void openKeyBinds() {
 		Minecraft minecraft = Minecraft.getInstance();
+		HubNav.kembaliSetelah(KeyBindsScreen.class); // the Di Sini context outlives the key screen (43.8.5)
 		minecraft.gui.setScreen(new KeyBindsScreen(CultivationScreen.buka(Tujuan.of(HubNav.PENGATURAN, Urutan.ID_KONTROL)), minecraft.options));
 	}
 

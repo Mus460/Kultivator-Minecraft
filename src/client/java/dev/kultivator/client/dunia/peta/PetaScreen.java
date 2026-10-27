@@ -1223,6 +1223,9 @@ public final class PetaScreen extends Page {
 		int by = cardY + cardH - 17;
 		TalismanButton.gambar(l, "kartu_layar", bx, by, bw, 14, Component.translatable("kultivator.peta.card.sail"), captain,
 				Component.translatable("kultivator.peta.sail.not_captain"), () -> layarKe(mark), helm != null && captain, false);
+		if (captain && l.di(bx, by, bx + bw, by + 14)) {
+			l.tip(Component.translatable("kultivator.peta.card.sail.tip"));
+		}
 		bx += bw + 4;
 		if (mark.waypoint >= 0) {
 			TalismanButton.gambar(l, "kartu_tanda", bx, by, bw, 14, Component.translatable("kultivator.peta.card.delete"), true, null, () -> {

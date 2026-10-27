@@ -17,6 +17,8 @@
   "kultivator.momen.setting.slowmo.tip": "Hanya efek Momen Epik yang melambat sesaat (paling lama 1,5 detik). Dunia, monster, partikel vanilla dan waktu permainan tidak pernah melambat.",
   "kultivator.momen.setting.geometry": "Geometri raksasa",
   "kultivator.momen.setting.geometry.tip": "Pusaran awan, petir, pilar cahaya, gerbang dan sosok raksasa digambar sebagai bentuk. Mati: semuanya memakai partikel yang lebih ringan.",
+  "kultivator.momen.setting.pack": "Bentuk lembut di paket shader",
+  "kultivator.momen.setting.pack.tip": "Saat paket shader aktif, geometri raksasa tetap digambar sebagai bentuk lembut. Mati: diganti partikel.",
   "kultivator.momen.setting.sky": "Langit berubah",
   "kultivator.momen.setting.sky.tip": "Langit, kabut, awan dan bintang berganti warna saat momen besar, plus lapisan langit di layar. Cuaca dan waktu tidak pernah berubah.",
   "kultivator.momen.setting.vfx": "Skala VFX momen: %s",

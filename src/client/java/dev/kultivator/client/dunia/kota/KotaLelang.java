@@ -86,7 +86,7 @@ public final class KotaLelang {
 		npc = payload.npcId();
 		LayarLelang page = new LayarLelang(npc, lembar());
 		halaman = page;
-		DiSini.buka(new Konteks(KotaJembatan.KONTEKS, npc, null, judul(page), Glyphs.HALL), page, null, page.tabSekarang());
+		DiSini.buka(new Konteks(KotaJembatan.KONTEKS, npc, judul(page), Glyphs.HALL), page, null, page.tabSekarang());
 		return true;
 	}
 

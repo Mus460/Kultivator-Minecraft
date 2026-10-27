@@ -4,6 +4,7 @@ import dev.kultivator.Kultivator;
 import dev.kultivator.client.EffectQuality;
 import dev.kultivator.client.epic.EpicSettings;
 import dev.kultivator.client.epic.sound.EpicSound;
+import dev.kultivator.client.hud.Kabar;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Palette;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement;
@@ -30,10 +31,11 @@ import java.util.Deque;
  * on an ink band with ink bleed on the last characters; a tapered underline sweeps in over 8 ticks, the subtitle (×1.25,
  * gold-grey) follows 6 ticks later; it leaves with an ink dissolve bottom-up over 10 ticks. "Kurangi gerak": a plain
  * fade.</li>
- * <li>STAMP: a top-right seal tile with a name, 1.5 s. BANNER: a thin line under the boss bar, 1.5 s.</li>
+ * <li>STAMP: a {@link Kabar} card with the seal and the name, 1.5 s (G27: one top-right stack). BANNER: a thin line under
+ * the boss bar, 1.5 s.</li>
  * </ul>
  * The seal is a red square with one CJK glyph in paper colour (Presentasi). One FULL card at a time, ≥ 1 s apart, at most 3
- * waiting; STAMPs drop when the queue is full. Cards come only for the protagonist's own scenes (the Kehancuran safety
+ * waiting. Cards come only for the protagonist's own scenes (the Kehancuran safety
  * BANNER is the one exception). For SUPPRESS_TITLE beats the vanilla title is cleared and {@code setTitle} /
  * {@code setSubtitle} are cancelled for 60 ticks. "Kartu judul" off: no cards, nothing suppressed.
  */
@@ -106,7 +108,6 @@ public final class TitleCard {
 
 	private static final Deque<Card> QUEUE = new ArrayDeque<>();
 	private static @Nullable Card full;
-	private static @Nullable Card stamp;
 	private static @Nullable Card banner;
 	private static long lastFullEnd;
 	private static long suppressUntil;
@@ -125,7 +126,7 @@ public final class TitleCard {
 		return new Card(Kind.BANNER, title, null, "", Palette.SEAL & 0xFFFFFF, 1500L);
 	}
 
-	/** Shows or queues a card (FULL waits its turn, STAMP drops when the queue is full, BANNER replaces the banner). */
+	/** Shows or queues a card (FULL waits its turn, STAMP becomes a Kabar card, BANNER replaces the banner). */
 	public static void show(Card card) {
 		if (!EpicSettings.cards()) {
 			return;
@@ -139,11 +140,7 @@ public final class TitleCard {
 				pump();
 			}
 			case STAMP -> {
-				if (QUEUE.size() >= 3) {
-					return;
-				}
-				card.start = Util.getMillis();
-				stamp = card;
+				Kabar.kirim(Kabar.kartu(null, Brush.bold(card.title)).ikon(Kabar.segel(card.seal, card.sealRgb)).lama(card.millis));
 				EpicSound.seal();
 			}
 			case BANNER -> {
@@ -165,7 +162,6 @@ public final class TitleCard {
 	public static void clear() {
 		QUEUE.clear();
 		full = null;
-		stamp = null;
 		banner = null;
 		suppressUntil = 0L;
 	}
@@ -181,7 +177,7 @@ public final class TitleCard {
 	}
 
 	public static boolean busy() {
-		return full != null || stamp != null || banner != null || !QUEUE.isEmpty();
+		return full != null || banner != null || !QUEUE.isEmpty();
 	}
 
 	private static void pump() {
@@ -207,7 +203,7 @@ public final class TitleCard {
 	public static final class Hud implements HudElement {
 		@Override
 		public void extractRenderState(GuiGraphicsExtractor g, DeltaTracker deltaTracker) {
-			if (full == null && stamp == null && banner == null && QUEUE.isEmpty()) {
+			if (full == null && banner == null && QUEUE.isEmpty()) {
 				return;
 			}
 			Minecraft minecraft = Minecraft.getInstance();
@@ -219,13 +215,6 @@ public final class TitleCard {
 			Font font = minecraft.font;
 			if (full != null) {
 				drawFull(g, font, full, now);
-			}
-			if (stamp != null) {
-				if (now - stamp.start >= stamp.millis) {
-					stamp = null;
-				} else {
-					drawStamp(g, font, stamp, now);
-				}
 			}
 			if (banner != null) {
 				if (now - banner.start >= banner.millis) {
@@ -376,26 +365,6 @@ public final class TitleCard {
 				}
 			}
 		}
-	}
-
-	private static void drawStamp(GuiGraphicsExtractor g, Font font, Card card, long now) {
-		long t = now - card.start;
-		float in = Mth.clamp(t / 200.0F, 0.0F, 1.0F);
-		float out = Mth.clamp((card.millis - t) / 250.0F, 0.0F, 1.0F);
-		float alpha = Math.min(in, out);
-		int width = g.guiWidth();
-		Component title = Brush.bold(card.title);
-		float scale = Math.min(1.0F, Brush.fitScale(font, title, width * 0.35F, 1.0F, 0.6F));
-		int textW = Math.round(font.width(title) * scale);
-		int size = 18;
-		int panelW = size + 8 + textW + 8;
-		int slide = Math.round((1.0F - in) * 20.0F);
-		int x = width - panelW - 6 + slide;
-		int y = 6;
-		Brush.chamfer(g, x, y, x + panelW, y + size + 4, 3, Palette.argb(Math.round(190 * alpha), 0x14110D));
-		Brush.frame(g, x, y, x + panelW, y + size + 4, Palette.argb(Math.round(150 * alpha), 0xB98F34));
-		drawSeal(g, font, card.seal, card.sealRgb, x + 2, y + 2, size, alpha, false, now);
-		Brush.text(g, font, title, x + size + 8.0F, y + (size + 4 - 8.0F * scale) / 2.0F, Palette.argb(Math.round(250 * alpha), PAPER), scale, true);
 	}
 
 	private static void drawBanner(GuiGraphicsExtractor g, Font font, Card card, long now) {

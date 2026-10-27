@@ -5,6 +5,7 @@ import dev.kultivator.sekte.gabung.Keanggotaan;
 import dev.kultivator.sekte.gabung.api.GabungApi;
 import dev.kultivator.sekte.gabung.hidup.PapanMisiSekte;
 import dev.kultivator.sekte.gabung.hidup.TugasHarian;
+import dev.kultivator.sekte.gabung.hidup.TurnamenMurid;
 import dev.kultivator.sekte.gabung.politik.MisiPerang;
 import dev.kultivator.sekte.gabung.politik.PanggilanPerang;
 import dev.kultivator.sekte.gabung.ui.GabungLembar.Papan;
@@ -51,6 +52,7 @@ public final class LembarPapan {
 		}
 		PapanMisiSekte.isiLembar(player, sekte, tag);
 		TugasHarian.isiLembar(player, sekte, tag);
+		tag.put(Papan.TURNAMEN, TurnamenMurid.lembar(player, sekte));
 		ListTag daftar = tag.getListOrEmpty(LembarKunci.DAFTAR);
 		ListTag perangMisi = MisiPerang.lembar(player);
 		// war missions first: a war call outranks the board (41.6.10)

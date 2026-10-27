@@ -21,7 +21,7 @@ import java.util.List;
  * Murid › Daftar › tangga (DESIGN 43.5; was the "Catatan Tangga" screen, R23 of the integration audit): one row per loaded
  * disciple with the steps of its last climb on the Tangga Seribu, its best and the heart verdict; a gold row reached the
  * peak; the Ujian Hati hint under the list. A click (or Enter on the chosen row) opens the disciple on Murid › Murid › hati
- * (R18; the rows carry only the name, matched against the hall board). A panel drawn by the Daftar page; the data comes
+ * (R18; each row carries the disciple's soul, and its body id when in reach). A panel drawn by the Daftar page; the data comes
  * from module G's {@code Catatan} payload (the records of {@code /kultivasi perguruan tangga}), asked for when the sub shows.
  */
 public final class TanggaCatatanScreen {
@@ -91,7 +91,7 @@ public final class TanggaCatatanScreen {
 			lk.teks(line, rx0 + 6, ry0 + 1, rx1 - rx0 - 8, peak ? Palette.SEAL_DARK : steps < 0 ? lk.gaya.teksLemah : lk.gaya.teks);
 			lk.zona(kunci + "#b" + i, rx0, ry0, rx1, ry1, () -> {
 				UiSound.press();
-				buka(nama);
+				buka(row);
 			}, true, null, false);
 			if (sorot) {
 				lk.tip(List.of(line, Component.translatable("kultivator.gui43.m04.klik_murid").withStyle(ChatFormatting.DARK_GRAY)));
@@ -99,12 +99,13 @@ public final class TanggaCatatanScreen {
 		}, () -> {
 			int p = daftar.pilihan();
 			if (p >= 0 && p < rows.size()) {
-				buka(rows.getCompoundOrEmpty(p).getStringOr("name", ""));
+				buka(rows.getCompoundOrEmpty(p));
 			}
 		}, null);
 	}
 
-	private static void buka(String nama) {
-		MandiriBoardScreen.bukaMuridNama(nama, "hati");
+	private static void buka(CompoundTag row) {
+		int eid = row.getIntOr("eid", -1);
+		MandiriBoardScreen.bukaMurid(row.getStringOr("soul", ""), eid, eid < 0, "hati");
 	}
 }

@@ -8,8 +8,6 @@ import dev.kultivator.client.screen.ui.UiSound;
 import dev.kultivator.duel.DuelIds;
 import dev.kultivator.duel.net.DuelPayloads;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -84,10 +82,6 @@ public final class ChallengeOfferToast {
 			}
 		}
 		return (int) Math.max(0L, p.expiresTicks() - (ticks - shownAt));
-	}
-
-	/** Was the slip drawn by the duel HUD; the card is drawn by {@link Kabar} now (kept for {@code DuelHud}'s call). */
-	static void draw(GuiGraphicsExtractor g, Font font, int width, int height, float partial) {
 	}
 
 	/** "Bebas · Pedang saja · Tebasan Penentu · Gelanggang 9" (shared with the duel screen). */

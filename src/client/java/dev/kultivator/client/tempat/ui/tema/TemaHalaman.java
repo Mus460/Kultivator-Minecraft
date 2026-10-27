@@ -3,12 +3,9 @@ package dev.kultivator.client.tempat.ui.tema;
 import dev.kultivator.Kultivator;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.DaftarGulir;
-import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.client.screen.ui.KartuBarang;
 import dev.kultivator.client.screen.ui.KeadaanKosong;
-import dev.kultivator.client.screen.ui.KeadaanTerkunci;
 import dev.kultivator.client.screen.ui.LabelHarga;
-import dev.kultivator.client.screen.ui.LencanaPangkat;
 import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.PemilihJumlah;
@@ -42,11 +39,8 @@ import org.jetbrains.annotations.Nullable;
  */
 public abstract class TemaHalaman extends LayarTemaDasar {
 
-	/** Height of the info strip over the content. */
-	private static final int STRIP = 12;
 	private static final float HURUF_PER_DETIK = 60.0F;
 
-	private long terkunciSejak = -1L;
 	/** The shop whose detail replaces its list this frame (narrow layout, 43.3.1); Esc / the header's back closes it. */
 	private @Nullable Toko tokoRinci;
 	// the speaker line written out like a brush (the old speech bubble, at 1.0)
@@ -90,80 +84,16 @@ public abstract class TemaHalaman extends LayarTemaDasar {
 			// the sheet's own style (night market, red lacquer ...) under its content: its text colours are made for it
 			l.g.fill(x0, y0, x1, y1, gaya.dasar);
 		}
-		if (adaStrip()) {
-			gambarStrip(l, x0, y0, x1);
-			y0 += STRIP + 3;
-		}
-		if (lembar.ada(LembarKunci.KUNCI_LAYAR)) {
-			if (terkunciSejak < 0L) {
-				terkunciSejak = l.kini;
-			}
-			Lembar k = lembar.sub(LembarKunci.KUNCI_LAYAR);
-			KeadaanTerkunci.gambar(l, k.teks(LembarKunci.ALASAN), k.teksAtau(LembarKunci.SYARAT), x0, y0, x1, y1, l.kini - terkunciSejak);
+		y0 += stripInfo(l, x0, y0, x1);
+		if (kunciLayar(l, x0, y0, x1, y1)) {
 			return;
 		}
-		terkunciSejak = -1L;
 		try {
 			lukisTema(l, x0 + 2, y0, x1 - 2, y1 - 2);
 		} catch (RuntimeException ex) {
 			Kultivator.LOGGER.warn("Themed page {} failed to draw", layar, ex);
 			l.teks(tt("galat"), x0 + 4, y0 + 4, x1 - x0 - 8, Palette.BAHAYA);
 		}
-	}
-
-	private boolean adaStrip() {
-		return !lembar.s(LembarKunci.DISTRIK).isEmpty() || lembar.ada(LembarKunci.SUBJUDUL) || lembar.ada(LembarKunci.TEMPAT)
-				|| lembar.ada(LembarKunci.NAMA_BAIK) || lembar.f(LembarKunci.DISKON, 0.0F) > 0.001F || lembar.b(UJI) || hanyaBaca();
-	}
-
-	/** District, subtitle or place, then from the right "only viewing", the test ribbon, the discount and Nama Baik. */
-	private void gambarStrip(Lukis l, int px0, int y, int px1) {
-		int x = px0 + 2;
-		int kanan = px1 - 2;
-		String distrik = lembar.s(LembarKunci.DISTRIK);
-		if (!distrik.isEmpty()) {
-			l.g.fill(x - 1, y, x + 12, y + STRIP, Palette.argb(0xC0, TempatWarna.distrik(distrik) & 0xFFFFFF));
-			Glyphs.Atlas.ikon(l.g, LembarKunci.Ikon.distrik(distrik), x, y + 1, 10, 0xFFFFFFFF);
-			x += 15;
-		}
-		if (hanyaBaca()) {
-			Component b = tt("hanya_baca.kaki");
-			int bw = Math.min(kanan - x - 20, font.width(b) + 6);
-			if (bw > 20) {
-				l.g.fill(kanan - bw, y, kanan, y + STRIP, Palette.argb(0x60, Palette.INK_FAINT));
-				l.teks(b, kanan - bw + 3, y + 2, bw - 6, gaya.teks);
-				kanan -= bw + 4;
-			}
-		}
-		if (lembar.b(UJI) && kanan - x > 60) {
-			Glyphs.Atlas.pita(l.g, true, kanan - 34, y, 32, STRIP, 0xFFFFFFFF);
-			l.tengah(tt("uji.pita"), kanan - 18, y + 2, 30, 0xFF5A3A08);
-			kanan -= 38;
-		}
-		float diskon = lembar.f(LembarKunci.DISKON, 0.0F);
-		if (diskon > 0.001F) {
-			Component d = tt("diskon", Math.round(diskon * 100));
-			int dw = font.width(d) + 6;
-			if (kanan - dw - x > 40) {
-				l.g.fill(kanan - dw, y, kanan, y + STRIP, Palette.SEAL);
-				l.teks(d, kanan - dw + 3, y + 2, dw - 4, 0xFFFFF0E0);
-				kanan -= dw + 4;
-			}
-		}
-		if (lembar.ada(LembarKunci.NAMA_BAIK) && kanan - x > 80) {
-			kanan -= LencanaPangkat.namaBaik(l, lembar.i(LembarKunci.NAMA_BAIK, 0), lembar.i(LembarKunci.PANGKAT_NB, LembarKunci.PANGKAT_ASING), kanan,
-					y + 2) + 4;
-		}
-		Component sub = lembar.teksAtau(LembarKunci.SUBJUDUL);
-		Component baris = sub != null ? sub : lembar.teksAtau(LembarKunci.TEMPAT);
-		if (baris != null && kanan - x > 12) {
-			l.teks(baris, x, y + 2, kanan - x - 2, gaya.teksLemah);
-		}
-		Component hint = petunjuk();
-		if (hint != null && l.di(px0, y, px1, y + STRIP)) {
-			l.tip(hint);
-		}
-		l.garis(px0, px1, y + STRIP + 1);
 	}
 
 	// ================================================================== input (the page's focus ring)

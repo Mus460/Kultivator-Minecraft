@@ -157,12 +157,6 @@ public abstract class LayarTempatDasar extends Page implements UiTempatClient.La
 		if ((buka || tab.isEmpty()) && !diminta.isEmpty() && tabBoleh(diminta)) {
 			gantiTab(diminta, false);
 		}
-		if (buka) {
-			String hub = dev.kultivator.client.tempat.ui.UiHub.ambilTab(layar);
-			if (hub != null && tabBoleh(hub)) {
-				gantiTab(hub, false);
-			}
-		}
 		pastikanTab();
 		Component p = lembar.teksAtau(LembarKunci.PESAN);
 		if (p != null && (lama == null || !p.getString().equals(lama.teks(LembarKunci.PESAN).getString()) || buka)) {
@@ -367,7 +361,8 @@ public abstract class LayarTempatDasar extends Page implements UiTempatClient.La
 		if (!lihatSaja && !UiTempatClient.sesiAktif(layar, npcId)) {
 			if (npcId >= 0) {
 				kirim(LembarKunci.OP_LIHAT);
-			} else if (DiSini.halaman() == this) {
+			} else if (DiSini.halaman() == this
+					|| DiSini.halaman() instanceof dev.kultivator.client.hub.LembarHub.Halaman h && h.isi() == this) {
 				DiSini.selesai(Component.translatable("kultivator.gui43.konteks.berakhir"));
 			}
 		}
@@ -502,9 +497,81 @@ public abstract class LayarTempatDasar extends Page implements UiTempatClient.La
 		iy1 = py1;
 	}
 
-	private boolean adaStrip() {
+	/** True when the sheet carries something for the info strip over the content. */
+	protected final boolean adaStrip() {
 		return lembar != null && (!lembar.s(LembarKunci.DISTRIK).isEmpty() || lembar.ada(LembarKunci.SUBJUDUL) || lembar.ada(LembarKunci.TEMPAT)
 				|| lembar.ada(LembarKunci.NAMA_BAIK) || lembar.f(LembarKunci.DISKON, 0.0F) > 0.001F || lembar.b(UJI) || hanyaBaca());
+	}
+
+	// =================================================================== strip and lock on the single kit (LayarInti, TemaHalaman)
+
+	/**
+	 * The info strip over the content (what the old header carried besides title and money), drawn with the single kit:
+	 * district, subtitle or place, then from the right "only viewing", the test ribbon, the discount and the place's Nama
+	 * Baik. Returns the height it takes from the content (0 when the sheet has nothing for it).
+	 */
+	protected final int stripInfo(dev.kultivator.client.screen.ui.Lukis l, int x0, int y, int x1) {
+		if (!adaStrip()) {
+			return 0;
+		}
+		int x = x0 + 2;
+		int kanan = x1 - 2;
+		String distrik = lembar.s(LembarKunci.DISTRIK);
+		if (!distrik.isEmpty()) {
+			l.g.fill(x - 1, y, x + 12, y + STRIP, Palette.argb(0xC0, TempatWarna.distrik(distrik) & 0xFFFFFF));
+			dev.kultivator.client.screen.ui.Glyphs.Atlas.ikon(l.g, LembarKunci.Ikon.distrik(distrik), x, y + 1, 10, 0xFFFFFFFF);
+			x += 15;
+		}
+		if (hanyaBaca()) {
+			Component b = TeksTempat.k("hanya_baca.kaki");
+			int bw = Math.min(kanan - x - 20, l.font.width(b) + 6);
+			if (bw > 20) {
+				l.g.fill(kanan - bw, y, kanan, y + STRIP, Palette.argb(0x60, Palette.INK_FAINT & 0xFFFFFF));
+				l.teks(b, kanan - bw + 3, y + 2, bw - 6, l.gaya.teks);
+				kanan -= bw + 4;
+			}
+		}
+		if (lembar.b(UJI) && kanan - x > 60) {
+			dev.kultivator.client.screen.ui.Glyphs.Atlas.pita(l.g, true, kanan - 34, y, 32, STRIP, 0xFFFFFFFF);
+			l.tengah(TeksTempat.k("uji.pita"), kanan - 18, y + 2, 30, 0xFF5A3A08);
+			kanan -= 38;
+		}
+		float diskon = lembar.f(LembarKunci.DISKON, 0.0F);
+		if (diskon > 0.001F) {
+			Component d = TeksTempat.k("diskon", Math.round(diskon * 100));
+			int dw = l.font.width(d) + 6;
+			if (kanan - dw - x > 40) {
+				l.g.fill(kanan - dw, y, kanan, y + STRIP, Palette.SEAL);
+				l.teks(d, kanan - dw + 3, y + 2, dw - 4, 0xFFFFF0E0);
+				kanan -= dw + 4;
+			}
+		}
+		if (lembar.ada(LembarKunci.NAMA_BAIK) && kanan - x > 80) {
+			kanan -= dev.kultivator.client.screen.ui.LencanaPangkat.namaBaik(l, lembar.i(LembarKunci.NAMA_BAIK, 0),
+					lembar.i(LembarKunci.PANGKAT_NB, LembarKunci.PANGKAT_ASING), kanan, y + 2) + 4;
+		}
+		Component sub = lembar.teksAtau(LembarKunci.SUBJUDUL);
+		Component baris = sub != null ? sub : lembar.teksAtau(LembarKunci.TEMPAT);
+		if (baris != null && kanan - x > 12) {
+			l.teks(baris, x, y + 2, kanan - x - 2, l.gaya.teksLemah);
+		}
+		Component hint = petunjuk();
+		if (hint != null && l.di(x0, y, x1, y + STRIP)) {
+			l.tip(hint);
+		}
+		l.garis(x0, x1, y + STRIP + 1);
+		return STRIP + 3;
+	}
+
+	/** The locked sheet ({@code kunci_layar}) over the box with the single kit; true when drawn (draw nothing else). */
+	protected final boolean kunciLayar(dev.kultivator.client.screen.ui.Lukis l, int x0, int y0, int x1, int y1) {
+		if (!lembar.ada(LembarKunci.KUNCI_LAYAR)) {
+			return false;
+		}
+		Lembar k = lembar.sub(LembarKunci.KUNCI_LAYAR);
+		dev.kultivator.client.screen.ui.KeadaanTerkunci.gambar(l, k.teks(LembarKunci.ALASAN), k.teksAtau(LembarKunci.SYARAT), x0, y0, x1, y1,
+				Util.getMillis() - Math.max(0L, terkunciSejak));
+		return true;
 	}
 
 	// =================================================================== drawing

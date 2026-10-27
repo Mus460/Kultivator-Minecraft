@@ -61,7 +61,7 @@ public final class LelangJembatan {
 
 	/** The {@code HubPages} supplier of Keabadian › Lelang: a new {@link LayarLelang} for this Gulungan. */
 	static Page halaman() {
-		LayarLelang page = new LayarLelang(NPC, lembar());
+		LayarLelang page = new LayarLelang(NPC, lembar()).kunciDari(AbadiClient::kunciNaik);
 		halaman = page;
 		return page;
 	}

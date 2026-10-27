@@ -3,7 +3,6 @@ package dev.kultivator.client.screen.ui;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.Util;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
@@ -11,14 +10,12 @@ import java.util.function.Supplier;
 /**
  * A round jade coin with a square hole, used as an on/off toggle: bright green jade with a gold rim when on, dull
  * grey-green when off. The label sits to its right (1.0, cut with "…"). The single toggle of the kit (DESIGN 43.7);
- * confirming a switch is {@link SegelKonfirmasi}'s job, so {@link #askingWhen} is only kept until the old pages that
- * call it have moved (43-M1), then P1 removes it.
+ * confirming a switch is {@link SegelKonfirmasi}'s job.
  */
 public class JadeCoin extends Widget {
 
 	private final Supplier<Component> label;
 	private final BooleanSupplier on;
-	private BooleanSupplier asking = () -> false;
 	private final Eased lit = new Eased(10.0F);
 
 	public JadeCoin(int x, int y, int w, int h, Supplier<Component> label, BooleanSupplier on) {
@@ -27,29 +24,20 @@ public class JadeCoin extends Widget {
 		this.on = on;
 	}
 
-	/** @deprecated DESIGN 43.7: confirm with {@link SegelKonfirmasi} instead; removed by P1. */
-	@Deprecated
-	public JadeCoin askingWhen(BooleanSupplier asking) {
-		this.asking = asking;
-		return this;
-	}
-
 	@Override
 	protected void draw(GuiGraphicsExtractor g, Font font, boolean over, float seconds) {
 		boolean state = on.getAsBoolean();
 		float t = lit.to(state ? 1.0F : 0.0F, seconds);
 		float glow = isEnabled() ? hover.get() : 0.0F;
-		boolean ask = asking.getAsBoolean();
-		float pulse = ask ? 0.5F + 0.5F * (float) Math.sin(Util.getMillis() / 140.0D) : 0.0F;
 		float r = h / 2.0F - 0.5F;
 		float cx = x + h / 2.0F;
 		float cy = y + h / 2.0F + pressOffset(over);
 
-		if (glow > 0.02F || ask) {
-			Brush.halo(g, cx, cy, r, 3.0F, ask ? 0xFF4030 : 0x9CFFD0, Math.max(glow, pulse));
+		if (glow > 0.02F) {
+			Brush.halo(g, cx, cy, r, 3.0F, 0x9CFFD0, glow);
 		}
 		Brush.disc(g, cx + 0.5F, cy + 1.0F, r, 0x40000000);
-		int rim = ask ? Palette.mix(Palette.GOLD, Palette.SEAL_GLOW, pulse) : Palette.mix(Palette.JADE_DULL, Palette.GOLD, t);
+		int rim = Palette.mix(Palette.JADE_DULL, Palette.GOLD, t);
 		Brush.disc(g, cx, cy, r, Palette.darken(rim, 0.25F));
 		Brush.disc(g, cx, cy, r - 0.7F, rim);
 		int faceTop = Palette.mix(0xFFA9B5AE, Palette.JADE_LIGHT, t);

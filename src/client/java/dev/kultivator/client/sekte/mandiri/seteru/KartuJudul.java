@@ -5,9 +5,6 @@ import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.sekte.api.Lambang;
 import dev.kultivator.sekte.mandiri.seteru.SeteruIds;
 import dev.kultivator.sekte.mandiri.seteru.SeteruPayloads;
-import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement;
-import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 
 /**
@@ -16,9 +13,8 @@ import net.minecraft.network.chat.Component;
  * and "Perseteruan · <our hall> lawan <their sect> · <cause> · <rung>" under it. It runs while the duel's own intro of
  * DESIGN 35 runs (that intro obeys the camera setting Penuh/Singkat/Mati; this card never moves the camera), follows the
  * setting "Kartu judul" (inside {@link TitleCard#show}), waits its turn behind another full card, and hides with the HUD.
- * The HUD element {@code mandiri_seteru_judul} stays registered and draws nothing of its own.
  */
-public final class KartuJudul implements HudElement {
+public final class KartuJudul {
 
 	/** The 32 emblem symbols as seal glyphs (the order of {@code api.Lambang} symbols, as D's screen). */
 	private static final String SIMBOL = "剑莲鹤龙凤虎龟山月日云雷火水木金土风星海玉竹梅松霜雪花鼎钟塔天道";
@@ -35,10 +31,5 @@ public final class KartuJudul implements HudElement {
 
 	/** Disconnect: {@link TitleCard} clears its own queue. */
 	static void hapus() {
-	}
-
-	@Override
-	public void extractRenderState(GuiGraphicsExtractor g, DeltaTracker deltaTracker) {
-		// drawn by TitleCard (DESIGN 43.9)
 	}
 }

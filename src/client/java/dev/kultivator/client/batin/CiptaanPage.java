@@ -8,6 +8,7 @@ import dev.kultivator.client.screen.Page;
 import dev.kultivator.client.screen.ui.Bilah;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Glyphs;
+import dev.kultivator.client.screen.ui.GulirTeks;
 import dev.kultivator.client.screen.ui.InkField;
 import dev.kultivator.client.screen.ui.KeadaanKosong;
 import dev.kultivator.client.screen.ui.Lukis;
@@ -47,7 +48,7 @@ public class CiptaanPage extends Page {
 	private static int daoB = 1;
 	private static int form = 1;
 	private static String name = "";
-	private final AbadiClient.Baris baris = new AbadiClient.Baris();
+	private final GulirTeks baris = new GulirTeks();
 	private int linesTop;
 	private @Nullable InkField nameField;
 
@@ -301,7 +302,7 @@ public class CiptaanPage extends Page {
 					Math.min(ritual, Creation.CHANNEL_SECONDS), Creation.CHANNEL_SECONDS, x, top, x + w, null, Palette.STORED);
 			top += 12;
 		}
-		baris.mulai(w);
+		AbadiClient.mulai(baris, w, Payloads.DuniaSync.CH_BATIN);
 		baris.tambah(Component.translatable(P + "cost", Creation.PEARL_COST, creator.getIntOr("pearls", 0), Creation.MATERIAL_COST,
 				creator.getIntOr("material", 0), Msg.number(creator.getDoubleOr("cost_qi", 0.0D)), Msg.number(creator.getDoubleOr("qi", 0.0D))), Palette.INK);
 		baris.tambah(daoA == daoB ? Component.translatable(P + "need_pure", (int) Creation.PURE_COMPREHENSION)

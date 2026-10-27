@@ -8,7 +8,6 @@ import dev.kultivator.client.tempat.ui.kit.Lembar;
 import dev.kultivator.client.tempat.ui.kit.Lukis;
 import dev.kultivator.client.tempat.ui.kit.PanelTempat;
 import dev.kultivator.client.tempat.ui.kit.TabLentera;
-import dev.kultivator.client.tempat.ui.kit.TeksTempat;
 import dev.kultivator.client.tempat.ui.kit.TempatWarna;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import dev.kultivator.sekte.gabung.api.Pangkat;
@@ -115,7 +114,7 @@ public final class LayarPangkat extends LayarGabungDasar {
 					LembarKunci.op(PohonPangkat.OP_TANTANG, e.id()));
 			if (over) {
 				int sk = e.i(GabungLembar.SIKAP, 0);
-				l.tip(List.of(e.teks(LembarKunci.NAMA), t("pangkat.sikap", Component.literal(TeksTempat.bertanda(sk)).withColor(warnaSikap(sk))),
+				l.tip(List.of(e.teks(LembarKunci.NAMA), t("pangkat.sikap", Component.literal(Brush.bertanda(sk)).withColor(warnaSikap(sk))),
 						t("pangkat.tantang_aturan")));
 			}
 			tx += w + 3;

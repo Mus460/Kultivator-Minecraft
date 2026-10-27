@@ -209,11 +209,8 @@
   "kultivator.goals.settings.guide.tip": "Shows the First Steps tracker on the right edge of the screen.",
 
   "kultivator.goals.page.section.steps": "Steps",
-  "kultivator.goals.page.section.steps.tip": "First Steps, World Path and Immortal Path: 60 steps in 15 chapters, a reward for each chapter.",
   "kultivator.goals.page.section.trials": "Trials",
-  "kultivator.goals.page.section.trials.tip": "Foundation Trials: three optional trials before each major breakthrough.",
   "kultivator.goals.page.section.daily": "Daily",
-  "kultivator.goals.page.section.daily.tip": "Daily Chores: three small tasks every day.",
   "kultivator.goals.page.hide": "Hide the guide",
   "kultivator.goals.page.hide.tip": "Hides the tracker on the right edge of the screen (switch it on again here or in Settings).",
   "kultivator.goals.page.claim": "Claim reward",

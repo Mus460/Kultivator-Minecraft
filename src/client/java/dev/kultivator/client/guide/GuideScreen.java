@@ -7,6 +7,7 @@ import dev.kultivator.client.screen.ui.Bilah;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.DaftarGulir;
 import dev.kultivator.client.screen.ui.Glyphs;
+import dev.kultivator.client.screen.ui.GulirTeks;
 import dev.kultivator.client.screen.ui.KeyHints;
 import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
@@ -47,7 +48,7 @@ public final class GuideScreen extends Page {
 
 	private final JalanPage.Langkah langkah = new JalanPage.Langkah();
 	private final DaftarGulir bab = new DaftarGulir();
-	private final JalanPage.Gulir kartu = new JalanPage.Gulir();
+	private final GulirTeks kartu = new GulirTeks();
 	private String sub = SUB_JALAN;
 	private boolean shown;
 	private int selected = -1;
@@ -317,7 +318,7 @@ public final class GuideScreen extends Page {
 		l.teks(heading, x0 + 6, y0 + 1, x1 - x0 - countW - 12, Palette.SEAL_DARK);
 		l.kanan(count, x1, y0 + 1, Palette.JADE_DARK);
 		l.g.fill(x0, y0 + 11, x1, y0 + 12, Palette.argb(0xB0, Palette.GOLD));
-		int lebar = x1 - x0 - JalanPage.Gulir.RUANG_BATANG;
+		int lebar = x1 - x0 - GulirTeks.RUANG_BATANG;
 		if (kotor || lebar != lebarIsi) {
 			kotor = false;
 			lebarIsi = lebar;

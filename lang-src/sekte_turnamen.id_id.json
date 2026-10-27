@@ -1,7 +1,5 @@
 {
   "kultivator.blueprint.comp.sx_turnamen_tribun": "Tribun Lei Tai",
-  "kultivator.hub.card.sekte_turnamen_papan": "Turnamen",
-  "kultivator.hub.card.sekte_turnamen_papan.tip": "Papan musim (Elo), bagan yang sedang berjalan, daftar juara dan tantangan antar-sekte.",
   "entity.kultivator.penonton": "Penonton",
   "advancement.kultivator.sekte.turnamen_juara.title": "Juara Lei Tai",
   "advancement.kultivator.sekte.turnamen_juara.description": "Seorang muridmu menjuarai turnamen sekte di panggung lei tai.",

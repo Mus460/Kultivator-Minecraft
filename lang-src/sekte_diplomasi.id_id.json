@@ -322,8 +322,6 @@
   "kultivator.sekte.diplomasi.uji.gerbang": "Ke gerbang %s di %s, %s, %s.",
   "kultivator.sekte.diplomasi.uji.gerbang_belum": "Gerbang %s belum lahir; ke titik rencananya %s, %s, %s (muat chunk baru di sana untuk melihatnya).",
   "kultivator.sekte.diplomasi.uji.simulasi": "%s hari disimulasikan.",
-  "kultivator.hub.card.sekte_diplomasi_rival": "Diplomasi Sekte",
-  "kultivator.hub.card.sekte_diplomasi_rival.tip": "Sekte-sekte NPC: utusan, hadiah, pakta, persekutuan, perang.",
   "advancement.kultivator.sekte.diplomasi_temu.title": "Gerbang di Balik Awan",
   "advancement.kultivator.sekte.diplomasi_temu.description": "Bertemu sebuah sekte NPC untuk pertama kali.",
   "advancement.kultivator.sekte.diplomasi_sekutu.title": "Sekte-Sekte Bersatu",

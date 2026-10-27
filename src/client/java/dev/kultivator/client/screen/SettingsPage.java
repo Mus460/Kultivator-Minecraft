@@ -67,6 +67,9 @@ public final class SettingsPage extends Page {
 	}
 
 	private static @Nullable Peringatan tunda;
+	/** The {@link Tujuan} focus key naming a heading (its lang key) to scroll to. */
+	public static final String FOKUS_BARIS = "baris";
+	private @Nullable String fokusBaris;
 
 	private final int group;
 	private final SettingsRows rows;
@@ -109,13 +112,6 @@ public final class SettingsPage extends Page {
 		HubNav.antre(Tujuan.of(HubNav.PENGATURAN, ID[group]));
 	}
 
-	/** Legacy constructor ({@code CultivationScreen.daftarBawaan}): Tampilan & Efek. */
-	SettingsPage(CultivationScreen screen) {
-		super(screen);
-		this.group = SettingsRows.TAMPILAN;
-		this.rows = new SettingsRows(this);
-	}
-
 	SettingsPage(int group) {
 		super();
 		this.group = SettingsRows.clamp(group);
@@ -138,6 +134,13 @@ public final class SettingsPage extends Page {
 	public void onShow(@Nullable CompoundTag fokus) {
 		super.onShow(fokus);
 		tampilkanTunda();
+	}
+
+	/** {@code {"baris": headingLangKey}}: scrolls to that heading's rows on the next frame (Langit Sekte, the last block). */
+	@Override
+	public void fokus(CompoundTag fokus) {
+		String key = fokus.getStringOr(FOKUS_BARIS, "");
+		fokusBaris = key.isEmpty() ? null : key;
 	}
 
 	@Override
@@ -338,6 +341,24 @@ public final class SettingsPage extends Page {
 			lists[c].gambar(l, kunci, box[0], y, box[1], y + h, col.size(), ROW,
 					(lk, i, x0, y0, x1, y1, sorot, pilih) -> baris(lk, kunci, i, col.get(i), x0, y0, x1, y1, sorot, pilih),
 					() -> pakai(cc), null);
+		}
+		if (fokusBaris != null) {
+			gulirKe(Component.translatable(fokusBaris).getString());
+			fokusBaris = null;
+		}
+	}
+
+	/** Selects the first row under the heading reading {@code judul} so its list scrolls there (after a frame laid it out). */
+	private void gulirKe(String judul) {
+		for (int c = 0; c < columns.size(); c++) {
+			List<Entry> col = columns.get(c);
+			for (int i = 0; i < col.size(); i++) {
+				SettingsRows.Item item = col.get(i).item();
+				if (item.type() == SettingsRows.Type.HEADING && item.label().get().getString().equals(judul)) {
+					lists[c].setPilih(Math.min(i + 1, col.size() - 1));
+					return;
+				}
+			}
 		}
 	}
 

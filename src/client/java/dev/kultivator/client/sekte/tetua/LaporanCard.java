@@ -6,8 +6,6 @@ import dev.kultivator.client.epic.screen.TitleCard;
 import dev.kultivator.client.hud.Kabar;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Palette;
-import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -28,10 +26,9 @@ import java.util.List;
  * group under its coloured name, as many lines as the screen allows) and the day's totals at its foot (disciples present,
  * the restless, garden and mine). It waits for a title card or a film to clear (at most 4 s) and stays about 10-20 s by
  * its length; {@link Kabar} stops its clock under an open screen. The Balai Tetua shows the same report in full
- * ({@link #rowsOf}, {@link #seal}). The HUD element {@code sekte_tetua_laporan} stays registered and draws nothing of its
- * own. Client thread only.
+ * ({@link #rowsOf}, {@link #seal}). Client thread only.
  */
-public final class LaporanCard implements HudElement {
+public final class LaporanCard {
 
 	static final Identifier SEAL = Kultivator.id("textures/sekte/tetua/segel.png");
 	private static final int W = 214;
@@ -95,11 +92,6 @@ public final class LaporanCard implements HudElement {
 	static void dismiss() {
 		report = null;
 		Kabar.tutup(KUNCI);
-	}
-
-	@Override
-	public void extractRenderState(GuiGraphicsExtractor g, DeltaTracker deltaTracker) {
-		// drawn by Kabar (DESIGN 43.9)
 	}
 
 	static List<Row> rowsOf(CompoundTag p) {
