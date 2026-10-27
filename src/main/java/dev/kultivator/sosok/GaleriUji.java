@@ -20,6 +20,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -202,11 +203,16 @@ public final class GaleriUji {
 		}
 		UJI.clear();
 		for (ServerLevel level : server.getAllLevels()) {
+			// Collect first: discard() edits the lookup map that getAllEntities() iterates.
+			List<Entity> weg = new ArrayList<>();
 			for (var entity : level.getAllEntities()) {
 				if (entity != null && entity.entityTags().contains(TAG) && !entity.isRemoved()) {
-					entity.discard();
-					n++;
+					weg.add(entity);
 				}
+			}
+			for (Entity entity : weg) {
+				entity.discard();
+				n++;
 			}
 		}
 		return n;

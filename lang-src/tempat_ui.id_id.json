@@ -1,4 +1,5 @@
 {
+  "entity.kultivator.papan_hidup": "Papan Pengumuman",
   "kultivator.tempat_ui.acara.belum_ada_skor": "Belum ada skor. Lomba belum dimulai.",
   "kultivator.tempat_ui.acara.bracket": "Bagan Turnamen",
   "kultivator.tempat_ui.acara.daftar": "Daftar · %s NB",

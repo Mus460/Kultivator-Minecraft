@@ -37,7 +37,10 @@ public final class AuraClient {
 		ClientPlayNetworking.registerGlobalReceiver(AuraPreviewPayload.TYPE, (payload, context) -> AuraPreviewClient.onPayload(payload));
 		LevelRenderEvents.COLLECT_SUBMITS.register(AuraEngine::render);
 		HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, Kultivator.id("aura_edge"), new AuraHud());
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> clear()));
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
+			clear();
+			lastLevel = null;
+		}));
 		AuraEngine.register(Realm.MORTAL, new MortalAura());
 		AuraEngine.register(Realm.QI_REFINING, new QiRefiningAura());
 		AuraEngine.register(Realm.FOUNDATION, new FoundationAura());

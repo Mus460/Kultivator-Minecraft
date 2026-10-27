@@ -253,6 +253,7 @@
   "kultivator.sekte.mandiri.cerita.papan.tampil.kabar": "News",
   "kultivator.sekte.mandiri.cerita.papan.tampil.kabar.tip": "The hall's last 30 events.",
   "kultivator.sekte.mandiri.cerita.papan.tampil.kebijakan": "Hall Policy",
+  "kultivator.sekte.mandiri.cerita.papan.tampil.kebijakan.mati": "Self-Reliant Disciples are switched off on this server; the hall policy does not apply.",
   "kultivator.sekte.mandiri.cerita.papan.tampil.kebijakan.tip": "The policy every disciple without its own follows.",
   "kultivator.sekte.mandiri.cerita.papan.tampil.murid": "Disciples",
   "kultivator.sekte.mandiri.cerita.papan.tampil.murid.tip": "Every disciple: loaded, travelling and last seen.",

@@ -253,6 +253,7 @@
   "kultivator.sekte.mandiri.cerita.papan.tampil.kabar": "Kabar",
   "kultivator.sekte.mandiri.cerita.papan.tampil.kabar.tip": "30 peristiwa terakhir aula.",
   "kultivator.sekte.mandiri.cerita.papan.tampil.kebijakan": "Kebijakan Aula",
+  "kultivator.sekte.mandiri.cerita.papan.tampil.kebijakan.mati": "Murid Mandiri dimatikan di server ini; kebijakan aula tidak berlaku.",
   "kultivator.sekte.mandiri.cerita.papan.tampil.kebijakan.tip": "Kebijakan yang diikuti semua murid tanpa kebijakan sendiri.",
   "kultivator.sekte.mandiri.cerita.papan.tampil.murid": "Murid",
   "kultivator.sekte.mandiri.cerita.papan.tampil.murid.tip": "Semua murid: yang dimuat, yang bepergian dan yang terakhir terlihat.",

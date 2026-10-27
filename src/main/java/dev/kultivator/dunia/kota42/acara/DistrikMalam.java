@@ -117,6 +117,7 @@ public final class DistrikMalam {
 		}
 		MALAM.clear();
 		TENDA.hapusSemua();
+		ADA.clear();
 	}
 
 	// ================================================================== the clock and the factors
@@ -137,18 +138,25 @@ public final class DistrikMalam {
 		return buka(server) && ada(server, situs) ? 2.0D : 1.0D;
 	}
 
-	private static final Map<Long, Boolean> ADA = new HashMap<>();
+	/** Per site: {@link Long#MAX_VALUE} once lots were found, else the server tick of the next look (unloaded pieces or growth can add lots). */
+	private static final Map<Long, Long> ADA = new HashMap<>();
 
 	/** True when the plan of {@code situs} holds night-district lots. */
 	public static boolean ada(MinecraftServer server, long situs) {
-		return ADA.computeIfAbsent(situs, s -> {
-			for (Titik t : dev.kultivator.dunia.tempat.TempatApi.titik(server.overworld(), s, "")) {
-				if (distrik(t)) {
-					return true;
-				}
+		long now = server.getTickCount();
+		Long cek = ADA.get(situs);
+		if (cek != null && now < cek) {
+			return cek == Long.MAX_VALUE;
+		}
+		boolean ada = false;
+		for (Titik t : dev.kultivator.dunia.tempat.TempatApi.titik(server.overworld(), situs, "")) {
+			if (distrik(t)) {
+				ada = true;
+				break;
 			}
-			return false;
-		});
+		}
+		ADA.put(situs, ada ? Long.MAX_VALUE : now + 1200L);
+		return ada;
 	}
 
 	private static boolean distrik(Titik t) {

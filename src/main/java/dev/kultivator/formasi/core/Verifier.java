@@ -4,6 +4,7 @@ import dev.kultivator.formasi.FormasiItems;
 import dev.kultivator.formasi.FormationRegistry;
 import dev.kultivator.formasi.match.ChunkReader;
 import dev.kultivator.formasi.match.MatchResult;
+import dev.kultivator.formasi.match.PatternMatcher;
 import dev.kultivator.formasi.spec.FormationSpec;
 import dev.kultivator.formasi.spec.Slot;
 import net.minecraft.core.BlockPos;
@@ -125,8 +126,13 @@ public final class Verifier {
 	/** Reads up to {@code reads} slots of one core from its cursor; returns the reads used. */
 	private static int stepCore(ServerLevel level, CoreRecord record, FormationSpec spec, int reads) {
 		List<Slot> slots = spec.pattern().slots(record.rot);
-		ensure(record, slots.size());
 		ChunkReader reader = new ChunkReader(level);
+		if (record.slotState.length != slots.size()) {
+			// First read after a load: one full match, so a broken core is not trusted until the round-robin has passed.
+			apply(record, PatternMatcher.full(reader, record.eye, spec, record.rot));
+			CoreTicker.refreshState(level, record);
+			return slots.size();
+		}
 		int used = 0;
 		while (used < reads) {
 			if (record.cursor >= slots.size()) {

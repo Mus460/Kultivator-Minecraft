@@ -1,7 +1,9 @@
 package dev.kultivator.formasi.effect.b;
 
 import dev.kultivator.data.Dao;
+import dev.kultivator.formasi.core.CoreRecord;
 import dev.kultivator.formasi.core.CoreState;
+import dev.kultivator.formasi.core.CoreTicker;
 import dev.kultivator.formasi.core.CoreView;
 import dev.kultivator.formasi.core.Cores;
 import dev.kultivator.formasi.effect.CoreContext;
@@ -21,9 +23,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -51,8 +51,8 @@ public final class TransportNetwork {
 	public static final double L5_COST_STEP = 2.0D;
 	public static final double L5_STEP_BLOCKS = 512.0D;
 	public static final int NAME_MAX = 24;
-
-	private static final Map<BUtil.CoreKey, Double> DEBT = new HashMap<>();
+	/** Ext key of the unpaid trip cost (saved with the record, so a restart does not forgive it). */
+	private static final String DEBT = "debt";
 
 	/** Every transport node of {@code owner}, by id. */
 	public static List<CoreView> nodes(UUID owner) {
@@ -210,7 +210,7 @@ public final class TransportNetwork {
 		} else if (kept) {
 			cost = 0.0D;
 		}
-		double owed = DEBT.getOrDefault(BUtil.CoreKey.of(from), 0.0D);
+		double owed = from.ext().getDoubleOr(DEBT, 0.0D);
 		if (cost > 0.0D && from.dayaCenti() < Math.round((cost + owed) * 100.0D)) {
 			return Component.translatable("kultivator.formasib.trip.refuse.daya", Math.round(cost));
 		}
@@ -230,8 +230,11 @@ public final class TransportNetwork {
 
 	/** A trip happened: the source owes {@code daya}, paid on its next pulse. */
 	static void addDebt(ResourceKey<Level> dim, int coreId, double daya) {
-		if (daya > 0.0D) {
-			DEBT.merge(new BUtil.CoreKey(dim, coreId), daya, Double::sum);
+		CoreRecord record = daya > 0.0D ? CoreTicker.record(dim, coreId) : null;
+		if (record != null) {
+			CompoundTag ext = record.ext.copy();
+			ext.putDouble(DEBT, ext.getDoubleOr(DEBT, 0.0D) + daya);
+			Cores.setExt(dim, coreId, ext);
 		}
 	}
 
@@ -278,18 +281,17 @@ public final class TransportNetwork {
 		return list;
 	}
 
-	static void clearAll() {
-		DEBT.clear();
-	}
-
 	/** The "transport" handler: pays trip debts; always standby (each trip pays its own cost). */
 	public static final class Effect implements FormationEffect {
 
 		@Override
 		public void pulse(CoreContext ctx) {
-			BUtil.CoreKey key = BUtil.CoreKey.of(ctx.core());
-			Double owed = DEBT.remove(key);
-			if (owed != null && owed > 0.0D) {
+			CoreView core = ctx.core();
+			double owed = core.ext().getDoubleOr(DEBT, 0.0D);
+			if (owed > 0.0D) {
+				CompoundTag ext = core.ext().copy();
+				ext.remove(DEBT);
+				Cores.setExt(core.dim(), core.id(), ext);
 				ctx.spend(owed);
 			}
 		}

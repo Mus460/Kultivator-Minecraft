@@ -416,6 +416,13 @@ public final class TrialFx {
 		return entity != null ? entity.position() : fallback;
 	}
 
+	/** Disconnect: drops the old world (the next world's first tick would only do it after it loads). */
+	static void forget() {
+		lastLevel = null;
+		RUNNING.clear();
+		lastTick = Long.MIN_VALUE;
+	}
+
 	private TrialFx() {
 	}
 }

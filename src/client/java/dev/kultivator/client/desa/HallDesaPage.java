@@ -11,6 +11,7 @@ import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.TalismanButton;
 import dev.kultivator.client.screen.ui.GulirIsi;
 import dev.kultivator.network.Actions;
+import dev.kultivator.sect.hall.Halls;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.nbt.CompoundTag;
@@ -221,16 +222,22 @@ public class HallDesaPage extends Page {
 		String req = v.getStringOr("req", "");
 		boolean surat = bisa && !req.isEmpty();
 		if (TalismanButton.gambar(l, "surat", x0, by, bw, 14, Component.translatable(DesaCards.P + "letter"), surat, null,
-				() -> send(Actions.DESA, 0, "letter:" + current().getIntOr("id", 0)))) {
+				() -> aksi("letter:" + current().getIntOr("id", 0)))) {
 			l.tip(Component.translatable(DesaCards.P + "letter.tip"));
 		}
 		boolean tanpaPelindung = v.getStringOr("guard", "").isEmpty();
 		boolean pelindung = bisa && v.getBooleanOr("pledged", false);
 		if (TalismanButton.gambar(l, "pelindung", x0 + bw + 6, by, x1 - x0 - bw - 6, 14,
 				Component.translatable(tanpaPelindung ? DesaCards.P + "assign" : DesaCards.P + "release"), pelindung, null,
-				() -> send(Actions.DESA, 0, (current().getStringOr("guard", "").isEmpty() ? "guard:" : "release:") + current().getIntOr("id", 0)))) {
+				() -> aksi((current().getStringOr("guard", "").isEmpty() ? "guard:" : "release:") + current().getIntOr("id", 0)))) {
 			l.tip(Component.translatable(tanpaPelindung ? DesaCards.P + "assign.tip" : DesaCards.P + "release.tip"));
 		}
+	}
+
+	/** The hall info is polled every 4 s: ask for it right after the action so the card does not show the old state. */
+	private static void aksi(String text) {
+		send(Actions.DESA, 0, text);
+		HallClient.send(Halls.OP_REFRESH, "");
 	}
 
 	@Override

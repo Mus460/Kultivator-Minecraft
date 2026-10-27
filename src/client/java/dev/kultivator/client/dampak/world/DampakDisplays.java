@@ -155,7 +155,7 @@ public final class DampakDisplays {
 				return null;
 			}
 			display.setId(nextId--);
-			if (nextId < FIRST_ID - 1_000_000) {
+			if (nextId <= FIRST_ID - 1_000_000) {
 				nextId = FIRST_ID;
 			}
 			display.setPos(at.x, at.y, at.z);
@@ -250,6 +250,7 @@ public final class DampakDisplays {
 			remove(PIECES.get(i).display);
 		}
 		PIECES.clear();
+		owner = null;
 	}
 
 	private static void remove(Display display) {

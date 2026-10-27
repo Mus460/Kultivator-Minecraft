@@ -15,6 +15,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
@@ -94,7 +95,7 @@ public final class Stacking {
 	/** Field cache lifetime. */
 	public static final int CACHE_TICKS = 20;
 
-	private record Cached(long time, String dim, FormationField field) {
+	private record Cached(long time, String dim, long chunk, FormationField field) {
 	}
 
 	private record PosCached(long time, FormationField field, List<CoreRecord> cores) {
@@ -117,14 +118,16 @@ public final class Stacking {
 		CoreTicker.ensureServer(level.getServer());
 		long now = level.getGameTime();
 		String dim = level.dimension().identifier().toString();
+		// Per chunk of the asked position: the eye of a stranger or the far end of a trip must not reuse the field of the entity's own spot.
+		long chunk = ChunkPos.pack(BlockPos.containing(pos));
 		Cached cached = CACHE.get(who.getUUID());
-		if (cached != null && cached.dim().equals(dim) && now - cached.time() < CACHE_TICKS && now >= cached.time()) {
+		if (cached != null && cached.dim().equals(dim) && cached.chunk() == chunk && now - cached.time() < CACHE_TICKS && now >= cached.time()) {
 			hits++;
 			return cached.field();
 		}
 		misses++;
 		FormationField field = compute(level, pos, who, null, null);
-		CACHE.put(who.getUUID(), new Cached(now, dim, field));
+		CACHE.put(who.getUUID(), new Cached(now, dim, chunk, field));
 		return field;
 	}
 

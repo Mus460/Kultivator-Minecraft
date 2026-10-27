@@ -41,7 +41,7 @@ import java.util.UUID;
  */
 public final class RingProtection {
 
-	/** Rings that fell into the void while their owner was offline, per owner (Overworld saved data). */
+	/** Rings that fell into the void while their owner was offline, or were kept through death until the respawn, per owner (Overworld saved data). */
 	public static final class RescueStore extends SavedData {
 
 		private static final Codec<Map<UUID, List<ItemStack>>> MAP_CODEC = Codec.unboundedMap(UUIDUtil.STRING_CODEC, ItemStack.CODEC.listOf());
@@ -68,9 +68,6 @@ public final class RingProtection {
 		}
 	}
 
-	/** Rings kept through death when {@code storageRingKeepOnDeath} is on, until the respawn. */
-	private static final Map<UUID, List<ItemStack>> KEPT = new HashMap<>();
-
 	static void init() {
 		ServerEntityEvents.ENTITY_LOAD.register((entity, level) -> {
 			if (entity instanceof ItemEntity item) {
@@ -92,12 +89,9 @@ public final class RingProtection {
 			return true;
 		});
 		ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> {
-			List<ItemStack> kept = KEPT.remove(newPlayer.getUUID());
-			if (kept != null) {
-				kept.forEach(stack -> Inv.give(newPlayer, stack));
-			}
+			returnRescued(newPlayer, false);
 		});
-		ServerPlayerEvents.JOIN.register(RingProtection::returnRescued);
+		ServerPlayerEvents.JOIN.register(player -> returnRescued(player, true));
 	}
 
 	/** Owner-only pickup and no despawn for a dropped ring with an imprint. */
@@ -132,7 +126,10 @@ public final class RingProtection {
 			}
 		}
 		if (!kept.isEmpty()) {
-			KEPT.computeIfAbsent(player.getUUID(), key -> new ArrayList<>()).addAll(kept);
+			// Saved data, not a static map: a player can quit from the death screen and rejoin dead (or in another world).
+			RescueStore store = RescueStore.get(player.level().getServer());
+			store.rings.computeIfAbsent(player.getUUID(), key -> new ArrayList<>()).addAll(kept);
+			store.setDirty();
 		}
 	}
 
@@ -163,7 +160,11 @@ public final class RingProtection {
 		return true;
 	}
 
-	private static void returnRescued(ServerPlayer player) {
+	/** Hands back rescued and death-kept rings; a player who joins dead waits for the respawn (a dead player's inventory is not carried over). */
+	private static void returnRescued(ServerPlayer player, boolean announce) {
+		if (player.isDeadOrDying()) {
+			return;
+		}
 		MinecraftServer server = player.level().getServer();
 		RescueStore store = RescueStore.get(server);
 		List<ItemStack> list = store.rings.remove(player.getUUID());
@@ -173,7 +174,9 @@ public final class RingProtection {
 		store.setDirty();
 		for (ItemStack stack : list) {
 			Inv.give(player, stack);
-			Msg.chat(player, Component.translatable("kultivator.tempa.ring.rescued", stack.getHoverName()).withStyle(ChatFormatting.GOLD));
+			if (announce) {
+				Msg.chat(player, Component.translatable("kultivator.tempa.ring.rescued", stack.getHoverName()).withStyle(ChatFormatting.GOLD));
+			}
 		}
 	}
 

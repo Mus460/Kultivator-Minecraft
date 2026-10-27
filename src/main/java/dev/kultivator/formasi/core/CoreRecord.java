@@ -174,6 +174,7 @@ public final class CoreRecord {
 		tag.putInt("kind", kind);
 		tag.putBoolean("on", on);
 		tag.putLong("daya", daya);
+		tag.putLong("crack_since", crackSince);
 		tag.putLong("daya_a", amethystPart());
 		tag.putDouble("carry", carry);
 		tag.putInt("best", best);
@@ -203,6 +204,7 @@ public final class CoreRecord {
 				tag.getStringOr("owner_name", ""), tag.getIntOr("kind", 1), false);
 		record.on = tag.getBooleanOr("on", false);
 		record.daya = Math.max(0L, tag.getLongOr("daya", 0L));
+		record.crackSince = tag.getLongOr("crack_since", -1L);
 		record.carry = tag.getDoubleOr("carry", 0.0D);
 		record.best = tag.getIntOr("best", -1);
 		// Older saves: a core never fed a stone holds only amethyst Daya.

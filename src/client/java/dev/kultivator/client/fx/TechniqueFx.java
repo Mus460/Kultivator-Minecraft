@@ -468,6 +468,13 @@ public final class TechniqueFx {
 		}
 	}
 
+	/** Disconnect: drops the old world (the next world's first tick would only do it after it loads). */
+	static void forget() {
+		lastLevel = null;
+		RUNNING.clear();
+		OrePingFx.clear();
+	}
+
 	private TechniqueFx() {
 	}
 }

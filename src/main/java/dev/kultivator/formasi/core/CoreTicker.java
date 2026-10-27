@@ -503,6 +503,7 @@ public final class CoreTicker {
 			if (record.missing == 1 && record.flaggedBy >= 0) {
 				if (record.crackSince < 0L) {
 					record.crackSince = now;
+					store(level).setDirty();
 				}
 				record.cracked = now - record.crackSince <= (long) CRACK_TICKS * (record.flagKeeper ? 2 : 1);
 			}
@@ -511,7 +512,8 @@ public final class CoreTicker {
 				record.reason = Component.translatable("kultivator.formasi.reason.broken", record.missing);
 				return;
 			}
-		} else {
+		} else if (record.slotState.length > 0) {
+			// Not yet read after a load: keep the saved crack timer until the first full read.
 			record.crackSince = -1L;
 		}
 		Component blocked = blocker(level, record, spec, hallLevel, hall);
@@ -828,8 +830,9 @@ public final class CoreTicker {
 	/** Forgets a real record (blocks untouched, Daya to the Kas, keepers freed). */
 	public static void forget(ServerLevel level, CoreStore store, CoreRecord record, boolean tell) {
 		FormationSpec spec = FormationRegistry.byId(record.spec);
+		long back = 0L;
 		if (!record.virtual && record.daya > 0L) {
-			refund(record, record.daya);
+			back = record.daya - refund(record, record.daya);
 		}
 		for (DiscipleEntity disciple : Disciples.loaded(record.owner)) {
 			if (record.hasKeeper(disciple.soulId())) {
@@ -844,10 +847,10 @@ public final class CoreTicker {
 		if (tell && !record.virtual) {
 			Component name = spec == null ? Component.literal(record.spec) : spec.name();
 			OwnerStore.get(level.getServer()).log(record.owner, level.getGameTime() / 24000L, "kultivator.formasi.log.removed", record.spec,
-					Long.toString(record.daya / 100L));
+					Long.toString(back / 100L));
 			ServerPlayer owner = level.getServer().getPlayerList().getPlayer(record.owner);
 			if (owner != null) {
-				Msg.chat(owner, Component.translatable("kultivator.formasi.removed", name, record.daya / 100L).withStyle(ChatFormatting.YELLOW));
+				Msg.chat(owner, Component.translatable("kultivator.formasi.removed", name, back / 100L).withStyle(ChatFormatting.YELLOW));
 			}
 		}
 	}

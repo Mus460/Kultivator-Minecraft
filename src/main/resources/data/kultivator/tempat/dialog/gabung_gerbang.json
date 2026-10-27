@@ -21,6 +21,11 @@
         {
           "ke": "tahap"
         },
+        {
+          "akibat": [
+            "gabung.aturan"
+          ]
+        },
         {}
       ]
     },

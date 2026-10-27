@@ -153,6 +153,7 @@ public final class ObrolanWarga {
 		SESI.clear();
 		TERAKHIR.clear();
 		JEJAK.clear();
+		TAMPIL.clear();
 	}
 
 	/** Last chats (newest last, at most 16). */

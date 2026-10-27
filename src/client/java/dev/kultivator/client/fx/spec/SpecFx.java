@@ -111,9 +111,9 @@ public final class SpecFx {
 		boolean displays = PhantomDisplays.enabled() && !(others && EffectQuality.others() != EffectQuality.Others.FULL);
 		FxEvent ev = new FxEvent(spec, payload, EffectQuality.level().factor(), othersFactor, displays,
 				EffectQuality.displayAllowance(spec.grade().tier()), FxBudget.perEvent());
-		followUntil(ev);
-		accents(ev);
 		try {
+			followUntil(ev);
+			accents(ev);
 			if (phase == Phase.PHANTOM) {
 				PhantomFx.onPhantom(ev);
 			}
@@ -125,9 +125,14 @@ public final class SpecFx {
 		} catch (RuntimeException exception) {
 			Kultivator.LOGGER.warn("Kultivator: technique extra effect of {} failed", spec.id(), exception);
 		}
-		List<FxLayer> layers = layersOf(spec, ev);
-		for (int i = 0; i < layers.size(); i++) {
-			start(ev, layers.get(i), i);
+		// a throw here would reach the packet handler and disconnect the player
+		try {
+			List<FxLayer> layers = layersOf(spec, ev);
+			for (int i = 0; i < layers.size(); i++) {
+				start(ev, layers.get(i), i);
+			}
+		} catch (RuntimeException exception) {
+			Kultivator.LOGGER.warn("Kultivator: technique layers of {} failed", spec.id(), exception);
 		}
 	}
 

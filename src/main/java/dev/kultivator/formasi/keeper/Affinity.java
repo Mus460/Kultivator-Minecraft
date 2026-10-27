@@ -2,13 +2,14 @@ package dev.kultivator.formasi.keeper;
 
 import dev.kultivator.data.Dao;
 import dev.kultivator.data.Element;
+import dev.kultivator.formasi.catalog.CatalogB;
 import dev.kultivator.formasi.spec.FormationSpec;
 import dev.kultivator.sect.hall.SectRanks;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * Keeper affinity (DESIGN 24.2.8): +0.10 to P when the keeper's Dao or a root element matches the family. Killing arrays
- * read the spec param {@code affinity} (0 sword, 1 thunder, 2 fire, 3 water; any of them when absent). Support and grand
+ * follow the spec param {@code kind} (sword, heaven and earth thunder, blaze fire, water; any of them otherwise). Support and grand
  * arrays match only a Tetua Agung.
  */
 public final class Affinity {
@@ -24,7 +25,7 @@ public final class Affinity {
 			case KENDALI, PELINDUNG -> dao == Dao.BODY || has(rootMask, Element.EARTH);
 			case PERPINDAHAN -> dao == Dao.SPACE || has(rootMask, Element.SPACE);
 			case PENANGKAL -> dao == Dao.LIGHTNING || has(rootMask, Element.LIGHTNING) || has(rootMask, Element.METAL);
-			case PEMBUNUH -> killing(spec.params().getInt("affinity", -1), dao, rootMask);
+			case PEMBUNUH -> killing(spec.params().getInt("kind", -1), dao, rootMask);
 			case PENGUAT, GABUNGAN -> sectRank >= SectRanks.TETUA_AGUNG;
 		};
 	}
@@ -35,10 +36,10 @@ public final class Affinity {
 		boolean fire = dao == Dao.FIRE || has(rootMask, Element.FIRE);
 		boolean water = dao == Dao.ICE || has(rootMask, Element.WATER) || has(rootMask, Element.ICE);
 		return switch (kind) {
-			case 0 -> sword;
-			case 1 -> thunder;
-			case 2 -> fire;
-			case 3 -> water;
+			case CatalogB.KILL_SWORD -> sword;
+			case CatalogB.KILL_HEAVEN, CatalogB.KILL_EARTH -> thunder;
+			case CatalogB.KILL_BLAZE -> fire;
+			case CatalogB.KILL_WATER -> water;
 			default -> sword || thunder || fire || water;
 		};
 	}

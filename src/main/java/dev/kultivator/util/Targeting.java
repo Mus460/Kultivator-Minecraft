@@ -16,7 +16,6 @@ import net.minecraft.world.entity.monster.creaking.Creaking;
 import net.minecraft.world.entity.monster.piglin.AbstractPiglin;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
-import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CampfireBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -137,7 +136,7 @@ public final class Targeting {
 	public static BlockHitResult blockHit(ServerPlayer caster, double range) {
 		Vec3 eye = caster.getEyePosition();
 		Vec3 end = eye.add(caster.getViewVector(1.0F).scale(range));
-		return caster.level().clip(new ClipContext(eye, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, caster));
+		return LoadedPath.ray(caster.level(), eye, end, caster);
 	}
 
 	/** The hostile entity under the crosshair within {@code range}, not behind a wall; null if none. */
@@ -175,7 +174,7 @@ public final class Targeting {
 	public static boolean hasLineOfSight(ServerPlayer caster, Entity target) {
 		Vec3 eye = caster.getEyePosition();
 		Vec3 middle = target.getBoundingBox().getCenter();
-		BlockHitResult hit = caster.level().clip(new ClipContext(eye, middle, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, caster));
+		BlockHitResult hit = LoadedPath.ray(caster.level(), eye, middle, caster);
 		return hit.getType() == HitResult.Type.MISS || hit.getLocation().distanceToSqr(eye) >= middle.distanceToSqr(eye) - 0.25D;
 	}
 

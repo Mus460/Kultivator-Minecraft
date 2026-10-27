@@ -256,7 +256,10 @@ public final class TitahSettings {
 				select(player, skill);
 				HeavenDecreeSealItem.refreshView(player);
 			}
-			case OP_RESET -> write(player, skill, Titah.Settings.DEFAULT);
+			case OP_RESET -> {
+				write(player, skill, Titah.Settings.DEFAULT);
+				HeavenDecreeSealItem.refreshView(player);
+			}
 			default -> {
 			}
 		}

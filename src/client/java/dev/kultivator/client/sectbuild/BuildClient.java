@@ -17,6 +17,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.nbt.CompoundTag;
@@ -154,7 +155,10 @@ public final class BuildClient {
 	/** True while a footprint preview is shown. */
 	public static boolean previewActive() {
 		CompoundTag tag = preview();
-		return !tag.isEmpty() && tag.contains("fp");
+		// the hologram and the HUD arrow only make sense in the dimension the preview was made in
+		ClientLevel level = Minecraft.getInstance().level;
+		String dim = tag.getStringOr("dim", "");
+		return !tag.isEmpty() && tag.contains("fp") && (level == null || dim.isEmpty() || dim.equals(level.dimension().identifier().toString()));
 	}
 
 	/** Milliseconds of the preview's hologram still left. */

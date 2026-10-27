@@ -413,7 +413,7 @@ public final class GuideChapters {
 		// the builders). Pledging a village is a side goal.
 		step(18, "kampung", null, "adv:tempat/kampung_tiba");
 		optional(18, "ikrar", null, "adv:tempat/kampung_ikrar");
-		step(18, "kompleks", null, "adv:tempat/kompleks_tiba|adv:tempat/tamu_sekte");
+		step(18, "kompleks", null, "adv:tempat/kompleks_tiba");
 		step(18, "pertapa", null, "adv:tempat/murid_pertapa");
 		step(18, "warisan", null, "adv:tempat/pewaris_makam");
 		step(18, "sarang", null, "adv:tempat/sarang_bersih");

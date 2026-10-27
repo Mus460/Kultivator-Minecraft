@@ -522,6 +522,12 @@ public final class AscensionFx {
 		return ColorParticleOption.create(ParticleTypes.FLASH, 0xFF000000 | rgb);
 	}
 
+	/** Disconnect: drops the old world (the next world's first tick would only do it after it loads). */
+	static void forget() {
+		lastLevel = null;
+		EVENTS.clear();
+	}
+
 	private AscensionFx() {
 	}
 }

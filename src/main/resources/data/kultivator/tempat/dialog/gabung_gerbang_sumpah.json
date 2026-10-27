@@ -17,6 +17,11 @@
             "gabung.sumpah"
           ]
         },
+        {
+          "akibat": [
+            "gabung.aturan"
+          ]
+        },
         {}
       ]
     }

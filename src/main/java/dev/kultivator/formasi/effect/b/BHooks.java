@@ -46,7 +46,6 @@ public final class BHooks {
 			RedSandEffect.clearAll();
 			KillingEffect.clearAll();
 			GrandArrayEffect.clearAll();
-			TransportNetwork.clearAll();
 			TransportChannel.clearAll();
 			TerritorySweep.clear();
 			BCommands.clearAll();

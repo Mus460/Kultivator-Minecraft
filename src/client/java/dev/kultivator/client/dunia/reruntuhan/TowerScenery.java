@@ -295,7 +295,7 @@ public final class TowerScenery {
 				return null;
 			}
 			display.setId(nextId--);
-			if (nextId < FIRST_ID - 1_000_000) {
+			if (nextId <= FIRST_ID - 1_000_000) {
 				nextId = FIRST_ID;
 			}
 			display.setPos(centre.x + run.x(), centre.y + run.y(), centre.z + run.z());

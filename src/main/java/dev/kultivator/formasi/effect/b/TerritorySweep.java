@@ -1,9 +1,11 @@
 package dev.kultivator.formasi.effect.b;
 
 import dev.kultivator.sect.hall.Halls;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
@@ -32,7 +34,10 @@ public final class TerritorySweep {
 	private record Result(long window, List<Mob> mobs) {
 	}
 
-	private static final Map<UUID, Result> CACHE = new HashMap<>();
+	private record Key(UUID owner, ResourceKey<Level> dim) {
+	}
+
+	private static final Map<Key, Result> CACHE = new HashMap<>();
 
 	/**
 	 * Intruders found for {@code owner} in this 40-tick window (one sector plus the member boxes): mobs inside the
@@ -41,7 +46,8 @@ public final class TerritorySweep {
 	public static List<Mob> sweep(ServerLevel level, UUID owner) {
 		long now = level.getGameTime();
 		long window = now / PERIOD_TICKS;
-		Result cached = CACHE.get(owner);
+		Key cacheKey = new Key(owner, level.dimension());
+		Result cached = CACHE.get(cacheKey);
 		if (cached != null && cached.window() == window) {
 			return cached.mobs();
 		}
@@ -65,7 +71,7 @@ public final class TerritorySweep {
 			}
 			found.addAll(set);
 		}
-		CACHE.put(owner, new Result(window, found));
+		CACHE.put(cacheKey, new Result(window, found));
 		if (CACHE.size() > 64) {
 			CACHE.entrySet().removeIf(entry -> entry.getValue().window() < window - 2L);
 		}

@@ -1061,6 +1061,13 @@ public final class DaoTechniqueFx {
 		return right.lengthSqr() < 1.0E-6D ? new Vec3(1.0D, 0.0D, 0.0D) : right.normalize();
 	}
 
+	/** Disconnect: drops the old world (the next world's first tick would only do it after it loads). */
+	static void forget() {
+		lastLevel = null;
+		ANIMS.clear();
+		MARKS.clear();
+	}
+
 	private DaoTechniqueFx() {
 	}
 }

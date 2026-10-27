@@ -187,9 +187,9 @@ public final class EpicIds {
 
 	/**
 	 * A reserved beat valid with any known moment and FLAG_TEST: the viewer's client ends every scene at once and restores
-	 * sky, sound, music and camera ({@code uji momen berhenti}). Above every {@link #maxBeat}, so older clients drop it.
+	 * sky, sound, music and camera ({@code uji momen berhenti}). Above every {@link #maxBeat} (the highest is EXTRA_SEKTE_LAST), so older clients drop it.
 	 */
-	public static final int BEAT_STOP_ALL = 120;
+	public static final int BEAT_STOP_ALL = 250;
 
 	/**
 	 * True for the beats that end a scene (results, ABORT / STOP / CANCEL, TECH_END): the per-subject rate limit never drops

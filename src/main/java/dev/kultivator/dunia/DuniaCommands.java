@@ -107,7 +107,6 @@ public final class DuniaCommands {
 			"ekonomi kas", "ekonomi kurs", "ekonomi stok ulang", "ekonomi lelang [agung|kota]",
 			"hidup jadwal <npc>", "hidup jam <0-23>", "hidup klip <id> [npc]", "hidup klip semua", "hidup prop <id>", "hidup impostor",
 			"hidup saksi", "hidup bahaya", "hidup cuaca <hujan|badai|kabut|gerhana>",
-			"model pamer", "model prop", "model gear <peran>", "model wajah", "model senjata", "model festival",
 			"cerita dialog <id>", "cerita quest <id> [tahap]", "cerita bendera <id> [on|off]", "cerita rumor [tambah <templat>]", "cerita tokoh",
 			"kampung cari <ukuran> [gaya]", "kampung klan", "kampung panen", "kampung anak",
 			"kompleks cari <sekte>", "kompleks rotasi", "kompleks sikap <sekte> <sikap>",

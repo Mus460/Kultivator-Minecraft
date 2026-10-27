@@ -80,6 +80,11 @@ public final class Keys {
 	}
 
 	public static void send(Payloads.Action action) {
+		if (action.text().length() > 64) {
+			// the codec limit: an over-long text (a modded item id) would throw in the encoder and disconnect the player
+			Kultivator.LOGGER.warn("Kultivator: action {} dropped, its text is longer than 64 characters", action.action());
+			return;
+		}
 		if (connected()) {
 			ClientPlayNetworking.send(action);
 		}

@@ -85,6 +85,8 @@ public final class Founding {
 		final int tier;
 		final boolean force;
 		final @Nullable BlockPos origin;
+		/** The dimension the preview was made in (the client draws the hologram and HUD only there). */
+		final String dim;
 		@Nullable PreviewData last;
 		int lastSnap = -1;
 		boolean lastConfirmable;
@@ -93,7 +95,7 @@ public final class Founding {
 		/** A sky design (DESIGN 37.3.4): rotating and re-previewing go through {@code LangitRancang}. */
 		boolean sky;
 
-		Pending(UUID player, long ticket, int template, int rot, Glaze glaze, Mode mode, int created, int tier, boolean force, @Nullable BlockPos origin) {
+		Pending(UUID player, long ticket, int template, int rot, Glaze glaze, Mode mode, int created, int tier, boolean force, @Nullable BlockPos origin, String dim) {
 			this.player = player;
 			this.ticket = ticket;
 			this.template = template;
@@ -104,6 +106,7 @@ public final class Founding {
 			this.tier = tier;
 			this.force = force;
 			this.origin = origin;
+			this.dim = dim;
 		}
 	}
 
@@ -209,7 +212,7 @@ public final class Founding {
 			Msg.chat(player, Component.translatable("kultivator.sectbuild.preview.refused").withStyle(ChatFormatting.YELLOW));
 			return false;
 		}
-		PENDING.put(owner, new Pending(owner, ticket, template, rotation, chosen, mode, tick(), 0, force, null));
+		PENDING.put(owner, new Pending(owner, ticket, template, rotation, chosen, mode, tick(), 0, force, null, dimOf(player)));
 		Msg.actionBar(player, Component.translatable("kultivator.sectbuild.preview.compiling", SectTemplates.name(template)).withStyle(ChatFormatting.AQUA));
 		return true;
 	}
@@ -234,7 +237,7 @@ public final class Founding {
 			Msg.chat(player, Component.translatable("kultivator.sectbuild.preview.refused").withStyle(ChatFormatting.YELLOW));
 			return false;
 		}
-		Pending pending = new Pending(owner, ticket, sky, rotation, Glaze.TINTA, mode, tick(), 0, test, null);
+		Pending pending = new Pending(owner, ticket, sky, rotation, Glaze.TINTA, mode, tick(), 0, test, null, dimOf(player));
 		pending.sky = true;
 		PENDING.put(owner, pending);
 		Msg.actionBar(player, Component.translatable("kultivator.sectbuild.preview.compiling", SectTemplates.name(sky)).withStyle(ChatFormatting.AQUA));
@@ -255,7 +258,7 @@ public final class Founding {
 			Msg.chat(player, Component.translatable("kultivator.sectbuild.preview.refused").withStyle(ChatFormatting.YELLOW));
 			return false;
 		}
-		PENDING.put(player.getUUID(), new Pending(player.getUUID(), ticket, template, rotation, Glaze.TINTA, mode, tick(), tier, false, origin.immutable()));
+		PENDING.put(player.getUUID(), new Pending(player.getUUID(), ticket, template, rotation, Glaze.TINTA, mode, tick(), tier, false, origin.immutable(), dimOf(player)));
 		Msg.actionBar(player, Component.translatable("kultivator.sectbuild.preview.compiling", SectTemplates.name(template)).withStyle(ChatFormatting.AQUA));
 		return true;
 	}
@@ -505,6 +508,10 @@ public final class Founding {
 		}
 	}
 
+	private static String dimOf(ServerPlayer player) {
+		return player.level().dimension().identifier().toString();
+	}
+
 	/** The {@code BuildPreview} with the flow's keys added: ticket, stele, mode, the ticks left and the confirm state. */
 	private static void send(ServerPlayer player, Pending pending, PreviewData data, int now) {
 		CompoundTag tag = data.toTag();
@@ -512,6 +519,7 @@ public final class Founding {
 		tag.putString("mode", pending.mode.id());
 		tag.putInt("left", Math.max(0, PREVIEW_TICKS - (now - pending.created)));
 		tag.putBoolean("confirmable", data.confirmable());
+		tag.putString("dim", pending.dim);
 		if (!tag.contains("t")) {
 			tag.putInt("t", pending.template);
 		}

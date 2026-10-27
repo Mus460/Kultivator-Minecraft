@@ -414,6 +414,13 @@ public final class AlchemyFx {
 		}
 	}
 
+	/** Disconnect: drops the old world (the next world's first tick would only do it after it loads). */
+	static void forget() {
+		lastLevel = null;
+		REFINING.clear();
+		GLOWS.clear();
+	}
+
 	private AlchemyFx() {
 	}
 }

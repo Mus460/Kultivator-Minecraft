@@ -73,6 +73,16 @@ final class MasukCerita {
 				Msg.chat(p, why.copy().withStyle(ChatFormatting.RED));
 			}
 		});
+		Akibat.daftar("gabung.aturan", (p, a) -> {
+			KultivatorNpc npc = TempatDialog.npc(p);
+			String sekte = sini(p);
+			if (npc == null || sekte == null) {
+				return;
+			}
+			int aliran = SekteApi.diplomasi().aliran(sekte);
+			TempatDialog.akhiri(p);
+			TempatDialog.buka(p, npc, "gabung_aturan_" + (aliran == 2 ? "iblis" : aliran == 1 ? "netral" : "lurus"));
+		});
 		Akibat.daftar("gabung.jawab", UjianHati::jawab);
 		Akibat.daftar("gabung.wawancara", (p, a) -> UjianHati.lanjutkan(p));
 		Akibat.daftar("gabung.tamu", UjianHati::tamu);

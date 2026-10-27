@@ -57,7 +57,8 @@ public class HeavenDecreeSealItem extends Item {
 	/** The Titah Langit menu: its data first, then the screen (29.2.2). */
 	static void openMenu(ServerPlayer player) {
 		TitahSettings.sync(player);
-		Net.send(player, new Payloads.OpenScreen(Payloads.OpenScreen.TITAH, 0));
+		// -1: show the selected decree (0 would select Pedang)
+		Net.send(player, new Payloads.OpenScreen(Payloads.OpenScreen.TITAH, -1));
 	}
 
 	/** True when the player carries a seal that is theirs or not yet bound (for {@code /kultivasi titah}). */

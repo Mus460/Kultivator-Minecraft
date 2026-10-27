@@ -6,6 +6,7 @@
   "item.kultivator.gulungan_penunjuk.tooltip": "Gunakan: menunjukkan situs terdekat dari jenis yang dipilih (jongkok + gunakan mengganti jenis). Habis bila menemukan situs baru.",
   "key.kultivator.peta": "Peta Dunia",
   "kultivator.peta.peta.source": "Sumber: Shan Hai Jing, geografi mitos yang mencatat gunung demi gunung dan laut demi laut beserta penghuninya. Terinspirasi dari Alam Gunung dan Laut dengan sembilan gunung dan sembilan lautnya di I Shall Seal the Heavens. Gaya peta, kabut dan wilayah sekte rancangan game.",
+  "kultivator.peta.penunjuk.source": "Sumber: Shan Hai Jing, yang mencatat gunung dan laut menurut arah dan jaraknya dari satu titik. Gulungan penunjuk, jangkauannya dan jenis situsnya rancangan game.",
   "kultivator.peta.off": "Peta dunia dimatikan di server ini.",
   "kultivator.peta.no_server": "Server ini tidak mengenal peta dunia.",
   "kultivator.peta.header": "%s · %s situs dikenal · %s petak dijelajahi",

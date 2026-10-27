@@ -1,4 +1,5 @@
 {
+  "entity.kultivator.papan_hidup": "Notice Board",
   "kultivator.tempat_ui.acara.belum_ada_skor": "No scores yet. The contest has not begun.",
   "kultivator.tempat_ui.acara.bracket": "Tournament Bracket",
   "kultivator.tempat_ui.acara.daftar": "Enter · %s NB",

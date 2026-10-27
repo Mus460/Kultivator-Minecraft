@@ -292,6 +292,13 @@ public final class BreakthroughFx {
 		}
 	}
 
+	/** Disconnect: drops the old world (the next world's first tick would only do it after it loads). */
+	static void forget() {
+		lastLevel = null;
+		ACTIVE.clear();
+		lastTickTime = Long.MIN_VALUE;
+	}
+
 	private BreakthroughFx() {
 	}
 }

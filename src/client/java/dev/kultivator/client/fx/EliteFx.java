@@ -160,6 +160,12 @@ public final class EliteFx {
 		ELITES.clear();
 	}
 
+	/** Disconnect: also lets go of the old world (the next world's first tick would only do it after it loads). */
+	public static void forget() {
+		lastLevel = null;
+		clear();
+	}
+
 	// ================================================================== auras
 
 	private static void rescan(ClientLevel level, Vec3 center) {

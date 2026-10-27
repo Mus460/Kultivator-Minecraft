@@ -9,6 +9,7 @@ import dev.kultivator.dunia.kota42.warga.ArsipWarga;
 import dev.kultivator.dunia.kota42.warga.NamaWarga;
 import dev.kultivator.dunia.kota42.warga.Warga;
 import dev.kultivator.dunia.kota42.warga.WargaData;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.core.Direction;
@@ -56,6 +57,11 @@ public final class TitikSiar {
 	public static void init() {
 		ServerTickEvents.END_SERVER_TICK.register(TitikSiar::tik);
 		ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> TERKIRIM.remove(handler.getPlayer().getUUID()));
+		// The cache clock is the server tick count, which restarts at 0: a stale entry would look fresh in the next world.
+		ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
+			CACHE.clear();
+			TERKIRIM.clear();
+		});
 	}
 
 	private static void tik(MinecraftServer server) {

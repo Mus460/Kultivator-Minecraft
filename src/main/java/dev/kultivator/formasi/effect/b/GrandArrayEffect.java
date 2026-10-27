@@ -5,6 +5,7 @@ import dev.kultivator.data.Cultivators;
 import dev.kultivator.disciple.DiscipleEntity;
 import dev.kultivator.formasi.core.CoreState;
 import dev.kultivator.formasi.core.CoreView;
+import dev.kultivator.formasi.core.Cores;
 import dev.kultivator.formasi.effect.CoreContext;
 import dev.kultivator.formasi.effect.FormationEffect;
 import dev.kultivator.formasi.stack.FieldSink;
@@ -70,7 +71,6 @@ public final class GrandArrayEffect implements FormationEffect {
 
 	private static final Map<UUID, Grand> GRAND = new HashMap<>();
 	private static final Map<UUID, Absolute> ABSOLUTE_STATE = new HashMap<>();
-	private static final Map<UUID, Integer> ARTS_SEEN = new HashMap<>();
 	private static final Map<UUID, Integer> PRETEND = new HashMap<>();
 	private static long clock;
 
@@ -130,7 +130,7 @@ public final class GrandArrayEffect implements FormationEffect {
 		}
 	}
 
-	/** The five 6c Absolute techniques known by the master (online) or by the altar's keepers; remembered while offline. */
+	/** The five 6c Absolute techniques known by the master (online) or by the altar's keepers; remembered while offline (saved in the record). */
 	private static int artsKnown(CoreView core, ServerPlayer online) {
 		int count = 0;
 		CultivationData master = online == null ? null : Cultivators.get(online);
@@ -145,9 +145,11 @@ public final class GrandArrayEffect implements FormationEffect {
 			}
 		}
 		if (online == null) {
-			count = Math.max(count, ARTS_SEEN.getOrDefault(core.owner(), 0));
-		} else {
-			ARTS_SEEN.put(core.owner(), count);
+			count = Math.max(count, core.ext().getIntOr("arts_seen", 0));
+		} else if (count != core.ext().getIntOr("arts_seen", 0)) {
+			CompoundTag ext = core.ext().copy();
+			ext.putInt("arts_seen", count);
+			Cores.setExt(core.dim(), core.id(), ext);
 		}
 		return count;
 	}
@@ -255,7 +257,6 @@ public final class GrandArrayEffect implements FormationEffect {
 	static void clearAll() {
 		GRAND.clear();
 		ABSOLUTE_STATE.clear();
-		ARTS_SEEN.clear();
 		PRETEND.clear();
 	}
 }

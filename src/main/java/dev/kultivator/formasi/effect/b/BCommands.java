@@ -16,6 +16,7 @@ import dev.kultivator.sect.hall.Halls;
 import dev.kultivator.util.Msg;
 import dev.kultivator.util.NoGrief;
 import dev.kultivator.util.Targeting;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
@@ -69,6 +70,8 @@ public final class BCommands {
 	private static final List<TestMob> TEST_MOBS = new ArrayList<>();
 
 	static void init() {
+		// A test mob that unloaded (or outlived a restart) is no longer tracked: it never loads back.
+		ServerEntityEvents.ALLOW_LOAD.register((entity, level, reason, flag) -> reason != EntitySpawnReason.LOAD || !entity.entityTags().contains(TEST_TAG));
 		LootTableEvents.MODIFY_DROPS.register((table, context, drops) -> {
 			Entity entity = context.getOptional(LootContextParams.THIS_ENTITY);
 			if (entity != null && entity.entityTags().contains(TEST_TAG)) {

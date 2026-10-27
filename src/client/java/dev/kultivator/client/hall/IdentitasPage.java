@@ -17,6 +17,8 @@ import dev.kultivator.sekte.mandiri.api.IzinKegiatan;
 import dev.kultivator.sekte.mandiri.api.Kebijakan;
 import dev.kultivator.sekte.mandiri.api.Kehatian;
 import dev.kultivator.sekte.mandiri.api.ModeMandiri;
+import dev.kultivator.sekte.mandiri.cerita.MandiriPayloads;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.KeyEvent;
@@ -158,7 +160,9 @@ public class IdentitasPage extends Page {
 		int cy = y0 + l.kepala(Component.translatable(L + "papan.tampil.kebijakan"), x0, y0, x1);
 		CompoundTag data = HallClient.papanMandiri();
 		if (data == null) {
-			l.samar(Component.translatable("kultivator.gui43.konteks.memuat"), x0 + 2, cy, x1 - x0 - 2);
+			// the server only listens for the board while Murid Mandiri is on (nothing is ever sent otherwise)
+			boolean mati = !ClientPlayNetworking.canSend(MandiriPayloads.Aksi.TYPE);
+			l.samar(Component.translatable(mati ? L + "papan.tampil.kebijakan.mati" : "kultivator.gui43.konteks.memuat"), x0 + 2, cy, x1 - x0 - 2);
 			return cy + BARIS + 2;
 		}
 		boolean own = data.getBooleanOr("own", false);

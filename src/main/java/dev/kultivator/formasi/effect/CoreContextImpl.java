@@ -57,6 +57,8 @@ public final class CoreContextImpl implements CoreContext {
 	public static final int BOSS_ROOT_TICKS = 20;
 	/** A steered zombie may break doors again after this many ticks without a new steer. */
 	public static final int DOOR_RESTORE_TICKS = 200;
+	/** On a zombie that could break doors before a steer; if it unloads steered, the flag is given back on load. */
+	private static final String DOOR_TAG = "kultivator.door_locked";
 
 	private static final Map<Integer, Long> LAST_ROOT = new HashMap<>();
 	private static final Map<Integer, Steered> STEERED = new HashMap<>();
@@ -260,6 +262,9 @@ public final class CoreContextImpl implements CoreContext {
 			Steered old = STEERED.get(zombie.getId());
 			boolean could = old != null ? old.couldBreak() : zombie.canBreakDoors();
 			zombie.setCanBreakDoors(false);
+			if (could) {
+				zombie.addTag(DOOR_TAG);
+			}
 			STEERED.put(zombie.getId(), new Steered(zombie, could, now() + DOOR_RESTORE_TICKS));
 		}
 		mark(mob);
@@ -351,6 +356,7 @@ public final class CoreContextImpl implements CoreContext {
 			if (steered.zombie().isRemoved() || now >= steered.until()) {
 				if (!steered.zombie().isRemoved() && steered.couldBreak()) {
 					steered.zombie().setCanBreakDoors(true);
+					steered.zombie().removeTag(DOOR_TAG);
 				}
 				iterator.remove();
 			}
@@ -358,6 +364,14 @@ public final class CoreContextImpl implements CoreContext {
 		LAST_ROOT.values().removeIf(time -> now - time > Stacking.ROOT_COOLDOWN_TICKS);
 		ALERT_CORE.values().removeIf(time -> now - time > Stacking.ALARM_CORE_KIND_TICKS);
 		ALERT_CHAT.values().removeIf(time -> now - time > Stacking.ALARM_PLAYER_CHAT_TICKS);
+	}
+
+	/** A zombie saved while steered gets its door-breaking back (ENTITY_LOAD). */
+	public static void onLoad(Entity entity) {
+		if (entity instanceof Zombie zombie && zombie.entityTags().contains(DOOR_TAG)) {
+			zombie.setCanBreakDoors(true);
+			zombie.removeTag(DOOR_TAG);
+		}
 	}
 
 	/** Forgets every session map (server stop). */

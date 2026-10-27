@@ -642,8 +642,9 @@ public final class TitahMonuments extends SavedData {
 	}
 
 	/**
-	 * Every tick: the dimensions whose list changed go out to all their players; every 100 ticks a player whose dimension
-	 * differs from the last one sent (a join, a portal) gets its dimension's list (no event API needed).
+	 * Every tick: the dimensions whose list changed go out to all their players, and so does a player whose dimension
+	 * differs from the last one sent (a join, a portal; checked every tick so a quick round trip is not missed, no event
+	 * API needed).
 	 */
 	private static void tickFar(MinecraftServer server) {
 		if (!FAR_DIRTY.isEmpty()) {
@@ -660,9 +661,6 @@ public final class TitahMonuments extends SavedData {
 					FAR_SENT.put(player.getUUID(), dimension);
 				}
 			}
-		}
-		if (server.getTickCount() % CLEAR_RETRY_TICKS != 3) {
-			return;
 		}
 		for (ServerPlayer player : server.getPlayerList().getPlayers()) {
 			ResourceKey<Level> dimension = player.level().dimension();

@@ -71,7 +71,7 @@ public final class PhantomDisplays {
 				return null;
 			}
 			display.setId(nextId--);
-			if (nextId < FIRST_ID - 1_000_000) {
+			if (nextId <= FIRST_ID - 1_000_000) {
 				nextId = FIRST_ID;
 			}
 			display.setPos(at.x, at.y, at.z);

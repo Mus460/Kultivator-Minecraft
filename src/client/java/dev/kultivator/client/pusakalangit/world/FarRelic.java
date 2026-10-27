@@ -470,7 +470,7 @@ public final class FarRelic {
 				return false;
 			}
 			display.setId(nextId--);
-			if (nextId < FIRST_ID - 1_000_000) {
+			if (nextId <= FIRST_ID - 1_000_000) {
 				nextId = FIRST_ID;
 			}
 			Vec3 base = relic.base(TitahWorld.clock());

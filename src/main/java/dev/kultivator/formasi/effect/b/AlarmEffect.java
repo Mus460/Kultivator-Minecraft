@@ -12,6 +12,7 @@ import dev.kultivator.formasi.spec.FormationSpec;
 import dev.kultivator.formasi.stack.Stacking;
 import dev.kultivator.fx.Fx;
 import dev.kultivator.fx.FxType;
+import dev.kultivator.sect.hall.Halls;
 import dev.kultivator.sect.hall.SectRanks;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
@@ -66,7 +67,9 @@ public final class AlarmEffect implements FormationEffect {
 	@Override
 	public void pulse(CoreContext ctx) {
 		CoreView core = ctx.core();
-		boolean territory = BUtil.keeperRank(core, SectRanks.DALAM) || BUtil.runningSpecs(ctx.owner()).contains(ConcealEffect.M2);
+		// Territory mode only for a core standing in the hall territory; a personal K1 outside it keeps its own radius.
+		boolean territory = (BUtil.keeperRank(core, SectRanks.DALAM) || BUtil.runningSpecs(ctx.owner()).contains(ConcealEffect.M2))
+				&& Halls.inTerritory(ctx.owner(), ctx.level(), ctx.centre());
 		detect(ctx, territory, territory ? M2_BAND : RING);
 	}
 

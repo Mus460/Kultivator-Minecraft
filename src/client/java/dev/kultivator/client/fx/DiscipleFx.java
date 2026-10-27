@@ -236,6 +236,12 @@ public final class DiscipleFx {
 		return (r << 16) | (g << 8) | b;
 	}
 
+	/** Disconnect: drops the old world (the next world's first tick would only do it after it loads). */
+	static void forget() {
+		lastLevel = null;
+		DiscipleLook.clear();
+	}
+
 	private DiscipleFx() {
 	}
 }

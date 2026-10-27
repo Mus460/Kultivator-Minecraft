@@ -10,6 +10,7 @@ import dev.kultivator.dunia.kota42.tumbuh.PekerjaanTumbuh;
 import dev.kultivator.dunia.kota42.tumbuh.RencanaTumbuh;
 import dev.kultivator.dunia.tempat.perbaikan.PerbaikanApi;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntArrayTag;
 import net.minecraft.nbt.ListTag;
@@ -54,6 +55,11 @@ public final class LembarKavling {
 	}
 
 	static void init() {
+		// The cache key would keep the stopped server (levels, chunks, entities) alive until someone opens a plot sheet again.
+		ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
+			siluetServer = null;
+			SILUET_CACHE.clear();
+		});
 		LembarKotaDasar.daftar(LAYAR, LembarKavling::bangun);
 		LembarKotaDasar.bawaan(LAYAR, OP_RENCANA, (p, npc, situs, op) -> LembarKotaDasar.hasil(p,
 				Jabatan.pilihRencana(p, situs, LembarKunci.arg(op, 1)), Component.translatable(K + "rencana_ok")));

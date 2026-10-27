@@ -21,6 +21,7 @@ import dev.kultivator.formasi.core.CoreTicker;
 import dev.kultivator.formasi.core.CoreView;
 import dev.kultivator.formasi.core.OwnerStore;
 import dev.kultivator.formasi.core.Verifier;
+import dev.kultivator.formasi.effect.CoreContextImpl;
 import dev.kultivator.formasi.fuel.FuelTable;
 import dev.kultivator.formasi.fuel.Kas;
 import dev.kultivator.formasi.fuel.Upkeep;
@@ -57,6 +58,7 @@ import dev.kultivator.sect.hall.Halls;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
 import dev.kultivator.util.Targeting;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.ChatFormatting;
@@ -154,6 +156,7 @@ public final class Formasi {
 		ZoneBridge.init();
 		HallBridge.init();
 		ProjectileTracker.init();
+		ServerEntityEvents.ENTITY_LOAD.register((entity, level) -> CoreContextImpl.onLoad(entity));
 	}
 
 	// ================================================================== block events
@@ -405,6 +408,13 @@ public final class Formasi {
 		record.spec = next.id();
 		record.rot = match.rot();
 		Verifier.apply(record, match);
+		// 24.2.7: amethyst never feeds Bumi and up, so its share goes back to the amethyst pool.
+		long amethyst = next.has(Flag.STONE_ONLY) ? record.amethystPart() : 0L;
+		if (amethyst > 0L) {
+			Kas.add(record.owner, amethyst, -1);
+			record.daya -= amethyst;
+			record.dayaA = 0L;
+		}
 		long cap = Upkeep.capCenti(next);
 		if (record.daya > cap) {
 			CoreTicker.refund(record, record.daya - cap);

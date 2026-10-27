@@ -54,6 +54,21 @@ public final class FxDispatcher {
 		}
 	}
 
+	/** Disconnect: the per-world modules let go of the old ClientLevel (their own level check only runs once a world is loaded). */
+	public static void forgetLevel() {
+		EliteFx.forget();
+		MeditationFx.forget();
+		DiscipleFx.forget();
+		BreakthroughFx.forget();
+		TribulationFx.forget();
+		TechniqueFx.forget();
+		DaoTechniqueFx.forget();
+		FormationFx.forget();
+		AlchemyFx.forget();
+		AscensionFx.forget();
+		TrialFx.forget();
+	}
+
 	/** Every client tick: continuous effects driven by synced state. */
 	public static void tick(Minecraft minecraft) {
 		if (minecraft.level == null || minecraft.player == null || minecraft.isPaused()) {
