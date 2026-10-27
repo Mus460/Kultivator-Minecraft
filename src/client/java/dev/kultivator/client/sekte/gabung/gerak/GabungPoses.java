@@ -225,10 +225,10 @@ public final class GabungPoses {
 			}
 		});
 		ClientTickEvents.END_CLIENT_TICK.register(GabungPoses::tick);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
 			JEJAK.clear();
 			PER_ID.clear();
-		});
+		}));
 	}
 
 	// ================================================================== props 150-156

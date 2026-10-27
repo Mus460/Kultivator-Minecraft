@@ -38,7 +38,7 @@ public final class TemaClient {
 		}
 		ready = true;
 		ClientPlayNetworking.registerGlobalReceiver(TemaNet.TemaFxPayload.TYPE, (payload, context) -> terima(payload));
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> TERAKHIR.clear());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> TERAKHIR.clear()));
 		TemaFx.init();
 		TemaModelClient.init();
 		TemaUiClient.init();

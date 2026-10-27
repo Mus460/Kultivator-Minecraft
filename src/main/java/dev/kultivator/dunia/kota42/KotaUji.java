@@ -38,7 +38,7 @@ import java.util.function.Supplier;
  * The test tree of Kota yang Hidup (DESIGN 42.14.3): {@code /kultivasi uji kota_hidup ...}, op 2, through
  * {@code DuniaCommands.test}. The root and the data subs live here; every module hangs its own subs ({@code warga},
  * {@code bicara}, {@code cakap}, {@code sebaran}, {@code ragam}, {@code kompat}, {@code gosip}, {@code jalan},
- * {@code tolong}, {@code ekonomi}, {@code acara}, {@code hewan}, {@code sekte}, {@code tumbuh}, {@code visual}) with
+ * {@code tolong}, {@code ekonomi}, {@code acara}, {@code hewan}, {@code sekte}, {@code tumbuh}) with
  * {@link #daftar} from its init, so nobody edits this file for a new sub. The tree is built when Brigadier asks, so later
  * registrations count. Literals registered by a module under the same name as a built-in are merged by Brigadier.
  * <p>
@@ -72,8 +72,7 @@ public final class KotaUji {
 			"kota_hidup acara wayang <naskah>", "kota_hidup acara guanpu", "kota_hidup hewan [semua|<jenis>]",
 			"kota_hidup sekte kantor [buat|pelamar <n>|ujian]", "kota_hidup sekte pakta [buat|serbuan|gagal]", "kota_hidup sekte murid <tugas>",
 			"kota_hidup sekte cabang <jenis>", "kota_hidup tumbuh kavling [daftar|tp <n>|pilih <rencana>]", "kota_hidup tumbuh tahap [lanjut|semua]",
-			"kota_hidup tumbuh bahan isi", "kota_hidup tumbuh makmur <n>", "kota_hidup tumbuh rusak_proyek", "kota_hidup visual lentera",
-			"kota_hidup visual asap", "kota_hidup visual panji <keadaan>", "kota_hidup visual titik", "kota_hidup anggaran",
+			"kota_hidup tumbuh bahan isi", "kota_hidup tumbuh makmur <n>", "kota_hidup tumbuh rusak_proyek", "kota_hidup anggaran",
 			"kota_hidup reset [bagian] [situs]"));
 
 	private static final List<String> BAGIAN = List.of("warga", "ekonomi", "acara", "sekte", "tumbuh", "ragam", "semua");

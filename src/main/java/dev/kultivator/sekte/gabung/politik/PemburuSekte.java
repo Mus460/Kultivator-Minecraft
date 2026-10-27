@@ -653,6 +653,7 @@ public final class PemburuSekte {
 		k.kurunganSampai = 0L;
 		k.bagian(PanggilanPerang.BAGIAN).remove(KURUNG_SEKTE);
 		data.setDirty();
+		GabungPayloads.kirimKlip(player, 0, 0);
 		player.sendSystemMessage(Component.translatable("kultivator.gabung.pemburu.kurung.bebas", PanggilanPerang.nama(sekte)).withStyle(ChatFormatting.GRAY));
 		serah(player, sekte, true);
 	}
@@ -693,6 +694,7 @@ public final class PemburuSekte {
 		k.catat(hari, "kultivator.gabung.riwayat.pemburu_serah", sekte);
 		data.setDirty();
 		GabungPayloads.kirimKlip(player, GabungGerakId.DIUSIR_TUNDUK, 0);
+		GabungPayloads.lepasKlipNanti(player, 80);
 		player.sendSystemMessage(Component.translatable("kultivator.gabung.pemburu.serah", PanggilanPerang.nama(sekte)).withStyle(ChatFormatting.YELLOW));
 	}
 

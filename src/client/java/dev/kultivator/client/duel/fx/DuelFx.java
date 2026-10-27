@@ -213,7 +213,7 @@ public final class DuelFx {
 		registerProviders();
 		DuelBus.register(new Listener());
 		ClientTickEvents.END_CLIENT_TICK.register(DuelFx::tick);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> clearAll());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(DuelFx::clearAll));
 		DuelTrailRenderer.init();
 		DuelCamera.init();
 		// the 7b shot guard never counts a fighter of a live duel as the hostile that blocks the intro or the finisher

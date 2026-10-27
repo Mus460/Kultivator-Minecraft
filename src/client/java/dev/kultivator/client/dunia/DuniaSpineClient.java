@@ -25,10 +25,10 @@ public final class DuniaSpineClient {
 		EntityRenderers.register(DuniaAnchors.TYPE, NoopRenderer::new);
 		ClientPlayNetworking.registerGlobalReceiver(DuniaGhostPayload.TYPE, (payload, context) -> DuniaGhost.onPayload(payload));
 		ClientTickEvents.END_CLIENT_TICK.register(client -> DuniaGhost.tick());
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
 			DuniaGhost.clear();
 			DuniaScenes.reset();
-		});
+		}));
 	}
 
 	private DuniaSpineClient() {

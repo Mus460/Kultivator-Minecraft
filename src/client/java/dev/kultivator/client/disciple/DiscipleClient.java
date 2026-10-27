@@ -33,7 +33,7 @@ public final class DiscipleClient {
 				DiscipleFx.tick(minecraft);
 			}
 		});
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> clear());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> clear()));
 		HubPages.daftar(HubNav.MURID, Urutan.ID_MURID, Urutan.MURID, MuridPage::new);
 	}
 

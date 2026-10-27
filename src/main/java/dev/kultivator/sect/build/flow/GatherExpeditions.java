@@ -270,7 +270,7 @@ public final class GatherExpeditions {
 	private static void tampilkan(MinecraftServer server, UUID owner, ListTag list, long now) {
 		Halls.HallView hall = Halls.hallOf(owner);
 		ServerLevel level = hall == null || hall.dim() == null ? null : server.getLevel(hall.dim());
-		if (level == null || !Jelmaan.dekatPemain(level, hall.pos(), 300.0D)) {
+		if (!dev.kultivator.sekte.mandiri.api.MandiriApi.aktif() || level == null || !Jelmaan.dekatPemain(level, hall.pos(), 300.0D)) {
 			return;
 		}
 		for (Tag tag : list) {
@@ -370,7 +370,8 @@ public final class GatherExpeditions {
 		}
 		DiscipleEntity back = Disciples.arrive(level, at, stored, owner);
 		if (back == null) {
-			return false;
+			// a forgotten soul never comes back: its place in the party ends here
+			return Disciples.forgotten(server, stored);
 		}
 		Vec3 pos = back.position();
 		Fx.burst(level, pos.add(0.0D, 1.0D, 0.0D), DEPART_COLOR, 24, 1.0F);

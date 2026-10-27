@@ -11,8 +11,8 @@ import net.minecraft.world.entity.MobCategory;
 /**
  * The entity type of module 37M (DESIGN 37.5.5): {@code kultivator:feri_awan}, the Cloud Ferry (3.0 × 1.2, tracked 10
  * chunks, position sent every tick so the seated riders stay smooth). Registered always, whatever the config says (audit
- * K1). The type stays serializable (vanilla refuses to seat anyone on a type that is not), the entity itself is never
- * written ({@code FeriAwanEntity.shouldBeSaved() = false}). Not summonable, no loot.
+ * K1). The type stays serializable (vanilla refuses to seat anyone on a type that is not), the entity itself is only
+ * written while it carries a disciple ({@code FeriAwanEntity.shouldBeSaved()}). Not summonable, no loot.
  */
 public final class LangitGerakEntities {
 

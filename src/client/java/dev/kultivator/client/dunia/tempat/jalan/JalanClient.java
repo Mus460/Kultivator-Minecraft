@@ -25,10 +25,10 @@ public final class JalanClient {
 		JalanPapan.init();
 		ClientPlayNetworking.registerGlobalReceiver(JalanNet.Peta.TYPE, (payload, context) -> JalanPeta.terima(payload));
 		ClientPlayNetworking.registerGlobalReceiver(JalanNet.Papan.TYPE, (payload, context) -> JalanPapan.terima(payload));
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
 			JalanPeta.lupakan();
 			JalanPapan.lupakan();
-		});
+		}));
 	}
 
 	private JalanClient() {

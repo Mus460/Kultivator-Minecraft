@@ -278,7 +278,8 @@ public final class BawahPeople {
 			return;
 		}
 		if (DimensiData.extra(player, DimensiData.BAWAH).getBooleanOr("coret", false)) {
-			health.addOrUpdateTransientModifier(new AttributeModifier(CORET_MODIFIER, CORET_HEALTH, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
+			// permanent: saved and loaded before Health, so a full bar is not clamped to the unboosted max on relog
+			health.addOrReplacePermanentModifier(new AttributeModifier(CORET_MODIFIER, CORET_HEALTH, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
 		} else {
 			health.removeModifier(CORET_MODIFIER);
 		}

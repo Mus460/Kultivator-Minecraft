@@ -321,6 +321,9 @@ public final class WargaApi {
 			}
 			Cakap.peristiwa(w, jenis, Fakta.Rujuk.pemain(idx), Math.min(1.0F, Math.abs(got) / 30.0F + 0.2F));
 		}
+		if ("sapa".equals(jenis) && Ingatan.yangIngat(data, data.situs(situs), player.getUUID()).size() >= 5) {
+			Advancements.grant(player, "tempat/kota42_sapa");
+		}
 	}
 
 	// ================================================================== sects and work

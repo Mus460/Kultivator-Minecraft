@@ -56,10 +56,10 @@ public final class LangitUiClient {
 				HubNav.buka(Tujuan.of(HubNav.SEKTE, Urutan.ID_WILAYAH).sub(WilayahPage.SUB_LANGIT));
 			}
 		});
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
 			data = null;
 			versi++;
-		});
+		}));
 		// the sky chronicle lives in the one Kronik of Sekte › Ikhtisar › Catatan (43.11 G37), not in a tab of its own
 		HallClient.sumberCatatan(JENIS_KRONIK, Component.translatable("kultivator.sekte_langit.layar.kronik"), LangitUiClient::kronik);
 		scenes();

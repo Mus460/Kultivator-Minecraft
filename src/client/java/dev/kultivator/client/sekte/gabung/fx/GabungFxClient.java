@@ -151,7 +151,7 @@ public final class GabungFxClient {
 		initialised = true;
 		LevelRenderEvents.COLLECT_SUBMITS.register(GabungFxClient::collect);
 		ClientTickEvents.END_CLIENT_TICK.register(minecraft -> tick(minecraft));
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> clear());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> clear()));
 		// where the halls stand: the dome over the aula and the crown over the puncak (GabungTitik, D-41V)
 		ClientPlayNetworking.registerGlobalReceiver(GabungTitik.TitikKelas.TYPE, (payload, context) -> {
 			for (GabungTitik.Entri e : payload.entri()) {

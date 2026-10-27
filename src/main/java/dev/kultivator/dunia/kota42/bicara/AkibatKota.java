@@ -22,11 +22,13 @@ import dev.kultivator.dunia.kota42.warga.Migrasi;
 import dev.kultivator.dunia.kota42.warga.SiklusHidup;
 import dev.kultivator.dunia.kota42.warga.Warga;
 import dev.kultivator.dunia.kota42.warga.WargaData;
+import dev.kultivator.dunia.tempat.TempatEvents;
 import dev.kultivator.dunia.tempat.cerita.Akibat;
 import dev.kultivator.dunia.tempat.cerita.CeritaApi;
 import dev.kultivator.dunia.tempat.cerita.TempatDialog;
 import dev.kultivator.dunia.tempat.tema.TemaKota;
 import dev.kultivator.sect.hall.Halls;
+import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
@@ -94,6 +96,16 @@ final class AkibatKota {
 		Akibat.daftar("kota42.pakta", AkibatKota::pakta);
 		Akibat.daftar("kota42.jabatan", AkibatKota::jabatan);
 		Akibat.daftar("kota42.restu", AkibatKota::restu);
+		TempatEvents.QUEST.register((player, id, tahap) -> {
+			if (tahap == TempatEvents.QUEST_SELESAI) {
+				switch (id) {
+					case "kota42_dua_keluarga" -> Advancements.grant(player, "tempat/kota42_dua_keluarga");
+					case "kota42_lentera_lao_geng" -> Advancements.grant(player, "tempat/kota42_lao_geng");
+					default -> {
+					}
+				}
+			}
+		});
 		HargaKota.daftarAcara((server, situs, k) -> {
 			if (!KotaBicara.aktif()) {
 				return null;
@@ -408,6 +420,7 @@ final class AkibatKota {
 		c.putString("u", player.getUUID().toString());
 		store.ubah();
 		CeritaApi.setBendera(player, "kota42.nama_jalan", true);
+		Advancements.grant(player, "tempat/kota42_jalan_namaku");
 		Msg.chat(player, Component.translatable("kultivator.kota42.bicara.cerita.nama_jalan", PajakKota.nama(server, situs), nama).withStyle(ChatFormatting.GOLD));
 	}
 

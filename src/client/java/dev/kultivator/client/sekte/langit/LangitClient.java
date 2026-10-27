@@ -38,7 +38,7 @@ public final class LangitClient {
 		ClientPlayNetworking.registerGlobalReceiver(LangitPayloads.Fx.TYPE, (payload, context) -> LangitFxClient.onFx(payload));
 		LevelRenderEvents.COLLECT_SUBMITS.register(LangitVisuals::collect);
 		ClientTickEvents.END_CLIENT_TICK.register(LangitVisuals::tick);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> LangitVisuals.clear());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> LangitVisuals.clear()));
 		LivingEntityRenderLayerRegistrationCallback.EVENT.register((entityType, renderer, helper, context) -> {
 			if (renderer instanceof DiscipleRenderer disciple) {
 				// the disciple model is a PlayerModel (an EntityModel of AvatarRenderState), which the helper's generic bound

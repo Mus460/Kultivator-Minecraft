@@ -29,7 +29,7 @@ public final class DuelAnim {
 		LevelRenderEvents.START_MAIN.register(context -> BladeTracker.beginFrame());
 		LevelRenderEvents.COLLECT_SUBMITS.register(BladeDebug::collect);
 		ClientTickEvents.END_CLIENT_TICK.register(DuelAnim::tick);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> clear());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(DuelAnim::clear));
 	}
 
 	private static void tick(Minecraft minecraft) {

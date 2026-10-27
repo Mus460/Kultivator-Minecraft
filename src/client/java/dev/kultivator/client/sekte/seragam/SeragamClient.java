@@ -60,7 +60,7 @@ public final class SeragamClient {
 			}
 		});
 		LevelRenderEvents.COLLECT_SUBMITS.register(BenderaRenderer::collect);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> clearAll());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> clearAll()));
 	}
 
 	/**

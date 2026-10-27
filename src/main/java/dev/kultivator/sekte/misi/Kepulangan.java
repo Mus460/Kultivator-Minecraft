@@ -23,6 +23,7 @@ import dev.kultivator.sekte.api.Perlakuan;
 import dev.kultivator.sekte.api.SekteApi;
 import dev.kultivator.sekte.api.SekteBus;
 import dev.kultivator.sekte.api.Sifat;
+import dev.kultivator.sekte.kepribadian.YangPergi;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
 import dev.kultivator.util.NoGrief;
@@ -273,7 +274,6 @@ final class Kepulangan {
 			report.putBoolean("found", found);
 			if (found) {
 				storyArgs.add("pulang:" + target);
-				MisiData.removeSearchable(owner, target);
 			}
 		}
 		storyArgs.add(tpl.id());
@@ -382,6 +382,12 @@ final class Kepulangan {
 			}
 		}
 		SekteBus.MISSION_RETURNED.invoker().onMissionReturned(server, owner, result);
+		// Forgotten only once Yang Pergi let go of the soul (master offline, no room: it stays searchable for another mission).
+		UUID rescued = result.storyArgs().isEmpty() || !result.storyArgs().get(0).startsWith("pulang:") ? null
+				: MisiData.uuid(result.storyArgs().get(0).substring("pulang:".length()));
+		if (rescued != null && YangPergi.list(server, owner).stream().noneMatch(entry -> entry.soul().equals(rescued))) {
+			MisiData.removeSearchable(owner, rescued);
+		}
 	}
 
 	/** Up to two strong memories of the members (not X's own) quoted at the end of the report. */

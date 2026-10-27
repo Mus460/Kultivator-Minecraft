@@ -105,7 +105,7 @@ public final class LangitJatuh {
 	private static final Map<UUID, Long> CAUGHT = new HashMap<>();
 	private static final List<BiPredicate<UUID, Entity>> GUESTS = new CopyOnWriteArrayList<>();
 	private static final Map<ResourceKey<Level>, List<SkyHallView>> HALLS = new HashMap<>();
-	private static long hallsAt = Long.MIN_VALUE;
+	private static long hallsAt = Long.MIN_VALUE / 2;
 
 	static void init() {
 		ServerTickEvents.END_SERVER_TICK.register(LangitJatuh::tick);
@@ -457,7 +457,7 @@ public final class LangitJatuh {
 		LAST_GROUND.clear();
 		CAUGHT.clear();
 		HALLS.clear();
-		hallsAt = Long.MIN_VALUE;
+		hallsAt = Long.MIN_VALUE / 2;
 	}
 
 	private LangitJatuh() {

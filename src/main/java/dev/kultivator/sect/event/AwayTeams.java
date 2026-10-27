@@ -197,7 +197,7 @@ final class AwayTeams {
 	 */
 	private static void tampilkan(UUID owner, @Nullable Halls.HallView hall, ListTag teams, long now) {
 		ServerLevel level = hall == null ? null : EventUtil.hallLevel(hall);
-		if (level == null || !Jelmaan.dekatPemain(level, hall.pos(), 300.0D)) {
+		if (!dev.kultivator.sekte.mandiri.api.MandiriApi.aktif() || level == null || !Jelmaan.dekatPemain(level, hall.pos(), 300.0D)) {
 			return;
 		}
 		for (Tag tag : teams) {
@@ -247,6 +247,10 @@ final class AwayTeams {
 
 	/** One member comes back (or its Soul Tablet goes to the storehouse). False when it has to wait. */
 	private static boolean arrive(UUID owner, @Nullable Halls.HallView hall, CompoundTag member, @Nullable ServerPlayer player) {
+		if (!dev.kultivator.sekte.mandiri.MandiriConfig.get().bolehGugur) {
+			// disciples never fall unless allowed: a leftover tablet order from before comes home wounded instead
+			member.remove("as_tablet");
+		}
 		if (member.getBooleanOr("as_tablet", false)) {
 			ItemStack tablet = tabletOf(member);
 			ItemStack rest = Storehouse.insert(owner, tablet);
@@ -280,7 +284,8 @@ final class AwayTeams {
 		DiscipleEntity disciple = Disciples.arrive(level, at, member, owner);
 		if (disciple == null) {
 			member.putFloat("arrive_hp", hpFraction);
-			return false;
+			// a soul its master forgot while away never comes back: it leaves the team instead of holding it forever
+			return Disciples.forgotten(level.getServer(), member);
 		}
 		if (hpFraction < 1.0F) {
 			disciple.setHealth(Math.max(1.0F, disciple.getMaxHealth() * hpFraction));

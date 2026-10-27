@@ -89,7 +89,7 @@ public final class KotaConfig {
 		public boolean aktif = true;
 		/** Dialog for every civilian. */
 		public boolean semuaWarga = true;
-		/** Days before the same line repeats. */
+		/** Days before the same line repeats (reserved: no consumer yet, the 42K anti-repeat rings use {@code antiUlangJam}). */
 		public int ulangHari = 3;
 		public int permintaanPerHari = 3;
 		public int permintaanPerTempat = 6;
@@ -153,7 +153,7 @@ public final class KotaConfig {
 		public double gajiSkala = 1.0D;
 		public boolean pasarHantu = true;
 		public double peluangRazia = 0.10D;
-		/** K2: a pickpocket also takes an unused stack (default false: spirit stones only). */
+		/** K2: a pickpocket also takes an unused stack (default false: spirit stones only) (reserved: Copet takes stones only). */
 		public boolean copetAmbilBarang = false;
 
 		Ekonomi clamp() {
@@ -178,6 +178,7 @@ public final class KotaConfig {
 		/** Ceremonies and events are drawn within this many blocks. */
 		public int jarakTampil = 96;
 		public boolean rombongan = true;
+		/** Reserved: the troupe size comes from {@code Rombongan.GRUP}. */
 		public int rombonganJumlah = 6;
 		public boolean rutinitasPagi = true;
 		public boolean ronda = true;
@@ -246,7 +247,7 @@ public final class KotaConfig {
 		public int ambangProyek = 200;
 		/** K7 soot marks (client, no blocks). */
 		public boolean jelaga = true;
-		/** K6 (default false): sect raid elites break real blocks through {@code WorldBreaker} (radius 6, outside the core). */
+		/** K6 (default false): sect raid elites break real blocks through {@code WorldBreaker} (radius 6, outside the core) (reserved: no raid breaks blocks yet). */
 		public boolean serbuanRusakNyata = false;
 
 		Tumbuh clamp() {

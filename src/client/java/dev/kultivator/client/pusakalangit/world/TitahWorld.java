@@ -171,7 +171,7 @@ public final class TitahWorld {
 				warn("tick", exception);
 			}
 		});
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> clear());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> clear()));
 	}
 
 	/** True for the four Titah decree specs. */

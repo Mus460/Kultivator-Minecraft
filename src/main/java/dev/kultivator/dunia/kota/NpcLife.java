@@ -120,6 +120,7 @@ final class NpcLife {
 			TubuhPenduduk.tik(level, npc, now);
 			return;
 		}
+		freePartner(level, npc);
 		boolean fighting = npc.getTarget() != null || DuelRules.inDuel(npc) || npc.memory().getBooleanOr("duel", false) || KotaDuel.inSession(npc);
 		if (fighting) {
 			endChat(level, npc);
@@ -251,6 +252,7 @@ final class NpcLife {
 		npc.memory().putLong("chat_next", now);
 		npc.memory().putBoolean("busy", true);
 		partner.memory().putBoolean("busy", true);
+		partner.memory().putInt("chat_by", npc.getId());
 		npc.getNavigation().stop();
 		partner.getNavigation().stop();
 		face(npc, partner.position());
@@ -299,6 +301,16 @@ final class NpcLife {
 		npc.memory().putLong("chat_next", now + LINE_TICKS + 10L);
 	}
 
+	/** A chat partner whose initiator vanished or moved on is not "busy" any more (only the initiator's endChat cleared it). */
+	private static void freePartner(ServerLevel level, KultivatorNpc npc) {
+		int by = npc.memory().getIntOr("chat_by", -1);
+		if (by != -1 && !(level.getEntity(by) instanceof KultivatorNpc starter && starter.isAlive()
+				&& starter.memory().getIntOr("chat_with", -1) == npc.getId())) {
+			npc.memory().remove("chat_by");
+			npc.memory().remove("busy");
+		}
+	}
+
 	private static void endChat(ServerLevel level, KultivatorNpc npc) {
 		if (!npc.memory().contains("chat_with")) {
 			return;
@@ -306,6 +318,7 @@ final class NpcLife {
 		net.minecraft.world.entity.Entity found = level.getEntity(npc.memory().getIntOr("chat_with", -1));
 		if (found instanceof KultivatorNpc partner) {
 			partner.memory().remove("busy");
+			partner.memory().remove("chat_by");
 		}
 		npc.memory().remove("chat_with");
 		npc.memory().remove("chat_topic");
@@ -504,6 +517,7 @@ final class NpcLife {
 		a.memory().putLong("chat_next", level.getGameTime());
 		a.memory().putBoolean("busy", true);
 		b.memory().putBoolean("busy", true);
+		b.memory().putInt("chat_by", a.getId());
 		sit(a, false);
 		sit(b, false);
 		continueChat(level, a, level.getGameTime());

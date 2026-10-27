@@ -59,7 +59,7 @@ public final class BuildClient {
 
 	/** Called once from {@code KultivatorClient}. */
 	public static void init() {
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> clear());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> clear()));
 		HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, Kultivator.id("sect_build_hud"), new BuildHud());
 		ClientTickEvents.END_CLIENT_TICK.register(BuildClient::tick);
 		// Sekte › Bangun of the Gulungan Utama (DESIGN 43.5, 43.12.2).

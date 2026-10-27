@@ -296,7 +296,7 @@ public final class BadaiPasir {
 			Msg.actionBar(p, Component.translatable("kultivator.kota_tema.oasis.badai.tertiup").withStyle(ChatFormatting.YELLOW));
 		}
 		if (p.getItemBySlot(EquipmentSlot.HEAD).isEmpty()) {
-			long last = LUKA_TERAKHIR.getOrDefault(p.getUUID(), Long.MIN_VALUE);
+			long last = LUKA_TERAKHIR.getOrDefault(p.getUUID(), Long.MIN_VALUE / 2);
 			if (now - last >= LUKA_SETIAP) {
 				LUKA_TERAKHIR.put(p.getUUID(), now);
 				p.hurtServer(level, level.damageSources().generic(), LUKA);

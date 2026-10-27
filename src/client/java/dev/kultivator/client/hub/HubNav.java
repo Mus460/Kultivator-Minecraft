@@ -65,7 +65,7 @@ public final class HubNav {
 	public static void init() {
 		ScreenEvents.AFTER_INIT.register((minecraft, screen, width, height) -> afterInit(screen));
 		ClientTickEvents.END_CLIENT_TICK.register(HubNav::tick);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> reset());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(HubNav::reset));
 	}
 
 	// ================================================================== Gulungan Utama (DESIGN 43.4.3)

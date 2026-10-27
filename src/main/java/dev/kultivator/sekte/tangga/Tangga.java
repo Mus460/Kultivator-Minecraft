@@ -75,6 +75,13 @@ public final class Tangga implements TanggaService {
 		content = true;
 		TanggaPayloads.register();
 		BatuHatiKomponen.register();
+		// A disciple saved in the middle of a climb (the game stopped hard) gets its gravity and AI back when it loads,
+		// whatever the module switch says now (a frozen body would stay frozen).
+		net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents.ENTITY_LOAD.register((entity, level) -> {
+			if (entity instanceof dev.kultivator.disciple.DiscipleEntity disciple && disciple.role() == dev.kultivator.disciple.DiscipleEntity.Role.DISCIPLE) {
+				Pendakian.recover(disciple);
+			}
+		});
 	}
 
 	public static void init() {
@@ -94,12 +101,6 @@ public final class Tangga implements TanggaService {
 		ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
 			Pendakian.stopAll(server);
 			STAIR.clear();
-		});
-		// A disciple saved in the middle of a climb (the game stopped hard) gets its gravity and AI back when it loads.
-		net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents.ENTITY_LOAD.register((entity, level) -> {
-			if (entity instanceof dev.kultivator.disciple.DiscipleEntity disciple && disciple.role() == dev.kultivator.disciple.DiscipleEntity.Role.DISCIPLE) {
-				Pendakian.recover(disciple);
-			}
 		});
 		DiscipleHooks.addInfo((entity, master, tag) -> {
 			CompoundTag mine = entity.data().extra().getCompound(SekteIds.EXTRA_G).orElse(null);

@@ -3,12 +3,15 @@ package dev.kultivator.sekte.gabung;
 import dev.kultivator.data.Cultivators;
 import dev.kultivator.data.Realm;
 import dev.kultivator.dunia.tempat.kompleks.Kartu;
+import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import dev.kultivator.sekte.gabung.api.GabungApi;
 import dev.kultivator.sekte.gabung.api.GabungGerakId;
 import dev.kultivator.sekte.gabung.api.KelasSekte;
 import dev.kultivator.sekte.gabung.api.Pangkat;
 import dev.kultivator.sekte.gabung.api.SyaratMasuk;
 import dev.kultivator.sekte.gabung.politik.Kursi;
+import dev.kultivator.sekte.gabung.ui.GabungLayar;
+import dev.kultivator.sekte.gabung.ui.GabungLembar;
 import dev.kultivator.util.Msg;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -87,6 +90,9 @@ public final class Promosi {
 		ServerTickEvents.END_SERVER_TICK.register(Promosi::tick);
 		ServerPlayerEvents.LEAVE.register(player -> batalkan(player, true));
 		ServerLifecycleEvents.SERVER_STOPPED.register(s -> UPACARA.clear());
+		// The rank tree's [Ajukan Kenaikan]: the ceremony, the own-grounds check and the trials start here, not the 41U default.
+		GabungLayar.daftarAksi(GabungLembar.PohonPangkat.LAYAR, GabungLembar.PohonPangkat.OP_AJUKAN,
+				(player, npcId, op) -> ajukan(player, Pangkat.byId(LembarKunci.arg(op, 1)) == Pangkat.TETUA));
 		GabungCommands.daftar("naik", () -> Commands.literal("naik")
 				.executes(ctx -> ajukan(ctx.getSource().getPlayerOrException()) ? 1 : 0)
 				.then(Commands.literal("tetua").executes(ctx -> ajukan(ctx.getSource().getPlayerOrException(), true) ? 1 : 0)));
@@ -113,6 +119,11 @@ public final class Promosi {
 	/** True when the trial of {@code tujuan} was passed (or the rank has none). */
 	public static boolean sudahLulus(Keanggotaan k, Pangkat tujuan) {
 		return ujian(tujuan) == null || k.bagian("pangkat").getBooleanOr("lulus." + tujuan.id(), false);
+	}
+
+	/** True when {@link #ajukan} itself starts the trial of {@code tujuan} (the Luar re-test, the Dalam duel, the Tetua trial). */
+	public static boolean mulaiUjian(Pangkat tujuan) {
+		return tujuan == Pangkat.LUAR || UjianPangkat.punya(tujuan);
 	}
 
 	/** The trial name key of rank {@code tujuan}, or null when it has none. */

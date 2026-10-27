@@ -15,7 +15,7 @@ public final class EliteClient {
 
 	public static void init() {
 		HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, Kultivator.id("elite_plate"), new ElitePlate());
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> EliteFx.clear());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(EliteFx::clear));
 	}
 
 	private EliteClient() {

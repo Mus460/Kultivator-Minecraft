@@ -67,9 +67,10 @@ public final class Voice {
 				return;
 			}
 			double r2 = radius * radius;
+			int kind = VoiceEvents.normalize(key).startsWith("demon.") ? VoicePayload.KIND_DEMON : VoicePayload.KIND_HEAVEN; // a demon key must not get "heaven."
 			for (ServerPlayer player : List.copyOf(level.players())) {
 				if (player.position().distanceToSqr(pos) <= r2) {
-					heavenTo(player, key, VoicePayload.KIND_HEAVEN, null);
+					heavenTo(player, key, kind, null);
 				}
 			}
 		});

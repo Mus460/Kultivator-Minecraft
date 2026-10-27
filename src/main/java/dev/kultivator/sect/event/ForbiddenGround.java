@@ -172,7 +172,8 @@ final class ForbiddenGround {
 				data.setDeviationTicks(Math.max(data.deviationTicks(), FAIL_DEVIATION));
 				data.setXp(data.xp() * FAIL_BAR_KEEP);
 				member.putFloat("arrive_hp", 0.30F);
-				if (hardcore) {
+				// a hardcore failure only costs a life when the user allowed disciples to fall (bolehGugur); otherwise it comes home wounded
+				if (hardcore && dev.kultivator.sekte.mandiri.MandiriConfig.get().bolehGugur) {
 					member.putBoolean("as_tablet", true);
 					line.putBoolean("tablet", true);
 				}

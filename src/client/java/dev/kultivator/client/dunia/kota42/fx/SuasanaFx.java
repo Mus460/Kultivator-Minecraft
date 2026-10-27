@@ -11,6 +11,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.minecraft.client.Minecraft;
+import net.minecraft.world.level.Level;
 
 /**
  * The one entry of the town fx of 42V-F (DESIGN 42.9.2-42.9.3, 42.12.6), started by {@code KotaSuasanaClient.init}: it owns the
@@ -39,7 +40,7 @@ public final class SuasanaFx {
 		ClientTickEvents.END_CLIENT_TICK.register(SuasanaFx::tik);
 		LevelRenderEvents.COLLECT_SUBMITS.register(SuasanaFx::kumpul);
 		ClientEntityEvents.ENTITY_UNLOAD.register((entity, level) -> Jelaga.hilang(entity));
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> bersihkan());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(SuasanaFx::bersihkan));
 	}
 
 	/**
@@ -134,7 +135,7 @@ public final class SuasanaFx {
 	}
 
 	private static void kumpul(LevelRenderContext context) {
-		if (Bingkai.level == null || ShaderCompat.shadowPass()) {
+		if (Bingkai.level == null || Bingkai.level.dimension() != Level.OVERWORLD || ShaderCompat.shadowPass()) {
 			return;
 		}
 		if (TitikPeta.lentera.isEmpty() && TitikPeta.kain.isEmpty() && TitikPeta.teks.isEmpty() && PartikelKota.jumlah() == 0 && !Petasan.ada() && !Jelaga.ada()) {

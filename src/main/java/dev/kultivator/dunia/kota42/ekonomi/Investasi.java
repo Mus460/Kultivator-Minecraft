@@ -359,11 +359,16 @@ public final class Investasi {
 	 * the start. Bypasses the per-business cap (the plot cost was the payment).
 	 */
 	public static void sahamKavling(MinecraftServer server, long situs, int id, UUID player, double bagian) {
+		sahamKavling(server, situs, id, player, bagian, Long.MAX_VALUE);
+	}
+
+	/** As above, the stake worth at most {@code maks} NB (what the donor really paid), so a plot never mints money. */
+	public static void sahamKavling(MinecraftServer server, long situs, int id, UUID player, double bagian, long maks) {
 		CompoundTag c = UsahaWarga.mentah(server, situs, id);
 		if (c == null || bagian <= 0.0D || bagian >= 1.0D) {
 			return;
 		}
-		long value = Math.round(c.getIntOr("m", 0) * bagian / (1.0D - bagian));
+		long value = Math.min(maks, Math.round(c.getIntOr("m", 0) * bagian / (1.0D - bagian)));
 		CompoundTag shares = c.getCompoundOrEmpty("s");
 		CompoundTag mine = shares.getCompoundOrEmpty(player.toString());
 		mine.putLong("v", value);

@@ -18,10 +18,10 @@ public final class MusuhClient {
 	public static void init() {
 		RogueMaskLayer.register();
 		EntityRenderers.register(RogueCultivators.TYPE, RogueRenderer::new);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
 			data = new CompoundTag();
 			MusuhFx.clear();
-		});
+		}));
 	}
 
 	/** The module's last {@code DuniaSync} data arrived. */

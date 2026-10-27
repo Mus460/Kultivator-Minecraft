@@ -170,7 +170,7 @@ public final class Kosmik3D {
 			return;
 		}
 		registered = true;
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> release());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> release()));
 	}
 
 	/** One boolean while idle (from {@code EpicRenderer.collect}). */

@@ -840,10 +840,20 @@ public final class Disciples {
 		DiscipleEntity back = arriveBody(level, pos, tag, owner);
 		if (back != null) {
 			for (java.util.function.Consumer<UUID> listener : ON_ARRIVE) {
-				listener.accept(back.soulId());
+				try {
+					listener.accept(back.soulId());
+				} catch (RuntimeException exception) {
+					dev.kultivator.Kultivator.LOGGER.error("Kultivator disciple arrive listener failed", exception);
+				}
 			}
 		}
 		return back;
+	}
+
+	/** True when the departed soul in {@code tag} was forgotten by its master meanwhile: {@link #arrive} never brings it back, so its away record must end. */
+	public static boolean forgotten(MinecraftServer server, CompoundTag tag) {
+		UUID soul = tag.read("soul", UUIDUtil.CODEC).orElse(null);
+		return soul != null && DiscipleRecords.get(server).isForgotten(soul);
 	}
 
 	/** The soul of every disciple that {@link #arrive} brought back is handed to {@code listener} (a stage body of its errand goes). */

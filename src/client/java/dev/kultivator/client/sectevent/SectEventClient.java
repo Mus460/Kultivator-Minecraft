@@ -40,14 +40,14 @@ public final class SectEventClient {
 				SectEventFx.tick(minecraft);
 			}
 		});
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
 			data = new CompoundTag();
 			version++;
 			seenHallVersion = -1L;
 			store = emptyStore();
 			storeVersion = -1L;
 			SectEventFx.clear();
-		});
+		}));
 		// Sekte › Kegiatan (DESIGN 43.5): Tugas, Misi, Papan, Arena in the Gulungan Utama
 		KegiatanPage.daftar();
 	}

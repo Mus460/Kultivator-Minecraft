@@ -70,7 +70,7 @@ public final class KehancuranClient {
 	private static Component stashedName = Component.empty();
 
 	public static void init() {
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> clear());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> clear()));
 		ClientTickEvents.END_CLIENT_TICK.register(KehancuranFx::tick);
 		HudElementRegistry.attachElementAfter(VanillaHudElements.MISC_OVERLAYS, Kultivator.id("kehancuran_sky"), new RedSkyHud());
 		Codex.daftarHalaman();

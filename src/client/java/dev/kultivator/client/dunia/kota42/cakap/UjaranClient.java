@@ -48,10 +48,10 @@ public final class UjaranClient {
 		initialised = true;
 		LevelRenderEvents.COLLECT_SUBMITS.register(GelembungUjaran::render);
 		ClientTickEvents.END_CLIENT_TICK.register(UjaranClient::tick);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
 			BERBUNYI.clear();
 			GelembungUjaran.bersih();
-		});
+		}));
 	}
 
 	private static void tick(Minecraft minecraft) {

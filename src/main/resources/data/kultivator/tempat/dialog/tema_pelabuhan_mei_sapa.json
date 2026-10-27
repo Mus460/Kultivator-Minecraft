@@ -18,10 +18,12 @@
         },
         {
           "syarat": [
-            "bendera pelabuhan_hasil_tumpas"
+            "bendera pelabuhan_hasil_tumpas",
+            "!bendera pelabuhan_mei_arwah"
           ],
           "akibat": [
-            "nama_baik 1"
+            "nama_baik 1",
+            "bendera pelabuhan_mei_arwah"
           ],
           "ke": "arwah"
         },

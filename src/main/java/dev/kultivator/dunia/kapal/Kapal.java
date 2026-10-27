@@ -146,7 +146,7 @@ public final class Kapal {
 			for (Tag tag : tags) {
 				if (tag instanceof CompoundTag entry) {
 					DiscipleEntity back = Disciples.arrive(level, player.position(), entry, owner);
-					if (back == null) {
+					if (back == null && !Disciples.forgotten(server, entry)) {
 						left.add(entry);
 					}
 				}

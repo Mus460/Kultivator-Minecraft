@@ -16,6 +16,7 @@ import dev.kultivator.dunia.kota42.warga.Warga;
 import dev.kultivator.dunia.kota42.warga.WargaData;
 import dev.kultivator.dunia.tempat.hidup.HidupApi;
 import dev.kultivator.dunia.tempat.hidup.TubuhPenduduk;
+import dev.kultivator.util.Advancements;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -620,6 +621,7 @@ public final class ObrolanWarga {
 		for (ServerPlayer p : level.players()) {
 			if (!p.isSpectator() && p.distanceToSqr(body) <= radius * radius) {
 				Pengetahuan.get(server).catat(data.indeksPemain(p.getUUID()), fakta, KotaHidup.hari(server));
+				Advancements.grant(p, "tempat/kota42_nguping");
 			}
 		}
 	}

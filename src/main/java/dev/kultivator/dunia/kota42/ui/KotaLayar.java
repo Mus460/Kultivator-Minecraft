@@ -415,6 +415,10 @@ public final class KotaLayar {
 			bukaJauh(ctx.getSource().getPlayerOrException(), KotaLembar.Milikku.LAYAR, null);
 			return 1;
 		}));
+		KotaHidupCommands.daftar("acara", () -> Commands.literal("acara").executes(ctx -> {
+			bukaJauh(ctx.getSource().getPlayerOrException(), KotaLembar.Buku.LAYAR, KotaLembar.Buku.TAB_ACARA);
+			return 1;
+		}));
 		KotaHidupCommands.daftar("harga", () -> Commands.literal("harga").executes(ctx -> {
 			bukaJauh(ctx.getSource().getPlayerOrException(), KotaLembar.Gudang.LAYAR, KotaLembar.Gudang.TAB_HARGA);
 			return 1;

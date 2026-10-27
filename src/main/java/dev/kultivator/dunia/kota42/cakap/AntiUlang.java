@@ -1,5 +1,7 @@
 package dev.kultivator.dunia.kota42.cakap;
 
+import dev.kultivator.dunia.kota42.KotaConfig;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -7,7 +9,7 @@ import java.util.UUID;
 /**
  * Anti-repetition memory (DESIGN 42.5A.8): every listener keeps a ring of the frame keys it heard recently, with who said
  * them and when (per player 256, per warga 64). A frame's weight is multiplied by {@code 0.1} when the same speaker said it
- * to the same listener within one world day and by {@code 0.5} when the listener heard it from anyone within one world
+ * to the same listener within {@code antiUlangJam} hours (default one world day) and by {@code 0.5} when the listener heard it from anyone within one world
  * hour (both: 0.05).
  * <p>
  * The rings here live for the server session; 42K persists them in {@code kultivator:kota_cakap} through
@@ -65,7 +67,7 @@ public final class AntiUlang {
 				if (umur < 0L) {
 					continue;
 				}
-				sama |= pembicara[i] == pembicaraId && umur <= HARI;
+				sama |= pembicara[i] == pembicaraId && umur <= KotaConfig.bicara().antiUlangJam * JAM;
 				baru |= umur <= JAM;
 			}
 			return (sama ? SAMA_PEMBICARA : 1.0D) * (baru ? SIAPA_PUN : 1.0D);

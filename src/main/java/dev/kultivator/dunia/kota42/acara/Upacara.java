@@ -3179,6 +3179,10 @@ public final class Upacara {
 				set = keluargaMati(server, a);
 			}
 			default -> {
+				if (dewasa.isEmpty()) {
+					ctx.getSource().sendFailure(Component.translatable(L + "uji.tanpa_warga"));
+					return 0;
+				}
 				Warga bayi = !kecil.isEmpty() ? kecil.get(r.nextInt(kecil.size())) : dewasa.get(r.nextInt(dewasa.size()));
 				Warga ibu = bayi.ibu == Warga.TANPA ? null : data.byId(bayi.ibu);
 				Warga ayah = bayi.ayah == Warga.TANPA ? null : data.byId(bayi.ayah);

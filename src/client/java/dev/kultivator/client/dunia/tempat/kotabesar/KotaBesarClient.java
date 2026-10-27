@@ -27,7 +27,7 @@ public final class KotaBesarClient {
 		ClientPlayNetworking.registerGlobalReceiver(KotaBesarPayload.TYPE, (payload, context) -> KotaBesarFx.terima(payload));
 		HudElementRegistry.attachElementAfter(VanillaHudElements.MISC_OVERLAYS, Kultivator.id("kota_besar_hud"), new KotaBesarHud());
 		ClientTickEvents.END_CLIENT_TICK.register(KotaBesarFx::tick);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> KotaBesarFx.bersihkan());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> KotaBesarFx.bersihkan()));
 	}
 
 	private KotaBesarClient() {

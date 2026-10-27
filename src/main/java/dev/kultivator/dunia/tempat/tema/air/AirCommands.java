@@ -35,12 +35,20 @@ final class AirCommands {
 				.then(Commands.literal("tur").executes(ctx -> {
 					ServerPlayer p = ctx.getSource().getPlayerOrException();
 					NilaiBatu.give(p, Perahu.HARGA_TUR);
-					return Perahu.mulaiTur(p, null) ? 1 : 0;
+					if (Perahu.mulaiTur(p, null)) {
+						return 1;
+					}
+					NilaiBatu.pay(p, Perahu.HARGA_TUR); // take the test money back: the call did not charge
+					return 0;
 				}))
 				.then(Commands.literal("sewa").executes(ctx -> {
 					ServerPlayer p = ctx.getSource().getPlayerOrException();
 					NilaiBatu.give(p, Perahu.HARGA_SEWA);
-					return Perahu.sewa(p) ? 1 : 0;
+					if (Perahu.sewa(p)) {
+						return 1;
+					}
+					NilaiBatu.pay(p, Perahu.HARGA_SEWA); // take the test money back: the call did not charge
+					return 0;
 				}))
 				.then(Commands.literal("tikus").executes(ctx -> paksa(ctx, TikusAir.ACARA)))
 				.then(Commands.literal("naga").executes(ctx -> paksa(ctx, LombaPerahuNaga.ACARA)))

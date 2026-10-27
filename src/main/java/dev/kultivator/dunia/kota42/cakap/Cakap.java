@@ -7,6 +7,7 @@ import dev.kultivator.dunia.kota42.KotaHidup;
 import dev.kultivator.dunia.kota42.api.WargaApi;
 import dev.kultivator.dunia.kota42.warga.Warga;
 import dev.kultivator.dunia.kota42.warga.WargaData;
+import dev.kultivator.util.Advancements;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.network.chat.Component;
@@ -341,6 +342,7 @@ public final class Cakap {
 				j.status = Pengetahuan.StatusJanji.DITEPATI;
 				peristiwa(warga, "janji_ditepati", Fakta.Rujuk.pemain(idx), 1.0F);
 				WargaApi.ubahKesan(warga, player, 5, "janji_ditepati", null);
+				Advancements.grant(player, "tempat/kota42_janji");
 				pk.ubah();
 				return true;
 			}

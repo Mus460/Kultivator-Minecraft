@@ -47,10 +47,10 @@ public final class HubunganClient {
 		ClientPlayNetworking.registerGlobalReceiver(HubunganPayloads.Jaring.TYPE, (payload, context) -> JaringScreen.receive(payload.data()));
 		ClientTickEvents.END_CLIENT_TICK.register(GelembungIkatan::tick);
 		LevelRenderEvents.COLLECT_SUBMITS.register(GelembungIkatan::render);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
 			GelembungIkatan.clear();
 			JaringScreen.bersih();
-		});
+		}));
 
 		// 43: Murid › Jaring is a page of the Gulungan; the Hubungan sub of Murid › Murid is mounted by the Murid page (M03).
 		HubPages.daftar(HubNav.MURID, Urutan.ID_JARING, Urutan.JARING, JaringScreen::new);

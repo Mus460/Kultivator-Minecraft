@@ -91,6 +91,11 @@ public final class Perjalanan {
 		content = true;
 	}
 
+	/** True once {@link #init} ran, that is while the module is on (the stage engine of {@link Jelmaan} ticks from here). */
+	static boolean berjalan() {
+		return initialised;
+	}
+
 	/** Runtime behaviour of 39C (server listeners, ticks, executors, commands); only while the module is on. */
 	public static void init() {
 		registerContent();

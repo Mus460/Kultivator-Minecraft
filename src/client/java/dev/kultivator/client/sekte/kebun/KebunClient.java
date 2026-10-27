@@ -56,7 +56,7 @@ public final class KebunClient {
 		ClientPlayNetworking.registerGlobalReceiver(KebunPayloads.World.TYPE, (p, context) -> TanamanRenderer.onWorld(p.data()));
 		ClientPlayNetworking.registerGlobalReceiver(KebunPayloads.Fx.TYPE, (p, context) -> KebunFx.on(p));
 		ClientTickEvents.END_CLIENT_TICK.register(KebunClient::tick);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> TanamanRenderer.clear());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> TanamanRenderer.clear()));
 		TanamanRenderer.init();
 		KebunPoses.init();
 		scenes();

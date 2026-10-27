@@ -1,6 +1,7 @@
 package dev.kultivator.dunia;
 
 import dev.kultivator.Kultivator;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerLevel;
@@ -29,7 +30,8 @@ public final class DuniaTickets {
 	private static final Deque<Live> LIVE = new ArrayDeque<>();
 
 	static void init() {
-		// the type registers with the class; nothing else to do
+		// the type registers with the class; a closed world must not stay referenced by the live tickets
+		ServerLifecycleEvents.SERVER_STOPPED.register(server -> LIVE.clear());
 	}
 
 	/** Loads {@code pos} (radius ≤ 1) for the next 100 ticks. */

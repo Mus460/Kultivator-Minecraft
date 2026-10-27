@@ -76,7 +76,7 @@ public final class SpecFx {
 			}
 		});
 		QuadFx.init();
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> clearAll());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> clearAll()));
 	}
 
 	/** Draws one technique event (called on the client thread by the payload receiver). */

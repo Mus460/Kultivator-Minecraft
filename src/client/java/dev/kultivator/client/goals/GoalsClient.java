@@ -26,7 +26,7 @@ public final class GoalsClient {
 		HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, Kultivator.id("tribulation_hud"), new TribulationHud());
 		HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, Kultivator.id("meditation_alert"), new MeditationAlert());
 		ClientTickEvents.END_CLIENT_TICK.register(GoalsClient::tick);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> reset());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> reset()));
 	}
 
 	private static void tick(Minecraft minecraft) {

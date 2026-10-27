@@ -106,7 +106,7 @@ public final class GrandFormation {
 			if (inside && SectRanks.isProtector(data)) {
 				protectors++;
 			}
-			if (onTrial(disciple)) {
+			if (heldElsewhere(disciple)) {
 				continue;
 			}
 			boolean qualifies = canGuard(disciple) && disciple.distanceToSqr(lodestone) <= (GUARD_RANGE + 1.0D) * (GUARD_RANGE + 1.0D);
@@ -149,7 +149,7 @@ public final class GrandFormation {
 	 * its master is beside its spot (otherwise it is freed at once, so a new order is obeyed).
 	 */
 	static void checkGuard(DiscipleEntity disciple) {
-		if (onTrial(disciple)) {
+		if (heldElsewhere(disciple)) {
 			return;
 		}
 		if (disciple.activity() != DiscipleEntity.ACTIVITY_FORMATION_GUARD || !(disciple.level() instanceof ServerLevel level)) {
@@ -176,9 +176,14 @@ public final class GrandFormation {
 		}
 	}
 
-	/** A Latihan Khusus holds activity 5 at the stele (PromotionTrial writes {@code trial_spot}); never touch it here. */
-	private static boolean onTrial(DiscipleEntity disciple) {
-		return disciple.data().extra().getCompoundOrEmpty(Duties.EXTRA).contains("trial_spot");
+	/**
+	 * A Latihan Khusus holds activity 5 at the stele (PromotionTrial writes {@code trial_spot}) and a village guard at its
+	 * plaque (VillageGuards); never touch either here.
+	 */
+	private static boolean heldElsewhere(DiscipleEntity disciple) {
+		UUID owner = disciple.ownerId();
+		return disciple.data().extra().getCompoundOrEmpty(Duties.EXTRA).contains("trial_spot")
+				|| (owner != null && dev.kultivator.desa.VillageGuards.isGuard(owner, disciple.soulId()));
 	}
 
 	/** The Aula tablet's line for the owner's formation near the stele: grand, layers, radius, guard. */

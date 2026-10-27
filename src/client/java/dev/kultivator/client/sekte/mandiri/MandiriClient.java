@@ -61,7 +61,7 @@ public final class MandiriClient {
 		});
 		ClientPlayNetworking.registerGlobalReceiver(MandiriPayloads.Pikir.TYPE, (payload, context) -> GelembungMandiri.terima(payload));
 		ClientPlayNetworking.registerGlobalReceiver(MandiriPayloads.Toast.TYPE, (payload, context) -> ToastMandiri.terima(payload));
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> bersih());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> bersih()));
 
 		// 43: Murid › Daftar is a page of the Gulungan; the Jalan Hidup sub of Murid › Murid is mounted by the Murid page (M03).
 		HubPages.daftar(HubNav.MURID, Urutan.ID_DAFTAR, Urutan.DAFTAR, MandiriBoardScreen::new);

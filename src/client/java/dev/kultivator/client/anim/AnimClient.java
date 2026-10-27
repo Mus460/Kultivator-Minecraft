@@ -44,7 +44,7 @@ public final class AnimClient {
 			}
 		});
 		ClientTickEvents.END_CLIENT_TICK.register(AnimClient::tick);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> clearAll());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(AnimClient::clearAll));
 	}
 
 	/** Client ticks since start (the clock of forms, binds and props). */

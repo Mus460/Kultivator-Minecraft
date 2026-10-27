@@ -72,11 +72,11 @@ public final class QuickWheel implements HudElement {
 		ClientTickEvents.START_CLIENT_TICK.register(QuickWheel::startTick);
 		ClientTickEvents.END_CLIENT_TICK.register(QuickWheel::endTick);
 		HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, Kultivator.id("quick_wheel"), new QuickWheel());
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
 			open = false;
 			held = false;
 			hovered = -1;
-		});
+		}));
 	}
 
 	public static boolean isOpen() {

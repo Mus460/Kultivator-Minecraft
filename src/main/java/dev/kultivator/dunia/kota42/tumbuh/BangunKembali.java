@@ -16,6 +16,7 @@ import dev.kultivator.dunia.tempat.hidup.Pemanggil;
 import dev.kultivator.dunia.tempat.hidup.Penduduk;
 import dev.kultivator.dunia.tempat.hidup.TempatHuni;
 import dev.kultivator.dunia.tempat.perbaikan.PerbaikanApi;
+import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -297,6 +298,16 @@ public final class BangunKembali {
 		siar(level, situs, Component.translatable("kultivator.kota42.tumbuh.bangun.selesai", c.getIntOr("tot", 0)).withStyle(ChatFormatting.GOLD));
 		GosipWarga.lahir(level, situs, "ACARA", 0, Fakta.Kebenaran.BENAR, List.of("syukur_bangun"), null, Fakta.Rujuk.tempat(situs));
 		Peresmian.syukur(server, level, situs);
+		for (String key : dn.keySet()) {
+			try {
+				ServerPlayer donor = server.getPlayerList().getPlayer(UUID.fromString(key));
+				if (donor != null) {
+					Advancements.grant(donor, "tempat/kota42_bangun_kembali");
+				}
+			} catch (IllegalArgumentException ignored) {
+				// not a player key
+			}
+		}
 	}
 
 	/** Keeps the refugee tents standing on the square while a player is near (one tent per refugee household). */

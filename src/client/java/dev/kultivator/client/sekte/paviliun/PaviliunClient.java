@@ -56,12 +56,12 @@ public final class PaviliunClient {
 		ClientPlayNetworking.registerGlobalReceiver(PaviliunPayloads.View.TYPE, (p, context) -> onView(p));
 		ClientPlayNetworking.registerGlobalReceiver(PaviliunPayloads.Places.TYPE, (p, context) -> PaviliunWorld.set(p.data()));
 		ClientTickEvents.END_CLIENT_TICK.register(PaviliunClient::tick);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
 			DATA[0] = new CompoundTag();
 			DATA[1] = new CompoundTag();
 			PaviliunWorld.clear();
 			PaviliunRenderer.clear();
-		});
+		}));
 		LevelRenderEvents.COLLECT_SUBMITS.register(PaviliunRenderer::collect);
 		PaviliunPoses.init();
 		scenes();

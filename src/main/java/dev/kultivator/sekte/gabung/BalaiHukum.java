@@ -527,6 +527,7 @@ public final class BalaiHukum {
 	/** Ends a confinement silently (the member left the sect: desertion, expulsion). */
 	public static void lepasKurungan(ServerPlayer player) {
 		KURUNGAN.remove(player.getUUID());
+		GabungPayloads.kirimKlip(player, 0, 0); // the RENUNGAN loop does not end by itself
 		Keanggotaan k = GabungData.get(player.level().getServer()).peek(player.getUUID());
 		if (k != null && k.kurunganSampai > 0L) {
 			k.kurunganSampai = 0L;
@@ -536,6 +537,7 @@ public final class BalaiHukum {
 
 	private static void lepas(ServerPlayer player, String kunci) {
 		KURUNGAN.remove(player.getUUID());
+		GabungPayloads.kirimKlip(player, 0, 0);
 		Keanggotaan k = GabungData.get(player.level().getServer()).peek(player.getUUID());
 		if (k != null) {
 			k.kurunganSampai = 0L;

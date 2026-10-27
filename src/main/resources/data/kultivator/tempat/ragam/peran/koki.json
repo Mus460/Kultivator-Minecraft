@@ -13,7 +13,7 @@
       "kunci": "kerja",
       "blok": "kerja",
       "tujuan": "@kerja",
-      "klip": "potong_talenan",
+      "klip": "kota42_potong_talenan",
       "kanan": "pisau_ganda",
       "durasi": [
         20,
@@ -241,7 +241,7 @@
       "kunci": "kerja",
       "blok": "kerja",
       "tujuan": "@kerja",
-      "klip": "uleni_adonan",
+      "klip": "kota42_uleni_adonan",
       "durasi": [
         20,
         40

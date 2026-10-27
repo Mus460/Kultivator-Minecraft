@@ -259,6 +259,8 @@ public final class Perencana {
 		CompoundTag rec = rekam(murid);
 		if (!rec.isEmpty()) {
 			// Activities 40-60 are never saved: the old record ends here, interrupted, and the planner picks again.
+			// The unloaded time earns no breath XP here (KejarKetinggalan pays it): the block counts from now.
+			rec.putLong(MandiriIds.KG_MULAI, now);
 			akhiri(murid, true);
 		}
 		CitaCita.terapkanAntre(murid);
@@ -429,7 +431,8 @@ public final class Perencana {
 		}
 		Kegiatan running = berjalan(murid);
 		CompoundTag rec = rekam(murid);
-		if (running != null && !rec.getStringOr(MandiriIds.KG_ACARA, "").isEmpty()) {
+		if (running != null && (!rec.getStringOr(MandiriIds.KG_ACARA, "").isEmpty() || running.perjalanan())) {
+			// A departure scene is never re-judged (the hour, the party itself counted as away): orders still end it (harusBatal).
 			return;
 		}
 		UUID owner = murid.ownerId();

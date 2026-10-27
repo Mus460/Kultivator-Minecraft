@@ -55,7 +55,7 @@ public final class GuideClient {
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.GuideSync.TYPE, (payload, context) -> onSync(payload));
 		HubPages.daftar(HubNav.PANDUAN, Urutan.ID_KITAB, Urutan.KITAB, GuideScreen::new);
 		ClientTickEvents.END_CLIENT_TICK.register(GuideClient::tick);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> clear());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> clear()));
 	}
 
 	private static void clear() {

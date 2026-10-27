@@ -42,7 +42,7 @@
     },
     {
       "id": "bintang",
-      "gestur": "v_tatap_tunjuk",
+      "gestur": "tatap_langit",
       "pilihan": [
         {
           "akibat": [

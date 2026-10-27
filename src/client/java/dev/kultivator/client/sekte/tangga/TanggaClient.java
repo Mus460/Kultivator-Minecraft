@@ -42,10 +42,10 @@ public final class TanggaClient {
 		initialised = true;
 		ClientPlayNetworking.registerGlobalReceiver(TanggaPayloads.State.TYPE, (payload, context) -> TanggaIlusi.onState(payload));
 		ClientTickEvents.END_CLIENT_TICK.register(minecraft -> TanggaIlusi.tick());
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
 			TanggaIlusi.clear();
 			TanggaCatatanScreen.bersih();
-		});
+		}));
 		LevelRenderEvents.COLLECT_SUBMITS.register(TanggaIlusiRenderer::collect);
 		HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, Kultivator.id("sekte_tangga_gulungan"), new TanggaHud());
 		SektePoses.register(SekteIds.ACT_CLIMB, TanggaClient::pose, List.of());

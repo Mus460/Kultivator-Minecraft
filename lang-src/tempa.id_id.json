@@ -289,5 +289,15 @@
   "kultivator.screen.help.roh_senjata.title": "Roh Senjata",
   "kultivator.screen.help.roh_senjata": "Pusaka natalmu menua saat kamu bermeditasi (1 tahun per menit), lewat pembunuhan musuh kuat dengan teknik, dan lewat inti seunsur. Tingkat Langit dan 100 tahun bisa ditanami benih roh; 400 tahun membawa Roh Dasar yang bertindak sendiri; 1.000 tahun, tingkat Abadi dan satu tribulasi menjadikannya Lengkap. Jiwa Binatang langsung memberi Roh Dasar buatan, tetapi tidak pernah menjadi Lengkap.",
   "kultivator.screen.help.cincin.title": "Cincin Penyimpanan",
-  "kultivator.screen.help.cincin": "Buat kantong (9 slot) di meja kerja dan tempa cincin 18 sampai 54 slot di Tungku Api Bumi. Jongkok + pakai atau tombol Buka Cincin membukanya. Pembukaan pertama menanam jejak jiwamu: hanya kamu yang bisa membuka atau memungutnya saat jatuh, dan api, lava serta ledakan tidak menghancurkannya. Cincin, kotak shulker dan bundel tidak bisa dimasukkan. Cincin tetap jatuh saat mati."
+  "kultivator.screen.help.cincin": "Buat kantong (9 slot) di meja kerja dan tempa cincin 18 sampai 54 slot di Tungku Api Bumi. Jongkok + pakai atau tombol Buka Cincin membukanya. Pembukaan pertama menanam jejak jiwamu: hanya kamu yang bisa membuka atau memungutnya saat jatuh, dan api, lava serta ledakan tidak menghancurkannya. Cincin, kotak shulker dan bundel tidak bisa dimasukkan. Cincin tetap jatuh saat mati.",
+  "kultivator.tempa.order.embryo_sword": "Pedang biasa (calon wadah)",
+  "kultivator.tempa.order.core_king": "Inti Binatang Raja",
+  "kultivator.tempa.order.core.1": "Inti Binatang Rendah atau lebih tinggi",
+  "kultivator.tempa.order.core.2": "Inti Binatang Menengah atau lebih tinggi",
+  "kultivator.tempa.order.core.3": "Inti Binatang Tinggi atau lebih tinggi",
+  "kultivator.tempa.order.core.4": "Inti Binatang Raja",
+  "kultivator.tempa.order.realm.2": "Herba Fondasi",
+  "kultivator.tempa.order.realm.3": "Kayu Pemelihara Jiwa",
+  "kultivator.tempa.order.realm.4": "Darah Dewa Kuno",
+  "kultivator.tempa.order.realm.5": "Esensi Energi Makam"
 }

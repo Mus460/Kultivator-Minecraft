@@ -33,14 +33,14 @@ public final class KotaClient {
 		KotaFx.init();
 		KotaLelang.init();
 		ClientTickEvents.END_CLIENT_TICK.register(KotaFx::tick);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
 			data = new CompoundTag();
 			npcId = -1;
 			screenKind = -1;
 			KotaLelang.reset();
 			KotaFx.clear();
 			NpcPoses.clear();
-		});
+		}));
 	}
 
 	private static void onScreen(KotaNet.Screen payload) {

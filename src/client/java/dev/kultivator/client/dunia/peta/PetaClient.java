@@ -33,8 +33,11 @@ public final class PetaClient {
 		ClientPlayNetworking.registerGlobalReceiver(PetaNet.Info.TYPE, (payload, context) -> onSheet(payload));
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
 			PetaCache.clear();
-			PetaPainter.release();
-			PetaPainter.reloadSources();
+			// DISCONNECT can fire on the netty thread; GL textures must be freed on the render thread
+			client.execute(() -> {
+				PetaPainter.release();
+				PetaPainter.reloadSources();
+			});
 		});
 		// the map page asks the server for a fresh sheet itself when it shows
 		HubPages.daftar(HubNav.DUNIA, Urutan.ID_PETA, Urutan.PETA, PetaScreen::new);

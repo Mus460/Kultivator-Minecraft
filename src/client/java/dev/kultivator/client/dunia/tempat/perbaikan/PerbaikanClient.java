@@ -28,7 +28,7 @@ public final class PerbaikanClient {
 		ClientPlayNetworking.registerGlobalReceiver(PerancahNet.Payload.TYPE, (payload, context) -> Perancah.onPayload(payload.data()));
 		ClientTickEvents.END_CLIENT_TICK.register(Perancah::tick);
 		LevelRenderEvents.COLLECT_SUBMITS.register(Perancah::render);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> Perancah.clear());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> Perancah.clear()));
 	}
 
 	/** A plot of Kota yang Hidup under construction: the box to put the scaffold round and the building progress 0..1. */

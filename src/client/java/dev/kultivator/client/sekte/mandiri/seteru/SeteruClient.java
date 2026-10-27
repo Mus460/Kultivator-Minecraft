@@ -42,12 +42,12 @@ public final class SeteruClient {
 		initialised = true;
 		ClientPlayNetworking.registerGlobalReceiver(SeteruPayloads.Layar.TYPE, (payload, context) -> lembar(payload));
 		ClientPlayNetworking.registerGlobalReceiver(SeteruPayloads.Judul.TYPE, (payload, context) -> KartuJudul.tampil(payload));
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
 			terakhir = null;
 			versi++;
 			rosterDiminta = "";
 			KartuJudul.hapus();
-		});
+		}));
 		SeteruPoses.daftar();
 	}
 

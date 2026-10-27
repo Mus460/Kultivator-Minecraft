@@ -45,6 +45,7 @@ import dev.kultivator.dunia.tempat.hidup.TempatHuni;
 import dev.kultivator.dunia.tempat.perbaikan.PerbaikanApi;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import dev.kultivator.sosok.GerakId;
+import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
 import dev.kultivator.voice.Voice;
 import dev.kultivator.voice.VoiceEvents;
@@ -988,6 +989,14 @@ public final class PermintaanWarga {
 			}
 		}
 		terimaKasih(player, situs, w, kesan);
+		CompoundTag bagian = KotaBicara.Data.get(server).bagian(KotaBicara.Data.TOLONG);
+		CompoundTag pc = bagian.getCompoundOrEmpty("p_" + player.getUUID());
+		pc.putInt("s", pc.getIntOr("s", 0) + 1);
+		bagian.put("p_" + player.getUUID(), pc);
+		KotaBicara.Data.get(server).ubah();
+		if (pc.getIntOr("s", 0) >= 10) {
+			Advancements.grant(player, "tempat/kota42_tolong");
+		}
 		if (nb > 0L) {
 			long paid = KasKota.ambil(server, situs, nb);
 			if (paid > 0L) {

@@ -65,7 +65,7 @@ public final class TemaFx {
 		LevelRenderEvents.COLLECT_SUBMITS.register(TemaFx::collect);
 		ClientTickEvents.END_CLIENT_TICK.register(TemaFx::tick);
 		HudElementRegistry.attachElementAfter(VanillaHudElements.MISC_OVERLAYS, Kultivator.id("tema_fx_hud"), new TemaHud());
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> bersihkan());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> bersihkan()));
 		TemaFxPerintah.init();
 	}
 

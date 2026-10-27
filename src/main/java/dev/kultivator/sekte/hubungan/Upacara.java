@@ -315,6 +315,11 @@ final class Upacara {
 		FINALES.add(new Finale(a, b, now + BOW_TICKS, now + BOW_TICKS + TOAST_TICKS));
 	}
 
+	/** Server stopped: no entity of the old world stays referenced. */
+	static void clear() {
+		FINALES.clear();
+	}
+
 	private static void tickFinale() {
 		for (java.util.Iterator<Finale> it = FINALES.iterator(); it.hasNext(); ) {
 			Finale f = it.next();

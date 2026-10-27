@@ -30,7 +30,7 @@ public final class KepribadianClient {
 		ClientPlayNetworking.registerGlobalReceiver(KepribadianPayloads.Suasana.TYPE, (payload, context) -> GelembungPikiran.onMoods(payload));
 		ClientPlayNetworking.registerGlobalReceiver(KepribadianPayloads.Letup.TYPE, (payload, context) -> GelembungPikiran.onPop(payload));
 		ClientPlayNetworking.registerGlobalReceiver(KepribadianPayloads.Daftar.TYPE, (payload, context) -> SuasanaScreen.onList(payload));
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> SuasanaScreen.bersih());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> SuasanaScreen.bersih()));
 		GelembungPikiran.init();
 		// 43: the Hati sub is built by the Murid page (M03); the mood list is the sub Murid › Daftar › suasana (M04).
 		registerPoses();

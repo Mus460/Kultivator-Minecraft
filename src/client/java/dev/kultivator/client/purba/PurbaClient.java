@@ -17,10 +17,10 @@ public final class PurbaClient {
 
 	/** Called once from {@code KultivatorClient}. */
 	public static void init() {
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
 			data = new CompoundTag();
 			PurbaFx.clear();
-		});
+		}));
 	}
 
 	/** Called once from {@code KultivatorClient} after {@link #init()}: the module's entity renderers. */

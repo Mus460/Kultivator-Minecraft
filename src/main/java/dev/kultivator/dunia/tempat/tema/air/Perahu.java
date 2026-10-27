@@ -233,7 +233,7 @@ public final class Perahu {
 				KultivatorNpc npc = HidupApi.tubuh(level, kota.situs, NpcRole.PENDAYUNG, BlockPos.containing(where), yaw);
 				if (npc != null) {
 					npc.memory().putBoolean("hold", true);
-					if (npc.startRiding(boat)) {
+					if (npc.startRiding(boat, true, false)) {
 						line.pendayung = npc;
 					} else {
 						npc.vanish();
@@ -366,7 +366,7 @@ public final class Perahu {
 		Tur tour = new Tur(kota.situs, boat, player.getUUID(), level.getGameTime());
 		if (pemandu != null && !pemandu.isRemoved()) {
 			tour.pulang = pemandu.blockPosition();
-			if (pemandu.startRiding(boat)) {
+			if (pemandu.startRiding(boat, true, false)) {
 				tour.pemandu = pemandu;
 			}
 		}

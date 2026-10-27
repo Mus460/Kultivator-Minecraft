@@ -121,7 +121,7 @@ public final class TeksDunia {
 		}
 		siap = true;
 		LevelRenderEvents.START_MAIN.register(context -> mulaiFrame());
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> bersihkan());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> bersihkan()));
 		// the 38MD board model with the sheet texts of this class (a later register of the same type would win)
 		EntityRenderers.register(PapanHidup.TYPE, PapanHidupTeksRenderer::new);
 	}

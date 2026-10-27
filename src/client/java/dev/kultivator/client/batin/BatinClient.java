@@ -22,7 +22,7 @@ public final class BatinClient {
 	/** Called once from {@code KultivatorClient}. */
 	public static void init() {
 		CodexNames.register(BatinClient::ownName);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> data = new CompoundTag());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> data = new CompoundTag()));
 	}
 
 	/** Called once from {@code KultivatorClient} after {@link #init()}: the module's entity renderers. */

@@ -150,7 +150,7 @@ public final class TitahClient {
 		ClientTickEvents.END_CLIENT_TICK.register(minecraft -> ticks++);
 		// Keabadian › Titah (DESIGN 43.5, M16)
 		HubPages.daftar(HubNav.KEABADIAN, Urutan.ID_TITAH, Urutan.TITAH, TitahScreen::new);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> clear());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> clear()));
 		try {
 			dev.kultivator.client.pusakalangit.world.TitahWorld.init();
 		} catch (RuntimeException | LinkageError exception) {

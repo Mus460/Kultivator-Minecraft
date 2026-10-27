@@ -301,6 +301,10 @@ public final class TugasKotaMurid {
 		info.putString("tugas", tugas);
 		Component nama = d.getDisplayName();
 		Halls.storeAway(owner, d, now + rotasi * 24000L, ALASAN, info);
+		if (!masihPergi(owner, jiwa)) {
+			// storeAway refused (mid release bow, no hall core): no phantom post
+			return KotaSekte.Hasil.gagal("murid.tidak_siap", nama).kirim(player);
+		}
 		bagian(server).put(jiwa.toString(), t);
 		KotaSekteData.get(server).ubah();
 		Fx.burst(player.level(), player.position().add(0.0D, 1.0D, 0.0D), 0xD8C8A8, 8, 0.5F);

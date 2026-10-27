@@ -1318,6 +1318,13 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity, Soso
 			if (!MandiriConfig.get().bolehGugur) {
 				// The user's rule: disciples never die (only /kill). It collapses with a heavy wound and rests a day instead.
 				this.setHealth(Math.max(1.0F, this.getMaxHealth() * 0.25F));
+				if (this.isInLava() || this.isInWall()) {
+					// it cannot climb out of lava or rock while it lies there: back to the last safe ground, else beside the master
+					ServerPlayer master = owner();
+					if (!(lastSafePos != null && returnTo(lastSafePos)) && master != null) {
+						teleportNear(master);
+					}
+				}
 				this.clearFire();
 				this.setInvulnerableTime(60);
 				long now = this.level().getGameTime();
@@ -1361,10 +1368,17 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity, Soso
 		if (role == Role.DISCIPLE && !MandiriConfig.get().bolehGugur) {
 			// It cannot die, so the void must not hold it: back up onto the ground above (or the world spawn).
 			BlockPos top = this.level().getHeightmapPos(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, this.blockPosition());
-			if (top.getY() <= this.level().getMinY() && this.level() instanceof ServerLevel level) {
-				top = level.getRespawnData().globalPos().pos();
-			}
 			this.setDeltaMovement(Vec3.ZERO);
+			if (top.getY() <= this.level().getMinY() && this.level() instanceof ServerLevel level) {
+				// a void column: the last safe ground or the post first; the (overworld) spawn only in its own dimension
+				if ((lastSafePos != null && returnTo(lastSafePos)) || (post != null && returnTo(post))) {
+					return;
+				}
+				net.minecraft.core.GlobalPos spawn = level.getRespawnData().globalPos();
+				if (spawn.dimension().equals(level.dimension())) {
+					top = spawn.pos();
+				}
+			}
 			this.teleportTo(top.getX() + 0.5D, top.getY() + 1.0D, top.getZ() + 0.5D);
 			return;
 		}
@@ -1591,8 +1605,9 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity, Soso
 					SosokApi.henti(this);
 				}
 				dutyClip = 0;
-			} else if (now != GerakId.BICARA) {
-				// another module's clip took over: it is theirs now (a spoken line plays over ours and ends by itself)
+			} else if (now != GerakId.BICARA && GerakId.durasiSekali(now, 0) <= 0) {
+				// another module's looping clip took over: it is theirs now (a once clip or a spoken line plays over ours,
+				// which it saved and restores, and ends by itself)
 				dutyClip = 0;
 			}
 		}

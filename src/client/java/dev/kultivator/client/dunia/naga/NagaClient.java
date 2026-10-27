@@ -46,14 +46,14 @@ public final class NagaClient {
 			NagaHud.tick(minecraft);
 			BeastTierLayers.tick(minecraft);
 		});
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
 			NagaVisuals.clear();
 			NagaFar.clear();
 			NagaStrikes.clear();
 			NagaHud.clear();
 			BeastTierLayers.clear();
 			NagaModels.clear();
-		});
+		}));
 		// a subdued dragon and an evolution are rare: one shot each per minute at most (the spine default)
 		DuniaScenes.cooldown("naga/tunduk", 1200);
 	}

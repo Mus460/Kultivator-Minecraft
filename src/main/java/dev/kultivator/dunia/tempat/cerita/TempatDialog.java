@@ -272,6 +272,10 @@ public final class TempatDialog {
 			Voice.say(npc, npc.voiceKey("greet"), null);
 		}
 		npc.say(teksNode(player, npc.town(), node, fixed), 100);
+		if (dialog.sekali() && node.pilihan().isEmpty()) {
+			// an ending node has no choice to send, so the once-flag is set on arrival
+			CeritaData.get(player.level().getServer()).setFlag(player.getUUID(), dialog.benderaSekali(), true);
+		}
 		if (!node.akibat().isEmpty() && kedalaman < 6) {
 			kedalaman++;
 			try {

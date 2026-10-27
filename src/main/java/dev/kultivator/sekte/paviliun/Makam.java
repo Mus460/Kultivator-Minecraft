@@ -163,8 +163,8 @@ final class Makam {
 		PENDING.clear();
 		for (Pending p : due) {
 			DiscipleEntity e = p.entity();
-			if (e.isAlive() && !e.isRemoved() && !e.isDeadOrDying()) {
-				// a later death handler saved it
+			if (e.departed() || (!e.isDeadOrDying() && e.getRemovalReason() != Entity.RemovalReason.KILLED)) {
+				// a later death handler saved it (maybe already unloaded or departed since: not a death)
 				continue;
 			}
 			bury(server, p.owner(), p.snapshot(), false);

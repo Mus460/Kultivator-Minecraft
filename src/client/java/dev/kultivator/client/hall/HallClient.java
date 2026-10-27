@@ -53,7 +53,7 @@ public final class HallClient {
 	private static long papanVersi;
 
 	public static void init() {
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> clear());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> clear()));
 		ClientTickEvents.END_CLIENT_TICK.register(HallFx::tick);
 		ClientTickEvents.END_CLIENT_TICK.register(HallClient::tick);
 		HubPages.daftar(HubNav.SEKTE, Urutan.ID_IKHTISAR, Urutan.IKHTISAR, IkhtisarPage::new);

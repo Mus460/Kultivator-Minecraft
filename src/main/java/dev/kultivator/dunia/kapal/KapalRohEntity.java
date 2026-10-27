@@ -1961,7 +1961,7 @@ public class KapalRohEntity extends Entity implements HasCustomInventoryScreen {
 			}
 			i++;
 			DiscipleEntity back = owner == null ? null : Disciples.arrive(level, at, entry, owner);
-			if (back == null) {
+			if (back == null && !(owner != null && Disciples.forgotten(level.getServer(), entry))) {
 				left.add(entry);
 			}
 		}

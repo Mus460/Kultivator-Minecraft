@@ -10,7 +10,7 @@
   "simpul": [
     {
       "id": "mulai",
-      "gestur": "v_tatap_tunjuk",
+      "gestur": "tatap_langit",
       "pilihan": [
         {}
       ]

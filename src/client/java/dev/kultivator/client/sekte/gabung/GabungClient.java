@@ -74,7 +74,7 @@ public final class GabungClient {
 				KLIP.put(payload.pemain(), payload);
 			}
 		});
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> hapus());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> hapus()));
 		// 41U Layar:
 		GabungUiClient.init();
 		// 41V Visual (class visuals, illusion stair, test effects):

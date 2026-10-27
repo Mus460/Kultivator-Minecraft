@@ -117,7 +117,7 @@ public final class DampakWorld {
 			}
 		});
 		LevelRenderEvents.COLLECT_SUBMITS.register(SigilRenderer::collect);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> clear());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> clear()));
 	}
 
 	/**

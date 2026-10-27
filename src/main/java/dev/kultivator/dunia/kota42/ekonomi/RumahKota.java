@@ -26,6 +26,7 @@ import dev.kultivator.dunia.tempat.kotabesar.KotaBesarApi;
 import dev.kultivator.dunia.tempat.tema.bersama.Dagang;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import dev.kultivator.kehancuran.ProtectedZones;
+import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -414,6 +415,7 @@ public final class RumahKota {
 		BukuKas.catat(server, player.getUUID(), LembarKunci.BukuKas.SUMBER_SEWA, 0, -harga, "kultivator.kota42.rumah.buku.beli", namaTempat(server, situs));
 		berubah(server, situs, id, player.getUUID());
 		beriKertas(player, situs, id);
+		Advancements.grant(player, "tempat/kota42_rumah");
 		return kirim(player, new Hasil(true, Component.translatable("kultivator.kota42.rumah.beli", nama(server, baca(situs, t)), NilaiBatu.text(harga))));
 	}
 

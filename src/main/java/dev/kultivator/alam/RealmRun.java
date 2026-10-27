@@ -829,6 +829,10 @@ final class RealmRun {
 				incoming.remove(soul);
 				disciples.add(body.getUUID());
 				Cultivators.dirty(ownerPlayer);
+			} else if (Disciples.forgotten(level.getServer(), tag)) {
+				home.remove(i);
+				incoming.remove(soul);
+				Cultivators.dirty(ownerPlayer);
 			}
 		}
 	}
@@ -1261,6 +1265,8 @@ final class RealmRun {
 						list.remove(i);
 						Fx.burst(player.level(), body.position().add(0.0D, 1.0D, 0.0D), 0xBFE8FF, 20, 1.0F);
 						Msg.chat(player, Component.translatable("kultivator.alam.disciple_home", body.getDisplayName()).withStyle(ChatFormatting.AQUA));
+					} else if (Disciples.forgotten(server, tag)) {
+						list.remove(i);
 					}
 				} else {
 					list.remove(i);

@@ -517,6 +517,8 @@ final class Crossing {
 						list.remove(i);
 						Fx.burst(player.level(), body.position().add(0.0D, 1.0D, 0.0D), 0xBFF0D8, 20, 1.0F);
 						weaken(body);
+					} else if (Disciples.forgotten(server, tag)) {
+						list.remove(i);
 					}
 				} else {
 					list.remove(i);

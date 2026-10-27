@@ -29,6 +29,7 @@ import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import dev.kultivator.dunia.tempat.ui.TempatLayar;
 import dev.kultivator.sect.hall.Halls;
 import dev.kultivator.sosok.GerakId;
+import dev.kultivator.util.Advancements;
 import dev.kultivator.voice.Voice;
 import dev.kultivator.voice.VoiceEvents;
 import net.minecraft.nbt.CompoundTag;
@@ -448,6 +449,7 @@ public final class BicaraWarga {
 			b.teks = Component.translatable("kultivator.kota42.bicara.kabar.lihat_sendiri." + watakNada(watak));
 			HidupApi.klip(npc, GerakId.TUNJUK, 0, 40);
 			TujuanKota.gosipTelusur(player, g.templat(), gosip);
+			Advancements.grant(player, "tempat/kota42_gosip");
 		} else if (next < 0) {
 			b.teks = Component.translatable("kultivator.kota42.bicara.kabar.dari_pendekar." + watakNada(watak));
 			HidupApi.klip(npc, GerakId.BISIK, 0, 40);

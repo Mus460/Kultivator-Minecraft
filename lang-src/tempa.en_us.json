@@ -289,5 +289,15 @@
   "kultivator.screen.help.roh_senjata.title": "Weapon Spirit",
   "kultivator.screen.help.roh_senjata": "Your natal treasure ages while you meditate (1 year a minute), with technique kills of strong foes and with cores of its element. Heaven grade and 100 years take a spirit seed; 400 years bring the Elementary Spirit, which acts on its own; 1,000 years, Immortal grade and a tribulation make it Complete. A Beast Soul gives an artificial Elementary Spirit at once, but it never becomes Complete.",
   "kultivator.screen.help.cincin.title": "Storage Rings",
-  "kultivator.screen.help.cincin": "Craft a pouch (9 slots) at a crafting table and forge rings of 18 to 54 slots at the Earthfire Forge. Sneak + use or the Open Ring key opens one. The first opening plants your soul imprint: only you can open it or pick it up when it drops, and fire, lava and explosions do not destroy it. Rings, shulker boxes and bundles cannot go inside. A ring still drops on death."
+  "kultivator.screen.help.cincin": "Craft a pouch (9 slots) at a crafting table and forge rings of 18 to 54 slots at the Earthfire Forge. Sneak + use or the Open Ring key opens one. The first opening plants your soul imprint: only you can open it or pick it up when it drops, and fire, lava and explosions do not destroy it. Rings, shulker boxes and bundles cannot go inside. A ring still drops on death.",
+  "kultivator.tempa.order.embryo_sword": "Any sword (the embryo)",
+  "kultivator.tempa.order.core_king": "King Beast Core",
+  "kultivator.tempa.order.core.1": "Low Beast Core or better",
+  "kultivator.tempa.order.core.2": "Mid Beast Core or better",
+  "kultivator.tempa.order.core.3": "High Beast Core or better",
+  "kultivator.tempa.order.core.4": "King Beast Core",
+  "kultivator.tempa.order.realm.2": "Foundation Herb",
+  "kultivator.tempa.order.realm.3": "Soul Nurturing Wood",
+  "kultivator.tempa.order.realm.4": "Ancient God Blood",
+  "kultivator.tempa.order.realm.5": "Tomb Energy Essence"
 }

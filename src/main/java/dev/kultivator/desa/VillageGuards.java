@@ -2,6 +2,7 @@ package dev.kultivator.desa;
 
 import dev.kultivator.disciple.DiscipleEntity;
 import dev.kultivator.disciple.Disciples;
+import dev.kultivator.disciple.DuelRules;
 import dev.kultivator.util.Msg;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
@@ -48,7 +49,10 @@ public final class VillageGuards {
 		DiscipleEntity best = null;
 		double bestSq = ASSIGN_RANGE * ASSIGN_RANGE;
 		for (DiscipleEntity disciple : Disciples.loaded(owner)) {
-			if (disciple.role() != DiscipleEntity.Role.DISCIPLE || disciple.departed() || disciple.level() != player.level() || isGuard(owner, disciple.soulId())) {
+			if (disciple.role() != DiscipleEntity.Role.DISCIPLE || disciple.departed() || disciple.level() != player.level() || isGuard(owner, disciple.soulId())
+					// not one in the middle of a tribulation, a duel, a bow or a post (the same bar as a sect errand)
+					|| !disciple.isAlive() || disciple.isReleasing() || disciple.data().breakingThrough() || DuelRules.inDuel(disciple)
+					|| disciple.activity() != DiscipleEntity.ACTIVITY_NONE) {
 				continue;
 			}
 			double distSq = disciple.distanceToSqr(player);
@@ -87,7 +91,7 @@ public final class VillageGuards {
 		String name = village.guardName;
 		if (!village.guardTag.isEmpty()) {
 			DiscipleEntity body = Disciples.arrive(player.level(), player.position(), village.guardTag, owner);
-			if (body == null) {
+			if (body == null && !Disciples.forgotten(server, village.guardTag)) {
 				Msg.chat(player, Component.translatable("kultivator.desa.guard.no_room").withStyle(ChatFormatting.YELLOW));
 				return false;
 			}
@@ -115,7 +119,7 @@ public final class VillageGuards {
 	}
 
 	/** True when the soul guards one of the owner's villages. */
-	static boolean isGuard(UUID owner, UUID soul) {
+	public static boolean isGuard(UUID owner, UUID soul) {
 		Vassals.Owner entry = Vassals.peek(owner);
 		if (entry != null) {
 			for (Village village : entry.villages) {
@@ -158,6 +162,10 @@ public final class VillageGuards {
 					village.guardTag = new CompoundTag();
 					body.setActivity(DiscipleEntity.ACTIVITY_FORMATION_GUARD, village.plaque);
 					body.setActivityFocus(player.blockPosition());
+					Vassals.changed();
+				} else if (Disciples.forgotten(server, village.guardTag)) {
+					// its master forgot it while it guarded: the post is free again
+					clearFields(village);
 					Vassals.changed();
 				}
 			}
@@ -279,7 +287,7 @@ public final class VillageGuards {
 		for (Tag tag : entry.returns) {
 			if (tag instanceof CompoundTag stored) {
 				DiscipleEntity body = Disciples.arrive(player.level(), player.position(), stored, owner);
-				if (body == null) {
+				if (body == null && !Disciples.forgotten(player.level().getServer(), stored)) {
 					keep.add(stored);
 				}
 			}

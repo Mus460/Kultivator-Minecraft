@@ -116,8 +116,8 @@ public class KultivatorClient implements ClientModInitializer {
 
 		HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, Kultivator.id("qi_hud"), new QiHud());
 		ClientTickEvents.END_CLIENT_TICK.register(FxDispatcher::tick);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
 			ClientCultivation.clear();
-		});
+		}));
 	}
 }

@@ -436,5 +436,19 @@
   "kultivator.hidup.kegiatan.tk_tak_terlihat": "out of sight",
   "kultivator.hidup.kegiatan.tk_tidur_bangku": "dozing on a bench",
   "kultivator.hidup.kegiatan.tk_tonton_gula": "watching the sugar-painter",
-  "kultivator.hidup.kegiatan.ronda_lentera": "lighting the street lanterns"
+  "kultivator.hidup.kegiatan.ronda_lentera": "lighting the street lanterns",
+  "item.kultivator.telur_merah": "Red Egg",
+  "item.kultivator.kue_pengantin": "Wedding Cake",
+  "item.kultivator.sup_hangat": "Warm Soup",
+  "item.kultivator.bubur_laba": "Laba Porridge",
+  "item.kultivator.kue_bulan": "Mooncake",
+  "item.kultivator.kue_keranjang": "Nian Gao",
+  "item.kultivator.air_plum": "Plum Drink",
+  "item.kultivator.permen_gula": "Sugar Candy",
+  "item.kultivator.tanghulu": "Tanghulu",
+  "entity.kultivator.barongsai": "Lion Dance",
+  "entity.kultivator.panggung_keliling": "Travelling Stage",
+  "entity.kultivator.tenda_pasar": "Market Tent",
+  "entity.kultivator.meja_dadu": "Dice Table",
+  "entity.kultivator.layar_bayang": "Shadow Screen"
 }

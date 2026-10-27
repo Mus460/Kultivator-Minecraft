@@ -117,7 +117,7 @@ public final class DuelClient {
 			lastPrefsSent = -1;
 			client.execute(DuelClient::sendPrefs);
 		});
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> clearAll());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(DuelClient::clearAll));
 		HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, Kultivator.id("duel_hud"), new DuelHud());
 		DuelSettings.onPrefsChanged(DuelClient::sendPrefs);
 		DuelSoundPlayer.init();

@@ -122,7 +122,7 @@ final class PamerModel {
 		}
 		initialised = true;
 		LevelRenderEvents.COLLECT_SUBMITS.register(PamerModel::collect);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> hapus());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> hapus()));
 	}
 
 	/** The creature and mechanism arc, 30 s. */

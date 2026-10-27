@@ -26,12 +26,12 @@ public final class AlamClient {
 	public static void init() {
 		EntityRenderers.register(AlamEntities.REALM_RELIC, NoopRenderer::new);
 		ClientTickEvents.END_CLIENT_TICK.register(TreasureScreen::tick);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
 			data = new CompoundTag();
 			TreasureScreen.reset();
 			dev.kultivator.client.dunia.kota.SainganScreen.reset();
 			AlamFx.clear();
-		});
+		}));
 		HubPages.daftar(HubNav.DUNIA, Urutan.ID_ALAM, Urutan.ALAM, AlamPage::new);
 		// musuh/MusuhClient has no Gulungan hook of its own; the phase-8 Dunia spine registers both of its pages here
 		HubPages.daftar(HubNav.DUNIA, Urutan.ID_MUSUH, Urutan.MUSUH, MusuhPage::new);

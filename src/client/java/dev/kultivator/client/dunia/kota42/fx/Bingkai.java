@@ -11,6 +11,7 @@ import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
@@ -42,8 +43,8 @@ final class Bingkai {
 	static boolean tik(Minecraft minecraft) {
 		level = minecraft.level;
 		pemain = minecraft.player;
-		if (level == null || pemain == null) {
-			return false;
+		if (level == null || pemain == null || level.dimension() != Level.OVERWORLD) {
+			return false; // 42 is overworld only: the cached town fx must not draw at the same coordinates elsewhere
 		}
 		waktu++;
 		long clock = level.getOverworldClockTime();

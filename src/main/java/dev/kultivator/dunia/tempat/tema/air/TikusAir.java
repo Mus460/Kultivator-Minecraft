@@ -319,7 +319,7 @@ public final class TikusAir {
 		skiff.setKeadaan(PerahuKanalEntity.KEADAAN_KEJAR);
 		skiff.setNilai(1.0F);
 		thief.teleportTo(at.x, at.y + 0.5D, at.z);
-		thief.startRiding(skiff);
+		thief.startRiding(skiff, true, false); // force: KultivatorNpc.canRide is false
 		k.sampan = skiff;
 		k.fase = Fase.KABUR;
 		k.sejak = now;

@@ -391,7 +391,7 @@ public final class Mural {
 			Vec3 cliff = kota.satu(OasisAnchors.MURAL).position();
 			long now = level.getGameTime();
 			for (ServerPlayer p : BadaiPasir.pemainDekat(level, BlockPos.containing(cliff), 96.0D)) {
-				long last = DIKIRIM.getOrDefault(p.getUUID(), Long.MIN_VALUE);
+				long last = DIKIRIM.getOrDefault(p.getUUID(), Long.MIN_VALUE / 2);
 				if (now - last < 1200L) {
 					continue;
 				}

@@ -9,12 +9,15 @@ import dev.kultivator.dunia.kota.NpcRole;
 import dev.kultivator.dunia.kota42.KotaConfig;
 import dev.kultivator.dunia.kota42.KotaHidup;
 import dev.kultivator.dunia.kota42.api.WargaApi;
+import dev.kultivator.dunia.kota42.bicara.KotaBicara;
 import dev.kultivator.dunia.kota42.warga.Ingatan;
 import dev.kultivator.dunia.kota42.warga.Warga;
 import dev.kultivator.dunia.kota42.warga.WargaData;
 import dev.kultivator.dunia.tempat.hidup.HidupApi;
 import dev.kultivator.dunia.tempat.kotabesar.KotaBesarApi;
 import dev.kultivator.dunia.tempat.tema.TemaApi;
+import dev.kultivator.util.Advancements;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -190,6 +193,9 @@ public final class KeadaanPercakapan {
 		boolean berhasil = !cek || rng.nextDouble() < peluang;
 		if (cek) {
 			r.pakaiNada(nada, hari);
+			if (berhasil) {
+				lidahPerak(server, player, nada);
+			}
 		}
 		int kesan = 0;
 		Component isyarat = null;
@@ -229,6 +235,21 @@ public final class KeadaanPercakapan {
 		}
 		pk.ubah();
 		return new Hasil(berhasil, turn, kesan, sesi.tahap, sesi.selesai() ? List.of() : sesi.opsi, isyarat, (float) peluang, sesi.selesai());
+	}
+
+	/** Remembers the tones {@code player} has pulled off; the fourth different one grants {@code kota42_lidah_perak}. */
+	private static void lidahPerak(MinecraftServer server, ServerPlayer player, Nada nada) {
+		CompoundTag part = KotaBicara.Data.get(server).bagian("nada");
+		String key = player.getUUID().toString();
+		int had = part.getIntOr(key, 0);
+		int bits = had | 1 << nada.ordinal();
+		if (bits != had) {
+			part.putInt(key, bits);
+			KotaBicara.Data.get(server).ubah();
+		}
+		if (Integer.bitCount(bits) >= 4) {
+			Advancements.grant(player, "tempat/kota42_lidah_perak");
+		}
 	}
 
 	/** The NB a bribe costs: 5 x (realm band + 1), at least the {@code nb_min} of {@code nada.json}. */

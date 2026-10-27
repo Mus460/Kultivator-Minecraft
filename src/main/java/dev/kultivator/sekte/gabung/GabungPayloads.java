@@ -190,7 +190,8 @@ public final class GabungPayloads {
 		EntityTrackingEvents.START_TRACKING.register((entity, viewer) -> {
 			if (entity instanceof ServerPlayer member && Gabung.aktif()) {
 				EntriLencana e = entri(member);
-				if (e != null && !e.sekte().isEmpty() && (e.jubah() || viewer == member)) {
+				// an empty entry too: a viewer that missed the member leaving the sect still draws the old robe
+				if (e != null && (e.sekte().isEmpty() || e.jubah() || viewer == member)) {
 					kirim(viewer, new Lencana(List.of(e)));
 				}
 			}
@@ -291,6 +292,18 @@ public final class GabungPayloads {
 				kirim(viewer, payload);
 			}
 		}
+	}
+
+	/** Drops the held or looping clip of {@code subjek} {@code ticks} ticks from now (if still online): a loop never ends by itself. */
+	public static void lepasKlipNanti(ServerPlayer subjek, int ticks) {
+		MinecraftServer server = subjek.level().getServer();
+		UUID id = subjek.getUUID();
+		dev.kultivator.voice.Voice.later(ticks, () -> {
+			ServerPlayer p = server.getPlayerList().getPlayer(id);
+			if (p != null) {
+				kirimKlip(p, 0, 0);
+			}
+		});
 	}
 
 	private static EntriLencana entri(ServerPlayer player) {

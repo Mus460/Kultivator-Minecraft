@@ -68,7 +68,7 @@ public final class GerakKlien {
 			}
 		});
 		ClientPlayConnectionEvents.JOIN.register((handler, sender, mc) -> muatUlang());
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, mc) -> muatUlang());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, mc) -> mc.execute(GerakKlien::muatUlang));
 	}
 
 	/** Forgets every body's state and the prop caches (world change, {@code /sosok muat_ulang}). */

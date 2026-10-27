@@ -503,11 +503,17 @@ public final class Perkara {
 		}
 		String key = situs + ":" + k.id();
 		List<KultivatorNpc> bodies = SAKSI.computeIfAbsent(key, x -> new ArrayList<>());
+		for (KultivatorNpc standing : bodies) {
+			if (standing.isAlive() && standing.memory().getIntOr("saksiW", -1) == w.id) {
+				return standing; // a second call stands no second body
+			}
+		}
 		BlockPos at = hall.pos().relative(hall.hadap().getClockWise(), bodies.size() * 2 - 2);
 		KultivatorNpc body = HidupApi.tubuh(level, situs, w.peranNpc(), at, hall.hadap().getOpposite().toYRot(), w.look);
 		if (body != null) {
 			body.setLonely(64.0D, SAKSI_TICK);
 			body.memory().putBoolean("saksi", true);
+			body.memory().putInt("saksiW", w.id);
 			HidupApi.tatap(body, player);
 			HidupApi.klip(body, klip, 0, tick);
 			bodies.add(body);

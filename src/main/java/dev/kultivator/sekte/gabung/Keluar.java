@@ -395,6 +395,7 @@ public final class Keluar {
 
 	private static void upacara(ServerPlayer player, int klip) {
 		GabungPayloads.kirimKlip(player, klip, 0);
+		GabungPayloads.lepasKlipNanti(player, 80);
 		ServerLevel level = player.level();
 		level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BELL_RESONATE, SoundSource.PLAYERS, 0.7F, 0.8F);
 		level.sendParticles(net.minecraft.core.particles.ParticleTypes.ASH, player.getX(), player.getY() + 1.0D, player.getZ(), 24,

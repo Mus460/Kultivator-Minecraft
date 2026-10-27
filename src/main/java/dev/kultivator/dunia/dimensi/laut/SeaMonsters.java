@@ -119,7 +119,8 @@ public final class SeaMonsters {
 	/** True when the column at the waterline is open sea (no island in the way). */
 	static boolean openWater(ServerLevel level, double x, double z) {
 		BlockPos top = BlockPos.containing(x, DimensiLevels.LAUT_SEA_TOP, z);
-		return level.getBlockState(top).getFluidState().isSource() && level.getBlockState(top.above()).isAir();
+		// an unloaded column is never worth a main-thread chunk load
+		return level.hasChunkAt(top) && level.getBlockState(top).getFluidState().isSource() && level.getBlockState(top.above()).isAir();
 	}
 
 	private static void turtle(ServerLevel level) {
@@ -127,7 +128,10 @@ public final class SeaMonsters {
 		if (!alive.isEmpty()) {
 			return;
 		}
-		spawnTurtle(level, level.players().get(level.getRandom().nextInt(level.players().size())));
+		List<ServerPlayer> watchers = level.players().stream().filter(p -> !p.isSpectator() && !p.isCreative()).toList();
+		if (!watchers.isEmpty()) {
+			spawnTurtle(level, watchers.get(level.getRandom().nextInt(watchers.size())));
+		}
 	}
 
 	/** Spawns Penyu Ao 70-110 b from {@code near} on open water; null when none fit. */

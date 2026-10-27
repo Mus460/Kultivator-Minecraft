@@ -42,11 +42,11 @@ public final class CodexClient {
 		ClientTickEvents.START_CLIENT_TICK.register(CodexClient::startTick);
 		ClientTickEvents.END_CLIENT_TICK.register(CodexClient::endTick);
 		HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, Kultivator.id("codex_hud"), new CodexHud());
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
 			SealWheel.close(false);
 			castHeld = false;
 			CodexHud.reset();
-		});
+		}));
 	}
 
 	/** Before vanilla's key handling: the wheel takes the hotbar keys 1-4, use and attack. */

@@ -44,10 +44,10 @@ public final class DiplomasiClient {
 
 	public static void init() {
 		ClientPlayNetworking.registerGlobalReceiver(DiplomasiPayloads.Sheet.TYPE, (payload, context) -> onSheet(payload));
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
 			last = null;
 			versi++;
-		});
+		}));
 		LuarPage.daftar();
 		HallClient.sumberCatatan(JENIS_KABAR, Component.translatable(KEY + "layar.kabar"), DiplomasiClient::kabar);
 		scenes();

@@ -107,6 +107,7 @@ public final class Hubungan {
 			GiliranSosial.clear();
 			DuelKehormatan.clear();
 			EfekIkatan.clear();
+			Upacara.clear();
 		});
 		SekteBus.TOURNAMENT_BOUT.register(Hubungan::onBout);
 		SekteBus.MISSION_RETURNED.register(Hubungan::onMission);

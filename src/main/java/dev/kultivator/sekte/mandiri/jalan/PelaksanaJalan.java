@@ -69,6 +69,8 @@ final class PelaksanaJalan {
 		boolean terbang;
 		Vec3 arah = Vec3.ZERO;
 		Vec3 pusat = Vec3.ZERO;
+		/** Where the sword flight began (the body goes back there when the departure is refused). */
+		@Nullable Vec3 asal;
 		boolean berangkat;
 		int hadiahKe;
 
@@ -399,6 +401,7 @@ final class PelaksanaJalan {
 						if (pedang) {
 							a.terbang = true;
 							a.pusat = murid.position();
+							a.asal = a.pusat;
 							a.arah = arah(murid.blockPosition(), p.tujuan().pos());
 							next(a, F_TERBANG, now);
 							murid.setActivity(MandiriKegiatan.ACT_TERBANG_JAUH, null);
@@ -568,6 +571,11 @@ final class PelaksanaJalan {
 			Perjalanan.berangkat(level, party, a.pilihan.jenis(), a.pilihan.tujuan());
 		} catch (RuntimeException exception) {
 			Kultivator.LOGGER.error("Mandiri departure of {} failed", leader.getName().getString(), exception);
+		}
+		if (a.asal != null && !leader.isRemoved()) {
+			// The leader did not leave (storeAway refused): back to where the flight began, not into a hill 96 blocks away.
+			leader.teleportTo(a.asal.x, a.asal.y, a.asal.z);
+			leader.resetFallDistance();
 		}
 		for (DiscipleEntity d : party) {
 			ADEGAN.remove(d.soulId());

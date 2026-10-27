@@ -164,7 +164,7 @@ public final class HiasanDunia {
 		}
 		initialised = true;
 		LevelRenderEvents.COLLECT_SUBMITS.register(HiasanDunia::collect);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> bersihkan());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> bersihkan()));
 	}
 
 	// ================================================================ client API

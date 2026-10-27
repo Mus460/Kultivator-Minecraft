@@ -56,12 +56,12 @@ public final class DimensiClient {
 		// the soul's view
 		HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, Kultivator.id("dimensi_jiwa"), new DimensiHud());
 		ClientTickEvents.END_CLIENT_TICK.register(DimensiClient::tick);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
 			DimensiState.clear();
 			DimensiJembatan.reset();
 			DimensiFx.clear();
 			UlarLautRenderer.clearChains();
-		});
+		}));
 	}
 
 	private static void tick(Minecraft minecraft) {

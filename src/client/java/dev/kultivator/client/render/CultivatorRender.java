@@ -25,7 +25,7 @@ public final class CultivatorRender {
 				helper.register(new DharmaGlowLayer(avatar, context));
 			}
 		});
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> CultivatorLook.clear());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> CultivatorLook.clear()));
 	}
 
 	private CultivatorRender() {

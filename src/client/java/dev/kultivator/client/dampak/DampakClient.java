@@ -86,7 +86,7 @@ public final class DampakClient {
 		});
 		ClientTickEvents.END_CLIENT_TICK.register(DampakClient::tick);
 		ClientLifecycleEvents.CLIENT_STARTED.register(client -> registerHud());
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> clearAll());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> clearAll()));
 		// the photosensitivity warning is a seal on Pengaturan › Kamera & Film (43.10.1), hooked by SettingsPage.daftar
 		try {
 			DampakWorld.init();

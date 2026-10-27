@@ -592,9 +592,18 @@ public class FeriAwanEntity extends Entity {
 		return distance < 192.0D * 192.0D;
 	}
 
-	/** Never saved: a ferry left in an unloaded chunk is simply gone (it is called again with the bell). */
+	/**
+	 * Never saved on its own (a ferry left in an unloaded chunk is simply gone, it is called again with the bell), except
+	 * while it carries a disciple: a passenger is only written with its vehicle, so the ferry is saved and, loaded without a
+	 * route, sets the riders down on its first tick.
+	 */
 	@Override
 	public boolean shouldBeSaved() {
+		for (Entity passenger : getPassengers()) {
+			if (passenger instanceof DiscipleEntity) {
+				return super.shouldBeSaved();
+			}
+		}
 		return false;
 	}
 

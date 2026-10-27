@@ -6,6 +6,7 @@ import dev.kultivator.data.Realm;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import dev.kultivator.sekte.gabung.GabungData;
 import dev.kultivator.sekte.gabung.Keanggotaan;
+import dev.kultivator.sekte.gabung.Promosi;
 import dev.kultivator.sekte.gabung.api.GabungApi;
 import dev.kultivator.sekte.gabung.api.KelasSekte;
 import dev.kultivator.sekte.gabung.api.Pangkat;
@@ -230,12 +231,20 @@ public final class LembarPangkat {
 		if (!langsung(k.pangkat, tujuan)) {
 			return Component.translatable("kultivator.gabung.ui.pangkat.satu_satu");
 		}
+		int gagal = 0;
+		Component pertama = null;
 		for (CompoundTag s : syarat) {
 			if (!s.getBooleanOr(LembarKunci.OK, false)) {
-				return LembarKunci.teks(s, LembarKunci.TEKS);
+				gagal++;
+				pertama = pertama == null ? LembarKunci.teks(s, LembarKunci.TEKS) : pertama;
 			}
 		}
-		return null;
+		// The trial is the only missing line and the hall ceremony (Promosi) starts it when asked: the button is open.
+		if (gagal == 1 && !GabungLayar.lulus(k, tujuan) && GabungLayar.adaAksi(PohonPangkat.LAYAR, PohonPangkat.OP_AJUKAN)
+				&& Promosi.mulaiUjian(tujuan)) {
+			return null;
+		}
+		return pertama;
 	}
 
 	// ================================================================== node helpers

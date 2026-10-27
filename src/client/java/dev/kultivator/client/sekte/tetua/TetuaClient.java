@@ -53,11 +53,11 @@ public final class TetuaClient {
 		ClientPlayNetworking.registerGlobalReceiver(TetuaPayloads.Report.TYPE, (p, context) -> LaporanCard.show(p.report()));
 		ClientPlayNetworking.registerGlobalReceiver(TetuaPayloads.Ceremony.TYPE, (p, context) -> TetuaPoses.onCeremony(p));
 		ClientTickEvents.END_CLIENT_TICK.register(client -> tick(client));
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
 			LaporanCard.clear();
 			TetuaPoses.clear();
 			view = new CompoundTag();
-		});
+		}));
 		TetuaPoses.init();
 		scenes();
 		// Gulungan Utama › Sekte › Anggota (DESIGN 43.5, 43.16.2 M06): candidates, ranks, the Balai Tetua and the heir in one

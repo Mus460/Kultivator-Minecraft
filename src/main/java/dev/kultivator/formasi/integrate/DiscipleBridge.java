@@ -10,6 +10,7 @@ import dev.kultivator.formasi.keeper.Keepers;
 import dev.kultivator.formasi.spec.FormationSpec;
 import dev.kultivator.formasi.stack.FormationField;
 import dev.kultivator.formasi.stack.Stacking;
+import dev.kultivator.sekte.mandiri.MandiriConfig;
 import net.minecraft.server.level.ServerLevel;
 
 /**
@@ -47,7 +48,8 @@ public final class DiscipleBridge {
 			return spec == null ? 0.0D : record.radius;
 		});
 		DiscipleHooks.addOnDeath((entity, source) -> {
-			if (entity.activity() == DiscipleEntity.ACTIVITY_FORMATION_KEEPER) {
+			// a faint (bolehGugur off) is not a death: the keeper keeps its post
+			if (entity.activity() == DiscipleEntity.ACTIVITY_FORMATION_KEEPER && MandiriConfig.get().bolehGugur) {
 				Keepers.release(entity);
 			}
 			return false;

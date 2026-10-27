@@ -187,7 +187,7 @@ public abstract class Caster implements CastContext {
 	@Nullable Vec3 pathFrom;
 	@Nullable Vec3 pathTo;
 	final List<Vec3> afterimages = new ArrayList<>();
-	private long fxWindow = Long.MIN_VALUE;
+	private long fxWindow = Long.MIN_VALUE / 2;
 	private int fxCount;
 	@Nullable LivingEntity specialTarget;
 	final Destruction destruction;
@@ -1723,8 +1723,8 @@ public abstract class Caster implements CastContext {
 	private boolean climaxSent;
 	private boolean anyFxSent;
 	private boolean abortSent;
-	private long lastSwing = Long.MIN_VALUE;
-	private long hitWindow = Long.MIN_VALUE;
+	private long lastSwing = Long.MIN_VALUE / 2;
+	private long hitWindow = Long.MIN_VALUE / 2;
 	private int hitCount;
 	private long foldTick = -1L;
 	private int foldCount;

@@ -55,12 +55,12 @@ public final class KapalClient {
 		ClientEntityEvents.ENTITY_LOAD.register((entity, level) -> KapalFx.loaded(entity));
 		ClientEntityEvents.ENTITY_UNLOAD.register((entity, level) -> KapalFx.unloaded(entity));
 		ClientTickEvents.END_CLIENT_TICK.register(KapalClient::tick);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
 			KapalFx.clear();
 			KapalModel.clear();
 			fadeStart = 0L;
 			fadeOut = false;
-		});
+		}));
 		HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, Kultivator.id("kapal_hud"), new KapalHud());
 		dev.kultivator.client.dunia.peta.PetaClient.init();
 	}

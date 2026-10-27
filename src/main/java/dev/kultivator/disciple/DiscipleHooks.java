@@ -502,7 +502,14 @@ public final class DiscipleHooks {
 			}
 		}
 		for (DeathHandler handler : ON_DEATH) {
-			if (handler.onDeath(entity, source)) {
+			boolean handled;
+			try {
+				handled = handler.onDeath(entity, source);
+			} catch (RuntimeException exception) {
+				dev.kultivator.Kultivator.LOGGER.error("Kultivator disciple death handler failed", exception);
+				handled = false;
+			}
+			if (handled) {
 				return true;
 			}
 		}

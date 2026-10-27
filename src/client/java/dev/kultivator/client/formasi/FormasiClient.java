@@ -53,7 +53,7 @@ public final class FormasiClient {
 			return;
 		}
 		initialised = true;
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
 			last = new CompoundTag();
 			cores = List.of();
 			pendingNodeMap = -1;
@@ -61,7 +61,7 @@ public final class FormasiClient {
 			PatternHologram.hide();
 			AlarmHud.clear();
 			FormasiFx.clear();
-		});
+		}));
 		ClientTickEvents.END_CLIENT_TICK.register(minecraft -> {
 			PatternHologram.tick(minecraft);
 			AlarmHud.tick(minecraft);

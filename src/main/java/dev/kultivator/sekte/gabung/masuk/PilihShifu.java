@@ -254,6 +254,7 @@ public final class PilihShifu {
 		}
 		// the player kneels and kowtows to the chosen teacher (a player can only play KLIP_PEMAIN clips: KOWTOW is the player form of SUJUD_GURU)
 		dev.kultivator.sekte.gabung.GabungPayloads.kirimKlip(player, GabungGerakId.KOWTOW, 0);
+		dev.kultivator.sekte.gabung.GabungPayloads.lepasKlipNanti(player, 60);
 		TempatLayar.tutup(player);
 		return true;
 	}

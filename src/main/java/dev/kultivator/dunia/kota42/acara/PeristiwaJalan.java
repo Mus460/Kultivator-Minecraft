@@ -1189,6 +1189,11 @@ public final class PeristiwaJalan {
 				BlockPos spot = berdiri(level, dinding.offset(i * 2 - 2, 0, 0));
 				tugas(penggosok.get(i), situs, di("gosok_jelaga", spot == null ? dinding : spot, KotaGerakId.GOSOK_DINDING, 0), sekarang + 1200L);
 			}
+			for (Warga w : rantai) {
+				if (!penggosok.contains(w)) {
+					lepas(w); // the rest of the bucket chain has nothing left to pass
+				}
+			}
 			for (UUID id : penolong) {
 				ServerPlayer p = server.getPlayerList().getPlayer(id);
 				if (p == null) {

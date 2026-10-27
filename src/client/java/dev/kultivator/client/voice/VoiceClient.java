@@ -33,7 +33,7 @@ public final class VoiceClient {
 	public static void init() {
 		ClientPlayNetworking.registerGlobalReceiver(VoicePayload.TYPE, (payload, context) -> onPayload(payload));
 		HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, Kultivator.id("voice_captions"), new VoiceCaptions());
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> VoiceCaptions.clear());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(VoiceCaptions::clear));
 	}
 
 	static void onPayload(VoicePayload p) {

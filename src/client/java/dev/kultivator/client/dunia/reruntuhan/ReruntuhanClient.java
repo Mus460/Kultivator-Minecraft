@@ -55,7 +55,7 @@ public final class ReruntuhanClient {
 			TowerSights.render(context);
 		});
 		ClientTickEvents.END_CLIENT_TICK.register(ReruntuhanClient::tick);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
 			RFxClient.clear();
 			TowerScenery.reset();
 			TowerSights.clear();
@@ -63,7 +63,7 @@ public final class ReruntuhanClient {
 			UjianScreen.reset();
 			MenaraScreen.reset();
 			RModels.clear();
-		});
+		}));
 		// a seal breaks rarely: one shot per prison moment and minute at most; milestones every 10 floors are rarer still
 		DuniaScenes.cooldown("segel/pecah", 1200);
 		DuniaScenes.cooldown("segel/buka", 200);

@@ -954,6 +954,9 @@ public final class GerakId {
 		if (id == TUANG_TEH && varian == V_TUANG_TEH_LOOP || id == LEMPAR_PAKAN && varian == V_LEMPAR_PAKAN_LOOP) {
 			return 0;
 		}
+		if (id >= KOTA_HIDUP_FIRST && id <= KOTA_HIDUP_LAST) {
+			return dev.kultivator.dunia.kota42.api.KotaGerakId.durasiSekali(id);
+		}
 		return id > 0 && id < SEKALI.length ? SEKALI[id] : 0;
 	}
 

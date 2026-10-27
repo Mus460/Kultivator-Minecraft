@@ -1,0 +1,6 @@
+{
+  "sources": [
+    { "type": "minecraft:directory", "source": "sekte/mandiri/prop", "prefix": "sekte/mandiri/prop/" },
+    { "type": "minecraft:directory", "source": "sekte/gabung/prop", "prefix": "sekte/gabung/prop/" }
+  ]
+}

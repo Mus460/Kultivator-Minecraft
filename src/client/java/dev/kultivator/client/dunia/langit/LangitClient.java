@@ -38,7 +38,7 @@ public final class LangitClient {
 		LevelRenderEvents.COLLECT_SUBMITS.register(LangitRenderer::collect);
 		HudElementRegistry.attachElementAfter(VanillaHudElements.MISC_OVERLAYS, Kultivator.id("langit_hud"), new LangitHud());
 		ClientTickEvents.END_CLIENT_TICK.register(LangitState::tick);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> LangitState.clear());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> LangitState.clear()));
 	}
 
 	private LangitClient() {

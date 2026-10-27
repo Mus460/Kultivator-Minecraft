@@ -30,11 +30,11 @@ public final class AbadiClient {
 
 	/** Called once from {@code KultivatorClient}. */
 	public static void init() {
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
 			data = new CompoundTag();
 			AbadiFx.clear();
 			LelangJembatan.reset();
-		});
+		}));
 		LelangJembatan.init();
 		HubPages.daftar(HubNav.KEABADIAN, Urutan.ID_ALAM_ABADI, Urutan.ALAM_ABADI, AlamAbadiPage::new);
 		HubPages.daftar(HubNav.KEABADIAN, Urutan.ID_PURBA, Urutan.PURBA, dev.kultivator.client.purba.PurbaPage::new);

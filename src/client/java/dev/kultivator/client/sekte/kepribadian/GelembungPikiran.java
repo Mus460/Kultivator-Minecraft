@@ -65,7 +65,7 @@ final class GelembungPikiran {
 		registered = true;
 		LevelRenderEvents.COLLECT_SUBMITS.register(GelembungPikiran::render);
 		ClientTickEvents.END_CLIENT_TICK.register(client -> tick());
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> clear());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> clear()));
 	}
 
 	static void clear() {

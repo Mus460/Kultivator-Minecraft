@@ -436,5 +436,19 @@
   "kultivator.hidup.kegiatan.tk_tak_terlihat": "tidak terlihat",
   "kultivator.hidup.kegiatan.tk_tidur_bangku": "tertidur di bangku",
   "kultivator.hidup.kegiatan.tk_tonton_gula": "menonton pembuat patung gula",
-  "kultivator.hidup.kegiatan.ronda_lentera": "menyalakan lentera-lentera jalan"
+  "kultivator.hidup.kegiatan.ronda_lentera": "menyalakan lentera-lentera jalan",
+  "item.kultivator.telur_merah": "Telur Merah",
+  "item.kultivator.kue_pengantin": "Kue Pengantin",
+  "item.kultivator.sup_hangat": "Sup Hangat",
+  "item.kultivator.bubur_laba": "Bubur Laba",
+  "item.kultivator.kue_bulan": "Kue Bulan",
+  "item.kultivator.kue_keranjang": "Kue Keranjang",
+  "item.kultivator.air_plum": "Air Plum",
+  "item.kultivator.permen_gula": "Permen Gula",
+  "item.kultivator.tanghulu": "Tanghulu",
+  "entity.kultivator.barongsai": "Barongsai",
+  "entity.kultivator.panggung_keliling": "Panggung Keliling",
+  "entity.kultivator.tenda_pasar": "Tenda Pasar",
+  "entity.kultivator.meja_dadu": "Meja Dadu",
+  "entity.kultivator.layar_bayang": "Layar Bayang"
 }

@@ -114,7 +114,7 @@ public final class RakSenjata {
 		}
 		initialised = true;
 		LevelRenderEvents.COLLECT_SUBMITS.register(RakSenjata::collect);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> bersihkan());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> bersihkan()));
 	}
 
 	// ================================================================ client API

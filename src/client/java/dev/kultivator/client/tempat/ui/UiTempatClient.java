@@ -98,13 +98,13 @@ public final class UiTempatClient {
 		}
 		siap = true;
 		ClientPlayNetworking.registerGlobalReceiver(TempatLayarPayload.TYPE, (payload, context) -> terima(payload));
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
 			LIHAT.clear();
 			TANPA_PEMBUAT.clear();
 			sesiLayar = null;
 			DiSini.reset();
 			LembarHub.reset();
-		});
+		}));
 		net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.END_CLIENT_TICK.register(DiSini::jaga);
 		LembarHub.init();
 		dev.kultivator.client.tempat.ui.layar.SemuaLayar.daftar();

@@ -41,10 +41,10 @@ public final class TurnamenClient {
 		ClientPlayNetworking.registerGlobalReceiver(TurnamenPayloads.Lingkar.TYPE, (payload, context) -> LeiTaiRenderer.onLingkar(payload));
 		ClientPlayNetworking.registerGlobalReceiver(TurnamenPayloads.Papan.TYPE, (payload, context) -> data = payload.data() == null ? null
 				: payload.data().copy());
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
 			LeiTaiRenderer.clear();
 			data = null;
-		});
+		}));
 		scenes();
 	}
 

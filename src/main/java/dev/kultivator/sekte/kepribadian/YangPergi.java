@@ -100,7 +100,16 @@ public final class YangPergi {
 		entry.put("tablet", tablet.copy());
 		list.add(entry);
 		while (list.size() > MAX) {
-			list.remove(0);
+			// The tablet is the only copy of the disciple: those a Cari mission may still find (MINGGAT, MENGEMBARA) go last.
+			int drop = 0;
+			for (int i = 0; i < list.size() - 1; i++) {
+				String cara = list.getCompoundOrEmpty(i).getStringOr("cara", "");
+				if (!Kepergian.MINGGAT.id().equals(cara) && !Kepergian.MENGEMBARA.id().equals(cara)) {
+					drop = i;
+					break;
+				}
+			}
+			list.remove(drop);
 		}
 		store.put(LIST, list);
 		dirty(server, owner);
@@ -200,6 +209,11 @@ public final class YangPergi {
 			return false;
 		}
 		DiscipleEntity back = Disciples.arrive(level, spot, tablet, owner);
+		if (back == null && Disciples.forgotten(server, tablet)) {
+			list.remove(at);
+			dirty(server, owner);
+			return false;
+		}
 		if (back == null) {
 			Msg.chat(master, Component.translatable("kultivator.sekte.kepribadian.kembali.gagal", name).withStyle(ChatFormatting.YELLOW));
 			return false;

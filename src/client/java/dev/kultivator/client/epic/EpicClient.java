@@ -50,7 +50,7 @@ public final class EpicClient {
 		LevelRenderEvents.BEFORE_BLOCK_OUTLINE.register((context, outline) -> !CinematicDirector.active());
 		ClientLifecycleEvents.CLIENT_STARTED.register(client -> registerHud());
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, buildContext) -> EpicClientCommands.register(dispatcher));
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> EpicDirector.clearAll());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> EpicDirector.clearAll()));
 	}
 
 	private static void registerHud() {

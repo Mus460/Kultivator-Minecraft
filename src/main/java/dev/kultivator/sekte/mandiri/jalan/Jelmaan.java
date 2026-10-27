@@ -605,6 +605,10 @@ public final class Jelmaan {
 	 */
 	public static void tunjukkan(ServerLevel level, String kunci, UUID owner, UUID soul, @Nullable CompoundTag tablet, BlockPos at,
 			@Nullable BlockPos hadap, Adegan adegan, int ttl) {
+		if (!Perjalanan.berjalan()) {
+			// perbarui only ticks while Murid Mandiri runs: no stage is kept that nothing would ever show or prune.
+			return;
+		}
 		Pasang.ok();
 		Panggung p = PANGGUNG.computeIfAbsent(kunci, k -> new Panggung(k, owner, soul, level.dimension(), adegan));
 		if (tablet != null) {
@@ -692,7 +696,7 @@ public final class Jelmaan {
 				total--;
 			}
 			if (p.tubuh == null) {
-				if (cfg.jelmaanServer <= 0 || cfg.jelmaanPerKota <= 0 || total >= cfg.jelmaanServer || !level.isLoaded(p.at)
+				if (cfg.jelmaanServer <= 0 || total >= cfg.jelmaanServer || !level.isLoaded(p.at)
 						|| !dekatPemain(level, p.at, 128.0D) || !DuniaBudget.mayAdd(level, DuniaBudget.NPC, Vec3.atBottomCenterOf(p.at))) {
 					continue;
 				}

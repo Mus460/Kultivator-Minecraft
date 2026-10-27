@@ -238,14 +238,18 @@ public final class Duties {
 		}
 		CompoundTag post = EventUtil.sub(posts, key);
 		BlockPos spot = EventUtil.pos(post, "spot");
-		if (spot == null) {
-			spot = postSpot(level, disciple, owner, duty, hall.pos(), Integer.parseInt(key));
+		if (spot == null || !duty.equals(post.getStringOr("duty", duty))) {
+			// a new post, or a new duty at an old one (the anchor depends on the duty): a fresh spot; the old one stays if none is found
+			BlockPos found = postSpot(level, disciple, owner, duty, hall.pos(), Integer.parseInt(key));
+			if (found != null) {
+				spot = found;
+				post.putLong("spot", spot.asLong());
+			}
 			if (spot == null) {
 				posts.remove(key);
 				EventUtil.chat(player, Component.translatable("kultivator.sectevent.duty.blocked").withStyle(ChatFormatting.YELLOW));
 				return false;
 			}
-			post.putLong("spot", spot.asLong());
 		}
 		boolean fresh = !post.contains("soul");
 		post.putString("soul", soul);

@@ -430,7 +430,7 @@ public final class PekerjaanTumbuh {
 				int id = UsahaWarga.buka(server, situs, usaha, owner == null ? 0 : owner.id, owner == null ? c.getIntOr("i", 0) : owner.slot);
 				c.putInt("usaha", id);
 				if (half && top != null) {
-					Investasi.sahamKavling(server, situs, id, top, 0.6D);
+					Investasi.sahamKavling(server, situs, id, top, 0.6D, given);
 				}
 			} catch (RuntimeException exception) {
 				Kultivator.LOGGER.debug("Kultivator: the plot business could not open", exception);

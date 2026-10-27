@@ -156,6 +156,11 @@ final class AwayStore {
 			}
 			DiscipleEntity back = Disciples.arrive(arriveLevel, at, stored, owner);
 			if (back == null) {
+				if (Disciples.forgotten(arriveLevel.getServer(), stored)) {
+					// forgotten while away: it never comes back, the record ends
+					list.remove(i);
+					changed = true;
+				}
 				continue;
 			}
 			list.remove(i);

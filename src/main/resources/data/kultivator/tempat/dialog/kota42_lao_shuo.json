@@ -122,11 +122,13 @@
         },
         {
           "syarat": [
-            "nb 2"
+            "nb 2",
+            "!bendera lao_shuo_kera_sakti"
           ],
           "akibat": [
             "bayar 2",
             "nama_baik 1",
+            "bendera lao_shuo_kera_sakti",
             "klip k:beri_koin"
           ],
           "ke": "terima_kasih"
@@ -174,11 +176,13 @@
         },
         {
           "syarat": [
-            "nb 2"
+            "nb 2",
+            "!bendera lao_shuo_ular_putih"
           ],
           "akibat": [
             "bayar 2",
             "nama_baik 1",
+            "bendera lao_shuo_ular_putih",
             "klip k:beri_koin"
           ],
           "ke": "terima_kasih"
@@ -226,11 +230,13 @@
         },
         {
           "syarat": [
-            "nb 2"
+            "nb 2",
+            "!bendera lao_shuo_penggembala"
           ],
           "akibat": [
             "bayar 2",
             "nama_baik 1",
+            "bendera lao_shuo_penggembala",
             "klip k:beri_koin"
           ],
           "ke": "terima_kasih"
@@ -278,11 +284,13 @@
         },
         {
           "syarat": [
-            "nb 2"
+            "nb 2",
+            "!bendera lao_shuo_change"
           ],
           "akibat": [
             "bayar 2",
             "nama_baik 1",
+            "bendera lao_shuo_change",
             "klip k:beri_koin"
           ],
           "ke": "terima_kasih"
@@ -330,11 +338,13 @@
         },
         {
           "syarat": [
-            "nb 2"
+            "nb 2",
+            "!bendera lao_shuo_mulan"
           ],
           "akibat": [
             "bayar 2",
             "nama_baik 1",
+            "bendera lao_shuo_mulan",
             "klip k:beri_koin"
           ],
           "ke": "terima_kasih"
@@ -382,11 +392,13 @@
         },
         {
           "syarat": [
-            "nb 2"
+            "nb 2",
+            "!bendera lao_shuo_hakim_bao"
           ],
           "akibat": [
             "bayar 2",
             "nama_baik 1",
+            "bendera lao_shuo_hakim_bao",
             "klip k:beri_koin"
           ],
           "ke": "terima_kasih"
@@ -434,11 +446,13 @@
         },
         {
           "syarat": [
-            "nb 2"
+            "nb 2",
+            "!bendera lao_shuo_delapan_dewa"
           ],
           "akibat": [
             "bayar 2",
             "nama_baik 1",
+            "bendera lao_shuo_delapan_dewa",
             "klip k:beri_koin"
           ],
           "ke": "terima_kasih"
@@ -486,11 +500,13 @@
         },
         {
           "syarat": [
-            "nb 2"
+            "nb 2",
+            "!bendera lao_shuo_yu_gong"
           ],
           "akibat": [
             "bayar 2",
             "nama_baik 1",
+            "bendera lao_shuo_yu_gong",
             "klip k:beri_koin"
           ],
           "ke": "terima_kasih"
@@ -538,11 +554,13 @@
         },
         {
           "syarat": [
-            "nb 2"
+            "nb 2",
+            "!bendera lao_shuo_sarjana_rubah"
           ],
           "akibat": [
             "bayar 2",
             "nama_baik 1",
+            "bendera lao_shuo_sarjana_rubah",
             "klip k:beri_koin"
           ],
           "ke": "terima_kasih"
@@ -590,11 +608,13 @@
         },
         {
           "syarat": [
-            "nb 2"
+            "nb 2",
+            "!bendera lao_shuo_kupu_kupu"
           ],
           "akibat": [
             "bayar 2",
             "nama_baik 1",
+            "bendera lao_shuo_kupu_kupu",
             "klip k:beri_koin"
           ],
           "ke": "terima_kasih"
@@ -642,11 +662,13 @@
         },
         {
           "syarat": [
-            "nb 2"
+            "nb 2",
+            "!bendera lao_shuo_penjara_iblis"
           ],
           "akibat": [
             "bayar 2",
             "nama_baik 1",
+            "bendera lao_shuo_penjara_iblis",
             "klip k:beri_koin"
           ],
           "ke": "terima_kasih"
@@ -694,11 +716,13 @@
         },
         {
           "syarat": [
-            "nb 2"
+            "nb 2",
+            "!bendera lao_shuo_sekte_awan"
           ],
           "akibat": [
             "bayar 2",
             "nama_baik 1",
+            "bendera lao_shuo_sekte_awan",
             "klip k:beri_koin"
           ],
           "ke": "terima_kasih"

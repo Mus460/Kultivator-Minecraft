@@ -50,7 +50,7 @@ public final class MandiriConfig {
 	public int rampasanMinggu = 12;
 	/** Share of the hall away at once: Seimbang, Penuh (percent). */
 	public int[] pergiMaksPersen = {25, 40};
-	/** Death for NEKAT only (needs the user's approval to turn on). */
+	/** Normal death for every cause, as before DESIGN 39 (the die guard checks only this flag; needs the user's approval to turn on). */
 	public boolean bolehGugur = false;
 	/** The temptation layer (39.3.3). */
 	public boolean jalanIblis = true;
