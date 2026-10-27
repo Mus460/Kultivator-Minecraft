@@ -12,8 +12,7 @@ import dev.kultivator.client.screen.ui.PemilihJumlah;
 import dev.kultivator.client.screen.ui.Potret;
 import dev.kultivator.client.screen.ui.Pratinjau3D;
 import dev.kultivator.client.screen.ui.TalismanButton;
-import dev.kultivator.client.tempat.ui.kit.Lembar;
-import dev.kultivator.client.tempat.ui.kit.TempatWarna;
+import dev.kultivator.client.screen.ui.Lembar;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import java.util.List;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -22,7 +21,6 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,10 +30,9 @@ import org.jetbrains.annotations.Nullable;
  * the old sheet engine, so a themed page under Di Sini behaves like every other page of the Gulungan (Tab ring, Enter,
  * number keys for numbered choices, the one confirm seal). Text is 1.0 and 1.5 only (43.0.5).
  * <p>
- * The helpers keep the names the sheets used ({@link #tombolOp}, {@link #kosong}, {@link #toko}, {@link #strip} ...) but
- * take the single kit's {@link Lukis}; {@link Toko} and {@link DetailEkstra} hide the old ones of the base. A sheet
- * draws its content in {@link #lukisTema}; the strip over it (district, subtitle, Nama Baik, discount, "only viewing")
- * and the locked state are drawn here.
+ * The helpers keep the names the sheets used ({@link #tombolOp}, {@link #kosong}, {@link #toko}, {@link #strip} ...) and
+ * take the single kit's {@link Lukis}. A sheet draws its content in {@link #lukisTema}; the strip over it (district,
+ * subtitle, Nama Baik, discount, "only viewing") and the locked state are drawn here.
  */
 public abstract class TemaHalaman extends LayarTemaDasar {
 
@@ -47,30 +44,24 @@ public abstract class TemaHalaman extends LayarTemaDasar {
 	private String ucapanTerakhir = "";
 	private long ucapanMulai;
 
-	protected TemaHalaman(String layar, int npcId, CompoundTag lembar, String judulKunci, TempatWarna.Gaya gaya) {
+	protected TemaHalaman(String layar, int npcId, CompoundTag lembar, String judulKunci, Palette.Gaya gaya) {
 		super(layar, npcId, lembar, judulKunci, gaya);
 	}
 
 	/** Draws the content of tab {@link #tab} into the box with the single kit. */
 	protected abstract void lukisTema(Lukis l, int x0, int y0, int x1, int y1);
 
-	/** Text of the kit-38 sheet fragment ({@code kultivator.tempat_ui.*}). */
-	protected static MutableComponent tt(String kunci, Object... args) {
-		return Component.translatable("kultivator.tempat_ui." + kunci, args);
+	/** Illustration of the empty state ({@link #kosong}). */
+	protected KeadaanKosong.Gambar kosongGambar() {
+		return KeadaanKosong.Gambar.NAMPAN;
 	}
 
-	// ================================================================== bridge to the base
-
-	/** Not used: the content is drawn in {@link #lukisTema}. */
-	@Override
-	protected final void gambar(dev.kultivator.client.tempat.ui.kit.Lukis l, int x0, int y0, int x1, int y1) {
-	}
+	// ================================================================== frame
 
 	@Override
 	protected void drawBehind(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
-		// applies the first sheet and runs the base hooks (lembarBaru / tabGanti); the content is drawn in lukis()
-		tabSekarang();
-		isi(null, 0, 0, 0, 0);
+		// applies the first sheet and runs the hooks (lembarBaru / tabGanti); the content is drawn in lukis()
+		olah();
 	}
 
 	@Override
@@ -80,7 +71,7 @@ public abstract class TemaHalaman extends LayarTemaDasar {
 		int y0 = y;
 		int x1 = x + w;
 		int y1 = y + h;
-		if (gaya != TempatWarna.Gaya.KERTAS) {
+		if (gaya != Palette.Gaya.KERTAS) {
 			// the sheet's own style (night market, red lacquer ...) under its content: its text colours are made for it
 			l.g.fill(x0, y0, x1, y1, gaya.dasar);
 		}
@@ -183,8 +174,7 @@ public abstract class TemaHalaman extends LayarTemaDasar {
 
 	/** Empty state with the sheet's {@code kosong} compound (or a fallback sentence). */
 	protected void kosong(Lukis l, @Nullable Component cadangan, int x0, int y0, int x1, int y1) {
-		KeadaanKosong.gambar(l, KeadaanKosong.Gambar.valueOf(gambarKosong().name()), lembar.sub(LembarKunci.KOSONG), cadangan, x0, y0, x1, y1,
-				this::kirim);
+		KeadaanKosong.gambar(l, kosongGambar(), lembar.sub(LembarKunci.KOSONG), cadangan, x0, y0, x1, y1, this::kirim);
 	}
 
 	/** A stacked heading (43.0.4). Returns the height used (13). */
@@ -259,7 +249,7 @@ public abstract class TemaHalaman extends LayarTemaDasar {
 
 	// ================================================================== shop block
 
-	/** State of one shop list of a themed page (list, turning preview, amount); hides the base's old-kit one. */
+	/** State of one shop list of a themed page (list, turning preview, amount). */
 	protected static final class Toko {
 		public final DaftarGulir daftar = new DaftarGulir();
 		public final Pratinjau3D pratinjau = new Pratinjau3D();

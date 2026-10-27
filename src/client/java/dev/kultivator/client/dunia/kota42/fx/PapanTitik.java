@@ -2,7 +2,7 @@ package dev.kultivator.client.dunia.kota42.fx;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.kultivator.client.tempat.ui.TeksDunia;
-import dev.kultivator.client.tempat.ui.kit.TempatWarna;
+import dev.kultivator.client.screen.ui.Palette;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.network.chat.Component;
@@ -32,7 +32,7 @@ final class PapanTitik {
 			}
 			int light = Bingkai.cahaya(t.x(), t.y() + 0.5D, t.z());
 			TeksDunia.papan(pose, collector, camera, dx, dy + (t.nisan() ? 1.45D : 0.55D), dz, List.of(Component.literal(t.teks())),
-					t.nisan() ? TempatWarna.Gaya.BATU : TempatWarna.Gaya.KAYU, t.nisan() ? 0.12F : 0.15F, light);
+					t.nisan() ? Palette.Gaya.BATU : Palette.Gaya.KAYU, t.nisan() ? 0.12F : 0.15F, light);
 		}
 	}
 

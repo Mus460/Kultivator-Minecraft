@@ -10,18 +10,12 @@ import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.Potret;
 import dev.kultivator.client.sekte.gabung.ui.IkonGabung;
-import dev.kultivator.client.tempat.ui.kit.Lembar;
-import dev.kultivator.client.tempat.ui.kit.TabLentera;
-import dev.kultivator.client.tempat.ui.kit.TempatWarna;
+import dev.kultivator.client.screen.ui.Lembar;
 import dev.kultivator.data.Dao;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import dev.kultivator.sekte.gabung.ui.GabungLembar;
 import dev.kultivator.sekte.gabung.ui.GabungLembar.Shifu;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.input.CharacterEvent;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -46,11 +40,11 @@ public final class LayarShifu extends LayarGabungDasar {
 	private long dibuka = Util.getMillis();
 
 	public LayarShifu(int npcId, CompoundTag lembar) {
-		super(Shifu.LAYAR, npcId, lembar, u("shifu.judul"), TempatWarna.Gaya.KERTAS);
+		super(Shifu.LAYAR, npcId, lembar, u("shifu.judul"), LembarKunci.GAYA_KERTAS);
 	}
 
 	@Override
-	protected List<TabLentera.Tab> tabs() {
+	protected List<Tab> daftarTab() {
 		return List.of();
 	}
 
@@ -67,11 +61,6 @@ public final class LayarShifu extends LayarGabungDasar {
 	}
 
 	@Override
-	protected void isiGabung(dev.kultivator.client.tempat.ui.kit.Lukis l, int x0, int y0, int x1, int y1) {
-		// not used: this page draws with the single kit in lukis()
-	}
-
-	@Override
 	public String helpTopic() {
 		return Shifu.LAYAR;
 	}
@@ -84,18 +73,8 @@ public final class LayarShifu extends LayarGabungDasar {
 	// ================================================================== drawing (single kit)
 
 	@Override
-	protected void drawBehind(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
-		// applies the first sheet; the content is drawn in lukis() with the page's focus ring
-		tabSekarang();
-	}
-
-	@Override
-	protected void lukis(Lukis l) {
-		int x0 = x + 2;
-		int x1 = x + w - 2;
-		int y0 = y + 2;
-		int y1 = y + h - 2;
-		int yy = y1 - y0 < PENDEK ? y0 : LayarPutusan.kepalaSekte(l, lembar, x0, y0, x1);
+	protected void isiGabung(Lukis l, int x0, int y0, int x1, int y1) {
+		int yy = kepalaSekte(l, x0, y0, x1);
 		boolean kasihan = lembar.b(Shifu.KASIHAN);
 		yy += Math.round(l.bungkus(kasihan ? u("shifu.kasihan") : u("shifu.ket"), x0, yy, x1 - x0, kasihan ? Palette.PERINGATAN : l.gaya.teksLemah, 18))
 				+ 3;
@@ -236,54 +215,5 @@ public final class LayarShifu extends LayarGabungDasar {
 		if (hover) {
 			l.g.fill(x0, y0, x1, y0 + 1, Palette.argb(0xC0, Palette.GOLD));
 		}
-	}
-
-	// ================================================================== input (the page's focus ring)
-
-	@Override
-	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-		return fokusRing.klik(event.x(), event.y(), event.button());
-	}
-
-	@Override
-	public boolean mouseReleased(MouseButtonEvent event) {
-		return fokusRing.lepas(event.x(), event.y());
-	}
-
-	@Override
-	public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
-		return fokusRing.seret(event.x(), event.y(), dx);
-	}
-
-	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-		return fokusRing.gulir(mouseX, mouseY, scrollY);
-	}
-
-	@Override
-	public boolean keyPressed(KeyEvent event) {
-		return fokusRing.tombol(event);
-	}
-
-	@Override
-	public boolean charTyped(CharacterEvent event) {
-		return fokusRing.ketik(event);
-	}
-
-	@Override
-	public boolean fokusTab(boolean back) {
-		fokusRing.geser(back ? -1 : 1);
-		return true;
-	}
-
-	@Override
-	public boolean mauTombol() {
-		return fokusRing.mauTombol();
-	}
-
-	/** K3 (43.17): under Di Sini the number keys pick the elder (the choices register their numbers). */
-	@Override
-	public boolean angka(int n) {
-		return fokusRing.angka(n);
 	}
 }

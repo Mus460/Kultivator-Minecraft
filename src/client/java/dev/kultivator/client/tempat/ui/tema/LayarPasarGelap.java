@@ -8,9 +8,8 @@ import dev.kultivator.client.screen.ui.KeadaanTerkunci;
 import dev.kultivator.client.screen.ui.LabelHarga;
 import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
-import dev.kultivator.client.tempat.ui.kit.Lembar;
-import dev.kultivator.client.tempat.ui.kit.TabLentera;
-import dev.kultivator.client.tempat.ui.kit.TempatWarna;
+import dev.kultivator.client.screen.ui.TabBar;
+import dev.kultivator.client.screen.ui.Lembar;
 import dev.kultivator.dunia.kota42.ui.KotaLembar;
 import dev.kultivator.dunia.kota42.ui.KotaLembar.PasarHantu;
 import dev.kultivator.dunia.tempat.tema.bersama.TemaLayar.PasarGelap;
@@ -50,7 +49,7 @@ public final class LayarPasarGelap extends TemaHalaman {
 
 	/** The black-market page for the 38.T id or the 42 Ghost Market id ({@code pasar_hantu}). */
 	public LayarPasarGelap(String layar, int npcId, CompoundTag lembar) {
-		super(layar, npcId, lembar, "layar.pasar_gelap", TempatWarna.Gaya.KAIN);
+		super(layar, npcId, lembar, "layar.pasar_gelap", Palette.Gaya.KAIN);
 	}
 
 	private boolean hantu() {
@@ -58,18 +57,15 @@ public final class LayarPasarGelap extends TemaHalaman {
 	}
 
 	@Override
-	protected List<TabLentera.Tab> tabs() {
+	protected List<TabBar.Tab> tabs() {
 		if (hantu()) {
-			return List.of(new TabLentera.Tab(PasarHantu.TAB_LAPAK, SketsaKota.t("pasar_hantu.tab.lapak"), LembarKunci.Ikon.JIMAT, null),
-					new TabLentera.Tab(PasarHantu.TAB_CURIAN, SketsaKota.t("pasar_hantu.tab.curian"), LembarKunci.Ikon.GEMBOK, null),
-					new TabLentera.Tab(PasarHantu.TAB_PENADAH, SketsaKota.t("pasar_hantu.tab.penadah"), LembarKunci.Ikon.TIMBANGAN, null));
+			return List.of(TabBar.Tab.of(PasarHantu.TAB_LAPAK, SketsaKota.t("pasar_hantu.tab.lapak")),
+					TabBar.Tab.of(PasarHantu.TAB_CURIAN, SketsaKota.t("pasar_hantu.tab.curian")),
+					TabBar.Tab.of(PasarHantu.TAB_PENADAH, SketsaKota.t("pasar_hantu.tab.penadah")));
 		}
-		List<TabLentera.Tab> out = new ArrayList<>();
-		int[] ikon = {LembarKunci.Ikon.CAP_MERAH, LembarKunci.Ikon.PIL, LembarKunci.Ikon.PASAR_BINATANG, LembarKunci.Ikon.MATA_BATIN,
-				LembarKunci.Ikon.JIMAT, LembarKunci.Ikon.GEMBOK};
-		for (int i = 0; i < PasarGelap.TABS.size(); i++) {
-			String id = PasarGelap.TABS.get(i);
-			out.add(tabTema(id, "gelap.tab." + id, ikon[i]));
+		List<TabBar.Tab> out = new ArrayList<>();
+		for (String id : PasarGelap.TABS) {
+			out.add(tabTema(id, "gelap.tab." + id));
 		}
 		return out;
 	}

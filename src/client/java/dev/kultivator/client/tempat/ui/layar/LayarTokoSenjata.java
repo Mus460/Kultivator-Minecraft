@@ -13,7 +13,7 @@ import dev.kultivator.client.screen.ui.PemilihJumlah;
 import dev.kultivator.client.screen.ui.Pratinjau3D;
 import dev.kultivator.client.screen.ui.Saring;
 import dev.kultivator.client.screen.ui.TalismanButton;
-import dev.kultivator.client.tempat.ui.kit.Lembar;
+import dev.kultivator.client.screen.ui.Lembar;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import dev.kultivator.dunia.tempat.ui.LembarKunci.TokoSenjata;
 import java.util.ArrayList;

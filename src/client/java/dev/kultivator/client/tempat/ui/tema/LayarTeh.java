@@ -5,9 +5,8 @@ import dev.kultivator.client.screen.ui.CincinWaktu;
 import dev.kultivator.client.screen.ui.LabelHarga;
 import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
-import dev.kultivator.client.tempat.ui.kit.Lembar;
-import dev.kultivator.client.tempat.ui.kit.TabLentera;
-import dev.kultivator.client.tempat.ui.kit.TempatWarna;
+import dev.kultivator.client.screen.ui.TabBar;
+import dev.kultivator.client.screen.ui.Lembar;
 import dev.kultivator.dunia.tempat.tema.bersama.TemaLayar.Teh;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import java.util.List;
@@ -26,11 +25,11 @@ public final class LayarTeh extends TemaHalaman {
 	private final Toko toko = new Toko();
 
 	public LayarTeh(int npcId, CompoundTag lembar) {
-		super(Teh.LAYAR, npcId, lembar, "layar.teh", TempatWarna.Gaya.KAYU);
+		super(Teh.LAYAR, npcId, lembar, "layar.teh", Palette.Gaya.KAYU);
 	}
 
 	@Override
-	protected List<TabLentera.Tab> tabs() {
+	protected List<TabBar.Tab> tabs() {
 		return List.of();
 	}
 

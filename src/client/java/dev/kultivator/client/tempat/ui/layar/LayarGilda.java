@@ -9,7 +9,7 @@ import dev.kultivator.client.screen.ui.LencanaPangkat;
 import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.PemilihJumlah;
 import dev.kultivator.client.screen.ui.Pratinjau3D;
-import dev.kultivator.client.tempat.ui.kit.Lembar;
+import dev.kultivator.client.screen.ui.Lembar;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import dev.kultivator.dunia.tempat.ui.LembarKunci.Gilda;
 import dev.kultivator.dunia.tempat.ui.LembarKunci.TokoSenjata;

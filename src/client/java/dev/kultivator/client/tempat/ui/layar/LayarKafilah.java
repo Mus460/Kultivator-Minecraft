@@ -9,9 +9,8 @@ import dev.kultivator.client.screen.ui.LabelHarga;
 import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.PemilihJumlah;
-import dev.kultivator.client.tempat.ui.kit.Lembar;
-import dev.kultivator.client.tempat.ui.kit.TabLentera;
-import dev.kultivator.client.tempat.ui.kit.TempatWarna;
+import dev.kultivator.client.screen.ui.Lembar;
+import dev.kultivator.client.screen.ui.TabBar;
 import dev.kultivator.client.tempat.ui.tema.TemaHalaman;
 import dev.kultivator.client.tempat.ui.tema.TemaUi;
 import dev.kultivator.dunia.tempat.tema.bersama.TemaLayar;
@@ -42,15 +41,15 @@ public final class LayarKafilah extends TemaHalaman {
 
 	/** Road mode ({@code kafilah}). */
 	public LayarKafilah(int npcId, CompoundTag lembar) {
-		this(LembarKunci.Kafilah.LAYAR, npcId, lembar, TempatWarna.Gaya.dari(LembarKunci.GAYA_KAYU, TempatWarna.Gaya.KERTAS), false);
+		this(LembarKunci.Kafilah.LAYAR, npcId, lembar, Palette.Gaya.dari(LembarKunci.GAYA_KAYU, Palette.Gaya.KERTAS), false);
 	}
 
 	/** Theme mode ({@code tema_kafilah}); the factory {@code TemaUiClient} registers. */
 	public static LayarKafilah tema(int npcId, CompoundTag lembar) {
-		return new LayarKafilah(TemaLayar.Kafilah.LAYAR, npcId, lembar, TempatWarna.Gaya.KAIN, true);
+		return new LayarKafilah(TemaLayar.Kafilah.LAYAR, npcId, lembar, Palette.Gaya.KAIN, true);
 	}
 
-	private LayarKafilah(String layar, int npcId, CompoundTag lembar, TempatWarna.Gaya gaya, boolean tema) {
+	private LayarKafilah(String layar, int npcId, CompoundTag lembar, Palette.Gaya gaya, boolean tema) {
 		super(layar, npcId, lembar, "layar.kafilah", gaya);
 		this.tema = tema;
 	}
@@ -67,7 +66,7 @@ public final class LayarKafilah extends TemaHalaman {
 	}
 
 	@Override
-	protected List<TabLentera.Tab> tabs() {
+	protected List<TabBar.Tab> tabs() {
 		return List.of();
 	}
 

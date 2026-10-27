@@ -7,7 +7,7 @@ import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.client.screen.ui.LabelHarga;
 import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
-import dev.kultivator.client.tempat.ui.kit.Lembar;
+import dev.kultivator.client.screen.ui.Lembar;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import dev.kultivator.dunia.tempat.ui.LembarKunci.Layanan;
 import java.util.List;

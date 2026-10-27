@@ -2,7 +2,7 @@ package dev.kultivator.client.dunia.kota42.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import dev.kultivator.client.tempat.ui.kit.TeksTempat;
+import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.dunia.kota42.ekonomi.RakDagangBlock;
 import dev.kultivator.dunia.kota42.ekonomi.RakDagangBlockEntity;
 import it.unimi.dsi.fastutil.HashCommon;
@@ -83,7 +83,7 @@ public class RakDagangRenderer implements BlockEntityRenderer<RakDagangBlockEnti
 			}
 			state.barang[slot] = shown;
 			int price = rak.harga(slot);
-			state.harga[slot] = price > 0 ? Component.translatable("kultivator.tempat_ui.nb", TeksTempat.singkat(price)).getVisualOrderText() : null;
+			state.harga[slot] = price > 0 ? Component.translatable("kultivator.tempat_ui.nb", Brush.singkat(price)).getVisualOrderText() : null;
 		}
 	}
 

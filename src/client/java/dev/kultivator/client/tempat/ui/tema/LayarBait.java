@@ -5,13 +5,12 @@ import dev.kultivator.client.screen.ui.DaftarPilihan;
 import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
+import dev.kultivator.client.screen.ui.TabBar;
 import dev.kultivator.client.screen.ui.UiSound;
-import dev.kultivator.client.tempat.ui.kit.Lembar;
-import dev.kultivator.client.tempat.ui.kit.TabLentera;
-import dev.kultivator.client.tempat.ui.kit.TempatWarna;
+import dev.kultivator.client.screen.ui.Lembar;
+import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import java.util.ArrayList;
 import dev.kultivator.dunia.tempat.tema.bersama.TemaLayar.Bait;
-import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import java.util.List;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -36,11 +35,11 @@ public final class LayarBait extends TemaHalaman {
 	private boolean hasilBenar;
 
 	public LayarBait(int npcId, CompoundTag lembar) {
-		super(Bait.LAYAR, npcId, lembar, "layar.bait", TempatWarna.Gaya.KERTAS);
+		super(Bait.LAYAR, npcId, lembar, "layar.bait", Palette.Gaya.KERTAS);
 	}
 
 	@Override
-	protected List<TabLentera.Tab> tabs() {
+	protected List<TabBar.Tab> tabs() {
 		return List.of();
 	}
 

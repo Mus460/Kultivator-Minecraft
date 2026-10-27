@@ -5,10 +5,9 @@ import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.KartuBarang;
 import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
+import dev.kultivator.client.screen.ui.TabBar;
 import dev.kultivator.client.screen.ui.TalismanButton;
 import dev.kultivator.client.screen.ui.UiSound;
-import dev.kultivator.client.tempat.ui.kit.TabLentera;
-import dev.kultivator.client.tempat.ui.kit.TempatWarna;
 import dev.kultivator.dunia.tempat.tema.bersama.TemaLayar.Irama;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import java.util.Arrays;
@@ -60,11 +59,11 @@ public final class LayarIrama extends TemaHalaman {
 	private final long[] laneNyala = new long[4];
 
 	public LayarIrama(int npcId, CompoundTag lembar) {
-		super(Irama.LAYAR, npcId, lembar, "layar.irama", TempatWarna.Gaya.KAIN);
+		super(Irama.LAYAR, npcId, lembar, "layar.irama", Palette.Gaya.KAIN);
 	}
 
 	@Override
-	protected List<TabLentera.Tab> tabs() {
+	protected List<TabBar.Tab> tabs() {
 		return List.of();
 	}
 

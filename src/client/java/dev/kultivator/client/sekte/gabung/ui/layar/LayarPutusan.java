@@ -8,21 +8,11 @@ import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.TalismanButton;
 import dev.kultivator.client.screen.ui.UiSound;
-import dev.kultivator.client.sekte.gabung.ui.IkonGabung;
-import dev.kultivator.client.tempat.ui.kit.Lembar;
-import dev.kultivator.client.tempat.ui.kit.TabLentera;
-import dev.kultivator.client.tempat.ui.kit.TempatWarna;
+import dev.kultivator.client.screen.ui.Lembar;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
-import dev.kultivator.sekte.gabung.api.Corak;
-import dev.kultivator.sekte.gabung.api.KelasSekte;
 import dev.kultivator.sekte.gabung.api.Pintu;
 import dev.kultivator.sekte.gabung.ui.GabungLembar;
 import dev.kultivator.sekte.gabung.ui.GabungLembar.Putusan;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.input.CharacterEvent;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -49,11 +39,11 @@ public final class LayarPutusan extends LayarGabungDasar {
 	private boolean bunyi;
 
 	public LayarPutusan(int npcId, CompoundTag lembar) {
-		super(Putusan.LAYAR, npcId, lembar, u("putusan.judul"), TempatWarna.Gaya.KERTAS);
+		super(Putusan.LAYAR, npcId, lembar, u("putusan.judul"), LembarKunci.GAYA_KERTAS);
 	}
 
 	@Override
-	protected List<TabLentera.Tab> tabs() {
+	protected List<Tab> daftarTab() {
 		return List.of();
 	}
 
@@ -64,11 +54,6 @@ public final class LayarPutusan extends LayarGabungDasar {
 			bunyi = false;
 			kartu.mulaiUlang(dibuka);
 		}
-	}
-
-	@Override
-	protected void isiGabung(dev.kultivator.client.tempat.ui.kit.Lukis l, int x0, int y0, int x1, int y1) {
-		// not used: this page draws with the single kit in lukis()
 	}
 
 	@Override
@@ -84,17 +69,7 @@ public final class LayarPutusan extends LayarGabungDasar {
 	// ================================================================== drawing (single kit)
 
 	@Override
-	protected void drawBehind(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
-		// applies the first sheet; the content is drawn in lukis() with the page's focus ring
-		tabSekarang();
-	}
-
-	@Override
-	protected void lukis(Lukis l) {
-		int x0 = x + 2;
-		int x1 = x + w - 2;
-		int y0 = y + 2;
-		int y1 = y + h - 2;
+	protected void isiGabung(Lukis l, int x0, int y0, int x1, int y1) {
 		boolean terima = lembar.b(Putusan.DITERIMA);
 		if (!bunyi && l.kini - dibuka > 320L) {
 			bunyi = true;
@@ -105,7 +80,7 @@ public final class LayarPutusan extends LayarGabungDasar {
 			}
 		}
 		// a short box (GUI scale 4) gives the strip's 19 px to the card
-		int yy = y1 - y0 < PENDEK ? y0 : kepalaSekte(l, lembar, x0, y0, x1);
+		int yy = kepalaSekte(l, x0, y0, x1);
 		// the score scale over the card
 		int skor = Math.max(0, Math.min(100, lembar.i(LembarKunci.SKOR, 0)));
 		Component skorT = Brush.bold(u("putusan.skor", skor));
@@ -186,106 +161,5 @@ public final class LayarPutusan extends LayarGabungDasar {
 			out.add(new KartuHasil.Bagian(null, saran, terima ? KartuHasil.BERHASIL : KartuHasil.GAGAL, 0));
 		}
 		return out;
-	}
-
-	/**
-	 * The sect strip of a 41 sheet on the single kit (the old-kit {@code kepalaSekte} of the base, text 1.0): emblem, class
-	 * plaque + tier, corak, alignment, cloud palace, MEROSOT and a rule in the sect's ink. Returns the y under it.
-	 */
-	static int kepalaSekte(Lukis l, Lembar lembar, int x0, int y0, int x1) {
-		if (!lembar.ada(GabungLembar.SEKTE_ID)) {
-			return y0;
-		}
-		Font font = l.font;
-		int y = y0 + 1;
-		IkonGabung.lambang(l.g, font, lembar.i(GabungLembar.LAMBANG, 0), x0 + 6.5F, y + 6.5F, 6.5F);
-		int x = x0 + 16;
-		int kelas = lembar.i(GabungLembar.KELAS, 1);
-		IkonGabung.gambar(l.g, IkonGabung.kelas(kelas), x, y, 12);
-		x += 14;
-		Component k = KelasSekte.byNomor(kelas).nama().copy().append(" · ").append(t("tier", lembar.i(GabungLembar.TINGKAT, 1)));
-		int kw = Math.min(130, Math.min(font.width(k), x1 - x));
-		l.teks(k, x, y + 2, kw, l.gaya.teks);
-		x += kw + 6;
-		String corak = lembar.s(GabungLembar.CORAK);
-		if (!corak.isEmpty() && x + 60 < x1) {
-			IkonGabung.gambar(l.g, IkonGabung.corak(corak), x, y, 12);
-			Component c = t("corak", Corak.byId(corak, Corak.PEDANG).nama());
-			int cw = Math.min(70, font.width(c));
-			l.teks(c, x + 14, y + 2, cw, l.gaya.teksLemah);
-			x += 14 + cw + 6;
-		}
-		int aliran = lembar.i(GabungLembar.ALIRAN, 0);
-		if (x + 12 < x1) {
-			IkonGabung.gambar(l.g, IkonGabung.ALIRAN + Math.max(0, Math.min(2, aliran)), x, y, 12);
-			if (l.di(x, y, x + 12, y + 12)) {
-				l.tip(t("aliran." + aliran));
-			}
-			x += 14;
-		}
-		if (lembar.b(GabungLembar.LANGIT) && x + 12 < x1) {
-			IkonGabung.gambar(l.g, IkonGabung.LANGIT, x, y, 12);
-			if (l.di(x, y, x + 12, y + 12)) {
-				l.tip(t("langit"));
-			}
-			x += 14;
-		}
-		if (lembar.b(GabungLembar.MEROSOT) && x + 12 < x1) {
-			IkonGabung.gambar(l.g, IkonGabung.MEROSOT, x, y, 12);
-			if (l.di(x, y, x + 12, y + 12)) {
-				l.tip(t("merosot"));
-			}
-		}
-		int ink = Palette.opaque(lembar.i(GabungLembar.WARNA, 0xB0B0B0));
-		l.g.fill(x0, y0 + 15, x1, y0 + 16, Palette.argb(0xB0, ink & 0xFFFFFF));
-		return y0 + 19;
-	}
-
-	// ================================================================== input (the page's focus ring)
-
-	@Override
-	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-		return fokusRing.klik(event.x(), event.y(), event.button());
-	}
-
-	@Override
-	public boolean mouseReleased(MouseButtonEvent event) {
-		return fokusRing.lepas(event.x(), event.y());
-	}
-
-	@Override
-	public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
-		return fokusRing.seret(event.x(), event.y(), dx);
-	}
-
-	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-		return fokusRing.gulir(mouseX, mouseY, scrollY);
-	}
-
-	@Override
-	public boolean keyPressed(KeyEvent event) {
-		return fokusRing.tombol(event);
-	}
-
-	@Override
-	public boolean charTyped(CharacterEvent event) {
-		return fokusRing.ketik(event);
-	}
-
-	@Override
-	public boolean fokusTab(boolean back) {
-		fokusRing.geser(back ? -1 : 1);
-		return true;
-	}
-
-	@Override
-	public boolean mauTombol() {
-		return fokusRing.mauTombol();
-	}
-
-	@Override
-	public boolean angka(int n) {
-		return fokusRing.angka(n);
 	}
 }

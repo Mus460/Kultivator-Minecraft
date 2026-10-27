@@ -7,7 +7,6 @@ import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.client.screen.ui.LencanaPangkat;
 import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
-import dev.kultivator.client.tempat.ui.kit.TempatWarna;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
@@ -334,38 +333,10 @@ public final class TemaUi {
 		return 8;
 	}
 
-	/** {@link #meter(Lukis, int, int, int, int, float, int, float)} for kit-38 sheets: the same 4 px bar as {@link Bilah}. */
-	public static int meter(dev.kultivator.client.tempat.ui.kit.Lukis l, int ikon, int x0, int y, int x1, float frac, int warna, float tanda) {
-		int bx0 = x0;
-		if (ikon >= 0) {
-			ikon(l.g, ikon, x0, y - 1, 10);
-			bx0 = x0 + 12;
-		}
-		if (x1 - bx0 < 4) {
-			return 8;
-		}
-		l.g.fill(bx0, y + 2, x1, y + 6, Palette.argb(0x50, 0x000000));
-		int fill = bx0 + Math.round((x1 - bx0) * Math.max(0.0F, Math.min(1.0F, frac)));
-		l.g.fillGradient(bx0, y + 2, fill, y + 6, Palette.lighten(warna, 0.25F), Palette.darken(warna, 0.2F));
-		if (tanda >= 0.0F) {
-			int tx = bx0 + Math.round((x1 - bx0) * Math.min(1.0F, tanda));
-			l.g.fill(tx, y + 1, tx + 1, y + 7, Palette.argb(0xC0, 0xFFF6E8));
-		}
-		return 8;
-	}
-
 	/** A small rounded chip with an icon and a caption (status chips: badai, macet, malam ...). Returns its width. */
 	public static int chip(Lukis l, int ikon, Component teks, int x, int y, int warna) {
-		return chip(l.g, l.font, ikon, teks, x, y, warna);
-	}
-
-	// shortcut: kit-38 overloads (chip, lambang, meter) for LayarTemaDasar and LayarBukuDagang (M15); drop them once P1 moves those to the single kit.
-	public static int chip(dev.kultivator.client.tempat.ui.kit.Lukis l, int ikon, Component teks, int x, int y, int warna) {
-		return chip(l.g, l.font, ikon, teks, x, y, warna);
-	}
-
-	private static int chip(GuiGraphicsExtractor g, net.minecraft.client.gui.Font font, int ikon, Component teks, int x, int y, int warna) {
-		int w = font.width(teks) + (ikon >= 0 ? 15 : 6);
+		GuiGraphicsExtractor g = l.g;
+		int w = l.font.width(teks) + (ikon >= 0 ? 15 : 6);
 		Brush.chamfer(g, x, y, x + w, y + 12, 2, Palette.argb(0xD8, warna & 0xFFFFFF));
 		Brush.frame(g, x, y, x + w, y + 12, Palette.argb(0x70, 0x000000));
 		int tx = x + 3;
@@ -373,20 +344,13 @@ public final class TemaUi {
 			ikon(g, ikon, x + 2, y + 1, 10);
 			tx = x + 13;
 		}
-		Brush.text(g, font, teks, tx, y + 2, Palette.luminance(warna) > 0.55F ? 0xFF201410 : 0xFFFFF6E8, 1.0F, false);
+		Brush.text(g, l.font, teks, tx, y + 2, Palette.luminance(warna) > 0.55F ? 0xFF201410 : 0xFFFFF6E8, 1.0F, false);
 		return w;
 	}
 
 	/** Theme emblem in a coloured roundel (city columns, contract targets). */
 	public static void lambang(Lukis l, String tema, int cx, int cy, int r) {
-		lambang(l.g, tema, cx, cy, r);
-	}
-
-	public static void lambang(dev.kultivator.client.tempat.ui.kit.Lukis l, String tema, int cx, int cy, int r) {
-		lambang(l.g, tema, cx, cy, r);
-	}
-
-	private static void lambang(GuiGraphicsExtractor g, String tema, int cx, int cy, int r) {
+		GuiGraphicsExtractor g = l.g;
 		int warna = warnaTema(tema);
 		Brush.disc(g, cx, cy, r, Palette.argb(0xC0, Palette.darken(warna, 0.35F) & 0xFFFFFF));
 		Brush.ring(g, cx, cy, r - 1.0F, r, Palette.argb(0xE0, warna & 0xFFFFFF));
@@ -407,11 +371,6 @@ public final class TemaUi {
 	/** A soft glow behind something precious (kit lantern glow). */
 	public static void cahaya(Lukis l, int cx, int cy, int r, int warna) {
 		Glyphs.Atlas.cahaya(l.g, cx - r, cy - r, r * 2, r * 2, warna);
-	}
-
-	/** Text colour that reads on the style's well (wells are light on every style). */
-	public static int tintaSumur(TempatWarna.Gaya gaya) {
-		return gaya.teksSumur();
 	}
 
 	private TemaUi() {

@@ -10,17 +10,13 @@ import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.Saring;
 import dev.kultivator.client.screen.ui.TalismanButton;
-import dev.kultivator.client.screen.ui.TombolKembali;
 import dev.kultivator.client.sekte.diplomasi.DiplomasiClient;
 import dev.kultivator.client.sekte.diplomasi.DiplomasiScreen;
 import dev.kultivator.client.sekte.gabung.ui.IkonGabung;
 import dev.kultivator.client.sekte.mandiri.seteru.SeteruClient;
 import dev.kultivator.client.sekte.mandiri.seteru.SeteruScreen;
 import dev.kultivator.client.screen.ui.GulirIsi;
-import dev.kultivator.client.tempat.ui.kit.IkonTempat;
-import dev.kultivator.client.tempat.ui.kit.Lembar;
-import dev.kultivator.client.tempat.ui.kit.TabLentera;
-import dev.kultivator.client.tempat.ui.kit.TempatWarna;
+import dev.kultivator.client.screen.ui.Lembar;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import dev.kultivator.sekte.gabung.api.Corak;
 import dev.kultivator.sekte.gabung.api.KelasSekte;
@@ -28,10 +24,6 @@ import dev.kultivator.sekte.gabung.api.Pintu;
 import dev.kultivator.sekte.gabung.ui.GabungLembar;
 import dev.kultivator.sekte.gabung.ui.GabungLembar.Direktori;
 import dev.kultivator.sekte.mandiri.seteru.SeteruIds;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.input.CharacterEvent;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
@@ -53,8 +45,8 @@ import java.util.Set;
  * ({@link Saring}, 43.2.3), Peringkat is a sort order, Sekteku lives in Sekte › Ikhtisar (G45) except its Papan Jasa,
  * a stacked heading in your own sect's detail here.
  * <p>
- * The list is {@link DaftarSekte}; the chosen sect's detail is beside it (or in its place in the narrow layout, with
- * "‹ Kembali"): its card, strength and trend, the best door's requirements with Lamar / Kartu Sekte / Tunjuk di peta, the
+ * The list is {@link DaftarSekte}; the chosen sect's detail is beside it (or in its place in the narrow layout; the way back is the
+ * Gulungan's header control and Esc): its card, strength and trend, the best door's requirements with Lamar / Kartu Sekte / Tunjuk di peta, the
  * diplomacy block of {@link DiplomasiScreen#blokDiplomasi} (hall owners) and its disciples' cards
  * ({@link SeteruScreen#kartuTokoh}), stacked headings in one scroll (43.0.4). The page is drawn with the single kit
  * {@code screen/ui} (its own focus ring, not the old sheet engine) whether it shows under Sekte › Luar or under Di Sini
@@ -63,7 +55,6 @@ import java.util.Set;
 public final class LayarDirektori extends LayarGabungDasar {
 
 	private static final String M = "kultivator.gui43.m11.";
-	private static final int TOMBOL_H = 14;
 	/** A sect asked for by {@code LuarPage} before the sheet was there (or for the next sheet). */
 	private static String tuju = "";
 
@@ -76,7 +67,7 @@ public final class LayarDirektori extends LayarGabungDasar {
 	private long diploDiminta = Long.MIN_VALUE / 2;
 
 	public LayarDirektori(int npcId, CompoundTag lembar) {
-		super(Direktori.LAYAR, npcId, lembar, t("direktori.judul"), TempatWarna.Gaya.KERTAS);
+		super(Direktori.LAYAR, npcId, lembar, t("direktori.judul"), LembarKunci.GAYA_KERTAS);
 		saring = new Saring(() -> daftar.mulaiUlang(Util.getMillis()));
 		saring.jenis(List.of(new Saring.Pilihan(Direktori.TAB_LURUS, t("tab.lurus")), new Saring.Pilihan(Direktori.TAB_NETRAL, t("tab.netral")),
 				new Saring.Pilihan(Direktori.TAB_IBLIS, t("tab.iblis"))));
@@ -93,13 +84,8 @@ public final class LayarDirektori extends LayarGabungDasar {
 
 	/** One tab: the old category tabs are filter chips of the one list (43.2.3); no sub bar. */
 	@Override
-	protected List<TabLentera.Tab> tabs() {
-		return List.of(tabBaru(Direktori.TAB_SEMUA, "tab.semua", IkonTempat.PETA));
-	}
-
-	@Override
-	protected TabLentera.Tab tabBaru(String id, String labelKunci, int ikon) {
-		return new TabLentera.Tab(id, t(labelKunci), ikon, null);
+	protected List<Tab> daftarTab() {
+		return List.of(tab(Direktori.TAB_SEMUA, t("tab.semua"), Glyphs.Atlas.PETA));
 	}
 
 	@Override
@@ -114,11 +100,6 @@ public final class LayarDirektori extends LayarGabungDasar {
 		if (buka && (Direktori.TAB_LURUS.equals(diminta) || Direktori.TAB_NETRAL.equals(diminta) || Direktori.TAB_IBLIS.equals(diminta))) {
 			saring.setJenis(diminta);
 		}
-	}
-
-	@Override
-	protected void isiGabung(dev.kultivator.client.tempat.ui.kit.Lukis l, int x0, int y0, int x1, int y1) {
-		// not used: this page draws with the single kit in lukis()
 	}
 
 	@Override
@@ -278,31 +259,12 @@ public final class LayarDirektori extends LayarGabungDasar {
 
 	// ================================================================== drawing (single kit)
 
+	/** The subtitle and the lock are the base's (strip over the content, the locked card); this is the list and its detail. */
 	@Override
-	protected void drawBehind(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
-		// applies the first sheet; the content is drawn in lukis() with the page's focus ring
-		tabSekarang();
-	}
-
-	@Override
-	protected void lukis(Lukis l) {
-		int x0 = x + 2;
-		int x1 = x + w - 2;
-		int y0 = y + 2;
-		int y1 = y + h - 2;
-		if (lembar.ada(LembarKunci.KUNCI_LAYAR)) {
-			Lembar k = lembar.sub(LembarKunci.KUNCI_LAYAR);
-			KeadaanKosong.gambar(l, KeadaanKosong.Gambar.GULUNGAN, k.teks(LembarKunci.ALASAN), null, null, x0, y0, x1, y1);
-			return;
-		}
+	protected void isiGabung(Lukis l, int x0, int y0, int x1, int y1) {
 		CompoundTag diplo = DiplomasiClient.data();
 		Set<String> seteru = seteru();
 		int y = y0;
-		Component sub = lembar.teksAtau(LembarKunci.SUBJUDUL);
-		if (sub != null) {
-			l.samar(sub, x0, y, x1 - x0);
-			y += 12;
-		}
 		List<Lembar> semua = lembar.daftar(LembarKunci.DAFTAR);
 		if (semua.isEmpty()) {
 			KeadaanKosong.gambar(l, KeadaanKosong.Gambar.GULUNGAN, lembar.sub(LembarKunci.KOSONG), t("direktori.kosong"), x0, y, x1, y1, this::kirim);
@@ -353,22 +315,18 @@ public final class LayarDirektori extends LayarGabungDasar {
 			});
 		}
 		if (!sempit && at >= 0) {
-			int ry0 = sub != null ? y0 + 12 : y0;
-			rinci(l, tampil.get(at), diplo, lx1 + 6, ry0, x1, y1);
+			rinci(l, tampil.get(at), diplo, lx1 + 6, y0, x1, y1);
 		}
 	}
 
 	/** The stacked detail of one sect. */
 	private void rinci(Lukis l, Lembar e, @Nullable CompoundTag diplo, int x0, int y0, int x1, int y1) {
-		int top = y0;
-		if (tata() == Tata.SEMPIT) {
-			TombolKembali.gambar(l, "kembali", x0, y0, null, () -> rinciSempit = false);
-			top += 16;
-		}
-		l.sumur(x0, top, x1, y1);
+		// the way back from a narrow detail is the Gulungan's header control and Esc ({@link #rinci}, {@link #mundur})
+		l.sumur(x0, y0, x1, y1);
 		int cx0 = x0 + 4;
 		int cx1 = x1 - 9;
-		int y = gulir.mulai(l, x0 + 1, top + 1, x1 - 6, y1 - 1) + 3;
+		gulirAktif = gulir;
+		int y = gulir.mulai(l, x0 + 1, y0 + 1, x1 - 6, y1 - 1) + 3;
 		Lembar rank = peringkat(e.id());
 		if (!e.b(Direktori.DIKENAL)) {
 			y = asing(l, e, rank, cx0, y, cx1);
@@ -566,54 +524,6 @@ public final class LayarDirektori extends LayarGabungDasar {
 			SeteruScreen.kartuTokoh(l, roster.get(i), cx, cy, cx + cw);
 		}
 		return y + ((n + kolom - 1) / kolom) * (SeteruScreen.TINGGI_KARTU + 3);
-	}
-
-	// ================================================================== input (the page's focus ring, not the old sheet engine)
-
-	@Override
-	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-		return fokusRing.klik(event.x(), event.y(), event.button());
-	}
-
-	@Override
-	public boolean mouseReleased(MouseButtonEvent event) {
-		return fokusRing.lepas(event.x(), event.y());
-	}
-
-	@Override
-	public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
-		return fokusRing.seret(event.x(), event.y(), dx);
-	}
-
-	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-		return fokusRing.gulir(mouseX, mouseY, scrollY) || gulir.roda(mouseX, mouseY, scrollY);
-	}
-
-	@Override
-	public boolean keyPressed(KeyEvent event) {
-		return fokusRing.tombol(event) || gulir.tombol(event);
-	}
-
-	@Override
-	public boolean charTyped(CharacterEvent event) {
-		return fokusRing.ketik(event);
-	}
-
-	@Override
-	public boolean fokusTab(boolean back) {
-		fokusRing.geser(back ? -1 : 1);
-		return true;
-	}
-
-	@Override
-	public boolean mauTombol() {
-		return fokusRing.mauTombol();
-	}
-
-	@Override
-	public boolean angka(int n) {
-		return fokusRing.angka(n);
 	}
 
 	@Override

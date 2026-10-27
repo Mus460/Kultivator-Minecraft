@@ -6,9 +6,8 @@ import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.SegelKonfirmasi;
-import dev.kultivator.client.tempat.ui.kit.Lembar;
-import dev.kultivator.client.tempat.ui.kit.TabLentera;
-import dev.kultivator.client.tempat.ui.kit.TempatWarna;
+import dev.kultivator.client.screen.ui.TabBar;
+import dev.kultivator.client.screen.ui.Lembar;
 import dev.kultivator.dunia.tempat.tema.bersama.TemaLayar.Racik;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import java.util.ArrayList;
@@ -36,11 +35,11 @@ public final class LayarRacik extends TemaHalaman {
 	private long langkahSejak = Util.getMillis();
 
 	public LayarRacik(int npcId, CompoundTag lembar) {
-		super(Racik.LAYAR, npcId, lembar, "layar.racik", TempatWarna.Gaya.KAYU);
+		super(Racik.LAYAR, npcId, lembar, "layar.racik", Palette.Gaya.KAYU);
 	}
 
 	@Override
-	protected List<TabLentera.Tab> tabs() {
+	protected List<TabBar.Tab> tabs() {
 		return List.of();
 	}
 

@@ -7,11 +7,10 @@ import dev.kultivator.client.screen.ui.LabelHarga;
 import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.Pratinjau3D;
+import dev.kultivator.client.screen.ui.TabBar;
 import dev.kultivator.client.screen.ui.TalismanButton;
 import dev.kultivator.client.screen.ui.UiSound;
-import dev.kultivator.client.tempat.ui.kit.Lembar;
-import dev.kultivator.client.tempat.ui.kit.TabLentera;
-import dev.kultivator.client.tempat.ui.kit.TempatWarna;
+import dev.kultivator.client.screen.ui.Lembar;
 import dev.kultivator.dunia.tempat.tema.bersama.TemaLayar.Tawar;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import java.util.ArrayList;
@@ -43,11 +42,11 @@ public final class LayarTawar extends TemaHalaman {
 	private int suasanaLalu = -1;
 
 	public LayarTawar(int npcId, CompoundTag lembar) {
-		super(Tawar.LAYAR, npcId, lembar, "layar.tawar", TempatWarna.Gaya.KAIN);
+		super(Tawar.LAYAR, npcId, lembar, "layar.tawar", Palette.Gaya.KAIN);
 	}
 
 	@Override
-	protected List<TabLentera.Tab> tabs() {
+	protected List<TabBar.Tab> tabs() {
 		return List.of();
 	}
 

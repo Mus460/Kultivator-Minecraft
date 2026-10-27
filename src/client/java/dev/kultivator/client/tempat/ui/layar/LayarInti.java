@@ -7,10 +7,9 @@ import dev.kultivator.client.screen.ui.KeadaanKosong;
 import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.SegelKonfirmasi;
+import dev.kultivator.client.screen.ui.TabBar;
 import dev.kultivator.client.screen.ui.TalismanButton;
-import dev.kultivator.client.tempat.ui.kit.LayarTempatDasar;
-import dev.kultivator.client.tempat.ui.kit.TabLentera;
-import dev.kultivator.client.tempat.ui.kit.TempatWarna;
+import dev.kultivator.client.tempat.ui.LayarTempatDasar;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,8 +32,8 @@ import org.jetbrains.annotations.Nullable;
  * <li>mouse, keys, Tab and digits go to {@code fokusRing} (Space first to {@link #spasi}, then the screen's own keys);</li>
  * <li>small helpers at text size 1.0 (43.0.5): {@link #nilai}, {@link #kosong}, {@link #tombolOp}, {@link #yakin}.</li>
  * </ul>
- * Not a second base: a helper subclass like {@code LayarGabungDasar}. The only kit-38 types left here are the base's own
- * signature ({@link TempatWarna.Gaya}, {@link TabLentera.Tab}); P1 removes them with the base's bridge.
+ * Every sheet of {@code tempat/ui/layar} (also the ledger, the journal and the city map) is a subclass of this one. The
+ * old kit-38 engine is gone: the base keeps only the sheet model.
  */
 public abstract class LayarInti extends LayarTempatDasar {
 
@@ -54,9 +53,13 @@ public abstract class LayarInti extends LayarTempatDasar {
 		return new Tab(id, k(labelKunci), ikon);
 	}
 
+	/** A tab with a ready-made label (sheets whose texts live outside {@code kultivator.tempat_ui.*}). */
+	protected static Tab tab(String id, Component label, int ikon) {
+		return new Tab(id, label, ikon);
+	}
 
 	protected LayarInti(String layar, int npcId, CompoundTag lembar, Component judul, String gayaId) {
-		super(layar, npcId, lembar, judul, TempatWarna.Gaya.dari(gayaId, TempatWarna.Gaya.KERTAS));
+		super(layar, npcId, lembar, judul, Palette.Gaya.dari(gayaId, Palette.Gaya.KERTAS));
 	}
 
 	/** A 38 sheet text ({@code kultivator.tempat_ui.<kunci>}). */
@@ -83,46 +86,25 @@ public abstract class LayarInti extends LayarTempatDasar {
 	}
 
 	@Override
-	protected final List<TabLentera.Tab> tabs() {
+	protected final List<TabBar.Tab> tabs() {
 		List<Tab> semua = daftarTab();
-		List<TabLentera.Tab> out = new ArrayList<>(semua.size());
+		List<TabBar.Tab> out = new ArrayList<>(semua.size());
 		for (Tab t : semua) {
-			out.add(new TabLentera.Tab(t.id(), t.label(), t.ikon(), null));
+			out.add(TabBar.Tab.of(t.id(), t.label()));
 		}
 		return out;
-	}
-
-	/**
-	 * True while the sheet shows a mode still drawn by the old sheet engine (the half-built 42 modes of the court, the
-	 * recruitment office and the events board call 42-G2 painters made for it; 43.16.6: 42U rebuilds them on the single
-	 * kit). Then {@link #isi} draws and the base handles the input; otherwise {@link #isiInti} and the focus ring.
-	 */
-	protected boolean mesinLama() {
-		return false;
-	}
-
-	/** The old-engine content of a {@link #mesinLama} mode (unused otherwise). */
-	@Override
-	protected void isi(dev.kultivator.client.tempat.ui.kit.Lukis l, int x0, int y0, int x1, int y1) {
 	}
 
 	// =================================================================== drawing
 
 	@Override
 	protected void drawBehind(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
-		if (mesinLama()) {
-			super.drawBehind(g, mouseX, mouseY, seconds);
-			return;
-		}
 		// applies the first sheet (F2); the content is drawn in lukis() with the page's focus ring
 		tabSekarang();
 	}
 
 	@Override
 	protected final void lukis(Lukis l) {
-		if (mesinLama()) {
-			return;
-		}
 		int x0 = x;
 		int y0 = y;
 		int x1 = x + w;
@@ -195,42 +177,27 @@ public abstract class LayarInti extends LayarTempatDasar {
 
 	@Override
 	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-		if (mesinLama()) {
-			return super.mouseClicked(event, doubleClick);
-		}
 		return fokusRing.klik(event.x(), event.y(), event.button());
 	}
 
 	@Override
 	public boolean mouseReleased(MouseButtonEvent event) {
-		if (mesinLama()) {
-			return super.mouseReleased(event);
-		}
 		return fokusRing.lepas(event.x(), event.y());
 	}
 
 	@Override
 	public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
-		if (mesinLama()) {
-			return super.mouseDragged(event, dx, dy);
-		}
 		return fokusRing.seret(event.x(), event.y(), dx);
 	}
 
 	@Override
 	public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-		if (mesinLama()) {
-			return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
-		}
 		return fokusRing.gulir(mouseX, mouseY, scrollY);
 	}
 
 	/** Space first to the screen's quick action (auction bid, dialog page), then the focus ring and the screen's keys. */
 	@Override
 	public boolean keyPressed(KeyEvent event) {
-		if (mesinLama()) {
-			return super.keyPressed(event);
-		}
 		if (modal() || fokusRing.mauTombol()) {
 			return fokusRing.tombol(event);
 		}
@@ -242,17 +209,11 @@ public abstract class LayarInti extends LayarTempatDasar {
 
 	@Override
 	public boolean charTyped(CharacterEvent event) {
-		if (mesinLama()) {
-			return super.charTyped(event);
-		}
 		return fokusRing.ketik(event);
 	}
 
 	@Override
 	public boolean fokusTab(boolean back) {
-		if (mesinLama()) {
-			return super.fokusTab(back);
-		}
 		fokusRing.geser(back ? -1 : 1);
 		return true;
 	}
@@ -260,6 +221,6 @@ public abstract class LayarInti extends LayarTempatDasar {
 	/** Under Di Sini the digits pick the numbered choices drawn this frame (43.17 K3). */
 	@Override
 	public boolean angka(int n) {
-		return !mesinLama() && fokusRing.angka(n);
+		return fokusRing.angka(n);
 	}
 }

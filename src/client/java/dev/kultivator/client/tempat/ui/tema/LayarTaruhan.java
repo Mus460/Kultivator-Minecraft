@@ -8,10 +8,9 @@ import dev.kultivator.client.screen.ui.LabelHarga;
 import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.Potret;
+import dev.kultivator.client.screen.ui.TabBar;
 import dev.kultivator.client.screen.ui.UiSound;
-import dev.kultivator.client.tempat.ui.kit.Lembar;
-import dev.kultivator.client.tempat.ui.kit.TabLentera;
-import dev.kultivator.client.tempat.ui.kit.TempatWarna;
+import dev.kultivator.client.screen.ui.Lembar;
 import dev.kultivator.dunia.kota42.ui.KotaLembar;
 import dev.kultivator.dunia.tempat.tema.bersama.TemaLayar.Taruhan;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
@@ -59,7 +58,7 @@ public final class LayarTaruhan extends TemaHalaman {
 
 	/** The betting page for the 38.T id or the 42 dice table id ({@code guanpu}). */
 	public LayarTaruhan(String layar, int npcId, CompoundTag lembar) {
-		super(layar, npcId, lembar, "layar.taruhan", KotaLembar.Guanpu.LAYAR.equals(layar) ? TempatWarna.Gaya.KAIN : TempatWarna.Gaya.BATU);
+		super(layar, npcId, lembar, "layar.taruhan", KotaLembar.Guanpu.LAYAR.equals(layar) ? Palette.Gaya.KAIN : Palette.Gaya.BATU);
 	}
 
 	private boolean dadu() {
@@ -67,13 +66,13 @@ public final class LayarTaruhan extends TemaHalaman {
 	}
 
 	@Override
-	protected List<TabLentera.Tab> tabs() {
+	protected List<TabBar.Tab> tabs() {
 		if (dadu()) {
-			return List.of(new TabLentera.Tab(KotaLembar.Guanpu.TAB_BESAR_KECIL, SketsaKota.t("guanpu.tab.besar_kecil"), LembarKunci.Ikon.JUDI_BATU, null),
-					new TabLentera.Tab(KotaLembar.Guanpu.TAB_GUANPU, SketsaKota.t("guanpu.tab.guanpu"), LembarKunci.Ikon.LELANG, null));
+			return List.of(TabBar.Tab.of(KotaLembar.Guanpu.TAB_BESAR_KECIL, SketsaKota.t("guanpu.tab.besar_kecil")),
+					TabBar.Tab.of(KotaLembar.Guanpu.TAB_GUANPU, SketsaKota.t("guanpu.tab.guanpu")));
 		}
-		return List.of(tabTema(Taruhan.TAB_TARUHAN, "taruhan.tab.taruhan", LembarKunci.Ikon.JUDI_BATU),
-				tabTema(Taruhan.TAB_TANGGA, "taruhan.tab.tangga", LembarKunci.Ikon.ARENA));
+		return List.of(tabTema(Taruhan.TAB_TARUHAN, "taruhan.tab.taruhan"),
+				tabTema(Taruhan.TAB_TANGGA, "taruhan.tab.tangga"));
 	}
 
 	@Override

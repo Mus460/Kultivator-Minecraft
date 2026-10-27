@@ -5,7 +5,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.kultivator.Kultivator;
 import dev.kultivator.client.EffectQuality;
 import dev.kultivator.client.epic.ShaderCompat;
-import dev.kultivator.client.tempat.ui.kit.TempatWarna;
+import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.dunia.tempat.ui.PapanHidup;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -80,7 +80,7 @@ public final class TeksDunia {
 	private static int dipakai;
 	private static int baru;
 
-	private static final Map<TempatWarna.Gaya, RenderType> PANEL = new EnumMap<>(TempatWarna.Gaya.class);
+	private static final Map<Palette.Gaya, RenderType> PANEL = new EnumMap<>(Palette.Gaya.class);
 	private static final Identifier STEMPEL = Kultivator.id("textures/gui/tempat/stempel.png");
 	private static RenderType stempel;
 	private static boolean siap;
@@ -268,7 +268,7 @@ public final class TeksDunia {
 	 * A nine-slice panel of style {@code gaya} from ({@code x0}, {@code y0}) to ({@code x1}, {@code y1}) at depth
 	 * {@code z}, corners {@code sudut} units wide, tinted {@code warna} (ARGB, -1 none).
 	 */
-	public static void panel(PoseStack poseStack, SubmitNodeCollector collector, TempatWarna.Gaya gaya, float x0, float y0, float x1, float y1,
+	public static void panel(PoseStack poseStack, SubmitNodeCollector collector, Palette.Gaya gaya, float x0, float y0, float x1, float y1,
 							 float z, float nz, float sudut, int light, int warna) {
 		if (x1 <= x0 || y1 <= y0) {
 			return;
@@ -370,13 +370,13 @@ public final class TeksDunia {
 	 * panel's centre on the point. The caller asks {@link #izin} first.
 	 */
 	public static void papan(PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera, double x, double y, double z,
-							 List<Component> baris, TempatWarna.Gaya gaya, float tinggi, int light) {
+							 List<Component> baris, Palette.Gaya gaya, float tinggi, int light) {
 		papanHadap(poseStack, collector, hadapKamera(camera), x, y, z, baris, gaya, tinggi, light);
 	}
 
 	/** {@link #papan} with a fixed facing ({@code arah} turns a y-up board whose front looks toward +z). */
 	public static void papanHadap(PoseStack poseStack, SubmitNodeCollector collector, Quaternionfc arah, double x, double y, double z,
-								  List<Component> baris, TempatWarna.Gaya gaya, float tinggi, int light) {
+								  List<Component> baris, Palette.Gaya gaya, float tinggi, int light) {
 		if (baris == null || baris.isEmpty()) {
 			return;
 		}

@@ -4,11 +4,10 @@ import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
+import dev.kultivator.client.screen.ui.TabBar;
 import dev.kultivator.client.screen.ui.TalismanButton;
 import dev.kultivator.client.screen.ui.UiSound;
-import dev.kultivator.client.tempat.ui.kit.Lembar;
-import dev.kultivator.client.tempat.ui.kit.TabLentera;
-import dev.kultivator.client.tempat.ui.kit.TempatWarna;
+import dev.kultivator.client.screen.ui.Lembar;
 import dev.kultivator.dunia.tempat.tema.bersama.TemaLayar.Dokumen;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import java.util.HashSet;
@@ -36,11 +35,11 @@ public final class LayarDokumen extends TemaHalaman {
 	private String labelSorot = "";
 
 	public LayarDokumen(int npcId, CompoundTag lembar) {
-		super(Dokumen.LAYAR, npcId, lembar, "layar.dokumen", TempatWarna.Gaya.KERTAS);
+		super(Dokumen.LAYAR, npcId, lembar, "layar.dokumen", Palette.Gaya.KERTAS);
 	}
 
 	@Override
-	protected List<TabLentera.Tab> tabs() {
+	protected List<TabBar.Tab> tabs() {
 		return List.of();
 	}
 

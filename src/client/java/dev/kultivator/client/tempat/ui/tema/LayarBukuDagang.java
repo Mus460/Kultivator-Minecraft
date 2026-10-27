@@ -1,20 +1,18 @@
 package dev.kultivator.client.tempat.ui.tema;
 
 import dev.kultivator.client.screen.ui.Brush;
+import dev.kultivator.client.screen.ui.DaftarGulir;
+import dev.kultivator.client.screen.ui.Glyphs;
+import dev.kultivator.client.screen.ui.KeadaanKosong;
+import dev.kultivator.client.screen.ui.LabelHarga;
+import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
+import dev.kultivator.client.screen.ui.PemilihJumlah;
+import dev.kultivator.client.screen.ui.Pratinjau3D;
+import dev.kultivator.client.screen.ui.TabBar;
+import dev.kultivator.client.screen.ui.TalismanButton;
 import dev.kultivator.client.screen.ui.UiSound;
-import dev.kultivator.client.tempat.ui.kit.DaftarGulir;
-import dev.kultivator.client.tempat.ui.kit.IkonTempat;
-import dev.kultivator.client.tempat.ui.kit.KeadaanKosong;
-import dev.kultivator.client.tempat.ui.kit.LabelHarga;
-import dev.kultivator.client.tempat.ui.kit.Lembar;
-import dev.kultivator.client.tempat.ui.kit.Lukis;
-import dev.kultivator.client.tempat.ui.kit.PanelTempat;
-import dev.kultivator.client.tempat.ui.kit.PemilihJumlah;
-import dev.kultivator.client.tempat.ui.kit.Pratinjau3D;
-import dev.kultivator.client.tempat.ui.kit.TabLentera;
-import dev.kultivator.client.tempat.ui.kit.TeksTempat;
-import dev.kultivator.client.tempat.ui.kit.TempatWarna;
+import dev.kultivator.client.screen.ui.Lembar;
 import dev.kultivator.dunia.tempat.tema.bersama.TemaLayar.Dagang;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import java.util.ArrayList;
@@ -43,12 +41,12 @@ import org.jetbrains.annotations.Nullable;
  * action button (ops {@code beli:ID:N}, {@code jual:ID:N}, {@code segel:ID}).</li>
  * </ul>
  */
-public final class LayarBukuDagang extends LayarTemaDasar {
+public final class LayarBukuDagang extends TemaHalaman {
 
 	private static final int KOL = 46;
 	private static final int NAMA_KOL = 92;
-	/** Paging arrow size (43.0.6: every click target at least 16 x 12). */
-	private static final int PANAH = 16;
+	/** Paging arrow talisman width: seal + glyph (a 16 px talisman has no room left for its label). */
+	private static final int PANAH = 30;
 
 	private final DaftarGulir daftar = new DaftarGulir();
 	private final DaftarGulir daftarKontrak = new DaftarGulir();
@@ -67,15 +65,13 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 	private final List<List<Lembar>> pasar = new ArrayList<>(List.of(List.of(), List.of(), List.of()));
 
 	public LayarBukuDagang(int npcId, CompoundTag lembar) {
-		super(Dagang.LAYAR, npcId, lembar, "layar.dagang", TempatWarna.Gaya.KERTAS);
+		super(Dagang.LAYAR, npcId, lembar, "layar.dagang", Palette.Gaya.KERTAS);
 	}
 
 	@Override
-	protected List<TabLentera.Tab> tabs() {
-		return List.of(tabTema(Dagang.PASAR, "dagang.tab.pasar", LembarKunci.Ikon.KAFILAH),
-				tabTema(Dagang.TAB_HARGA, "dagang.tab.harga", LembarKunci.Ikon.TIMBANGAN),
-				tabTema(Dagang.TAB_LABA, "dagang.tab.laba", LembarKunci.Ikon.TREN_NAIK),
-				tabTema(Dagang.TAB_KONTRAK, "dagang.tab.kontrak", IkonTempat.SURAT));
+	protected List<TabBar.Tab> tabs() {
+		return List.of(tabTema(Dagang.PASAR, "dagang.tab.pasar"), tabTema(Dagang.TAB_HARGA, "dagang.tab.harga"),
+				tabTema(Dagang.TAB_LABA, "dagang.tab.laba"), tabTema(Dagang.TAB_KONTRAK, "dagang.tab.kontrak"));
 	}
 
 	/** The market tab exists only while the sheet carries a market block (client-only tab; the server just stores it). */
@@ -85,7 +81,7 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 	}
 
 	@Override
-	protected KeadaanKosong.Gambar gambarKosong() {
+	protected KeadaanKosong.Gambar kosongGambar() {
 		return KeadaanKosong.Gambar.GULUNGAN;
 	}
 
@@ -132,7 +128,7 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 	}
 
 	@Override
-	protected void gambar(Lukis l, int x0, int y0, int x1, int y1) {
+	protected void lukisTema(Lukis l, int x0, int y0, int x1, int y1) {
 		if (Dagang.PASAR.equals(tab) && lembar.ada(Dagang.PASAR)) {
 			pasar(l, x0, y0, x1, y1);
 			return;
@@ -150,10 +146,9 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 
 	// ------------------------------------------------------------------------------------------------ prices
 
-	/** Columns that fit; when they do not all fit, room is kept at the right for the two 16 px paging arrows. */
+	/** Columns that fit (the paging arrows sit in the name column of the header, so they take no column room). */
 	private int kolomMuat(int x0, int x1) {
-		int muat = Math.max(1, (x1 - x0 - NAMA_KOL - 6) / KOL);
-		return kota.size() > muat ? Math.max(1, (x1 - x0 - NAMA_KOL - 6 - PANAH * 2 - 4) / KOL) : muat;
+		return Math.max(1, (x1 - x0 - NAMA_KOL - 6) / KOL);
 	}
 
 	private void geserKolom(int arah, int muat) {
@@ -172,7 +167,8 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 		int akhir = Math.min(kota.size(), kolomAwal + muat);
 		// header row: city emblems and names
 		int hy = y0;
-		l.teks(TemaUi.k("dagang.barang"), x0 + 2, hy + 8, NAMA_KOL - 4, gaya.teksLemah);
+		boolean halaman = kota.size() > muat;
+		l.teks(TemaUi.k("dagang.barang"), x0 + 2, hy + (halaman ? 1 : 8), NAMA_KOL - 4, gaya.teksLemah);
 		for (int c = kolomAwal; c < akhir; c++) {
 			Lembar k = kota.get(c);
 			int cx = x0 + NAMA_KOL + (c - kolomAwal) * KOL + KOL / 2;
@@ -189,12 +185,18 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 				l.tip(tip);
 			}
 		}
-		// paging arrows when the columns do not fit
-		if (kota.size() > muat) {
-			panah(l, "kiri", x1 - PANAH * 2 - 2, hy + 4, IkonTempat.PANAH_KIRI, kolomAwal > 0, () -> geserKolom(-1, muat));
-			panah(l, "kanan", x1 - PANAH, hy + 4, IkonTempat.PANAH_KANAN, akhir < kota.size(), () -> geserKolom(1, muat));
+		// paging arrows under the caption when the columns do not fit; the zone makes the header a stop of the Tab ring for ← / →
+		if (halaman) {
+			Lukis.Zona kolom = l.zona("tabel", x0, hy, x0 + NAMA_KOL, hy + 23, null, true, null, true);
+			if (kolom != null) {
+				kolom.geser = arah -> geserKolom(arah, muat);
+			}
+			l.fokusCincin("tabel", x0, hy, x0 + NAMA_KOL, hy + 23);
+			TalismanButton.gambar(l, "kiri", x0 + 2, hy + 10, PANAH, 12, Component.literal("‹"), kolomAwal > 0, null, () -> geserKolom(-1, muat));
+			TalismanButton.gambar(l, "kanan", x0 + 4 + PANAH, hy + 10, PANAH, 12, Component.literal("›"), akhir < kota.size(), null,
+					() -> geserKolom(1, muat));
 		}
-		PanelTempat.garis(l.g, gaya, x0, x1, hy + 24);
+		l.garis(x0, x1, hy + 24);
 		int ty0 = hy + 27;
 		// legend line (3 + 9) and route line (2 + 9) under the table
 		int ty1 = y1 - 25;
@@ -205,10 +207,6 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 		daftar.gambar(l, "harga", x0, ty0, x1, ty1, harga.size(), 17, (lk, i, rx0, ry0, rx1, ry1, sorot, pilih) -> baris(lk, harga.get(i), rx0, ry0,
 				rx1, ry1, sorot, pilih, akhir), null, i -> {
 		});
-		Lukis.Zona z = l.zona("tabel", x0, ty0, x0 + NAMA_KOL, ty1, null, true, null, false);
-		if (z != null) {
-			z.geser = arah -> geserKolom(arah, muat);
-		}
 		// legend and the selected row's best route
 		int ly = ty1 + 3;
 		legenda(l, x0, ly, x1);
@@ -218,18 +216,8 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 		}
 	}
 
-	private void panah(Lukis l, String kunci, int x, int y, int ikon, boolean on, Runnable aksi) {
-		int x1 = x + PANAH;
-		int y1 = y + 12;
-		boolean over = l.di(x, y, x1, y1);
-		l.g.fill(x, y, x1, y1, Palette.argb(on ? (over ? 0x70 : 0x40) : 0x18, 0x000000));
-		IkonTempat.gambar(l.g, ikon, x + (PANAH - 10) / 2, y + 1, 10, on ? 0xFFFFFFFF : 0x60FFFFFF);
-		l.zona(kunci, x, y, x1, y1, aksi, on, null, true);
-		l.fokusCincin(kunci, x, y, x1, y1);
-	}
-
 	private void baris(Lukis l, Lembar e, int rx0, int ry0, int rx1, int ry1, boolean sorot, boolean pilih, int akhir) {
-		PanelTempat.kartu(l.g, gaya, rx0, ry0, rx1, ry1, sorot ? 1.0F : 0.0F, pilih);
+		l.kartu(rx0, ry0, rx1, ry1, sorot ? 1.0F : 0.0F, pilih);
 		ikonBarang(l, e, rx0 + 1, ry0);
 		l.teks(e.teks(LembarKunci.NAMA), rx0 + 19, ry0 + 4, NAMA_KOL - 21, gaya.teks);
 		Map<Integer, Lembar> sel = new HashMap<>();
@@ -243,7 +231,7 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 			int cx0 = rx0 + NAMA_KOL + (c - kolomAwal) * KOL;
 			Lembar s = sel.get(c);
 			if (s == null) {
-				Brush.centered(l.g, font, Component.literal("—"), cx0 + KOL / 2.0F, ry0 + 4, TempatWarna.terkunci(gaya.teksSamar), 1.0F, false);
+				Brush.centered(l.g, font, Component.literal("—"), cx0 + KOL / 2.0F, ry0 + 4, Palette.terkunci(gaya.teksSamar), 1.0F, false);
 				continue;
 			}
 			sel(l, s, kota.get(c), cx0, ry0, cx0 + KOL, ry1);
@@ -256,7 +244,7 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 		if (jenuh < 0.97F) {
 			l.g.fill(cx0 + 1, ry0 + 1, cx1 - 1, ry1, Palette.argb(Math.round(0x70 * (1.0F - jenuh) / 0.4F), 0xB03030));
 		}
-		int warna = tua ? TempatWarna.terkunci(gaya.teks) : s.b(Dagang.TERBAIK) ? 0xFF2E7A4E : gaya.teks;
+		int warna = tua ? Palette.terkunci(gaya.teks) : s.b(Dagang.TERBAIK) ? 0xFF2E7A4E : gaya.teks;
 		Component nb = Component.literal(Brush.desimal1(s.f(LembarKunci.NB, 0.0F)));
 		float w = font.width(nb);
 		float tx = (cx0 + cx1) / 2.0F - w / 2.0F - 4;
@@ -280,7 +268,7 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 				tip.add(TemaUi.k("dagang.sel_asal"));
 			}
 			if (s.b(Dagang.TERBAIK)) {
-				tip.add(TemaUi.k("dagang.sel_terbaik").withColor(TempatWarna.EMAS_TERANG));
+				tip.add(TemaUi.k("dagang.sel_terbaik").withColor(Palette.GOLD_LIGHT));
 			}
 			l.tip(tip);
 		}
@@ -309,7 +297,7 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 			x += 10 + font.width(jenuh) + 8;
 		}
 		if (x + font.width(tua) <= x1) {
-			Brush.text(l.g, font, tua, x, y, TempatWarna.terkunci(gaya.teks), 1.0F, false);
+			Brush.text(l.g, font, tua, x, y, Palette.terkunci(gaya.teks), 1.0F, false);
 		}
 		if (l.di(x0, y - 1, x1, y + 9)) {
 			l.tip(List.of(asal, terbaik, jenuh, tua));
@@ -360,31 +348,31 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 		y += subjudul(l, TemaUi.k("dagang.laba_minggu"), x, y, kiri.x1());
 		long minggu = laba.l(Dagang.MINGGU, 0L);
 		long batas = Math.max(1L, laba.l(Dagang.BATAS, 150L));
-		LabelHarga.gambar(l, minggu, -1L, x, y + 2, false, 1.5F, false);
-		l.kanan(TemaUi.k("dagang.dari_batas", Brush.angka(batas)), kiri.x1(), y + 5, gaya.teksLemah, 1.0F);
+		LabelHarga.gambar(l, minggu, -1L, x, y + 2, false, false);
+		l.kanan(TemaUi.k("dagang.dari_batas", Brush.angka(batas)), kiri.x1(), y + 5, gaya.teksLemah);
 		y += 18;
 		float frac = minggu / (float) batas;
-		int warna = frac >= 1.0F ? TempatWarna.BAHAYA : frac > 0.8F ? TempatWarna.PERINGATAN : TempatWarna.OK;
+		int warna = frac >= 1.0F ? Palette.BAHAYA : frac > 0.8F ? Palette.PERINGATAN : Palette.OK;
 		y += TemaUi.meter(l, -1, x, y, kiri.x1(), frac, warna, -1.0F) + 4;
 		if (laba.b(Dagang.LEWAT)) {
-			y += pita(l, LembarKunci.Ikon.TIMBANGAN, TemaUi.k("dagang.lewat"), x, y, kiri.x1(), TempatWarna.BAHAYA);
+			y += pita(l, LembarKunci.Ikon.TIMBANGAN, TemaUi.k("dagang.lewat"), x, y, kiri.x1(), Palette.BAHAYA);
 		}
 		// at most two lines (the rest on hover) so the lifetime row below always has room
-		y += Math.round(l.bungkus(TemaUi.k("dagang.batas_jelas"), x, y, kiri.w(), gaya.teksSamar, 1.0F, Math.min(18, kiri.y1() - y - 24))) + 3;
+		y += Math.round(l.bungkus(TemaUi.k("dagang.batas_jelas"), x, y, kiri.w(), gaya.teksSamar, Math.min(18, kiri.y1() - y - 24))) + 3;
 		// lifetime profit toward the "Saudagar Lima Kota" advancement
 		long total = laba.l(Dagang.TOTAL, 0L);
 		if (y + 24 > kiri.y1()) {
 			// narrow layout (GUI scale 4): no room under the weekly block; the right card follows below
 		} else if (total < SAUDAGAR) {
 			y += barisNilai(l, TemaUi.k("dagang.laba_total"), Brush.nb(total, false), x, y, kiri.x1());
-			TemaUi.meter(l, TemaUi.I_TERBAIK, x, y, kiri.x1(), total / (float) SAUDAGAR, TempatWarna.EMAS_TERANG, -1.0F);
+			TemaUi.meter(l, TemaUi.I_TERBAIK, x, y, kiri.x1(), total / (float) SAUDAGAR, Palette.GOLD_LIGHT, -1.0F);
 			if (l.di(x, y - 1, kiri.x1(), y + 9)) {
 				l.tip(TemaUi.k("dagang.saudagar_tip", Brush.angka(SAUDAGAR - Math.max(0L, total))));
 			}
 			y += 12;
 		} else {
 			y += barisNilai(l, TemaUi.k("dagang.laba_total"), Brush.nb(total, false), x, y, kiri.x1());
-			TemaUi.chip(l, TemaUi.I_TERBAIK, TemaUi.k("dagang.saudagar"), x, y, TempatWarna.EMAS_TERANG);
+			TemaUi.chip(l, TemaUi.I_TERBAIK, TemaUi.k("dagang.saudagar"), x, y, Palette.GOLD_LIGHT);
 			y += 14;
 		}
 		// seven-day bars
@@ -403,7 +391,7 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 			for (int i = 0; i < n; i++) {
 				int bx = x + i * (bw + 3);
 				int tinggi = Math.round(bh * Math.abs(hari[i]) / (float) maks);
-				int c = hari[i] >= 0 ? 0xFF4F9A6A : TempatWarna.BAHAYA;
+				int c = hari[i] >= 0 ? 0xFF4F9A6A : Palette.BAHAYA;
 				l.g.fillGradient(bx, dasar - tinggi, bx + bw, dasar, Palette.lighten(c, 0.2F), c);
 				Component hariLabel = Component.literal(i == n - 1 ? TemaUi.k("dagang.hari_ini").getString() : "−" + (n - 1 - i));
 				// day labels at 1.0 only where a bar is wide enough; the tooltip always names the day
@@ -417,7 +405,7 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 		}
 		// right: standing in the dark world
 		Kotak kanan = k[1];
-		PanelTempat.kartu(l.g, gaya, kanan.x0(), kanan.y0(), kanan.x1(), kanan.y1(), 0.0F, false);
+		l.kartu(kanan.x0(), kanan.y0(), kanan.x1(), kanan.y1(), 0.0F, false);
 		int rx0 = kanan.x0() + 5;
 		int rx1 = kanan.x1() - 5;
 		int ry = kanan.y0() + 4;
@@ -430,7 +418,7 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 		// the standing note gets what the Gentar rows leave (two lines at most; the rest on hover)
 		float maksJelas = Math.min(27, kanan.y1() - ry - 4 - (gentar.isEmpty() ? 0 : 24));
 		ry += Math.round(l.bungkus(TemaUi.k(infami >= 60 ? "dagang.infami_tinggi" : infami >= 30 ? "dagang.infami_sedang" : "dagang.infami_rendah"), rx0,
-				ry, rx1 - rx0, gaya.teksSamar, 1.0F, maksJelas)) + 4;
+				ry, rx1 - rx0, gaya.teksSamar, maksJelas)) + 4;
 		if (!gentar.isEmpty() && ry + 24 <= kanan.y1()) {
 			ry += subjudul(l, TemaUi.k("dagang.gentar"), rx0, ry, rx1);
 			for (Lembar g : gentar) {
@@ -457,7 +445,7 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 		Kotak kiri = k[0];
 		daftarKontrak.gambar(l, "kontrak", kiri.x0(), kiri.y0(), kiri.x1(), kiri.y1(), daftarK.size(), 26, (lk, i, rx0, ry0, rx1, ry1, sorot, pilih) -> {
 			Lembar e = daftarK.get(i);
-			PanelTempat.kartu(lk.g, gaya, rx0, ry0, rx1, ry1, sorot ? 1.0F : 0.0F, pilih);
+			lk.kartu(rx0, ry0, rx1, ry1, sorot ? 1.0F : 0.0F, pilih);
 			TemaUi.ikon(lk.g, e.b(Dagang.KAPAL) ? TemaUi.I_KAPAL : TemaUi.I_KARUNG, rx0 + 3, ry0 + 5, 16);
 			int sisa = e.i(LembarKunci.SISA_HARI, 0);
 			Component hari = Brush.hari(sisa);
@@ -466,13 +454,13 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 			lk.teks(e.teks(LembarKunci.NAMA), rx0 + 23, ry0 + 3, rx1 - rx0 - 23 - kananW, gaya.teks);
 			lk.teks(TemaUi.k("dagang.kontrak_ke", e.teks(LembarKunci.TUJUAN), e.i(Dagang.PETI, 0)), rx0 + 23, ry0 + 14, rx1 - rx0 - 23 - kananW,
 					gaya.teksSamar);
-			lk.kanan(hari, rx1 - 4, ry0 + 3, sisa <= 1 ? TempatWarna.BAHAYA : gaya.teksLemah, 1.0F);
-			LabelHarga.gambar(lk, e.l(Dagang.BAYAR, 0L), -1L, rx1 - 4, ry0 + 14, true, 1.0F, false);
+			lk.kanan(hari, rx1 - 4, ry0 + 3, sisa <= 1 ? Palette.BAHAYA : gaya.teksLemah);
+			LabelHarga.gambar(lk, e.l(Dagang.BAYAR, 0L), -1L, rx1 - 4, ry0 + 14, true, false);
 		}, null, i -> {
 		});
 		int sel = daftarKontrak.pilihan();
 		Kotak kanan = k[1];
-		PanelTempat.kartu(l.g, gaya, kanan.x0(), kanan.y0(), kanan.x1(), kanan.y1(), 0.0F, false);
+		l.kartu(kanan.x0(), kanan.y0(), kanan.x1(), kanan.y1(), 0.0F, false);
 		if (sel < 0 || sel >= daftarK.size()) {
 			return;
 		}
@@ -491,7 +479,7 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 			TemaUi.chip(l, TemaUi.I_KAPAL, TemaUi.k("dagang.k_kapal"), rx0, ry, 0xFF6FA8C8);
 			ry += 14;
 		}
-		l.bungkus(TemaUi.k("dagang.k_jelas"), rx0, ry + 2, rx1 - rx0, gaya.teksSamar, 1.0F, kanan.y1() - ry - 6);
+		l.bungkus(TemaUi.k("dagang.k_jelas"), rx0, ry + 2, rx1 - rx0, gaya.teksSamar, kanan.y1() - ry - 6);
 	}
 
 	// ------------------------------------------------------------------------------------------------ market
@@ -501,7 +489,6 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 	private static final int ISI_PETI = dev.kultivator.dunia.tempat.tema.bersama.PetiDagangItem.ISI_PETI;
 	/** Lifetime trade profit of the advancement {@code tempat/tema_saudagar} (Dagang.LABA_SAUDAGAR). */
 	private static final long SAUDAGAR = dev.kultivator.dunia.tempat.tema.bersama.Dagang.LABA_SAUDAGAR;
-	private static final int[] IKON_SEGMEN = {TemaUi.I_KARUNG, TemaUi.I_JENUH, TemaUi.I_CAP};
 	private static final String[] KUNCI_SEGMEN = {"beli", "jual", "segel"};
 
 	private void gantiSegmen(int s) {
@@ -524,7 +511,7 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 			int pw = Math.min(x1 - x0 - 20, font.width(nama) + 16);
 			int cx = (x0 + x1) / 2;
 			l.g.fill(cx - pw / 2, y0 + 9, cx + pw / 2, y0 + 22, Palette.argb(0xE8, 0x3A2414));
-			Brush.frame(l.g, cx - pw / 2, y0 + 9, cx + pw / 2, y0 + 22, TempatWarna.EMAS_GELAP);
+			Brush.frame(l.g, cx - pw / 2, y0 + 9, cx + pw / 2, y0 + 22, Palette.GOLD_DARK);
 			Brush.fitCentered(l.g, font, nama, cx, y0 + 12, pw - 8, 0xFFFFE6B0, 1.0F, 1.0F, false);
 			if (l.di(cx - pw / 2, y0 + 9, cx + pw / 2, y0 + 22)) {
 				l.tip(nama);
@@ -532,29 +519,15 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 			y = y0 + 25;
 		}
 		if (p.b(Dagang.LEWAT)) {
-			y += pita(l, TemaUi.I_JENUH, TemaUi.k("dagang.pasar.lewat"), x0, y, x1, TempatWarna.PERINGATAN);
+			y += pita(l, TemaUi.I_JENUH, TemaUi.k("dagang.pasar.lewat"), x0, y, x1, Palette.PERINGATAN);
 		}
 		// segment buttons: Beli · Jual · Segel (with counts)
 		int sw = (x1 - x0 - 8) / 3;
 		for (int i = 0; i < 3; i++) {
 			int bx0 = x0 + i * (sw + 4);
-			int bx1 = bx0 + sw;
-			boolean on = segmen == i;
-			boolean over = l.di(bx0, y, bx1, y + 14);
-			int dasar = on ? Palette.darken(gaya.aksen, 0.1F) : Palette.argb(over ? 0x50 : 0x30, 0x000000);
-			Brush.chamfer(l.g, bx0, y, bx1, y + 14, 2, dasar);
-			if (on) {
-				l.g.fill(bx0 + 2, y + 12, bx1 - 2, y + 14, TempatWarna.EMAS_TERANG);
-			}
-			TemaUi.ikon(l.g, IKON_SEGMEN[i], bx0 + 3, y + 2, 10);
-			int n = pasar.get(i).size();
-			Component label = TemaUi.k("dagang.pasar." + KUNCI_SEGMEN[i], n);
-			l.teks(label, bx0 + 16, y + 3, sw - 19, on ? 0xFFFFF6E8 : n == 0 ? TempatWarna.terkunci(gaya.teks) : gaya.teks);
-			String kunci = "segmen_" + i;
+			Component label = TemaUi.k("dagang.pasar." + KUNCI_SEGMEN[i], pasar.get(i).size());
 			final int s = i;
-			l.zona(kunci, bx0, y, bx1, y + 14, () -> gantiSegmen(s), true, null, true);
-			l.fokusCincin(kunci, bx0, y, bx1, y + 14);
-			if (over) {
+			if (TalismanButton.gambar(l, "segmen_" + i, bx0, y, sw, 14, label, true, null, () -> gantiSegmen(s), false, segmen == i)) {
 				l.tip(TemaUi.k("dagang.pasar." + KUNCI_SEGMEN[i] + "_tip"));
 			}
 		}
@@ -590,22 +563,22 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 	}
 
 	private void barisPasar(Lukis l, Lembar e, int rx0, int ry0, int rx1, int ry1, boolean sorot, boolean pilih, long u) {
-		PanelTempat.kartu(l.g, gaya, rx0, ry0, rx1, ry1, sorot ? 1.0F : 0.0F, pilih);
+		l.kartu(rx0, ry0, rx1, ry1, sorot ? 1.0F : 0.0F, pilih);
 		boolean kunci = !e.bisa();
 		ikonBarang(l, e, rx0 + 2, ry0 + 2);
 		int namaW = rx1 - rx0 - 76;
-		l.teks(e.teks(LembarKunci.NAMA), rx0 + 20, ry0 + 2, namaW, kunci ? TempatWarna.terkunci(gaya.teks) : gaya.teks);
+		l.teks(e.teks(LembarKunci.NAMA), rx0 + 20, ry0 + 2, namaW, kunci ? Palette.terkunci(gaya.teks) : gaya.teks);
 		switch (segmen) {
 			case BELI -> {
 				int stok = e.i(Dagang.STOK, 0);
-				l.teks(stok <= 0 ? TeksTempat.k("kartu.habis") : TemaUi.k("dagang.pasar.stok", stok, STOK_HARIAN), rx0 + 20, ry0 + 12, namaW,
-						stok <= 0 ? TempatWarna.BAHAYA : gaya.teksSamar);
-				LabelHarga.gambar(l, e.l(LembarKunci.NB, 0L), u, rx1 - 4, ry0 + 7, true, 1.0F, false);
+				l.teks(stok <= 0 ? tt("kartu.habis") : TemaUi.k("dagang.pasar.stok", stok, STOK_HARIAN), rx0 + 20, ry0 + 12, namaW,
+						stok <= 0 ? Palette.BAHAYA : gaya.teksSamar);
+				LabelHarga.gambar(l, e.l(LembarKunci.NB, 0L), u, rx1 - 4, ry0 + 7, true, false);
 			}
 			case JUAL -> {
 				l.teks(TemaUi.k("dagang.pasar.bawa", e.i(LembarKunci.JUMLAH, 0)), rx0 + 20, ry0 + 12, namaW, gaya.teksSamar);
 				if (kunci) {
-					IkonTempat.gambar(l.g, IkonTempat.KUNCI, rx1 - 14, ry0 + 5, 10, 0xC0FFFFFF);
+					Glyphs.Atlas.ikon(l.g, Glyphs.Atlas.KUNCI, rx1 - 14, ry0 + 5, 10, 0xC0FFFFFF);
 					Component a = alasanKeadaan(e);
 					if (a != null && l.di(rx0, ry0, rx1, ry1)) {
 						l.tip(a);
@@ -613,21 +586,21 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 				} else {
 					float j = e.f(Dagang.JENUH, 1.0F);
 					Component nb = TemaUi.k("dagang.pasar.nb_kira", Brush.desimal1(e.f(LembarKunci.NB, 0.0F)));
-					l.kanan(nb, rx1 - 4, ry0 + 2, warnaJenuh(j), 1.0F);
+					l.kanan(nb, rx1 - 4, ry0 + 2, warnaJenuh(j));
 					TemaUi.meter(l, -1, rx1 - 46, ry0 + 12, rx1 - 4, (j - 0.6F) / 0.4F, warnaJenuh(j), -1.0F);
 				}
 			}
 			default -> {
 				l.teks(TemaUi.k("dagang.pasar.segel_baris", ISI_PETI), rx0 + 20, ry0 + 12, namaW, gaya.teksSamar);
 				TemaUi.ikon(l.g, TemaUi.I_CAP, rx1 - 40, ry0 + 5, 12);
-				LabelHarga.gambar(l, e.l(LembarKunci.NB, 1L), u, rx1 - 4, ry0 + 7, true, 1.0F, false);
+				LabelHarga.gambar(l, e.l(LembarKunci.NB, 1L), u, rx1 - 4, ry0 + 7, true, false);
 			}
 		}
 	}
 
 	/** Green while the market still pays full, amber then red as it fills (jenuh 1.0 .. 0.6). */
 	private static int warnaJenuh(float j) {
-		return j >= 0.9F ? 0xFF2E7A4E : j >= 0.75F ? TempatWarna.PERINGATAN : TempatWarna.BAHAYA;
+		return j >= 0.9F ? 0xFF2E7A4E : j >= 0.75F ? Palette.PERINGATAN : Palette.BAHAYA;
 	}
 
 	/** Units carried of good {@code id} (from the Jual ledger; 0 when none). */
@@ -656,7 +629,7 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 	}
 
 	private void detailPasar(Lukis l, Kotak k, List<Lembar> rows) {
-		PanelTempat.kartu(l.g, gaya, k.x0(), k.y0(), k.x1(), k.y1(), 0.0F, false);
+		l.kartu(k.x0(), k.y0(), k.x1(), k.y1(), 0.0F, false);
 		int sel = daftarPasar.pilihan();
 		if (sel < 0 || sel >= rows.size()) {
 			tengah(l, TemaUi.k(rows.isEmpty() ? "dagang.pasar.jelas_" + KUNCI_SEGMEN[segmen] : "toko.pilih"), k);
@@ -693,11 +666,14 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 					ty += barisNilai(l, TemaUi.k("dagang.pasar.sisa"), Component.literal(stok + " / " + STOK_HARIAN), tx, ty, x1);
 				}
 				if (ty + 8 <= batas) {
-					TemaUi.meter(l, -1, tx, ty, x1, stok / (float) STOK_HARIAN, stok > 4 ? TempatWarna.OK : TempatWarna.PERINGATAN, -1.0F);
+					TemaUi.meter(l, -1, tx, ty, x1, stok / (float) STOK_HARIAN, stok > 4 ? Palette.OK : Palette.PERINGATAN, -1.0F);
 				}
 				ty = Math.max(ty + 12, y + pv + 4);
-				l.bungkus(TemaUi.k("dagang.pasar.beli_jelas"), x0, ty, x1 - x0, gaya.teksSamar, 1.0F, by - ty - 12);
-				int pw = jumlah.gambar(l, "pasar_n", x1 - 50, by + 1, Math.max(1, stok)) + 6;
+				l.bungkus(TemaUi.k("dagang.pasar.beli_jelas"), x0, ty, x1 - x0, gaya.teksSamar, by - ty - 12);
+				int maksJ = Math.max(1, stok);
+				int pw = PemilihJumlah.lebar(l, maksJ);
+				jumlah.gambar(l, "pasar_n", x1 - pw, by + 1, maksJ);
+				pw += 6;
 				int n = jumlah.nilai();
 				long total = nb * n;
 				Component alasan = stok <= 0 ? TemaUi.k("dagang.pasar.habis") : !mampu(total) ? kurang(total) : null;
@@ -714,9 +690,9 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 					ty = Math.max(ty + 2, y + pv + 4);
 					// the reason also rides on the disabled button's tooltip, so the band may be left out when low
 					if (a != null && ty + 15 <= batas) {
-						ty += pita(l, TemaUi.I_TOPENG, a, x0, ty, x1, TempatWarna.BAHAYA);
+						ty += pita(l, TemaUi.I_TOPENG, a, x0, ty, x1, Palette.BAHAYA);
 					}
-					l.bungkus(TemaUi.k("dagang.pasar.jual_tolak"), x0, ty + 2, x1 - x0, gaya.teksSamar, 1.0F, by - ty - 14);
+					l.bungkus(TemaUi.k("dagang.pasar.jual_tolak"), x0, ty + 2, x1 - x0, gaya.teksSamar, by - ty - 14);
 					tombolOp(l, "pasar_jual", x0, by, x1 - x0, 15, TemaUi.k("dagang.pasar.tombol_jual", "—"), false, a,
 							LembarKunci.op(Dagang.OP_JUAL, e.id(), 1));
 					break;
@@ -735,8 +711,11 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 				}
 				ty = Math.max(ty + 12, y + pv + 4);
 				Component jelas = TemaUi.k(lembar.sub(Dagang.PASAR).b(Dagang.LEWAT) ? "dagang.pasar.jual_lewat" : "dagang.pasar.jual_jelas");
-				l.bungkus(jelas, x0, ty, x1 - x0, gaya.teksSamar, 1.0F, by - ty - 12);
-				int pw = jumlah.gambar(l, "pasar_n", x1 - 50, by + 1, Math.max(1, Math.min(64, bawa))) + 6;
+				l.bungkus(jelas, x0, ty, x1 - x0, gaya.teksSamar, by - ty - 12);
+				int maksJ = Math.max(1, Math.min(64, bawa));
+				int pw = PemilihJumlah.lebar(l, maksJ);
+				jumlah.gambar(l, "pasar_n", x1 - pw, by + 1, maksJ);
+				pw += 6;
 				int n = jumlah.nilai();
 				// shortcut: the client does not know jenuhPerUnit, so the total shown is next-unit price x n (an upper bound)
 				String kira = Brush.angka(Math.max(1L, Math.round(nb * n)));
@@ -760,11 +739,11 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 						ikonBarang(l, e, gx, ty);
 						gx += 11;
 					}
-					IkonTempat.gambar(l.g, IkonTempat.PANAH_KANAN, gx + 6, ty + 3, 9, 0xC0FFFFFF);
+					Glyphs.Atlas.ikon(l.g, Glyphs.Atlas.PANAH_KANAN, gx + 6, ty + 3, 9, 0xC0FFFFFF);
 					TemaUi.ikon(l.g, TemaUi.I_CAP, gx + 18, ty, 14);
 					ty += 18;
 				}
-				l.bungkus(TemaUi.k("dagang.pasar.segel_jelas", ISI_PETI), x0, ty, x1 - x0, gaya.teksSamar, 1.0F, by - ty - 12);
+				l.bungkus(TemaUi.k("dagang.pasar.segel_jelas", ISI_PETI), x0, ty, x1 - x0, gaya.teksSamar, by - ty - 12);
 				Component alasan = bawa < ISI_PETI ? TemaUi.k("dagang.pasar.segel_kurang", ISI_PETI) : !mampu(nb) ? kurang(nb) : null;
 				tombolOp(l, "pasar_segel", x0, by, x1 - x0, 15, TemaUi.k("dagang.pasar.tombol_segel", Brush.angka(nb)), alasan == null, alasan,
 						LembarKunci.op(Dagang.OP_SEGEL, e.id()));
@@ -772,7 +751,7 @@ public final class LayarBukuDagang extends LayarTemaDasar {
 		}
 		long u = uang();
 		if (u >= 0L && by - 10 >= ty) {
-			l.kanan(TemaUi.k("dagang.pasar.uang", Brush.angka(u)), x1, by - 10, gaya.teksSamar, 1.0F);
+			l.kanan(TemaUi.k("dagang.pasar.uang", Brush.angka(u)), x1, by - 10, gaya.teksSamar);
 		}
 	}
 }

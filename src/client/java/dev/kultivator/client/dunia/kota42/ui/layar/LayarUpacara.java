@@ -7,7 +7,7 @@ import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.PemilihJumlah;
 import dev.kultivator.client.screen.ui.TalismanButton;
-import dev.kultivator.client.tempat.ui.kit.Lembar;
+import dev.kultivator.client.screen.ui.Lembar;
 import dev.kultivator.dunia.kota42.ui.KotaLembar;
 import dev.kultivator.dunia.kota42.ui.KotaLembar.Rombongan;
 import dev.kultivator.dunia.kota42.ui.KotaLembar.Upacara;

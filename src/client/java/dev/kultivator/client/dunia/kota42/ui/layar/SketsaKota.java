@@ -1,6 +1,6 @@
 package dev.kultivator.client.dunia.kota42.ui.layar;
 
-import dev.kultivator.client.tempat.ui.kit.Lembar;
+import dev.kultivator.client.screen.ui.Lembar;
 import dev.kultivator.dunia.kota42.ui.KotaLembar;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;

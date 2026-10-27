@@ -4,17 +4,16 @@ import static dev.kultivator.client.sekte.gabung.ui.layar.LayarGabung2.pk;
 import static dev.kultivator.client.sekte.gabung.ui.layar.LayarGabung2.u;
 
 import dev.kultivator.client.screen.ui.Brush;
+import dev.kultivator.client.screen.ui.CincinWaktu;
+import dev.kultivator.client.screen.ui.DaftarGulir;
+import dev.kultivator.client.screen.ui.Glyphs;
+import dev.kultivator.client.screen.ui.GulirIsi;
+import dev.kultivator.client.screen.ui.KeadaanKosong;
+import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
+import dev.kultivator.client.screen.ui.TalismanButton;
 import dev.kultivator.client.sekte.gabung.ui.IkonGabung;
-import dev.kultivator.client.tempat.ui.kit.CincinWaktu;
-import dev.kultivator.client.tempat.ui.kit.DaftarGulir;
-import dev.kultivator.client.tempat.ui.kit.IkonTempat;
-import dev.kultivator.client.tempat.ui.kit.KeadaanKosong;
-import dev.kultivator.client.tempat.ui.kit.Lembar;
-import dev.kultivator.client.tempat.ui.kit.Lukis;
-import dev.kultivator.client.tempat.ui.kit.PanelTempat;
-import dev.kultivator.client.tempat.ui.kit.TabLentera;
-import dev.kultivator.client.tempat.ui.kit.TempatWarna;
+import dev.kultivator.client.screen.ui.Lembar;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import dev.kultivator.sekte.gabung.ui.GabungLembar;
 import dev.kultivator.sekte.gabung.ui.GabungLembar.Kediaman;
@@ -45,25 +44,25 @@ public final class LayarKediaman extends LayarGabungDasar {
 	private final DaftarGulir pilih = new DaftarGulir();
 	private final DaftarGulir kolam = new DaftarGulir();
 	/** The stacked plaque + chest of a narrow page (GUI scale 4) scroll as one column. */
-	private final GulirKolom kolomGua = new GulirKolom();
+	private final GulirIsi kolomGua = new GulirIsi();
 
 	/** Height of the dwelling plaque (the lines down to the amulet button) and of the stacked chest. */
 	private static final int PLAKAT_H = 78;
 	private static final int PETI_H = 94;
 
 	public LayarKediaman(int npcId, CompoundTag lembar) {
-		super(Kediaman.LAYAR, npcId, lembar, u("kediaman.judul"), TempatWarna.Gaya.GIOK);
+		super(Kediaman.LAYAR, npcId, lembar, u("kediaman.judul"), LembarKunci.GAYA_GIOK);
 	}
 
 	@Override
-	protected List<TabLentera.Tab> tabs() {
-		return List.of(new TabLentera.Tab(Kediaman.TAB_GUA, u("kediaman.tab.gua"), IkonTempat.DUPA, null),
-				new TabLentera.Tab(Kediaman.TAB_PILIH, u("kediaman.tab.pilih"), IkonTempat.KUNCI, null),
-				new TabLentera.Tab(Kediaman.TAB_KOLAM, u("kediaman.tab.kolam"), IkonTempat.HATI, null));
+	protected List<Tab> daftarTab() {
+		return List.of(tab(Kediaman.TAB_GUA, u("kediaman.tab.gua"), Glyphs.Atlas.DUPA),
+				tab(Kediaman.TAB_PILIH, u("kediaman.tab.pilih"), Glyphs.Atlas.KUNCI),
+				tab(Kediaman.TAB_KOLAM, u("kediaman.tab.kolam"), Glyphs.Atlas.HATI));
 	}
 
 	@Override
-	protected KeadaanKosong.Gambar gambarKosong() {
+	protected KeadaanKosong.Gambar kosongGambar() {
 		return KeadaanKosong.Gambar.LENTERA;
 	}
 
@@ -72,14 +71,14 @@ public final class LayarKediaman extends LayarGabungDasar {
 		long now = Util.getMillis();
 		pilih.mulaiUlang(now);
 		kolam.mulaiUlang(now);
-		kolomGua.ulang();
+		kolomGua.atas();
 	}
 
 	@Override
 	protected void isiGabung(Lukis l, int x0, int y0, int x1, int y1) {
 		int y = kepalaSekte(l, x0, y0, x1);
 		int pkPunya = lembar.i(LembarKunci.PK, 0);
-		l.kanan(u("kediaman.pk_anda"), x1 - pk(l, pkPunya, -1L, x1, y, true, 1.0F) - 4, y, gaya.teksSamar, 1.0F);
+		l.kanan(u("kediaman.pk_anda"), x1 - pk(l, pkPunya, -1L, x1, y, true) - 4, y, l.gaya.teksSamar);
 		y += 12;
 		switch (tab) {
 			case Kediaman.TAB_PILIH -> pilih(l, x0, y, x1, y1);
@@ -101,14 +100,16 @@ public final class LayarKediaman extends LayarGabungDasar {
 		// stack in one scrolled column (arrow keys / wheel) instead of two clipped halves.
 		boolean tumpuk = x1 - x0 < 240;
 		int py0 = y0;
-		int px1 = tumpuk ? x1 : x0 + (x1 - x0) * 11 / 20;
+		// stacked: the kit's scroll keeps 5 px at the right of its box for the bar
+		int rx1 = tumpuk ? x1 - 8 : x1;
+		int px1 = tumpuk ? rx1 : x0 + (x1 - x0) * 11 / 20;
 		int py1 = by - 4;
 		int cx0 = px1 + 6;
 		int cy0 = y0;
 		int cy1 = by - 4;
 		if (tumpuk) {
 			gulirAktif = kolomGua;
-			py0 = kolomGua.mulai(l, x0, y0, x1, by - 3);
+			py0 = kolomGua.mulai(l, x0, y0, x1 - 5, by - 3);
 			py1 = py0 + PLAKAT_H;
 			cx0 = x0;
 			cy0 = py1 + 5;
@@ -122,27 +123,27 @@ public final class LayarKediaman extends LayarGabungDasar {
 		int x = x0 + 9;
 		int y = py0 + 8;
 		IkonGabung.gambar(l.g, IkonGabung.MEDITASI, x, y, 20);
-		l.teks(Brush.bold(h.teks(LembarKunci.NAMA)), x + 24, y + 1, px1 - x - 34, ink, 1.0F);
-		l.teks(u("kediaman.jenis." + h.s(LembarKunci.JENIS)), x + 24, y + 11, px1 - x - 34, lemah, 1.0F);
+		l.teks(Brush.bold(h.teks(LembarKunci.NAMA)), x + 24, y + 1, px1 - x - 34, ink);
+		l.teks(u("kediaman.jenis." + h.s(LembarKunci.JENIS)), x + 24, y + 11, px1 - x - 34, lemah);
 		y += 25;
 		long sampai = h.l(Kediaman.SAMPAI, 0L);
 		int sisa = h.i(LembarKunci.SISA_HARI, 0);
-		l.teks(u("kediaman.lunas", sampai, sisa), x, y, px1 - x - 9, sisa <= 1 ? 0xFFB03030 : ink, 1.0F);
+		l.teks(u("kediaman.lunas", sampai, sisa), x, y, px1 - x - 9, sisa <= 1 ? 0xFFB03030 : ink);
 		y += 10;
-		batang(l, x, y, px1 - x - 9, 4, Math.min(1.0F, sisa / (float) (SEWA_HARI * 2)), sisa <= 1 ? TempatWarna.BAHAYA : 0xFF2E8963, 0.5F);
+		batang(l, x, y, px1 - x - 9, Math.min(1.0F, sisa / (float) (SEWA_HARI * 2)), sisa <= 1 ? Palette.BAHAYA : 0xFF2E8963, 0.5F);
 		y += 8;
 		float faktor = h.f(Kediaman.FAKTOR, 1.0F);
-		l.teks(u("kediaman.faktor", String.format(Locale.ROOT, "%.2f", faktor)), x, y, px1 - x - 9, ink, 1.0F);
+		l.teks(u("kediaman.faktor", String.format(Locale.ROOT, "%.2f", faktor)), x, y, px1 - x - 9, ink);
 		y += 10;
 		boolean jimat = h.b(Kediaman.JIMAT);
-		IkonTempat.gambar(l.g, jimat ? IkonTempat.CENTANG : IkonTempat.SILANG, x, y, 9, 0xFFFFFFFF);
-		l.teks(u(jimat ? "kediaman.jimat_ya" : "kediaman.jimat_tidak"), x + 12, y + 1, px1 - x - 9 - 70, jimat ? ink : lemah, 1.0F);
+		Glyphs.Atlas.ikon(l.g, jimat ? Glyphs.Atlas.CENTANG : Glyphs.Atlas.SILANG, x, y, 9, 0xFFFFFFFF);
+		l.teks(u(jimat ? "kediaman.jimat_ya" : "kediaman.jimat_tidak"), x + 12, y + 1, px1 - x - 9 - 70, jimat ? ink : lemah);
 		if (!jimat && py1 - y > 12) {
 			tombolOp(l, "jimat", px1 - 74, y - 2, 66, 13, u("kediaman.jadikan_jimat"), true, null, LembarKediaman.OP_JIMAT);
 		}
 		l.lepasKlip();
 		// the deposit chest
-		peti(l, h, cx0, cy0, x1, cy1);
+		peti(l, h, cx0, cy0, rx1, cy1);
 		if (tumpuk) {
 			kolomGua.selesai(l, cy1);
 		}
@@ -152,14 +153,14 @@ public final class LayarKediaman extends LayarGabungDasar {
 		boolean penuh = sisa >= SEWA_HARI * 2 - 1;
 		tombolOp(l, "perpanjang", x0, by, bw, 15, u("kediaman.perpanjang", Brush.angka(sewa)), !penuh && sewa <= lembar.i(LembarKunci.PK, 0),
 				penuh ? u("kediaman.sudah_penuh") : u("kediaman.kurang_pk", sewa), Kediaman.OP_PERPANJANG);
-		tombol.gambar(l, "pindah", x0 + bw + 4, by, bw, 15, u("kediaman.pindah"), true, null, () -> gantiTab(Kediaman.TAB_PILIH, true));
+		TalismanButton.gambar(l, "pindah", x0 + bw + 4, by, bw, 15, u("kediaman.pindah"), true, null, () -> gantiTab(Kediaman.TAB_PILIH, true));
 		tombolYakin(l, "lepas", x0 + (bw + 4) * 2, by, bw, 15, u("kediaman.lepas"), true, null, Kediaman.OP_LEPAS);
 	}
 
 	private void peti(Lukis l, Lembar h, int x0, int y0, int x1, int y1) {
 		sumur(l, new Kotak(x0, y0, x1, y1));
-		int teks = gaya.teksSumur();
-		l.teks(Brush.bold(u("kediaman.peti")), x0 + 4, y0 + 3, x1 - x0 - 8, teks, 1.0F);
+		int teks = l.gaya.teksSumur();
+		l.teks(Brush.bold(u("kediaman.peti")), x0 + 4, y0 + 3, x1 - x0 - 8, teks);
 		List<Lembar> slot = h.daftar(Kediaman.PETI);
 		// three rows must fit between the title (15) and the deposit talisman (17) too
 		int sel = Math.max(16, Math.min(24, Math.min((x1 - x0 - 12) / 3, (y1 - y0 - 38) / 3)));
@@ -195,14 +196,14 @@ public final class LayarKediaman extends LayarGabungDasar {
 	private void bilik(Lukis l, int x0, int y0, int x1, int y1) {
 		float cx = (x0 + x1) / 2.0F;
 		int y = y0 + Math.max(4, (y1 - y0) / 2 - 52);
-		IkonTempat.gambar(l.g, IkonTempat.DUPA, Math.round(cx - 16), y, 32, 0xFFFFFFFF);
+		Glyphs.Atlas.ikon(l.g, Glyphs.Atlas.DUPA, Math.round(cx - 16), y, 32, 0xFFFFFFFF);
 		y += 36;
-		Brush.fitCentered(l.g, font, Brush.bold(u("kediaman.bilik.judul")), cx, y, x1 - x0 - 20, gaya.teks, 1.0F, 1.0F, false);
+		Brush.fitCentered(l.g, font, Brush.bold(u("kediaman.bilik.judul")), cx, y, x1 - x0 - 20, l.gaya.teks, 1.0F, 1.0F, false);
 		y += 13;
 		int w = Math.min(270, x1 - x0 - 16);
-		y += Math.round(l.bungkus(u("kediaman.bilik.isi"), cx - w / 2.0F, y, w, gaya.teksLemah, 1.0F, y1 - y - 24)) + 6;
+		y += Math.round(l.bungkus(u("kediaman.bilik.isi"), cx - w / 2.0F, y, w, l.gaya.teksLemah, y1 - y - 24)) + 6;
 		int bw = Math.min(160, x1 - x0 - 16);
-		tombol.gambar(l, "kePilih", Math.round(cx - bw / 2.0F), Math.min(y, y1 - 17), bw, 15, u("kediaman.bilik.cari"), true, null,
+		TalismanButton.gambar(l, "kePilih", Math.round(cx - bw / 2.0F), Math.min(y, y1 - 17), bw, 15, u("kediaman.bilik.cari"), true, null,
 				() -> gantiTab(Kediaman.TAB_PILIH, true));
 	}
 
@@ -222,39 +223,39 @@ public final class LayarKediaman extends LayarGabungDasar {
 			boolean anda = e.b(LembarKunci.ANDA);
 			boolean bisa = LembarKunci.K_OK.equals(keadaan) && !anda;
 			boolean redup = !bisa && !anda;
-			PanelTempat.kartu(lk.g, gaya, rx0, ry0, rx1, ry1, sorot ? 1.0F : 0.0F, sel);
+			lk.kartu(rx0, ry0, rx1, ry1, sorot ? 1.0F : 0.0F, sel);
 			if (anda) {
-				lk.g.fill(rx0, ry0, rx0 + 2, ry1, TempatWarna.EMAS);
+				lk.g.fill(rx0, ry0, rx0 + 2, ry1, Palette.GOLD);
 			}
 			int pangkat = e.i(GabungLembar.PANGKAT, 0);
 			IkonGabung.gambar(lk.g, IkonGabung.pangkat(pangkat), rx0 + 4, ry0 + 5, 16, redup ? 0x90FFFFFF : 0xFFFFFFFF);
 			int bw = Math.min(64, (rx1 - rx0) / 5);
 			int bx = rx1 - bw - 4;
 			int harga = e.i(LembarKunci.HARGA, 0);
-			int pw = harga > 0 ? pk(lk, harga, redup ? -1L : pkPunya, bx - 6, ry0 + 4, true, 1.0F) : 0;
+			int pw = harga > 0 ? pk(lk, harga, redup ? -1L : pkPunya, bx - 6, ry0 + 4, true) : 0;
 			if (harga > 0) {
-				lk.kanan(u("kediaman.per_7"), bx - 6, ry0 + 14, gaya.teksSamar, 1.0F);
+				lk.kanan(u("kediaman.per_7"), bx - 6, ry0 + 14, l.gaya.teksSamar);
 			}
 			// the caption below the name stops before "/7 hari" under the price
 			int perW = harga > 0 ? font.width(u("kediaman.per_7")) + 4 : 0;
 			int tx = rx0 + 24;
-			int warna = redup ? TempatWarna.terkunci(gaya.teks) : gaya.teks;
+			int warna = redup ? Palette.terkunci(l.gaya.teks) : l.gaya.teks;
 			Component nama = e.teks(LembarKunci.NAMA).copy().append(Component.literal(String.format(Locale.ROOT, "  ×%.2f", e.f(Kediaman.FAKTOR, 1.0F))));
-			lk.teks(nama, tx, ry0 + 4, bx - pw - 12 - tx, warna, 1.0F);
+			lk.teks(nama, tx, ry0 + 4, bx - pw - 12 - tx, warna);
 			Component bawah;
-			int bwarna = gaya.teksSamar;
+			int bwarna = l.gaya.teksSamar;
 			if (anda) {
 				bawah = u("kediaman.pilih.milikmu");
-				bwarna = TempatWarna.OK;
+				bwarna = Palette.OK;
 			} else if (e.teksAtau(Kediaman.PEMAKAI) != null && LembarKunci.K_HABIS.equals(keadaan)) {
 				bawah = u("kediaman.pilih.dipakai", e.teks(Kediaman.PEMAKAI));
 			} else if (e.teksAtau(LembarKunci.ALASAN) != null) {
 				bawah = e.teks(LembarKunci.ALASAN);
-				bwarna = gaya.gelap() ? 0xFFFF9A8A : TempatWarna.BAHAYA;
+				bwarna = l.gaya.gelap() ? 0xFFFF9A8A : Palette.BAHAYA;
 			} else {
 				bawah = u("kediaman.pilih.bebas", namaPangkat(pangkat));
 			}
-			lk.teks(bawah, tx, ry0 + 14.0F, bx - tx - 6 - perW, bwarna, 1.0F);
+			lk.teks(bawah, tx, ry0 + 14.0F, bx - tx - 6 - perW, bwarna);
 			if (!anda && "bilik".equals(e.s(LembarKunci.JENIS))) {
 				// back to the dormitory = giving the cave up (the chest's items come back)
 				tombolYakin(lk, "bilik" + i, bx, ry0 + 5, bw, 15, u("kediaman.ke_bilik"), true, null, Kediaman.OP_LEPAS);
@@ -277,16 +278,16 @@ public final class LayarKediaman extends LayarGabungDasar {
 			return;
 		}
 		boolean gratis = !list.isEmpty() && list.getFirst().b(Kediaman.GRATIS);
-		l.teks(gratis ? u("kediaman.kolam.ket_gratis") : u("kediaman.kolam.ket"), x0, y0, x1 - x0, gratis ? TempatWarna.OK : gaya.teksSamar, 1.0F);
+		l.teks(gratis ? u("kediaman.kolam.ket_gratis") : u("kediaman.kolam.ket"), x0, y0, x1 - x0, gratis ? Palette.OK : l.gaya.teksSamar);
 		y0 += 11;
 		int pkPunya = lembar.i(LembarKunci.PK, 0);
 		kolam.gambar(l, "kolam", x0, y0, x1, y1, list.size(), 26, (lk, i, rx0, ry0, rx1, ry1, sorot, sel) -> {
 			Lembar e = list.get(i);
 			boolean anda = e.b(LembarKunci.ANDA);
 			boolean terisi = e.b(Kediaman.TERISI);
-			PanelTempat.kartu(lk.g, gaya, rx0, ry0, rx1, ry1, sorot ? 1.0F : 0.0F, sel);
+			lk.kartu(rx0, ry0, rx1, ry1, sorot ? 1.0F : 0.0F, sel);
 			// a seat ring: jade when free, grey when taken, gold for the own session
-			int warna = anda ? TempatWarna.EMAS : terisi ? 0xFF7A8C83 : 0xFF2E8963;
+			int warna = anda ? Palette.GOLD : terisi ? 0xFF7A8C83 : 0xFF2E8963;
 			Brush.ring(lk.g, rx0 + 12, ry0 + 13, 5.0F, 8.0F, warna);
 			if (terisi || anda) {
 				Brush.disc(lk.g, rx0 + 12, ry0 + 13, 4.0F, warna);
@@ -294,9 +295,9 @@ public final class LayarKediaman extends LayarGabungDasar {
 			int bw = Math.min(84, (rx1 - rx0) / 3);
 			int bx = rx1 - bw - 4;
 			int tx = rx0 + 26;
-			lk.teks(e.teks(LembarKunci.NAMA), tx, ry0 + 4, bx - tx - 30, gaya.teks, 1.0F);
+			lk.teks(e.teks(LembarKunci.NAMA), tx, ry0 + 4, bx - tx - 30, l.gaya.teks);
 			Component bawah = anda ? u("kediaman.kolam.sesimu") : terisi ? u("kediaman.kolam.terisi", e.teks(Kediaman.PEMAKAI)) : u("kediaman.kolam.bebas");
-			lk.teks(bawah, tx, ry0 + 14.0F, bx - tx - 30, anda ? TempatWarna.OK : gaya.teksSamar, 1.0F);
+			lk.teks(bawah, tx, ry0 + 14.0F, bx - tx - 30, anda ? Palette.OK : l.gaya.teksSamar);
 			if (anda && e.ada(LembarKunci.SISA_TICK)) {
 				CincinWaktu.gambar(lk, bx - 14, ry0 + 13, 8.0F, e.l(LembarKunci.SISA_TICK, 0L), 30L * 60L * 20L, diterima, CincinWaktu.TANPA);
 				tombolOp(lk, "tandaiK" + i, bx, ry0 + 5, bw, 15, u("kediaman.kolam.tandai"), true, null,

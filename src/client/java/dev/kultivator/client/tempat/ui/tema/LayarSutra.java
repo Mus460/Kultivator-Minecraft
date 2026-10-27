@@ -1,15 +1,13 @@
 package dev.kultivator.client.tempat.ui.tema;
 
 import dev.kultivator.client.screen.ui.Brush;
-import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.client.screen.ui.KeadaanTerkunci;
 import dev.kultivator.client.screen.ui.LabelHarga;
 import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
+import dev.kultivator.client.screen.ui.TabBar;
 import dev.kultivator.client.screen.ui.UiSound;
-import dev.kultivator.client.tempat.ui.kit.Lembar;
-import dev.kultivator.client.tempat.ui.kit.TabLentera;
-import dev.kultivator.client.tempat.ui.kit.TempatWarna;
+import dev.kultivator.client.screen.ui.Lembar;
 import dev.kultivator.dunia.tempat.tema.bersama.TemaLayar.Sutra;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import java.util.List;
@@ -38,14 +36,14 @@ public final class LayarSutra extends TemaHalaman {
 	private long ubahSejak = -1L;
 
 	public LayarSutra(int npcId, CompoundTag lembar) {
-		super(Sutra.LAYAR, npcId, lembar, "layar.sutra", TempatWarna.Gaya.KAIN);
+		super(Sutra.LAYAR, npcId, lembar, "layar.sutra", Palette.Gaya.KAIN);
 	}
 
 	@Override
-	protected List<TabLentera.Tab> tabs() {
-		return List.of(tabTema(Sutra.TAB_TOKO, "sutra.tab.toko", LembarKunci.Ikon.TIMBANGAN),
-				tabTema(Sutra.TAB_JUBAH, "sutra.tab.jubah", LembarKunci.Ikon.ZIRAH),
-				tabTema(Sutra.TAB_TENUN, "sutra.tab.tenun", Glyphs.Atlas.BINTANG_PENUH));
+	protected List<TabBar.Tab> tabs() {
+		return List.of(tabTema(Sutra.TAB_TOKO, "sutra.tab.toko"),
+				tabTema(Sutra.TAB_JUBAH, "sutra.tab.jubah"),
+				tabTema(Sutra.TAB_TENUN, "sutra.tab.tenun"));
 	}
 
 	@Override

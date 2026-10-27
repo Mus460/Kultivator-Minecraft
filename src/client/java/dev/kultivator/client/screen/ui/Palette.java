@@ -70,6 +70,10 @@ public final class Palette {
 	public static final int BAHAYA = 0xFFB03030;
 	/** "Locked" = 45 % ink. */
 	public static final float TERKUNCI_ALFA = 0.45F;
+	/** The demonic path's colour (sect sheets, DESIGN 41). */
+	public static final int IBLIS = 0xFF6A1420;
+	/** The town gate marker of the city map. */
+	public static final int GERBANG = 0xFF8E1F1F;
 
 	/** Quality colours by grade 0-4 (mutu) used for item names. */
 	private static final int[] MUTU = {0xFF8A8F8C, 0xFF4F9A4A, 0xFF3E78C0, 0xFF8B4FC8, 0xFFD08A2A};
@@ -158,6 +162,23 @@ public final class Palette {
 			case dev.kultivator.dunia.tempat.ui.LembarKunci.PESAN_BAHAYA -> BAHAYA;
 			case dev.kultivator.dunia.tempat.ui.LembarKunci.PESAN_PERINGATAN -> PERINGATAN;
 			default -> OK;
+		};
+	}
+
+	/** District colour of a {@code LembarKunci.DISTRIK_*} id (jade green when unknown). */
+	public static int distrik(String id) {
+		return switch (id) {
+			case dev.kultivator.dunia.tempat.ui.LembarKunci.DISTRIK_ISTANA -> 0xFFC9A24A;
+			case dev.kultivator.dunia.tempat.ui.LembarKunci.DISTRIK_CENDEKIA -> 0xFF2A3A5C;
+			case dev.kultivator.dunia.tempat.ui.LembarKunci.DISTRIK_AWAN -> 0xFF6FA8C8;
+			case dev.kultivator.dunia.tempat.ui.LembarKunci.DISTRIK_GILDA -> 0xFF8C6A3A;
+			case dev.kultivator.dunia.tempat.ui.LembarKunci.DISTRIK_PASAR -> 0xFFD08A2A;
+			case dev.kultivator.dunia.tempat.ui.LembarKunci.DISTRIK_HUNIAN -> 0xFF7A5A3A;
+			case dev.kultivator.dunia.tempat.ui.LembarKunci.DISTRIK_ARENA -> 0xFF7A1A1A;
+			case dev.kultivator.dunia.tempat.ui.LembarKunci.DISTRIK_KUMUH -> 0xFF6A6A60;
+			case dev.kultivator.dunia.tempat.ui.LembarKunci.DISTRIK_GERBANG -> GERBANG;
+			case dev.kultivator.dunia.tempat.ui.LembarKunci.DISTRIK_LUAR -> 0xFF4F8A3A;
+			default -> 0xFF5FA88C;
 		};
 	}
 

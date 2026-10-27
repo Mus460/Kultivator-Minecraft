@@ -123,6 +123,22 @@ public abstract class Page {
 	public void showSub(String id) {
 	}
 
+	/**
+	 * The sub shown now, for a page that changes it itself (a sheet's own tab button) so the host's sub bar can follow it;
+	 * "" when the page has no subs of its own.
+	 */
+	public String tabSekarang() {
+		return "";
+	}
+
+	/** A home page mounts only these tabs of a sheet page (empty = all); a page without tab sets ignores it. */
+	public void batasTab(java.util.Set<String> ids) {
+	}
+
+	/** Marks this page a read-only hub view (a sheet's write buttons are drawn disabled with the reason); default ignores it. */
+	public void lihatSaja(boolean baca) {
+	}
+
 	/** True for pages on the wide paper (43.3.2: Kodeks, Cincin Segel, Peta, Buku Harian, Templat, wide Di Sini). */
 	public boolean lebar() {
 		return false;

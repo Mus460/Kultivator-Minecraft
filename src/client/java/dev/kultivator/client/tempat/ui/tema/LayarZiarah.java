@@ -5,9 +5,8 @@ import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.SegelKonfirmasi;
-import dev.kultivator.client.tempat.ui.kit.Lembar;
-import dev.kultivator.client.tempat.ui.kit.TabLentera;
-import dev.kultivator.client.tempat.ui.kit.TempatWarna;
+import dev.kultivator.client.screen.ui.TabBar;
+import dev.kultivator.client.screen.ui.Lembar;
 import dev.kultivator.dunia.tempat.tema.bersama.TemaLayar.Ziarah;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import java.util.List;
@@ -26,11 +25,11 @@ import net.minecraft.network.chat.Component;
 public final class LayarZiarah extends TemaHalaman {
 
 	public LayarZiarah(int npcId, CompoundTag lembar) {
-		super(Ziarah.LAYAR, npcId, lembar, "layar.ziarah", TempatWarna.Gaya.BATU);
+		super(Ziarah.LAYAR, npcId, lembar, "layar.ziarah", Palette.Gaya.BATU);
 	}
 
 	@Override
-	protected List<TabLentera.Tab> tabs() {
+	protected List<TabBar.Tab> tabs() {
 		return List.of();
 	}
 

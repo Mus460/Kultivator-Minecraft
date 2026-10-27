@@ -9,7 +9,7 @@ import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.SegelKonfirmasi;
 import dev.kultivator.client.screen.ui.TalismanButton;
-import dev.kultivator.client.tempat.ui.kit.Lembar;
+import dev.kultivator.client.screen.ui.Lembar;
 import dev.kultivator.data.Realm;
 import dev.kultivator.dunia.kota42.ui.KotaLembar;
 import dev.kultivator.dunia.kota42.ui.KotaLembar.Pakta;

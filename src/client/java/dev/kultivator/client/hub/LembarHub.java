@@ -7,7 +7,6 @@ import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.UiSound;
 import dev.kultivator.client.tempat.ui.UiTempatClient;
-import dev.kultivator.client.tempat.ui.kit.LayarTempatDasar;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -155,13 +154,11 @@ public final class LembarHub {
 			isi = page;
 			konteks = hidup;
 			bersama = nama;
-			if (page instanceof LayarTempatDasar l) {
-				l.batasTab(tab);
-				l.lihatSaja(!hidup);
-				if (!subTunda.isEmpty()) {
-					l.showSub(subTunda);
-					subTunda = "";
-				}
+			page.batasTab(tab);
+			page.lihatSaja(!hidup);
+			if (!subTunda.isEmpty()) {
+				page.showSub(subTunda);
+				subTunda = "";
 			}
 			if (screen != null) {
 				page.pasang(screen);
@@ -169,10 +166,10 @@ public final class LembarHub {
 			tataUlang();
 			// The Gulungan picked the sub before the sheet existed: show the sheet's tab as the chosen sub.
 			HubPages.Entri e = entri();
-			if (screen != null && e != null && page instanceof LayarTempatDasar l) {
+			if (screen != null && e != null) {
 				Tujuan di = screen.tempat();
-				String t = l.tabSekarang();
-				if (di.bagian() == e.bagian() && di.halaman().equals(e.id()) && !t.equals(di.sub())) {
+				String t = page.tabSekarang();
+				if (!t.isEmpty() && di.bagian() == e.bagian() && di.halaman().equals(e.id()) && !t.equals(di.sub())) {
 					screen.tuju(Tujuan.of(e.bagian(), e.id()).sub(t));
 				}
 			}

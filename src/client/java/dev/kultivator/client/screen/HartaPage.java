@@ -12,7 +12,6 @@ import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.SegelKonfirmasi;
 import dev.kultivator.client.screen.ui.TalismanButton;
-import dev.kultivator.client.tempat.ui.kit.LayarTempatDasar;
 import dev.kultivator.data.CultivationData;
 import dev.kultivator.dunia.tempat.ui.LembarKunci.BukuKas;
 import dev.kultivator.network.Actions;
@@ -187,8 +186,8 @@ public final class HartaPage extends Page {
 		}
 		s.tick();
 		// The sheet changed its own tab (a button inside it): follow with the sub bar.
-		if (s == kediaman && kediaman.isi() instanceof LayarTempatDasar l && screen != null) {
-			String tab = l.tabSekarang();
+		if (s == kediaman && kediaman.isi() != null && screen != null) {
+			String tab = kediaman.isi().tabSekarang();
 			if (!tab.equals(sub) && Kediaman.TABS.contains(tab)) {
 				screen.tuju(Tujuan.of(HubNav.DIRI, Urutan.ID_HARTA).sub(tab));
 			}

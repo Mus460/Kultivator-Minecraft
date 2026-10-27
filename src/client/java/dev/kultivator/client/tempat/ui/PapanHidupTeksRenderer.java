@@ -4,8 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import dev.kultivator.client.dunia.tempat.model.PapanHidupRenderer;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Palette;
-import dev.kultivator.client.tempat.ui.kit.TeksTempat;
-import dev.kultivator.client.tempat.ui.kit.TempatWarna;
 import dev.kultivator.dunia.tempat.ui.PapanHidupEntity;
 import java.util.List;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -118,7 +116,7 @@ public class PapanHidupTeksRenderer extends PapanHidupRenderer<PapanHidupEntity>
 			}
 			poseStack.scale(1.0F / 16.0F, 1.0F / 16.0F, 1.0F / 16.0F);
 			// model px now: origin at the sheet's top centre, y down, the viewer toward -z
-			TeksDunia.panel(poseStack, collector, TempatWarna.Gaya.KERTAS, -w / 2.0F - 0.06F, -0.06F, w / 2.0F + 0.06F, h + 0.06F, Z_PANEL, -1.0F,
+			TeksDunia.panel(poseStack, collector, Palette.Gaya.KERTAS, -w / 2.0F - 0.06F, -0.06F, w / 2.0F + 0.06F, h + 0.06F, Z_PANEL, -1.0F,
 					Math.min(w, h) * 0.16F, light, -1);
 			poseStack.translate(0.0F, 0.0F, Z_TINTA - Z_PANEL);
 			if (buronan && i == 0) {
@@ -169,7 +167,7 @@ public class PapanHidupTeksRenderer extends PapanHidupRenderer<PapanHidupEntity>
 		float m = 0.5F;
 		float lebar = w - 2.0F * m;
 		float y = m;
-		Component dicari = TeksTempat.k("papan.dicari");
+		Component dicari = Component.translatable("kultivator.tempat_ui.papan.dicari");
 		float tinggi = Math.min(1.05F, lebar / Math.max(1, TeksDunia.lebar(dicari)) * TeksDunia.BARIS);
 		TeksDunia.baris(poseStack, collector, dicari, 0.0F, y, tinggi, TeksDunia.Rata.TENGAH, -1.0F, MERAH, light);
 		y += tinggi + 0.2F;
@@ -185,7 +183,7 @@ public class PapanHidupTeksRenderer extends PapanHidupRenderer<PapanHidupEntity>
 		Component judul = isi.judul[0] != null && !isi.judul[0].getString().isEmpty() ? isi.judul[0] : Component.literal(nama);
 		y = judul(poseStack, collector, judul, lebar, y, TINTA, light);
 		if (isi.hadiah > 0L) {
-			Component hadiah = TeksTempat.k("papan.hadiah", Brush.angka(isi.hadiah));
+			Component hadiah = Component.translatable("kultivator.tempat_ui.papan.hadiah", Brush.angka(isi.hadiah));
 			float th = Math.min(0.8F, lebar / Math.max(1, TeksDunia.lebar(hadiah)) * TeksDunia.BARIS);
 			TeksDunia.baris(poseStack, collector, hadiah, 0.0F, y + 0.1F, th, TeksDunia.Rata.TENGAH, -1.0F, MERAH, light);
 			y += th + 0.2F;

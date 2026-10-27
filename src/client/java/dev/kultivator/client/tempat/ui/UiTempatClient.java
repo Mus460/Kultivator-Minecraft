@@ -9,7 +9,6 @@ import dev.kultivator.client.hub.LembarHub;
 import dev.kultivator.client.hub.Tujuan;
 import dev.kultivator.client.screen.Page;
 import dev.kultivator.client.screen.ui.Glyphs;
-import dev.kultivator.client.tempat.ui.kit.LayarTempatDasar;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import dev.kultivator.dunia.tempat.ui.TempatAksiPayload;
 import dev.kultivator.dunia.tempat.ui.TempatLayar;

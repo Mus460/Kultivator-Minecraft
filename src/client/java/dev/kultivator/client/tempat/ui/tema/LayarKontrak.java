@@ -9,9 +9,8 @@ import dev.kultivator.client.screen.ui.LencanaPangkat;
 import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.SegelKonfirmasi;
-import dev.kultivator.client.tempat.ui.kit.Lembar;
-import dev.kultivator.client.tempat.ui.kit.TabLentera;
-import dev.kultivator.client.tempat.ui.kit.TempatWarna;
+import dev.kultivator.client.screen.ui.TabBar;
+import dev.kultivator.client.screen.ui.Lembar;
 import dev.kultivator.dunia.tempat.tema.bersama.TemaLayar.Kontrak;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import java.util.List;
@@ -34,11 +33,11 @@ public final class LayarKontrak extends TemaHalaman {
 	private boolean rinciSempit;
 
 	public LayarKontrak(int npcId, CompoundTag lembar) {
-		super(Kontrak.LAYAR, npcId, lembar, "layar.kontrak", TempatWarna.Gaya.KERTAS);
+		super(Kontrak.LAYAR, npcId, lembar, "layar.kontrak", Palette.Gaya.KERTAS);
 	}
 
 	@Override
-	protected List<TabLentera.Tab> tabs() {
+	protected List<TabBar.Tab> tabs() {
 		return List.of();
 	}
 

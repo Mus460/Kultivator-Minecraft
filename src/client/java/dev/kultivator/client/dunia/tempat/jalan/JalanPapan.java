@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import dev.kultivator.client.epic.EpicBudget;
 import dev.kultivator.client.epic.ShaderCompat;
 import dev.kultivator.client.tempat.ui.TeksDunia;
-import dev.kultivator.client.tempat.ui.kit.TempatWarna;
+import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.dunia.tempat.jalan.JalanNet;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
@@ -114,7 +114,7 @@ public final class JalanPapan {
 			int light = LightCoordsUtil.getLightCoords(level, lightAt);
 			// carved letters keep a faint glow of their own so the stone is still read at dusk
 			light = LightCoordsUtil.max(light, LightCoordsUtil.pack(5, 0));
-			TeksDunia.papan(pose, context.submitNodeCollector(), camera, x - cam.x, y - cam.y, z - cam.z, lines, TempatWarna.Gaya.BATU,
+			TeksDunia.papan(pose, context.submitNodeCollector(), camera, x - cam.x, y - cam.y, z - cam.z, lines, Palette.Gaya.BATU,
 					TINGGI_BARIS, light);
 		}
 		EpicBudget.addCpu(System.nanoTime() - start);

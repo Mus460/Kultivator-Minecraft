@@ -1,6 +1,5 @@
 package dev.kultivator.client.screen.ui;
 
-import dev.kultivator.client.tempat.ui.kit.Lembar;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import java.util.HashMap;
 import java.util.List;

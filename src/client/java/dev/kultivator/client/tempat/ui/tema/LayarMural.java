@@ -3,12 +3,11 @@ package dev.kultivator.client.tempat.ui.tema;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.DaftarGulir;
 import dev.kultivator.client.screen.ui.Glyphs;
+import dev.kultivator.client.screen.ui.KeadaanKosong;
 import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
-import dev.kultivator.client.tempat.ui.kit.KeadaanKosong;
-import dev.kultivator.client.tempat.ui.kit.Lembar;
-import dev.kultivator.client.tempat.ui.kit.TabLentera;
-import dev.kultivator.client.tempat.ui.kit.TempatWarna;
+import dev.kultivator.client.screen.ui.TabBar;
+import dev.kultivator.client.screen.ui.Lembar;
 import dev.kultivator.dunia.tempat.tema.bersama.TemaLayar.Mural;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import java.util.HashSet;
@@ -46,12 +45,12 @@ public final class LayarMural extends TemaHalaman {
 	private boolean rinciSempit;
 
 	public LayarMural(int npcId, CompoundTag lembar) {
-		super(Mural.LAYAR, npcId, lembar, "layar.mural", TempatWarna.Gaya.BATU);
+		super(Mural.LAYAR, npcId, lembar, "layar.mural", Palette.Gaya.BATU);
 	}
 
 	@Override
-	protected List<TabLentera.Tab> tabs() {
-		return List.of(tabTema(TAB_KISAH, "mural.tab.kisah", Glyphs.Atlas.GULUNGAN), tabTema(TAB_PESAN, "mural.tab.pesan", LembarKunci.Ikon.CAP_MERAH));
+	protected List<TabBar.Tab> tabs() {
+		return List.of(tabTema(TAB_KISAH, "mural.tab.kisah"), tabTema(TAB_PESAN, "mural.tab.pesan"));
 	}
 
 	@Override
@@ -60,7 +59,7 @@ public final class LayarMural extends TemaHalaman {
 	}
 
 	@Override
-	protected KeadaanKosong.Gambar gambarKosong() {
+	protected KeadaanKosong.Gambar kosongGambar() {
 		return KeadaanKosong.Gambar.GULUNGAN;
 	}
 

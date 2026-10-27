@@ -4,19 +4,16 @@ import static dev.kultivator.client.sekte.gabung.ui.layar.LayarGabung2.pk;
 import static dev.kultivator.client.sekte.gabung.ui.layar.LayarGabung2.u;
 
 import dev.kultivator.client.screen.ui.Brush;
+import dev.kultivator.client.screen.ui.DaftarGulir;
+import dev.kultivator.client.screen.ui.Glyphs;
+import dev.kultivator.client.screen.ui.KeadaanKosong;
+import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
+import dev.kultivator.client.screen.ui.PemilihJumlah;
+import dev.kultivator.client.screen.ui.Pratinjau3D;
+import dev.kultivator.client.screen.ui.Saring;
 import dev.kultivator.client.sekte.gabung.ui.IkonGabung;
-import dev.kultivator.client.tempat.ui.kit.DaftarGulir;
-import dev.kultivator.client.tempat.ui.kit.IkonTempat;
-import dev.kultivator.client.tempat.ui.kit.KeadaanKosong;
-import dev.kultivator.client.tempat.ui.kit.KotakCari;
-import dev.kultivator.client.tempat.ui.kit.Lembar;
-import dev.kultivator.client.tempat.ui.kit.Lukis;
-import dev.kultivator.client.tempat.ui.kit.PanelTempat;
-import dev.kultivator.client.tempat.ui.kit.PemilihJumlah;
-import dev.kultivator.client.tempat.ui.kit.Pratinjau3D;
-import dev.kultivator.client.tempat.ui.kit.TabLentera;
-import dev.kultivator.client.tempat.ui.kit.TempatWarna;
+import dev.kultivator.client.screen.ui.Lembar;
 import dev.kultivator.data.Dao;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import dev.kultivator.sekte.gabung.api.Pangkat;
@@ -54,26 +51,27 @@ public final class LayarPaviliun extends LayarGabungDasar {
 	private final List<Lembar> tampil = new ArrayList<>();
 	private String tampilKunci = "";
 	private long muncul;
+	/** The search of the goods tablets (the kit's one filter row; the tablets themselves are the kinds). */
+	private final Saring saring = new Saring(() -> tampilKunci = "");
 
 	public LayarPaviliun(int npcId, CompoundTag lembar) {
-		super(Paviliun.LAYAR, npcId, lembar, u("paviliun.judul"), TempatWarna.Gaya.GIOK);
-		cari = new KotakCari();
+		super(Paviliun.LAYAR, npcId, lembar, u("paviliun.judul"), LembarKunci.GAYA_GIOK);
 	}
 
 	@Override
-	protected List<TabLentera.Tab> tabs() {
-		return List.of(new TabLentera.Tab(Paviliun.TAB_TEKNIK, u("paviliun.tab.teknik"), IkonTempat.GULUNGAN, null),
-				new TabLentera.Tab(Paviliun.TAB_WARISAN, u("paviliun.tab.warisan"), LembarKunci.Ikon.CAP_MERAH, null),
-				new TabLentera.Tab(Paviliun.TAB_PIL, u("paviliun.tab.pil"), LembarKunci.Ikon.PIL, null),
-				new TabLentera.Tab(Paviliun.TAB_PUSAKA, u("paviliun.tab.pusaka"), LembarKunci.Ikon.JIAN, null),
-				new TabLentera.Tab(Paviliun.TAB_BAHAN, u("paviliun.tab.bahan"), LembarKunci.Ikon.HERBA, null),
-				new TabLentera.Tab(Paviliun.TAB_KUOTA, u("paviliun.tab.kuota"), IkonTempat.KUNCI, null),
-				new TabLentera.Tab(Paviliun.TAB_PESANAN, u("paviliun.tab.pesanan"), IkonTempat.SURAT, null),
-				new TabLentera.Tab(Paviliun.TAB_CERAMAH, u("paviliun.tab.ceramah"), IkonTempat.BUKU, null));
+	protected List<Tab> daftarTab() {
+		return List.of(tab(Paviliun.TAB_TEKNIK, u("paviliun.tab.teknik"), Glyphs.Atlas.GULUNGAN),
+				tab(Paviliun.TAB_WARISAN, u("paviliun.tab.warisan"), LembarKunci.Ikon.CAP_MERAH),
+				tab(Paviliun.TAB_PIL, u("paviliun.tab.pil"), LembarKunci.Ikon.PIL),
+				tab(Paviliun.TAB_PUSAKA, u("paviliun.tab.pusaka"), LembarKunci.Ikon.JIAN),
+				tab(Paviliun.TAB_BAHAN, u("paviliun.tab.bahan"), LembarKunci.Ikon.HERBA),
+				tab(Paviliun.TAB_KUOTA, u("paviliun.tab.kuota"), Glyphs.Atlas.KUNCI),
+				tab(Paviliun.TAB_PESANAN, u("paviliun.tab.pesanan"), Glyphs.Atlas.SURAT),
+				tab(Paviliun.TAB_CERAMAH, u("paviliun.tab.ceramah"), Glyphs.Atlas.BUKU));
 	}
 
 	@Override
-	protected KeadaanKosong.Gambar gambarKosong() {
+	protected KeadaanKosong.Gambar kosongGambar() {
 		return KeadaanKosong.Gambar.NAMPAN;
 	}
 
@@ -121,8 +119,8 @@ public final class LayarPaviliun extends LayarGabungDasar {
 	/** Search (goods tablets), the rank factor seal and the PK on hand. Returns the y under it. */
 	private int bilah(Lukis l, int x0, int y, int x1) {
 		int kanan = x1;
-		kanan -= pk(l, pkPunya(), -1L, kanan, y + 2, true, 1.0F) + 4;
-		l.kanan(u("paviliun.pk_anda"), kanan, y + 2, gaya.teksSamar, 1.0F);
+		kanan -= pk(l, pkPunya(), -1L, kanan, y + 2, true) + 4;
+		l.kanan(u("paviliun.pk_anda"), kanan, y + 2, l.gaya.teksSamar);
 		kanan -= font.width(u("paviliun.pk_anda")) + 8;
 		int pangkat = lembar.i(GabungLembar.PANGKAT_ANGGOTA, 0);
 		float pengali = lembar.f(Paviliun.PENGALI, 1.0F);
@@ -131,7 +129,7 @@ public final class LayarPaviliun extends LayarGabungDasar {
 		int sw = font.width(seal) + 18;
 		if (kanan - sw > x0 + 60) {
 			int sx = kanan - sw;
-			l.g.fill(sx, y, sx + sw, y + 11, pengali < 0.999F ? TempatWarna.SEGEL : Palette.argb(0x50, 0x000000));
+			l.g.fill(sx, y, sx + sw, y + 11, pengali < 0.999F ? Palette.SEAL : Palette.argb(0x50, 0x000000));
 			IkonGabung.gambar(l.g, IkonGabung.pangkat(Math.max(0, pangkat)), sx + 2, y + 1, 9);
 			Brush.text(l.g, font, seal, sx + 14, y + 2, 0xFFFFF4E8, 1.0F, false);
 			if (l.di(sx, y, sx + sw, y + 11)) {
@@ -139,23 +137,23 @@ public final class LayarPaviliun extends LayarGabungDasar {
 			}
 			kanan = sx - 6;
 		}
-		if (barangTab() && cari != null) {
-			cari.gambar(l, "cari", x0, y, Math.max(40, Math.min(150, kanan - x0)), 12);
+		if (barangTab()) {
+			saring.gambar(l, "saring", x0, y, x0 + Math.max(40, Math.min(150, kanan - x0)));
 		}
-		PanelTempat.garis(l.g, gaya, x0, x1, y + 15);
-		return y + 19;
+		l.garis(x0, x1, y + 17);
+		return y + 21;
 	}
 
 	// ================================================================== goods tablets
 
-	private List<Lembar> saring() {
-		String kunci = tab + "|" + (cari == null ? "" : cari.teks()) + "|" + System.identityHashCode(lembar);
+	private List<Lembar> tersaring() {
+		String kunci = tab + "|" + saring.teks() + "|" + System.identityHashCode(lembar);
 		if (kunci.equals(tampilKunci)) {
 			return tampil;
 		}
 		tampil.clear();
 		for (Lembar e : lembar.daftar(LembarKunci.DAFTAR)) {
-			if (e.s(Paviliun.TAB_ENTRI).equals(tab) && (cari == null || cari.cocok(e.teks(LembarKunci.NAMA)))) {
+			if (e.s(Paviliun.TAB_ENTRI).equals(tab) && saring.cocok(e.teks(LembarKunci.NAMA), null)) {
 				tampil.add(e);
 			}
 		}
@@ -164,9 +162,9 @@ public final class LayarPaviliun extends LayarGabungDasar {
 	}
 
 	private void barang(Lukis l, int x0, int y0, int x1, int y1) {
-		List<Lembar> list = saring();
+		List<Lembar> list = tersaring();
 		if (list.isEmpty()) {
-			kosong(l, cari != null && !cari.kosong() ? u("paviliun.tidak_ketemu") : u("paviliun.tab_kosong." + tab), x0, y0, x1, y1);
+			kosong(l, !saring.kolom().kosong() ? u("paviliun.tidak_ketemu") : u("paviliun.tab_kosong." + tab), x0, y0, x1, y1);
 			return;
 		}
 		y0 = bilahHalaman(l, x0, y0, x1, u("paviliun.hal.barang"), u("paviliun.hal.rincian"));
@@ -185,10 +183,10 @@ public final class LayarPaviliun extends LayarGabungDasar {
 		boolean kunci = LembarKunci.K_TERKUNCI.equals(keadaan);
 		boolean habis = LembarKunci.K_HABIS.equals(keadaan);
 		boolean redup = kunci || habis;
-		PanelTempat.kartu(l.g, gaya, x0, y0, x1, y1, sorot ? 1.0F : 0.0F, pilih);
+		l.kartu(x0, y0, x1, y1, sorot ? 1.0F : 0.0F, pilih);
 		if (e.b(Paviliun.WARISAN)) {
 			// the Teknik Warisan: a thin gold rim
-			l.g.fill(x0, y0, x0 + 2, y1, TempatWarna.EMAS);
+			l.g.fill(x0, y0, x0 + 2, y1, Palette.GOLD);
 		}
 		ItemStack item = e.barang();
 		int iy = y0 + (y1 - y0 - 16) / 2;
@@ -196,29 +194,29 @@ public final class LayarPaviliun extends LayarGabungDasar {
 			l.g.item(item, x0 + 4, iy);
 		}
 		if (redup) {
-			l.g.fill(x0 + 4, iy, x0 + 20, iy + 16, Palette.argb(0x70, gaya.dasar & 0xFFFFFF));
+			l.g.fill(x0 + 4, iy, x0 + 20, iy + 16, Palette.argb(0x70, l.gaya.dasar & 0xFFFFFF));
 		}
 		int kanan = x1 - 4;
 		int harga = e.i(LembarKunci.HARGA, 0);
 		int dasar = e.i(Paviliun.HARGA_DASAR, harga);
-		int pw = pk(l, harga, redup ? -1L : pkPunya(), kanan, y0 + 3, true, 1.0F);
+		int pw = pk(l, harga, redup ? -1L : pkPunya(), kanan, y0 + 3, true);
 		if (dasar > harga) {
 			Component coret = Component.literal(Brush.angka(dasar)).withStyle(ChatFormatting.STRIKETHROUGH);
-			l.kanan(coret, kanan, y0 + 13, gaya.teksSamar, 1.0F);
+			l.kanan(coret, kanan, y0 + 13, l.gaya.teksSamar);
 		}
 		if (kunci) {
-			IkonTempat.gambar(l.g, LembarKunci.Ikon.GEMBOK, kanan - pw - 11, y0 + 2, 9, 0xFFFFFFFF);
+			Glyphs.Atlas.ikon(l.g, LembarKunci.Ikon.GEMBOK, kanan - pw - 11, y0 + 2, 9, 0xFFFFFFFF);
 			pw += 11;
 		}
 		int tx = x0 + 24;
 		int room = kanan - pw - 6 - tx;
-		int warna = redup ? TempatWarna.terkunci(gaya.teks) : TempatWarna.mutu(e.i(LembarKunci.MUTU, -1), gaya.gelap(), gaya.teks);
+		int warna = redup ? Palette.terkunci(l.gaya.teks) : Palette.mutu(e.i(LembarKunci.MUTU, -1), l.gaya.gelap(), l.gaya.teks);
 		l.teks(e.teks(LembarKunci.NAMA), tx, y0 + 3, room, warna);
 		Component bawah;
-		int bawahWarna = gaya.teksSamar;
+		int bawahWarna = l.gaya.teksSamar;
 		if (redup) {
 			bawah = e.teksAtau(LembarKunci.ALASAN) != null ? e.teks(LembarKunci.ALASAN) : u("paviliun.habis");
-			bawahWarna = gaya.gelap() ? 0xFFFF9A8A : TempatWarna.BAHAYA;
+			bawahWarna = l.gaya.gelap() ? 0xFFFF9A8A : Palette.BAHAYA;
 		} else {
 			int stok = e.i(LembarKunci.STOK, -1);
 			bawah = stok < 0 ? u("paviliun.stok_bebas") : u("paviliun.stok", stok);
@@ -252,15 +250,15 @@ public final class LayarPaviliun extends LayarGabungDasar {
 		int y = k.y0() + 4;
 		int by = k.y1() - 19;
 		boolean bisa = e.bisa();
-		int teks = gaya.teksSumur();
+		int teks = l.gaya.teksSumur();
 		int lemah = Palette.argb(0xB0, teks & 0xFFFFFF);
 		// the preview: big in the wide layout, a band otherwise
-		int ph = tata == Tata.LEBAR ? Math.min(80, (by - y) / 2) : Math.min(46, (by - y) / 3);
+		int ph = tata() == Tata.LEBAR ? Math.min(80, (by - y) / 2) : Math.min(46, (by - y) / 3);
 		if (ph >= 24) {
 			pratinjau.gambar(l, "pratinjau", x0, y, x1, y + ph, e.barang(), null, -1);
 			y += ph + 3;
 		}
-		int warna = TempatWarna.mutu(e.i(LembarKunci.MUTU, -1), false, teks);
+		int warna = Palette.mutu(e.i(LembarKunci.MUTU, -1), false, teks);
 		l.teks(Brush.bold(e.teks(LembarKunci.NAMA)), x0, y, x1 - x0, warna);
 		y += 11;
 		Dao dao = e.ada(GabungLembar.DAO) ? Dao.byId(e.s(GabungLembar.DAO)) : null;
@@ -280,16 +278,16 @@ public final class LayarPaviliun extends LayarGabungDasar {
 		int dasar = e.i(Paviliun.HARGA_DASAR, harga);
 		if (y + 10 < by - 16) {
 			l.teks(u("paviliun.harga_dasar"), x0, y, 70, lemah);
-			pk(l, dasar, -1L, x1, y, true, 1.0F, teks);
+			pk(l, dasar, -1L, x1, y, true, teks);
 			y += 10;
 		}
 		float pengali = lembar.f(Paviliun.PENGALI, 1.0F);
 		if (pengali < 0.999F && y + 10 < by - 16) {
-			l.teks(u("paviliun.potong_pangkat", Math.round((1.0F - pengali) * 100)), x0, y, x1 - x0, TempatWarna.OK);
+			l.teks(u("paviliun.potong_pangkat", Math.round((1.0F - pengali) * 100)), x0, y, x1 - x0, Palette.OK);
 			y += 10;
 		}
 		if (e.b(Paviliun.CORAK_DISKON) && y + 10 < by - 16) {
-			l.teks(u("paviliun.potong_corak"), x0, y, x1 - x0, TempatWarna.OK);
+			l.teks(u("paviliun.potong_corak"), x0, y, x1 - x0, Palette.OK);
 			y += 10;
 		}
 		if (y + 10 < by - 16) {
@@ -299,7 +297,7 @@ public final class LayarPaviliun extends LayarGabungDasar {
 		}
 		Component alasan = e.teksAtau(LembarKunci.ALASAN);
 		if (alasan != null && !bisa && y + 10 < by - 16) {
-			y += Math.round(l.bungkus(alasan, x0, y, x1 - x0, TempatWarna.BAHAYA, 1.0F, by - 16 - y)) + 2;
+			y += Math.round(l.bungkus(alasan, x0, y, x1 - x0, Palette.BAHAYA, by - 16 - y)) + 2;
 		}
 		// amount and the exchange button
 		int stok = e.i(LembarKunci.STOK, -1);
@@ -307,7 +305,7 @@ public final class LayarPaviliun extends LayarGabungDasar {
 		int maks = Math.max(1, Math.min(TUKAR_MAKS, Math.min(stok < 0 ? TUKAR_MAKS : stok, mampu)));
 		int jy = by - 15;
 		int jw = jumlah.gambar(l, "jumlah", x0, jy, maks);
-		pk(l, (long) harga * jumlah.nilai(), pkPunya(), x0 + jw + 6, jy + 2, false, 1.0F, teks);
+		pk(l, (long) harga * jumlah.nilai(), pkPunya(), x0 + jw + 6, jy + 2, false, teks);
 		boolean cukup = (long) harga * jumlah.nilai() <= pkPunya();
 		Component tolak = !bisa ? (alasan != null ? alasan : u("paviliun.habis")) : !cukup ? u("paviliun.kurang_pk") : null;
 		tombolOp(l, "tukar", x0, by, x1 - x0, 15, u("paviliun.tukar", jumlah.nilai(), Brush.angka((long) harga * jumlah.nilai())), bisa && cukup,
@@ -315,7 +313,7 @@ public final class LayarPaviliun extends LayarGabungDasar {
 	}
 
 	private void tukar() {
-		List<Lembar> list = saring();
+		List<Lembar> list = tersaring();
 		int i = daftar.pilihan();
 		if (i >= 0 && i < list.size() && list.get(i).bisa()) {
 			kirim(LembarKunci.op(Paviliun.OP_TUKAR, list.get(i).id(), jumlah.nilai()));
@@ -326,7 +324,7 @@ public final class LayarPaviliun extends LayarGabungDasar {
 
 	private void pesanan(Lukis l, int x0, int y0, int x1, int y1) {
 		List<Lembar> list = lembar.daftar(Paviliun.PESANAN);
-		l.teks(u("paviliun.pesanan.ket"), x0, y0, x1 - x0, gaya.teksSamar);
+		l.teks(u("paviliun.pesanan.ket"), x0, y0, x1 - x0, l.gaya.teksSamar);
 		y0 += 11;
 		if (list.isEmpty()) {
 			kosong(l, u("paviliun.pesanan.kosong"), x0, y0, x1, y1);
@@ -334,7 +332,7 @@ public final class LayarPaviliun extends LayarGabungDasar {
 		}
 		pesanan.gambar(l, "pesanan", x0, y0, x1, y1, list.size(), 30, (lk, i, rx0, ry0, rx1, ry1, sorot, pilih) -> {
 			Lembar e = list.get(i);
-			PanelTempat.kartu(lk.g, gaya, rx0, ry0, rx1, ry1, sorot ? 1.0F : 0.0F, pilih);
+			lk.kartu(rx0, ry0, rx1, ry1, sorot ? 1.0F : 0.0F, pilih);
 			ItemStack item = e.barang();
 			if (!item.isEmpty()) {
 				lk.g.item(item, rx0 + 5, ry0 + 7);
@@ -345,12 +343,12 @@ public final class LayarPaviliun extends LayarGabungDasar {
 			int bw = Math.min(110, (rx1 - rx0) / 3);
 			int bx = rx1 - bw - 4;
 			int tx = rx0 + 26;
-			lk.teks(e.teks(LembarKunci.NAMA).copy().append(" ×" + perlu), tx, ry0 + 4, bx - tx - 60, gaya.teks);
-			int iw = pk(lk, e.i(LembarKunci.PK, 0), -1L, bx - 6, ry0 + 4, true, 1.0F);
+			lk.teks(e.teks(LembarKunci.NAMA).copy().append(" ×" + perlu), tx, ry0 + 4, bx - tx - 60, l.gaya.teks);
+			int iw = pk(lk, e.i(LembarKunci.PK, 0), -1L, bx - 6, ry0 + 4, true);
 			lk.teks(u("paviliun.pesanan.imbalan"), bx - 8 - iw - font.width(u("paviliun.pesanan.imbalan")), ry0 + 4, 60,
-					gaya.teksSamar);
-			batang(lk, tx, ry0 + 17, Math.max(20, bx - tx - 50), 4, punya / (float) perlu, siap ? TempatWarna.OK : TempatWarna.PERINGATAN, -1.0F);
-			lk.teks(u("paviliun.pesanan.punya", punya, perlu), tx + Math.max(20, bx - tx - 50) + 4, ry0 + 16, 46, siap ? TempatWarna.OK : gaya.teksSamar);
+					l.gaya.teksSamar);
+			batang(lk, tx, ry0 + 17, Math.max(20, bx - tx - 50), punya / (float) perlu, siap ? Palette.OK : Palette.PERINGATAN, -1.0F);
+			lk.teks(u("paviliun.pesanan.punya", punya, perlu), tx + Math.max(20, bx - tx - 50) + 4, ry0 + 16, 46, siap ? Palette.OK : l.gaya.teksSamar);
 			tombolOp(lk, "serah" + i, bx, ry0 + 7, bw, 15, u("paviliun.pesanan.serahkan"), siap, u("paviliun.pesanan.kurang", perlu - punya),
 					LembarKunci.op(Paviliun.OP_SERAHKAN, e.id()));
 		}, null, null);
@@ -358,7 +356,7 @@ public final class LayarPaviliun extends LayarGabungDasar {
 
 	private void ceramah(Lukis l, int x0, int y0, int x1, int y1) {
 		List<Lembar> list = lembar.daftar(Paviliun.CERAMAH);
-		l.teks(u("paviliun.ceramah.ket"), x0, y0, x1 - x0, gaya.teksSamar);
+		l.teks(u("paviliun.ceramah.ket"), x0, y0, x1 - x0, l.gaya.teksSamar);
 		y0 += 11;
 		if (list.isEmpty()) {
 			kosong(l, u("paviliun.ceramah.kosong"), x0, y0, x1, y1);
@@ -366,14 +364,14 @@ public final class LayarPaviliun extends LayarGabungDasar {
 		}
 		ceramah.gambar(l, "ceramah", x0, y0, x1, y1, list.size(), 26, (lk, i, rx0, ry0, rx1, ry1, sorot, pilih) -> {
 			Lembar e = list.get(i);
-			PanelTempat.kartu(lk.g, gaya, rx0, ry0, rx1, ry1, sorot ? 1.0F : 0.0F, pilih);
+			lk.kartu(rx0, ry0, rx1, ry1, sorot ? 1.0F : 0.0F, pilih);
 			IkonGabung.gambar(lk.g, IkonGabung.MURID, rx0 + 4, ry0 + 5, 16);
 			int bw = Math.min(120, (rx1 - rx0) / 3);
 			int bx = rx1 - bw - 4;
-			lk.teks(e.teks(LembarKunci.NAMA), rx0 + 24, ry0 + 4, bx - rx0 - 30, gaya.teks);
+			lk.teks(e.teks(LembarKunci.NAMA), rx0 + 24, ry0 + 4, bx - rx0 - 30, l.gaya.teks);
 			boolean bisa = e.b(LembarKunci.BISA);
 			Component bawah = bisa ? u("paviliun.ceramah.siap") : e.teks(LembarKunci.ALASAN);
-			lk.teks(bawah, rx0 + 24, ry0 + 14, bx - rx0 - 30, bisa ? TempatWarna.OK : TempatWarna.BAHAYA);
+			lk.teks(bawah, rx0 + 24, ry0 + 14, bx - rx0 - 30, bisa ? Palette.OK : Palette.BAHAYA);
 			int harga = e.i(LembarKunci.HARGA, 0);
 			tombolOp(lk, "ceramah" + i, bx, ry0 + 5, bw, 15, u("paviliun.ceramah.tombol", Brush.angka(harga)), bisa && harga <= pkPunya(),
 					bisa ? u("paviliun.kurang_pk") : e.teksAtau(LembarKunci.ALASAN), LembarKunci.op(Paviliun.OP_CERAMAH, e.id()));

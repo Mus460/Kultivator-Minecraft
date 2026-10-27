@@ -225,7 +225,6 @@
   "kultivator.gabung.ui2.politik.kas.tangan_kosong": "Your hand is empty",
   "kultivator.gabung.ui2.politik.kas.tak_bernilai": "The treasury does not take this item",
   "kultivator.gabung.ui2.politik.kas.grafik": "Resources over the last 7 days",
-  "kultivator.gabung.ui2.politik.kas.hari": "%s days ago: %s",
   "kultivator.gabung.ui2.politik.kas.hari_ini": "now",
   "kultivator.gabung.ui2.politik.cabang.induk": "Your hall is a branch of %s",
   "kultivator.gabung.ui2.politik.cabang.merdeka": "Secede",

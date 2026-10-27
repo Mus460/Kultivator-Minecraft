@@ -4,10 +4,9 @@ import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
+import dev.kultivator.client.screen.ui.TabBar;
 import dev.kultivator.client.screen.ui.UiSound;
-import dev.kultivator.client.tempat.ui.kit.Lembar;
-import dev.kultivator.client.tempat.ui.kit.TabLentera;
-import dev.kultivator.client.tempat.ui.kit.TempatWarna;
+import dev.kultivator.client.screen.ui.Lembar;
 import dev.kultivator.dunia.tempat.tema.bersama.TemaLayar.KitabTerlarang;
 import dev.kultivator.dunia.tempat.tema.bersama.TemaLayar.PasarGelap;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
@@ -34,11 +33,11 @@ public final class LayarKitabTerlarang extends TemaHalaman {
 	private int gentar;
 
 	public LayarKitabTerlarang(int npcId, CompoundTag lembar) {
-		super(KitabTerlarang.LAYAR, npcId, lembar, "layar.kitab", TempatWarna.Gaya.KERTAS);
+		super(KitabTerlarang.LAYAR, npcId, lembar, "layar.kitab", Palette.Gaya.KERTAS);
 	}
 
 	@Override
-	protected List<TabLentera.Tab> tabs() {
+	protected List<TabBar.Tab> tabs() {
 		return List.of();
 	}
 

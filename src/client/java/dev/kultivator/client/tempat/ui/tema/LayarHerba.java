@@ -7,9 +7,8 @@ import dev.kultivator.client.screen.ui.LabelHarga;
 import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.Pratinjau3D;
-import dev.kultivator.client.tempat.ui.kit.Lembar;
-import dev.kultivator.client.tempat.ui.kit.TabLentera;
-import dev.kultivator.client.tempat.ui.kit.TempatWarna;
+import dev.kultivator.client.screen.ui.TabBar;
+import dev.kultivator.client.screen.ui.Lembar;
 import dev.kultivator.dunia.tempat.tema.bersama.TemaLayar.Herba;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import java.util.List;
@@ -38,15 +37,15 @@ public final class LayarHerba extends TemaHalaman {
 	private final Pratinjau3D pratinjauNilai = new Pratinjau3D();
 
 	public LayarHerba(int npcId, CompoundTag lembar) {
-		super(Herba.LAYAR, npcId, lembar, "layar.herba", TempatWarna.Gaya.KAYU);
+		super(Herba.LAYAR, npcId, lembar, "layar.herba", Palette.Gaya.KAYU);
 	}
 
 	@Override
-	protected List<TabLentera.Tab> tabs() {
-		return List.of(tabTema(Herba.TAB_BELI, "herba.tab.beli", LembarKunci.Ikon.HERBA),
-				tabTema(Herba.TAB_JUAL, "herba.tab.jual", LembarKunci.Ikon.TIMBANGAN),
-				tabTema(Herba.TAB_NILAI, "herba.tab.nilai", LembarKunci.Ikon.MATA_BATIN),
-				tabTema(Herba.TAB_PERINGKAT, "herba.tab.peringkat", Glyphs.Atlas.PIALA));
+	protected List<TabBar.Tab> tabs() {
+		return List.of(tabTema(Herba.TAB_BELI, "herba.tab.beli"),
+				tabTema(Herba.TAB_JUAL, "herba.tab.jual"),
+				tabTema(Herba.TAB_NILAI, "herba.tab.nilai"),
+				tabTema(Herba.TAB_PERINGKAT, "herba.tab.peringkat"));
 	}
 
 	@Override

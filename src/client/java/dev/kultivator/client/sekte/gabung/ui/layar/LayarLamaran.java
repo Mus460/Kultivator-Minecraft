@@ -1,16 +1,15 @@
 package dev.kultivator.client.sekte.gabung.ui.layar;
 
 import dev.kultivator.client.screen.ui.Brush;
+import dev.kultivator.client.screen.ui.DaftarGulir;
+import dev.kultivator.client.screen.ui.Glyphs;
+import dev.kultivator.client.screen.ui.KeadaanKosong;
+import dev.kultivator.client.screen.ui.Lukis;
+import dev.kultivator.client.screen.ui.Palette;
+import dev.kultivator.client.screen.ui.TalismanButton;
 import dev.kultivator.client.sekte.diplomasi.LuarPage;
 import dev.kultivator.client.sekte.gabung.ui.IkonGabung;
-import dev.kultivator.client.tempat.ui.kit.DaftarGulir;
-import dev.kultivator.client.tempat.ui.kit.IkonTempat;
-import dev.kultivator.client.tempat.ui.kit.KeadaanKosong;
-import dev.kultivator.client.tempat.ui.kit.Lembar;
-import dev.kultivator.client.tempat.ui.kit.Lukis;
-import dev.kultivator.client.tempat.ui.kit.PanelTempat;
-import dev.kultivator.client.tempat.ui.kit.TabLentera;
-import dev.kultivator.client.tempat.ui.kit.TempatWarna;
+import dev.kultivator.client.screen.ui.Lembar;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import dev.kultivator.sekte.gabung.api.Pintu;
 import dev.kultivator.sekte.gabung.ui.GabungLembar;
@@ -34,20 +33,20 @@ public final class LayarLamaran extends LayarGabungDasar {
 	private final DaftarGulir tokenGulir = new DaftarGulir();
 
 	public LayarLamaran(int npcId, CompoundTag lembar) {
-		super(Lamaran.LAYAR, npcId, lembar, t("lamaran.judul_bawaan"), TempatWarna.Gaya.KERTAS);
+		super(Lamaran.LAYAR, npcId, lembar, t("lamaran.judul_bawaan"), LembarKunci.GAYA_KERTAS);
 	}
 
 	@Override
-	protected List<TabLentera.Tab> tabs() {
-		return List.of(new TabLentera.Tab(Lamaran.TAB_GERBANG, Pintu.GERBANG.nama(), LembarKunci.Ikon.KUIL, null),
-				new TabLentera.Tab(Lamaran.TAB_TOKEN, Pintu.TOKEN.nama(), LembarKunci.Ikon.JIMAT, null),
-				new TabLentera.Tab(Lamaran.TAB_UNDANGAN, Pintu.UNDANGAN.nama(), IkonTempat.SURAT, null),
-				new TabLentera.Tab(Lamaran.TAB_PELAYAN, Pintu.PELAYAN.nama(), IkonTempat.TONGGAK, null),
-				new TabLentera.Tab(Lamaran.TAB_TAMU, Pintu.TAMU.nama(), IkonTempat.DUPA, null));
+	protected List<Tab> daftarTab() {
+		return List.of(tab(Lamaran.TAB_GERBANG, Pintu.GERBANG.nama(), LembarKunci.Ikon.KUIL),
+				tab(Lamaran.TAB_TOKEN, Pintu.TOKEN.nama(), LembarKunci.Ikon.JIMAT),
+				tab(Lamaran.TAB_UNDANGAN, Pintu.UNDANGAN.nama(), Glyphs.Atlas.SURAT),
+				tab(Lamaran.TAB_PELAYAN, Pintu.PELAYAN.nama(), Glyphs.Atlas.TONGGAK),
+				tab(Lamaran.TAB_TAMU, Pintu.TAMU.nama(), Glyphs.Atlas.DUPA));
 	}
 
 	@Override
-	protected KeadaanKosong.Gambar gambarKosong() {
+	protected KeadaanKosong.Gambar kosongGambar() {
 		return KeadaanKosong.Gambar.GULUNGAN;
 	}
 
@@ -79,10 +78,10 @@ public final class LayarLamaran extends LayarGabungDasar {
 		long hariIni = hariIni();
 		// the door line and the test day
 		IkonGabung.gambar(l.g, IkonGabung.PINTU + pintu.ordinal(), x0, y, 16);
-		l.teks(Brush.bold(t("lamaran.pintu", pintu.nama())), x0 + 19, y + 1, (x1 - x0) / 2 - 20, gaya.teks, 1.0F);
+		l.teks(Brush.bold(t("lamaran.pintu", pintu.nama())), x0 + 19, y + 1, (x1 - x0) / 2 - 20, l.gaya.teks);
 		Component hari = pintu == Pintu.PELAYAN || pintu == Pintu.TAMU ? t("lamaran.kapan_saja")
 				: t("lamaran.hari_ujian", hariKe(lembar.l(GabungLembar.HARI_UJIAN, -1L), hariIni));
-		l.kanan(hari, x1, y + 1, gaya.teksLemah, 1.0F);
+		l.kanan(hari, x1, y + 1, l.gaya.teksLemah);
 		y += 12;
 		// the stages as a chain of icons, then the best rank
 		int sx = x0 + 19;
@@ -101,10 +100,10 @@ public final class LayarLamaran extends LayarGabungDasar {
 			if (sx + 12 + nw > x1) {
 				break; // P5: text 1.0 (43.0.5); the full chain stays in the requirement lines below
 			}
-			l.teks(nama, sx + 12, y + 1, 90, gaya.teks, 1.0F);
+			l.teks(nama, sx + 12, y + 1, 90, l.gaya.teks);
 			sx += 12 + nw + 3;
 			if (i < tahap.size() - 1 && sx + 8 < x1) {
-				l.teks(Component.literal("›"), sx, y + 1, 6, gaya.teksSamar, 1.0F);
+				l.teks(Component.literal("›"), sx, y + 1, 6, l.gaya.teksSamar);
 				sx += 8;
 			}
 		}
@@ -113,17 +112,17 @@ public final class LayarLamaran extends LayarGabungDasar {
 		int mw = font.width(maks);
 		if (sx + mw + 16 < x1) {
 			IkonGabung.gambar(l.g, IkonGabung.pangkat(pangkat), x1 - mw - 12, y, 10);
-			l.kanan(maks, x1, y + 1, gaya.teksLemah, 1.0F);
+			l.kanan(maks, x1, y + 1, l.gaya.teksLemah);
 		}
 		y += 13;
-		PanelTempat.garis(l.g, gaya, x0, x1, y);
+		l.garis(x0, x1, y);
 		y += 4;
 		int by = y1 - 18;
 		// tab Token: the tokens of the bag on the right (a second page behind two chips in the narrow layout)
 		int sx1 = x1;
 		boolean adaToken = Lamaran.TAB_TOKEN.equals(tab);
 		boolean halamanToken = false;
-		if (adaToken && tata == Tata.SEMPIT) {
+		if (adaToken && tata() == Tata.SEMPIT) {
 			y = bilahHalaman(l, x0, y, x1, t("lamaran.hal.syarat"), t("lamaran.hal.token"));
 			halamanToken = halaman == 1;
 		} else if (adaToken) {
@@ -144,19 +143,19 @@ public final class LayarLamaran extends LayarGabungDasar {
 			boolean sini = calon.b(Lamaran.SINI);
 			status = sini ? t("lamaran.calon_sini", Pintu.byId(calon.s(GabungLembar.PINTU), Pintu.GERBANG).nama(),
 					hariKe(calon.l(Lamaran.SAMPAI, -1L), hariIni)) : t("lamaran.calon_lain", calon.teks(GabungLembar.NAMA_SEKTE));
-			warna = sini ? TempatWarna.OK : TempatWarna.PERINGATAN;
+			warna = sini ? Palette.OK : Palette.PERINGATAN;
 		} else if (lembar.ada(Lamaran.JEDA)) {
 			status = t("lamaran.jeda", hariKe(lembar.l(Lamaran.JEDA, -1L), hariIni));
-			warna = TempatWarna.PERINGATAN;
+			warna = Palette.PERINGATAN;
 		} else if (!p.b(LembarKunci.BISA) && p.teksAtau(LembarKunci.ALASAN) != null) {
 			// the locked button's reason in plain sight (a disabled button is not a Tab stop)
 			status = p.teks(LembarKunci.ALASAN);
-			warna = TempatWarna.PERINGATAN;
+			warna = Palette.PERINGATAN;
 		} else {
 			status = t("lamaran.catatan_jeda");
-			warna = gaya.teksSamar;
+			warna = l.gaya.teksSamar;
 		}
-		l.teks(status, x0, by - 11, x1 - x0, warna, 1.0F);
+		l.teks(status, x0, by - 11, x1 - x0, warna);
 		boolean sini = !calon.kosongSemua() && calon.b(Lamaran.SINI);
 		int bw = Math.min(150, (x1 - x0 - 4) / 2);
 		if (sini) {
@@ -173,23 +172,23 @@ public final class LayarLamaran extends LayarGabungDasar {
 			Component ke = Component.translatable("kultivator.gui43.m11.ke_sekte_dunia");
 			kw = Math.min(110, (x1 - x0 - 4) / 2 - bw / 2);
 			if (kw >= 40) {
-				tombol.gambar(l, "sekte_dunia", x1 - kw, by, kw, 15, ke, true, null, () -> LuarPage.bukaSekte(sekte));
+				TalismanButton.gambar(l, "sekte_dunia", x1 - kw, by, kw, 15, ke, true, null, () -> LuarPage.bukaSekte(sekte));
 			} else {
 				kw = 0;
 			}
 		}
 		Component catatan = t("lamaran.tahap_jumlah", tahap.size());
-		l.teks(catatan, x0 + bw + 8, by + 4, x1 - x0 - bw - 8 - (kw > 0 ? kw + 4 : 0), gaya.teksSamar, 1.0F);
+		l.teks(catatan, x0 + bw + 8, by + 4, x1 - x0 - bw - 8 - (kw > 0 ? kw + 4 : 0), l.gaya.teksSamar);
 	}
 
 	/** The tokens in the bag, with whether this sect takes them (a scrolled list: arrow keys reach every one). */
 	private void token(Lukis l, int x0, int y0, int x1, int y1) {
-		PanelTempat.kartu(l.g, gaya, x0, y0, x1, y1, 0.0F, false);
-		l.teks(t("lamaran.token.judul"), x0 + 4, y0 + 3, x1 - x0 - 8, gaya.gelap() ? TempatWarna.EMAS_TERANG : gaya.aksen, 1.0F);
+		l.kartu(x0, y0, x1, y1, 0.0F, false);
+		l.teks(t("lamaran.token.judul"), x0 + 4, y0 + 3, x1 - x0 - 8, l.gaya.gelap() ? Palette.GOLD_LIGHT : l.gaya.aksen);
 		List<Lembar> token = lembar.daftar(Lamaran.TOKEN);
 		int y = y0 + 14;
 		if (token.isEmpty()) {
-			l.bungkus(t("lamaran.token.kosong"), x0 + 4, y, x1 - x0 - 8, gaya.teksSamar, 1.0F, y1 - y - 2);
+			l.bungkus(t("lamaran.token.kosong"), x0 + 4, y, x1 - x0 - 8, l.gaya.teksSamar, y1 - y - 2);
 			return;
 		}
 		tokenGulir.gambar(l, "token", x0 + 1, y, x1 - 1, y1 - 1, token.size(), 20, (lk, i, rx0, ry0, rx1, ry1, sorot, pilih) -> {
@@ -199,10 +198,10 @@ public final class LayarLamaran extends LayarGabungDasar {
 				lk.g.item(stack, rx0 + 2, ry0);
 			}
 			boolean sah = e.b(Lamaran.SAH);
-			lk.teks(e.teks(LembarKunci.NAMA), rx0 + 21, ry0 + 1, rx1 - rx0 - 35, gaya.teks, 1.0F);
-			IkonTempat.gambar(lk.g, sah ? IkonTempat.CENTANG : IkonTempat.SILANG, rx1 - 12, ry0 + 1, 9, 0xFFFFFFFF);
+			lk.teks(e.teks(LembarKunci.NAMA), rx0 + 21, ry0 + 1, rx1 - rx0 - 35, l.gaya.teks);
+			Glyphs.Atlas.ikon(lk.g, sah ? Glyphs.Atlas.CENTANG : Glyphs.Atlas.SILANG, rx1 - 12, ry0 + 1, 9, 0xFFFFFFFF);
 			Component bawah = sah ? t("lamaran.token.sah") : e.teks(LembarKunci.ALASAN);
-			lk.teks(bawah, rx0 + 21, ry0 + 10, rx1 - rx0 - 25, sah ? TempatWarna.OK : TempatWarna.BAHAYA, 1.0F);
+			lk.teks(bawah, rx0 + 21, ry0 + 10, rx1 - rx0 - 25, sah ? Palette.OK : Palette.BAHAYA);
 			if (lk.di(rx0, ry0, rx1, ry1) && !stack.isEmpty()) {
 				lk.tip(stack.getHoverName());
 			}

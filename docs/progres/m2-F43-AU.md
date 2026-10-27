@@ -27,11 +27,12 @@ irisan yang kecil dan pasti, lalu membangun. Tanpa commit, tanpa salin ke `.mine
 - [x] sekte #3/#11: ubahan server dicatat di 43.14 sebagai S6 (Tangga `soul`/`eid`) dan S7 (blok `turnamen` papan sekte).
 
 ## Butir needs yang belum (pekerjaan tersendiri, satu lembar per langkah dengan kompilasi)
-- [ ] kit G-1/G-2/G-4, sekte #7, dunia G-4/K-4, disini #10: lembar kit 38 (sekte/gabung/ui/layar/*, tempat/ui/layar/*,
+- [x] kit G-1/G-2/G-4, sekte #7, dunia G-4/K-4, disini #10: lembar kit 38 (sekte/gabung/ui/layar/*, tempat/ui/layar/*,
       `LayarBukuDagang`) ke `screen/ui.Lukis` + `TabBar.Tab` + `TalismanButton`; sesudahnya `.deactivation` 10 kembar
       kit 38, `TombolAksi`, `TabLentera`, mesin LTD. Kit 38 juga dipakai kota42 (G2, tidak boleh disentuh).
-- [ ] kit G-3: `LayarPaviliun` ke `Saring`/`InkField.cari`, lalu `KotakCari` (ikut port lembar di atas).
-- [ ] kit G-6..G-12, B-2, K-2, K-4, T-2, T-3: ikut port kit 38 yang sama.
+      Selesai di F43-B (`m2-F43-B.md`): semua kelas kit 38 jadi `.deactivation`, mesin LTD dibuang, model lembar pindah ke `tempat/ui/LayarTempatDasar`.
+- [x] kit G-3: `LayarPaviliun` ke `Saring`/`InkField.cari`, lalu `KotakCari` (ikut port lembar di atas).
+- [x] kit G-6..G-12, B-2, K-2, K-4, T-2, T-3: ikut port kit 38 yang sama.
 - [ ] sekte #9: `PapanMisi` butuh imbalan PK sebelum `LayarPapan` pindah.
 - [ ] disini #12: uji skala UI untuk lembar kit tunggal (skala di `Page.render` + transform tetikus) belum.
 - [ ] dunia: baris sumber `abadi.lelang.source` di LayarLelang (kontrak lembar tanpa baris kaki); kunci dibiarkan.

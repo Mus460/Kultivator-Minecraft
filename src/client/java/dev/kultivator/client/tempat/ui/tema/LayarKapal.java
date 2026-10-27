@@ -6,9 +6,8 @@ import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.Pratinjau3D;
-import dev.kultivator.client.tempat.ui.kit.Lembar;
-import dev.kultivator.client.tempat.ui.kit.TabLentera;
-import dev.kultivator.client.tempat.ui.kit.TempatWarna;
+import dev.kultivator.client.screen.ui.TabBar;
+import dev.kultivator.client.screen.ui.Lembar;
 import dev.kultivator.dunia.tempat.tema.bersama.TemaLayar.Kapal;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import java.util.ArrayList;
@@ -35,13 +34,13 @@ public final class LayarKapal extends TemaHalaman {
 	private int murid;
 
 	public LayarKapal(int npcId, CompoundTag lembar) {
-		super(Kapal.LAYAR, npcId, lembar, "layar.kapal", TempatWarna.Gaya.KAYU);
+		super(Kapal.LAYAR, npcId, lembar, "layar.kapal", Palette.Gaya.KAYU);
 	}
 
 	@Override
-	protected List<TabLentera.Tab> tabs() {
-		return List.of(tabTema(Kapal.TAB_MUATAN, "kapal.tab.muatan", LembarKunci.Ikon.DERMAGA),
-				tabTema(Kapal.TAB_LINTAS, "kapal.tab.lintas", Glyphs.Atlas.KOMPAS));
+	protected List<TabBar.Tab> tabs() {
+		return List.of(tabTema(Kapal.TAB_MUATAN, "kapal.tab.muatan"),
+				tabTema(Kapal.TAB_LINTAS, "kapal.tab.lintas"));
 	}
 
 	@Override

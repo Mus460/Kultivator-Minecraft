@@ -1,20 +1,19 @@
 package dev.kultivator.client.sekte.gabung.ui.layar;
 
 import dev.kultivator.client.screen.ui.Brush;
+import dev.kultivator.client.screen.ui.CincinWaktu;
+import dev.kultivator.client.screen.ui.DaftarGulir;
+import dev.kultivator.client.screen.ui.DaftarSekte;
+import dev.kultivator.client.screen.ui.Glyphs;
+import dev.kultivator.client.screen.ui.GulirIsi;
+import dev.kultivator.client.screen.ui.KeadaanKosong;
+import dev.kultivator.client.screen.ui.LabelHarga;
+import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
+import dev.kultivator.client.screen.ui.Potret;
 import dev.kultivator.client.screen.ui.SegelKonfirmasi;
 import dev.kultivator.client.sekte.gabung.ui.IkonGabung;
-import dev.kultivator.client.tempat.ui.kit.CincinWaktu;
-import dev.kultivator.client.tempat.ui.kit.DaftarGulir;
-import dev.kultivator.client.tempat.ui.kit.IkonTempat;
-import dev.kultivator.client.tempat.ui.kit.KeadaanKosong;
-import dev.kultivator.client.tempat.ui.kit.LabelHarga;
-import dev.kultivator.client.tempat.ui.kit.Lembar;
-import dev.kultivator.client.tempat.ui.kit.Lukis;
-import dev.kultivator.client.tempat.ui.kit.PanelTempat;
-import dev.kultivator.client.tempat.ui.kit.Potret;
-import dev.kultivator.client.tempat.ui.kit.TabLentera;
-import dev.kultivator.client.tempat.ui.kit.TempatWarna;
+import dev.kultivator.client.screen.ui.Lembar;
 import dev.kultivator.data.Dao;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import dev.kultivator.sekte.gabung.ui.GabungLembar;
@@ -45,14 +44,16 @@ public final class LayarKartu extends LayarGabungDasar {
 
 	private final DaftarGulir catatan = new DaftarGulir();
 	private final DaftarGulir syaratKeluar = new DaftarGulir();
-	private final GulirKolom kolom = new GulirKolom();
+	private final GulirIsi kolom = new GulirIsi();
+	/** The column has been laid out once (its height is known), so {@link #lompat} can scroll. */
+	private boolean kolomSiap;
 	/** Heading to scroll to once laid out ("shifu" / "murid"), or "". */
 	private String lompat = "";
 	private int shifuY;
 	private int muridY;
 
 	public LayarKartu(int npcId, CompoundTag lembar) {
-		super(Kartu.LAYAR, npcId, lembar, t("kartu.judul"), TempatWarna.Gaya.GIOK);
+		super(Kartu.LAYAR, npcId, lembar, t("kartu.judul"), LembarKunci.GAYA_GIOK);
 	}
 
 	/** The "?" seal: the Ensiklopedia topic of the 41 sects (the sheet id is not a topic). */
@@ -62,14 +63,14 @@ public final class LayarKartu extends LayarGabungDasar {
 	}
 
 	@Override
-	protected List<TabLentera.Tab> tabs() {
-		return List.of(new TabLentera.Tab(Kartu.TAB_KARTU, t("tab.kartu"), LembarKunci.Ikon.CAP_MERAH, null),
-				new TabLentera.Tab(Kartu.TAB_HUKUM, t("tab.hukum"), LembarKunci.Ikon.TIMBANGAN, null),
-				new TabLentera.Tab(Kartu.TAB_KELUAR, t("tab.keluar"), IkonTempat.PANAH_KANAN, null));
+	protected List<Tab> daftarTab() {
+		return List.of(tab(Kartu.TAB_KARTU, t("tab.kartu"), LembarKunci.Ikon.CAP_MERAH),
+				tab(Kartu.TAB_HUKUM, t("tab.hukum"), LembarKunci.Ikon.TIMBANGAN),
+				tab(Kartu.TAB_KELUAR, t("tab.keluar"), Glyphs.Atlas.PANAH_KANAN));
 	}
 
 	@Override
-	protected KeadaanKosong.Gambar gambarKosong() {
+	protected KeadaanKosong.Gambar kosongGambar() {
 		return KeadaanKosong.Gambar.LENTERA;
 	}
 
@@ -86,7 +87,8 @@ public final class LayarKartu extends LayarGabungDasar {
 	protected void tabBerubah() {
 		catatan.mulaiUlang(Util.getMillis());
 		syaratKeluar.mulaiUlang(Util.getMillis());
-		kolom.ulang();
+		kolom.atas();
+		kolomSiap = false;
 	}
 
 	@Override
@@ -102,13 +104,14 @@ public final class LayarKartu extends LayarGabungDasar {
 	// ================================================================== Kartu: card, Shifu, Murid in one scroll
 
 	private void tumpuk(Lukis l, int x0, int y0, int x1, int y1) {
-		if (!lompat.isEmpty() && kolom.isi() > 0) {
+		if (!lompat.isEmpty() && kolomSiap) {
 			kolom.ke(Kartu.TAB_SHIFU.equals(lompat) ? shifuY : muridY);
 			lompat = "";
 		}
 		gulirAktif = kolom;
-		int top = kolom.mulai(l, x0, y0, x1, y1);
-		int bx1 = x1 - 4;
+		// the kit's scroll keeps 5 px at the right of its box for the bar
+		int top = kolom.mulai(l, x0, y0, x1 - 5, y1);
+		int bx1 = x1 - 8;
 		int cy = top;
 		kartu(l, x0, cy, bx1, cy + KARTU_H);
 		cy += KARTU_H + 6;
@@ -120,6 +123,7 @@ public final class LayarKartu extends LayarGabungDasar {
 		cy += subjudul(l, t("tab.murid"), x0, cy, bx1);
 		cy = murid(l, x0, cy + 2, bx1);
 		kolom.selesai(l, cy);
+		kolomSiap = true;
 	}
 
 	private void kartu(Lukis l, int x0, int y0, int x1, int y1) {
@@ -150,7 +154,7 @@ public final class LayarKartu extends LayarGabungDasar {
 			l.teks(t("kartu.samaran", samaran), tx, y, tw, 0xFF6A2A8A);
 			y += BARIS;
 		}
-		int pw = LabelHarga.pk(l, c.i(LembarKunci.PK, 0), tx, y, false, 1.0F, ink);
+		int pw = LabelHarga.pk(l, c.i(LembarKunci.PK, 0), tx, y, false, ink);
 		l.teks(t("kartu.pk_total", Brush.angka(c.l(GabungLembar.PK_TOTAL, 0L)), c.i(Kartu.PERINGKAT, 0)), tx + pw + 6, y, tw - pw - 6, lemah);
 		y = Math.max(y + 13, py + foto + 6);
 		int lx = x0 + 9;
@@ -164,7 +168,7 @@ public final class LayarKartu extends LayarGabungDasar {
 			int sw = Math.max(20, Math.min(lw - 12 - 60 - font.width(ikatan), font.width(s)));
 			l.teks(s, lx + 12, y, sw, ink);
 			l.teks(ikatan, lx + 16 + sw, y, font.width(ikatan), lemah);
-			segmen(l, lx + 19 + sw + font.width(ikatan), y + 1, shifu.i(GabungLembar.IKATAN, 0), 100, 0xFF2E8963);
+			meter(l, lx + 19 + sw + font.width(ikatan), y + 1, shifu.i(GabungLembar.IKATAN, 0), 100, 0xFF2E8963);
 		} else {
 			l.teks(t("kartu.shifu_belum"), lx + 12, y, lw - 12, lemah);
 		}
@@ -179,7 +183,7 @@ public final class LayarKartu extends LayarGabungDasar {
 			}
 			if (!saingan.kosongSemua()) {
 				int sk = saingan.i(GabungLembar.SIKAP, 0);
-				Component sg = t("kartu.saingan", saingan.teks(LembarKunci.NAMA), Component.literal(Brush.bertanda(sk)).withColor(warnaSikap(sk)));
+				Component sg = t("kartu.saingan", saingan.teks(LembarKunci.NAMA), Component.literal(Brush.bertanda(sk)).withColor(DaftarSekte.warnaSikap(sk)));
 				baris = kakak.kosongSemua() ? sg : baris.copy().append(" · ").append(sg);
 			}
 			l.teks(baris, lx + 12, y, lw - 12, ink);
@@ -187,19 +191,19 @@ public final class LayarKartu extends LayarGabungDasar {
 		}
 		// record (with its bar), chores and allowance: one line each so they stay readable at 1.0
 		int pel = c.i(Kartu.PELANGGARAN, 0);
-		int pelWarna = pel >= 35 ? TempatWarna.BAHAYA : pel >= 10 ? 0xFF9A6A10 : lemah;
+		int pelWarna = pel >= 35 ? Palette.BAHAYA : pel >= 10 ? 0xFF9A6A10 : lemah;
 		Component pelT = t("kartu.pelanggaran", pel);
 		int pelW = Math.min(lw - 40, font.width(pelT));
 		l.teks(pelT, lx, y, pelW, pelWarna);
-		batang(l, lx + pelW + 4, y + 2, Math.min(60, lw - pelW - 4), 4, pel / 100.0F,
-				pel >= 35 ? TempatWarna.BAHAYA : pel >= 10 ? TempatWarna.PERINGATAN : TempatWarna.OK, -1.0F);
+		batang(l, lx + pelW + 4, y + 2, Math.min(60, lw - pelW - 4), pel / 100.0F,
+				pel >= 35 ? Palette.BAHAYA : pel >= 10 ? Palette.PERINGATAN : Palette.OK, -1.0F);
 		y += BARIS;
 		int tugas = c.i(Kartu.TUGAS, 0);
 		int tugasMaks = c.i(Kartu.TUGAS_MAKS, 3);
 		boolean jatah = c.b(Kartu.JATAH);
 		Component tugasT = t("kartu.tugas", tugas, tugasMaks);
 		int tugasW = Math.min(lw / 2, font.width(tugasT));
-		l.teks(tugasT, lx, y, tugasW, tugas > 0 ? ink : TempatWarna.PERINGATAN);
+		l.teks(tugasT, lx, y, tugasW, tugas > 0 ? ink : Palette.PERINGATAN);
 		IkonGabung.gambar(l.g, IkonGabung.JATAH, lx + tugasW + 8, y - 1, 9);
 		l.teks(t(jatah ? "kartu.jatah_siap" : "kartu.jatah_belum"), lx + tugasW + 19, y, lw - tugasW - 19, jatah ? 0xFF2E7A4E : lemah);
 		y += BARIS;
@@ -223,7 +227,7 @@ public final class LayarKartu extends LayarGabungDasar {
 				if (sy + 9 > cy1 - 4) {
 					break;
 				}
-				IkonTempat.gambar(l.g, ok ? IkonTempat.CENTANG : IkonTempat.SILANG, sx, sy, 8, 0xFFFFFFFF);
+				Glyphs.Atlas.ikon(l.g, ok ? Glyphs.Atlas.CENTANG : Glyphs.Atlas.SILANG, sx, sy, 8, 0xFFFFFFFF);
 				l.teks(teks, sx + 10, sy, w - 12, ok ? ink : 0xFF9A3A2A);
 				sx += w + 4;
 			}
@@ -245,48 +249,48 @@ public final class LayarKartu extends LayarGabungDasar {
 	private int shifu(Lukis l, int x0, int y0, int x1) {
 		Lembar s = lembar.sub(Kartu.SHIFU);
 		if (s.kosongSemua()) {
-			return y0 + Math.round(l.bungkus(t("kartu.shifu_kosong"), x0 + 2, y0, x1 - x0 - 4, gaya.teksSamar, 1.0F)) + 2;
+			return y0 + Math.round(l.bungkus(t("kartu.shifu_kosong"), x0 + 2, y0, x1 - x0 - 4, l.gaya.teksSamar)) + 2;
 		}
 		int size = 40;
 		Potret.gambar(l, x0, y0 + 2, size, s.i(GabungLembar.POTRET, -1), Potret.IKON_BAWAAN, false, 0.0F);
 		int tx = x0 + size + 8;
 		int tw = x1 - tx;
-		l.teks(Brush.bold(s.teks(LembarKunci.NAMA)), tx, y0 + 2, tw, gaya.teks);
-		l.teks(s.teks(GabungLembar.JABATAN), tx, y0 + 2 + BARIS, tw, gaya.teksLemah);
+		l.teks(Brush.bold(s.teks(LembarKunci.NAMA)), tx, y0 + 2, tw, l.gaya.teks);
+		l.teks(s.teks(GabungLembar.JABATAN), tx, y0 + 2 + BARIS, tw, l.gaya.teksLemah);
 		int y = y0 + 2 + 2 * BARIS;
 		if (s.ada(GabungLembar.RANAH)) {
 			Dao dao = daoDari(s.s(GabungLembar.DAO));
 			Component rd = dao == null ? namaRanah(s.i(GabungLembar.RANAH, 0)) : namaRanah(s.i(GabungLembar.RANAH, 0)).copy().append(" · ")
 					.append(dao.displayName());
-			l.teks(rd, tx, y, tw, gaya.teks);
+			l.teks(rd, tx, y, tw, l.gaya.teks);
 			y += BARIS;
 		}
 		Component watak = s.teksAtau(GabungLembar.WATAK);
 		if (watak != null) {
-			l.teks(t("kartu.watak", watak), tx, y, tw, gaya.teksLemah);
+			l.teks(t("kartu.watak", watak), tx, y, tw, l.gaya.teksLemah);
 			y += BARIS;
 		}
 		Component ikatan = t("kartu.ikatan");
-		l.teks(ikatan, tx, y, Math.min(tw, font.width(ikatan)), gaya.teksLemah);
+		l.teks(ikatan, tx, y, Math.min(tw, font.width(ikatan)), l.gaya.teksLemah);
 		int ik = s.i(GabungLembar.IKATAN, 0);
-		segmen(l, tx + font.width(ikatan) + 4, y + 1, ik, 100, 0xFF2E8963);
+		meter(l, tx + font.width(ikatan) + 4, y + 1, ik, 100, 0xFF2E8963);
 		y = Math.max(y + BARIS + 2, y0 + size + 8);
-		PanelTempat.garis(l.g, gaya, x0, x1, y);
+		l.garis(x0, x1, y);
 		y += 5;
 		IkonGabung.gambar(l.g, IkonGabung.MEDITASI, x0, y - 1, 10);
-		l.teks(t("kartu.pelajaran", hariKe(s.l(Kartu.PELAJARAN, -1L), hariIni())), x0 + 12, y, x1 - x0 - 12, gaya.teks);
+		l.teks(t("kartu.pelajaran", hariKe(s.l(Kartu.PELAJARAN, -1L), hariIni())), x0 + 12, y, x1 - x0 - 12, l.gaya.teks);
 		y += BARIS;
 		y += Math.round(l.bungkus(t(ik >= 60 ? "kartu.pelajaran_dua" : ik >= 40 ? "kartu.lindung" : "kartu.ikatan_naik"), x0 + 12, y, x1 - x0 - 12,
-				gaya.teksSamar, 1.0F)) + 3;
+				l.gaya.teksSamar)) + 3;
 		List<Lembar> misi = s.daftar(Kartu.MISI);
 		y += subjudul(l, t("kartu.misi_shifu"), x0, y, x1);
 		if (misi.isEmpty()) {
-			l.teks(t("kartu.misi_kosong"), x0 + 2, y, x1 - x0 - 4, gaya.teksSamar);
+			l.teks(t("kartu.misi_kosong"), x0 + 2, y, x1 - x0 - 4, l.gaya.teksSamar);
 			y += BARIS;
 		} else {
 			for (Lembar m : misi) {
-				IkonTempat.gambar(l.g, IkonTempat.GULUNGAN, x0, y - 1, 9, 0xFFFFFFFF);
-				l.teks(m.teks(LembarKunci.NAMA), x0 + 11, y, x1 - x0 - 11, gaya.teks);
+				Glyphs.Atlas.ikon(l.g, Glyphs.Atlas.GULUNGAN, x0, y - 1, 9, 0xFFFFFFFF);
+				l.teks(m.teks(LembarKunci.NAMA), x0 + 11, y, x1 - x0 - 11, l.gaya.teks);
 				y += BARIS;
 			}
 		}
@@ -314,7 +318,7 @@ public final class LayarKartu extends LayarGabungDasar {
 	private int murid(Lukis l, int x0, int y0, int x1) {
 		Component kunci = lembar.sub(LembarKunci.TAB_KUNCI).teksAtau(Kartu.TAB_MURID);
 		if (kunci != null) {
-			return y0 + Math.round(l.bungkus(kunci, x0 + 2, y0, x1 - x0 - 4, gaya.teksSamar, 1.0F)) + 2;
+			return y0 + Math.round(l.bungkus(kunci, x0 + 2, y0, x1 - x0 - 4, l.gaya.teksSamar)) + 2;
 		}
 		Lembar m = lembar.sub(Kartu.MURID);
 		int maks = m.i(LembarKunci.MAKS, 0);
@@ -326,11 +330,11 @@ public final class LayarKartu extends LayarGabungDasar {
 			}
 		}
 		IkonGabung.gambar(l.g, IkonGabung.MURID, x0, y0, 16);
-		l.teks(Brush.bold(t("kartu.murid.judul", terdaftar, maks)), x0 + 20, y0 + 1, x1 - x0 - 20, gaya.teks);
-		l.teks(t("kartu.murid.biaya", m.i(LembarKunci.BIAYA, 0)), x0 + 20, y0 + 1 + BARIS, x1 - x0 - 20, gaya.teksSamar);
+		l.teks(Brush.bold(t("kartu.murid.judul", terdaftar, maks)), x0 + 20, y0 + 1, x1 - x0 - 20, l.gaya.teks);
+		l.teks(t("kartu.murid.biaya", m.i(LembarKunci.BIAYA, 0)), x0 + 20, y0 + 1 + BARIS, x1 - x0 - 20, l.gaya.teksSamar);
 		int y = y0 + 2 + 2 * BARIS + 2;
 		if (rows.isEmpty()) {
-			return y + Math.round(l.bungkus(t("kartu.murid.kosong"), x0 + 2, y, x1 - x0 - 4, gaya.teksSamar, 1.0F)) + 2;
+			return y + Math.round(l.bungkus(t("kartu.murid.kosong"), x0 + 2, y, x1 - x0 - 4, l.gaya.teksSamar)) + 2;
 		}
 		int bw = 76;
 		for (int i = 0; i < rows.size(); i++) {
@@ -338,11 +342,11 @@ public final class LayarKartu extends LayarGabungDasar {
 			int ry0 = y;
 			int ry1 = y + ROW_H - 2;
 			boolean ya = e.b(Kartu.TERDAFTAR);
-			PanelTempat.kartu(l.g, gaya, x0, ry0, x1, ry1, l.di(x0, ry0, x1, ry1) ? 1.0F : 0.0F, false);
+			l.kartu(x0, ry0, x1, ry1, l.di(x0, ry0, x1, ry1) ? 1.0F : 0.0F, false);
 			IkonGabung.gambar(l.g, ya ? IkonGabung.LENCANA : IkonGabung.MURID, x0 + 3, ry0 + 3, 16);
-			l.teks(Brush.bold(e.teks(LembarKunci.NAMA)), x0 + 22, ry0 + 2, x1 - x0 - bw - 30, gaya.teks);
+			l.teks(Brush.bold(e.teks(LembarKunci.NAMA)), x0 + 22, ry0 + 2, x1 - x0 - bw - 30, l.gaya.teks);
 			l.teks(namaRanah(e.i(GabungLembar.RANAH, 0)).copy().append(ya ? t("kartu.murid.titipan") : Component.empty()), x0 + 22, ry0 + 2 + 10,
-					x1 - x0 - bw - 30, ya ? TempatWarna.OK : gaya.teksSamar);
+					x1 - x0 - bw - 30, ya ? Palette.OK : l.gaya.teksSamar);
 			if (ya) {
 				tombolYakin(l, "lepas" + i, x1 - bw - 4, ry0 + 3, bw, 15, t("kartu.murid.lepas"), true, null, LembarKunci.op(Kartu.OP_LEPAS_MURID, e.id()),
 						SegelKonfirmasi.Tingkat.RINGAN);
@@ -361,12 +365,12 @@ public final class LayarKartu extends LayarGabungDasar {
 		Lembar h = lembar.sub(Kartu.HUKUM);
 		int pel = h.i(Kartu.PELANGGARAN, 0);
 		IkonGabung.gambar(l.g, IkonGabung.HUKUM, x0, y0, 16);
-		l.teks(Brush.bold(t("kartu.hukum.catatan", pel)), x0 + 20, y0 + 1, x1 - x0 - 20, pel >= 35 ? TempatWarna.BAHAYA : gaya.teks);
+		l.teks(Brush.bold(t("kartu.hukum.catatan", pel)), x0 + 20, y0 + 1, x1 - x0 - 20, pel >= 35 ? Palette.BAHAYA : l.gaya.teks);
 		// the thresholds of 41.6.11 on one bar
 		int bx = x0 + 20;
 		int bw = x1 - bx - 4;
-		int warna = pel >= 50 ? TempatWarna.BAHAYA : pel >= 20 ? TempatWarna.PERINGATAN : TempatWarna.OK;
-		batang(l, bx, y0 + 13, bw, 5, pel / 100.0F, warna, -1.0F);
+		int warna = pel >= 50 ? Palette.BAHAYA : pel >= 20 ? Palette.PERINGATAN : Palette.OK;
+		batang(l, bx, y0 + 13, bw, pel / 100.0F, warna, -1.0F);
 		int[] ambang = {10, 20, 35, 50, 60};
 		String[] nama = {"teguran", "denda", "kurungan", "turun", "diusir"};
 		for (int i = 0; i < ambang.length; i++) {
@@ -379,24 +383,24 @@ public final class LayarKartu extends LayarGabungDasar {
 		int y = y0 + 24;
 		if (h.ada(Kartu.KURUNGAN)) {
 			CincinWaktu.gambar(l, x0 + 9, y + 8, 8.0F, h.l(Kartu.KURUNGAN, 0L), 0L, diterima, CincinWaktu.TANPA);
-			l.teks(t("kartu.hukum.kurungan"), x0 + 21, y + 4, x1 - x0 - 21, TempatWarna.BAHAYA);
+			l.teks(t("kartu.hukum.kurungan"), x0 + 21, y + 4, x1 - x0 - 21, Palette.BAHAYA);
 			y += 20;
 		}
 		int by = y1 - 16;
 		List<Lembar> rows = h.daftar(LembarKunci.CATATAN);
 		y += subjudul(l, t("kartu.hukum.riwayat"), x0, y, x1);
 		if (rows.isEmpty()) {
-			l.bungkus(t("kartu.hukum.bersih"), x0 + 2, y, x1 - x0 - 4, gaya.teksSamar, 1.0F, by - y - 4);
+			l.bungkus(t("kartu.hukum.bersih"), x0 + 2, y, x1 - x0 - 4, l.gaya.teksSamar, by - y - 4);
 		} else {
 			catatan.gambar(l, "catatan", x0, y, x1, by - 3, rows.size(), 13, (lk, i, rx0, ry0, rx1, ry1, sorot, pilih) -> {
 				Lembar e = rows.get(i);
-				lk.g.fill(rx0, ry0, rx1, ry1 - 1, i % 2 == 0 ? gaya.kartu : 0);
+				lk.g.fill(rx0, ry0, rx1, ry1 - 1, i % 2 == 0 ? l.gaya.kartu : 0);
 				Component hari = t("hari.pendek", e.l(LembarKunci.HARI, 0L));
 				int hw = Math.min(56, font.width(hari));
-				lk.teks(hari, rx0 + 2, ry0 + 2, hw, gaya.teksSamar);
+				lk.teks(hari, rx0 + 2, ry0 + 2, hw, l.gaya.teksSamar);
 				Component poin = Component.literal("+" + e.i(Kartu.POIN, 0));
-				lk.kanan(poin, rx1 - 3, ry0 + 2, TempatWarna.BAHAYA, 1.0F);
-				lk.teks(e.teks(LembarKunci.TEKS), rx0 + hw + 6, ry0 + 2, rx1 - rx0 - hw - 10 - font.width(poin), gaya.teks);
+				lk.kanan(poin, rx1 - 3, ry0 + 2, Palette.BAHAYA);
+				lk.teks(e.teks(LembarKunci.TEKS), rx0 + hw + 6, ry0 + 2, rx1 - rx0 - hw - 10 - font.width(poin), l.gaya.teks);
 			}, null, null);
 		}
 		boolean sidang = h.b(Kartu.SIDANG);
@@ -408,27 +412,27 @@ public final class LayarKartu extends LayarGabungDasar {
 	private void keluar(Lukis l, int x0, int y0, int x1, int y1) {
 		Lembar k = lembar.sub(Kartu.KELUAR);
 		IkonGabung.gambar(l.g, IkonGabung.KELUAR, x0, y0, 16);
-		l.teks(Brush.bold(t("kartu.keluar.judul")), x0 + 20, y0 + 1, x1 - x0 - 20, gaya.teks);
-		l.teks(t("kartu.keluar.sub"), x0 + 20, y0 + 1 + BARIS, x1 - x0 - 20, gaya.teksSamar);
+		l.teks(Brush.bold(t("kartu.keluar.judul")), x0 + 20, y0 + 1, x1 - x0 - 20, l.gaya.teks);
+		l.teks(t("kartu.keluar.sub"), x0 + 20, y0 + 1 + BARIS, x1 - x0 - 20, l.gaya.teksSamar);
 		int y = y0 + 25;
 		int by = y1 - 16;
 		int peringatanY = by - 34;
 		List<Lembar> syarat = k.daftar(LembarKunci.SYARAT);
 		if (syarat.isEmpty()) {
-			l.teks(t("kartu.keluar.tanpa_syarat"), x0, y, x1 - x0, gaya.teksSamar);
+			l.teks(t("kartu.keluar.tanpa_syarat"), x0, y, x1 - x0, l.gaya.teksSamar);
 		} else {
 			daftarSyarat(l, syaratKeluar, "syarat", syarat, x0, y, x1, peringatanY - 12);
 		}
 		boolean bisa = k.b(LembarKunci.BISA);
 		if (k.b(Kartu.RESTU)) {
 			IkonGabung.gambar(l.g, IkonGabung.PINTU + 2, x0, peringatanY - 12, 9);
-			l.teks(t("kartu.keluar.restu"), x0 + 11, peringatanY - 11, x1 - x0 - 11, TempatWarna.OK);
+			l.teks(t("kartu.keluar.restu"), x0 + 11, peringatanY - 11, x1 - x0 - 11, Palette.OK);
 		}
 		// the deserter's warning in danger colours
 		Component peringatan = k.teks(Kartu.PERINGATAN);
-		l.g.fill(x0, peringatanY - 1, x1, peringatanY + 31, Palette.argb(0x40, TempatWarna.BAHAYA & 0xFFFFFF));
-		l.g.fill(x0, peringatanY - 1, x0 + 2, peringatanY + 31, TempatWarna.BAHAYA);
-		l.bungkus(peringatan, x0 + 5, peringatanY + 1, x1 - x0 - 8, gaya.gelap() ? 0xFFFFB0A0 : 0xFF8A1A10, 1.0F, 30);
+		l.g.fill(x0, peringatanY - 1, x1, peringatanY + 31, Palette.argb(0x40, Palette.BAHAYA & 0xFFFFFF));
+		l.g.fill(x0, peringatanY - 1, x0 + 2, peringatanY + 31, Palette.BAHAYA);
+		l.bungkus(peringatan, x0 + 5, peringatanY + 1, x1 - x0 - 8, l.gaya.gelap() ? 0xFFFFB0A0 : 0xFF8A1A10, 30);
 		int bw = (x1 - x0 - 6) / 3;
 		tombolYakin(l, "pamit", x0, by, bw, 15, t("kartu.keluar.tombol"), bisa, t("kartu.keluar.belum_bisa"), Kartu.OP_PAMIT);
 		tombolYakin(l, "paksa", x0 + bw + 3, by, bw, 15, t("kartu.keluar.paksa"), true, null, Kartu.OP_PAMIT_PAKSA);

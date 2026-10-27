@@ -4,9 +4,8 @@ import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.CincinWaktu;
 import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
-import dev.kultivator.client.tempat.ui.kit.Lembar;
-import dev.kultivator.client.tempat.ui.kit.TabLentera;
-import dev.kultivator.client.tempat.ui.kit.TempatWarna;
+import dev.kultivator.client.screen.ui.TabBar;
+import dev.kultivator.client.screen.ui.Lembar;
 import dev.kultivator.dunia.tempat.tema.bersama.TemaLayar.Lift;
 import java.util.List;
 import net.minecraft.nbt.CompoundTag;
@@ -23,11 +22,11 @@ import net.minecraft.network.chat.Component;
 public final class LayarLift extends TemaHalaman {
 
 	public LayarLift(int npcId, CompoundTag lembar) {
-		super(Lift.LAYAR, npcId, lembar, "layar.lift", TempatWarna.Gaya.KAYU);
+		super(Lift.LAYAR, npcId, lembar, "layar.lift", Palette.Gaya.KAYU);
 	}
 
 	@Override
-	protected List<TabLentera.Tab> tabs() {
+	protected List<TabBar.Tab> tabs() {
 		return List.of();
 	}
 

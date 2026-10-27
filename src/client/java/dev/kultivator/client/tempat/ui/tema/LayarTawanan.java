@@ -7,9 +7,8 @@ import dev.kultivator.client.screen.ui.LabelHarga;
 import dev.kultivator.client.screen.ui.Lukis;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.Potret;
-import dev.kultivator.client.tempat.ui.kit.Lembar;
-import dev.kultivator.client.tempat.ui.kit.TabLentera;
-import dev.kultivator.client.tempat.ui.kit.TempatWarna;
+import dev.kultivator.client.screen.ui.TabBar;
+import dev.kultivator.client.screen.ui.Lembar;
 import dev.kultivator.dunia.tempat.tema.bersama.TemaLayar.Tawanan;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import java.util.HashMap;
@@ -37,11 +36,11 @@ public final class LayarTawanan extends TemaHalaman {
 	private boolean rinciSempit;
 
 	public LayarTawanan(int npcId, CompoundTag lembar) {
-		super(Tawanan.LAYAR, npcId, lembar, "layar.tawanan", TempatWarna.Gaya.BATU);
+		super(Tawanan.LAYAR, npcId, lembar, "layar.tawanan", Palette.Gaya.BATU);
 	}
 
 	@Override
-	protected List<TabLentera.Tab> tabs() {
+	protected List<TabBar.Tab> tabs() {
 		return List.of();
 	}
 

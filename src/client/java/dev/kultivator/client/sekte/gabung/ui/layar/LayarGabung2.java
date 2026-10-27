@@ -1,10 +1,10 @@
 package dev.kultivator.client.sekte.gabung.ui.layar;
 
 import dev.kultivator.client.screen.ui.Brush;
+import dev.kultivator.client.screen.ui.Glyphs;
+import dev.kultivator.client.screen.ui.Lukis;
+import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.tempat.ui.UiTempatClient;
-import dev.kultivator.client.tempat.ui.kit.IkonTempat;
-import dev.kultivator.client.tempat.ui.kit.Lukis;
-import dev.kultivator.client.tempat.ui.kit.TempatWarna;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import dev.kultivator.sekte.gabung.ui.GabungLembar;
 import net.minecraft.network.chat.Component;
@@ -23,9 +23,11 @@ public final class LayarGabung2 {
 	/** Lang prefix of the 41U-2 texts (fragment {@code sekte_gabung_ui2}). */
 	public static final String K = "kultivator.gabung.ui2.";
 
+	private static final int IKON = 10;
+
 	private static boolean terdaftar;
 
-	/** Registers every 41U-2 screen with the 38 kit. Idempotent; client thread. */
+	/** Registers every 41U-2 screen with the sheet router (38 sheet, drawn with the single kit). Idempotent; client thread. */
 	public static void daftar() {
 		if (terdaftar) {
 			return;
@@ -48,21 +50,20 @@ public final class LayarGabung2 {
 	 * A PK price "380" with the tally icon at (x, y) (or right-aligned at x); red when {@code punya} (PK on hand, -1 = do not
 	 * compare) is short, with the shortfall as tooltip. Returns the width drawn.
 	 */
-	public static int pk(Lukis l, long harga, long punya, float x, float y, boolean kanan, float ukuran) {
-		return pk(l, harga, punya, x, y, kanan, ukuran, l.gaya.teks);
+	public static int pk(Lukis l, long harga, long punya, float x, float y, boolean kanan) {
+		return pk(l, harga, punya, x, y, kanan, l.gaya.teks);
 	}
 
 	/** {@link #pk} in ink {@code warna} (inside a light well use {@code gaya.teksSumur()}). */
-	public static int pk(Lukis l, long harga, long punya, float x, float y, boolean kanan, float ukuran, int warna) {
+	public static int pk(Lukis l, long harga, long punya, float x, float y, boolean kanan, int warna) {
 		boolean kurang = punya >= 0L && harga > punya;
 		Component angka = Component.literal(Brush.angka(harga));
-		int ikon = Math.round(10 * ukuran);
-		int lebar = ikon + 2 + Math.round(l.font.width(angka) * ukuran);
+		int lebar = IKON + 2 + l.font.width(angka);
 		int x0 = Math.round(kanan ? x - lebar : x);
-		int yi = Math.round(y + (8.0F * ukuran - ikon) / 2.0F);
-		IkonTempat.gambar(l.g, LembarKunci.Ikon.PK, x0, yi, ikon, 0xFFFFFFFF);
-		Brush.text(l.g, l.font, angka, x0 + ikon + 2, y, kurang ? TempatWarna.BAHAYA : warna, ukuran, false);
-		if (l.di(x0, yi, x0 + lebar, yi + Math.max(ikon, Math.round(9 * ukuran)))) {
+		int yi = Math.round(y - 1.0F);
+		Glyphs.Atlas.ikon(l.g, LembarKunci.Ikon.PK, x0, yi, IKON, 0xFFFFFFFF);
+		Brush.text(l.g, l.font, angka, x0 + IKON + 2, y, kurang ? Palette.BAHAYA : warna, 1.0F, false);
+		if (l.di(x0, yi, x0 + lebar, yi + IKON)) {
 			l.tip(kurang ? List.of(u("pk.tip", Brush.angka(harga)), u("pk.kurang", Brush.angka(harga - punya)))
 					: List.of(u("pk.tip", Brush.angka(harga))));
 		}

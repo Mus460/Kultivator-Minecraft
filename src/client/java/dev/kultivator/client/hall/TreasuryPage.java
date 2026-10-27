@@ -24,7 +24,6 @@ import dev.kultivator.client.sekte.mandiri.MandiriClient;
 import dev.kultivator.client.sekte.paviliun.PaviliunClient;
 import dev.kultivator.client.sekte.paviliun.PaviliunScreen;
 import dev.kultivator.client.screen.ui.GulirIsi;
-import dev.kultivator.client.tempat.ui.kit.LayarTempatDasar;
 import dev.kultivator.data.TechniqueRegistry;
 import dev.kultivator.data.TechniqueSpec;
 import dev.kultivator.dunia.kota.NilaiBatu;
@@ -164,7 +163,7 @@ public final class TreasuryPage extends PageKomposit {
 
 	/** The tab the mounted ledger shows now ("" while it has no sheet). */
 	private String tabBuku() {
-		return buku.isi() instanceof LayarTempatDasar l ? l.tabSekarang() : "";
+		return buku.isi() != null ? buku.isi().tabSekarang() : "";
 	}
 
 	/** Applies {@link #tujuDunia}; true when it changed what the sub shows. */
@@ -343,7 +342,7 @@ public final class TreasuryPage extends PageKomposit {
 		if (SUB_KAS.equals(sub)) {
 			return view;
 		}
-		return jasa.isi() instanceof LayarTempatDasar l ? l.tabSekarang() : "";
+		return jasa.isi() != null ? jasa.isi().tabSekarang() : "";
 	}
 
 	private void pilihChip(String id) {
