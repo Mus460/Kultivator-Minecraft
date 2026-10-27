@@ -1,0 +1,11 @@
+{
+  "nama": "kultivator.kota42.tolong.surat_kekasih.nama",
+  "teks": [
+    "kultivator.kota42.tolong.surat_kekasih.teks.0",
+    "kultivator.kota42.tolong.surat_kekasih.teks.1",
+    "kultivator.kota42.tolong.surat_kekasih.teks.2"
+  ],
+  "imbalan": "kultivator.kota42.tolong.surat_kekasih.imbalan",
+  "batas_hari": 7,
+  "peluang": 1.0
+}

@@ -134,11 +134,14 @@
         "k": "kultivator.cakap.kabar.copet.1.ibukota",
         "a": [
           {
+            "k": "kultivator.cakap.awal.kabar.7",
+            "a": []
+          },
+          {
             "t": "pasar"
           },
           {
-            "k": "kultivator.cakap.seru.kaget.6",
-            "a": []
+            "t": ""
           },
           {
             "t": ""
@@ -149,8 +152,8 @@
       "gestur": "tunjuk",
       "seru": null,
       "tik": null,
-      "id_id": "Penjaga istana pun memuji pasar. Copet di  kini mendekam di penjara.",
-      "en_us": "Even the palace guard praised pasar. The thief from  now sits in jail."
+      "id_id": "Kebetulan kita bertemu, ada yang ingin kusampaikan. Penjaga istana pun memuji pasar. Copet di  kini mendekam di penjara.",
+      "en_us": "Fortunate we met; there is something I wish to tell you. Even the palace guard praised pasar. The thief from  now sits in jail."
     },
     {
       "ubah": {
@@ -202,6 +205,9 @@
           {
             "k": "kultivator.cakap.frag.sebab_harga.4.ibukota",
             "a": []
+          },
+          {
+            "t": ""
           },
           {
             "t": ""

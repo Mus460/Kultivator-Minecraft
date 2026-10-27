@@ -151,6 +151,18 @@ public final class KolamRoh {
 				&& player.position().distanceToSqr(seat.getX() + 0.5D, seat.getY(), seat.getZ() + 0.5D) <= DEKAT * DEKAT;
 	}
 
+	/** Once a second: motes of Qi gather round a member sitting out a booked session (D-41C), so the pool looks used. */
+	static void suasana(net.minecraft.server.MinecraftServer server) {
+		for (ServerPlayer p : server.getPlayerList().getPlayers()) {
+			if (!aktifDi(p)) {
+				continue;
+			}
+			ServerLevel level = p.level();
+			level.sendParticles(ParticleTypes.ENCHANT, p.getX(), p.getY() + 0.4D, p.getZ(), 10, 0.5D, 0.2D, 0.5D, 0.3D);
+			level.sendParticles(ParticleTypes.END_ROD, p.getX(), p.getY() + 0.2D, p.getZ(), 1, 0.4D, 0.0D, 0.4D, 0.02D);
+		}
+	}
+
 	// ================================================================== booking
 
 	/** Books seat {@code id} ({@code sesi:TITIK}) for one session. Null when booked, else the reason. */

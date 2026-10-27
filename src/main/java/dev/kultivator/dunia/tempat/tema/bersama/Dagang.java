@@ -116,7 +116,11 @@ public final class Dagang {
 
 	/** The player's trade record ({@code inti.pemain.<uuid>}). */
 	static CompoundTag pemain(MinecraftServer server, ServerPlayer player) {
-		return sub(sub(inti(server), "pemain"), player.getUUID().toString());
+		return pemain(server, player.getUUID());
+	}
+
+	private static CompoundTag pemain(MinecraftServer server, java.util.UUID id) {
+		return sub(sub(inti(server), "pemain"), id.toString());
 	}
 
 	private static void ubah(MinecraftServer server) {
@@ -243,9 +247,18 @@ public final class Dagang {
 
 	/** Profit this world week (may be below 0 after losses). */
 	public static long labaMinggu(ServerPlayer player) {
-		MinecraftServer server = player.level().getServer();
-		CompoundTag laba = pemain(server, player).getCompoundOrEmpty("laba");
+		return labaMinggu(player.level().getServer(), player.getUUID());
+	}
+
+	/** The same for a player who may be away (42C contract caravans pay while he is offline). */
+	public static long labaMinggu(MinecraftServer server, java.util.UUID id) {
+		CompoundTag laba = pemain(server, id).getCompoundOrEmpty("laba");
 		return laba.getLongOr("minggu", -1L) == minggu(server) ? laba.getLongOr("nb", 0L) : 0L;
+	}
+
+	/** The weekly cap for a player known only by his last band: {@code batasLabaMingguan x (band + 1)} NB. */
+	public static long batas(int pita) {
+		return (long) TemaConfig.inti().batasLabaMingguan * (pita + 1L);
 	}
 
 	/** True when the player passed the weekly cap. */
@@ -276,8 +289,19 @@ public final class Dagang {
 	}
 
 	private static void catatLaba(ServerPlayer player, long delta) {
-		MinecraftServer server = player.level().getServer();
-		CompoundTag laba = sub(pemain(server, player), "laba");
+		catatLaba(player.level().getServer(), player.getUUID(), player, delta);
+	}
+
+	/**
+	 * Books trade profit of a player who may be away into the one weekly ledger (the cap above is shared by every kind of
+	 * trade profit: 42C contract premiums use this). Rewards are only granted to an online player.
+	 */
+	public static void catatLaba(MinecraftServer server, java.util.UUID id, long delta) {
+		catatLaba(server, id, server.getPlayerList().getPlayer(id), delta);
+	}
+
+	private static void catatLaba(MinecraftServer server, java.util.UUID id, @org.jetbrains.annotations.Nullable ServerPlayer player, long delta) {
+		CompoundTag laba = sub(pemain(server, id), "laba");
 		long week = minggu(server);
 		if (laba.getLongOr("minggu", -1L) != week) {
 			laba.putLong("minggu", week);
@@ -302,7 +326,8 @@ public final class Dagang {
 		laba.putLong("hari_akhir", today);
 		long total = laba.getLongOr("total", 0L) + Math.max(0L, delta);
 		laba.putLong("total", total);
-		if (delta > 0L) {
+		ubah(server);
+		if (delta > 0L && player != null) {
 			Advancements.grant(player, "tempat/tema_dagang");
 			CeritaApi.peristiwa(player, TemaCerita.DAGANG_LABA, Long.toString(total));
 			if (total >= LABA_SAUDAGAR) {

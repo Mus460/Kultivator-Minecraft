@@ -1,0 +1,21 @@
+{
+  "pembicara": [
+    "tokoh:ma_fu"
+  ],
+  "prioritas": 55,
+  "syarat": [
+    "quest kota42_kota_tumbuh tahap genteng",
+    "!bendera kota42.tumbuh.kayu"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "359",
+      "akibat": [
+        "bendera kota42.tumbuh.kayu",
+        "kota42.kesan tokoh:ma_fu 15"
+      ]
+    }
+  ]
+}

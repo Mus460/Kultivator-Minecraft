@@ -1,0 +1,11 @@
+{
+  "nama": "kultivator.kota42.tolong.barang_dicopet.nama",
+  "teks": [
+    "kultivator.kota42.tolong.barang_dicopet.teks.0",
+    "kultivator.kota42.tolong.barang_dicopet.teks.1",
+    "kultivator.kota42.tolong.barang_dicopet.teks.2"
+  ],
+  "imbalan": "kultivator.kota42.tolong.barang_dicopet.imbalan",
+  "batas_hari": 4,
+  "peluang": 1.0
+}

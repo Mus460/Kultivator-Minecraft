@@ -1,0 +1,88 @@
+{
+  "templat": [
+    {
+      "id": "gabung_politik_merosot_1",
+      "pemicu": "gabung.merosot",
+      "bobot": 10,
+      "umur_hari": 10,
+      "teks": "kultivator.gabung.politik.kabar.merosot_1"
+    },
+    {
+      "id": "gabung_politik_merosot_2",
+      "pemicu": "gabung.merosot",
+      "bobot": 10,
+      "umur_hari": 10,
+      "teks": "kultivator.gabung.politik.kabar.merosot_2"
+    },
+    {
+      "id": "gabung_politik_merosot_3",
+      "pemicu": "gabung.merosot",
+      "bobot": 10,
+      "umur_hari": 10,
+      "teks": "kultivator.gabung.politik.kabar.merosot_3"
+    },
+    {
+      "id": "gabung_politik_bangkit_1",
+      "pemicu": "gabung.bangkit",
+      "bobot": 10,
+      "umur_hari": 10,
+      "teks": "kultivator.gabung.politik.kabar.bangkit_1"
+    },
+    {
+      "id": "gabung_politik_bangkit_2",
+      "pemicu": "gabung.bangkit",
+      "bobot": 10,
+      "umur_hari": 10,
+      "teks": "kultivator.gabung.politik.kabar.bangkit_2"
+    },
+    {
+      "id": "gabung_politik_bangkit_3",
+      "pemicu": "gabung.bangkit",
+      "bobot": 10,
+      "umur_hari": 10,
+      "teks": "kultivator.gabung.politik.kabar.bangkit_3"
+    },
+    {
+      "id": "gabung_politik_peringkat_1",
+      "pemicu": "gabung.peringkat",
+      "bobot": 8,
+      "umur_hari": 8,
+      "teks": "kultivator.gabung.politik.kabar.peringkat_1"
+    },
+    {
+      "id": "gabung_politik_peringkat_2",
+      "pemicu": "gabung.peringkat",
+      "bobot": 8,
+      "umur_hari": 8,
+      "teks": "kultivator.gabung.politik.kabar.peringkat_2"
+    },
+    {
+      "id": "gabung_politik_peringkat_3",
+      "pemicu": "gabung.peringkat",
+      "bobot": 8,
+      "umur_hari": 8,
+      "teks": "kultivator.gabung.politik.kabar.peringkat_3"
+    },
+    {
+      "id": "gabung_politik_serap_1",
+      "pemicu": "gabung.serap",
+      "bobot": 10,
+      "umur_hari": 12,
+      "teks": "kultivator.gabung.politik.kabar.serap_1"
+    },
+    {
+      "id": "gabung_politik_serap_2",
+      "pemicu": "gabung.serap",
+      "bobot": 10,
+      "umur_hari": 12,
+      "teks": "kultivator.gabung.politik.kabar.serap_2"
+    },
+    {
+      "id": "gabung_politik_serap_3",
+      "pemicu": "gabung.serap",
+      "bobot": 10,
+      "umur_hari": 12,
+      "teks": "kultivator.gabung.politik.kabar.serap_3"
+    }
+  ]
+}

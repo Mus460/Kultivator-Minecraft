@@ -48,6 +48,10 @@
           {
             "k": "kultivator.cakap.lex.kawan.kampung",
             "a": []
+          },
+          {
+            "k": "kultivator.cakap.ekor.sapa.7",
+            "a": []
           }
         ]
       },
@@ -55,8 +59,8 @@
       "gestur": "seka_keringat",
       "seru": null,
       "tik": null,
-      "id_id": "Tanganku kotor. Salam saja dari situ.",
-      "en_us": "Hands are dirty. Greet from there."
+      "id_id": "Tanganku kotor. Salam saja dari situ. Jalan terus, jangan menghalangi.",
+      "en_us": "Hands are dirty. Greet from there. Keep walking, don't block the way."
     },
     {
       "ubah": {
@@ -69,7 +73,11 @@
       },
       "harap": {
         "k": "kultivator.cakap.sapa.pekerja.pagi.1.kasar",
-        "a": []
+        "a": [
+          {
+            "t": ""
+          }
+        ]
       },
       "aturan": "sapa.pekerja.pagi",
       "gestur": "lambai",
@@ -88,6 +96,9 @@
           {
             "k": "kultivator.cakap.lex.kawan.kampung",
             "a": []
+          },
+          {
+            "t": ""
           }
         ]
       },

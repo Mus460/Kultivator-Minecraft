@@ -1,0 +1,45 @@
+{
+  "pembicara": [
+    "tokoh:kakek_che"
+  ],
+  "prioritas": 5,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "catur",
+      "prop": "papan_catur",
+      "pilihan": [
+        {
+          "ke": "tetua"
+        },
+        {
+          "ke": "tantang"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "tetua",
+      "gestur": "catur",
+      "prop": "papan_catur",
+      "suara": "kota42.catur_skak",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "tantang",
+      "gestur": "sikap_angkuh",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

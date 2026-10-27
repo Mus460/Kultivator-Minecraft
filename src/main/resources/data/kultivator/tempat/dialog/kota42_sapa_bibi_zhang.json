@@ -1,0 +1,52 @@
+{
+  "pembicara": [
+    "tokoh:bibi_zhang"
+  ],
+  "prioritas": 5,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "timba_sumur",
+      "suara": "kota42.gosip_tawa",
+      "pilihan": [
+        {
+          "syarat": [
+            "quest kota42_dua_keluarga baru"
+          ],
+          "akibat": [
+            "quest_mulai kota42_dua_keluarga"
+          ]
+        },
+        {
+          "ke": "keluarga"
+        },
+        {
+          "ke": "kabar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "keluarga",
+      "gestur": "bisik",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "bisik",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

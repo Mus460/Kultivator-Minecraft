@@ -1,0 +1,59 @@
+{
+  "pembicara": [
+    "tokoh:bibi_mei"
+  ],
+  "prioritas": 5,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "357",
+      "prop": "177",
+      "suara": "kota42.comblang",
+      "pilihan": [
+        {
+          "ke": "jodoh"
+        },
+        {
+          "ke": "pemain"
+        },
+        {
+          "ke": "kabar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "jodoh",
+      "gestur": "357",
+      "prop": "177",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "pemain",
+      "gestur": "tertawa",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "bisik",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

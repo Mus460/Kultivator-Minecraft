@@ -1,0 +1,49 @@
+{
+  "pembicara": [
+    "tokoh:fang_gudang"
+  ],
+  "prioritas": 5,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "416",
+      "prop": "204",
+      "pilihan": [
+        {
+          "akibat": [
+            "buka_layanan gudang"
+          ]
+        },
+        {
+          "ke": "timbang"
+        },
+        {
+          "ke": "shen"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "timbang",
+      "gestur": "416",
+      "prop": "204",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "shen",
+      "gestur": "marah_tunjuk",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "pemberi": "peran:tetua_sekte",
+  "tempat": "gabung_sekte",
+  "tahap": [
+    {
+      "id": "pintu",
+      "tujuan": [
+        "tanda gabung_tugas_gerbang"
+      ],
+      "akibat": [
+        "gabung.sikap luar 3"
+      ]
+    },
+    {
+      "id": "tamu",
+      "tujuan": [
+        "tanda gabung_tugas_gerbang x2"
+      ],
+      "akibat": [
+        "gabung.pk 25",
+        "gabung.ikatan 3",
+        "efek minecraft:resistance 2400 0"
+      ]
+    }
+  ]
+}

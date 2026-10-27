@@ -1,0 +1,60 @@
+{
+  "pemberi": "peran:tabib",
+  "tempat": "kota42",
+  "alur": true,
+  "tahap": [
+    {
+      "id": "beli",
+      "tujuan": [
+        "bendera kota42.hulu.beli"
+      ]
+    },
+    {
+      "id": "uji",
+      "tujuan": [
+        "bendera kota42.hulu.uji"
+      ]
+    },
+    {
+      "id": "hadapi",
+      "cabang": [
+        {
+          "syarat": [
+            "bendera kota42.hulu.bongkar"
+          ],
+          "ke": "bongkar"
+        },
+        {
+          "syarat": [
+            "bendera kota42.hulu.mitra"
+          ],
+          "ke": "mitra"
+        }
+      ]
+    },
+    {
+      "id": "bongkar",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "nama_baik 3",
+        "kota42.kesan tokoh:hu_lu -40",
+        "kabar kota42_hulu_bongkar pemain"
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "mitra",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "kota42.saham tokoh:hu_lu 20",
+        "kota42.kesan tokoh:hu_lu 30",
+        "kabar kota42_hulu_mitra"
+      ],
+      "ke": "selesai"
+    }
+  ]
+}

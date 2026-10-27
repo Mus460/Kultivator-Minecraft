@@ -1,0 +1,52 @@
+{
+  "pembicara": [
+    "tokoh:shi_xiaoqian"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest kota42_seribu_jari tahap sarang"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "358",
+      "pilihan": [
+        {
+          "akibat": [
+            "bendera kota42.jari.serah",
+            "kawal_mulai 30",
+            "quest_maju kota42_seribu_jari"
+          ],
+          "ke": "serah"
+        },
+        {
+          "akibat": [
+            "bendera kota42.jari.informan",
+            "quest_maju kota42_seribu_jari"
+          ],
+          "ke": "informan"
+        },
+        {
+          "akibat": [
+            "bendera kota42.jari.insaf",
+            "quest_maju kota42_seribu_jari"
+          ],
+          "ke": "insaf"
+        }
+      ]
+    },
+    {
+      "id": "serah",
+      "gestur": "berlutut"
+    },
+    {
+      "id": "informan",
+      "gestur": "tertawa"
+    },
+    {
+      "id": "insaf",
+      "gestur": "451"
+    }
+  ]
+}

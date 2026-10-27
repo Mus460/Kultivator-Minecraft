@@ -43,7 +43,7 @@
     {
       "ubah": {},
       "harap": {
-        "k": "kultivator.cakap.sapa.tahu_nama.0",
+        "k": "kultivator.cakap.sapa.akrab.2",
         "a": [
           {
             "k": "kultivator.cakap.lex.sebutan_nama",
@@ -56,15 +56,18 @@
                 "t": "Han"
               }
             ]
+          },
+          {
+            "t": ""
           }
         ]
       },
-      "aturan": "sapa.tahu_nama",
-      "gestur": "lambai",
+      "aturan": "sapa.akrab",
+      "gestur": "tepuk_bahu",
       "seru": null,
       "tik": null,
-      "id_id": "Tuanku Han! Aku masih ingat namamu, lho.",
-      "en_us": "My Lord Han! I still remember your name, you know."
+      "id_id": "Tuanku Han! Pas sekali, aku baru saja memikirkanmu.",
+      "en_us": "My Lord Han! Perfect, I was just thinking of you."
     },
     {
       "ubah": {
@@ -76,7 +79,7 @@
         }
       },
       "harap": {
-        "k": "kultivator.cakap.sapa.tahu_nama.1",
+        "k": "kultivator.cakap.sapa.tahu_nama.0",
         "a": [
           {
             "k": "kultivator.cakap.lex.sebutan_nama",
@@ -89,6 +92,9 @@
                 "t": "Mei"
               }
             ]
+          },
+          {
+            "t": ""
           }
         ]
       },
@@ -96,8 +102,8 @@
       "gestur": "lambai",
       "seru": null,
       "tik": null,
-      "id_id": "Ah, Nona Mei, kan? Tentu saja aku ingat.",
-      "en_us": "Ah, Miss Mei, isn't it? Of course I remember."
+      "id_id": "Nona Mei! Aku masih ingat namamu, lho.",
+      "en_us": "Miss Mei! I still remember your name, you know."
     },
     {
       "ubah": {
@@ -106,7 +112,11 @@
       },
       "harap": {
         "k": "kultivator.cakap.sapa.pekerja.4",
-        "a": []
+        "a": [
+          {
+            "t": ""
+          }
+        ]
       },
       "aturan": "sapa.pekerja",
       "gestur": "seka_keringat",
@@ -132,6 +142,10 @@
           {
             "k": "kultivator.cakap.lex.kawan.kampung",
             "a": []
+          },
+          {
+            "k": "kultivator.cakap.ekor.sapa.5",
+            "a": []
           }
         ]
       },
@@ -139,8 +153,8 @@
       "gestur": "lambai",
       "seru": null,
       "tik": null,
-      "id_id": "Selamat pagi, Kang!",
-      "en_us": "Good morning, Pal!"
+      "id_id": "Selamat pagi, Kang! Ada yang bisa kubantu?",
+      "en_us": "Good morning, Pal! Anything I can help with?"
     }
   ]
 }

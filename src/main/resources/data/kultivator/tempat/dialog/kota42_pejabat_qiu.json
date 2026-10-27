@@ -1,0 +1,46 @@
+{
+  "pembicara": [
+    "tokoh:qiu_panitera"
+  ],
+  "prioritas": 30,
+  "syarat": [
+    "nama_baik 30"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "menulis",
+      "prop": "kuas",
+      "pilihan": [
+        {
+          "syarat": [
+            "quest kota42_pejabat_jujur baru"
+          ],
+          "akibat": [
+            "quest_mulai kota42_pejabat_jujur"
+          ],
+          "ke": "terima"
+        },
+        {
+          "ke": "cara"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "cara",
+      "gestur": "bicara_tangan",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "terima",
+      "gestur": "hormat"
+    }
+  ]
+}

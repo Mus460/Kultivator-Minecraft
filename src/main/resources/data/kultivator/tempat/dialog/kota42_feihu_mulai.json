@@ -1,0 +1,27 @@
+{
+  "pembicara": [
+    "tokoh:yan_feiyan"
+  ],
+  "prioritas": 35,
+  "syarat": [
+    "quest kota42_hati_feihu baru",
+    "hari 3"
+  ],
+  "sekali": true,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "372",
+      "prop": "189",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai kota42_hati_feihu"
+          ]
+        },
+        {}
+      ]
+    }
+  ]
+}

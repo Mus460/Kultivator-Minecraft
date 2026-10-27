@@ -1,0 +1,222 @@
+{
+  "id": "sosial_ragam",
+  "jenis": "realisasi",
+  "_catatan": "D-42K: condolence, introduction, request for help, return to the topic, thanks, price question.",
+  "benih_dunia": 42,
+  "masukan": {
+    "niat": "BELASUNGKAWA",
+    "pembicara": 644,
+    "hari": 120,
+    "now": 2880000,
+    "cuaca": "hujan",
+    "musim": "gugur",
+    "situasi": {
+      "jam": "sore",
+      "cuaca": "hujan",
+      "musim": "gugur",
+      "kelompok": "tetua",
+      "watak": "bijak",
+      "kebiasaan": [],
+      "sifat": {
+        "H": 30,
+        "E": -30,
+        "X": 0,
+        "A": 20,
+        "C": 30,
+        "O": 50
+      },
+      "wajah": "netral",
+      "tempat": "kota_besar"
+    },
+    "pendengar": {
+      "nama": "Han",
+      "kelamin": "l",
+      "tahap": "dewasa",
+      "pemain": true
+    },
+    "kesan": "kenal",
+    "tahu_nama": false,
+    "register": "biasa",
+    "dialek": "kampung",
+    "kelamin": "l",
+    "tahap": "dewasa",
+    "nilai": {
+      "fakta.subjek": {
+        "orang": {
+          "nama": "Kakek Sun",
+          "kelamin": "l",
+          "tahap": "tua"
+        }
+      },
+      "nama": {
+        "orang": {
+          "nama": "Bibi Wang",
+          "kelamin": "p",
+          "tahap": "dewasa"
+        }
+      },
+      "konteks.barang_mahal": "minecraft:honey_bottle",
+      "konteks.barang_murah": "minecraft:carrot"
+    },
+    "peran": "penjual_ikan"
+  },
+  "langkah": [
+    {
+      "ubah": {
+        "dialek": "gunung"
+      },
+      "harap": {
+        "k": "kultivator.cakap.belasungkawa.lagi.1.gunung",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.kakak.gunung",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "belasungkawa.lagi",
+      "gestur": "sikap_tunduk",
+      "seru": null,
+      "tik": null,
+      "id_id": "Amitaba. Yang pergi hanya berganti rupa, Saudara.",
+      "en_us": "Amitabha. Those who go only change form, Brother."
+    },
+    {
+      "ubah": {
+        "niat": "PERKENALAN",
+        "dialek": "pelabuhan"
+      },
+      "harap": {
+        "k": "kultivator.cakap.perkenalan.diri.1",
+        "a": [
+          {
+            "t": "Bibi Wang"
+          },
+          {
+            "k": "kultivator.kota.peran.penjual_ikan",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "perkenalan.diri",
+      "gestur": "hormat",
+      "seru": null,
+      "tik": null,
+      "id_id": "Kita belum berkenalan, ya? Aku Bibi Wang.",
+      "en_us": "We haven't been introduced, have we? I'm Bibi Wang."
+    },
+    {
+      "ubah": {
+        "niat": "PERKENALAN",
+        "register": "kuno"
+      },
+      "harap": {
+        "k": "kultivator.cakap.perkenalan.diri.0.kuno",
+        "a": [
+          {
+            "t": "Bibi Wang"
+          },
+          {
+            "k": "kultivator.kota.peran.penjual_ikan",
+            "a": []
+          },
+          {
+            "k": "kultivator.cakap.lex.rekan_daois.kampung",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "perkenalan.diri",
+      "gestur": "hormat",
+      "seru": null,
+      "tik": null,
+      "id_id": "Hamba bernama Bibi Wang, seorang Penjual Ikan yang rendah. Suatu kehormatan, Mas Daois.",
+      "en_us": "This one is called Bibi Wang, a humble Fishmonger. An honour, Brother Daoist."
+    },
+    {
+      "ubah": {
+        "niat": "MINTA",
+        "dialek": "ibukota",
+        "register": "sopan"
+      },
+      "harap": {
+        "k": "kultivator.cakap.minta.lagi.0",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.tuan.ibukota",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "minta.lagi",
+      "gestur": "bicara_tangan",
+      "seru": null,
+      "tik": null,
+      "id_id": "Tuanku, tolong lihat-lihat tokoku sebentar. Aku mau ke belakang.",
+      "en_us": "My Lord, please mind my shop a moment. I need to step out back."
+    },
+    {
+      "ubah": {
+        "niat": "KEMBALI",
+        "dialek": "air"
+      },
+      "harap": {
+        "k": "kultivator.cakap.kembali.2",
+        "a": []
+      },
+      "aturan": "kembali",
+      "gestur": "bicara_tangan",
+      "seru": null,
+      "tik": null,
+      "id_id": "Aduh, aku sampai lupa. Oh, iya, iya.",
+      "en_us": "Oh, I nearly forgot. Ah, yes, yes."
+    },
+    {
+      "ubah": {
+        "niat": "TERIMA_KASIH",
+        "dialek": "kampung"
+      },
+      "harap": {
+        "k": "kultivator.cakap.terima_kasih.1",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.kakak.kampung",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "terima_kasih",
+      "gestur": "hormat",
+      "seru": "kota42.seru.terima_kasih_l",
+      "tik": null,
+      "id_id": "Wah, untukku? Tidak usah repot-repot... tapi terima kasih! Hehe.",
+      "en_us": "Oh, for me? You shouldn't have... but thank you! Hehe."
+    },
+    {
+      "ubah": {
+        "niat": "TANYA",
+        "topik": "harga",
+        "dialek": "oasis"
+      },
+      "harap": {
+        "k": "kultivator.cakap.dagang.tanya_harga.1",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.kakak.oasis",
+            "a": []
+          },
+          {
+            "k": "item.minecraft.honey_bottle",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "dagang.tanya_harga",
+      "gestur": "bicara_tangan",
+      "seru": null,
+      "tik": null,
+      "id_id": "Mau beli apa hari ini, Saudara Tua? Kalau mencari item.minecraft.honey_bottle, mahal sekarang.",
+      "en_us": "What are you buying today, Elder Brother? If it's item.minecraft.honey_bottle, it's dear now."
+    }
+  ]
+}

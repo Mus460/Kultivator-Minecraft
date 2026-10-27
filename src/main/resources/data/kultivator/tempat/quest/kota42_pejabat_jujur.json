@@ -1,0 +1,68 @@
+{
+  "pemberi": "tokoh:qiu_panitera",
+  "tempat": "kota42",
+  "alur": true,
+  "tahap": [
+    {
+      "id": "sidang",
+      "tujuan": [
+        "perkara * x3"
+      ]
+    },
+    {
+      "id": "paceklik",
+      "tujuan": [
+        "bendera kota42.pejabat.bukti"
+      ],
+      "akibat_masuk": [
+        "kota42.harga pangan 150 10"
+      ]
+    },
+    {
+      "id": "besar",
+      "cabang": [
+        {
+          "syarat": [
+            "bendera kota42.pejabat.sita"
+          ],
+          "ke": "sita"
+        },
+        {
+          "syarat": [
+            "bendera kota42.pejabat.suap"
+          ],
+          "ke": "suap"
+        }
+      ]
+    },
+    {
+      "id": "sita",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "kota42.harga pangan 85 7",
+        "kota42.jabatan 5",
+        "kota42.kesan tokoh:shen_wan -40",
+        "kota42.kesan tokoh:qiu_panitera 40",
+        "nama_baik 8",
+        "kabar kota42_pejabat_sita pemain"
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "suap",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "beri_nb_pita 30",
+        "infami 10 kota42",
+        "kota42.kesan tokoh:shen_wan 30",
+        "kota42.kesan tokoh:qiu_panitera -60",
+        "kabar kota42_pejabat_suap"
+      ],
+      "ke": "selesai"
+    }
+  ]
+}

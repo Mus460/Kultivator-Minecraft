@@ -26,71 +26,15 @@ import org.jetbrains.annotations.Nullable;
  * lantern riddles with three answers; and, for an event that ran as data with no player near, its summary. Single kit,
  * text 1.0.
  * <p>
- * The 42 ids {@code upacara} (an invitation card) and {@code rombongan} (a travelling troupe's programme) are drawn by
- * {@link LayarAcaraKota} (42-G2, half-built) with the old sheet engine through the bridge below until 42U rebuilds them on
- * the single kit (43.16.6, {@link #mesinLama}).
+ * The 42 ids {@code upacara} (an invitation card) and {@code rombongan} (a travelling troupe's programme) have their own page
+ * on the single kit, {@code client/dunia/kota42/ui/layar/LayarUpacara} (D-42U).
  */
 public final class LayarAcara extends LayarInti {
 
 	private final PapanSkor papan = new PapanSkor();
-	/** 42 modes (DESIGN 42.11.14): the envelope or tip amount the player picked. */
-	long jumlah42 = -1L;
 
 	public LayarAcara(int npcId, CompoundTag lembar) {
-		this(Acara.LAYAR, npcId, lembar);
-	}
-
-	/**
-	 * The one events screen of the mod (jadwal 41/42 0.1 "No GUI twice"): the 38 {@code acara} id, or the 42 ids
-	 * {@code upacara} and {@code rombongan}, drawn by {@link LayarAcaraKota}.
-	 */
-	public LayarAcara(String layar, int npcId, CompoundTag lembar) {
-		super(layar, npcId, lembar, LayarAcaraKota.judul(layar), LayarAcaraKota.ROMBONGAN.equals(layar) ? LembarKunci.GAYA_KAYU : LembarKunci.GAYA_KAIN);
-	}
-
-	// bridge for LayarAcaraKota (same package; the old kit's protected helpers, 42 modes only)
-	Lembar lembar42() {
-		return lembar;
-	}
-
-	TempatWarna.Gaya gaya42() {
-		return gaya;
-	}
-
-	long uang42() {
-		return uang();
-	}
-
-	long diterima42() {
-		return diterima;
-	}
-
-	int subjudul42(dev.kultivator.client.tempat.ui.kit.Lukis l, Component t, int x0, int y, int x1) {
-		return subjudul(l, t, x0, y, x1);
-	}
-
-	void op42(dev.kultivator.client.tempat.ui.kit.Lukis l, String kunci, int x, int y, int w, int h, Component label, boolean aktif,
-			@Nullable Component alasan, String op) {
-		tombolOp(l, kunci, x, y, w, h, label, aktif, alasan, op);
-	}
-
-	void tombol42(dev.kultivator.client.tempat.ui.kit.Lukis l, String kunci, int x, int y, int w, int h, Component label, boolean aktif, Runnable aksi) {
-		tombol.gambar(l, kunci, x, y, w, h, label, aktif, null, aksi);
-	}
-
-	void kosong42(dev.kultivator.client.tempat.ui.kit.Lukis l, Component teks, int x0, int y0, int x1, int y1) {
-		kosong(l, teks, x0, y0, x1, y1);
-	}
-
-	@Override
-	protected boolean mesinLama() {
-		return LayarAcaraKota.UPACARA.equals(layar) || LayarAcaraKota.ROMBONGAN.equals(layar);
-	}
-
-	/** The 42 modes (old sheet engine, {@link #mesinLama}). */
-	@Override
-	protected void isi(dev.kultivator.client.tempat.ui.kit.Lukis l, int x0, int y0, int x1, int y1) {
-		LayarAcaraKota.isi(this, l, x0, y0, x1, y1);
+		super(Acara.LAYAR, npcId, lembar, k("layar.acara"), LembarKunci.GAYA_KAIN);
 	}
 
 	@Override
@@ -105,9 +49,6 @@ public final class LayarAcara extends LayarInti {
 
 	@Override
 	protected Component judulBawaan() {
-		if (!Acara.LAYAR.equals(layar)) {
-			return title;
-		}
 		String jenis = lembar.s(LembarKunci.JENIS);
 		return jenis.isEmpty() ? title : k("acara.jenis." + jenis);
 	}

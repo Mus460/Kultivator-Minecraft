@@ -1,5 +1,6 @@
 package dev.kultivator.sekte.gabung.ui;
 
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import dev.kultivator.Kultivator;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
@@ -88,6 +89,8 @@ public final class GabungLayar {
 	private static final Map<String, Aksi> BAWAAN = new ConcurrentHashMap<>();
 	private static final Map<String, List<Pengisi>> PENGISI = new ConcurrentHashMap<>();
 	private static final Map<UUID, Object[]> PESAN = new HashMap<>();
+	/** Players testing {@code gabung skala N}: every sheet built for them is laid out as GUI scale N would (the 38.U.2 test). */
+	private static final Map<UUID, Integer> UJI_SKALA = new ConcurrentHashMap<>();
 	private static boolean initialised;
 
 	/** Registers the 41 screens and the player command subs. Safe to call twice. */
@@ -130,6 +133,14 @@ public final class GabungLayar {
 			Object[] p = PESAN.remove(player.getUUID());
 			return p == null || !LembarKunci.PESAN_BAHAYA.equals(p[1]) ? 1 : 0;
 		}));
+		// GUI scale test (D-41U): `gabung skala <0|2|3|4> [layar]`; the old-sheet screens lay out as that scale would (0 = off)
+		GabungCommands.daftar("skala", () -> Commands.literal("skala").then(Commands.argument("n", IntegerArgumentType.integer(0, 4))
+				.executes(ctx -> ujiSkala(ctx.getSource().getPlayerOrException(), IntegerArgumentType.getInteger(ctx, "n"), null))
+				.then(Commands.argument("layar", StringArgumentType.word()).suggests((ctx, b) -> {
+					PEMBANGUN.keySet().stream().sorted().forEach(b::suggest);
+					return b.buildFuture();
+				}).executes(ctx -> ujiSkala(ctx.getSource().getPlayerOrException(), IntegerArgumentType.getInteger(ctx, "n"),
+						StringArgumentType.getString(ctx, "layar"))))));
 		GabungCommands.daftar("info", () -> Commands.literal("info").then(Commands.argument("sekte", StringArgumentType.word())
 				.suggests((ctx, b) -> {
 					SekteApi.diplomasi().sects().forEach(b::suggest);
@@ -233,12 +244,31 @@ public final class GabungLayar {
 				Kultivator.LOGGER.warn("Gabung sheet filler of {} failed", layar, exception);
 			}
 		}
+		Integer uji = UJI_SKALA.get(player.getUUID());
+		if (uji != null) {
+			lembar.putInt("uji_skala", uji); // key of LayarTempatDasar.UJI_SKALA (the client class is not referenced here)
+		}
 		Object[] pesan = PESAN.remove(player.getUUID());
 		if (pesan != null) {
 			LembarKunci.teks(lembar, LembarKunci.PESAN, (Component) pesan[0]);
 			lembar.putString(LembarKunci.PESAN_JENIS, (String) pesan[1]);
 		}
 		return lembar;
+	}
+
+	/** {@code gabung skala n [layar]}: sets (n 2-4) or clears (0) the layout test of the player and opens {@code layar}. */
+	private static int ujiSkala(ServerPlayer player, int n, @Nullable String layar) {
+		if (n > 0) {
+			UJI_SKALA.put(player.getUUID(), n);
+		} else {
+			UJI_SKALA.remove(player.getUUID());
+		}
+		Msg.chat(player, Component.translatable(n > 0 ? "kultivator.gabung.ui.skala.hidup" : "kultivator.gabung.ui.skala.mati", n)
+				.withStyle(ChatFormatting.GRAY));
+		if (layar != null && !bukaLayar(player, layar, -1, null)) {
+			return 0;
+		}
+		return 1;
 	}
 
 	// ================================================================== actions

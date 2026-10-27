@@ -1,0 +1,744 @@
+{
+  "pembicara": [
+    "tokoh:lao_shuo"
+  ],
+  "prioritas": 10,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "371",
+      "prop": "kipas_lipat",
+      "suara": "kota42.lao_shuo_buka",
+      "pilihan": [
+        {
+          "ke": "menu1"
+        },
+        {
+          "ke": "menu2"
+        },
+        {
+          "ke": "petunjuk"
+        },
+        {
+          "ke": "diri"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "menu1",
+      "gestur": "371",
+      "pilihan": [
+        {
+          "ke": "kera_sakti_1"
+        },
+        {
+          "ke": "ular_putih_1"
+        },
+        {
+          "ke": "penggembala_1"
+        },
+        {
+          "ke": "change_1"
+        },
+        {
+          "ke": "mulan_1"
+        },
+        {
+          "ke": "hakim_bao_1"
+        },
+        {
+          "ke": "menu2"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "menu2",
+      "gestur": "371",
+      "pilihan": [
+        {
+          "ke": "delapan_dewa_1"
+        },
+        {
+          "ke": "yu_gong_1"
+        },
+        {
+          "ke": "sarjana_rubah_1"
+        },
+        {
+          "ke": "kupu_kupu_1"
+        },
+        {
+          "ke": "penjara_iblis_1"
+        },
+        {
+          "ke": "sekte_awan_1"
+        },
+        {
+          "ke": "menu1"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kera_sakti_1",
+      "gestur": "371",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "kera_sakti_2"
+        }
+      ]
+    },
+    {
+      "id": "kera_sakti_2",
+      "gestur": "369",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "kera_sakti_3"
+        }
+      ]
+    },
+    {
+      "id": "kera_sakti_3",
+      "gestur": "371",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "kera_sakti_4"
+        }
+      ]
+    },
+    {
+      "id": "kera_sakti_4",
+      "gestur": "369",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "menu1"
+        },
+        {
+          "syarat": [
+            "nb 2"
+          ],
+          "akibat": [
+            "bayar 2",
+            "nama_baik 1",
+            "klip k:beri_koin"
+          ],
+          "ke": "terima_kasih"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "ular_putih_1",
+      "gestur": "371",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "ular_putih_2"
+        }
+      ]
+    },
+    {
+      "id": "ular_putih_2",
+      "gestur": "369",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "ular_putih_3"
+        }
+      ]
+    },
+    {
+      "id": "ular_putih_3",
+      "gestur": "371",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "ular_putih_4"
+        }
+      ]
+    },
+    {
+      "id": "ular_putih_4",
+      "gestur": "369",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "menu1"
+        },
+        {
+          "syarat": [
+            "nb 2"
+          ],
+          "akibat": [
+            "bayar 2",
+            "nama_baik 1",
+            "klip k:beri_koin"
+          ],
+          "ke": "terima_kasih"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "penggembala_1",
+      "gestur": "371",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "penggembala_2"
+        }
+      ]
+    },
+    {
+      "id": "penggembala_2",
+      "gestur": "369",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "penggembala_3"
+        }
+      ]
+    },
+    {
+      "id": "penggembala_3",
+      "gestur": "371",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "penggembala_4"
+        }
+      ]
+    },
+    {
+      "id": "penggembala_4",
+      "gestur": "369",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "menu1"
+        },
+        {
+          "syarat": [
+            "nb 2"
+          ],
+          "akibat": [
+            "bayar 2",
+            "nama_baik 1",
+            "klip k:beri_koin"
+          ],
+          "ke": "terima_kasih"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "change_1",
+      "gestur": "371",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "change_2"
+        }
+      ]
+    },
+    {
+      "id": "change_2",
+      "gestur": "369",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "change_3"
+        }
+      ]
+    },
+    {
+      "id": "change_3",
+      "gestur": "371",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "change_4"
+        }
+      ]
+    },
+    {
+      "id": "change_4",
+      "gestur": "369",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "menu1"
+        },
+        {
+          "syarat": [
+            "nb 2"
+          ],
+          "akibat": [
+            "bayar 2",
+            "nama_baik 1",
+            "klip k:beri_koin"
+          ],
+          "ke": "terima_kasih"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "mulan_1",
+      "gestur": "371",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "mulan_2"
+        }
+      ]
+    },
+    {
+      "id": "mulan_2",
+      "gestur": "369",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "mulan_3"
+        }
+      ]
+    },
+    {
+      "id": "mulan_3",
+      "gestur": "371",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "mulan_4"
+        }
+      ]
+    },
+    {
+      "id": "mulan_4",
+      "gestur": "369",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "menu1"
+        },
+        {
+          "syarat": [
+            "nb 2"
+          ],
+          "akibat": [
+            "bayar 2",
+            "nama_baik 1",
+            "klip k:beri_koin"
+          ],
+          "ke": "terima_kasih"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "hakim_bao_1",
+      "gestur": "371",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "hakim_bao_2"
+        }
+      ]
+    },
+    {
+      "id": "hakim_bao_2",
+      "gestur": "369",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "hakim_bao_3"
+        }
+      ]
+    },
+    {
+      "id": "hakim_bao_3",
+      "gestur": "371",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "hakim_bao_4"
+        }
+      ]
+    },
+    {
+      "id": "hakim_bao_4",
+      "gestur": "369",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "menu1"
+        },
+        {
+          "syarat": [
+            "nb 2"
+          ],
+          "akibat": [
+            "bayar 2",
+            "nama_baik 1",
+            "klip k:beri_koin"
+          ],
+          "ke": "terima_kasih"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "delapan_dewa_1",
+      "gestur": "371",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "delapan_dewa_2"
+        }
+      ]
+    },
+    {
+      "id": "delapan_dewa_2",
+      "gestur": "369",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "delapan_dewa_3"
+        }
+      ]
+    },
+    {
+      "id": "delapan_dewa_3",
+      "gestur": "371",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "delapan_dewa_4"
+        }
+      ]
+    },
+    {
+      "id": "delapan_dewa_4",
+      "gestur": "369",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "menu1"
+        },
+        {
+          "syarat": [
+            "nb 2"
+          ],
+          "akibat": [
+            "bayar 2",
+            "nama_baik 1",
+            "klip k:beri_koin"
+          ],
+          "ke": "terima_kasih"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "yu_gong_1",
+      "gestur": "371",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "yu_gong_2"
+        }
+      ]
+    },
+    {
+      "id": "yu_gong_2",
+      "gestur": "369",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "yu_gong_3"
+        }
+      ]
+    },
+    {
+      "id": "yu_gong_3",
+      "gestur": "371",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "yu_gong_4"
+        }
+      ]
+    },
+    {
+      "id": "yu_gong_4",
+      "gestur": "369",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "menu1"
+        },
+        {
+          "syarat": [
+            "nb 2"
+          ],
+          "akibat": [
+            "bayar 2",
+            "nama_baik 1",
+            "klip k:beri_koin"
+          ],
+          "ke": "terima_kasih"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "sarjana_rubah_1",
+      "gestur": "371",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "sarjana_rubah_2"
+        }
+      ]
+    },
+    {
+      "id": "sarjana_rubah_2",
+      "gestur": "369",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "sarjana_rubah_3"
+        }
+      ]
+    },
+    {
+      "id": "sarjana_rubah_3",
+      "gestur": "371",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "sarjana_rubah_4"
+        }
+      ]
+    },
+    {
+      "id": "sarjana_rubah_4",
+      "gestur": "369",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "menu1"
+        },
+        {
+          "syarat": [
+            "nb 2"
+          ],
+          "akibat": [
+            "bayar 2",
+            "nama_baik 1",
+            "klip k:beri_koin"
+          ],
+          "ke": "terima_kasih"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kupu_kupu_1",
+      "gestur": "371",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "kupu_kupu_2"
+        }
+      ]
+    },
+    {
+      "id": "kupu_kupu_2",
+      "gestur": "369",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "kupu_kupu_3"
+        }
+      ]
+    },
+    {
+      "id": "kupu_kupu_3",
+      "gestur": "371",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "kupu_kupu_4"
+        }
+      ]
+    },
+    {
+      "id": "kupu_kupu_4",
+      "gestur": "369",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "menu1"
+        },
+        {
+          "syarat": [
+            "nb 2"
+          ],
+          "akibat": [
+            "bayar 2",
+            "nama_baik 1",
+            "klip k:beri_koin"
+          ],
+          "ke": "terima_kasih"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "penjara_iblis_1",
+      "gestur": "371",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "penjara_iblis_2"
+        }
+      ]
+    },
+    {
+      "id": "penjara_iblis_2",
+      "gestur": "369",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "penjara_iblis_3"
+        }
+      ]
+    },
+    {
+      "id": "penjara_iblis_3",
+      "gestur": "371",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "penjara_iblis_4"
+        }
+      ]
+    },
+    {
+      "id": "penjara_iblis_4",
+      "gestur": "369",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "menu1"
+        },
+        {
+          "syarat": [
+            "nb 2"
+          ],
+          "akibat": [
+            "bayar 2",
+            "nama_baik 1",
+            "klip k:beri_koin"
+          ],
+          "ke": "terima_kasih"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "sekte_awan_1",
+      "gestur": "371",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "sekte_awan_2"
+        }
+      ]
+    },
+    {
+      "id": "sekte_awan_2",
+      "gestur": "369",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "sekte_awan_3"
+        }
+      ]
+    },
+    {
+      "id": "sekte_awan_3",
+      "gestur": "371",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "sekte_awan_4"
+        }
+      ]
+    },
+    {
+      "id": "sekte_awan_4",
+      "gestur": "369",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "menu1"
+        },
+        {
+          "syarat": [
+            "nb 2"
+          ],
+          "akibat": [
+            "bayar 2",
+            "nama_baik 1",
+            "klip k:beri_koin"
+          ],
+          "ke": "terima_kasih"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "terima_kasih",
+      "gestur": "hormat",
+      "suara": "kota42.lao_shuo_tutup",
+      "pilihan": [
+        {
+          "ke": "menu2"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "petunjuk",
+      "gestur": "bisik",
+      "pilihan": [
+        {
+          "ke": "penjara_iblis_1"
+        },
+        {
+          "ke": "mulai"
+        }
+      ]
+    },
+    {
+      "id": "diri",
+      "gestur": "minum_teh",
+      "prop": "cangkir",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

@@ -9,18 +9,20 @@ syarat: acara=festival
 lanjut: acara keluarga
 gestur: tepuk_tangan
 $sebutan: tipe=sebutan_pendengar dari=pendengar
-- [3] Festival! Sudah lihat barongsai di alun-alun? Ekornya tadi jatuh, hahaha! || Festival! Seen the lion dance in the square? The tail end fell over, hahaha!
-  ~ kasar: Ramai sekali. Copet pasti pesta juga hari ini. Jaga dompetmu. || So crowded. The pickpockets are feasting too. Mind your purse.
-  ~ kuno: Lentera merah, genderang, tawa anak-anak. Hari seperti ini menyuburkan hati. || Red lanterns, drums, children's laughter. Days like this nourish the heart.
-  ~ kampung: Hajatan desa, Nak! Ada wayang semalam suntuk. Bawa tikar! || Village feast, child! A puppet show all night. Bring a mat!
-  ~ pelabuhan: Perahu-perahu berhias semua, Bung! Nanti malam lomba dayung! || Every boat is decked out, mate! Rowing race tonight!
-- [2] Coba tanghulu di lapak ujung. Gulanya tebal, buahnya segar. || Try the candied haws at the end stall. Thick sugar, fresh fruit.
-  ~ oasis: Kurma madu dan susu unta gratis di festival, Saudara! Minum sebanyaknya! || Honey dates and free camel milk at the festival, friend! Drink your fill!
-  ~ air: Lentera teratai mulai dihanyutkan, Kakak... ayo, buat permohonan... || They're floating the lotus lanterns, dear... come, make a wish...
-- Anak-anak sudah menunggu kembang api sejak sore. Aku juga, sebenarnya. Hehe. || The kids have waited for the fireworks since afternoon. So have I, really. Heh.
-  ~ p: Aku pakai baju baru hari ini. Bagus, kan? Jahit sendiri tiga malam. || New dress today. Nice, isn't it? Sewed it myself over three nights.
-- Ada panggung opera di dekat kuil. Lakonnya tentang jenderal setia. Aku menangis tiap tahun. || There's an opera stage by the temple. A play about a loyal general. I cry every year.
-- Setahun sekali kota ini lupa susahnya. Nikmati, {$sebutan}! || Once a year this town forgets its troubles. Enjoy it, {$sebutan}!
+$awal: aturan=awal.kabar opsional=0.35
+$ekor: aturan=ekor.kabar opsional=0.4
+- [3] {$awal}Festival! Sudah lihat barongsai di alun-alun? Ekornya tadi jatuh, hahaha!{$ekor} || {$awal}Festival! Seen the lion dance in the square? The tail end fell over, hahaha!{$ekor}
+  ~ kasar: {$awal}Ramai sekali. Copet pasti pesta juga hari ini. Jaga dompetmu.{$ekor} || {$awal}So crowded. The pickpockets are feasting too. Mind your purse.{$ekor}
+  ~ kuno: {$awal}Lentera merah, genderang, tawa anak-anak. Hari seperti ini menyuburkan hati.{$ekor} || {$awal}Red lanterns, drums, children's laughter. Days like this nourish the heart.{$ekor}
+  ~ kampung: {$awal}Hajatan desa, Nak! Ada wayang semalam suntuk. Bawa tikar!{$ekor} || {$awal}Village feast, child! A puppet show all night. Bring a mat!{$ekor}
+  ~ pelabuhan: {$awal}Perahu-perahu berhias semua, Bung! Nanti malam lomba dayung!{$ekor} || {$awal}Every boat is decked out, mate! Rowing race tonight!{$ekor}
+- [2] {$awal}Coba tanghulu di lapak ujung. Gulanya tebal, buahnya segar.{$ekor} || {$awal}Try the candied haws at the end stall. Thick sugar, fresh fruit.{$ekor}
+  ~ oasis: {$awal}Kurma madu dan susu unta gratis di festival, Saudara! Minum sebanyaknya!{$ekor} || {$awal}Honey dates and free camel milk at the festival, friend! Drink your fill!{$ekor}
+  ~ air: {$awal}Lentera teratai mulai dihanyutkan, Kakak... ayo, buat permohonan...{$ekor} || {$awal}They're floating the lotus lanterns, dear... come, make a wish...{$ekor}
+- {$awal}Anak-anak sudah menunggu kembang api sejak sore. Aku juga, sebenarnya. Hehe.{$ekor} || {$awal}The kids have waited for the fireworks since afternoon. So have I, really. Heh.{$ekor}
+  ~ p: {$awal}Aku pakai baju baru hari ini. Bagus, kan? Jahit sendiri tiga malam.{$ekor} || {$awal}New dress today. Nice, isn't it? Sewed it myself over three nights.{$ekor}
+- {$awal}Ada panggung opera di dekat kuil. Lakonnya tentang jenderal setia. Aku menangis tiap tahun.{$ekor} || {$awal}There's an opera stage by the temple. A play about a loyal general. I cry every year.{$ekor}
+- {$awal}Setahun sekali kota ini lupa susahnya. Nikmati, {$sebutan}!{$ekor} || {$awal}Once a year this town forgets its troubles. Enjoy it, {$sebutan}!{$ekor}
 
 == acara.nikah
 niat: BERI_KABAR
@@ -29,15 +31,17 @@ syarat: acara=nikah
 lanjut: keluarga asmara
 gestur: tertawa
 $doa: aturan=frag.doa opsional=0.4
-- [3] Ada pernikahan hari ini! Dengar suona-nya? Pengantin sudah di jalan. || There's a wedding today! Hear the suona? The bride is on her way.
-  ~ kasar: Pernikahan. Ribut. Tapi makanannya gratis. || Wedding. Noisy. But the food's free.
-  ~ kuno: Dua keluarga menjadi satu hari ini. Langit tersenyum. || Two families become one today. Heaven smiles.
-  ~ kampung: Kawinan, Nak! Ayo ikut makan, semua orang diundang. || A wedding, child! Come eat, everyone's invited.
-- [2] Tandu merahnya cantik sekali. Pengantin perempuannya pasti gugup. || The red sedan is so pretty. The bride must be nervous.
-  ~ p: Dulu aku juga duduk di tandu merah seperti itu. Gemetar sepanjang jalan. Hihi. || I sat in a red sedan like that once. Trembled all the way. Hehe.
-  ~ pelabuhan: Mereka menikah di dermaga, Bung. Semua kapal membunyikan lonceng. || They're marrying on the dock, mate. Every ship rings its bell.
-- Jangan lupa angpao kalau mau ikut masuk. Yang penting niatnya. || Don't forget a red envelope if you go in. It's the thought that counts.
-- Semoga mereka bahagia sampai rambut putih. {$doa} || May they be happy until their hair turns white. {$doa}
+$awal: aturan=awal.kabar opsional=0.35
+$ekor: aturan=ekor.kabar opsional=0.4
+- [3] {$awal}Ada pernikahan hari ini! Dengar suona-nya? Pengantin sudah di jalan.{$ekor} || {$awal}There's a wedding today! Hear the suona? The bride is on her way.{$ekor}
+  ~ kasar: {$awal}Pernikahan. Ribut. Tapi makanannya gratis.{$ekor} || {$awal}Wedding. Noisy. But the food's free.{$ekor}
+  ~ kuno: {$awal}Dua keluarga menjadi satu hari ini. Langit tersenyum.{$ekor} || {$awal}Two families become one today. Heaven smiles.{$ekor}
+  ~ kampung: {$awal}Kawinan, Nak! Ayo ikut makan, semua orang diundang.{$ekor} || {$awal}A wedding, child! Come eat, everyone's invited.{$ekor}
+- [2] {$awal}Tandu merahnya cantik sekali. Pengantin perempuannya pasti gugup.{$ekor} || {$awal}The red sedan is so pretty. The bride must be nervous.{$ekor}
+  ~ p: {$awal}Dulu aku juga duduk di tandu merah seperti itu. Gemetar sepanjang jalan. Hihi.{$ekor} || {$awal}I sat in a red sedan like that once. Trembled all the way. Hehe.{$ekor}
+  ~ pelabuhan: {$awal}Mereka menikah di dermaga, Bung. Semua kapal membunyikan lonceng.{$ekor} || {$awal}They're marrying on the dock, mate. Every ship rings its bell.{$ekor}
+- {$awal}Jangan lupa angpao kalau mau ikut masuk. Yang penting niatnya.{$ekor} || {$awal}Don't forget a red envelope if you go in. It's the thought that counts.{$ekor}
+- {$awal}Semoga mereka bahagia sampai rambut putih. {$doa} || {$awal}May they be happy until their hair turns white. {$doa}
 
 == acara.makam
 niat: BERI_KABAR
@@ -62,13 +66,15 @@ syarat: acara=lahir
 lanjut: keluarga
 gestur: tertawa
 $musim: tipe=musim dari=konteks.musim
-- [3] Ada bayi lahir di gang ini! Telur merah dibagikan, ambil satu! || A baby was born in this lane! Red eggs are going round; take one!
-  ~ kasar: Bayi baru. Malam ini pasti berisik. || New baby. Tonight's going to be loud.
-  ~ kuno: Kehidupan baru hadir di antara kita. Semoga tumbuh dengan akar yang kuat. || A new life has come among us. May it grow with strong roots.
-  ~ kampung: Ada yang lairan, Nak! Bayinya laki-laki, gemuk sekali! || Someone gave birth, child! A boy, so chubby!
-- [2] Neneknya sudah memilih nama dari kitab tua. Katanya nama yang membawa keberuntungan. || The grandmother picked a name from an old book. A lucky name, she says.
-  ~ p: Aku membantu persalinannya semalam. Lelah, tapi bahagia. || I helped with the birth last night. Tired, but happy.
-- Bayi lahir di musim {$musim}, kata orang tua, akan berwatak {$musim}. Hehe, entahlah. || Babies born in {$musim}, the elders say, take a {$musim} temper. Heh, who knows.
+$awal: aturan=awal.kabar opsional=0.35
+$ekor: aturan=ekor.kabar opsional=0.4
+- [3] {$awal}Ada bayi lahir di gang ini! Telur merah dibagikan, ambil satu!{$ekor} || {$awal}A baby was born in this lane! Red eggs are going round; take one!{$ekor}
+  ~ kasar: {$awal}Bayi baru. Malam ini pasti berisik.{$ekor} || {$awal}New baby. Tonight's going to be loud.{$ekor}
+  ~ kuno: {$awal}Kehidupan baru hadir di antara kita. Semoga tumbuh dengan akar yang kuat.{$ekor} || {$awal}A new life has come among us. May it grow with strong roots.{$ekor}
+  ~ kampung: {$awal}Ada yang lairan, Nak! Bayinya laki-laki, gemuk sekali!{$ekor} || {$awal}Someone gave birth, child! A boy, so chubby!{$ekor}
+- [2] {$awal}Neneknya sudah memilih nama dari kitab tua. Katanya nama yang membawa keberuntungan.{$ekor} || {$awal}The grandmother picked a name from an old book. A lucky name, she says.{$ekor}
+  ~ p: {$awal}Aku membantu persalinannya semalam. Lelah, tapi bahagia.{$ekor} || {$awal}I helped with the birth last night. Tired, but happy.{$ekor}
+- {$awal}Bayi lahir di musim {$musim}, kata orang tua, akan berwatak {$musim}. Hehe, entahlah.{$ekor} || {$awal}Babies born in {$musim}, the elders say, take a {$musim} temper. Heh, who knows.{$ekor}
 
 == acara.serangan
 niat: BERI_KABAR
@@ -114,13 +120,15 @@ syarat: acara=copet_tertangkap
 lanjut: kejahatan
 gestur: tunjuk
 $senang: aturan=seru.senang opsional=0.5
-- [3] Copetnya tertangkap! Lihat, diikat di tiang pasar! || The pickpocket's caught! Look, tied to the market post!
-  ~ kasar: Rasakan! Biar kapok tangannya. || Serves them right! Let their hands learn.
-  ~ kuno: Keadilan kecil di pasar hari ini. Semoga dia bertobat. || A small justice in the market today. May the thief repent.
-- [2] Dompetku kembali! Tiga hari aku kira hilang selamanya. {$senang} || My purse came back! For three days I thought it was gone forever. {$senang}
-  ~ p: Giwangku kembali! Hadiah dari ibuku! Aduh, syukurlah! || My earrings are back! A gift from my mother! Oh, thank heaven!
-- Ternyata copetnya anak muda. Kasihan juga, tapi tetap salah. || The thief turned out to be a youngster. A bit sad, but still wrong.
-- Pasar akan tenang beberapa hari. Sampai copet berikutnya datang. || The market will be calm a few days. Until the next thief comes.
+$awal: aturan=awal.kabar opsional=0.35
+$ekor: aturan=ekor.kabar opsional=0.4
+- [3] {$awal}Copetnya tertangkap! Lihat, diikat di tiang pasar!{$ekor} || {$awal}The pickpocket's caught! Look, tied to the market post!{$ekor}
+  ~ kasar: {$awal}Rasakan! Biar kapok tangannya.{$ekor} || {$awal}Serves them right! Let their hands learn.{$ekor}
+  ~ kuno: {$awal}Keadilan kecil di pasar hari ini. Semoga dia bertobat.{$ekor} || {$awal}A small justice in the market today. May the thief repent.{$ekor}
+- [2] {$awal}Dompetku kembali! Tiga hari aku kira hilang selamanya. {$senang} || {$awal}My purse came back! For three days I thought it was gone forever. {$senang}
+  ~ p: {$awal}Giwangku kembali! Hadiah dari ibuku! Aduh, syukurlah! || {$awal}My earrings are back! A gift from my mother! Oh, thank heaven!
+- {$awal}Ternyata copetnya anak muda. Kasihan juga, tapi tetap salah.{$ekor} || {$awal}The thief turned out to be a youngster. A bit sad, but still wrong.{$ekor}
+- Pasar akan tenang beberapa hari. Sampai copet berikutnya datang.{$ekor} || The market will be calm a few days. Until the next thief comes.{$ekor}
 
 == acara.pasar_hantu
 niat: BERI_KABAR
@@ -129,13 +137,15 @@ syarat: acara=pasar_hantu
 lanjut: pasar_hantu dunia
 gestur: bisik
 seru: bisik
-- [3] Sst... malam ini Pasar Hantu buka. Jangan menoleh kalau namamu dipanggil. || Shh... the Ghost Market opens tonight. Don't turn if someone calls your name.
-  ~ kasar: Pasar Hantu. Orang bodoh pergi, orang bodoh hilang. || Ghost Market. Fools go, fools vanish.
-  ~ kuno: Malam ini batas dunia menipis. Pasar para arwah terbuka. || Tonight the boundary of worlds thins. The spirits' market opens.
-- [2] Lentera putih sudah dipasang di jalan lama. Kalau lewat, jangan injak bayangan sendiri. || White lanterns hang on the old road. If you pass, don't step on your own shadow.
-  ~ air: Perahu-perahu tanpa pendayung terlihat di kanal, Kakak... aku tidak mau keluar... || Boats without rowers on the canal, dear... I won't go out...
-- Kakekku bilang, di Pasar Hantu jangan pernah menawar. Bayar apa yang diminta, lalu pergi. || My grandfather said: at the Ghost Market, never haggle. Pay what's asked, then leave.
-- Ada yang membeli umur panjang di sana, katanya. Bayarannya kenangan. || Someone bought a long life there, they say. Paid for it in memories.
+$awal: aturan=awal.kabar opsional=0.35
+$ekor: aturan=ekor.kabar opsional=0.4
+- [3] Sst... malam ini Pasar Hantu buka. Jangan menoleh kalau namamu dipanggil.{$ekor} || Shh... the Ghost Market opens tonight. Don't turn if someone calls your name.{$ekor}
+  ~ kasar: Pasar Hantu. Orang bodoh pergi, orang bodoh hilang.{$ekor} || Ghost Market. Fools go, fools vanish.{$ekor}
+  ~ kuno: Malam ini batas dunia menipis. Pasar para arwah terbuka.{$ekor} || Tonight the boundary of worlds thins. The spirits' market opens.{$ekor}
+- [2] {$awal}Lentera putih sudah dipasang di jalan lama. Kalau lewat, jangan injak bayangan sendiri.{$ekor} || {$awal}White lanterns hang on the old road. If you pass, don't step on your own shadow.{$ekor}
+  ~ air: {$awal}Perahu-perahu tanpa pendayung terlihat di kanal, Kakak... aku tidak mau keluar...{$ekor} || {$awal}Boats without rowers on the canal, dear... I won't go out...{$ekor}
+- {$awal}Kakekku bilang, di Pasar Hantu jangan pernah menawar. Bayar apa yang diminta, lalu pergi.{$ekor} || {$awal}My grandfather said: at the Ghost Market, never haggle. Pay what's asked, then leave.{$ekor}
+- {$awal}Ada yang membeli umur panjang di sana, katanya. Bayarannya kenangan.{$ekor} || {$awal}Someone bought a long life there, they say. Paid for it in memories.{$ekor}
 
 == acara.rombongan
 niat: BERI_KABAR
@@ -144,13 +154,15 @@ syarat: acara=rombongan
 lanjut: kafilah dagang
 gestur: tunjuk
 $arah: tipe=arah dari=konteks.arah
-- [3] Rombongan datang! Lihat kudanya, besar-besar! || A train's arrived! Look at the horses, huge!
-  ~ kasar: Rombongan. Penginapan penuh, harga naik. || A train. Inns full, prices up.
-  ~ kuno: Rombongan dari negeri jauh singgah di kota kita. Ada kabar dunia luar. || A train from far lands stops in our town. News of the wider world.
-  ~ oasis: Kafilah besar, Saudara! Seratus unta lebih! || A great caravan, friend! Over a hundred camels!
-- [2] Mereka membawa rempah yang belum pernah kucium. Pasar harum seperti dapur dewa. || They brought spices I've never smelt. The market smells like a god's kitchen.
-  ~ pelabuhan: Armada dagang berlabuh, Bung! Dermaga penuh sampai ke ujung! || A trading fleet has docked, mate! The pier's full to the end!
-- Kepala rombongan mencari pemandu ke {$arah}. Bayarannya bagus. || The train master seeks a guide to the {$arah}. Good pay.
+$awal: aturan=awal.kabar opsional=0.35
+$ekor: aturan=ekor.kabar opsional=0.4
+- [3] {$awal}Rombongan datang! Lihat kudanya, besar-besar!{$ekor} || {$awal}A train's arrived! Look at the horses, huge!{$ekor}
+  ~ kasar: {$awal}Rombongan. Penginapan penuh, harga naik.{$ekor} || {$awal}A train. Inns full, prices up.{$ekor}
+  ~ kuno: {$awal}Rombongan dari negeri jauh singgah di kota kita. Ada kabar dunia luar.{$ekor} || {$awal}A train from far lands stops in our town. News of the wider world.{$ekor}
+  ~ oasis: {$awal}Kafilah besar, Saudara! Seratus unta lebih!{$ekor} || {$awal}A great caravan, friend! Over a hundred camels!{$ekor}
+- [2] {$awal}Mereka membawa rempah yang belum pernah kucium. Pasar harum seperti dapur dewa.{$ekor} || {$awal}They brought spices I've never smelt. The market smells like a god's kitchen.{$ekor}
+  ~ pelabuhan: {$awal}Armada dagang berlabuh, Bung! Dermaga penuh sampai ke ujung!{$ekor} || {$awal}A trading fleet has docked, mate! The pier's full to the end!{$ekor}
+- {$awal}Kepala rombongan mencari pemandu ke {$arah}. Bayarannya bagus.{$ekor} || {$awal}The train master seeks a guide to the {$arah}. Good pay.{$ekor}
 
 == acara.harga_pangan
 niat: BERI_KABAR
@@ -160,13 +172,15 @@ lanjut: harga kafilah
 gestur: geleng
 seru: aduh
 $keluh: aturan=seru.keluh opsional=0.5
-- [3] Beras naik lagi. Kata orang kafilah dari selatan tertahan begal. {$keluh} || Rice is up again. They say the caravan from the south is held by bandits. {$keluh}
-  ~ kasar: Harga gila. Orang miskin makan apa? Rumput? || Mad prices. What are the poor to eat? Grass?
-  ~ kuno: Ketika lumbung kosong, hati rakyat ikut kosong. || When the granaries empty, the people's hearts empty too.
-  ~ kampung: Beras mahal, Nak. Sekarang makan singkong dulu. Tidak apa, sehat. || Rice is dear, child. Cassava for now. It's fine, healthy.
-- [2] Antrean di lumbung kota panjang sekali sejak subuh. || The queue at the town granary has been long since dawn.
-  ~ ibukota: Istana membuka lumbung darurat. Semoga cukup sampai panen. || The palace opened the emergency granary. May it last till harvest.
-- Kalau terus begini, orang mulai mencuri. Perut kosong tidak kenal hukum. || If this goes on, people will steal. An empty belly knows no law.
+$awal: aturan=awal.kabar opsional=0.35
+$ekor: aturan=ekor.kabar opsional=0.4
+- [3] {$awal}Beras naik lagi. Kata orang kafilah dari selatan tertahan begal. {$keluh} || {$awal}Rice is up again. They say the caravan from the south is held by bandits. {$keluh}
+  ~ kasar: {$awal}Harga gila. Orang miskin makan apa? Rumput? || {$awal}Mad prices. What are the poor to eat? Grass?
+  ~ kuno: {$awal}Ketika lumbung kosong, hati rakyat ikut kosong. || {$awal}When the granaries empty, the people's hearts empty too.
+  ~ kampung: {$awal}Beras mahal, Nak. Sekarang makan singkong dulu. Tidak apa, sehat. || {$awal}Rice is dear, child. Cassava for now. It's fine, healthy.
+- [2] {$awal}Antrean di lumbung kota panjang sekali sejak subuh.{$ekor} || {$awal}The queue at the town granary has been long since dawn.{$ekor}
+  ~ ibukota: {$awal}Istana membuka lumbung darurat. Semoga cukup sampai panen.{$ekor} || {$awal}The palace opened the emergency granary. May it last till harvest.{$ekor}
+- {$awal}Kalau terus begini, orang mulai mencuri. Perut kosong tidak kenal hukum.{$ekor} || {$awal}If this goes on, people will steal. An empty belly knows no law.{$ekor}
 
 == acara.bangun
 niat: BERI_KABAR
@@ -174,13 +188,15 @@ topik: kota
 syarat: acara=kavling_jadi,pembangunan
 lanjut: kota
 gestur: tunjuk
-- [3] Tukang-tukang bekerja sejak subuh. Bunyi palu tidak berhenti. || The builders have worked since dawn. The hammering never stops.
-  ~ kasar: Berisik. Tapi kota butuh rumah. || Noisy. But the town needs houses.
-  ~ kuno: Kota ini membangun kembali dirinya. Seperti bambu yang tumbuh setelah api. || This town rebuilds itself. Like bamboo growing after fire.
-  ~ kampung: Gotong royong, Nak! Ayo bantu angkat bambu! || Working together, child! Come help lift bamboo!
-- [2] Atap baru dipasang hari ini. Pemiliknya menyiapkan babi panggang untuk tukang. || A new roof goes up today. The owner's preparing roast pork for the builders.
-  ~ ibukota: Petugas pekerjaan umum mengawasi setiap balok. Ibu kota tidak boleh miring. || The works officer watches every beam. The capital may not lean.
-- Rumah yang dulu rusak sekarang lebih bagus dari sebelumnya. || The house that was damaged is now better than before.
+$awal: aturan=awal.kabar opsional=0.35
+$ekor: aturan=ekor.kabar opsional=0.4
+- [3] {$awal}Tukang-tukang bekerja sejak subuh. Bunyi palu tidak berhenti.{$ekor} || {$awal}The builders have worked since dawn. The hammering never stops.{$ekor}
+  ~ kasar: {$awal}Berisik. Tapi kota butuh rumah.{$ekor} || {$awal}Noisy. But the town needs houses.{$ekor}
+  ~ kuno: {$awal}Kota ini membangun kembali dirinya. Seperti bambu yang tumbuh setelah api.{$ekor} || {$awal}This town rebuilds itself. Like bamboo growing after fire.{$ekor}
+  ~ kampung: {$awal}Gotong royong, Nak! Ayo bantu angkat bambu!{$ekor} || {$awal}Working together, child! Come help lift bamboo!{$ekor}
+- [2] {$awal}Atap baru dipasang hari ini. Pemiliknya menyiapkan babi panggang untuk tukang.{$ekor} || {$awal}A new roof goes up today. The owner's preparing roast pork for the builders.{$ekor}
+  ~ ibukota: {$awal}Petugas pekerjaan umum mengawasi setiap balok. Ibu kota tidak boleh miring.{$ekor} || {$awal}The works officer watches every beam. The capital may not lean.{$ekor}
+- {$awal}Rumah yang dulu rusak sekarang lebih bagus dari sebelumnya.{$ekor} || {$awal}The house that was damaged is now better than before.{$ekor}
 
 == acara.pelindung
 niat: BERI_KABAR
@@ -189,12 +205,14 @@ syarat: acara=pelindung_baru
 lanjut: sekte kota
 gestur: hormat
 $sekte_pelindung: tipe=tempat dari=konteks.sekte_pelindung
-- [3] Panji sekte baru dipasang di gerbang hari ini. Kota kita punya pelindung! || A new sect banner went up at the gate today. Our town has a protector!
-  ~ kasar: Pelindung baru. Semoga lebih berguna dari yang lama. || New protector. Hope they're more use than the last.
-  ~ kuno: {$sekte_pelindung} kini menaungi kota ini. Semoga Dao mereka panjang. || {$sekte_pelindung} now shelters this town. May their Dao be long.
-- [2] Murid-murid {$sekte_pelindung} tadi berbaris lewat pasar. Gagah sekali. || {$sekte_pelindung}'s disciples marched through the market. Very dashing.
-  ~ kampung: Anak-anak kampung ikut berbaris di belakang murid {$sekte_pelindung}. Lucu sekali. || The village kids marched behind {$sekte_pelindung}'s disciples. So sweet.
-- Kepala kota mengadakan jamuan untuk utusan sekte. Bau masakannya sampai ke sini. || The town head is holding a banquet for the sect envoys. You can smell it from here.
+$awal: aturan=awal.kabar opsional=0.35
+$ekor: aturan=ekor.kabar opsional=0.4
+- [3] {$awal}Panji sekte baru dipasang di gerbang hari ini. Kota kita punya pelindung!{$ekor} || {$awal}A new sect banner went up at the gate today. Our town has a protector!{$ekor}
+  ~ kasar: {$awal}Pelindung baru. Semoga lebih berguna dari yang lama.{$ekor} || {$awal}New protector. Hope they're more use than the last.{$ekor}
+  ~ kuno: {$sekte_pelindung} kini menaungi kota ini. Semoga Dao mereka panjang.{$ekor} || {$sekte_pelindung} now shelters this town. May their Dao be long.{$ekor}
+- [2] Murid-murid {$sekte_pelindung} tadi berbaris lewat pasar. Gagah sekali.{$ekor} || {$sekte_pelindung}'s disciples marched through the market. Very dashing.{$ekor}
+  ~ kampung: {$awal}Anak-anak kampung ikut berbaris di belakang murid {$sekte_pelindung}. Lucu sekali.{$ekor} || {$awal}The village kids marched behind {$sekte_pelindung}'s disciples. So sweet.{$ekor}
+- {$awal}Kepala kota mengadakan jamuan untuk utusan sekte. Bau masakannya sampai ke sini.{$ekor} || {$awal}The town head is holding a banquet for the sect envoys. You can smell it from here.{$ekor}
 
 == acara.tahun_baru
 niat: BERI_KABAR
@@ -204,15 +222,17 @@ lanjut: keluarga acara
 gestur: ucap_selamat
 $sebutan: tipe=sebutan_pendengar dari=pendengar
 $tahun: tipe=angka dari=konteks.tahun
-- [3] Selamat tahun baru, {$sebutan}! Semoga rezekimu melimpah tahun ini! || Happy new year, {$sebutan}! May your fortune overflow this year!
-  ~ kasar: Tahun baru. Utang lama. Selamat. || New year. Old debts. Cheers.
-  ~ kuno: Tahun baru menghapus debu tahun lama. Semoga Dao-mu maju, {$sebutan}. || The new year sweeps away the old year's dust. May your Dao advance, {$sebutan}.
+$awal: aturan=awal.kabar opsional=0.35
+$ekor: aturan=ekor.kabar opsional=0.4
+- [3] Selamat tahun baru, {$sebutan}! Semoga rezekimu melimpah tahun ini!{$ekor} || Happy new year, {$sebutan}! May your fortune overflow this year!{$ekor}
+  ~ kasar: Tahun baru. Utang lama. Selamat.{$ekor} || New year. Old debts. Cheers.{$ekor}
+  ~ kuno: Tahun baru menghapus debu tahun lama. Semoga Dao-mu maju, {$sebutan}.{$ekor} || The new year sweeps away the old year's dust. May your Dao advance, {$sebutan}.{$ekor}
   ~ kampung: Sugeng warsa enggal, Nak! Eh, selamat tahun baru! Sudah dapat angpao? || Happy new year, child! Got your red envelope yet?
-- [2] Kuplet merah sudah kutempel di pintu. Tahun ini harus lebih baik. || I've pasted the red couplets on my door. This year must be better.
-  ~ p: Semalam aku membuat pangsit sampai jariku keriting. Tahun baru harus makan pangsit! || I made dumplings all night till my fingers wrinkled. New year means dumplings!
-  ~ pelabuhan: Tahun baru, Bung! Semua kapal pulang, semua pelaut mabuk! || New year, mate! Every ship home, every sailor drunk!
-- Petasan membuat setan takut. Dan anjingku juga. Kasihan dia. || Firecrackers scare off demons. And my dog. Poor thing.
-- Tahun {$tahun} sudah tiba. Cepat sekali waktu berlari. || The year {$tahun} is here. How fast time runs.
+- [2] {$awal}Kuplet merah sudah kutempel di pintu. Tahun ini harus lebih baik.{$ekor} || {$awal}I've pasted the red couplets on my door. This year must be better.{$ekor}
+  ~ p: {$awal}Semalam aku membuat pangsit sampai jariku keriting. Tahun baru harus makan pangsit!{$ekor} || {$awal}I made dumplings all night till my fingers wrinkled. New year means dumplings!{$ekor}
+  ~ pelabuhan: {$awal}Tahun baru, Bung! Semua kapal pulang, semua pelaut mabuk!{$ekor} || {$awal}New year, mate! Every ship home, every sailor drunk!{$ekor}
+- {$awal}Petasan membuat setan takut. Dan anjingku juga. Kasihan dia.{$ekor} || {$awal}Firecrackers scare off demons. And my dog. Poor thing.{$ekor}
+- {$awal}Tahun {$tahun} sudah tiba. Cepat sekali waktu berlari.{$ekor} || {$awal}The year {$tahun} is here. How fast time runs.{$ekor}
 
 == acara.panen
 niat: BERI_KABAR
@@ -220,13 +240,15 @@ topik: musim
 syarat: acara=panen
 lanjut: harga musim
 gestur: menari_panen
-- [3] Panen raya! Lumbung penuh, perut kenyang, hati senang! || Harvest home! Full granaries, full bellies, glad hearts!
-  ~ kasar: Panen. Akhirnya bisa bayar utang. || Harvest. Finally I can pay my debts.
-  ~ kuno: Bumi telah memberi. Mari bersyukur kepada langit dan leluhur. || The earth has given. Let us thank heaven and the ancestors.
-  ~ kampung: Panen, Nak! Malam ini ada tari panen di lapangan. Jangan sampai ketinggalan! || Harvest, child! Harvest dance on the field tonight. Don't miss it!
-- [2] Gabah tahun ini bernas semua. Kerja keras setahun terbayar. || Every grain is plump this year. A year's toil repaid.
-  ~ gunung: Para biksu menerima persembahan panen pertama. Berkah dibagi untuk semua. || The monks receive the first harvest offering. The blessing is shared by all.
-- Harga beras pasti turun setelah panen. Akhirnya! || Rice will surely drop after the harvest. At last!
+$awal: aturan=awal.kabar opsional=0.35
+$ekor: aturan=ekor.kabar opsional=0.4
+- [3] {$awal}Panen raya! Lumbung penuh, perut kenyang, hati senang!{$ekor} || {$awal}Harvest home! Full granaries, full bellies, glad hearts!{$ekor}
+  ~ kasar: {$awal}Panen. Akhirnya bisa bayar utang.{$ekor} || {$awal}Harvest. Finally I can pay my debts.{$ekor}
+  ~ kuno: {$awal}Bumi telah memberi. Mari bersyukur kepada langit dan leluhur.{$ekor} || {$awal}The earth has given. Let us thank heaven and the ancestors.{$ekor}
+  ~ kampung: {$awal}Panen, Nak! Malam ini ada tari panen di lapangan. Jangan sampai ketinggalan!{$ekor} || {$awal}Harvest, child! Harvest dance on the field tonight. Don't miss it!{$ekor}
+- [2] {$awal}Gabah tahun ini bernas semua. Kerja keras setahun terbayar.{$ekor} || {$awal}Every grain is plump this year. A year's toil repaid.{$ekor}
+  ~ gunung: {$awal}Para biksu menerima persembahan panen pertama. Berkah dibagi untuk semua.{$ekor} || {$awal}The monks receive the first harvest offering. The blessing is shared by all.{$ekor}
+- {$awal}Harga beras pasti turun setelah panen. Akhirnya!{$ekor} || {$awal}Rice will surely drop after the harvest. At last!{$ekor}
 
 == acara.qingming
 niat: BERI_KABAR

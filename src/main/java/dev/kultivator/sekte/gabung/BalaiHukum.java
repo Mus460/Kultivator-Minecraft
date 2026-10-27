@@ -112,6 +112,8 @@ public final class BalaiHukum {
 		}
 		registered = true;
 		GabungApi.addPenegak(BalaiHukum::langgar);
+		// 41.6.11: meditation keeps running in the Gua Renungan, at x0.8
+		dev.kultivator.cultivation.Meditation.addGainFactor(p -> KURUNGAN.containsKey(p.getUUID()) ? 0.8D : 1.0D);
 		Keanggotaan.addPenyentuh(BalaiHukum::sentuh);
 		ServerTickEvents.END_SERVER_TICK.register(BalaiHukum::tick);
 		ServerPlayerEvents.JOIN.register(BalaiHukum::masuk);

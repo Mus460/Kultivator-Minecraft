@@ -1,0 +1,186 @@
+{
+  "id": "reaksi_pemain_ragam",
+  "jenis": "realisasi",
+  "_catatan": "D-42K: reactions to the player (angry, scared, disappointed, insulting, apology, refusal, laughter, congratulation).",
+  "benih_dunia": 42,
+  "masukan": {
+    "niat": "MARAH",
+    "pembicara": 512,
+    "hari": 120,
+    "now": 2880000,
+    "cuaca": "hujan",
+    "musim": "gugur",
+    "situasi": {
+      "jam": "sore",
+      "cuaca": "hujan",
+      "musim": "gugur",
+      "kelompok": "penjaga",
+      "watak": "sombong",
+      "kebiasaan": [],
+      "sifat": {
+        "H": -50,
+        "E": -10,
+        "X": 40,
+        "A": -30,
+        "C": 0,
+        "O": 0
+      },
+      "wajah": "marah",
+      "tempat": "kota_besar"
+    },
+    "pendengar": {
+      "nama": "Han",
+      "kelamin": "l",
+      "tahap": "dewasa",
+      "pemain": true
+    },
+    "kesan": "kenal",
+    "tahu_nama": false,
+    "register": "biasa",
+    "dialek": "kampung",
+    "kelamin": "l",
+    "tahap": "dewasa",
+    "nilai": {
+      "konteks.cuaca": "hujan",
+      "konteks.arah": "utara",
+      "konteks.barang_mahal": "minecraft:honey_bottle",
+      "konteks.barang_murah": "minecraft:carrot"
+    }
+  },
+  "langkah": [
+    {
+      "ubah": {},
+      "harap": {
+        "k": "kultivator.cakap.marah.lagi.2.kampung",
+        "a": []
+      },
+      "aturan": "marah.lagi",
+      "gestur": "marah_hentak",
+      "seru": "kota42.seru.cih",
+      "tik": null,
+      "id_id": "Wong kok kurang ajar! Pergi, sebelum kusiram air panas!",
+      "en_us": "What rudeness! Go, before I throw hot water!"
+    },
+    {
+      "ubah": {
+        "niat": "TAKUT",
+        "dialek": "air",
+        "kelamin": "p"
+      },
+      "harap": {
+        "k": "kultivator.cakap.takut.lagi.1.p",
+        "a": []
+      },
+      "aturan": "takut.lagi",
+      "gestur": "takut_sembunyi",
+      "seru": "kota42.seru.takut_p",
+      "tik": null,
+      "id_id": "Tolong... aku hanya ingin pulang ke anak-anakku...",
+      "en_us": "Please... I only want to go home to my children..."
+    },
+    {
+      "ubah": {
+        "niat": "KECEWA",
+        "register": "kuno"
+      },
+      "harap": {
+        "k": "kultivator.cakap.kecewa.3",
+        "a": []
+      },
+      "aturan": "kecewa",
+      "gestur": "sikap_tunduk",
+      "seru": "kota42.seru.aduh_l",
+      "tik": null,
+      "id_id": "Lain kali, kalau tidak bisa, bilang dari awal, ya.",
+      "en_us": "Next time, if you can't, say so from the start."
+    },
+    {
+      "ubah": {
+        "niat": "HINA",
+        "topik": "pemain",
+        "dialek": "pelabuhan"
+      },
+      "harap": {
+        "k": "kultivator.cakap.hina.pemain.0.pelabuhan",
+        "a": []
+      },
+      "aturan": "hina.pemain",
+      "gestur": "marah_tunjuk",
+      "seru": "kota42.seru.cih",
+      "tik": null,
+      "id_id": "Kau seperti teritip, Bung. Menempel, tidak berguna, susah dibuang.",
+      "en_us": "You're like a barnacle, mate. Clinging, useless, hard to scrape off."
+    },
+    {
+      "ubah": {
+        "niat": "MAAF",
+        "register": "sopan"
+      },
+      "harap": {
+        "k": "kultivator.cakap.maaf.lagi.1",
+        "a": []
+      },
+      "aturan": "maaf.lagi",
+      "gestur": "sikap_tunduk",
+      "seru": "kota42.seru.maaf_l",
+      "tik": null,
+      "id_id": "Tadi aku kurang ajar. Kalau mau, kutraktir teh sebagai tanda maaf.",
+      "en_us": "I was rude earlier. If you like, I'll treat you to tea in apology."
+    },
+    {
+      "ubah": {
+        "niat": "TOLAK",
+        "topik": "minta",
+        "dialek": "iblis"
+      },
+      "harap": {
+        "k": "kultivator.cakap.tolak.lagi.1.iblis",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.kakak.iblis",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "tolak.lagi",
+      "gestur": "geleng",
+      "seru": null,
+      "tik": null,
+      "id_id": "Tidak gratis, tidak hari ini, tidak untukmu. Pilih salah satu alasan.",
+      "en_us": "Not free, not today, not for you. Take your pick of reasons."
+    },
+    {
+      "ubah": {
+        "niat": "TAWA",
+        "kelamin": "p"
+      },
+      "harap": {
+        "k": "kultivator.cakap.tawa.lagi.2.kampung",
+        "a": []
+      },
+      "aturan": "tawa.lagi",
+      "gestur": "tertawa",
+      "seru": "kota42.seru.tawa_p",
+      "tik": null,
+      "id_id": "Hahaha! Wis, Nak, aku butuh ketawa begini. Matur nuwun.",
+      "en_us": "Hahaha! Well, child, I needed laughing like this. Thanks."
+    },
+    {
+      "ubah": {
+        "niat": "SELAMAT",
+        "dialek": "oasis",
+        "register": "biasa"
+      },
+      "harap": {
+        "k": "kultivator.cakap.selamat.pemain.3",
+        "a": []
+      },
+      "aturan": "selamat.pemain",
+      "gestur": "ucap_selamat",
+      "seru": "kota42.seru.oh_l",
+      "tik": null,
+      "id_id": "Kabar baikmu membuat hari kami cerah juga. Terima kasih.",
+      "en_us": "Your good news brightens our day too. Thank you."
+    }
+  ]
+}

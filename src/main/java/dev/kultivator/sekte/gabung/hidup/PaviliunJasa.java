@@ -332,13 +332,29 @@ public final class PaviliunJasa {
 		long hari = Kota.day(server);
 		RandomSource random = RandomSource.create(server.overworld().getSeed() ^ sekte.hashCode() * 0x2545F4914F6CDD1DL ^ hari * 0x27BB2EE687B0B0FDL);
 		int kelas = GabungApi.kelas(sekte);
-		boolean tubuh = JenisMisiGabung.pesananPusaka(sekte);
+		// D-41C: what the pavilion asks for follows the style: rolls below `pusaka` ask for an artifact, below `pil` for a pill,
+		// below 9 for aged herbs, the rest for an artifact (TUBUH keeps the 38 rule: 4 / 6)
+		dev.kultivator.sekte.gabung.api.Corak corak = GabungApi.corak(sekte);
+		int pusaka = switch (corak) {
+			case TUBUH -> 4;
+			case PEDANG -> 3;
+			case FORMASI, BAYANGAN -> 2;
+			case UNSUR -> 1;
+			default -> 0;
+		};
+		int pil = switch (corak) {
+			case ALKIMIA -> 8;
+			case RACUN -> 7;
+			case TUBUH, PEDANG, FORMASI -> 6;
+			case UNSUR, DARAH, BAYANGAN -> 5;
+			default -> 3; // BUDDHA, BINATANG: mostly herbs
+		};
 		List<CompoundTag> out = new ArrayList<>();
 		for (int i = 0; i < PESANAN_PER_HARI; i++) {
 			CompoundTag o = new CompoundTag();
 			o.putString("id", "o." + hari + "." + i);
 			int roll = random.nextInt(10);
-			String jenis = tubuh && roll < 4 ? "pusaka" : roll < 6 ? "pil" : roll < 9 ? "herba" : "pusaka";
+			String jenis = roll < pusaka ? "pusaka" : roll < pil ? "pil" : roll < 9 ? "herba" : "pusaka";
 			o.putString("jenis", jenis);
 			switch (jenis) {
 				case "pil" -> {

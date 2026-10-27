@@ -36,9 +36,12 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -234,9 +237,55 @@ public final class Kediaman {
 	private static final String PETI = "peti";
 	private static final int WARNA = 0x8FE3C8;
 
+	/** Between two spoken greetings in the same cave (ticks, 5 minutes); the action-bar line shows at every entry. */
+	public static final int SAMBUT_JEDA = 6000;
+
 	private static boolean initialised;
+	/** Members now inside their own cave, and the game time of the last spoken greeting (runtime only). */
+	private static final Set<UUID> DI_GUA = new HashSet<>();
+	private static final Map<UUID, Long> SAMBUT = new HashMap<>();
 
 	private Kediaman() {
+	}
+
+	static void reset() {
+		DI_GUA.clear();
+		SAMBUT.clear();
+	}
+
+	/**
+	 * Once a second: a member who steps into the cave he rents is welcomed (D-41C). The action bar names the dwelling, its
+	 * meditation factor and the day the rent runs to; the first entry in 5 minutes adds one line in the cave's own voice
+	 * ({@code sambut.<kind>}), a chime and a drift of motes, and a hint to set the Jimat Pulang when it is not set yet.
+	 */
+	static void sambut(MinecraftServer server) {
+		GabungData data = GabungData.get(server);
+		for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+			Keanggotaan k = data.peek(player.getUUID());
+			Hunian h = k == null || k.sekteAktif() == null ? null : hunian(k);
+			boolean di = h != null && h.jenis() != Jenis.BILIK && player.isAlive() && diDalam(player, h);
+			if (!di) {
+				DI_GUA.remove(player.getUUID());
+				continue;
+			}
+			if (!DI_GUA.add(player.getUUID())) {
+				continue;
+			}
+			ServerLevel level = player.level();
+			Msg.actionBar(player, Component.translatable("kultivator.gabung.kediaman.sambut", h.nama(), faktorTeks(h.jenis()), h.sewaSampai()).withColor(WARNA));
+			long now = level.getGameTime();
+			Long last = SAMBUT.get(player.getUUID());
+			if (last != null && now - last < SAMBUT_JEDA) {
+				continue;
+			}
+			SAMBUT.put(player.getUUID(), now);
+			Msg.chat(player, Component.translatable("kultivator.gabung.kediaman.sambut." + h.jenis().id()).withStyle(ChatFormatting.ITALIC).withColor(WARNA));
+			if (!jimat(player)) {
+				Msg.chat(player, Component.translatable("kultivator.gabung.kediaman.sambut_jimat").withStyle(ChatFormatting.GRAY));
+			}
+			level.playSound(null, player.blockPosition(), SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 0.7F, 0.9F);
+			level.sendParticles(net.minecraft.core.particles.ParticleTypes.ENCHANT, player.getX(), player.getY() + 1.2D, player.getZ(), 24, 0.7D, 0.6D, 0.7D, 0.4D);
+		}
 	}
 
 	// ================================================================== wiring

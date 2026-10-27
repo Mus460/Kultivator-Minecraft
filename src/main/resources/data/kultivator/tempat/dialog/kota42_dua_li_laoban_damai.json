@@ -1,0 +1,29 @@
+{
+  "pembicara": [
+    "tokoh:li_laoban"
+  ],
+  "prioritas": 60,
+  "syarat": [
+    "quest kota42_dua_keluarga tahap nikah",
+    "!bendera kota42.dua.maaf"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "membaca",
+      "pilihan": [
+        {
+          "ke": "maaf"
+        }
+      ]
+    },
+    {
+      "id": "maaf",
+      "gestur": "396",
+      "akibat": [
+        "bendera kota42.dua.maaf"
+      ]
+    }
+  ]
+}

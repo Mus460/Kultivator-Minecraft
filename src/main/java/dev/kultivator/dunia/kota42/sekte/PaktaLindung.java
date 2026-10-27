@@ -370,6 +370,7 @@ public final class PaktaLindung {
 		t.putInt("setengah", 0);
 		if (dapat > 0L) {
 			EkonomiApi.beri(player, dapat, "kota42.upeti");
+			dev.kultivator.dunia.kota42.ekonomi.Investasi.catatKeran(server, player.getUUID(), dev.kultivator.dunia.kota42.ekonomi.Investasi.K_UPETI, dapat);
 			EkonomiApi.kas(player.getUUID(), LembarKunci.BukuKas.SUMBER_UPETI, false, dapat, "kultivator.kota42.sekte.buku.upeti");
 		}
 		int barang = 0;

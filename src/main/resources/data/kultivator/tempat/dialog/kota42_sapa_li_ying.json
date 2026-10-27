@@ -1,0 +1,44 @@
+{
+  "pembicara": [
+    "tokoh:li_ying"
+  ],
+  "prioritas": 5,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "tuang_teh",
+      "prop": "kendi",
+      "pilihan": [
+        {
+          "ke": "arak"
+        },
+        {
+          "ke": "nyanyi"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "arak",
+      "gestur": "tuang_teh",
+      "prop": "kendi",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "nyanyi",
+      "gestur": "tertawa",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

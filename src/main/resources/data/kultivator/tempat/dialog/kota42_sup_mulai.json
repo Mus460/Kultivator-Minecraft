@@ -1,0 +1,47 @@
+{
+  "pembicara": [
+    "tokoh:nenek_tang"
+  ],
+  "prioritas": 40,
+  "syarat": [
+    "quest kota42_sup_hangat baru"
+  ],
+  "sekali": true,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "445",
+      "prop": "212",
+      "suara": "kota42.sup_nenek",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai kota42_sup_hangat"
+          ],
+          "ke": "butuh"
+        },
+        {
+          "ke": "mangkuk"
+        }
+      ]
+    },
+    {
+      "id": "butuh",
+      "gestur": "bicara_tangan"
+    },
+    {
+      "id": "mangkuk",
+      "gestur": "menangis",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai kota42_sup_hangat"
+          ],
+          "ke": "butuh"
+        },
+        {}
+      ]
+    }
+  ]
+}

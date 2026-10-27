@@ -175,5 +175,16 @@
   "kultivator.kota42.toko.ringkas.isi": "Reputation %1$s · till %2$s · sold today %3$s of %4$s · clerk %5$s · racks %6$s/%7$s",
   "kultivator.kota42.toko.buka_label": "OPEN",
   "kultivator.kota42.toko.tutup_label": "CLOSED",
-  "kultivator.kota42.toko.tanpa_pegawai": "none"
+  "kultivator.kota42.toko.tanpa_pegawai": "none",
+  "kultivator.kota42.bank.riwayat.toko": "Shop takings: %s",
+  "kultivator.kota42.bank.riwayat.pajak": "House tax, paid automatically: %s",
+  "kultivator.kota42.bank.riwayat.gaji": "Staff wage, paid automatically: %s",
+  "kultivator.kota42.toko.ke_bank_ya": "Sales now go straight into the Rumah Uang (no fee).",
+  "kultivator.kota42.toko.ke_bank_tidak": "Sales wait in the till again.",
+  "kultivator.kota42.toko.gagal.segel": "This house is sealed: its shop cannot open until the seal is lifted.",
+  "kultivator.kota42.toko.gagal.tanpa_tukang": "No carpenter near you. Find a Tukang at the market, or craft it yourself from planks and iron.",
+  "kultivator.kota42.toko.perabot": "The carpenter hands over %s for %s.",
+  "kultivator.kota42.harga.uji.keran_judul": "This week's faucets · band %s (used / cap)",
+  "kultivator.kota42.harga.uji.keran_baris": "  %s: %s / %s NB",
+  "kultivator.kota42.toko.ringkas.bank": "Takings go straight to the Rumah Uang · deposit %s"
 }

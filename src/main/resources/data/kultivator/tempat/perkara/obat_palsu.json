@@ -1,0 +1,66 @@
+{
+  "nama": "kultivator.kota42.perkara.t.obat_palsu.nama",
+  "teks": "kultivator.kota42.perkara.t.obat_palsu.teks",
+  "penggugat": {
+    "klaim": "kultivator.kota42.perkara.t.obat_palsu.klaim_a",
+    "peran": [
+      "warga",
+      "petani"
+    ]
+  },
+  "tergugat": {
+    "klaim": "kultivator.kota42.perkara.t.obat_palsu.klaim_b",
+    "peran": [
+      "penjual_obat",
+      "tabib"
+    ]
+  },
+  "benar": "acak",
+  "saksi": 2,
+  "kesaksian": {
+    "penggugat": [
+      "kultivator.kota42.perkara.t.obat_palsu.saksi_a1",
+      "kultivator.kota42.perkara.t.obat_palsu.saksi_a2"
+    ],
+    "tergugat": [
+      "kultivator.kota42.perkara.t.obat_palsu.saksi_b1",
+      "kultivator.kota42.perkara.t.obat_palsu.saksi_b2"
+    ]
+  },
+  "dusta": "kultivator.kota42.perkara.t.obat_palsu.dusta",
+  "bukti": [
+    {
+      "jenis": "barang",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.obat_palsu.bukti1_a",
+        "tergugat": "kultivator.kota42.perkara.t.obat_palsu.bukti1_b"
+      },
+      "barang": "minecraft:sugar"
+    },
+    {
+      "jenis": "gosip",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.obat_palsu.bukti2_a",
+        "tergugat": "kultivator.kota42.perkara.t.obat_palsu.bukti2_b"
+      }
+    }
+  ],
+  "putusan": [
+    {
+      "untuk": "penggugat",
+      "teks": "kultivator.kota42.perkara.t.obat_palsu.putusan1",
+      "akibat": "kultivator.kota42.perkara.t.obat_palsu.putusan1_akibat"
+    },
+    {
+      "untuk": "tergugat",
+      "teks": "kultivator.kota42.perkara.t.obat_palsu.putusan2",
+      "akibat": "kultivator.kota42.perkara.t.obat_palsu.putusan2_akibat"
+    },
+    {
+      "untuk": "damai",
+      "teks": "kultivator.kota42.perkara.t.obat_palsu.putusan3",
+      "akibat": "kultivator.kota42.perkara.t.obat_palsu.putusan3_akibat"
+    }
+  ],
+  "suap": 0.45
+}

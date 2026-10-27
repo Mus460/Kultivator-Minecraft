@@ -1,0 +1,29 @@
+{
+  "pembicara": [
+    "tokoh:tetua_he"
+  ],
+  "prioritas": 5,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "hormat",
+      "pilihan": [
+        {
+          "ke": "kota"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kota",
+      "gestur": "memandang",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

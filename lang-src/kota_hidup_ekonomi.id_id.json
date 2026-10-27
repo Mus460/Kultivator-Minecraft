@@ -175,5 +175,16 @@
   "kultivator.kota42.toko.ringkas.isi": "Reputasi %1$s · laci %2$s · terjual hari ini %3$s dari %4$s · pegawai %5$s · rak %6$s/%7$s",
   "kultivator.kota42.toko.buka_label": "BUKA",
   "kultivator.kota42.toko.tutup_label": "TUTUP",
-  "kultivator.kota42.toko.tanpa_pegawai": "tidak ada"
+  "kultivator.kota42.toko.tanpa_pegawai": "tidak ada",
+  "kultivator.kota42.bank.riwayat.toko": "Hasil toko: %s",
+  "kultivator.kota42.bank.riwayat.pajak": "Pajak rumah otomatis: %s",
+  "kultivator.kota42.bank.riwayat.gaji": "Gaji pegawai otomatis: %s",
+  "kultivator.kota42.toko.ke_bank_ya": "Hasil penjualan kini langsung masuk Rumah Uang (tanpa biaya).",
+  "kultivator.kota42.toko.ke_bank_tidak": "Hasil penjualan kembali menunggu di laci kasir.",
+  "kultivator.kota42.toko.gagal.segel": "Rumah ini disegel: tokonya tidak bisa dibuka sampai segel dicabut.",
+  "kultivator.kota42.toko.gagal.tanpa_tukang": "Tidak ada tukang di dekatmu. Cari Tukang di pasar, atau rakit sendiri dari papan dan besi.",
+  "kultivator.kota42.toko.perabot": "Tukang menyerahkan %s seharga %s.",
+  "kultivator.kota42.harga.uji.keran_judul": "Keran minggu ini · pita %s (terpakai / batas)",
+  "kultivator.kota42.harga.uji.keran_baris": "  %s: %s / %s NB",
+  "kultivator.kota42.toko.ringkas.bank": "Hasil penjualan langsung ke Rumah Uang · saldo %s"
 }

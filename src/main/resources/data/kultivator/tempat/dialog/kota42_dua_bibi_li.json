@@ -1,0 +1,29 @@
+{
+  "pembicara": [
+    "tokoh:bibi_li"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest kota42_dua_keluarga tahap telusur"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "366",
+      "akibat": [
+        "peristiwa tanda kota42.telusur.kota42_batas_sumur"
+      ],
+      "pilihan": [
+        {
+          "ke": "bayar"
+        }
+      ]
+    },
+    {
+      "id": "bayar",
+      "gestur": "bisik",
+      "suara": "kota42.gosip_bisik"
+    }
+  ]
+}

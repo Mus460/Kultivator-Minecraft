@@ -152,6 +152,24 @@ public record RupaKunci(String kunci, @Nullable String sekte, int dao, int pangk
 	}
 
 	/**
+	 * A sect style key ({@code tetua_sekte.pedang}, {@code ketua_sekte.alkimia}, {@code murid.2.buddha}, DESIGN 41.11.5) without
+	 * its style; any other key unchanged. Behaviour tables keyed on the plain rows ({@code tetua_sekte}, {@code murid.2}) read
+	 * the key through this.
+	 */
+	public static String tanpaGaya(String kunci) {
+		if (kunci.startsWith("tetua_sekte.")) {
+			return "tetua_sekte";
+		}
+		if (kunci.startsWith("ketua_sekte.")) {
+			return "ketua_sekte";
+		}
+		if (kunci.length() > 8 && kunci.startsWith("murid.") && kunci.charAt(7) == '.' && Character.isDigit(kunci.charAt(6))) {
+			return kunci.substring(0, 7);
+		}
+		return kunci;
+	}
+
+	/**
 	 * Keeps only {@code [A-Za-z0-9_.]} (plus {@code :} and {@code -} in a sect value, for {@code npc:<id>} and owner
 	 * UUIDs), so a key can never break the {@code |} and {@code =} syntax. Case is kept ({@code kelompok.PEKERJA}).
 	 */

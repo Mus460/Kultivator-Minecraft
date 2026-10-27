@@ -1,0 +1,175 @@
+# rinci_keluh: D-42K detail pass. New KELUH bodies (same niat/topik as the old rules, so the planner pools them): five more
+# complaints per topic. The glue slots {$awal}/{$ekor} are added by the drafting aid (scratchpad d42k/decor.py).
+@kelompok rinci
+
+== keluh.lagi.cuaca
+niat: KELUH
+topik: cuaca
+gestur: geleng
+seru: aduh
+$cuaca: tipe=cuaca dari=konteks.cuaca
+$awal: aturan=awal.keluh opsional=0.45
+$ekor: aturan=ekor.keluh opsional=0.4
+- [2] {$awal}Kemarin {$cuaca}, hari ini {$cuaca}. Atap bocorku sudah menyerah.{$ekor} || {$awal}Yesterday {$cuaca}, today {$cuaca}. My leaky roof has given up.{$ekor}
+  ~ kasar: Lagi-lagi {$cuaca}. Langit itu sengaja menguji kesabaran orang.{$ekor} || {$cuaca} yet again. Heaven is testing people's patience on purpose.{$ekor}
+  ~ kuno: Hamba jemu menatap {$cuaca} yang berkepanjangan; hamba tak mampu menolak kehendak langit.{$ekor} || This one is weary of the endless {$cuaca}; this one cannot refuse heaven's will.{$ekor}
+- {$awal}Tulang-tulangku berderak setiap kali cuaca berganti. Tabib saja kalah tepat.{$ekor} || {$awal}My bones creak whenever the weather turns. No physician is as precise.{$ekor}
+  ~ kampung: {$awal}Pinggangku pegal tiap cuaca berubah, Nak. Itu pertanda, katanya.{$ekor} || {$awal}My back aches each time the weather turns, child. It's an omen, they say.{$ekor}
+- {$awal}Gara-gara cuaca, pelanggan tidak datang. Seharian aku menunggu sendirian.{$ekor} || {$awal}Because of the weather no customers came. I waited alone all day.{$ekor}
+  ~ pelabuhan: {$awal}Cuaca begini, kapal tidak jalan, kedai kosong, Bung.{$ekor} || {$awal}Weather like this, no ships sail, the tavern's empty, mate.{$ekor}
+- {$awal}Anak-anak terkurung di rumah karena cuaca. Rumahku seperti pasar ikan.{$ekor} || {$awal}The children are shut in by the weather. My house is like a fish market.{$ekor}
+- {$awal}Aku sudah tiga kali menjemur dan tiga kali mengangkat jemuran. Tiga kali sia-sia.{$ekor} || {$awal}I've hung the washing out three times and taken it in three times. Three times for nothing.{$ekor}
+  ~ p: {$awal}Jemuranku tidak pernah kering sempurna. Baju suamiku bau apek semua.{$ekor} || {$awal}My washing never dries properly. My husband's clothes all smell musty.{$ekor}
+
+== keluh.lagi.kerja
+niat: KELUH
+topik: kerja
+gestur: seka_keringat
+seru: aduh
+$awal: aturan=awal.keluh opsional=0.45
+$ekor: aturan=ekor.keluh opsional=0.4
+- [2] {$awal}Pekerjaan menumpuk, orang yang membantu tidak ada. Satu tanganku untuk tiga pekerjaan.{$ekor} || {$awal}Work piles up and nobody helps. One pair of hands for three jobs.{$ekor}
+  ~ kasar: {$awal}Semua orang malas, aku yang kerja. Biasa.{$ekor} || {$awal}Everyone's lazy and I do the work. Usual.{$ekor}
+- {$awal}Mandor memarahiku untuk kesalahan orang lain. Aku diam saja. Apa gunanya membela diri? || {$awal}The foreman scolded me for someone else's mistake. I kept quiet. What use is defending myself?
+  ~ kuno: {$awal}Hamba menanggung kesalahan orang lain dan memilih diam. || {$awal}This one bears another's fault and chooses silence.
+- {$awal}Dua hari ini aku tidak sempat makan siang. Perutku sudah berhenti protes.{$ekor} || {$awal}For two days I've had no time for lunch. My stomach has stopped protesting.{$ekor}
+  ~ p: {$awal}Kakiku bengkak berdiri seharian. Majikan tidak mau tahu.{$ekor} || {$awal}My feet are swollen from standing all day. The master doesn't want to know.{$ekor}
+- {$awal}Pekerja baru itu dibayar lebih tinggi dariku, padahal aku sepuluh tahun di sini.{$ekor} || {$awal}That new hand is paid more than me, though I've been here ten years.{$ekor}
+  ~ kampung: {$awal}Anak kemarin sore dapat upah lebih besar dariku, Nak. Dunia kok begini.{$ekor} || {$awal}A newcomer gets more pay than me, child. What a world.{$ekor}
+- {$awal}Kalau saja aku punya akar roh, aku tidak perlu memanggul karung begini.{$ekor} || {$awal}If only I had a spirit root, I wouldn't have to shoulder sacks like this.{$ekor}
+  ~ iblis: {$awal}Di kota ini otot dijual murah, kebodohan dijual mahal. Aku menjual otot.{$ekor} || {$awal}In this city muscle is sold cheap and folly sold dear. I sell muscle.{$ekor}
+
+== keluh.lagi.pejabat
+niat: KELUH
+topik: pejabat
+gestur: geleng
+$awal: aturan=awal.keluh opsional=0.45
+$ekor: aturan=ekor.keluh opsional=0.4
+- [2] {$awal}Surat izin dapurku sudah tiga bulan ditahan. Kata juru tulis, mejanya penuh.{$ekor} || {$awal}My kitchen permit has been held three months. The clerk says his desk is full.{$ekor}
+  ~ ibukota: {$awal}Berkas izinku berpindah dari meja ke meja. Tiap meja minta amplop sendiri.{$ekor} || {$awal}My permit papers wander from desk to desk. Every desk wants its own envelope.{$ekor}
+- {$awal}Petugas pajak datang dengan buku yang tidak bisa kubaca dan angka yang tidak bisa kubantah.{$ekor} || {$awal}The tax man comes with a ledger I can't read and numbers I can't dispute.{$ekor}
+  ~ kasar: {$awal}Petugas pajak itu rampok yang punya stempel.{$ekor} || {$awal}That tax man is a robber with a seal.{$ekor}
+- {$awal}Pejabat baru bicaranya manis seperti madu. Tapi madunya hanya untuk kantongnya sendiri.{$ekor} || {$awal}The new official talks sweet as honey. But the honey only goes into his own pocket.{$ekor}
+- {$awal}Kami minta sumur diperbaiki. Dijawab: tunggu tahun anggaran. Entah tahun yang mana.{$ekor} || {$awal}We asked for the well to be mended. Answer: wait for the budget year. Which year, who knows.{$ekor}
+  ~ kampung: {$awal}Minta jembatan, dijanjikan upacara peresmian. Jembatannya tetap tidak ada.{$ekor} || {$awal}Asked for a bridge, promised an opening ceremony. Still no bridge.{$ekor}
+- {$awal}Orang kecil antre sejak subuh, pejabat datang menjelang siang. Kapan keadilan bangun? || {$awal}The small folk queue from dawn, the official arrives near noon. When does justice wake?
+  ~ kuno: {$awal}Rakyat menanti di gerbang sejak fajar, tuan-tuan itu datang bersama matahari tinggi. || {$awal}The people wait at the gate from dawn; the masters arrive with the sun high.
+
+== keluh.lagi.uang
+niat: KELUH
+topik: uang
+gestur: hitung_koin
+seru: aduh
+$awal: aturan=awal.keluh opsional=0.45
+$ekor: aturan=ekor.keluh opsional=0.4
+- [2] {$awal}Sudah kuhitung tiga kali, jumlahnya tetap kurang. Uangnya tidak mau bertambah.{$ekor} || {$awal}I've counted three times and it's still short. The money won't grow.{$ekor}
+  ~ kasar: {$awal}Kantong bolong. Uang masuk, uang kabur.{$ekor} || {$awal}Pocket's got a hole. Money in, money gone.{$ekor}
+- {$awal}Biaya obat ibuku lebih besar dari upahku sebulan. Aku pilih makan sekali sehari.{$ekor} || {$awal}My mother's medicine costs more than a month's pay. I eat once a day.{$ekor}
+  ~ p: {$awal}Uang belanja dipotong lagi. Aku harus menyulap dua keping menjadi makan malam.{$ekor} || {$awal}The housekeeping is cut again. I must conjure dinner out of two coins.{$ekor}
+- {$awal}Dulu sekeping tembaga bisa membeli sepiring bakpao. Sekarang cuma baunya.{$ekor} || {$awal}A copper once bought a plate of buns. Now it buys only the smell.{$ekor}
+  ~ kampung: {$awal}Dulu seekor ayam sepuluh keping, sekarang tiga puluh. Siapa yang sanggup, Nak? || {$awal}A hen was ten coins; now thirty. Who can manage that, child?
+- {$awal}Aku menabung bertahun-tahun untuk atap baru. Satu sakit, tabungan habis dalam semalam.{$ekor} || {$awal}I saved for years for a new roof. One illness and the savings were gone in a night.{$ekor}
+- {$awal}Teman-temanku sudah berhasil, aku masih menghitung receh. Kadang malu menyapa mereka.{$ekor} || {$awal}My friends have all done well, and I'm still counting small change. Sometimes I'm ashamed to greet them.{$ekor}
+  ~ iblis: {$awal}Di kota ini tak punya uang berarti tak punya teman. Aku sudah belajar itu.{$ekor} || {$awal}In this city having no money means having no friends. I've learned that.{$ekor}
+
+== keluh.lagi.harga
+niat: KELUH
+topik: harga
+gestur: geleng
+seru: aduh
+$barang_mahal: tipe=barang dari=konteks.barang_mahal fitur=jamak
+$barang_murah: tipe=barang dari=konteks.barang_murah
+$awal: aturan=awal.keluh opsional=0.45
+$ekor: aturan=ekor.keluh opsional=0.4
+- [2] {$awal}Kemarin {$barang_mahal} masih terjangkau. Hari ini pedagang menatapku seolah aku maling.{$ekor} || {$awal}Yesterday {$barang_mahal} was still within reach. Today the trader eyes me like a thief.{$ekor}
+  ~ kasar: Orang menjual {$barang_mahal} seperti emas padahal rasanya tanah.{$ekor} || Folk sell {$barang_mahal} like gold when it tastes like dirt.{$ekor}
+- {$awal}Satu-satunya yang murah sekarang tinggal {$barang_murah}. Kami makan itu setiap hari.{$ekor} || {$awal}The only cheap thing left is {$barang_murah}. We eat it every day.{$ekor}
+  ~ kampung: {$awal}Cuma {$barang_murah} yang masih murah, Nak. Hari-hari kami {$barang_murah} saja.{$ekor} || {$awal}Only {$barang_murah} is still cheap, child. Day after day it's just {$barang_murah}.{$ekor}
+- {$awal}Kata pedagang, harga naik karena jalan rusak. Kata pengemudi gerobak, karena pedagang rakus.{$ekor} || {$awal}The trader says prices rose because the roads are bad. The cart driver says because traders are greedy.{$ekor}
+- {$awal}Aku membandingkan harga di tiga lapak. Ketiganya sepakat untuk sama-sama mencekik.{$ekor} || {$awal}I compared prices at three stalls. All three agreed to throttle equally.{$ekor}
+  ~ ibukota: {$awal}Tiga toko di Jalan Pasar, tiga harga yang sama persis. Itu bukan kebetulan.{$ekor} || {$awal}Three shops on Market Street, the exact same price. That's no coincidence.{$ekor}
+- {$awal}Anakku menangis minta manisan. Aku hanya bisa menunjuk ke bulan.{$ekor} || {$awal}My child cried for sweets. All I could do was point at the moon.{$ekor}
+  ~ p: {$awal}Anakku bertanya kenapa kami tidak beli manisan lagi. Susah menjawabnya.{$ekor} || {$awal}My child asked why we don't buy sweets any more. Hard to answer.{$ekor}
+
+== keluh.lagi.kejahatan
+niat: KELUH
+topik: kejahatan
+gestur: geleng
+$awal: aturan=awal.keluh opsional=0.45
+$ekor: aturan=ekor.keluh opsional=0.4
+- [2] {$awal}Dompetku hilang di tengah keramaian. Tidak ada yang melihat. Selalu begitu.{$ekor} || {$awal}My purse vanished in the middle of the crowd. Nobody saw. Always the same.{$ekor}
+  ~ kasar: {$awal}Copet di pasar kerjanya lebih rapi dari penjaga.{$ekor} || {$awal}The market pickpockets work tidier than the guards.{$ekor}
+- {$awal}Pintu tetangga dicongkel semalam. Sekarang tiap malam aku menyalakan lampu sampai pagi.{$ekor} || {$awal}The neighbour's door was jimmied last night. Now I leave the lamp lit till morning.{$ekor}
+  ~ kuno: {$awal}Pencuri merajalela. Hamba tak lagi berani lelap.{$ekor} || {$awal}Thieves run rampant. This one no longer dares sleep deeply.{$ekor}
+- {$awal}Anak muda sekarang berkelompok, mengancam pedagang kecil, minta uang jaga. Penjaga pura-pura tidak tahu.{$ekor} || {$awal}Young toughs go in gangs now, threatening small traders, asking protection money. The guards pretend not to know.{$ekor}
+  ~ iblis: {$awal}Uang jaga. Di sini kami menyebutnya sewa udara. Mahal juga.{$ekor} || {$awal}Protection money. Here we call it air rent. Dear too.{$ekor}
+- {$awal}Kemarin kudengar jeritan di gang. Aku menutup pintu. Aku malu, tapi aku takut.{$ekor} || {$awal}Yesterday I heard a scream in the alley. I shut my door. I'm ashamed, but I was afraid.{$ekor}
+- {$awal}Pedagang tetangga ditipu orang asing dengan timbangan palsu. Dia rugi sebulan hasil.{$ekor} || {$awal}A neighbouring trader was cheated by a stranger with false scales. He lost a month's takings.{$ekor}
+  ~ pelabuhan: {$awal}Awak kapal asing menipu pedagang ikan dengan dacin curang. Rugi besar, Bung.{$ekor} || {$awal}A foreign crew cheated the fish trader with a crooked balance. Big loss, mate.{$ekor}
+
+== keluh.lagi.begal
+niat: KELUH
+topik: begal
+gestur: geleng
+seru: aduh
+$arah: tipe=arah dari=konteks.arah
+$awal: aturan=awal.keluh opsional=0.45
+$ekor: aturan=ekor.keluh opsional=0.4
+- [2] {$awal}Pedagang yang pergi ke {$arah} minggu lalu belum pulang. Istrinya menunggu di gerbang tiap sore.{$ekor} || {$awal}The trader who went {$arah} last week hasn't come back. His wife waits at the gate each evening.{$ekor}
+  ~ kuno: {$awal}Mereka yang menempuh jalan {$arah} tak kembali. Hamba tak sanggup menatap para istri.{$ekor} || {$awal}Those who took the {$arah} road did not return. This one can't face the wives.{$ekor}
+- {$awal}Upah pengawal kafilah naik dua kali lipat gara-gara begal. Barang pun jadi mahal.{$ekor} || {$awal}Caravan guards' wages doubled because of the bandits. So goods got dear too.{$ekor}
+- {$awal}Jalan {$arah} dulu jalan utama. Sekarang orang memilih memutar tiga hari demi selamat.{$ekor} || {$awal}The {$arah} road used to be the main one. Now people detour three days to be safe.{$ekor}
+  ~ oasis: {$awal}Jalur {$arah} dulu jalur emas. Sekarang pasir menelan kafilah yang nekat, Saudara.{$ekor} || {$awal}The {$arah} route was once the golden route. Now the sand swallows reckless caravans, friend.{$ekor}
+- {$awal}Aku punya paman yang diambil begal. Sejak itu tak ada yang berani bicara soal jalan itu.{$ekor} || {$awal}I had an uncle taken by bandits. Since then nobody dares speak of that road.{$ekor}
+- {$awal}Penjaga bilang akan mengirim pasukan. Sudah dua musim bilang begitu.{$ekor} || {$awal}The guards say they'll send a troop. They've said so two seasons now.{$ekor}
+  ~ pelabuhan: {$awal}Pasukan laut berjanji menumpas bajak laut. Dua musim berjanji, kapal tetap hilang.{$ekor} || {$awal}The sea patrol promised to crush the pirates. Two seasons promising and ships still vanish.{$ekor}
+
+== keluh.lagi.panen
+niat: KELUH
+topik: panen
+gestur: geleng
+seru: aduh
+$awal: aturan=awal.keluh opsional=0.45
+$ekor: aturan=ekor.keluh opsional=0.4
+- [2] {$awal}Hama menggerogoti separuh ladangku. Aku sudah memasang jerami, jimat, dan doa. Semuanya sia-sia.{$ekor} || {$awal}Pests gnawed half my field. I put up straw, charms and prayers. All for nothing.{$ekor}
+  ~ kampung: {$awal}Wereng makan separuh padi, Nak. Doa, jimat, orang-orangan sawah, semua sudah.{$ekor} || {$awal}Hoppers ate half the rice, child. Prayers, charms, scarecrows, I've tried them all.{$ekor}
+- {$awal}Panen tahun ini cuma cukup untuk pajak. Untuk kami sendiri, entah.{$ekor} || {$awal}This year's harvest only covers the tax. For ourselves, who knows.{$ekor}
+- {$awal}Tengkulak datang menawar murah selagi gabah masih basah. Mereka tahu kami tak punya pilihan.{$ekor} || {$awal}The middlemen come to bargain low while the grain's still wet. They know we have no choice.{$ekor}
+  ~ kasar: {$awal}Tengkulak itu burung nasar berjas.{$ekor} || {$awal}Those middlemen are vultures in robes.{$ekor}
+- {$awal}Hujan datang terlambat, panas datang terlalu cepat. Tanaman bingung seperti kami.{$ekor} || {$awal}Rain came late, heat came too soon. The crops are as confused as we are.{$ekor}
+  ~ kuno: {$awal}Hujan dan terik salah waktu. Tanah pun kehilangan arah.{$ekor} || {$awal}Rain and heat out of season. Even the soil has lost its way.{$ekor}
+- {$awal}Anakku tidak mau melanjutkan ladang. Kata dia, dia mau jadi murid sekte. Ladang ini untuk siapa? || {$awal}My child won't carry on the field. Says they want to be a sect disciple. Who is this field for?
+
+== keluh.lagi.curhat
+niat: KELUH
+topik: curhat
+gestur: menangis
+seru: aduh
+$lawan: tipe=nama_warga dari=lawan
+$awal: aturan=awal.keluh opsional=0.45
+$ekor: aturan=ekor.keluh opsional=0.4
+- [2] {$awal}Aku iri pada {$lawan}. Hidupnya tampak ringan. Mungkin aku saja yang menyimpan beban terlalu rapat.{$ekor} || {$awal}I envy {$lawan}. Their life looks light. Maybe it's only me hoarding burdens too tight.{$ekor}
+- {$awal}Malam-malam aku terjaga memikirkan hari tua. Siapa yang akan merawatku? || {$awal}At night I lie awake thinking of old age. Who will look after me?
+  ~ kuno: {$awal}Hamba memikirkan hari senja yang kian dekat. Tak ada yang sudi menemani. || {$awal}This one thinks of the twilight years drawing near. No one will keep me company.
+- {$awal}Aku sudah berusaha jadi orang baik, {$lawan}. Kenapa yang kudapat selalu kerikil? || {$awal}I've tried to be a good person, {$lawan}. Why do I only ever get pebbles?
+  ~ kasar: {$awal}Jadi orang baik di kota ini cuma bikin kita jadi sasaran, {$lawan}. || {$awal}Being good in this town only makes you a target, {$lawan}.
+- {$awal}Kata orang aku terlalu pendiam. Mereka tidak tahu betapa ributnya isi kepalaku.{$ekor} || {$awal}They say I'm too quiet. They don't know how noisy my head is.{$ekor}
+  ~ p: {$awal}Suamiku tidak pernah bertanya aku sedih atau tidak. Aku pun malas menjelaskan.{$ekor} || {$awal}My husband never asks whether I'm sad. I can't be bothered explaining.{$ekor}
+- {$awal}Rumahku sepi sejak anak-anak merantau. Kadang aku menyiapkan makan malam untuk empat orang.{$ekor} || {$awal}My house is quiet since the children left. Sometimes I still cook supper for four.{$ekor}
+
+== keluh.lagi.dagang
+niat: KELUH
+topik: dagang
+gestur: hitung_koin
+seru: aduh
+$barang_murah: tipe=barang dari=konteks.barang_murah
+$awal: aturan=awal.keluh opsional=0.45
+$ekor: aturan=ekor.keluh opsional=0.4
+- [2] {$awal}Pelanggan tetapku pindah ke lapak sebelah. Katanya harganya lebih bersahabat. Aku rugi dua kali.{$ekor} || {$awal}My regular customer moved to the next stall. Says the prices are friendlier. I lose twice over.{$ekor}
+  ~ kasar: {$awal}Pembeli datang cuma untuk menawar, lalu pergi. Hobi yang bagus.{$ekor} || {$awal}Buyers come only to haggle, then leave. A fine hobby.{$ekor}
+- {$awal}Stok {$barang_murah} menumpuk di gudang, tak ada yang beli. Modalku terkunci di sana.{$ekor} || {$awal}Stocks of {$barang_murah} pile up in the warehouse and nobody buys. My capital is locked in there.{$ekor}
+- {$awal}Biaya sewa lapak naik lagi. Rasanya aku berdagang untuk pemilik lapak, bukan untuk diriku.{$ekor} || {$awal}The stall rent is up again. I feel I trade for the landlord, not for myself.{$ekor}
+  ~ ibukota: {$awal}Sewa kios di pasar timur naik lagi. Pemiliknya kerabat pejabat distrik, tentu saja.{$ekor} || {$awal}Stall rent in the east market is up again. The owner is kin to a district official, of course.{$ekor}
+- {$awal}Kafilah terlambat tiga hari. Barang pesananku sudah busuk setengah. Siapa yang ganti rugi? || {$awal}The caravan was three days late. Half my ordered goods have spoiled. Who pays the damages?
+  ~ oasis: {$awal}Kafilah tertahan badai pasir, Saudara. Kurma pesananku mengering menjadi batu. || {$awal}The caravan was held by a sandstorm, friend. My ordered dates dried into stones.
+- {$awal}Timbangan dicek petugas pasar lagi. Sudah kelima kalinya bulan ini. Aku curiga ada yang iri.{$ekor} || {$awal}The market warden checked my scales again. Fifth time this month. I suspect someone's jealous.{$ekor}

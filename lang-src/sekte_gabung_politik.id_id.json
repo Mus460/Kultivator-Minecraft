@@ -216,5 +216,17 @@
   "kultivator.gabung.politik.usul_terkirim": "Usulanmu disampaikan kepada Ketua.",
   "kultivator.gabung.politik.veto.perang": "Kamu terikat pada %s; menyatakan perang kepada perguruanmu sendiri ditolak.",
   "kultivator.gabung.politik.veto.tuntut": "Upeti tidak bisa dituntut dari %s, perguruan induk aulamu.",
-  "kultivator.gabung.riwayat.sumbang": "Menyumbang %s PK ke kas sekte (%s)"
+  "kultivator.gabung.riwayat.sumbang": "Menyumbang %s PK ke kas sekte (%s)",
+  "kultivator.gabung.politik.kabar.merosot_1": "%s merosot: separuh muridnya pergi, paviliunnya sepi. Orang bilang gunungnya kehilangan napas.",
+  "kultivator.gabung.politik.kabar.merosot_2": "Kabar buruk dari gerbang %s. Murid-muridnya meninggalkan gunung satu per satu, dan lonceng pagi berdentang untuk bangku kosong.",
+  "kultivator.gabung.politik.kabar.merosot_3": "Pedagang yang lewat gerbang %s berkata, 'Dulu ramai, sekarang yang ada hanya penjaga tua dan debu.'",
+  "kultivator.gabung.politik.kabar.bangkit_1": "%s bangkit lagi! Gerbangnya dicat ulang dan murid-muridnya mulai pulang.",
+  "kultivator.gabung.politik.kabar.bangkit_2": "Orang-orang membicarakan %s yang berdiri kembali setelah masa gelapnya. Asap dupa naik lagi dari aulanya.",
+  "kultivator.gabung.politik.kabar.bangkit_3": "Lonceng %s berbunyi lagi di pagi hari. Kata para pedagang, gunung itu belum mati.",
+  "kultivator.gabung.politik.kabar.peringkat_1": "%s kini sekte terkuat di negeri ini, naik dari peringkat %s. Para pelamar berbaris di tangga gunungnya.",
+  "kultivator.gabung.politik.kabar.peringkat_2": "Daftar peringkat berubah: %s merebut puncak (sebelumnya peringkat %s). Sekte lain mulai gelisah.",
+  "kultivator.gabung.politik.kabar.peringkat_3": "Di kedai teh, semua membicarakan %s yang naik dari peringkat %s ke peringkat pertama.",
+  "kultivator.gabung.politik.kabar.serap_1": "%s diserap ke dalam aula %s. Panji lamanya diturunkan, panji barunya dikibarkan di gerbang yang sama.",
+  "kultivator.gabung.politik.kabar.serap_2": "Gerbang %s tidak lagi berdiri sendiri: %s menyatukannya ke dalam aulanya. Murid-muridnya kini memakai jubah baru.",
+  "kultivator.gabung.politik.kabar.serap_3": "Kabar dari gunung: %s dilebur ke dalam aula %s. Ada yang menangis, ada yang bersulang."
 }

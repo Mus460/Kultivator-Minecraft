@@ -14,6 +14,7 @@ import dev.kultivator.dunia.tempat.hidup.TempatHuni;
 import dev.kultivator.dunia.tempat.perbaikan.PerbaikanApi;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.server.MinecraftServer;
 
 import java.util.ArrayList;
@@ -30,6 +31,9 @@ import java.util.List;
  *       destroyed houses while their project runs; {@code Suasana.addPengaruhTempat}: -20 during a project;</li>
  *   <li>{@code PerbaikanApi.setPengali}: growth speed ({@code kotaTumbuh.kecepatan}) and rebuild multipliers;</li>
  *   <li>{@code KontrakDagang.daftarPesanan}: plot material as city orders;</li>
+ *   <li>{@link PapanKavling}: right-click the lot post to open the plot sheet;</li>
+ *   <li>{@link Peresmian}: the opening of a finished plot (lion dance, ribbon) and the thanksgiving after a rebuild;</li>
+ *   <li>{@link Blokade}: a raid blockades the town (production halves, families by the wall camp in tents), no block changes;</li>
  *   <li>events: real damage clusters ({@code TempatEvents.TEMPAT_RUSAK}), crimes, raids ({@code KotaBus.SERBUAN});</li>
  *   <li>commands: {@code uji kota_hidup tumbuh ...}, {@code uji kota_hidup kompat periksa}, {@code /kultivasi kotaku kavling}
  *       ({@link KotaTumbuhPerintah}).</li>
@@ -50,16 +54,27 @@ public final class KotaTumbuh {
 		}
 		initialised = true;
 		RencanaTumbuh.init();
+		Peresmian.init();
+		PapanKavling.init();
 		ServerTickEvents.END_SERVER_TICK.register(server -> {
 			if (server.getTickCount() % 20 == 11 && KotaConfig.tumbuh().aktif) {
 				PekerjaanTumbuh.tick(server);
 				BangunKembali.tick(server);
+				TuguKenangan.tick(server);
+			}
+		});
+		ServerTickEvents.END_SERVER_TICK.register(server -> {
+			if (server.getTickCount() % 2 == 0 && KotaConfig.tumbuh().aktif) {
+				Peresmian.tick(server);
 			}
 		});
 		ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
+			Peresmian.lupakan();
 			PekerjaanTumbuh.lupakan();
 			BangunKembali.lupakan();
+			TuguKenangan.lupakan();
 		});
+		ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> TuguKenangan.lupakan(handler.getPlayer().getUUID()));
 		HariWarga.addLangkah(HariWarga.URUT_STAT + 10, "tumbuh", (server, data, s, hari, random) -> {
 			if (KotaConfig.tumbuh().aktif) {
 				Kemakmuran.harian(server, s, hari);
@@ -77,7 +92,8 @@ public final class KotaTumbuh {
 			if (server == null || !KotaConfig.tumbuh().aktif) {
 				return 1.0D;
 			}
-			return tumbuh ? KotaConfig.tumbuh().kecepatan : BangunKembali.pengali(server, situs);
+			// the disciples on the building site are a third of a crew each (Pembangun), the migrants' x1.33 is in BangunKembali
+			return (tumbuh ? KotaConfig.tumbuh().kecepatan : BangunKembali.pengali(server, situs)) * Pembangun.faktorMurid(server, situs);
 		});
 		KontrakDagang.daftarPesanan(new KontrakDagang.PenyediaPesanan() {
 			@Override
@@ -100,6 +116,7 @@ public final class KotaTumbuh {
 			if (mulai && KotaConfig.tumbuh().aktif) {
 				Kemakmuran.serbuan(server, situs);
 			}
+			Blokade.serbuan(server, situs, mulai, menang);
 		});
 		KotaUji.daftar("tumbuh", KotaTumbuhPerintah::uji);
 		KotaUji.daftar("kompat", KotaTumbuhPerintah::kompat);

@@ -1,138 +1,76 @@
 package dev.kultivator.dunia.kota42.ui;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import dev.kultivator.Kultivator;
+import dev.kultivator.dunia.kota42.KotaConfig;
 import dev.kultivator.dunia.kota42.ekonomi.Jabatan;
 import dev.kultivator.dunia.kota42.ekonomi.KotaEkonomi;
 import dev.kultivator.dunia.kota42.tumbuh.BahanKota;
 import dev.kultivator.dunia.kota42.tumbuh.Kavling;
 import dev.kultivator.dunia.kota42.tumbuh.Kemakmuran;
+import dev.kultivator.dunia.kota42.tumbuh.PekerjaanTumbuh;
+import dev.kultivator.dunia.kota42.tumbuh.RencanaTumbuh;
+import dev.kultivator.dunia.tempat.perbaikan.PerbaikanApi;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.IntArrayTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.packs.resources.Resource;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.UUID;
 
 import static dev.kultivator.dunia.kota42.ui.KotaLembar.Kavling.*;
 
 /**
- * {@code kavling} (DESIGN 42.11.13, keys {@link KotaLembar.Kavling}) — one growth lot of 42F, drawn as the client's
- * {@code LayarKavling} (style giok). From the frozen contract C42.F1 ({@code Kavling.daftar}, {@code BahanKota.stok},
- * {@code Kemakmuran.nilai}) plus the 42W-G plan sidecar {@code structure/kota_tumbuh/rencana.json} (stage names,
- * materials per stage, needs) read once per server: the lot card with stage x/5 and its name, this stage's materials
- * against the town stock and the bag, a top-down silhouette of the finished stage 5 (column heights and map colours of
- * the plan's last template, &le; 32 x 32), the requirements (prosperity &ge; 55, Kas Kota, blocked), tab Pilih (rank 4+:
- * every plan of the lot's style with the need it answers; picks through 42C-2 {@code Jabatan.pilihRencana}) and tab Dana.
- * Progress inside a stage, crews, donors and selling or donating materials belong to 42F: it adds them with
- * {@link LembarKotaDasar#addPengisi} / {@link LembarKotaDasar#daftarAksi} (verbs {@code jual}, {@code sumbang},
- * {@code sumbang_nb}).
+ * {@code kavling} (DESIGN 42.11.13, keys {@link KotaLembar.Kavling}) from 42F's growth system ({@link Kavling#rinci},
+ * {@link RencanaTumbuh}, {@link BahanKota}, {@link PekerjaanTumbuh}, {@link Kemakmuran}); drawn as the client's
+ * {@code LayarKavling} (style giok): the lot card with stage x/5, its progress and the crew at work (the crew job of 42F,
+ * {@link PerbaikanApi#sisa}), this stage's materials against the town stock and the bag, a top-down silhouette of the
+ * finished stage 5, the requirements (prosperity, Kas Kota, blocked: the reason 42F wrote), tab Pilih (rank 4+: every plan
+ * of the lot's style and class with the need it answers; picks through 42C-2 {@code Jabatan.pilihRencana}) and tab Dana
+ * (donors and their share of the cost; 25 % puts the name on the finished sign).
+ * <p>
+ * Ops: {@code jual:BH:N} and {@code sumbang:BH:N} (materials from the bag, {@link BahanKota#jual} /
+ * {@link BahanKota#sumbang}), {@code sumbang_nb:NB} ({@link Kavling#sumbangNb}), {@code rencana:ID} (the deputy's standing
+ * choice, read by 42F when it picks the next plan).
  */
 public final class LembarKavling {
 
 	private static final String K = LembarKotaDasar.K + "kavling.";
-	private static final Identifier RENCANA_JSON = Kultivator.id("structure/kota_tumbuh/rencana.json");
-	/** Prosperity a lot needs before its next stage (42.9.4). */
-	public static final int MAKMUR_MIN = 55;
-	private static final int SILUET_MAKS = 32;
+	/** Share of the cost that puts a donor's name on the finished sign. */
+	private static final double PAPAN_BAGIAN = 0.25D;
 
-	private static @Nullable JsonObject rencana;
-	private static @Nullable MinecraftServer rencanaServer;
-	private static final Map<String, CompoundTag> SILUET = new HashMap<>();
+	private static final Map<String, CompoundTag> SILUET_CACHE = new HashMap<>();
+	private static @Nullable MinecraftServer siluetServer;
+
+	/** Prosperity a lot needs before its next stage (42.9.4); the world's {@code kotaTumbuh.ambang}. */
+	public static int makmurMin() {
+		return KotaConfig.tumbuh().ambang;
+	}
 
 	static void init() {
 		LembarKotaDasar.daftar(LAYAR, LembarKavling::bangun);
 		LembarKotaDasar.bawaan(LAYAR, OP_RENCANA, (p, npc, situs, op) -> LembarKotaDasar.hasil(p,
 				Jabatan.pilihRencana(p, situs, LembarKunci.arg(op, 1)), Component.translatable(K + "rencana_ok")));
-	}
-
-	// ================================================================== plans (rencana.json of 42W-G)
-
-	private static @Nullable JsonObject rencana(MinecraftServer server) {
-		if (rencana != null && rencanaServer == server) {
-			return rencana;
-		}
-		rencanaServer = server;
-		rencana = null;
-		SILUET.clear();
-		Optional<Resource> res = server.getResourceManager().getResource(RENCANA_JSON);
-		if (res.isPresent()) {
-			try (Reader reader = res.get().openAsReader()) {
-				JsonElement root = JsonParser.parseReader(reader);
-				if (root.isJsonObject()) {
-					rencana = root.getAsJsonObject();
-				}
-			} catch (Exception ex) {
-				Kultivator.LOGGER.warn("kota_tumbuh/rencana.json unreadable for the kavling screen", ex);
+		LembarKotaDasar.bawaan(LAYAR, OP_JUAL, (p, npc, situs, op) -> LembarKotaDasar.hasil(p,
+				BahanKota.jual(p, situs, BahanKota.JENIS.indexOf(LembarKunci.arg(op, 1)), LembarKunci.argInt(op, 2, 1)),
+				Component.translatable(K + "jual_ok")));
+		LembarKotaDasar.bawaan(LAYAR, OP_SUMBANG, (p, npc, situs, op) -> LembarKotaDasar.hasil(p,
+				BahanKota.sumbang(p, situs, BahanKota.JENIS.indexOf(LembarKunci.arg(op, 1)), LembarKunci.argInt(op, 2, 1)),
+				Component.translatable(K + "sumbang_ok")));
+		LembarKotaDasar.bawaan(LAYAR, OP_SUMBANG_NB, (p, npc, situs, op) -> {
+			Kavling.Info k = pilihan(p, situs, Kavling.daftar(situs));
+			if (k == null) {
+				LembarKotaDasar.pesan(p, Component.translatable(K + "kosong"), LembarKunci.PESAN_PERINGATAN);
+				return;
 			}
-		}
-		return rencana;
-	}
-
-	private static @Nullable JsonObject plan(MinecraftServer server, String id) {
-		JsonObject root = rencana(server);
-		JsonObject all = root == null || !root.has("rencana") ? null : root.getAsJsonObject("rencana");
-		return all == null || !all.has(id) ? null : all.getAsJsonObject(id);
-	}
-
-	private static List<String> plansOfStyle(MinecraftServer server, String gaya) {
-		List<String> out = new ArrayList<>();
-		JsonObject root = rencana(server);
-		JsonObject all = root == null || !root.has("rencana") ? null : root.getAsJsonObject("rencana");
-		if (all != null) {
-			for (String id : all.keySet()) {
-				if (id.startsWith(gaya + "/")) {
-					out.add(id);
-				}
-			}
-		}
-		return out;
-	}
-
-	/** The material of a block id per the plan palette ("" when it costs nothing). */
-	private static String bahanBlok(MinecraftServer server, String blockId) {
-		JsonObject root = rencana(server);
-		if (root == null) {
-			return "";
-		}
-		JsonObject palet = root.has("palet_bahan") ? root.getAsJsonObject("palet_bahan") : null;
-		if (palet != null && palet.has(blockId)) {
-			return palet.get(blockId).getAsString();
-		}
-		JsonObject genteng = root.has("atap_genteng") ? root.getAsJsonObject("atap_genteng") : null;
-		if (genteng != null) {
-			for (String g : genteng.keySet()) {
-				JsonElement e = genteng.get(g);
-				if (e.isJsonArray()) {
-					for (JsonElement b : e.getAsJsonArray()) {
-						if (b.isJsonPrimitive() && blockId.equals(b.getAsString())) {
-							return BH_GENTENG;
-						}
-					}
-				} else if (e.isJsonPrimitive() && blockId.equals(e.getAsString())) {
-					return BH_GENTENG;
-				}
-			}
-		}
-		return "";
+			LembarKotaDasar.hasil(p, Kavling.sumbangNb(p, situs, k.id(), LembarKunci.argLong(op, 1, 0L)), Component.translatable(K + "sumbang_nb_ok"));
+		});
 	}
 
 	// ================================================================== rows for other screens
@@ -142,13 +80,14 @@ public final class LembarKavling {
 		List<CompoundTag> rows = new ArrayList<>();
 		MinecraftServer server = dev.kultivator.dunia.kota42.KotaHidup.server();
 		for (Kavling.Info k : Kavling.daftar(situs)) {
+			Kavling.Rinci r = server == null ? null : Kavling.rinci(server, situs, k.id());
 			CompoundTag t = new CompoundTag();
 			t.putInt(LembarKunci.ID, k.id());
 			LembarKunci.teks(t, LembarKunci.NAMA, Component.translatable(K + "nama", k.id()));
 			LembarKunci.teks(t, RENCANA, namaRencana(k.gaya(), k.jenis()));
 			t.putInt(KotaLembar.Kavling.TAHAP_TOTAL, Kavling.SELESAI);
 			t.putInt("tahap", Math.max(0, k.tahap()));
-			t.putString(LembarKunci.KEADAAN, keadaan(k));
+			t.putString(LembarKunci.KEADAAN, r != null ? r.keadaan() : keadaan(k));
 			t.putInt(LembarKunci.X, k.pos().getX());
 			t.putInt(LembarKunci.Z, k.pos().getZ());
 			rows.add(t);
@@ -204,43 +143,48 @@ public final class LembarKavling {
 		if (situs == 0L) {
 			return LembarKotaDasar.kunci(tag, Component.translatable(LembarKotaDasar.K + "jabatan.tanpa_tempat"));
 		}
-		List<Kavling.Info> semua = Kavling.daftar(situs);
-		Kavling.Info k = pilihan(player, situs, semua);
-		if (k == null) {
+		Kavling.Info k = pilihan(player, situs, Kavling.daftar(situs));
+		Kavling.Rinci rinci = k == null ? null : Kavling.rinci(server, situs, k.id());
+		if (k == null || rinci == null) {
 			CompoundTag kosong = new CompoundTag();
 			LembarKunci.teks(kosong, LembarKunci.TEKS, Component.translatable(K + "kosong"));
 			tag.put(LembarKunci.KOSONG, kosong);
 			return tag;
 		}
-		String rencanaId = k.jenis().isEmpty() ? "" : k.gaya() + "/" + k.jenis();
-		JsonObject plan = rencanaId.isEmpty() ? null : plan(server, rencanaId);
+		RencanaTumbuh.Rencana plan = rinci.rencana().isEmpty() ? null : RencanaTumbuh.get(server, rinci.rencana());
 		int tahap = Math.max(0, k.tahap());
 		int berikut = Math.min(Kavling.SELESAI, tahap + 1);
+		int makmur = Kemakmuran.nilai(situs);
+		int ambang = makmurMin();
+		long kas = KotaEkonomi.kasKota(server, situs);
+		String keadaan = rinci.keadaan();
 
 		CompoundTag c = new CompoundTag();
 		c.putInt(LembarKunci.ID, k.id());
 		LembarKunci.teks(c, LembarKunci.NAMA, Component.translatable(K + "nama", k.id()));
 		LembarKunci.teks(c, RENCANA, namaRencana(k.gaya(), k.jenis()));
-		c.putString(RENCANA_ID, rencanaId);
+		c.putString(RENCANA_ID, rinci.rencana());
 		c.putString(GAYA_KAVLING, k.gaya());
 		c.putString(JENIS, k.jenis());
 		c.putInt("tahap", tahap);
 		c.putInt(TAHAP_TOTAL, Kavling.SELESAI);
-		LembarKunci.teks(c, TAHAP_NAMA, Component.translatable(K + "tahap." + (k.selesai() ? Kavling.SELESAI : berikut)));
-		c.putInt(KEMAJUAN, 0);
-		c.putInt(REGU, 0);
+		LembarKunci.teks(c, TAHAP_NAMA, Component.translatable(K + "tahap." + (k.selesai() ? Kavling.SELESAI + 1 : berikut)));
+		// the crew job of the running stage: finished operations out of all of them
+		int[] sisa = rinci.job() == 0L ? new int[3] : PerbaikanApi.sisa(rinci.job());
+		int semua = sisa[0] + sisa[1] + sisa[2];
+		c.putInt(KEMAJUAN, k.selesai() ? 100 : semua == 0 ? 0 : Math.min(100, sisa[1] * 100 / semua));
+		c.putInt(REGU, rinci.job() == 0L ? 0 : PerbaikanApi.regu(rinci.job()));
 		c.putInt(LembarKunci.SISA_HARI, -1);
-		String keadaan = keadaan(k);
 		c.putString(LembarKunci.KEADAAN, keadaan);
 		c.putInt(LembarKunci.X, k.pos().getX());
 		c.putInt(LembarKunci.Z, k.pos().getZ());
-		int makmur = Kemakmuran.nilai(situs);
-		long kas = KotaEkonomi.kasKota(server, situs);
 		Component halang = null;
-		if (KV_TIDAK_LAYAK.equals(keadaan)) {
+		if (!rinci.alasan().isEmpty()) {
+			halang = Component.translatable("kultivator.kota42.tumbuh.alasan." + rinci.alasan());
+		} else if (KV_TIDAK_LAYAK.equals(keadaan)) {
 			halang = Component.translatable(K + "halang.tidak_layak");
-		} else if (!k.selesai() && makmur < MAKMUR_MIN) {
-			halang = Component.translatable(K + "halang.makmur", makmur, MAKMUR_MIN);
+		} else if (!k.selesai() && makmur < ambang) {
+			halang = Component.translatable(K + "halang.makmur", makmur, ambang);
 		}
 		if (halang != null) {
 			LembarKunci.teks(c, TERHALANG, halang);
@@ -248,42 +192,38 @@ public final class LembarKavling {
 		tag.put(KAVLING, c);
 
 		if (plan != null) {
-			CompoundTag s = siluet(server, rencanaId, plan);
+			CompoundTag s = siluet(server, plan);
 			if (s != null) {
-				tag.put(KotaLembar.Kavling.SILUET, s); // the cache map SILUET shadows the static-imported key
+				tag.put(KotaLembar.Kavling.SILUET, s); // the cache map shadows the static-imported key
 			}
 		}
 
 		// materials of the next stage against the town stock and the bag
-		int[] stok = BahanKota.stok(situs);
-		int[] tas = tasBahan(server, player);
-		JsonObject bahanTahap = bahanTahap(plan, berikut);
+		int[] stok = BahanKota.stok(server, situs);
+		RencanaTumbuh.Tahap stage = plan == null ? null : plan.tahap(berikut);
 		List<CompoundTag> bahan = new ArrayList<>();
-		for (int i = 0; i < SEMUA_BAHAN.size(); i++) {
-			String id = SEMUA_BAHAN.get(i);
-			int perlu = bahanTahap != null && bahanTahap.has(id) ? bahanTahap.get(id).getAsInt() : 0;
-			if (perlu <= 0 && (i >= stok.length || stok[i] <= 0)) {
+		for (int i = 0; i < BahanKota.JENIS.size(); i++) {
+			int perlu = stage == null ? 0 : stage.bahan()[i];
+			int ada = stok[i];
+			if (perlu <= 0 && ada <= 0) {
 				continue;
 			}
 			CompoundTag t = new CompoundTag();
-			t.putString(LembarKunci.ID, id);
-			LembarKunci.teks(t, LembarKunci.NAMA, Component.translatable(K + "bahan." + id));
-			int ada = i < stok.length ? stok[i] : 0;
-			t.putInt(TERKUMPUL, Math.min(ada, Math.max(perlu, ada)));
+			t.putString(LembarKunci.ID, BahanKota.JENIS.get(i));
+			LembarKunci.teks(t, LembarKunci.NAMA, Component.translatable(K + "bahan." + BahanKota.JENIS.get(i)));
+			t.putInt(TERKUMPUL, ada);
 			t.putInt(PERLU, perlu);
-			t.putInt(TAS, tas[i]);
-			t.putLong(LembarKunci.HARGA, hargaBahan(id));
+			t.putInt(TAS, BahanKota.tas(player, i));
+			t.putLong(LembarKunci.HARGA, Math.max(1L, Math.round(BahanKota.harga(server, situs, i) * 1.1D)));
 			t.putBoolean(LembarKunci.OK, ada >= perlu);
 			bahan.add(t);
 		}
 		tag.put(BAHAN, LembarKotaDasar.daftar(bahan));
 
 		List<CompoundTag> syarat = new ArrayList<>();
-		syarat.add(LembarKotaDasar.syarat(makmur >= MAKMUR_MIN, Component.translatable(K + "syarat.makmur", MAKMUR_MIN),
-				Component.literal(Integer.toString(makmur))));
-		long biayaTahap = biayaTahap(plan, berikut);
-		syarat.add(LembarKotaDasar.syarat(kas >= biayaTahap, Component.translatable(K + "syarat.kas", biayaTahap),
-				Component.literal(Long.toString(kas))));
+		syarat.add(LembarKotaDasar.syarat(makmur >= ambang, Component.translatable(K + "syarat.makmur", ambang), Component.literal(Integer.toString(makmur))));
+		long biayaTahap = plan == null ? 0L : PekerjaanTumbuh.biayaTahap(server, situs, plan, berikut);
+		syarat.add(LembarKotaDasar.syarat(kas >= biayaTahap, Component.translatable(K + "syarat.kas", biayaTahap), Component.literal(Long.toString(kas))));
 		syarat.add(LembarKotaDasar.syarat(halang == null, Component.translatable(K + "syarat.halang"),
 				halang == null ? Component.translatable(K + "syarat.halang_tidak") : halang));
 		tag.put(LembarKunci.SYARAT, LembarKotaDasar.daftar(syarat));
@@ -292,18 +232,13 @@ public final class LembarKavling {
 		if (pangkat >= Jabatan.WAKIL && !k.selesai()) {
 			String dipilih = Jabatan.pilihanRencana(server, situs);
 			List<CompoundTag> pilihan = new ArrayList<>();
-			for (String id : plansOfStyle(server, k.gaya())) {
-				JsonObject p = plan(server, id);
-				if (p == null) {
-					continue;
-				}
-				String jenis = p.has("jenis") ? p.get("jenis").getAsString() : id.substring(id.indexOf('/') + 1);
+			for (RencanaTumbuh.Rencana r : RencanaTumbuh.untuk(server, k.gaya(), rinci.kelas())) {
 				CompoundTag t = new CompoundTag();
-				t.putString(LembarKunci.ID, id);
-				LembarKunci.teks(t, LembarKunci.NAMA, Component.translatable(K + "jenis." + jenis));
-				LembarKunci.teks(t, LembarKunci.TEKS, kebutuhan(p));
-				t.putLong(LembarKunci.HARGA, biayaTotal(p));
-				t.putBoolean(KotaLembar.PILIH, id.equals(dipilih));
+				t.putString(LembarKunci.ID, r.id());
+				LembarKunci.teks(t, LembarKunci.NAMA, Component.translatable(K + "jenis." + r.jenis()));
+				LembarKunci.teks(t, LembarKunci.TEKS, kebutuhan(r));
+				t.putLong(LembarKunci.HARGA, PekerjaanTumbuh.biaya(server, situs, r));
+				t.putBoolean(KotaLembar.PILIH, r.id().equals(dipilih));
 				t.putBoolean(LembarKunci.BISA, true);
 				pilihan.add(t);
 			}
@@ -314,141 +249,71 @@ public final class LembarKavling {
 					: Component.translatable(K + "kunci_pilih", Jabatan.gelar(server, situs, Jabatan.WAKIL)));
 			tag.put(LembarKunci.TAB_KUNCI, kunciTab);
 		}
-		tag.put(DANA, new ListTag());
-		tag.putLong(DANA_TOTAL, 0L);
-		tag.putLong(BIAYA_TOTAL, plan == null ? 0L : biayaTotal(plan));
+
+		long biayaTotal = plan == null ? 0L : PekerjaanTumbuh.biaya(server, situs, plan);
+		long danaTotal = 0L;
+		List<CompoundTag> dana = new ArrayList<>();
+		boolean papan = false;
+		for (Map.Entry<UUID, Long> e : rinci.dana().entrySet()) {
+			long nb = e.getValue();
+			danaTotal += nb;
+			boolean anda = e.getKey().equals(player.getUUID());
+			CompoundTag t = new CompoundTag();
+			LembarKunci.teks(t, LembarKunci.NAMA, Component.literal(rinci.namaDana().getOrDefault(e.getKey(), "?")));
+			t.putBoolean(KotaLembar.PEMAIN, true);
+			t.putBoolean(LembarKunci.ANDA, anda);
+			t.putLong(LembarKunci.NB, nb);
+			t.putLong(LembarKunci.HARGA, nb); // the client reads the donation as the row's price
+			t.putInt(PERSEN, biayaTotal <= 0L ? 0 : (int) Math.min(100L, nb * 100L / biayaTotal));
+			papan |= anda && biayaTotal > 0L && nb >= PAPAN_BAGIAN * biayaTotal;
+			dana.add(t);
+		}
+		dana.sort((a, b) -> Long.compare(b.getLongOr(LembarKunci.NB, 0L), a.getLongOr(LembarKunci.NB, 0L)));
+		tag.put(DANA, LembarKotaDasar.daftar(dana));
+		tag.putLong(DANA_TOTAL, danaTotal);
+		tag.putLong(BIAYA_TOTAL, biayaTotal);
+		tag.putBoolean(PAPAN_NAMA, papan);
 		return tag;
 	}
 
-	private static @Nullable JsonObject bahanTahap(@Nullable JsonObject plan, int tahap) {
-		if (plan == null || !plan.has("tahap")) {
-			return null;
-		}
-		for (JsonElement e : plan.getAsJsonArray("tahap")) {
-			JsonObject t = e.getAsJsonObject();
-			if (t.has("tahap") && t.get("tahap").getAsInt() == tahap && t.has("bahan")) {
-				return t.getAsJsonObject("bahan");
-			}
-		}
-		return null;
-	}
-
-	/** Material units are bought at the town price 1.1 x (42.9.4); 2 NB per unit is the plan's base, so the cost of a stage. */
-	private static long biayaTahap(@Nullable JsonObject plan, int tahap) {
-		JsonObject b = bahanTahap(plan, tahap);
-		long n = 0L;
-		if (b != null) {
-			for (String id : b.keySet()) {
-				n += b.get(id).getAsLong() * hargaBahan(id);
-			}
-		}
-		return n;
-	}
-
-	private static long biayaTotal(JsonObject plan) {
-		long n = 0L;
-		for (int t = 1; t <= Kavling.SELESAI; t++) {
-			n += biayaTahap(plan, t);
-		}
-		return n;
-	}
-
-	/** Price per material unit in NB (stone and wood 2, tiles and paper 3, cloth 4; x1.1 town markup, rounded up). */
-	private static long hargaBahan(String id) {
-		return switch (id) {
-			case BH_KAIN -> 5L;
-			case BH_GENTENG, BH_KACA_KERTAS -> 4L;
-			default -> 3L;
-		};
-	}
-
-	private static Component kebutuhan(JsonObject plan) {
-		JsonArray need = plan.has("kebutuhan") ? plan.getAsJsonArray("kebutuhan") : new JsonArray();
+	private static Component kebutuhan(RencanaTumbuh.Rencana plan) {
 		Component out = null;
-		for (JsonElement e : need) {
-			Component c = Component.translatable(K + "butuh." + e.getAsString());
+		for (String need : plan.kebutuhan()) {
+			Component c = Component.translatable(K + "butuh." + need);
 			out = out == null ? c : out.copy().append(" · ").append(c);
 		}
 		return out == null ? Component.translatable(K + "butuh.umum") : out;
 	}
 
-	/** Matching blocks in the bag per material, by the plan palette (block items only). */
-	private static int[] tasBahan(MinecraftServer server, ServerPlayer player) {
-		int[] out = new int[SEMUA_BAHAN.size()];
-		for (int slot = 0; slot < 36; slot++) {
-			ItemStack stack = player.getInventory().getItem(slot);
-			if (stack.isEmpty() || !(stack.getItem() instanceof BlockItem bi)) {
-				continue;
-			}
-			String bahan = bahanBlok(server, BuiltInRegistries.BLOCK.getKey(bi.getBlock()).toString());
-			int i = SEMUA_BAHAN.indexOf(bahan);
-			if (i >= 0) {
-				out[i] += stack.getCount();
-			}
+	/** Column heights and top map colours of the plan's last stage (42F reads the template; cached per server). */
+	private static @Nullable CompoundTag siluet(MinecraftServer server, RencanaTumbuh.Rencana plan) {
+		if (siluetServer != server) {
+			siluetServer = server;
+			SILUET_CACHE.clear();
 		}
-		return out;
-	}
-
-	/** Column heights and top map colours of the plan's last stage (read once per plan). */
-	private static @Nullable CompoundTag siluet(MinecraftServer server, String id, JsonObject plan) {
-		CompoundTag cached = SILUET.get(id);
+		CompoundTag cached = SILUET_CACHE.get(plan.id());
 		if (cached != null) {
 			return cached;
 		}
-		String tpl = null;
-		if (plan.has("tahap")) {
-			for (JsonElement e : plan.getAsJsonArray("tahap")) {
-				JsonObject t = e.getAsJsonObject();
-				if (t.has("template")) {
-					tpl = t.get("template").getAsString();
-				}
-			}
-		}
-		Identifier tid = tpl == null ? null : Identifier.tryParse(tpl);
-		Optional<StructureTemplate> st = tid == null ? Optional.empty() : server.getStructureTemplateManager().get(tid);
-		if (st.isEmpty()) {
+		int[] raw = RencanaTumbuh.siluet(server, plan);
+		int w = raw[0];
+		int d = raw[1];
+		if (w <= 0 || d <= 0 || raw.length < 2 + 2 * w * d) {
 			return null;
-		}
-		CompoundTag nbt = st.get().save(new CompoundTag());
-		ListTag palette = nbt.getListOrEmpty(StructureTemplate.PALETTE_TAG);
-		ListTag blocks = nbt.getListOrEmpty(StructureTemplate.BLOCKS_TAG);
-		int w = Math.min(SILUET_MAKS, st.get().getSize().getX());
-		int d = Math.min(SILUET_MAKS, st.get().getSize().getZ());
-		if (w <= 0 || d <= 0) {
-			return null;
-		}
-		int[] colour = new int[palette.size()];
-		for (int i = 0; i < palette.size(); i++) {
-			String name = palette.getCompoundOrEmpty(i).getStringOr("Name", "minecraft:air");
-			Identifier bid = Identifier.tryParse(name);
-			Block b = bid == null ? null : BuiltInRegistries.BLOCK.getValue(bid);
-			colour[i] = b == null || name.endsWith(":air") || name.endsWith("structure_void") || name.endsWith("jigsaw") ? 0
-					: b.defaultMapColor().col;
 		}
 		int[] tinggi = new int[w * d];
 		int[] warna = new int[w * d];
-		for (int i = 0; i < blocks.size(); i++) {
-			CompoundTag b = blocks.getCompoundOrEmpty(i);
-			ListTag pos = b.getListOrEmpty(StructureTemplate.BLOCK_TAG_POS);
-			int x = pos.getIntOr(0, -1);
-			int y = pos.getIntOr(1, 0);
-			int z = pos.getIntOr(2, -1);
-			int state = b.getIntOr(StructureTemplate.BLOCK_TAG_STATE, -1);
-			if (x < 0 || z < 0 || x >= w || z >= d || state < 0 || state >= colour.length || colour[state] == 0) {
-				continue;
-			}
-			int idx = z * w + x;
-			if (y + 1 >= tinggi[idx]) {
-				tinggi[idx] = y + 1;
-				warna[idx] = 0xFF000000 | colour[state];
-			}
+		for (int i = 0; i < w * d; i++) {
+			tinggi[i] = raw[2 + i];
+			int rgb = raw[2 + w * d + i];
+			warna[i] = tinggi[i] > 0 ? 0xFF000000 | rgb : 0;
 		}
 		CompoundTag s = new CompoundTag();
 		s.putInt(KotaLembar.LEBAR, w);
 		s.putInt(KotaLembar.PANJANG, d);
-		s.putIntArray(TINGGI, tinggi);
-		s.putIntArray(KotaLembar.WARNA, warna);
-		SILUET.put(id, s);
+		s.put(TINGGI, new IntArrayTag(tinggi));
+		s.put(KotaLembar.WARNA, new IntArrayTag(warna));
+		SILUET_CACHE.put(plan.id(), s);
 		return s;
 	}
 

@@ -1,0 +1,82 @@
+{
+  "pembicara": [
+    "tokoh:hu_lu"
+  ],
+  "prioritas": 10,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "359",
+      "prop": "214",
+      "suara": "kota42.penjual_obat",
+      "pilihan": [
+        {
+          "syarat": [
+            "nb 3",
+            "quest kota42_tabib_keliling tahap beli"
+          ],
+          "akibat": [
+            "bayar 3",
+            "bendera kota42.hulu.beli"
+          ],
+          "ke": "beli",
+          "tampil": true,
+          "alasan": "kultivator.cerita.kota42_hulu_sapa.mulai.1.alasan"
+        },
+        {
+          "ke": "manjur"
+        },
+        {
+          "syarat": [
+            "quest kota42_tabib_keliling tahap hadapi"
+          ],
+          "ke": "hadapi"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "beli",
+      "gestur": "tertawa"
+    },
+    {
+      "id": "manjur",
+      "gestur": "451",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "hadapi",
+      "gestur": "bisik",
+      "pilihan": [
+        {
+          "akibat": [
+            "bendera kota42.hulu.bongkar",
+            "quest_maju kota42_tabib_keliling"
+          ],
+          "ke": "bongkar"
+        },
+        {
+          "akibat": [
+            "bendera kota42.hulu.mitra",
+            "quest_maju kota42_tabib_keliling"
+          ],
+          "ke": "mitra"
+        }
+      ]
+    },
+    {
+      "id": "bongkar",
+      "gestur": "lari_takut"
+    },
+    {
+      "id": "mitra",
+      "gestur": "hormat"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "pembicara": [
+    "tokoh:xiao_bang"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest kota42_lentera_lao_geng tahap ziarah"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "424"
+    }
+  ]
+}

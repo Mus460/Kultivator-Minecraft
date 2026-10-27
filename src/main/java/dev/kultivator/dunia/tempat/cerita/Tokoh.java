@@ -84,6 +84,22 @@ public final class Tokoh {
 		add("ah_lun", NpcRole.MURID_SEKTE_LUAR, "kompleks_ah_lun", 1, false, 6);
 	}
 
+	/** Characters read from data files by 42B (DESIGN 42.10): fixed name everywhere, bound to no service lot. */
+	private static final java.util.Set<String> DATA = new java.util.HashSet<>();
+
+	/**
+	 * DESIGN 42.10: registers a character of {@code data/kultivator/tempat/tokoh/*.json} (42B {@code TokohKota}) so the 38
+	 * dialogs, effects ({@code jadi_tokoh}), name plates and {@link #nama} know it. A character of the table above is left
+	 * alone; names and titles come from {@code kultivator.cerita.tokoh.<id>[.gelar]} like the others.
+	 */
+	public static void daftarData(String id, NpcRole peran, int suara, boolean perempuan, int watak) {
+		if (id == null || id.isEmpty() || SEMUA.containsKey(id) && !DATA.contains(id)) {
+			return;
+		}
+		SEMUA.put(id, new Data(id, peran, "", Math.floorMod(suara, 6), perempuan, Math.floorMod(watak, WATAK.size())));
+		DATA.add(id);
+	}
+
 	private static void add(String id, NpcRole peran, String layanan, int suara, boolean perempuan, int watak) {
 		Data data = new Data(id, peran, layanan, suara, perempuan, watak);
 		SEMUA.put(id, data);
@@ -154,7 +170,7 @@ public final class Tokoh {
 
 	/** Characters who travel the whole world keep their name everywhere (the peddler, Ah Lun, the hidden beggar master). */
 	private static boolean fixedOutside(Data data) {
-		return "lao_qiao".equals(data.id) || "ah_lun".equals(data.id) || "feng_ao".equals(data.id);
+		return "lao_qiao".equals(data.id) || "ah_lun".equals(data.id) || "feng_ao".equals(data.id) || DATA.contains(data.id);
 	}
 
 	public static MutableComponent gelar(String id) {

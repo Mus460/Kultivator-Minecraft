@@ -1,0 +1,32 @@
+{
+  "pembicara": [
+    "tokoh:gong_shu"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest kota42_kota_tumbuh tahap resmi",
+    "!bendera kota42.tumbuh.potong_pita"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "423",
+      "prop": "223",
+      "pilihan": [
+        {
+          "akibat": [
+            "bendera kota42.tumbuh.potong_pita",
+            "klip k:potong_pita k:gunting_besar"
+          ],
+          "ke": "potong"
+        }
+      ]
+    },
+    {
+      "id": "potong",
+      "gestur": "tepuk_tangan",
+      "suara": "kota42.kavling_selesai"
+    }
+  ]
+}

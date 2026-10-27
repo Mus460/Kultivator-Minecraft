@@ -150,7 +150,9 @@ public final class BahanKota {
 			}
 		}
 		// a little always comes in by cart, so a town without porters is slow, not stuck
-		int n = (int) Math.floor(units) + 1;
+		// a blockade (42.9.5) halves the porters' work and stops the cart
+		boolean blokade = Blokade.aktif(server, s.id);
+		int n = blokade ? (int) Math.floor(units * 0.5D) : (int) Math.floor(units) + 1;
 		int[] stock = stok(server, s.id);
 		for (int k = 0; k < n; k++) {
 			// wood and stone are local; the kind furthest below its need gets the unit, wood/stone only

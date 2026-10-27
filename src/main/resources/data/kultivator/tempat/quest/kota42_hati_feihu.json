@@ -1,0 +1,61 @@
+{
+  "pemberi": "tokoh:yan_feiyan",
+  "tempat": "kota42",
+  "alur": true,
+  "tahap": [
+    {
+      "id": "dengar",
+      "tujuan": [
+        "bicara tokoh:yan_feihu"
+      ]
+    },
+    {
+      "id": "comblang",
+      "tujuan": [
+        "bendera kota42.feihu.comblang"
+      ]
+    },
+    {
+      "id": "putus",
+      "cabang": [
+        {
+          "syarat": [
+            "bendera kota42.feihu.tinggal"
+          ],
+          "ke": "tinggal"
+        },
+        {
+          "syarat": [
+            "bendera kota42.feihu.pergi"
+          ],
+          "ke": "pergi"
+        }
+      ]
+    },
+    {
+      "id": "tinggal",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "kota42.pindah tokoh:yan_feihu kota/",
+        "kota42.kesan tokoh:yan_feihu 40",
+        "kota42.kesan tokoh:yan_feiyan 10",
+        "kabar kota42_feihu_tinggal"
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "pergi",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "kota42.kesan tokoh:yan_feiyan 40",
+        "kota42.kesan tokoh:hong_ling 20",
+        "kabar kota42_feihu_pergi"
+      ],
+      "ke": "selesai"
+    }
+  ]
+}

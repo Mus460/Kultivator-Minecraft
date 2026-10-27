@@ -44,7 +44,7 @@
     {
       "ubah": {},
       "harap": {
-        "k": "kultivator.cakap.tutup.pamit_balas.0.ibukota",
+        "k": "kultivator.cakap.tutup.sopan.pamit.1",
         "a": [
           {
             "k": "kultivator.cakap.lex.tuan.ibukota",
@@ -52,12 +52,12 @@
           }
         ]
       },
-      "aturan": "tutup.pamit_balas",
-      "gestur": "lambai",
+      "aturan": "tutup.sopan.pamit",
+      "gestur": "hormat",
       "seru": null,
       "tik": null,
-      "id_id": "Selamat jalan, Tuanku. Semoga urusan Tuanku di ibu kota lancar.",
-      "en_us": "Farewell, My Lord. May your business in the capital go smoothly."
+      "id_id": "Selamat jalan, Tuanku. Mohon kembali bila memerlukan sesuatu.",
+      "en_us": "Safe journey, My Lord. Please return if you need anything."
     },
     {
       "ubah": {
@@ -81,30 +81,35 @@
         }
       },
       "harap": {
-        "k": "kultivator.cakap.tutup.pamit_balas.3",
+        "k": "kultivator.cakap.tutup.pamit_balas.2",
         "a": []
       },
       "aturan": "tutup.pamit_balas",
       "gestur": "lambai",
       "seru": null,
       "tik": null,
-      "id_id": "Sampai nanti. Jangan lupa pesanku tadi.",
-      "en_us": "Till later. Don't forget what I said."
+      "id_id": "Iya, iya. Mampir lagi kalau lewat.",
+      "en_us": "Yes, yes. Drop by when you pass."
     },
     {
       "ubah": {
         "kesan": "sahabat"
       },
       "harap": {
-        "k": "kultivator.cakap.tutup.akrab.0",
-        "a": []
+        "k": "kultivator.cakap.tutup.sopan.pamit.0",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.tuan.ibukota",
+            "a": []
+          }
+        ]
       },
-      "aturan": "tutup.akrab",
-      "gestur": "tepuk_bahu",
+      "aturan": "tutup.sopan.pamit",
+      "gestur": "hormat",
       "seru": null,
       "tik": null,
-      "id_id": "Mampir lagi kapan-kapan, ya! Pintuku selalu terbuka untukmu.",
-      "en_us": "Drop by again some time! My door's always open for you."
+      "id_id": "Terima kasih atas waktunya, Tuanku. Sampai jumpa lagi.",
+      "en_us": "Thank you for your time, My Lord. Until we meet again."
     },
     {
       "ubah": {

@@ -41,6 +41,8 @@ public final class TempatWarna {
 	public static final int EMAS_TERANG = Palette.GOLD_LIGHT;
 	public static final int EMAS_GELAP = Palette.GOLD_DARK;
 	public static final int SEGEL = Palette.SEAL;
+	/** The Ghost Market green (DESIGN 42.11): accents of the 42 night market and the shadow world. */
+	public static final int HIJAU_HANTU = 0xFF3FA86A;
 
 	/** Quality colours by grade 0-4 (mutu) used for item names. */
 	private static final int[] MUTU = {0xFF8A8F8C, 0xFF4F9A4A, 0xFF3E78C0, 0xFF8B4FC8, 0xFFD08A2A};

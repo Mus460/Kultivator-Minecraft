@@ -436,8 +436,40 @@ public final class TokohAnchors {
 			p.sendSystemMessage(Component.translatable("kultivator.gabung.tokoh.sapa.chat", t.namaGelar().withStyle(ChatFormatting.GOLD),
 					Component.translatable("kultivator.gabung.tokoh.sapa." + t.kantor() + "." + rel, p.getName(), sektePendek(t.sekte())))
 					.withStyle(ChatFormatting.GRAY));
+			kenang(server, p, t, rel);
 			break;
 		}
+	}
+
+	/** Anecdotes an elder may tell per office (lang {@code tokoh.cerita.<office>.0-3}); the later ones need a warmer attitude. */
+	static final int KENANGAN = 4;
+
+	/**
+	 * After the greeting an elder sometimes tells a memory of their own (D-41W): a different one each day (a pure function of
+	 * player, character and world day), the personal ones only once the attitude has grown ({@code 0, 15, 40, 70}; a Shifu
+	 * counts 15 higher, a guest only ever hears the first). On the other days the elder's own temper speaks instead.
+	 * A deserter or an enemy of the sect gets nothing.
+	 */
+	private static void kenang(MinecraftServer server, ServerPlayer p, TokohSekte.Tokoh t, String rel) {
+		if ("musuh".equals(rel)) {
+			return;
+		}
+		long h = TokohSekte.campur(p.getUUID().getLeastSignificantBits() ^ t.id().hashCode(), Kota.day(server));
+		long dadu = Math.floorMod(h, 3L);
+		if (dadu == 2L) {
+			return;
+		}
+		Component isi;
+		if (dadu == 1L && !t.sifat().isEmpty()) {
+			isi = Component.translatable("kultivator.gabung.tokoh.ucap." + t.sifat().get((int) Math.floorMod(h >>> 8, (long) t.sifat().size())).id());
+		} else {
+			int sikap = TokohSekte.sikap(server, t.id(), p.getUUID()) + ("murid".equals(rel) ? 15 : 0);
+			int terbuka = "tamu".equals(rel) ? 1 : 1 + (sikap >= 15 ? 1 : 0) + (sikap >= 40 ? 1 : 0) + (sikap >= 70 ? 1 : 0);
+			int n = (int) Math.floorMod(h >>> 16, (long) Math.min(terbuka, KENANGAN));
+			isi = Component.translatable("kultivator.gabung.tokoh.cerita." + t.kantor() + "." + n);
+		}
+		p.sendSystemMessage(Component.translatable("kultivator.gabung.tokoh.cerita.chat", t.namaGelar().withStyle(ChatFormatting.GOLD), isi)
+				.withStyle(ChatFormatting.ITALIC, ChatFormatting.GRAY));
 	}
 
 	/**

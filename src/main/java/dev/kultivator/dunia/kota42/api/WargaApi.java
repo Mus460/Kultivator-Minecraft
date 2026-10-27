@@ -218,6 +218,9 @@ public final class WargaApi {
 
 	/** The full name of a resident ({@code NamaWarga}, {@code data/kultivator/kota/nama.json}; pinyin reads the same everywhere). */
 	public static Component nama(Warga w) {
+		if (!w.tokoh.isEmpty() && dev.kultivator.dunia.tempat.cerita.Tokoh.byId(w.tokoh) != null) {
+			return Component.translatable("kultivator.cerita.tokoh." + w.tokoh);
+		}
 		return NamaWarga.komponen(w);
 	}
 

@@ -1,0 +1,11 @@
+{
+  "nama": "kultivator.kota42.tolong.cari_jodoh.nama",
+  "teks": [
+    "kultivator.kota42.tolong.cari_jodoh.teks.0",
+    "kultivator.kota42.tolong.cari_jodoh.teks.1",
+    "kultivator.kota42.tolong.cari_jodoh.teks.2"
+  ],
+  "imbalan": "kultivator.kota42.tolong.cari_jodoh.imbalan",
+  "batas_hari": 10,
+  "peluang": 0.7
+}

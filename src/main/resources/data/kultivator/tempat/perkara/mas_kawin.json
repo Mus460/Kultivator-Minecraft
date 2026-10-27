@@ -1,0 +1,66 @@
+{
+  "nama": "kultivator.kota42.perkara.t.mas_kawin.nama",
+  "teks": "kultivator.kota42.perkara.t.mas_kawin.teks",
+  "penggugat": {
+    "klaim": "kultivator.kota42.perkara.t.mas_kawin.klaim_a",
+    "peran": [
+      "warga",
+      "petani"
+    ]
+  },
+  "tergugat": {
+    "klaim": "kultivator.kota42.perkara.t.mas_kawin.klaim_b",
+    "peran": [
+      "warga",
+      "pedagang_keliling"
+    ]
+  },
+  "benar": "acak",
+  "saksi": 2,
+  "kesaksian": {
+    "penggugat": [
+      "kultivator.kota42.perkara.t.mas_kawin.saksi_a1",
+      "kultivator.kota42.perkara.t.mas_kawin.saksi_a2"
+    ],
+    "tergugat": [
+      "kultivator.kota42.perkara.t.mas_kawin.saksi_b1",
+      "kultivator.kota42.perkara.t.mas_kawin.saksi_b2"
+    ]
+  },
+  "dusta": "kultivator.kota42.perkara.t.mas_kawin.dusta",
+  "bukti": [
+    {
+      "jenis": "barang",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.mas_kawin.bukti1_a",
+        "tergugat": "kultivator.kota42.perkara.t.mas_kawin.bukti1_b"
+      },
+      "barang": "minecraft:red_dye"
+    },
+    {
+      "jenis": "gosip",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.mas_kawin.bukti2_a",
+        "tergugat": "kultivator.kota42.perkara.t.mas_kawin.bukti2_b"
+      }
+    }
+  ],
+  "putusan": [
+    {
+      "untuk": "penggugat",
+      "teks": "kultivator.kota42.perkara.t.mas_kawin.putusan1",
+      "akibat": "kultivator.kota42.perkara.t.mas_kawin.putusan1_akibat"
+    },
+    {
+      "untuk": "tergugat",
+      "teks": "kultivator.kota42.perkara.t.mas_kawin.putusan2",
+      "akibat": "kultivator.kota42.perkara.t.mas_kawin.putusan2_akibat"
+    },
+    {
+      "untuk": "damai",
+      "teks": "kultivator.kota42.perkara.t.mas_kawin.putusan3",
+      "akibat": "kultivator.kota42.perkara.t.mas_kawin.putusan3_akibat"
+    }
+  ],
+  "suap": 0.3
+}

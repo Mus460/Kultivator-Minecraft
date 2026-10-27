@@ -34,5 +34,7 @@
   "kultivator.gui43.m18.hud.tema": "Themed place HUD",
   "kultivator.gui43.m18.hud.elite": "Elite enemy plates",
   "kultivator.gui43.m18.hud.formasi": "Formation alarm",
-  "kultivator.gui43.m18.hud.bangun": "Sect building HUD"
+  "kultivator.gui43.m18.hud.bangun": "Sect building HUD",
+  "kultivator.gui43.m18.hud.kota_kejar": "Pickpocket chase HUD",
+  "kultivator.gui43.m18.hud.kota_irama": "Town rhythm HUD (night watch, shadow play)"
 }

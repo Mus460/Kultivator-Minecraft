@@ -1,0 +1,39 @@
+{
+  "pemberi": "tokoh:ah_qin",
+  "tempat": "kota42",
+  "alur": true,
+  "tahap": [
+    {
+      "id": "bait_satu",
+      "tujuan": [
+        "bendera kota42.lagu.satu"
+      ]
+    },
+    {
+      "id": "bait_dua",
+      "tujuan": [
+        "bicara_warga kebiasaan:penggemar_opera"
+      ],
+      "arah": "kota/"
+    },
+    {
+      "id": "bait_tiga",
+      "tujuan": [
+        "pergi kota_tema/air",
+        "bicara_warga kebiasaan:pemain_erhu"
+      ],
+      "arah": "kota_tema/air"
+    },
+    {
+      "id": "mainkan",
+      "tujuan": [
+        "bendera kota42.lagu.main"
+      ],
+      "akibat": [
+        "kota42.kesan tokoh:ah_qin 40",
+        "efek minecraft:regeneration 60",
+        "kabar kota42_lagu_jembatan pemain"
+      ]
+    }
+  ]
+}

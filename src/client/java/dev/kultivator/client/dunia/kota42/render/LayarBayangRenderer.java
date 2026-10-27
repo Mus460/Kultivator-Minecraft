@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.kultivator.client.dunia.tempat.tema.model.TemaBendaRenderer;
 import dev.kultivator.client.epic.ShaderCompat;
+import dev.kultivator.client.screen.SettingsRows;
 import dev.kultivator.dunia.kota42.acara.LayarBayangEntity;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -100,7 +101,7 @@ public class LayarBayangRenderer extends TemaBendaRenderer<LayarBayangEntity, La
 
 	@Override
 	protected void submitExtra(State state, PoseStack poseStack, SubmitNodeCollector collector) {
-		if (state.terang <= 0.01F || state.jauh || ShaderCompat.shadowPass()) {
+		if (state.terang <= 0.01F || state.jauh || ShaderCompat.shadowPass() || !SettingsRows.kota42("kota42.wayang")) {
 			return;
 		}
 		float[] q = susun(state);

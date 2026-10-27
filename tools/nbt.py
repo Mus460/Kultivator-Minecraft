@@ -36,6 +36,19 @@ import struct
 
 DATA_VERSION = 5023  # net.minecraft.SharedConstants.WORLD_VERSION in 26.3
 
+# Point types a generator writes under a design name but the mod reads under another (kota_hidup_kit.pasang fills it):
+# Template.titik stores the target type and keeps the design tool in data "alat".
+TITIK_ALIAS = {}
+
+
+def alias_titik(jenis, data=None):
+    """(jenis, data) with a design-only point type replaced by the type the mod reads (see TITIK_ALIAS)."""
+    if jenis in TITIK_ALIAS:
+        data = dict(data or {})
+        data.setdefault("alat", jenis.split(":")[-1])
+        jenis = TITIK_ALIAS[jenis]
+    return jenis, data
+
 TAG_END, TAG_BYTE, TAG_SHORT, TAG_INT, TAG_LONG, TAG_FLOAT, TAG_DOUBLE = 0, 1, 2, 3, 4, 5, 6
 TAG_BYTE_ARRAY, TAG_STRING, TAG_LIST, TAG_COMPOUND, TAG_INT_ARRAY, TAG_LONG_ARRAY = 7, 8, 9, 10, 11, 12
 
@@ -403,6 +416,7 @@ class Template:
         """
         if not isinstance(jenis, str) or not jenis or jenis != jenis.strip():
             raise ValueError("titik jenis must be a non-empty string, got %r" % (jenis,))
+        jenis, data = alias_titik(jenis, data)
         if not self.inside(x, y, z):
             raise IndexError("titik %s (%d,%d,%d) outside template %r" % (jenis, x, y, z, self.size))
         if hadap not in ("north", "east", "south", "west"):

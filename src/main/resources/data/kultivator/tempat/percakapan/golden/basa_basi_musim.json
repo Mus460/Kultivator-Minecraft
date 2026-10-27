@@ -68,15 +68,22 @@
         "musim": "semi"
       },
       "harap": {
-        "k": "kultivator.cakap.basa.musim.semi.4",
-        "a": []
+        "k": "kultivator.cakap.kerja.pekerja.1",
+        "a": [
+          {
+            "t": ""
+          },
+          {
+            "t": ""
+          }
+        ]
       },
-      "aturan": "basa.musim.semi",
-      "gestur": "bicara_tangan",
+      "aturan": "kerja.pekerja",
+      "gestur": "seka_keringat",
       "seru": null,
       "tik": null,
-      "id_id": "Burung walet kembali ke atap kami tahun ini. Pertanda rumah tangga rukun.",
-      "en_us": "The swallows came back to our eaves this year. A sign of a harmonious household."
+      "id_id": "Mandor bilang kalau selesai sebelum gelap, ada upah tambahan. Semoga benar.",
+      "en_us": "The foreman says finish before dark and there's extra pay. I hope so."
     },
     {
       "ubah": {
@@ -101,15 +108,15 @@
         "musim": "panas"
       },
       "harap": {
-        "k": "kultivator.cakap.kerja.pekerja.2",
+        "k": "kultivator.cakap.basa.sopan.cerah.1",
         "a": []
       },
-      "aturan": "kerja.pekerja",
-      "gestur": "seka_keringat",
+      "aturan": "basa.sopan.cerah",
+      "gestur": "tatap_langit",
       "seru": null,
       "tik": null,
-      "id_id": "Kerja keras tidak apa-apa, asal anak-anak bisa makan.",
-      "en_us": "Hard work's fine, as long as the children eat."
+      "id_id": "Langitnya begitu cerah. Rasanya semua urusan akan lancar hari ini.",
+      "en_us": "The sky is so bright. It feels like all business will go smoothly today."
     },
     {
       "ubah": {
@@ -135,14 +142,22 @@
       },
       "harap": {
         "k": "kultivator.cakap.basa.cuaca.cerah.0",
-        "a": []
+        "a": [
+          {
+            "t": ""
+          },
+          {
+            "k": "kultivator.cakap.ekor.basa.7",
+            "a": []
+          }
+        ]
       },
       "aturan": "basa.cuaca.cerah",
       "gestur": "tatap_langit",
       "seru": null,
       "tik": null,
-      "id_id": "Langit bersih sekali hari ini. Pertanda baik, kata orang.",
-      "en_us": "Such a clear sky today. A good omen, they say."
+      "id_id": "Langit bersih sekali hari ini. Pertanda baik, kata orang. Demikian sekadar basa-basi dari hamba.",
+      "en_us": "Such a clear sky today. A good omen, they say. Such is this one's idle chatter."
     },
     {
       "ubah": {
@@ -167,20 +182,28 @@
         "musim": "dingin"
       },
       "harap": {
-        "k": "kultivator.cakap.basa.musim.dingin.4",
+        "k": "kultivator.cakap.kerja.pekerja.0",
         "a": [
           {
-            "k": "kultivator.cakap.seru.keluh.10",
+            "k": "kultivator.cakap.awal.basa.18",
+            "a": []
+          },
+          {
+            "k": "kultivator.cakap.ekor.basa.1",
+            "a": []
+          },
+          {
+            "k": "kultivator.cakap.lex.tuan.air",
             "a": []
           }
         ]
       },
-      "aturan": "basa.musim.dingin",
-      "gestur": "hangat_tangan",
+      "aturan": "kerja.pekerja",
+      "gestur": "seka_keringat",
       "seru": null,
       "tik": null,
-      "id_id": "Tanganku pecah-pecah kena air dingin. Yah, begitulah.",
-      "en_us": "My hands are cracked from cold water. Well, that's how it is."
+      "id_id": "Kalau tidak mengganggu. Pekerjaan hari ini berat. Punggungku seperti dipukul palu. Kau sendiri bagaimana?",
+      "en_us": "If it's no bother. Today's work is heavy. My back feels hammered. And yourself?"
     }
   ]
 }

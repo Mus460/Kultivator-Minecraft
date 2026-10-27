@@ -1,0 +1,47 @@
+{
+  "pembicara": [
+    "tokoh:qiu_panitera"
+  ],
+  "prioritas": 20,
+  "syarat": [
+    "hari 3"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "menulis",
+      "prop": "kuas",
+      "suara": "kota42.pejabat_sapa",
+      "pilihan": [
+        {
+          "syarat": [
+            "quest kota42_catatan_kota baru"
+          ],
+          "akibat": [
+            "quest_mulai kota42_catatan_kota"
+          ],
+          "ke": "mulai_ya"
+        },
+        {
+          "ke": "guna"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "mulai_ya",
+      "gestur": "tunjuk"
+    },
+    {
+      "id": "guna",
+      "gestur": "menulis",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

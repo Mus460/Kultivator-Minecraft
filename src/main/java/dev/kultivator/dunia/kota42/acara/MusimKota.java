@@ -314,6 +314,9 @@ public final class MusimKota {
 							return new Kegiatan("hr_barongsai", xz, klip, 0, 0, 0, 0, GerakId.JALAN_TERGESA, false);
 						}
 					}
+					if (anak && KalenderKota.antara(h, 14.0D, 15.0D) && !hujan) {
+						return Kegiatan.di("hr_tanghulu", Kegiatan.JALAN + (w.id % 9), KotaGerakId.MAKAN_TANGHULU, KotaGerakId.PROP_TANGHULU);
+					}
 					if (KalenderKota.antara(h, 12.0D, 14.0D)) {
 						return new Kegiatan("hr_makan_besar", "meja_makan", GerakId.MAKAN, 0, PropId.SUMPIT, PropId.MANGKUK, 0, 0, false);
 					}
@@ -345,6 +348,14 @@ public final class MusimKota {
 							boolean sapu = (s.menit() / 20 + w.id) % 2 == 0;
 							return new Kegiatan("hr_makam", xz, sapu ? KotaGerakId.SAPU_MAKAM : KotaGerakId.BAKAR_UANG_KERTAS, 0,
 									sapu ? KotaGerakId.PROP_SAPU_LIDI : KotaGerakId.PROP_UANG_KERTAS, 0, 0, 0, false);
+						}
+					}
+					if (KalenderKota.antara(h, 11.0D, 14.0D) && !hujan) {
+						BlockPos grave = nisanUntuk(huni, w);
+						if (grave != null) {
+							String xz = Kegiatan.XZ + (grave.getX() + 3 + (w.id % 3)) + "," + (grave.getZ() + 2 + (w.id % 2));
+							return anak ? new Kegiatan("hr_cuju", xz, KotaGerakId.MAIN_CUJU, 0, KotaGerakId.PROP_BOLA_CUJU, 0, 0, 0, false)
+									: new Kegiatan("hr_piknik", xz, KotaGerakId.PIKNIK_DUDUK, 0, 0, 0, 0, tua ? GerakId.JALAN_TUA : 0, false);
 						}
 					}
 					if (KalenderKota.antara(h, 14.0D, 17.0D) && !hujan && (anak || tahap == WargaInfo.Tahap.MUDA)) {
@@ -408,6 +419,9 @@ public final class MusimKota {
 					if (KalenderKota.antara(h, 8.0D, 12.0D) && tua && !hujan) {
 						String to = !huni.titik("dupa").isEmpty() ? "dupa" : "obrol";
 						return new Kegiatan("hr_naik_bukit", to, GerakId.TATAP_LANGIT, 0, 0, 0, 0, GerakId.JALAN_TUA, false);
+					}
+					if (KalenderKota.antara(h, 12.0D, 14.0D) && tua && !hujan) {
+						return new Kegiatan("hr_piknik", !huni.titik("dupa").isEmpty() ? "dupa" : "obrol", KotaGerakId.PIKNIK_DUDUK, 0, 0, 0, 0, GerakId.JALAN_TUA, false);
 					}
 					return null;
 				}

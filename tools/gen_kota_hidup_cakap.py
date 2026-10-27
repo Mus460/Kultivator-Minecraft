@@ -35,6 +35,7 @@ Frame line "- [tags] Indonesian || English". Tags (optional): a number = weight 
 (sopan biasa kasar kuno) = only said in those registers; a comma list of dialect ids = only in those dialects.
 Variant line "~ f[.f2]: ..." right below its frame: features l p (speaker gender), a register, a dialect id; the engine
 looks up key.f1.f2 -> key.f1 -> key (order register, dialect, gender). Key of frame n of rule R: kultivator.cakap.R.n.
+A text may start or end with backslash-underscore = one literal space (a fragment that glues to its frame: "{$awal}Text" / "Text.{$ekor}").
 Placeholders: {$name} declared slot, or a typed slot used directly ({$sebutan_pendengar} / alias {$sebutan},
 {$waktu_lalu}, {$barang} ...); {@rule.id} inline fragment, {@rule.id?0.4} filled with chance 0.4; {lex:word} inline
 lexicon word. Both languages use the same placeholder set (order free: arguments are positional %n$s). Write % as %%.
@@ -71,11 +72,20 @@ class Galat(Exception):
     pass
 
 
+def _spasi(t):
+    """A leading or trailing backslash-underscore is one literal space (fragments that glue to a frame)."""
+    if t.startswith("\\_"):
+        t = " " + t[2:]
+    if t.endswith("\\_"):
+        t = t[:-2] + " "
+    return t
+
+
 def _bagi_teks(s, tempat):
     if "||" in s:
         a, b = s.split("||", 1)
-        return a.strip(), b.strip()
-    return s.strip(), None
+        return _spasi(a.strip()), _spasi(b.strip())
+    return _spasi(s.strip()), None
 
 
 def _cek_persen(teks, tempat):

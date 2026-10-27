@@ -15,6 +15,11 @@ public final class KotaAcara {
 			return;
 		}
 		initialised = true;
+		// the calendar hub starts the morning routine, the night watch, the seasons, the troupes and the night district
+		KalenderKota.init();
+		// street events (also starts Upacara) and the shadow theatre
+		PeristiwaJalan.init();
+		TeaterBayang.init();
 	}
 
 	private KotaAcara() {

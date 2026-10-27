@@ -50,6 +50,10 @@
           {
             "k": "kultivator.cakap.lex.senior.kampung",
             "a": []
+          },
+          {
+            "k": "kultivator.cakap.ekor.sapa.10",
+            "a": []
           }
         ]
       },
@@ -57,8 +61,8 @@
       "gestur": "lambai",
       "seru": null,
       "tik": null,
-      "id_id": "Pagi, Tuan Pendekar. Bila hendak memesan sesuatu, pagi inilah tangan hamba paling cekatan.",
-      "en_us": "Morning, Master Warrior. If you'd order something, this one's hands are deftest in the morning."
+      "id_id": "Pagi, Tuan Pendekar. Bila hendak memesan sesuatu, pagi inilah tangan hamba paling cekatan. Semoga jalanmu lapang.",
+      "en_us": "Morning, Master Warrior. If you'd order something, this one's hands are deftest in the morning. May your path be wide."
     },
     {
       "ubah": {
@@ -76,6 +80,10 @@
           {
             "k": "kultivator.cakap.lex.tuan_abadi.kampung.p",
             "a": []
+          },
+          {
+            "k": "kultivator.cakap.ekor.sapa.14",
+            "a": []
           }
         ]
       },
@@ -83,8 +91,8 @@
       "gestur": "lambai",
       "seru": null,
       "tik": null,
-      "id_id": "Pagi, Nak! Adonan bakpao sudah ngembang. Nanti mampir!",
-      "en_us": "Morning, child! The bun dough's risen. Drop by later!"
+      "id_id": "Pagi, Nak! Adonan bakpao sudah ngembang. Nanti mampir! Hati-hati ya, jalannya licin.",
+      "en_us": "Morning, child! The bun dough's risen. Drop by later! Careful now, the path is slippery."
     },
     {
       "ubah": {
@@ -96,6 +104,10 @@
           {
             "k": "kultivator.cakap.lex.leluhur.kampung",
             "a": []
+          },
+          {
+            "k": "kultivator.cakap.ekor.sapa.9.kuno",
+            "a": []
           }
         ]
       },
@@ -103,8 +115,8 @@
       "gestur": "lambai",
       "seru": null,
       "tik": null,
-      "id_id": "Salam pagi, Mbah Leluhur.",
-      "en_us": "Morning greetings, Grand Ancestor."
+      "id_id": "Salam pagi, Mbah Leluhur. Hamba mendoakan keselamatanmu.",
+      "en_us": "Morning greetings, Grand Ancestor. This one prays for your safety."
     },
     {
       "ubah": {
@@ -116,6 +128,9 @@
           {
             "k": "kultivator.cakap.lex.anak_muda.kampung",
             "a": []
+          },
+          {
+            "t": ""
           }
         ]
       },

@@ -1,0 +1,32 @@
+{
+  "pemberi": "tokoh:bibi_zhang",
+  "tempat": "kota42",
+  "alur": true,
+  "tahap": [
+    {
+      "id": "kakek_zhang",
+      "tujuan": [
+        "bendera kota42.zhuazhou.zhang"
+      ]
+    },
+    {
+      "id": "kakek_li",
+      "tujuan": [
+        "bendera kota42.zhuazhou.li"
+      ]
+    },
+    {
+      "id": "upacara",
+      "tujuan": [
+        "hadir_upacara lahir tokoh:zhang_shan"
+      ],
+      "akibat": [
+        "kota42.kesan tokoh:zhang_laotou 30",
+        "kota42.kesan tokoh:li_laoban 30",
+        "beri kultivator:telur_merah 4",
+        "kabar kota42_zhuazhou_damai pemain"
+      ],
+      "arah": "kota_tema/air"
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "pemberi": "tokoh:dalang_su",
+  "tempat": "kota42",
+  "alur": true,
+  "tahap": [
+    {
+      "id": "dicuri",
+      "tujuan": [
+        "bicara tokoh:dalang_su"
+      ]
+    },
+    {
+      "id": "telusur",
+      "tujuan": [
+        "tanda kota42.telusur.kota42_wayang_hilang"
+      ],
+      "akibat_masuk": [
+        "kota42.gosip kota42_wayang_hilang"
+      ]
+    },
+    {
+      "id": "tebus",
+      "tujuan": [
+        "punya kultivator:wayang_kulit_kera_sakti"
+      ]
+    },
+    {
+      "id": "kembali",
+      "tujuan": [
+        "antar kultivator:wayang_kulit_kera_sakti tokoh:dalang_su"
+      ]
+    },
+    {
+      "id": "perdana",
+      "tujuan": [
+        "tanda kota42.irama_wayang"
+      ],
+      "akibat": [
+        "bendera kota42.tiket_wayang",
+        "kota42.kesan tokoh:dalang_su 30",
+        "kabar kota42_wayang_perdana pemain"
+      ]
+    }
+  ]
+}

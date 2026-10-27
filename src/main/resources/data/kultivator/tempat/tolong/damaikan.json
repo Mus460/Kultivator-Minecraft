@@ -1,0 +1,11 @@
+{
+  "nama": "kultivator.kota42.tolong.damaikan.nama",
+  "teks": [
+    "kultivator.kota42.tolong.damaikan.teks.0",
+    "kultivator.kota42.tolong.damaikan.teks.1",
+    "kultivator.kota42.tolong.damaikan.teks.2"
+  ],
+  "imbalan": "kultivator.kota42.tolong.damaikan.imbalan",
+  "batas_hari": 6,
+  "peluang": 0.8
+}

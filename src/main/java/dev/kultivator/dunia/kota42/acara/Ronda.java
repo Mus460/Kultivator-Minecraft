@@ -271,6 +271,12 @@ public final class Ronda {
 			return null;
 		}
 		double h = s.jam() + s.menit() / 60.0D;
+		if (KalenderKota.antara(h, 18.0D, 19.0D) && penjagaWarga(huni).indexOf(w) == 0) {
+			// the head watchman walks the round with his pole and lights the street lanterns, the hour before the first watch
+			Jaga j = jaga(huni, KalenderKota.hari(server));
+			Vec3 at = j.titik((h - 18.0D) * j.total());
+			return Kegiatan.di("ronda_lentera", Kegiatan.XZ + (int) Math.floor(at.x) + "," + (int) Math.floor(at.z), KotaGerakId.NYALAKAN_LENTERA, 0).berjalan(GerakId.JALAN_SANTAI);
+		}
 		if (KalenderKota.antara(h, 19.0D, 5.0D)) {
 			List<Warga> list = penjagaWarga(huni);
 			int k = list.indexOf(w);
@@ -575,7 +581,7 @@ public final class Ronda {
 		Msg.chat(p, Component.translatable(paid > 0L ? "kultivator.kota42.acara.ronda.upah" : "kultivator.kota42.acara.ronda.upah_kosong",
 				st[3] + 1, NAMA_BAIK, paid).withStyle(ChatFormatting.GOLD));
 		Advancements.grant(p, "tempat/kota42_ronda");
-		CeritaApi.peristiwa(p, "ronda_geng", Long.toString(huni.situsId));
+		dev.kultivator.dunia.kota42.bicara.TujuanKota.ronda(p, huni.situsId, (int) st[3] + 1);
 	}
 
 	/**

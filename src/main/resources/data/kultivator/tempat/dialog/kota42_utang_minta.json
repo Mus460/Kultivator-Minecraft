@@ -1,0 +1,31 @@
+{
+  "pembicara": [
+    "tokoh:wu_niangzi"
+  ],
+  "prioritas": 40,
+  "syarat": [
+    "quest kota42_utang_tiga_generasi baru",
+    "hari 3"
+  ],
+  "sekali": true,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "hormat",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai kota42_utang_tiga_generasi"
+          ],
+          "ke": "awal"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "awal",
+      "gestur": "bicara_tangan"
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "pembicara": [
+    "tokoh:shen_wan"
+  ],
+  "prioritas": 5,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "hormat",
+      "pilihan": [
+        {
+          "akibat": [
+            "buka_layanan investasi"
+          ]
+        },
+        {
+          "ke": "pinjam"
+        },
+        {
+          "ke": "dermawan"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "pinjam",
+      "gestur": "358",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "dermawan",
+      "gestur": "tertawa",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

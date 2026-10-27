@@ -1,0 +1,53 @@
+{
+  "pembicara": [
+    "tokoh:guru_zhou"
+  ],
+  "prioritas": 5,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "mengajar",
+      "prop": "kitab",
+      "pilihan": [
+        {
+          "syarat": [
+            "quest kota42_akar_langit baru"
+          ],
+          "akibat": [
+            "quest_mulai kota42_akar_langit"
+          ]
+        },
+        {
+          "ke": "anak"
+        },
+        {
+          "ke": "bakat"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "anak",
+      "gestur": "mengajar",
+      "prop": "kitab",
+      "suara": "kota42.sekolah_hafal",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "bakat",
+      "gestur": "bicara_tangan",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

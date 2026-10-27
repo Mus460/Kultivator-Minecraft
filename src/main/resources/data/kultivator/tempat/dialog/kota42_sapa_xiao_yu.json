@@ -1,0 +1,44 @@
+{
+  "pembicara": [
+    "tokoh:xiao_yu"
+  ],
+  "prioritas": 5,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "367",
+      "suara": "kota42.anak_kagum",
+      "pilihan": [
+        {
+          "ke": "gula"
+        },
+        {
+          "ke": "sekolah"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "gula",
+      "gestur": "429",
+      "prop": "181",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "sekolah",
+      "gestur": "366",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

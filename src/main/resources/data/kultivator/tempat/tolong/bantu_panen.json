@@ -1,0 +1,11 @@
+{
+  "nama": "kultivator.kota42.tolong.bantu_panen.nama",
+  "teks": [
+    "kultivator.kota42.tolong.bantu_panen.teks.0",
+    "kultivator.kota42.tolong.bantu_panen.teks.1",
+    "kultivator.kota42.tolong.bantu_panen.teks.2"
+  ],
+  "imbalan": "kultivator.kota42.tolong.bantu_panen.imbalan",
+  "batas_hari": 3,
+  "peluang": 0.8
+}

@@ -209,10 +209,22 @@ public final class RencanaHarian {
 
 	/** Keys of the round that are the role's work. */
 	private static final Set<String> KERJA = Set.of("kerja", "angkut", "sidang", "pasar", "patroli", "pasar_malam", "hitung_malam",
-			"pasar_ikan", "bazar", "pasar_bulan", "pasar_air", "pasar_gelap");
+			"pasar_ikan", "bazar", "pasar_bulan", "pasar_air", "pasar_gelap", "patroli_siang", "patroli_zona", "patroli_lentera", "tonton_arena");
+	/** True for the round keys that are a role's core work (the metrics leave them out of the repeat count). */
+	static boolean kunciInti(String kunci) {
+		return KERJA.contains(kunci) || INTI_TEMA.contains(kunci);
+	}
+
+	/** Duty loops of the themed towns' own routines (JadwalTema): the plan leaves them alone, the metrics call them core work. */
+	private static final Set<String> INTI_TEMA = Set.of("ikat_tali", "teropong", "jaga_suar", "tabuh_ikan_kayu", "sapu_kuil", "sapu_biara",
+			"doa_subuh", "doa_sore", "doa_senja", "meditasi", "meditasi_malam", "semedi", "ziarah", "menulis");
+
 	/** Keys of the round that are free time the plan may fill. */
 	private static final Set<String> SANTAI = Set.of("obrol", "serambi", "minum_teh", "catur", "memancing", "beri_pakan", "bercerita",
-			"musik", "kedai", "main", "main_rumah", "bantu", "jalan_jalan", "pandang", "main_air", "teh", "belanja_sore", "lihat_kota");
+			"musik", "kedai", "main", "main_rumah", "bantu", "jalan_jalan", "pandang", "main_air", "teh", "belanja_sore", "lihat_kota", "belanja", "nyanyi_pelaut",
+			// the themed towns' evening and rest-hour routines (JadwalTema): leisure the plan may vary
+			"semedi", "berdebat", "kedai_racun", "ke_arena", "pesta_kedai", "api_unggun", "karavanserai", "tamu_teh", "teh_jendela",
+			"tatap_bulan", "tatap_laut", "obrol_jembatan", "mancing_jembatan", "menyimak_hujan");
 
 	/**
 	 * The block a round's activity belongs to at the resident's hour {@code jam}, or null when the plan must not touch it

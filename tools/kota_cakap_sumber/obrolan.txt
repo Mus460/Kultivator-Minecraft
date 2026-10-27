@@ -210,18 +210,20 @@ gestur: menangis
 seru: aduh
 $lawan: tipe=nama_warga dari=lawan
 $almarhum: tipe=nama_warga dari=konteks.almarhum
-- [3] Aku capek, {$lawan}. Kerja dari subuh, uang tetap tidak cukup. || I'm tired, {$lawan}. Working since dawn and the money's never enough.
-  ~ kasar: Hidup ini busuk, {$lawan}. Busuk. || This life stinks, {$lawan}. Stinks.
-  ~ kuno: Hatiku berat, {$lawan}. Jalan di depan tertutup kabut. || My heart is heavy, {$lawan}. The road ahead is shrouded in fog.
-  ~ kampung: Aduh, {$lawan}... panen gagal, utang menumpuk. Bingung aku. || Oh, {$lawan}... the harvest failed, the debts pile up. I'm lost.
-- [2] Anakku tidak mau mendengar lagi, {$lawan}. Setiap kunasihati, dia pergi. || My child won't listen any more, {$lawan}. Every time I advise, they walk off.
-  ~ p: Suamiku pulang larut terus, {$lawan}. Katanya kerja... entahlah. || My husband keeps coming home late, {$lawan}. Says it's work... who knows.
-  ~ l: Istriku marah terus, {$lawan}. Apa pun yang kulakukan salah. || My wife's always angry, {$lawan}. Whatever I do is wrong.
-- [2] Aku rindu {$almarhum}, {$lawan}. Kadang aku masih menyiapkan dua mangkuk. || I miss {$almarhum}, {$lawan}. Sometimes I still set out two bowls.
-  ~ kuno: Bayangan {$almarhum} masih kulihat di setiap sudut rumah, {$lawan}. || I still see {$almarhum}'s shadow in every corner of the house, {$lawan}.
-- Pelanggan sepi, sewa lapak naik. Mungkin aku harus pulang kampung saja. || Customers are few, the stall rent's up. Maybe I should just go back home.
-  ~ pelabuhan: Ikan menjauh, jala robek, perahu bocor. Laut sedang marah padaku, {$lawan}. || The fish stay away, the net's torn, the boat leaks. The sea is angry with me, {$lawan}.
-- Tidak ada yang mengerti aku, {$lawan}. Hanya kau yang mau mendengar. || No one understands me, {$lawan}. Only you will listen.
+$awal: aturan=awal.keluh opsional=0.45
+$ekor: aturan=ekor.keluh opsional=0.4
+- [3] {$awal}Aku capek, {$lawan}. Kerja dari subuh, uang tetap tidak cukup.{$ekor} || {$awal}I'm tired, {$lawan}. Working since dawn and the money's never enough.{$ekor}
+  ~ kasar: {$awal}Hidup ini busuk, {$lawan}. Busuk.{$ekor} || {$awal}This life stinks, {$lawan}. Stinks.{$ekor}
+  ~ kuno: {$awal}Hatiku berat, {$lawan}. Jalan di depan tertutup kabut.{$ekor} || {$awal}My heart is heavy, {$lawan}. The road ahead is shrouded in fog.{$ekor}
+  ~ kampung: Aduh, {$lawan}... panen gagal, utang menumpuk. Bingung aku.{$ekor} || Oh, {$lawan}... the harvest failed, the debts pile up. I'm lost.{$ekor}
+- [2] {$awal}Anakku tidak mau mendengar lagi, {$lawan}. Setiap kunasihati, dia pergi.{$ekor} || {$awal}My child won't listen any more, {$lawan}. Every time I advise, they walk off.{$ekor}
+  ~ p: {$awal}Suamiku pulang larut terus, {$lawan}. Katanya kerja... entahlah.{$ekor} || {$awal}My husband keeps coming home late, {$lawan}. Says it's work... who knows.{$ekor}
+  ~ l: {$awal}Istriku marah terus, {$lawan}. Apa pun yang kulakukan salah.{$ekor} || {$awal}My wife's always angry, {$lawan}. Whatever I do is wrong.{$ekor}
+- [2] {$awal}Aku rindu {$almarhum}, {$lawan}. Kadang aku masih menyiapkan dua mangkuk.{$ekor} || {$awal}I miss {$almarhum}, {$lawan}. Sometimes I still set out two bowls.{$ekor}
+  ~ kuno: {$awal}Bayangan {$almarhum} masih kulihat di setiap sudut rumah, {$lawan}.{$ekor} || {$awal}I still see {$almarhum}'s shadow in every corner of the house, {$lawan}.{$ekor}
+- {$awal}Pelanggan sepi, sewa lapak naik. Mungkin aku harus pulang kampung saja.{$ekor} || {$awal}Customers are few, the stall rent's up. Maybe I should just go back home.{$ekor}
+  ~ pelabuhan: {$awal}Ikan menjauh, jala robek, perahu bocor. Laut sedang marah padaku, {$lawan}.{$ekor} || {$awal}The fish stay away, the net's torn, the boat leaks. The sea is angry with me, {$lawan}.{$ekor}
+- {$awal}Tidak ada yang mengerti aku, {$lawan}. Hanya kau yang mau mendengar.{$ekor} || {$awal}No one understands me, {$lawan}. Only you will listen.{$ekor}
 
 == curhat.hibur
 niat: HIBUR

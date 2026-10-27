@@ -246,6 +246,16 @@ public final class KerjaPeran {
 		put(NpcRole.WARGA_IBLIS, k("obrol", GerakId.BICARA_TANGAN, PropId.CAWAN_ARAK), k("kerja:kuali", GerakId.MASAK, PropId.SENDOK_SAYUR),
 				k("lapak", GerakId.HITUNG_KOIN_GELAP, PropId.KANTONG_UANG));
 		put(NpcRole.PEMBURU_LURUS, k("jaga", GerakId.BERDIRI_JAGA, 0).sel(GerakId.ASAH_PEDANG, 0));
+
+		// ---------------------------------------------------------------- 42 resident roles (troupe bodies PENGAMEN/AKROBAT/PENARI/PEMUSIK/PENCOPET are event-driven)
+		put(NpcRole.PENJAGA_MALAM, k("jaga", GerakId.BERDIRI_JAGA, PropId.LENTERA_TANGAN).sel(GerakId.SIKAP_TANGAN_BELAKANG, 0));
+		put(NpcRole.MAK_COMBLANG, k("obrol", GerakId.BICARA_TANGAN, PropId.KIPAS_LIPAT, 0, 0, GerakId.ANGGUK_DENGAR));
+		put(NpcRole.PENDONGENG, k("panggung", GerakId.BICARA_TANGAN, PropId.KIPAS_LIPAT));
+		put(NpcRole.PENJUAL_OBAT, k("lapak", GerakId.TAWAR, 0, 0, 0, GerakId.SERU_DAGANG));
+		put(NpcRole.GURU_SEKOLAH, k("panggung", GerakId.MENGAJAR, PropId.KIPAS_LIPAT).sel(GerakId.MEMBACA, PropId.KITAB));
+		put(NpcRole.PENGURUS_DUKA, k("dupa", GerakId.MEMBACA, PropId.KITAB, 0, 0, GerakId.SUJUD_DUPA));
+		put(NpcRole.PENJAGA_GUDANG, k("lapak", GerakId.HITUNG_SEMPOA, PropId.SEMPOA, 0, 0, GerakId.SERU_DAGANG));
+		put(NpcRole.PIALANG, k("meja_tulis", GerakId.MENULIS, PropId.KUAS, PropId.PAPAN_CATATAN, 0, 0).sel(GerakId.HITUNG_SEMPOA, PropId.SEMPOA));
 	}
 
 	/** The work of {@code peran} for a resident with seed {@code benih} (variants by seed). */

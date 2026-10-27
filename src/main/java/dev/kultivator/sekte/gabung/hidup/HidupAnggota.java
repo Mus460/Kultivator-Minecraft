@@ -422,6 +422,25 @@ public final class HidupAnggota {
 					PapanMisiSekte.tulisChat(p);
 					return 1;
 				}))
+				.then(Commands.literal("jenis").executes(ctx -> {
+					// every kind drawn once at its lowest rank: the target, the goal and the waypoints it would get in this world
+					ServerPlayer p = pemain(ctx);
+					String s = sekte(p);
+					if (s == null) {
+						return balas(ctx, Component.translatable("kultivator.gabung.hidup.bukan_anggota"));
+					}
+					MinecraftServer server = ctx.getSource().getServer();
+					int n = 0;
+					for (JenisMisiGabung.Jenis j : JenisMisiGabung.semua()) {
+						var m = JenisMisiGabung.susun(server, s, Kota.day(server), 90 + n++, j, j.misi().pangkatMin(), net.minecraft.util.RandomSource.create(n * 31L));
+						Component line = m == null ? Component.translatable("kultivator.gabung.uji.jenis_tidak", j.judul())
+								: Component.translatable("kultivator.gabung.uji.jenis_baris", j.judul(), JenisMisiGabung.huruf(j.misi().pangkatMin()),
+										m.getIntOr(JenisMisiGabung.X, 0) + ", " + m.getIntOr(JenisMisiGabung.Z, 0), JenisMisiGabung.tujuanBaris(m),
+										m.getIntArray(JenisMisiGabung.TITIK).map(a -> a.length / 2).orElse(0));
+						ctx.getSource().sendSuccess(() -> line, false);
+					}
+					return 1;
+				}))
 				.then(Commands.literal("selesai").then(Commands.argument("id", StringArgumentType.word()).executes(ctx -> {
 					ServerPlayer p = pemain(ctx);
 					Keanggotaan k = GabungApi.anggota(p);

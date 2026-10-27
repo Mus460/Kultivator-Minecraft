@@ -92,7 +92,7 @@ public final class Penyatuan {
 		GabungData.get(server).setDirty();
 		Advancements.grant(player, "sekte/gabung_serap");
 		Halls.log(player.getUUID(), Component.translatable(KEY + "log", DiplomasiGabung.nama(server, sekte)).withStyle(ChatFormatting.GOLD));
-		Politik.kabar(server, "gabung.serap", DiplomasiGabung.nama(server, sekte), player.getName());
+		Politik.kabar(server, "gabung.serap", "sekte:" + sekte, player.getName().getString());
 		Politik.kabarAnggota(server, sekte, Component.translatable(KEY + "kabar", player.getName(), namaTampil(server, sekte)), ChatFormatting.GOLD);
 		return null;
 	}

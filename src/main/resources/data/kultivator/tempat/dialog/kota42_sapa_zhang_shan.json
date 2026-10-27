@@ -1,0 +1,42 @@
+{
+  "pembicara": [
+    "tokoh:zhang_shan"
+  ],
+  "prioritas": 5,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "palu_landasan",
+      "pilihan": [
+        {
+          "ke": "ukir"
+        },
+        {
+          "ke": "ayah"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "ukir",
+      "gestur": "451",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "ayah",
+      "gestur": "bicara_tangan",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

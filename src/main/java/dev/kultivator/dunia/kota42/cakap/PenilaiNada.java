@@ -48,7 +48,7 @@ public final class PenilaiNada {
 						w.put(e.getKey(), e.getValue().getAsDouble());
 					}
 				}
-				rows.put(n, new Baris(n, CakapReload.objek(o, "syarat"), CakapReload.pecahan(o, "b0", 0.0F), Map.copyOf(w),
+				rows.put(n, new Baris(n, CakapReload.objek(o, "syarat"), CakapReload.pecahan(o, "b0", 0.0F), java.util.Collections.unmodifiableMap(w),
 						CakapReload.objek(o, "berhasil"), CakapReload.objek(o, "gagal")));
 			}
 			return new Tabel(json.has("ulang") ? json.get("ulang").getAsDouble() : 0.7D, rows);

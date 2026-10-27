@@ -68,6 +68,9 @@
           {
             "k": "kultivator.cakap.lex.kakak.oasis",
             "a": []
+          },
+          {
+            "t": ""
           }
         ]
       },
@@ -101,7 +104,11 @@
       },
       "harap": {
         "k": "kultivator.cakap.sapa.pekerja.4",
-        "a": []
+        "a": [
+          {
+            "t": ""
+          }
+        ]
       },
       "aturan": "sapa.pekerja",
       "gestur": "seka_keringat",
@@ -137,6 +144,10 @@
           {
             "k": "kultivator.cakap.lex.kakak.oasis",
             "a": []
+          },
+          {
+            "k": "kultivator.cakap.ekor.sapa.3",
+            "a": []
           }
         ]
       },
@@ -144,8 +155,8 @@
       "gestur": "seka_keringat",
       "seru": null,
       "tik": null,
-      "id_id": "Salam, Saudara Tua. Kerjaan menumpuk, tapi untukmu ada waktu sebentar.",
-      "en_us": "Greetings, Elder Brother. Work's piling up, but I've a moment for you."
+      "id_id": "Salam, Saudara Tua. Kerjaan menumpuk, tapi untukmu ada waktu sebentar. Jangan membuat masalah, ya.",
+      "en_us": "Greetings, Elder Brother. Work's piling up, but I've a moment for you. Don't make trouble, will you."
     },
     {
       "ubah": {
@@ -180,6 +191,9 @@
           {
             "k": "kultivator.cakap.lex.kakak.oasis.p",
             "a": []
+          },
+          {
+            "t": ""
           }
         ]
       },

@@ -200,13 +200,15 @@ gestur: geleng
 seru: aduh
 $cuaca: tipe=cuaca dari=konteks.cuaca
 $keluh: aturan=seru.keluh opsional=0.5
+$awal: aturan=awal.keluh opsional=0.45
+$ekor: aturan=ekor.keluh opsional=0.4
 - [3] {$cuaca} lagi. Jemuranku tidak kering-kering. {$keluh} || {$cuaca} again. My washing never dries. {$keluh}
-  ~ kasar: Cuaca sialan. Rugi terus. || Damn weather. Losing money nonstop.
-  ~ kuno: Langit sedang murung. Hamba hanya bisa bersabar. || Heaven is sullen. This one can only be patient.
-  ~ kampung: Cuacanya nggak karuan, Nak. Padi bisa busuk kalau begini terus. || The weather's all over the place, child. The rice could rot like this.
-- [2] Kalau cuaca begini terus, panen bisa gagal. Lalu apa? || If the weather stays like this, the harvest could fail. Then what?
-  ~ pelabuhan: Cuaca begini, Bung, kapal tidak bisa keluar. Upah tidak masuk. || Weather like this, mate, no boats go out. No wages come in.
-- Lututku sakit setiap cuaca berubah. Lebih tepat dari almanak. || My knees ache whenever the weather turns. More accurate than the almanac.
+  ~ kasar: {$awal}Cuaca sialan. Rugi terus. || {$awal}Damn weather. Losing money nonstop.
+  ~ kuno: {$awal}Langit sedang murung. Hamba hanya bisa bersabar. || {$awal}Heaven is sullen. This one can only be patient.
+  ~ kampung: {$awal}Cuacanya nggak karuan, Nak. Padi bisa busuk kalau begini terus. || {$awal}The weather's all over the place, child. The rice could rot like this.
+- [2] {$awal}Kalau cuaca begini terus, panen bisa gagal. Lalu apa? || {$awal}If the weather stays like this, the harvest could fail. Then what?
+  ~ pelabuhan: {$awal}Cuaca begini, Bung, kapal tidak bisa keluar. Upah tidak masuk. || {$awal}Weather like this, mate, no boats go out. No wages come in.
+- {$awal}Lututku sakit setiap cuaca berubah. Lebih tepat dari almanak.{$ekor} || {$awal}My knees ache whenever the weather turns. More accurate than the almanac.{$ekor}
 
 == keluh.kerja
 niat: KELUH
@@ -214,25 +216,29 @@ topik: kerja
 gestur: seka_keringat
 seru: aduh
 $keluh: aturan=seru.keluh opsional=0.5
-- [3] Mandor menambah jam kerja, tapi upahnya tetap. {$keluh} || The foreman added hours, but the pay's the same. {$keluh}
-  ~ kasar: Kerja seperti kerbau, dibayar seperti ayam. || Work like a buffalo, paid like a chicken.
-  ~ kuno: Jerih payah hamba tak sebanding dengan upahnya. Namun apa daya. || This one's toil isn't matched by the pay. But what can be done.
-  ~ kampung: Kerja dari subuh sampai sore, upahnya cuma cukup buat beras. || Working dawn to dusk, the pay barely covers rice.
-- [2] Punggungku sudah tidak lurus lagi. Tahun depan entah masih kuat atau tidak. || My back isn't straight any more. Next year, who knows if I'll still manage.
-  ~ p: Tanganku pecah-pecah kena air cucian majikan. Tapi siapa yang peduli? || My hands are cracked from the master's washing water. But who cares?
-- Mandor baru itu galak sekali. Salah sedikit, potong upah. || That new foreman is so harsh. One slip, docked pay.
+$awal: aturan=awal.keluh opsional=0.45
+$ekor: aturan=ekor.keluh opsional=0.4
+- [3] {$awal}Mandor menambah jam kerja, tapi upahnya tetap. {$keluh} || {$awal}The foreman added hours, but the pay's the same. {$keluh}
+  ~ kasar: {$awal}Kerja seperti kerbau, dibayar seperti ayam. || {$awal}Work like a buffalo, paid like a chicken.
+  ~ kuno: {$awal}Jerih payah hamba tak sebanding dengan upahnya. Namun apa daya. || {$awal}This one's toil isn't matched by the pay. But what can be done.
+  ~ kampung: {$awal}Kerja dari subuh sampai sore, upahnya cuma cukup buat beras. || {$awal}Working dawn to dusk, the pay barely covers rice.
+- [2] {$awal}Punggungku sudah tidak lurus lagi. Tahun depan entah masih kuat atau tidak.{$ekor} || {$awal}My back isn't straight any more. Next year, who knows if I'll still manage.{$ekor}
+  ~ p: {$awal}Tanganku pecah-pecah kena air cucian majikan. Tapi siapa yang peduli? || {$awal}My hands are cracked from the master's washing water. But who cares?
+- {$awal}Mandor baru itu galak sekali. Salah sedikit, potong upah.{$ekor} || {$awal}That new foreman is so harsh. One slip, docked pay.{$ekor}
 
 == keluh.pejabat
 niat: KELUH
 topik: pejabat
 gestur: geleng
-- [3] Pajak naik lagi. Pejabat makin gemuk, kami makin kurus. || Taxes up again. Officials grow fatter, we grow thinner.
-  ~ kasar: Pejabat lintah. Semuanya. || Leech officials. The lot.
-  ~ kuno: Para pejabat lupa bahwa kursi mereka ditopang punggung rakyat. || The officials forget their chairs rest on the people's backs.
-  ~ ibukota: Mengurus surat di kantor distrik butuh tiga bulan. Kalau tanpa amplop. || Getting a paper at the district office takes three months. Without an envelope.
-- [2] Jalan di depan rumahku sudah rusak dua tahun. Laporan sudah tiga kali. || The road outside my house has been broken two years. Reported three times.
-  ~ kampung: Pak Lurah janji bikin jembatan. Janji terus, jembatannya mana? || The headman promised a bridge. Promises, promises; where's the bridge?
-- Kalau mau keadilan, bawa uang. Kalau tidak punya uang, bawa kesabaran. || Want justice, bring money. No money, bring patience.
+$awal: aturan=awal.keluh opsional=0.45
+$ekor: aturan=ekor.keluh opsional=0.4
+- [3] {$awal}Pajak naik lagi. Pejabat makin gemuk, kami makin kurus.{$ekor} || {$awal}Taxes up again. Officials grow fatter, we grow thinner.{$ekor}
+  ~ kasar: {$awal}Pejabat lintah. Semuanya.{$ekor} || {$awal}Leech officials. The lot.{$ekor}
+  ~ kuno: {$awal}Para pejabat lupa bahwa kursi mereka ditopang punggung rakyat.{$ekor} || {$awal}The officials forget their chairs rest on the people's backs.{$ekor}
+  ~ ibukota: {$awal}Mengurus surat di kantor distrik butuh tiga bulan. Kalau tanpa amplop.{$ekor} || {$awal}Getting a paper at the district office takes three months. Without an envelope.{$ekor}
+- [2] {$awal}Jalan di depan rumahku sudah rusak dua tahun. Laporan sudah tiga kali.{$ekor} || {$awal}The road outside my house has been broken two years. Reported three times.{$ekor}
+  ~ kampung: {$awal}Pak Lurah janji bikin jembatan. Janji terus, jembatannya mana? || {$awal}The headman promised a bridge. Promises, promises; where's the bridge?
+- {$awal}Kalau mau keadilan, bawa uang. Kalau tidak punya uang, bawa kesabaran.{$ekor} || {$awal}Want justice, bring money. No money, bring patience.{$ekor}
 
 == keluh.uang
 niat: KELUH
@@ -240,13 +246,15 @@ topik: uang
 gestur: hitung_koin
 seru: aduh
 $keluh: aturan=seru.keluh opsional=0.5
-- [3] Uang di kantong tinggal beberapa keping. Akhir bulan masih lama. {$keluh} || Only a few coins left in my purse. Month's end is far off. {$keluh}
-  ~ kasar: Miskin. Itu saja masalahku. || Poor. That's my whole problem.
-  ~ kuno: Pundi-pundi hamba kering seperti sumur kemarau. || This one's purse is dry as a well in drought.
-  ~ kampung: Duit habis, Nak. Utang di warung sudah sepanjang lenganku. || Money's gone, child. My tab at the stall is as long as my arm.
-- [2] Rentenir datang lagi kemarin. Bunganya saja sudah lebih besar dari utangnya. || The lender came again yesterday. The interest alone is bigger than the debt.
-  ~ iblis: Utang di kota ini dibayar dengan uang atau jari. Aku masih punya sepuluh jari. Untuk sekarang. || Debts in this city are paid in coin or fingers. I still have ten fingers. For now.
-- Harga naik, upah tetap. Bagaimana orang kecil bisa menabung? || Prices up, wages flat. How are small folk to save?
+$awal: aturan=awal.keluh opsional=0.45
+$ekor: aturan=ekor.keluh opsional=0.4
+- [3] {$awal}Uang di kantong tinggal beberapa keping. Akhir bulan masih lama. {$keluh} || {$awal}Only a few coins left in my purse. Month's end is far off. {$keluh}
+  ~ kasar: {$awal}Miskin. Itu saja masalahku. || {$awal}Poor. That's my whole problem.
+  ~ kuno: {$awal}Pundi-pundi hamba kering seperti sumur kemarau. || {$awal}This one's purse is dry as a well in drought.
+  ~ kampung: {$awal}Duit habis, Nak. Utang di warung sudah sepanjang lenganku. || {$awal}Money's gone, child. My tab at the stall is as long as my arm.
+- [2] {$awal}Rentenir datang lagi kemarin. Bunganya saja sudah lebih besar dari utangnya.{$ekor} || {$awal}The lender came again yesterday. The interest alone is bigger than the debt.{$ekor}
+  ~ iblis: {$awal}Utang di kota ini dibayar dengan uang atau jari. Aku masih punya sepuluh jari. Untuk sekarang.{$ekor} || {$awal}Debts in this city are paid in coin or fingers. I still have ten fingers. For now.{$ekor}
+- {$awal}Harga naik, upah tetap. Bagaimana orang kecil bisa menabung? || {$awal}Prices up, wages flat. How are small folk to save?
 
 == keluh.harga
 niat: KELUH
@@ -255,25 +263,29 @@ gestur: geleng
 seru: aduh
 $barang_mahal: tipe=barang dari=konteks.barang_mahal fitur=jamak
 $keluh: aturan=seru.keluh opsional=0.5
+$awal: aturan=awal.keluh opsional=0.45
+$ekor: aturan=ekor.keluh opsional=0.4
 - [3] {$barang_mahal} sekarang semahal emas. Dulu sekeping dapat sekarung. {$keluh} || {$barang_mahal} costs like gold now. Once a coin bought a sackful. {$keluh}
-  ~ kasar: Harga gila. Pedagang rakus. || Mad prices. Greedy traders.
-  ~ kuno: Harga {$barang_mahal} melambung, dan rakyat kecil menanggungnya. || The price of {$barang_mahal} soars, and the small folk bear it.
+  ~ kasar: {$awal}Harga gila. Pedagang rakus. || {$awal}Mad prices. Greedy traders.
+  ~ kuno: {$awal}Harga {$barang_mahal} melambung, dan rakyat kecil menanggungnya. || {$awal}The price of {$barang_mahal} soars, and the small folk bear it.
   ~ oasis: {$barang_mahal} makin mahal, Saudara. Kafilah pun tak sanggup membeli. || {$barang_mahal} costs more and more, friend. Even caravans can't afford it.
-- [2] Aku sampai menawar setengah jam hanya untuk {$barang_mahal} sedikit. || I haggled half an hour for just a little {$barang_mahal}.
-  ~ p: Belanja ke pasar sekarang seperti perang. Pulang-pulang kantong kosong, keranjang juga. || Market shopping now is like war. Come home with an empty purse and basket.
-- Kalau terus begini, kita makan apa musim dingin nanti? || If this goes on, what will we eat this winter?
+- [2] {$awal}Aku sampai menawar setengah jam hanya untuk {$barang_mahal} sedikit.{$ekor} || {$awal}I haggled half an hour for just a little {$barang_mahal}.{$ekor}
+  ~ p: {$awal}Belanja ke pasar sekarang seperti perang. Pulang-pulang kantong kosong, keranjang juga.{$ekor} || {$awal}Market shopping now is like war. Come home with an empty purse and basket.{$ekor}
+- {$awal}Kalau terus begini, kita makan apa musim dingin nanti? || {$awal}If this goes on, what will we eat this winter?
 
 == keluh.kejahatan
 niat: KELUH
 topik: kejahatan
 gestur: geleng
-- [3] Copet makin berani. Siang bolong pun mereka beraksi. || The pickpockets grow bolder. They strike in broad daylight.
-  ~ kasar: Maling di mana-mana. Penjaga tidur semua. || Thieves everywhere. Guards all asleep.
-  ~ kuno: Kejahatan tumbuh seperti rumput liar ketika penjaga lengah. || Crime grows like weeds when the watch is lax.
-  ~ kampung: Ayam di kampung hilang terus, Nak. Malingnya belum ketangkap. || Chickens keep vanishing in the village, child. The thief's still not caught.
-- [2] Toko sebelah dibobol semalam. Aku mengunci pintuku tiga kali sekarang. || The shop next door was broken into last night. I lock my door three times now.
-  ~ iblis: Kejahatan? Di sini itu namanya berdagang. Masalahnya kalau yang dirampok aku. || Crime? Here it's called trading. Problem is when I'm the one robbed.
-- Penjaga datang setelah malingnya pergi. Selalu begitu. || The guards arrive after the thief has gone. Always.
+$awal: aturan=awal.keluh opsional=0.45
+$ekor: aturan=ekor.keluh opsional=0.4
+- [3] {$awal}Copet makin berani. Siang bolong pun mereka beraksi.{$ekor} || {$awal}The pickpockets grow bolder. They strike in broad daylight.{$ekor}
+  ~ kasar: {$awal}Maling di mana-mana. Penjaga tidur semua.{$ekor} || {$awal}Thieves everywhere. Guards all asleep.{$ekor}
+  ~ kuno: {$awal}Kejahatan tumbuh seperti rumput liar ketika penjaga lengah.{$ekor} || {$awal}Crime grows like weeds when the watch is lax.{$ekor}
+  ~ kampung: {$awal}Ayam di kampung hilang terus, Nak. Malingnya belum ketangkap.{$ekor} || {$awal}Chickens keep vanishing in the village, child. The thief's still not caught.{$ekor}
+- [2] {$awal}Toko sebelah dibobol semalam. Aku mengunci pintuku tiga kali sekarang.{$ekor} || {$awal}The shop next door was broken into last night. I lock my door three times now.{$ekor}
+  ~ iblis: {$awal}Kejahatan? Di sini itu namanya berdagang. Masalahnya kalau yang dirampok aku.{$ekor} || {$awal}Crime? Here it's called trading. Problem is when I'm the one robbed.{$ekor}
+- {$awal}Penjaga datang setelah malingnya pergi. Selalu begitu.{$ekor} || {$awal}The guards arrive after the thief has gone. Always.{$ekor}
 
 == begal.peringat
 niat: PERINGATAN
@@ -297,12 +309,14 @@ gestur: geleng
 seru: aduh
 $arah: tipe=arah dari=konteks.arah
 $keluh: aturan=seru.keluh opsional=0.5
-- [3] Gara-gara begal di jalan {$arah}, gerobak kami harus memutar dua hari. {$keluh} || Because of the bandits on the {$arah} road, our carts must detour two days. {$keluh}
-  ~ kasar: Begal sialan. Penjaga tidak berguna. || Damn bandits. Useless guards.
-  ~ kuno: Para begal merampas jerih payah rakyat. Langit pasti membalas. || The bandits rob the people's toil. Heaven will surely repay them.
-- [2] Daganganku dirampas begal bulan lalu. Sampai sekarang belum bisa bangkit. || Bandits took my goods last month. I still haven't recovered.
-  ~ kampung: Kerbau Pak Darmo digondol begal, Nak. Sekampung marah. || Bandits made off with old Darmo's buffalo, child. The whole village is furious.
-- Kalau ada kultivator yang mau membersihkan jalan itu, seluruh kota akan berterima kasih. || If any cultivator would clear that road, the whole town would be grateful.
+$awal: aturan=awal.keluh opsional=0.45
+$ekor: aturan=ekor.keluh opsional=0.4
+- [3] {$awal}Gara-gara begal di jalan {$arah}, gerobak kami harus memutar dua hari. {$keluh} || {$awal}Because of the bandits on the {$arah} road, our carts must detour two days. {$keluh}
+  ~ kasar: {$awal}Begal sialan. Penjaga tidak berguna. || {$awal}Damn bandits. Useless guards.
+  ~ kuno: {$awal}Para begal merampas jerih payah rakyat. Langit pasti membalas. || {$awal}The bandits rob the people's toil. Heaven will surely repay them.
+- [2] {$awal}Daganganku dirampas begal bulan lalu. Sampai sekarang belum bisa bangkit.{$ekor} || {$awal}Bandits took my goods last month. I still haven't recovered.{$ekor}
+  ~ kampung: {$awal}Kerbau Pak Darmo digondol begal, Nak. Sekampung marah.{$ekor} || {$awal}Bandits made off with old Darmo's buffalo, child. The whole village is furious.{$ekor}
+- {$awal}Kalau ada kultivator yang mau membersihkan jalan itu, seluruh kota akan berterima kasih.{$ekor} || {$awal}If any cultivator would clear that road, the whole town would be grateful.{$ekor}
 
 == makanan.basa
 niat: BASA_BASI
@@ -310,15 +324,17 @@ topik: makanan
 gestur: makan
 $sebutan: tipe=sebutan_pendengar dari=pendengar
 $musim: tipe=musim dari=konteks.musim
-- [3] Sudah makan? Bakpao di ujung jalan baru keluar dari kukusan. || Eaten yet? The buns down the road just came out of the steamer.
-  ~ kasar: Lapar? Beli sana. Jangan lihat makananku. || Hungry? Go buy. Don't eye my food.
-  ~ kuno: Perut yang kenyang menenangkan pikiran, {$sebutan}. Sudahkah bersantap? || A full belly calms the mind, {$sebutan}. Have you dined?
-  ~ kampung: Sudah makan, Nak? Jangan sungkan, nasi masih banyak di dapur. || Eaten, child? Don't be shy, there's plenty of rice in the kitchen.
-  ~ pelabuhan: Ikan bakar baru diangkat, Bung! Bau asapnya sampai ke kapal! || Grilled fish just off the fire, mate! You can smell it from the ships!
-  ~ oasis: Kurma dan roti pipih, Saudara. Makanan gurun sederhana, tapi mengenyangkan. || Dates and flatbread, friend. Simple desert food, but filling.
-- [2] Mi tarik di kedai sebelah enak sekali. Kuahnya direbus semalaman. || The pulled noodles next door are wonderful. The broth simmers all night.
-  ~ air: Bubur ikan di perahu pagi itu, Kakak... paling enak di kanal... || The fish congee on the morning boat, dear... the best on the canal...
-- Musim {$musim} begini paling enak makan sup jahe. || {$musim} like this is perfect for ginger soup.
+$awal: aturan=awal.basa opsional=0.4
+$ekor: aturan=ekor.basa opsional=0.4
+- [3] {$awal}Sudah makan? Bakpao di ujung jalan baru keluar dari kukusan.{$ekor} || {$awal}Eaten yet? The buns down the road just came out of the steamer.{$ekor}
+  ~ kasar: {$awal}Lapar? Beli sana. Jangan lihat makananku.{$ekor} || {$awal}Hungry? Go buy. Don't eye my food.{$ekor}
+  ~ kuno: {$awal}Perut yang kenyang menenangkan pikiran, {$sebutan}. Sudahkah bersantap? || {$awal}A full belly calms the mind, {$sebutan}. Have you dined?
+  ~ kampung: {$awal}Sudah makan, Nak? Jangan sungkan, nasi masih banyak di dapur.{$ekor} || {$awal}Eaten, child? Don't be shy, there's plenty of rice in the kitchen.{$ekor}
+  ~ pelabuhan: {$awal}Ikan bakar baru diangkat, Bung! Bau asapnya sampai ke kapal!{$ekor} || {$awal}Grilled fish just off the fire, mate! You can smell it from the ships!{$ekor}
+  ~ oasis: {$awal}Kurma dan roti pipih, Saudara. Makanan gurun sederhana, tapi mengenyangkan.{$ekor} || {$awal}Dates and flatbread, friend. Simple desert food, but filling.{$ekor}
+- [2] {$awal}Mi tarik di kedai sebelah enak sekali. Kuahnya direbus semalaman.{$ekor} || {$awal}The pulled noodles next door are wonderful. The broth simmers all night.{$ekor}
+  ~ air: {$awal}Bubur ikan di perahu pagi itu, Kakak... paling enak di kanal...{$ekor} || {$awal}The fish congee on the morning boat, dear... the best on the canal...{$ekor}
+- Musim {$musim} begini paling enak makan sup jahe.{$ekor} || {$musim} like this is perfect for ginger soup.{$ekor}
 
 == makanan.tawar
 niat: TAWARAN
@@ -349,13 +365,15 @@ niat: BERI_KABAR
 topik: panen
 gestur: memanen
 $senang: aturan=seru.senang opsional=0.5
-- [3] Panen tahun ini bagus! Gabah bernas, lumbung hampir penuh. {$senang} || The harvest is good this year! Plump grain, the granary nearly full. {$senang}
-  ~ kasar: Panen lumayan. Akhirnya. || Decent harvest. Finally.
-  ~ kuno: Bumi bermurah hati tahun ini. Lumbung penuh, hati tenteram. || The earth is generous this year. Full granaries, peaceful hearts.
-  ~ kampung: Panen raya, Nak! Sawah Pak Lurah sampai butuh dua puluh orang. || Bumper harvest, child! The headman's paddies needed twenty hands.
-- [2] Kebun persik di bukit berbuah lebat. Harga persik pasti turun. || The peach orchard on the hill is heavy with fruit. Peach prices will surely fall.
-  ~ gunung: Daun teh musim ini paling harum dalam sepuluh tahun. Para biksu bersyukur. || This season's tea leaves are the most fragrant in ten years. The monks give thanks.
-- Semua orang sibuk di sawah. Pasar sepi, tapi hati senang. || Everyone's busy in the paddies. The market's quiet, but hearts are glad.
+$awal: aturan=awal.kabar opsional=0.35
+$ekor: aturan=ekor.kabar opsional=0.4
+- [3] {$awal}Panen tahun ini bagus! Gabah bernas, lumbung hampir penuh. {$senang} || {$awal}The harvest is good this year! Plump grain, the granary nearly full. {$senang}
+  ~ kasar: {$awal}Panen lumayan. Akhirnya. || {$awal}Decent harvest. Finally.
+  ~ kuno: {$awal}Bumi bermurah hati tahun ini. Lumbung penuh, hati tenteram. || {$awal}The earth is generous this year. Full granaries, peaceful hearts.
+  ~ kampung: {$awal}Panen raya, Nak! Sawah Pak Lurah sampai butuh dua puluh orang. || {$awal}Bumper harvest, child! The headman's paddies needed twenty hands.
+- [2] {$awal}Kebun persik di bukit berbuah lebat. Harga persik pasti turun.{$ekor} || {$awal}The peach orchard on the hill is heavy with fruit. Peach prices will surely fall.{$ekor}
+  ~ gunung: {$awal}Daun teh musim ini paling harum dalam sepuluh tahun. Para biksu bersyukur.{$ekor} || {$awal}This season's tea leaves are the most fragrant in ten years. The monks give thanks.{$ekor}
+- {$awal}Semua orang sibuk di sawah. Pasar sepi, tapi hati senang.{$ekor} || {$awal}Everyone's busy in the paddies. The market's quiet, but hearts are glad.{$ekor}
 
 == panen.keluh
 niat: KELUH
@@ -363,12 +381,14 @@ topik: panen
 gestur: geleng
 seru: aduh
 $keluh: aturan=seru.keluh opsional=0.5
-- [3] Hama wereng menyerang sawah timur. Separuh padi habis. {$keluh} || Planthoppers struck the east paddies. Half the rice is gone. {$keluh}
-  ~ kasar: Panen gagal. Hidup makin sial. || Harvest failed. Life gets worse.
-  ~ kuno: Langit menahan rahmatnya tahun ini. Lumbung setengah kosong. || Heaven withholds its mercy this year. The granaries are half empty.
-  ~ kampung: Gabahnya kopong, Nak. Hujan telat sebulan. || The grain's hollow, child. The rain came a month late.
-- [2] Babi hutan masuk ladang semalam. Jagungku habis diinjak. || Wild boar got into the field last night. My corn is trampled flat.
-- Kalau panen gagal lagi, aku harus jual kerbau. || If the harvest fails again, I'll have to sell the buffalo.
+$awal: aturan=awal.keluh opsional=0.45
+$ekor: aturan=ekor.keluh opsional=0.4
+- [3] {$awal}Hama wereng menyerang sawah timur. Separuh padi habis. {$keluh} || {$awal}Planthoppers struck the east paddies. Half the rice is gone. {$keluh}
+  ~ kasar: {$awal}Panen gagal. Hidup makin sial. || {$awal}Harvest failed. Life gets worse.
+  ~ kuno: {$awal}Langit menahan rahmatnya tahun ini. Lumbung setengah kosong. || {$awal}Heaven withholds its mercy this year. The granaries are half empty.
+  ~ kampung: {$awal}Gabahnya kopong, Nak. Hujan telat sebulan. || {$awal}The grain's hollow, child. The rain came a month late.
+- [2] {$awal}Babi hutan masuk ladang semalam. Jagungku habis diinjak.{$ekor} || {$awal}Wild boar got into the field last night. My corn is trampled flat.{$ekor}
+- {$awal}Kalau panen gagal lagi, aku harus jual kerbau.{$ekor} || {$awal}If the harvest fails again, I'll have to sell the buffalo.{$ekor}
 
 == kenangan.cerita
 niat: CERITA
@@ -392,12 +412,14 @@ $subjek: tipe=nama_warga dari=fakta.subjek
 $waktu_lalu: tipe=waktu_lalu dari=fakta.hariKejadian
 $sebutan: tipe=sebutan_pendengar dari=pendengar
 $penutup_kecil: aturan=frag.penutup_kecil opsional=0.4
-- [3] {$katanya} ada kabar tentang {$subjek} sejak {$waktu_lalu}. Semua orang membicarakannya. || {$katanya} there's news about {$subjek} since {$waktu_lalu}. Everyone's talking about it.
-  ~ kasar: Ada kabar soal {$subjek}. Aku tidak peduli, tapi kau mungkin. || There's news about {$subjek}. I don't care, but you might.
-  ~ kuno: Kabar tentang {$subjek} telah beredar sejak {$waktu_lalu}, {$sebutan}. || News of {$subjek} has circulated since {$waktu_lalu}, {$sebutan}.
-- [2] Kau sudah dengar soal {$subjek}? Aku baru tahu tadi pagi. || Heard about {$subjek}? I only found out this morning.
-  ~ kampung: Wis krungu, Nak? Soal si {$subjek}. Sekampung geger. || Heard yet, child? About {$subjek}. The whole village is in uproar.
-- Soal {$subjek}... nanti kau dengar sendiri dari orang lain. Lebih lengkap. {$penutup_kecil} || About {$subjek}... you'll hear it from others. More complete. {$penutup_kecil}
+$awal: aturan=awal.kabar opsional=0.35
+$ekor: aturan=ekor.kabar opsional=0.4
+- [3] {$katanya} ada kabar tentang {$subjek} sejak {$waktu_lalu}. Semua orang membicarakannya.{$ekor} || {$katanya} there's news about {$subjek} since {$waktu_lalu}. Everyone's talking about it.{$ekor}
+  ~ kasar: {$awal}Ada kabar soal {$subjek}. Aku tidak peduli, tapi kau mungkin.{$ekor} || {$awal}There's news about {$subjek}. I don't care, but you might.{$ekor}
+  ~ kuno: Kabar tentang {$subjek} telah beredar sejak {$waktu_lalu}, {$sebutan}.{$ekor} || News of {$subjek} has circulated since {$waktu_lalu}, {$sebutan}.{$ekor}
+- [2] Kau sudah dengar soal {$subjek}? Aku baru tahu tadi pagi.{$ekor} || Heard about {$subjek}? I only found out this morning.{$ekor}
+  ~ kampung: Wis krungu, Nak? Soal si {$subjek}. Sekampung geger.{$ekor} || Heard yet, child? About {$subjek}. The whole village is in uproar.{$ekor}
+- {$awal}Soal {$subjek}... nanti kau dengar sendiri dari orang lain. Lebih lengkap. {$penutup_kecil} || {$awal}About {$subjek}... you'll hear it from others. More complete. {$penutup_kecil}
 
 == kilas.utang_warga
 niat: KILAS_BALIK

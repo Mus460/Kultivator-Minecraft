@@ -873,19 +873,18 @@ GLYPH_SRC = {
         ".....#...#.....",
         "...##.....##...",
     ],
-    "jiu": [  # wine
+    "jiu": [  # wine (酒): three drops and the wine jar
+        "........#...#..",
         "#.....#########",
-        ".#.......#.#...",
-        ".........#.#...",
-        "#.....#########",
-        ".#....#..#.#..#",
-        "......#.#..#..#",
-        "..#...##....###",
-        "..#...#.......#",
+        ".#.....#.....#.",
+        ".......#.....#.",
+        ".......#######.",
+        "#......#..#..#.",
+        ".#.....#..#..#.",
+        ".......#######.",
+        ".......#.....#.",
+        "..#....#.....#.",
         ".#....#########",
-        ".#....#.......#",
-        "#.....#.......#",
-        "#.....#########",
     ],
     "cha": [  # tea
         "...#.....#.....",
@@ -1029,17 +1028,21 @@ GLYPH_SRC = {
         "......#........",
         "......#........",
     ],
-    "jie": [  # beware
-        "..........#.#..",
-        "..........#..#.",
+    "jie": [  # beware (戒): the halberd stroke on the right, the two-handed base on the left
+        ".............#.",
         "###############",
-        "....#..#..#....",
-        "....#..#..#..#.",
-        "#############..",
-        "....#..#...#.#.",
-        "...#...#....#..",
-        "..#....#...#.#.",
-        ".#.........#..#",
+        "......#.......#",
+        ".....#........#",
+        "....#.........#",
+        "..##########..#",
+        "....#...#.....#",
+        "....#...#....#.",
+        "....#...#....#.",
+        "....#...#...#..",
+        "...#....#..#...",
+        "...#....##.#...",
+        "..#.....#.#....",
+        ".#......###....",
     ],
     "mian": [  # noodles
         "###############",
@@ -3243,13 +3246,16 @@ def panji_textures():
         if gid:
             rows = GLYPH[gid]
             gc = rgb(gcol)
-            oy = 10 if name != "arak" else 14
-            ox = 0 if name != "arak" else -2
-            for y in range(32):
-                for x in range(32):
-                    if rows[y // 2][x // 2] == "#":
+            # the glyph (a 16 x 16 matrix) scaled to fit the cloth inside the borders (x 2..29): 24 px, the wine flag
+            # (free toothed edge from x 26) 22 px; nearest sampling at the pixel centres keeps every stroke
+            size = 24 if name != "arak" else 22
+            ox = 2 + ((28 if name != "arak" else 24) - size) // 2
+            oy = 14 if name != "arak" else 16
+            for y in range(size):
+                for x in range(size):
+                    if rows[int((y + 0.5) * 16 / size)][int((x + 0.5) * 16 / size)] == "#":
                         px, py = x + ox, y + oy
-                        if 0 <= px < 32 and img.get(px, py)[3] > 0:
+                        if 2 <= px <= 29 and img.get(px, py)[3] > 0:
                             img.set(px, py, rgba(gc))
         save(img, os.path.join(PANJI_TEX, name + ".png"))
         out[name] = img

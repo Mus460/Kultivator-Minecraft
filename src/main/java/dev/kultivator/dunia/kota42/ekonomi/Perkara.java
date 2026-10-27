@@ -566,6 +566,8 @@ public final class Perkara {
 		c.putInt("ampd", terima ? 1 : 2);
 		if (terima) {
 			EkonomiApi.beri(player, nb, "kota42.suap");
+			// a bribe is minted money: it counts in the weekly office faucet (42.6.0 "gaji jabatan")
+			Investasi.catatKeran(server, player.getUUID(), Investasi.K_GAJI, nb);
 			TemaApi.tambahInfami(player, INFAMI_SUAP, "suap");
 			Msg.chat(player, Component.translatable("kultivator.kota42.perkara.amplop_terima", NilaiBatu.text(nb)).withStyle(ChatFormatting.DARK_RED));
 		} else {
@@ -625,6 +627,7 @@ public final class Perkara {
 		site.putLong("mds", today + SUASANA_HARI);
 		boolean bribed = c.getIntOr("ampd", 0) == 1;
 		Jabatan.catatPutusan(server, player.getUUID(), bribed);
+		dev.kultivator.dunia.kota42.bicara.TujuanKota.perkara(player, k.templat(), untuk);
 		Jabatan.catatTugasMinggu(server, situs, player.getUUID(), "perkara");
 		Jabatan.catatTugas(player, situs);
 		KotaHidup.lepasSibuk(player, KotaHidup.SIBUK_SIDANG);

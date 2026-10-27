@@ -89,7 +89,8 @@ final class Toko {
 	/** 0.9 from Nama Baik 50 on, else 1. */
 	static double discount(ServerPlayer player, KultivatorNpc npc) {
 		int rep = KotaData.get(player.level().getServer()).reputation(npc.town(), player.getUUID());
-		return rep >= Kota.DISCOUNT_REPUTATION ? 0.9D : 1.0D;
+		// a town office adds its own 3-5 % (42.6.6); the two together stay under the 15 % shop cap of 38.0
+		return (rep >= Kota.DISCOUNT_REPUTATION ? 0.9D : 1.0D) * (1.0D - dev.kultivator.dunia.kota42.ekonomi.Jabatan.diskon(player, npc.town()));
 	}
 
 	private static CompoundTag soldTag(ServerPlayer player, KultivatorNpc npc, long day) {

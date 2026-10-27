@@ -78,7 +78,7 @@ public final class PeringkatSekte {
 				b.putInt("peringkat", i + 1);
 				data.setDirty();
 				if (i == 0 && lama > 1) {
-					Politik.kabar(server, "gabung.peringkat", DiplomasiGabung.nama(server, rows.get(0).sekte()), lama);
+					Politik.kabar(server, "gabung.peringkat", "sekte:" + rows.get(0).sekte(), lama);
 					Politik.kabarAnggota(server, rows.get(0).sekte(), Component.translatable(KEY + "juara",
 							DiplomasiGabung.nama(server, rows.get(0).sekte())), ChatFormatting.GOLD);
 				}

@@ -101,6 +101,10 @@ public final class KotaHidup {
 		dev.kultivator.dunia.kota42.sekte.KotaSekte.init();
 		// 42F Tumbuh & Bangun Kembali:
 		dev.kultivator.dunia.kota42.tumbuh.KotaTumbuh.init();
+		// 42U Layar (sheet builders of every 42 screen):
+		dev.kultivator.dunia.kota42.ui.KotaLayar.init();
+		// 42V-F: the server sender of the visual titik (lanterns, chimneys, banners, street names, gravestones)
+		TitikSiar.init();
 	}
 
 	/** Payload types, blocks, items and entity types of 42, always registered. Safe to call twice. */

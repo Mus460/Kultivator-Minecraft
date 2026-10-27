@@ -3,6 +3,10 @@
 Owners: 41V-P (section 41), 42V-B / 42V-F / D-42V (sections 42). Nobody but **F-END** edits `tools/gen_voices.py` or
 `assets/kultivator/sounds.json` or runs VOICEVOX. Until a clip exists every caller falls back to its listed line.
 
+D-42V check: every `Voice.say` / `VoiceEvents.exists` key in the code is listed below, and `VoiceEvents.GABUNG` (28 keys) and
+`VoiceEvents.KOTA42` (105 keys) equal the tables exactly (133 clips in all; the 5 additions of D-41C and 42D-P are in the lists
+since D-42V). Nothing else in the code asks for a `gabung.*` / `kota42.*` voice.
+
 ## 41 Gabung Sekte (41.11.7, 26 lines, 41V-P)
 
 Group `GABUNG` in `voice/VoiceEvents.java` (keys `gabung.<line>`). It is registered only while
@@ -75,6 +79,22 @@ Ketua Sekte / Sect Master; Pemburu Sekte / Sect Hunter; Ketua Lama / Old Sect Ma
 
 F-END checklist for 41: add the 26 tuples to `WORLD` (speaker ids above are `WORLD_SPEAKER` keys), run the voice pass,
 verify 26 new `.ogg` under `sounds/voice/gabung/` and no old clip changed, then set `VoiceEvents.GABUNG_SIAP = true`.
+
+## D-41C additions (2 lines of 41C-K, 41.6.9 Disciple Tournament and 41.5.7 Shifu lesson)
+
+Used by `hidup/TurnamenMurid` and `hidup/Pelajaran` through `Voice.say`; silent with a chat caption until generated. F-END adds
+`turnamen_juara` and `pelajaran_mulai` to the 41 group `GABUNG` in `voice/VoiceEvents.java` together with the 26 above (28 clips).
+
+| key | speaker (voice) | caption id | fallback | emotion | Japanese |
+|---|---|---|---|---|---|
+| gabung.turnamen_juara | Tetua Sekte di lei tai (elder) | kultivator.voice.gabung.turnamen_juara | elder.advice | joy | 見事だ。今日より、お前が門内一の弟子だ。 |
+| gabung.pelajaran_mulai | Shifu (elder) | kultivator.voice.gabung.pelajaran_mulai | elder.advice | calm | 座れ。今日は一つ、大事なことを教えよう。 |
+
+Captions id_id / en_us:
+- turnamen_juara — "Luar biasa. Mulai hari ini, kaulah murid terbaik perguruan." / "Splendid. From today you are the first disciple of this school."
+- pelajaran_mulai — "Duduklah. Hari ini akan kuajarkan satu hal penting." / "Sit. Today I will teach you one thing that matters."
+
+Speaker captions: Tetua Sekte / Sect Elder; Shifu / Master (both already listed above).
 
 ## 42 Kota yang Hidup (42.12.7 + 42.5A.8, 102 clips, 42V-B)
 
@@ -377,3 +397,47 @@ F-END checklist for 42: add the 102 tuples to `WORLD` (speakers are `WORLD_SPEAK
 Market keeper), run the voice pass, verify 102 new `.ogg` under `sounds/voice/kota42/` and no old clip changed, then
 set `VoiceEvents.KOTA42_SIAP = true`. Synth sounds of 42V-F (`gen_kota_hidup_suara.py`) are listed by 42V-F in a
 `## sounds.json` section below.
+
+## 42D-P additions (3 lines for the ceremonies, 42.7.7)
+
+Used by `Upacara` (guarded by `VoiceEvents.exists`, the bubble text from lang `kota_hidup_peristiwa` always shows). Same group
+and flag as the 102 clips above (`kota42.*`, `KOTA42_SIAP`): F-END adds these 3 tuples to `WORLD` too (105 clips in all).
+
+| key | speaker (voice) | caption id | fallback | emotion | Japanese |
+|---|---|---|---|---|---|
+| kota42.nikah_selamat | Tamu Pesta (f1) | kultivator.voice.kota42.nikah_selamat | gumam.wanita | joy | ご結婚おめでとうございます！末永くお幸せに！ |
+| kota42.makam_sujud | Keluarga Almarhum (m3) | kultivator.voice.kota42.makam_sujud | gumam.pria | sad | どうか、安らかに眠ってください…。 |
+| kota42.sebulan_selamat | Tetangga Tua (elder) | kultivator.voice.kota42.sebulan_selamat | gumam.kakek | joy | 満月おめでとう。丈夫に育つんだよ。 |
+
+Indonesian captions (`en` is written by 42V as for the others):
+- nikah_selamat: "Selamat atas pernikahan kalian! Semoga bahagia selamanya!" / "Congratulations on your wedding! May you be happy forever!"
+- makam_sujud: "Semoga beristirahat dengan tenang..." / "May you rest in peace..."
+- sebulan_selamat: "Selamat sebulan! Tumbuhlah sehat, ya." / "Happy one month! Grow up healthy, little one."
+
+## sounds.json (42V-F: synthesised sounds of 42.12.6, no VOICEVOX)
+
+F-END runs `python tools/gen_kota_hidup_suara.py <repo> --merge-sounds-json` (venv with numpy + soundfile; `C:\Users\Musyaffa\AppData\Local\Temp\kv\Scripts\python.exe`
+has both). It rewrites the 65 clips under `assets/kultivator/sounds/kota42/`, the two beds, the 11 tunes
+`data/kultivator/kota/melodi/*.json` and the lang fragment `lang-src/kota_hidup_subtitle.*.json`, and merges the 60 entries below
+into `sounds.json` (every other entry kept; it deletes only keys starting with `kota42.` and the two `ambient.kota.*` beds of
+this section first). The same 60 entries, ready to paste, are in `docs/progres/m2-42V-F-suara.json`. All sounds are played by
+the client only (`fx/SuaraKota42`, local `SoundEvent`s, no registry entry), so nothing else in Java needs the ids.
+
+| Event (`kultivator:`) | Files under `kota42/` (weighted equally) | Subtitle key (`subtitles.kultivator.`) | Used by |
+|---|---|---|---|
+| `kota42.erhu.0` .. `.11` | `erhu_<n>` | `kota42.erhu` | `MelodiJalan` (busker, night district, wedding/funeral lead) |
+| `kota42.suona.0` .. `.11` | `suona_<n>` | `kota42.suona` | wedding and funeral processions, strolling musicians |
+| `kota42.pipa.0` .. `.11` | `pipa_<n>` | `kota42.pipa` | night district, tea house |
+| `kota42.dizi.0` .. `.11` | `dizi_<n>` | `kota42.dizi` | night district, festival evenings |
+| `kota42.gong.0` .. `.2` | `gong_<n>` (big, medium, small) | `kota42.gong` | night watch strike, processions, lion dance |
+| `kota42.kentongan.0` .. `.2` | `kentongan_<n>` | `kota42.kentongan` | night watch (`ronda` tune) |
+| `kota42.genderang_kecil` | `genderang_kecil_0`, `_1` | `kota42.genderang_kecil` | processions, lion dance |
+| `kota42.balok_kayu` | `balok_kayu_0`, `_1` | `kota42.balok_kayu` | processions, lion dance, market tunes |
+| `kota42.petasan` | `petasan_0` .. `_5` | `kota42.petasan` | `Petasan` strings (weddings, New Year, festivals, plot openings) |
+| `kota42.merpati_peluit` | `merpati_peluit` | `kota42.merpati_peluit` | `MerpatiFx` (flocks that take off or circle) |
+| `ambient.kota.malam_meriah` | `ambient/kota/malam_meriah` (stream) | `ambient.kota.malam_meriah` | `RiuhKota` night-district bed |
+| `ambient.kota.upacara` | `ambient/kota/upacara` (stream) | `ambient.kota.upacara` | `RiuhKota` distant-procession bed |
+
+Subtitles (id / en) are in `lang-src/kota_hidup_subtitle.id_id.json` / `.en_us.json` (10 sound captions, 2 bed captions) together
+with the tune names `kultivator.kota42.melodi.<id>` (11). Credit for CREDITS.md: all of these are synthesised in
+`tools/gen_kota_hidup_suara.py` (own work); the two beds also mix the existing `ambient/kota/jalan` and `kedai` loops.

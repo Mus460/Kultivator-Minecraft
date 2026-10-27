@@ -471,7 +471,7 @@ public final class SosokRender {
 		if (bar >= 0) {
 			kunci = kunci.substring(0, bar);
 		}
-		kunci = kunci.toLowerCase(Locale.ROOT);
+		kunci = dev.kultivator.sosok.RupaKunci.tanpaGaya(kunci.toLowerCase(Locale.ROOT));
 		if (kunci.startsWith("liar.") || kunci.contains("iblis") || kunci.equals("makelar_gelap") || kunci.equals("pembunuh_bayaran")) {
 			return "iblis";
 		}

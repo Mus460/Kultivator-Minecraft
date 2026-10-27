@@ -1,0 +1,66 @@
+{
+  "nama": "kultivator.kota42.perkara.t.warisan_rumah.nama",
+  "teks": "kultivator.kota42.perkara.t.warisan_rumah.teks",
+  "penggugat": {
+    "klaim": "kultivator.kota42.perkara.t.warisan_rumah.klaim_a",
+    "peran": [
+      "warga",
+      "tukang"
+    ]
+  },
+  "tergugat": {
+    "klaim": "kultivator.kota42.perkara.t.warisan_rumah.klaim_b",
+    "peran": [
+      "warga",
+      "petani"
+    ]
+  },
+  "benar": "acak",
+  "saksi": 2,
+  "kesaksian": {
+    "penggugat": [
+      "kultivator.kota42.perkara.t.warisan_rumah.saksi_a1",
+      "kultivator.kota42.perkara.t.warisan_rumah.saksi_a2"
+    ],
+    "tergugat": [
+      "kultivator.kota42.perkara.t.warisan_rumah.saksi_b1",
+      "kultivator.kota42.perkara.t.warisan_rumah.saksi_b2"
+    ]
+  },
+  "dusta": "kultivator.kota42.perkara.t.warisan_rumah.dusta",
+  "bukti": [
+    {
+      "jenis": "catatan",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.warisan_rumah.bukti1_a",
+        "tergugat": "kultivator.kota42.perkara.t.warisan_rumah.bukti1_b"
+      }
+    },
+    {
+      "jenis": "barang",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.warisan_rumah.bukti2_a",
+        "tergugat": "kultivator.kota42.perkara.t.warisan_rumah.bukti2_b"
+      },
+      "barang": "minecraft:book"
+    }
+  ],
+  "putusan": [
+    {
+      "untuk": "penggugat",
+      "teks": "kultivator.kota42.perkara.t.warisan_rumah.putusan1",
+      "akibat": "kultivator.kota42.perkara.t.warisan_rumah.putusan1_akibat"
+    },
+    {
+      "untuk": "tergugat",
+      "teks": "kultivator.kota42.perkara.t.warisan_rumah.putusan2",
+      "akibat": "kultivator.kota42.perkara.t.warisan_rumah.putusan2_akibat"
+    },
+    {
+      "untuk": "damai",
+      "teks": "kultivator.kota42.perkara.t.warisan_rumah.putusan3",
+      "akibat": "kultivator.kota42.perkara.t.warisan_rumah.putusan3_akibat"
+    }
+  ],
+  "suap": 0.3
+}

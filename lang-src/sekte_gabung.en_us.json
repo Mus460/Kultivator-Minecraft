@@ -373,10 +373,10 @@
   "kultivator.gabung.naik.tamu": "A Guest Elder does not rise in rank; their honour is their freedom.",
   "kultivator.gabung.naik.lulus_ujian": "The trial for %s is passed. Request your promotion in the hall.",
   "kultivator.gabung.naik.ujian.luar": "Re-test (repeat the style test, threshold 0.5)",
-  "kultivator.gabung.naik.ujian.dalam": "Inner Disciple Trial (duel an inner disciple or reach floor 5 of the Heavenvoid)",
+  "kultivator.gabung.naik.ujian.dalam": "Inner Disciple Trial (a Sword Duel against an inner disciple on the arena)",
   "kultivator.gabung.naik.ujian.inti": "Top three of the Disciple Tournament or one A-rank mission",
   "kultivator.gabung.naik.ujian.pewaris": "Win the Heir Election",
-  "kultivator.gabung.naik.ujian.tetua": "The Elder Trial of the sect's style",
+  "kultivator.gabung.naik.ujian.tetua": "Elder Trial (the sect's style tested again, bar 0.85)",
   "kultivator.gabung.naik.ujian.wakil": "Support of half the elders or more",
   "kultivator.gabung.syarat.naik.anggota": "A sworn member of a sect",
   "kultivator.gabung.syarat.naik.ranah": "Realm at least %s (now %s)",
@@ -415,5 +415,10 @@
   "kultivator.gabung.aturan.dialog.sumpah.iblis": "\"Good. Now you belong to this mountain. Whoever betrays it never sleeps soundly again.\"",
   "kultivator.gabung.syarat.diusir_kelas": "Expelled from a sect of the same path within 30 days: judged as a %s",
   "kultivator.gabung.naik.uji_ulang_mulai": "Re-test begins: show your sect's style once more. You need 50%.",
-  "kultivator.gabung.naik.uji_ulang_gagal": "Re-test not passed (%s%%, 50%% needed). Try again any time."
+  "kultivator.gabung.naik.uji_ulang_gagal": "Re-test not passed (%s%%, 50%% needed). Try again any time.",
+  "kultivator.gabung.naik.penguji_dalam": "Inner Disciple Examiner",
+  "kultivator.gabung.naik.ujian_dalam.mulai": "Inner Disciple Trial: %s waits for you on the arena. A Sword Duel of %s seconds, stopping at 10%% health. Winning, lasting until time runs out, or bringing the opponent down to half health passes.",
+  "kultivator.gabung.naik.ujian_dalam.gagal": "The examiner beat you. Train on the arena, then ask for promotion again at any time.",
+  "kultivator.gabung.naik.ujian_tetua.mulai": "The Elder Trial begins: your sect's style is tested again, but an elder must reach %s%%.",
+  "kultivator.gabung.naik.ujian_tetua.gagal": "Elder Trial not passed (%s%%, %s%% needed). Ask again at any time."
 }

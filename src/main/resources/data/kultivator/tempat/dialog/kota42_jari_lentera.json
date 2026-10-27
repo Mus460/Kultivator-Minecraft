@@ -1,0 +1,38 @@
+{
+  "pembicara": [
+    "tokoh:lentera_hijau"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest kota42_seribu_jari tahap sandi"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "366",
+      "suara": "kota42.lentera_hijau",
+      "pilihan": [
+        {
+          "syarat": [
+            "bendera kota42.jari.sandi"
+          ],
+          "ke": "jawab",
+          "tampil": true,
+          "alasan": "kultivator.cerita.kota42_jari_lentera.mulai.1.alasan"
+        },
+        {
+          "ke": "usir"
+        }
+      ]
+    },
+    {
+      "id": "usir",
+      "gestur": "366"
+    },
+    {
+      "id": "jawab",
+      "gestur": "tunjuk"
+    }
+  ]
+}

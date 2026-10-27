@@ -25,6 +25,10 @@ public record Titik(String jenis, BlockPos pos, Direction hadap, Map<String, Str
 
 	/** The tool of a {@code kerja:<alat>} point, or the empty string. */
 	public String alat() {
+		String a = data.get("alat"); // 42W kit points alias the clip tool; "alat" keeps the design name
+		if (a != null) {
+			return a;
+		}
 		return jenis.startsWith("kerja:") ? jenis.substring(6) : "";
 	}
 

@@ -208,7 +208,7 @@ public final class LapakKota {
 		t.store("o", UUIDUtil.CODEC, player.getUUID());
 		t.putLong("s", KotaHidup.hari(server) + 7L * w);
 		t.putInt("b", band);
-		KasKota.tambah(server, situs, biaya);
+		KasKota.pajak(server, situs, biaya, "lapak");
 		BukuKas.catat(server, player.getUUID(), LembarKunci.BukuKas.SUMBER_SEWA, 0, -biaya, "kultivator.kota42.lapak.buku.sewa", no, w);
 		berubah(server);
 		TokoPemain.bukaLapak(server, situs, no, player);
@@ -234,7 +234,7 @@ public final class LapakKota {
 			return kirim(player, gagal("uang", NilaiBatu.text(biaya)));
 		}
 		lapakTag(server, situs).getCompoundOrEmpty(Integer.toString(no)).putLong("s", dari + 7L * w);
-		KasKota.tambah(server, situs, biaya);
+		KasKota.pajak(server, situs, biaya, "lapak");
 		BukuKas.catat(server, player.getUUID(), LembarKunci.BukuKas.SUMBER_SEWA, 0, -biaya, "kultivator.kota42.lapak.buku.sewa", no, w);
 		berubah(server);
 		return kirim(player, new RumahKota.Hasil(true, Component.translatable("kultivator.kota42.lapak.diperpanjang", no, dari + 7L * w)));

@@ -1,0 +1,36 @@
+{
+  "pembicara": [
+    "tokoh:shi_xiaoqian"
+  ],
+  "prioritas": 55,
+  "syarat": [
+    "quest kota42_seribu_jari tahap insaf",
+    "!bendera kota42.jari.modal"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "bicara_tangan",
+      "pilihan": [
+        {
+          "syarat": [
+            "nb_pita 15"
+          ],
+          "akibat": [
+            "bayar_pita 15",
+            "bendera kota42.jari.modal"
+          ],
+          "ke": "terima",
+          "tampil": true,
+          "alasan": "kultivator.cerita.kota42_jari_modal.mulai.1.alasan"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "terima",
+      "gestur": "hormat"
+    }
+  ]
+}

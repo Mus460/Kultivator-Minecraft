@@ -78,6 +78,10 @@
                 "t": "Mei"
               }
             ]
+          },
+          {
+            "k": "kultivator.cakap.ekor.sapa.13",
+            "a": []
           }
         ]
       },
@@ -85,8 +89,8 @@
       "gestur": "lambai",
       "seru": null,
       "tik": null,
-      "id_id": "Salam, Yang Tercerahkan Mei. Pertemuan kembali ini menggembirakan.",
-      "en_us": "Greetings, Enlightened One Mei. This reunion is gladdening."
+      "id_id": "Salam, Yang Tercerahkan Mei. Pertemuan kembali ini menggembirakan. Amitaba. Semoga tenang.",
+      "en_us": "Greetings, Enlightened One Mei. This reunion is gladdening. Amitabha. Be at peace."
     },
     {
       "ubah": {
@@ -106,6 +110,10 @@
                 "t": "Han"
               }
             ]
+          },
+          {
+            "k": "kultivator.cakap.ekor.sapa.9.kuno",
+            "a": []
           }
         ]
       },
@@ -113,8 +121,8 @@
       "gestur": "lambai",
       "seru": null,
       "tik": null,
-      "id_id": "Salam pagi, Rekan Daois Han.",
-      "en_us": "Morning greetings, Fellow Daoist Han."
+      "id_id": "Salam pagi, Rekan Daois Han. Hamba mendoakan keselamatanmu.",
+      "en_us": "Morning greetings, Fellow Daoist Han. This one prays for your safety."
     }
   ]
 }

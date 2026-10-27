@@ -1,0 +1,32 @@
+{
+  "pembicara": [
+    "tokoh:zhang_laotou"
+  ],
+  "prioritas": 55,
+  "syarat": [
+    "quest kota42_dua_keluarga aktif",
+    "bendera kota42.dua.surat",
+    "!bendera kota42.dua.dengar_zhang"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "marah_tunjuk",
+      "suara": "kota42.marah",
+      "akibat": [
+        "bendera kota42.dua.dengar_zhang"
+      ],
+      "pilihan": [
+        {
+          "ke": "yakin"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "yakin",
+      "gestur": "berdebat"
+    }
+  ]
+}

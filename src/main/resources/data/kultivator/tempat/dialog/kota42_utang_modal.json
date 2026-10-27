@@ -1,0 +1,36 @@
+{
+  "pembicara": [
+    "tokoh:wu_dalang"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest kota42_utang_tiga_generasi tahap modal",
+    "!bendera kota42.utang.modal_bayar"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "bicara_tangan",
+      "pilihan": [
+        {
+          "syarat": [
+            "nb_pita 12"
+          ],
+          "akibat": [
+            "bayar_pita 12",
+            "bendera kota42.utang.modal_bayar"
+          ],
+          "ke": "terima",
+          "tampil": true,
+          "alasan": "kultivator.cerita.kota42_utang_modal.mulai.1.alasan"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "terima",
+      "gestur": "359"
+    }
+  ]
+}

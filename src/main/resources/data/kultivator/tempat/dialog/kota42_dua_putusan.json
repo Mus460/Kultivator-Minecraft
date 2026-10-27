@@ -1,0 +1,42 @@
+{
+  "pembicara": [
+    "tokoh:bibi_wang"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest kota42_dua_keluarga tahap putusan"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "takut_sembunyi",
+      "pilihan": [
+        {
+          "akibat": [
+            "beri kultivator:kwitansi_sumur",
+            "bendera kota42.dua.damai",
+            "quest_maju kota42_dua_keluarga"
+          ],
+          "ke": "damai"
+        },
+        {
+          "akibat": [
+            "bendera kota42.dua.lari",
+            "quest_maju kota42_dua_keluarga"
+          ],
+          "ke": "lari"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "damai",
+      "gestur": "367"
+    },
+    {
+      "id": "lari",
+      "gestur": "kaget"
+    }
+  ]
+}

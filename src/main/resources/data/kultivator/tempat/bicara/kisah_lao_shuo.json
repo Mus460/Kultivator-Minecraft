@@ -1,0 +1,149 @@
+{
+  "pendongeng": "lao_shuo",
+  "kisah": [
+    {
+      "id": "kera_sakti",
+      "judul": "kultivator.kota42.kisah.kera_sakti.judul",
+      "sumber": "kultivator.kota42.kisah.kera_sakti.sumber",
+      "baris": 8,
+      "simpul": [
+        "kultivator.cerita.kota42_lao_shuo.kera_sakti_1",
+        "kultivator.cerita.kota42_lao_shuo.kera_sakti_2",
+        "kultivator.cerita.kota42_lao_shuo.kera_sakti_3",
+        "kultivator.cerita.kota42_lao_shuo.kera_sakti_4"
+      ]
+    },
+    {
+      "id": "ular_putih",
+      "judul": "kultivator.kota42.kisah.ular_putih.judul",
+      "sumber": "kultivator.kota42.kisah.ular_putih.sumber",
+      "baris": 8,
+      "simpul": [
+        "kultivator.cerita.kota42_lao_shuo.ular_putih_1",
+        "kultivator.cerita.kota42_lao_shuo.ular_putih_2",
+        "kultivator.cerita.kota42_lao_shuo.ular_putih_3",
+        "kultivator.cerita.kota42_lao_shuo.ular_putih_4"
+      ]
+    },
+    {
+      "id": "penggembala",
+      "judul": "kultivator.kota42.kisah.penggembala.judul",
+      "sumber": "kultivator.kota42.kisah.penggembala.sumber",
+      "baris": 7,
+      "simpul": [
+        "kultivator.cerita.kota42_lao_shuo.penggembala_1",
+        "kultivator.cerita.kota42_lao_shuo.penggembala_2",
+        "kultivator.cerita.kota42_lao_shuo.penggembala_3",
+        "kultivator.cerita.kota42_lao_shuo.penggembala_4"
+      ]
+    },
+    {
+      "id": "change",
+      "judul": "kultivator.kota42.kisah.change.judul",
+      "sumber": "kultivator.kota42.kisah.change.sumber",
+      "baris": 7,
+      "simpul": [
+        "kultivator.cerita.kota42_lao_shuo.change_1",
+        "kultivator.cerita.kota42_lao_shuo.change_2",
+        "kultivator.cerita.kota42_lao_shuo.change_3",
+        "kultivator.cerita.kota42_lao_shuo.change_4"
+      ]
+    },
+    {
+      "id": "mulan",
+      "judul": "kultivator.kota42.kisah.mulan.judul",
+      "sumber": "kultivator.kota42.kisah.mulan.sumber",
+      "baris": 7,
+      "simpul": [
+        "kultivator.cerita.kota42_lao_shuo.mulan_1",
+        "kultivator.cerita.kota42_lao_shuo.mulan_2",
+        "kultivator.cerita.kota42_lao_shuo.mulan_3",
+        "kultivator.cerita.kota42_lao_shuo.mulan_4"
+      ]
+    },
+    {
+      "id": "hakim_bao",
+      "judul": "kultivator.kota42.kisah.hakim_bao.judul",
+      "sumber": "kultivator.kota42.kisah.hakim_bao.sumber",
+      "baris": 7,
+      "simpul": [
+        "kultivator.cerita.kota42_lao_shuo.hakim_bao_1",
+        "kultivator.cerita.kota42_lao_shuo.hakim_bao_2",
+        "kultivator.cerita.kota42_lao_shuo.hakim_bao_3",
+        "kultivator.cerita.kota42_lao_shuo.hakim_bao_4"
+      ]
+    },
+    {
+      "id": "delapan_dewa",
+      "judul": "kultivator.kota42.kisah.delapan_dewa.judul",
+      "sumber": "kultivator.kota42.kisah.delapan_dewa.sumber",
+      "baris": 7,
+      "simpul": [
+        "kultivator.cerita.kota42_lao_shuo.delapan_dewa_1",
+        "kultivator.cerita.kota42_lao_shuo.delapan_dewa_2",
+        "kultivator.cerita.kota42_lao_shuo.delapan_dewa_3",
+        "kultivator.cerita.kota42_lao_shuo.delapan_dewa_4"
+      ]
+    },
+    {
+      "id": "yu_gong",
+      "judul": "kultivator.kota42.kisah.yu_gong.judul",
+      "sumber": "kultivator.kota42.kisah.yu_gong.sumber",
+      "baris": 7,
+      "simpul": [
+        "kultivator.cerita.kota42_lao_shuo.yu_gong_1",
+        "kultivator.cerita.kota42_lao_shuo.yu_gong_2",
+        "kultivator.cerita.kota42_lao_shuo.yu_gong_3",
+        "kultivator.cerita.kota42_lao_shuo.yu_gong_4"
+      ]
+    },
+    {
+      "id": "sarjana_rubah",
+      "judul": "kultivator.kota42.kisah.sarjana_rubah.judul",
+      "sumber": "kultivator.kota42.kisah.sarjana_rubah.sumber",
+      "baris": 7,
+      "simpul": [
+        "kultivator.cerita.kota42_lao_shuo.sarjana_rubah_1",
+        "kultivator.cerita.kota42_lao_shuo.sarjana_rubah_2",
+        "kultivator.cerita.kota42_lao_shuo.sarjana_rubah_3",
+        "kultivator.cerita.kota42_lao_shuo.sarjana_rubah_4"
+      ]
+    },
+    {
+      "id": "kupu_kupu",
+      "judul": "kultivator.kota42.kisah.kupu_kupu.judul",
+      "sumber": "kultivator.kota42.kisah.kupu_kupu.sumber",
+      "baris": 7,
+      "simpul": [
+        "kultivator.cerita.kota42_lao_shuo.kupu_kupu_1",
+        "kultivator.cerita.kota42_lao_shuo.kupu_kupu_2",
+        "kultivator.cerita.kota42_lao_shuo.kupu_kupu_3",
+        "kultivator.cerita.kota42_lao_shuo.kupu_kupu_4"
+      ]
+    },
+    {
+      "id": "penjara_iblis",
+      "judul": "kultivator.kota42.kisah.penjara_iblis.judul",
+      "sumber": "kultivator.kota42.kisah.penjara_iblis.sumber",
+      "baris": 7,
+      "simpul": [
+        "kultivator.cerita.kota42_lao_shuo.penjara_iblis_1",
+        "kultivator.cerita.kota42_lao_shuo.penjara_iblis_2",
+        "kultivator.cerita.kota42_lao_shuo.penjara_iblis_3",
+        "kultivator.cerita.kota42_lao_shuo.penjara_iblis_4"
+      ]
+    },
+    {
+      "id": "sekte_awan",
+      "judul": "kultivator.kota42.kisah.sekte_awan.judul",
+      "sumber": "kultivator.kota42.kisah.sekte_awan.sumber",
+      "baris": 7,
+      "simpul": [
+        "kultivator.cerita.kota42_lao_shuo.sekte_awan_1",
+        "kultivator.cerita.kota42_lao_shuo.sekte_awan_2",
+        "kultivator.cerita.kota42_lao_shuo.sekte_awan_3",
+        "kultivator.cerita.kota42_lao_shuo.sekte_awan_4"
+      ]
+    }
+  ]
+}

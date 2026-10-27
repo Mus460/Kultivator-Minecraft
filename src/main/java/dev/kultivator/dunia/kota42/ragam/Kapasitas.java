@@ -199,6 +199,23 @@ public final class Kapasitas {
 	 */
 	public static Sasaran hitung(int[] kapasitas, String[] jenis, int[] tetap, int bebas, int jam, @Nullable String acara, int acaraZona,
 			double kapZona, double lantaiZona, long hari) {
+		return hitung(kapasitas, jenis, tetap, bebas, jam, acara, acaraZona, kapZona, lantaiZona, hari, null);
+	}
+
+	/** Share of the demand seen in the data (what the free residents want right now) in the split of a target; the rest is the table. */
+	static final double BOBOT_MINAT = 0.75D;
+	/** Fewest free residents with a known wish before the observed demand is used at all. */
+	static final int MINAT_MIN = 8;
+
+	/**
+	 * {@link #hitung} with the observed demand: {@code minat[z]} = free residents who want a spot that lies in zone {@code z}
+	 * right now (each wish shared over the zones holding a matching titik, {@code Penyeimbang.hitung}). The split of the free
+	 * residents between zones is {@link #BOBOT_MINAT} what they actually want and the rest the hour table, so a lunch hour
+	 * that sends forty people to the tables, or monks who meditate all night in one court, sets those zones' targets high
+	 * instead of leaving them "over target".
+	 */
+	public static Sasaran hitung(int[] kapasitas, String[] jenis, int[] tetap, int bebas, int jam, @Nullable String acara, int acaraZona,
+			double kapZona, double lantaiZona, long hari, double @Nullable [] minat) {
 		int n = kapasitas.length;
 		double[] m = new double[n];
 		double[] bobot = new double[n];
@@ -214,6 +231,9 @@ public final class Kapasitas {
 			double sisa = Math.max(0, kapasitas[z] - tetap[z]);
 			bobot[z] = sisa * m[z];
 			sum += bobot[z];
+		}
+		if (minat != null) {
+			sum = minatkan(bobot, minat, sum);
 		}
 		// share the free residents by K' x m, never past a zone's room (K - tetap): what a full zone cannot take goes to the
 		// others in the same proportions (water filling), so the targets add up to N_bebas while the place has room
@@ -252,6 +272,23 @@ public final class Kapasitas {
 			lantai[z] = kapasitas[z] >= 4 ? (int) Math.floor(lantaiZona * t) : 0;
 		}
 		return new Sasaran(target, topi, lantai, m, bebas);
+	}
+
+	/** Blends the observed demand into the zone weights (zone weight -> mix of its table share and its demand share); the new sum. */
+	private static double minatkan(double[] bobot, double[] minat, double sum) {
+		double total = 0.0D;
+		for (double v : minat) {
+			total += v;
+		}
+		if (total < MINAT_MIN || sum <= 0.0D) {
+			return sum;
+		}
+		double baru = 0.0D;
+		for (int z = 0; z < bobot.length; z++) {
+			bobot[z] = (1.0D - BOBOT_MINAT) * bobot[z] / sum + BOBOT_MINAT * (z < minat.length ? minat[z] : 0.0D) / total;
+			baru += bobot[z];
+		}
+		return baru;
 	}
 
 	/** Largest-remainder split of {@code total} by {@code bobot}, at least {@code minimal} for every positive weight while possible. */

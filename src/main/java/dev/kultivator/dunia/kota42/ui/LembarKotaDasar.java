@@ -149,6 +149,19 @@ public final class LembarKotaDasar {
 		return true;
 	}
 
+	/**
+	 * Opens {@code layar} at a service anchor block without an NPC (the {@code papan_cabang} sign, a notice board): writes are
+	 * allowed within {@code TempatLayar.JANGKAU} blocks of {@code jangkar}; the place is where the player stands.
+	 */
+	public static boolean bukaDi(ServerPlayer player, String layar, net.minecraft.core.BlockPos jangkar) {
+		CompoundTag tag = bangun(layar, player, -1);
+		if (tag == null) {
+			return false;
+		}
+		TempatLayar.bukaDi(player, layar, jangkar, tag);
+		return true;
+	}
+
 	static @Nullable CompoundTag bangun(String layar, ServerPlayer player, int npcId) {
 		Bangun b = PEMBANGUN.get(layar);
 		if (b == null) {

@@ -383,6 +383,8 @@ public final class Keluar {
 			kel.putInt("ajar." + sekte, kel.getIntOr("ajar." + sekte, 0) + 1);
 			GabungData.get(master.level().getServer()).setDirty();
 			SekteApi.diplomasi().adjust(master.getUUID(), sekte, AJAR_STANDING, "gabung.ajar_warisan");
+			// 41.7.4 / D-41AD: every unblessed lesson sends one more hunter with the next squad
+			dev.kultivator.sekte.gabung.politik.PemburuSekte.tambahRegu(master);
 			Msg.chat(master, Component.translatable("kultivator.gabung.keluar.ajar_warisan", Pemeriksa.nama(sekte), AJAR_STANDING)
 					.withStyle(ChatFormatting.RED));
 			return;

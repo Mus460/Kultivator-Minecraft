@@ -1,0 +1,26 @@
+{
+  "pembicara": [
+    "tokoh:gong_shu"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest kota42_banjir_musim_semi tahap lapor"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "423",
+      "suara": "kota42.mandor",
+      "pilihan": [
+        {
+          "ke": "kuat"
+        }
+      ]
+    },
+    {
+      "id": "kuat",
+      "gestur": "tepuk_tangan"
+    }
+  ]
+}

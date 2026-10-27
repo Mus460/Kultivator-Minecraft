@@ -1,0 +1,37 @@
+{
+  "pemberi": "tokoh:qiu_panitera",
+  "tempat": "kota42",
+  "alur": true,
+  "tahap": [
+    {
+      "id": "warga",
+      "tujuan": [
+        "bicara_warga * x5"
+      ]
+    },
+    {
+      "id": "tetua",
+      "tujuan": [
+        "bicara_warga tahap:tua"
+      ]
+    },
+    {
+      "id": "anak",
+      "tujuan": [
+        "bicara_warga tahap:anak"
+      ]
+    },
+    {
+      "id": "lapor",
+      "tujuan": [
+        "bicara tokoh:qiu_panitera"
+      ],
+      "akibat": [
+        "bendera kota42.catatan_kota",
+        "nama_baik 4",
+        "beri_nb_pita 25",
+        "kota42.kesan tokoh:qiu_panitera 20"
+      ]
+    }
+  ]
+}

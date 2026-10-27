@@ -133,6 +133,10 @@ bulat di dalam game.
 72. [**Penampilan dan Animasi**](#72-penampilan-dan-animasi): Sosok untuk murid dan NPC, setelan detail animasi
 74. [**Gulungan Utama**](#74-gulungan-utama): satu GUI untuk semua menu, delapan bagian, tablet Di Sini, tombol,
     konfirmasi, HUD
+75. [**Gabung Sekte**](#75-gabung-sekte-menjadi-murid-sekte-npc): melamar ke sekte NPC, ujian masuk, sumpah, Shifu, pangkat,
+    paviliun, kediaman, perang, keluar dan pemburu, cabang dan suksesi
+76. [**Kota yang Hidup**](#76-kota-yang-hidup-warga-ekonomi-dan-kehidupan-kota): warga yang menikah dan beranak, percakapan,
+    rumah dan toko, investasi, jabatan, ronda, upacara, sekte di kota, kota tumbuh
 
 ---
 
@@ -10052,5 +10056,68 @@ Tidak ada lagi dua layar berbeda untuk fungsi yang sama.
 * **Pengaturan › Kontrol**: ubah tombol mod langsung di tempat; tombol yang bentrok ditandai. Tautan "Semua tombol
   Minecraft" membuka layar tombol vanilla. Sakelar Langit Sekte, setelan duel dan peringatan cahaya kini ada di
   Pengaturan.
-* Lembar kota 42 (Kota yang Hidup) belum dipetakan; akan dibangun langsung sebagai halaman Gulungan. Rancangan lengkap:
+* Lembar kota 42 (Jabatan, Perkara, Kantor, Pakta, Cabang, Upacara, Kavling, Toko, Gudang) kini halaman Gulungan juga, dibuka dari
+  baris Jasa dialog ([bab 76](#76-kota-yang-hidup-warga-ekonomi-dan-kehidupan-kota)). Rancangan lengkap:
   `docs/rancangan/43-satu-gui.md`; daftar uji `docs/uji/FASE-43.md`.
+* **Uji skala GUI** (op, untuk penguji): `/kultivasi gabung skala <0|2|3|4> [layar]` menata layar Gabung Sekte seolah skala GUI
+  itu (0 = mati); coba skala 2, 3 dan 4 pada tiap halaman.
+
+## 75. Gabung Sekte: Menjadi Murid Sekte NPC
+
+Selain mendirikan sekte sendiri, kamu bisa **bergabung ke salah satu dari delapan sekte NPC**. Tiap sekte punya **kelas** (Kecil,
+Menengah, Besar, Agung, Abadi mengikuti tingkat 1-9; pengaturan `gabungSekte.sebaran` menentukan sebarannya) dan **corak** yang
+menentukan ujian dan suasananya. Semua perintah di bawah juga ada sebagai halaman di Gulungan Utama (bagian Sekte).
+
+* **Mencari sekte**: `/kultivasi gabung direktori` atau halaman Direktori; `info <sekte>` menunjukkan kelas, corak, syarat (ranah,
+  akar roh, Usia Tulang, Infami) dan kondisi masuk. Sekte punya tamu dan utusan yang kadang mengirim **surat Undangan**; juara
+  Turnamen Agung mendapat satu.
+* **Melamar**: `lamar <sekte> [gerbang|token|undangan|pelayan|tamu]`. Lewat **Gerbang** kamu menunggu **Hari Ujian** sekte itu:
+  menaiki **tangga ilusi** (tekanan hati), lalu **Ujian Corak** (sepuluh jenis, mis. Seratus Tebasan, Lima Pilar, Kolam Darah),
+  wawancara tetua, dan putusan. Lulus berarti **Upacara Sumpah** (tiga aturan sekte) dan seorang **Shifu** bernama. Gagal berarti
+  menunggu tiga hari; pelayan dan tamu adalah jalan yang lebih rendah dan lebih longgar.
+* **Pangkat**: Murid Pelayan, Luar, Dalam, Inti, Tetua, sampai Ketua. Naik pangkat butuh **Poin Kontribusi** pribadi dan ujian
+  (`naik`, `tantang <kursi>`; ujian Murid Dalam berupa duel). Halaman Pangkat menunjukkan syarat yang belum terpenuhi.
+* **Hidup di sekte**: **Papan Misi** (misi menurut kelas), tugas harian (sapu, kebun, gerbang), **Paviliun Jasa** (belanja dengan
+  Poin Kontribusi; stok menurut kelas dan corak), **Gua Kediaman** dengan kolam roh, pelajaran Shifu, **Turnamen Murid** (juara
+  dipuji tetua), dan jatah bulanan (`jatah`). `sumbang <NB>` menyumbang ke kas sekte.
+* **Politik dan perang**: halaman Politik menunjukkan kursi, peringkat sekte dan hubungan; **Panggilan Perang** memanggilmu
+  membela gerbang; **Balai Hukum** bisa menegur, mengurung di Tebing Renungan, atau mengusir.
+* **Keluar**: `pamit` (baik-baik, separuh PK beku), **diusir** atau **membelot**. Pembelot diburu **Pemburu Sekte** dan warisan
+  teknik yang tertangkap bisa dihapus; **Tebus Dosa** (cerita) membuka lamaran ulang setelah diusir. Dengan `bolehCabang`,
+  `bolehTamu`, `bolehSuksesi` dan `bolehLebur` kamu bisa menyatukan jalan sendiri dengan sekte itu (cabang, tetua tamu, jadi Ketua
+  lewat suksesi, peleburan).
+* **Tampilan**: jubah dan seragam menurut corak, kubah dan mahkota kelas di atas aula dan puncak sekte; nametag pangkat. Klien
+  mengatur lewat Pengaturan (`gabung.jubahDiAtasZirah`, `gabung.visualKelas`, `gabung.tanggaIlusi`, `gabung.nametagPangkat`).
+* **Suara**: 28 baris suara Jepang bernama (gerbang, tangga, putusan, sumpah, Shifu, hukum, usir, pemburu, suksesi, kelas naik);
+  teksnya selalu tampil sebagai takarir. Kredit: `docs/CREDITS.md`.
+* Uji (op): `/kultivasi uji gabung ...` (daftar, sebaran, dan seterusnya; lihat `docs/uji/FASE-41.md`).
+
+## 76. Kota yang Hidup: Warga, Ekonomi, dan Kehidupan Kota
+
+Kota kini berpenghuni **orang sungguhan**. Kamu bisa berbicara dengan **warga mana pun** (klik kanan); tablet **Jasa** tetap menuju
+lapak lama. Dialog mengikuti jam, cuaca, peristiwa terbaru, suasana hati dan apa yang warga ingat tentangmu. Semua percakapan
+dibuat oleh mesin tata bahasa lokal **tanpa model bahasa**; hasilnya tetap sama bila keadaannya sama.
+
+* **Warga**: punya nama marga, umur, keluarga, sahabat dan musuh; **lahir, menikah, pindah, menua dan meninggal**, sehingga kota
+  berganti generasi dalam sekitar 150 hari dunia. Mereka mengingat perkenalan, bantuan dan utang; berbagi **gosip** satu sama lain;
+  punya kebiasaan (pemabuk di kedai, kakek bermain catur, ibu-ibu bergosip di sumur). Anak warga bisa menjadi calon murid sektemu.
+  `/kultivasi kotaku warga <nama>` membuka kartu warga; `kotaku buku` buku kota.
+* **Ekonomi**: **beli atau sewa rumah** (`kotaku rumah`, kunci rumah, kasur, peti), **toko sendiri** dengan pajangan dan pembeli
+  (`kotaku toko`), **harga dinamis** (kelangkaan, festival, perang), **investasi** pada usaha warga dengan bagi laba mingguan
+  (`investasi`), **gudang** dan **kontrak dagang** (`gudang`, `kontrak`), **pajak** dan **jabatan** (hakim, kepala desa, tetua,
+  menteri; `jabatan`, `perkara`), serta **Pasar Hantu** yang pindah tempat tiap malam. Ada batas keran PK mingguan agar ekonomi
+  tidak jebol.
+* **Kehidupan jalan**: rombongan keliling (pendongeng, pengamen, akrobat, penjual obat), tai chi pagi dan anak ke sekolah, **ronda
+  malam** dengan lentera dan kentongan, copet yang bisa dikejar, perkelahian, kebakaran kecil, hewan kota, musim, dan **upacara**
+  (arak-arakan nikah, pemakaman, sebulan bayi). `kotaku acara` menunjukkan kalender festival.
+* **Sekte dan kota**: sewa **kantor rekrutmen**; **pakta perlindungan** (`kotaku pakta`) memberi upeti dan reputasi;
+  **murid**-mu belanja, bekerja dan berjaga di kota; **cabang sekte** (`kotaku cabang`) berupa toko pil atau balai latihan.
+* **Kota tumbuh**: `kotaku kavling` menunjukkan kavling; tukang membangun bertahap dan ada **peresmian**; kerusakan nyata
+  dibangun kembali (hanya yang benar-benar dirusak), dengan **tugu kenangan**; blokade menghentikan kafilah.
+* **Tampilan dan suara**: interior berbeda per profesi, lentera menyala malam, asap cerobong, panji dan spanduk festival, distrik
+  malam; delapan hewan baru; 65 suara sintetis (erhu, suona, pipa, dizi, gong, kentongan, petasan) dengan melodi; 105 baris suara
+  Jepang bernama dan seruan pendek di awal gelembung ucapan. Setelan HUD `kota_kejar` dan `kota_irama` ada di Pengaturan.
+* Uji (op): `/kultivasi uji kota_hidup ...` (warga, ragam, sebaran, cakap, bicara, tolong, tokoh, gosip, jalan, ekonomi, acara,
+  hewan, tumbuh, sekte, kompat, anggaran; lihat `docs/uji/FASE-42.md`).
+* Kompatibel dengan Terralith, Tectonic, Structory, Dungeons and Taverns, Lithostitched, Amplified Nether dan Nullscape: kota dan
+  kompleks hanya muncul di chunk baru dan menghindari struktur mod-mod itu.

@@ -236,7 +236,8 @@ public final class SyaratMasuk {
 			int tunggu = lalu.status().jedaHari();
 			if (tunggu < 0) {
 				out.add(new Baris(false, "pembelot", new Object[]{nama}));
-			} else if (hari - lalu.hari() < tunggu) {
+			} else if (hari - lalu.hari() < tunggu
+					&& !(lalu.status() == StatusKeluar.DIUSIR && dev.kultivator.sekte.gabung.dunia.CeritaGabung.sudahTebus(player, sekte))) {
 				out.add(new Baris(false, "riwayat", new Object[]{lalu.status().nama(), tunggu - (hari - lalu.hari())}));
 			}
 		}

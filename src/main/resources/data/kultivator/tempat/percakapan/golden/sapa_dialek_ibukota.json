@@ -63,7 +63,7 @@
         }
       },
       "harap": {
-        "k": "kultivator.cakap.sapa.kenal.3",
+        "k": "kultivator.cakap.sapa.kenal.1",
         "a": [
           {
             "k": "kultivator.cakap.lex.tuan.ibukota",
@@ -75,8 +75,8 @@
       "gestur": "lambai",
       "seru": null,
       "tik": null,
-      "id_id": "Ah, kau rupanya, Tuanku. Mampir?",
-      "en_us": "Ah, it's you, My Lord. Dropping by?"
+      "id_id": "Tuanku! Apa kabar?",
+      "en_us": "My Lord! How are you?"
     },
     {
       "ubah": {
@@ -100,11 +100,14 @@
         }
       },
       "harap": {
-        "k": "kultivator.cakap.sapa.pagi.2",
+        "k": "kultivator.cakap.sapa.pagi.0",
         "a": [
           {
             "k": "kultivator.cakap.lex.tuan.ibukota",
             "a": []
+          },
+          {
+            "t": ""
           }
         ]
       },
@@ -112,8 +115,8 @@
       "gestur": "lambai",
       "seru": null,
       "tik": null,
-      "id_id": "Pagi yang cerah, Tuanku. Semoga harimu lancar.",
-      "en_us": "A bright morning, My Lord. May your day go smoothly."
+      "id_id": "Selamat pagi, Tuanku!",
+      "en_us": "Good morning, My Lord!"
     },
     {
       "ubah": {
@@ -138,14 +141,19 @@
       },
       "harap": {
         "k": "kultivator.cakap.sapa.pekerja.4",
-        "a": []
+        "a": [
+          {
+            "k": "kultivator.cakap.ekor.sapa.0",
+            "a": []
+          }
+        ]
       },
       "aturan": "sapa.pekerja",
       "gestur": "seka_keringat",
       "seru": null,
       "tik": null,
-      "id_id": "Salam! Jangan berdiri di situ, nanti kena serbuk kayu.",
-      "en_us": "Greetings! Don't stand there; you'll get sawdust on you."
+      "id_id": "Salam! Jangan berdiri di situ, nanti kena serbuk kayu. Semoga harimu lancar.",
+      "en_us": "Greetings! Don't stand there; you'll get sawdust on you. May your day go smoothly."
     },
     {
       "ubah": {
@@ -175,7 +183,7 @@
         }
       },
       "harap": {
-        "k": "kultivator.cakap.sapa.malam.1",
+        "k": "kultivator.cakap.sapa.sopan.malam.1",
         "a": [
           {
             "k": "kultivator.cakap.lex.nona.ibukota",
@@ -183,12 +191,12 @@
           }
         ]
       },
-      "aturan": "sapa.malam",
-      "gestur": "lambai",
+      "aturan": "sapa.sopan.malam",
+      "gestur": "hormat",
       "seru": null,
       "tik": null,
-      "id_id": "Malam, Nona yang mulia. Jangan lewat gang gelap, ya.",
-      "en_us": "Evening, Gracious Lady. Stay out of the dark alleys."
+      "id_id": "Selamat malam, Nona yang mulia. Bila mencari penginapan, ada yang masih buka di ujung jalan.",
+      "en_us": "Good evening, Gracious Lady. If you seek lodging, one is still open at the end of the lane."
     }
   ]
 }

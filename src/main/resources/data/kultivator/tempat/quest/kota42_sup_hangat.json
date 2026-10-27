@@ -1,0 +1,52 @@
+{
+  "pemberi": "tokoh:nenek_tang",
+  "tempat": "kota42",
+  "alur": true,
+  "tahap": [
+    {
+      "id": "bahan",
+      "tujuan": [
+        "antar minecraft:beetroot tokoh:nenek_tang x2",
+        "antar minecraft:carrot tokoh:nenek_tang x2",
+        "antar minecraft:brown_mushroom tokoh:nenek_tang",
+        "antar minecraft:red_mushroom tokoh:nenek_tang",
+        "antar minecraft:dried_kelp tokoh:nenek_tang",
+        "antar kultivator:hidangan/sup_ginseng_roh tokoh:nenek_tang"
+      ]
+    },
+    {
+      "id": "bagi",
+      "tujuan": [
+        "bendera kota42.sup.bagi"
+      ],
+      "akibat": [
+        "beri kultivator:resep_sup",
+        "kota42.resep kultivator:sup_hangat",
+        "kota42.kesan tokoh:nenek_tang 30",
+        "nama_baik 3",
+        "kabar kota42_sup_bagi pemain"
+      ]
+    },
+    {
+      "id": "musim_depan",
+      "tujuan": [
+        "hadir_upacara makam tokoh:nenek_tang"
+      ],
+      "akibat_masuk": [
+        "kota42.pensiun tokoh:nenek_tang"
+      ],
+      "batas_hari": 60,
+      "gagal_ke": "cucu"
+    },
+    {
+      "id": "cucu",
+      "tujuan": [
+        "bendera kota42.sup.rahasia"
+      ],
+      "akibat": [
+        "kota42.kesan tokoh:tang_xiaomi 40",
+        "kabar kota42_sup_cucu"
+      ]
+    }
+  ]
+}

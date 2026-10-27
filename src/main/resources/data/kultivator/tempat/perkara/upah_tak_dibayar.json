@@ -1,0 +1,67 @@
+{
+  "nama": "kultivator.kota42.perkara.t.upah_tak_dibayar.nama",
+  "teks": "kultivator.kota42.perkara.t.upah_tak_dibayar.teks",
+  "penggugat": {
+    "klaim": "kultivator.kota42.perkara.t.upah_tak_dibayar.klaim_a",
+    "peran": [
+      "tukang",
+      "kuli",
+      "pelayan"
+    ]
+  },
+  "tergugat": {
+    "klaim": "kultivator.kota42.perkara.t.upah_tak_dibayar.klaim_b",
+    "peran": [
+      "pemilik_teh",
+      "pedagang_keliling",
+      "pemilik_penginapan"
+    ]
+  },
+  "benar": "acak",
+  "saksi": 2,
+  "kesaksian": {
+    "penggugat": [
+      "kultivator.kota42.perkara.t.upah_tak_dibayar.saksi_a1",
+      "kultivator.kota42.perkara.t.upah_tak_dibayar.saksi_a2"
+    ],
+    "tergugat": [
+      "kultivator.kota42.perkara.t.upah_tak_dibayar.saksi_b1",
+      "kultivator.kota42.perkara.t.upah_tak_dibayar.saksi_b2"
+    ]
+  },
+  "dusta": "kultivator.kota42.perkara.t.upah_tak_dibayar.dusta",
+  "bukti": [
+    {
+      "jenis": "catatan",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.upah_tak_dibayar.bukti1_a",
+        "tergugat": "kultivator.kota42.perkara.t.upah_tak_dibayar.bukti1_b"
+      }
+    },
+    {
+      "jenis": "gosip",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.upah_tak_dibayar.bukti2_a",
+        "tergugat": "kultivator.kota42.perkara.t.upah_tak_dibayar.bukti2_b"
+      }
+    }
+  ],
+  "putusan": [
+    {
+      "untuk": "penggugat",
+      "teks": "kultivator.kota42.perkara.t.upah_tak_dibayar.putusan1",
+      "akibat": "kultivator.kota42.perkara.t.upah_tak_dibayar.putusan1_akibat"
+    },
+    {
+      "untuk": "tergugat",
+      "teks": "kultivator.kota42.perkara.t.upah_tak_dibayar.putusan2",
+      "akibat": "kultivator.kota42.perkara.t.upah_tak_dibayar.putusan2_akibat"
+    },
+    {
+      "untuk": "damai",
+      "teks": "kultivator.kota42.perkara.t.upah_tak_dibayar.putusan3",
+      "akibat": "kultivator.kota42.perkara.t.upah_tak_dibayar.putusan3_akibat"
+    }
+  ],
+  "suap": 0.4
+}

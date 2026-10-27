@@ -1,0 +1,48 @@
+{
+  "pembicara": [
+    "tokoh:bibi_zhang"
+  ],
+  "prioritas": 40,
+  "syarat": [
+    "quest kota42_dua_keluarga baru",
+    "hari 2"
+  ],
+  "sekali": true,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "bisik",
+      "suara": "kota42.gosip_bisik",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai kota42_dua_keluarga"
+          ],
+          "ke": "terima"
+        },
+        {
+          "ke": "sebab"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "sebab",
+      "gestur": "bicara_tangan",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai kota42_dua_keluarga"
+          ],
+          "ke": "terima"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "terima",
+      "gestur": "414"
+    }
+  ]
+}

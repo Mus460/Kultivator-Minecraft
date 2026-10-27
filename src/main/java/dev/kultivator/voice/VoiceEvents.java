@@ -92,24 +92,24 @@ public final class VoiceEvents {
 	public static final List<String> SEKTE_LANGIT = List.of("bajak_datang", "longbo_datang", "longbo_kalah", "tamu_salam", "utusan_salam",
 			"utusan_tantang");
 	/**
-	 * DESIGN 41.11.7 (41V-P, docs/progres/m2-voices.md): Gabung Sekte, joining an NPC sect (the gate call, the test stair,
+	 * DESIGN 41.11.7 (41V-P, docs/progres/m2-voices.md): Gabung Sekte, 28 clips, joining an NPC sect (the gate call, the test stair,
 	 * the verdict, the oath, the Shifu, senior and rival, war, the Hall of Law, leaving, the hunters, succession, the guest
-	 * elder, a class rising); keys {@code gabung.<line>}.
+	 * elder, a class rising, the tournament champion, the Shifu's lesson); keys {@code gabung.<line>}.
 	 */
 	public static final List<String> GABUNG = List.of("gerbang_panggil", "tangga_tekanan", "ujian_mulai", "ujian_lulus", "ujian_gagal", "diterima",
 			"istimewa", "sumpah_aturan_1", "sumpah_aturan_2", "sumpah_aturan_3", "shifu_pilih", "shifu_lindungi", "shifu_lampaui", "sapa_adik",
 			"sapa_kakak", "saingan_ejek", "panggilan_perang", "hukum_tegur", "hukum_kurung", "usir", "pamit", "pemburu", "ketua_serah", "ketua_baru",
-			"tamu_sambut", "naik_kelas");
+			"tamu_sambut", "naik_kelas", "turnamen_juara", "pelajaran_mulai");
 	/**
 	 * True once the {@link #GABUNG} clips are in {@code sounds.json} (the voice pass F-END sets it). While false the group
 	 * is not registered, so {@link #exists} is false and every 41 caller keeps its listed fallback line (41.11.7) instead
 	 * of playing an empty event.
 	 */
-	public static final boolean GABUNG_SIAP = false;
+	public static final boolean GABUNG_SIAP = true;
 	/**
-	 * DESIGN 42.12.7 + 42.5A.8 (42V-B, docs/progres/m2-voices.md): Kota yang Hidup, 102 clips: 78 town lines (greetings,
+	 * DESIGN 42.12.7 + 42.5A.8 (42V-B, docs/progres/m2-voices.md): Kota yang Hidup, 105 clips: 81 town lines (greetings,
 	 * gossip, the night watch's five calls, street events, weddings and funerals, the recruitment office, the protecting
-	 * sect, growth, the night district, festivals, the court, the named characters) and 24 short interjections played at
+	 * sect, growth, the night district, festivals, the court, the ceremonies' guests, the named characters) and 24 short interjections played at
 	 * the start of a speech bubble ({@code seru.*}; an {@code _l}/{@code _p} pair is chosen by the speaker's sex); keys
 	 * {@code kota42.<line>}.
 	 */
@@ -124,13 +124,14 @@ public final class VoiceEvents {
 			"pejabat_sapa", "putusan", "suap", "pajak_keluh", "cucu_cerita", "ah_qin", "lao_geng_pamit", "xiao_bang", "xiao_yu", "seru.ya_l",
 			"seru.ya_p", "seru.eh_l", "seru.eh_p", "seru.hmm_l", "seru.hmm_p", "seru.oh_l", "seru.oh_p", "seru.tawa_l", "seru.tawa_p", "seru.cih",
 			"seru.aduh_l", "seru.aduh_p", "seru.terima_kasih_l", "seru.terima_kasih_p", "seru.maaf_l", "seru.maaf_p", "seru.wah_anak",
-			"seru.tetua_hmm", "seru.tetua_marah", "seru.mabuk", "seru.bisik_p", "seru.takut_p", "seru.setuju_l");
+			"seru.tetua_hmm", "seru.tetua_marah", "seru.mabuk", "seru.bisik_p", "seru.takut_p", "seru.setuju_l", "nikah_selamat",
+			"makam_sujud", "sebulan_selamat");
 	/**
 	 * True once the {@link #KOTA42} clips are in {@code sounds.json} (the voice pass F-END sets it). While false the group
 	 * is not registered, so {@link #exists} is false and every 42 caller keeps its text bubble (and the old
 	 * {@code kotabesar.*}/{@code tempat.*} clips or the far murmurs it falls back to, 42.12.7).
 	 */
-	public static final boolean KOTA42_SIAP = false;
+	public static final boolean KOTA42_SIAP = true;
 	/**
 	 * Kota yang Hidup (docs/progres/suara-kota.md): the far murmurs under the residents' gestured talks, voice type
 	 * ({@code pria}, {@code wanita}, {@code kakek}, {@code nenek}, {@code anak}) to its line count; keys {@code gumam.<tipe>.<n>}.

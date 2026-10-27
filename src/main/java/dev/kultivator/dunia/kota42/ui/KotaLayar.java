@@ -335,7 +335,47 @@ public final class KotaLayar {
 						Component.translatable(K + "jasa." + layar + ".catatan"), false, null));
 			}
 		}
+		// 42E: the protector of a held town offers the pact, the clerk of the player's own recruitment office the office sheet
+		if (role == NpcRole.JUARA_SEKTE) {
+			out.add(jasaSekte(KotaLembar.Pakta.LAYAR, LembarKunci.Ikon.TIMBANGAN));
+		} else if (role == NpcRole.PETUGAS_GILDA
+				&& dev.kultivator.dunia.kota42.sekte.KantorRekrut.kantor(TempatDialog.situs(player), player.getUUID()) != null) {
+			out.add(jasaSekte(KotaLembar.Kantor.LAYAR, IKON_BUKU));
+		}
+		jasaBalai(out, player, role);
 		return out;
+	}
+
+	/** Roles that sit in a town's hall and serve the office sheet, the court sheet and the lots sheet. */
+	private static final Set<NpcRole> BALAI_JABATAN = Set.of(NpcRole.HAKIM, NpcRole.KEPALA_DESA, NpcRole.TETUA_DESA, NpcRole.MENTERI);
+	private static final Set<NpcRole> BALAI_KAVLING = Set.of(NpcRole.KEPALA_DESA, NpcRole.TETUA_DESA, NpcRole.MENTERI, NpcRole.TUAN_BENTENG);
+
+	/**
+	 * The hall's own sheets (D-42U; they opened only from the read-only hub before): the office of the player in this town
+	 * (every official), the cases of the court (the judge; locked below the deputy judge's rank, with the reason) and the
+	 * town's growth lots (the heads and the lord of the keep, when the town has lots).
+	 */
+	private static void jasaBalai(List<TempatDialog.JasaEntri> out, ServerPlayer player, NpcRole role) {
+		long situs = TempatDialog.situs(player);
+		if (BALAI_JABATAN.contains(role) && dev.kultivator.dunia.kota42.ekonomi.Jabatan.aktif()) {
+			out.add(new TempatDialog.JasaEntri(KotaLembar.Jabatan.LAYAR, Component.translatable(K + "jasa." + KotaLembar.Jabatan.LAYAR),
+					LembarKunci.Ikon.CAP_MERAH, Component.translatable(K + "jasa." + KotaLembar.Jabatan.LAYAR + ".catatan"), false, null));
+		}
+		if (role == NpcRole.HAKIM && dev.kultivator.dunia.kota42.ekonomi.Jabatan.aktif()) {
+			boolean hakim = situs != 0L && dev.kultivator.dunia.kota42.ekonomi.Jabatan.pangkat(player.getUUID(), situs) >= KotaLembar.Jabatan.HAKIM_PEMBANTU;
+			out.add(new TempatDialog.JasaEntri(KotaLembar.Perkara.LAYAR, Component.translatable(K + "jasa." + KotaLembar.Perkara.LAYAR),
+					LembarKunci.Ikon.YAMEN, Component.translatable(K + "jasa." + KotaLembar.Perkara.LAYAR + ".catatan"), !hakim,
+					hakim ? null : Component.translatable(K + "jasa." + KotaLembar.Perkara.LAYAR + ".kunci")));
+		}
+		if (BALAI_KAVLING.contains(role) && situs != 0L && !dev.kultivator.dunia.kota42.tumbuh.Kavling.daftar(situs).isEmpty()) {
+			out.add(new TempatDialog.JasaEntri(KotaLembar.Kavling.LAYAR, Component.translatable(K + "jasa." + KotaLembar.Kavling.LAYAR),
+					LembarKunci.Ikon.BEBAS_PERTAMA + 14, Component.translatable(K + "jasa." + KotaLembar.Kavling.LAYAR + ".catatan"), false, null));
+		}
+	}
+
+	private static TempatDialog.JasaEntri jasaSekte(String layar, int ikon) {
+		return new TempatDialog.JasaEntri(layar, Component.translatable(K + "jasa." + layar), ikon,
+				Component.translatable(K + "jasa." + layar + ".catatan"), false, null);
 	}
 
 	/** Tempat atlas slots of the 38UI additions: 121 book, 123 key (client {@code IkonTempat.BUKU}/{@code KUNCI}). */

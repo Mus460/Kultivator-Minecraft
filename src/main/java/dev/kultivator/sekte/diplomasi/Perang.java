@@ -352,11 +352,13 @@ public final class Perang {
 			return 0;
 		}
 		DiplomasiData data = DiplomasiData.get(server);
+		String induk = dev.kultivator.sekte.gabung.politik.Cabang.induk(server, owner);
 		int score = 0;
 		for (SekteNpc sect : data.sects()) {
 			Relasi r = data.peek(owner, sect.id);
 			if (r != null && r.pakta == Relasi.PAKTA_SEKUTU) {
-				score += sect.tier * 4;
+				// D-41AD (41.8.2): the mother sect of a branch hall stands twice as strong behind it
+				score += sect.tier * (sect.id.equals(induk) ? 8 : 4);
 			}
 		}
 		return score;
@@ -378,6 +380,15 @@ public final class Perang {
 		boolean sacked = result == SectRaids.RES_SACKED || result == SectRaids.RES_DATA_SACKED;
 		boolean repelled = result == SectRaids.RES_REPELLED || result == SectRaids.RES_DATA_REPELLED;
 		r.note(today, Component.translatable(GeneratorNama.KEY + (sacked ? "kronik.serbuan_jarah" : repelled ? "kronik.serbuan_tolak" : "kronik.serbuan_tahan")));
+		if (repelled) {
+			// D-41AD (41.8.4): a hall that holds against the enemy of its member's sect adds +10 to the sect's war score
+			String mother = dev.kultivator.sekte.gabung.api.GabungApi.anggota(owner).sekteAktif();
+			dev.kultivator.sekte.diplomasi.DiplomasiGabung.Perang war = mother == null ? null
+					: dev.kultivator.sekte.diplomasi.DiplomasiGabung.perang(server, mother);
+			if (war != null && war.lawan().equals(sect.id)) {
+				dev.kultivator.sekte.diplomasi.DiplomasiGabung.perangSkor(server, mother, 10, "aula_tahan");
+			}
+		}
 		if (r.perang) {
 			if (sacked) {
 				r.perangKalah++;
@@ -405,18 +416,27 @@ public final class Perang {
 		if (server == null || hall == null || max <= 0) {
 			return;
 		}
+		// D-41AD (41.8.2): a branch hall also gets its mother sect's guards (2 -> 4), mother's guards come first
+		String induk = dev.kultivator.sekte.gabung.politik.Cabang.induk(server, owner);
+		if (induk != null) {
+			max += 2;
+		}
 		ServerLevel level = server.getLevel(hall.dim());
 		if (level == null) {
 			return;
 		}
 		DiplomasiData data = DiplomasiData.get(server);
 		List<DiscipleEntity> guards = new ArrayList<>();
-		for (SekteNpc sect : data.sects()) {
+		List<SekteNpc> order = new ArrayList<>(data.sects());
+		if (induk != null) {
+			order.sort(java.util.Comparator.comparing((SekteNpc x) -> !x.id.equals(induk)));
+		}
+		for (SekteNpc sect : order) {
 			Relasi r = data.peek(owner, sect.id);
 			if (r == null || r.pakta != Relasi.PAKTA_SEKUTU) {
 				continue;
 			}
-			for (int i = 0; i < 2 && guards.size() < max; i++) {
+			for (int i = 0; i < (sect.id.equals(induk) ? 4 : 2) && guards.size() < max; i++) {
 				double angle = level.getRandom().nextDouble() * Math.PI * 2.0D;
 				BlockPos at = Tubuh.ground(level, hall.pos().offset((int) Math.round(Math.cos(angle) * 4.0D), 0, (int) Math.round(Math.sin(angle) * 4.0D)));
 				DiscipleEntity guard = Tubuh.spawn(level, Vec3.atBottomCenterOf(at), sect, sect.memberRankStep(i) + 2, 40 + i,

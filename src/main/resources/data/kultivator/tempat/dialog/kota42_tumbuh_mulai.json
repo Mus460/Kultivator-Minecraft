@@ -1,0 +1,48 @@
+{
+  "pembicara": [
+    "tokoh:gong_shu"
+  ],
+  "prioritas": 30,
+  "syarat": [
+    "hari 6"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "420",
+      "prop": "224",
+      "suara": "kota42.mandor",
+      "pilihan": [
+        {
+          "syarat": [
+            "quest kota42_kota_tumbuh baru"
+          ],
+          "akibat": [
+            "quest_mulai kota42_kota_tumbuh"
+          ],
+          "ke": "bantu"
+        },
+        {
+          "ke": "kitab"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "bantu",
+      "gestur": "tunjuk"
+    },
+    {
+      "id": "kitab",
+      "gestur": "membaca",
+      "prop": "kitab",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

@@ -121,7 +121,8 @@ final class Perkelahian extends PeristiwaJalan.Kejadian {
 			List<Titik> kedai = PeristiwaJalan.titik(huni, "kerja:teko", "meja_makan");
 			for (KultivatorNpc npc : bodies) {
 				Warga w = WargaApi.dari(npc);
-				if (w == null || !layak(w) || !w.pria()) {
+				// the hot-tempered always qualify, the drunk usually, the placid half of the time (Kebiasaan.faktorKelahi)
+				if (w == null || !layak(w) || !w.pria() || level.getRandom().nextDouble() * 2.0D >= dev.kultivator.dunia.kota42.warga.Kebiasaan.faktorKelahi(w)) {
 					continue;
 				}
 				boolean dekatKedai = kedai.isEmpty();
@@ -233,7 +234,7 @@ final class Perkelahian extends PeristiwaJalan.Kejadian {
 			if (penjaga.isRemoved() || penjaga.distanceToSqr(Vec3.atCenterOf(pusat)) < 3.0D * 3.0D || now - penjagaT >= PENJAGA_MAKS) {
 				if (!penjaga.isRemoved()) {
 					PeristiwaJalan.seru(penjaga, "kota42.lerai", "kelahi.penjaga");
-					HidupApi.klip(penjaga, GerakId.MARAH_TUNJUK, 0, 40);
+					HidupApi.klip(penjaga, KotaGerakId.LERAI, 0, 80);
 				}
 				bubar(level, "penjaga", null);
 				return true;
@@ -371,7 +372,8 @@ final class Perkelahian extends PeristiwaJalan.Kejadian {
 			KultivatorNpc winner = winA ? ta : tb;
 			if (loser != null) {
 				SosokApi.henti(loser);
-				HidupApi.klip(loser, GerakId.BERLUTUT, 0, 120);
+				// the guard has arrived: the loser groans with a slap on the forehead, otherwise he kneels
+				HidupApi.klip(loser, "penjaga".equals(sebab) ? KotaGerakId.MENEPUK_JIDAT : GerakId.BERLUTUT, 0, "penjaga".equals(sebab) ? 40 : 120);
 			}
 			if (winner != null) {
 				SosokApi.henti(winner);

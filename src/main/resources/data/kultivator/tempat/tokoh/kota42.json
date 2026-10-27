@@ -1,0 +1,1412 @@
+{
+  "tokoh": [
+    {
+      "id": "lao_shuo",
+      "nama_han": "老说",
+      "peran": "pendongeng",
+      "perempuan": false,
+      "umur": 70,
+      "watak": "bijak",
+      "suara": "elder",
+      "suara_tubuh": 1,
+      "abadi": true,
+      "tempat": "keliling",
+      "lokasi": [
+        "teh",
+        "panggung"
+      ],
+      "kebiasaan": [
+        "pencerita_anak",
+        "pecinta_teh"
+      ],
+      "keluarga": [],
+      "jadwal": "rombongan",
+      "hewan": false,
+      "rupa": "",
+      "nama": "kultivator.cerita.tokoh.lao_shuo",
+      "gelar": "kultivator.cerita.tokoh.lao_shuo.gelar",
+      "riwayat": "kultivator.kota42.tokoh.lao_shuo.riwayat",
+      "dialog": [
+        "kota42_lagu_lao_shuo",
+        "kota42_lao_shuo"
+      ],
+      "alur": []
+    },
+    {
+      "id": "ah_qin",
+      "nama_han": "阿琴",
+      "peran": "pengamen",
+      "perempuan": true,
+      "umur": 45,
+      "watak": "jujur",
+      "suara": "f2",
+      "suara_tubuh": 4,
+      "abadi": false,
+      "tempat": "keliling",
+      "lokasi": [
+        "jembatan",
+        "pasar_pagi_1",
+        "teh"
+      ],
+      "kebiasaan": [
+        "pemain_erhu"
+      ],
+      "keluarga": [],
+      "jadwal": "pengamen",
+      "hewan": false,
+      "rupa": "",
+      "nama": "kultivator.cerita.tokoh.ah_qin",
+      "gelar": "kultivator.cerita.tokoh.ah_qin.gelar",
+      "riwayat": "kultivator.kota42.tokoh.ah_qin.riwayat",
+      "dialog": [
+        "kota42_lagu_ah_qin",
+        "kota42_lagu_main"
+      ],
+      "alur": [
+        "kota42_lagu_jembatan"
+      ]
+    },
+    {
+      "id": "hong_ling",
+      "nama_han": "红绫",
+      "peran": "akrobat",
+      "perempuan": true,
+      "umur": 50,
+      "watak": "ramah",
+      "suara": "f1",
+      "suara_tubuh": 3,
+      "abadi": true,
+      "tempat": "keliling",
+      "lokasi": [
+        "panggung",
+        "teh"
+      ],
+      "kebiasaan": [],
+      "keluarga": [
+        {
+          "hubungan": "murid",
+          "tokoh": "yan_feiyan"
+        },
+        {
+          "hubungan": "murid",
+          "tokoh": "yan_feihu"
+        },
+        {
+          "hubungan": "rekan",
+          "tokoh": "lao_shuo"
+        }
+      ],
+      "jadwal": "rombongan",
+      "hewan": false,
+      "rupa": "",
+      "nama": "kultivator.cerita.tokoh.hong_ling",
+      "gelar": "kultivator.cerita.tokoh.hong_ling.gelar",
+      "riwayat": "kultivator.kota42.tokoh.hong_ling.riwayat",
+      "dialog": [
+        "kota42_sapa_hong_ling"
+      ],
+      "alur": []
+    },
+    {
+      "id": "yan_feiyan",
+      "nama_han": "燕飞燕",
+      "peran": "akrobat",
+      "perempuan": true,
+      "umur": 19,
+      "watak": "ramah",
+      "suara": "f3",
+      "suara_tubuh": 5,
+      "abadi": false,
+      "tempat": "keliling",
+      "lokasi": [
+        "panggung"
+      ],
+      "kebiasaan": [],
+      "keluarga": [
+        {
+          "hubungan": "adik",
+          "tokoh": "yan_feihu"
+        }
+      ],
+      "jadwal": "rombongan",
+      "hewan": false,
+      "rupa": "",
+      "nama": "kultivator.cerita.tokoh.yan_feiyan",
+      "gelar": "kultivator.cerita.tokoh.yan_feiyan.gelar",
+      "riwayat": "kultivator.kota42.tokoh.yan_feiyan.riwayat",
+      "dialog": [
+        "kota42_feihu_mulai",
+        "kota42_sapa_yan_feiyan"
+      ],
+      "alur": [
+        "kota42_hati_feihu"
+      ]
+    },
+    {
+      "id": "yan_feihu",
+      "nama_han": "燕飞虎",
+      "peran": "akrobat",
+      "perempuan": false,
+      "umur": 17,
+      "watak": "sombong",
+      "suara": "m3",
+      "suara_tubuh": 2,
+      "abadi": false,
+      "tempat": "keliling",
+      "lokasi": [
+        "panggung"
+      ],
+      "kebiasaan": [],
+      "keluarga": [
+        {
+          "hubungan": "kakak",
+          "tokoh": "yan_feiyan"
+        }
+      ],
+      "jadwal": "rombongan",
+      "hewan": false,
+      "rupa": "",
+      "nama": "kultivator.cerita.tokoh.yan_feihu",
+      "gelar": "kultivator.cerita.tokoh.yan_feihu.gelar",
+      "riwayat": "kultivator.kota42.tokoh.yan_feihu.riwayat",
+      "dialog": [
+        "kota42_feihu_dengar",
+        "kota42_feihu_putus",
+        "kota42_sapa_yan_feihu"
+      ],
+      "alur": []
+    },
+    {
+      "id": "hu_lu",
+      "nama_han": "胡卢",
+      "peran": "penjual_obat",
+      "perempuan": false,
+      "umur": 40,
+      "watak": "licik",
+      "suara": "m2",
+      "suara_tubuh": 1,
+      "abadi": true,
+      "tempat": "keliling",
+      "lokasi": [
+        "pasar_pagi_2",
+        "teh"
+      ],
+      "kebiasaan": [
+        "penjudi"
+      ],
+      "keluarga": [],
+      "jadwal": "rombongan",
+      "hewan": false,
+      "rupa": "",
+      "nama": "kultivator.cerita.tokoh.hu_lu",
+      "gelar": "kultivator.cerita.tokoh.hu_lu.gelar",
+      "riwayat": "kultivator.kota42.tokoh.hu_lu.riwayat",
+      "dialog": [
+        "kota42_hulu_sapa",
+        "kota42_jari_hu_lu"
+      ],
+      "alur": []
+    },
+    {
+      "id": "ma_fu",
+      "nama_han": "马福",
+      "peran": "kafilah_bashi",
+      "perempuan": false,
+      "umur": 55,
+      "watak": "serakah",
+      "suara": "m2",
+      "suara_tubuh": 1,
+      "abadi": true,
+      "tempat": "keliling",
+      "lokasi": [
+        "kafilah",
+        "gudang_kafilah"
+      ],
+      "kebiasaan": [
+        "penabung"
+      ],
+      "keluarga": [],
+      "jadwal": "kafilah",
+      "hewan": false,
+      "rupa": "",
+      "nama": "kultivator.cerita.tokoh.ma_fu",
+      "gelar": "kultivator.cerita.tokoh.ma_fu.gelar",
+      "riwayat": "kultivator.kota42.tokoh.ma_fu.riwayat",
+      "dialog": [
+        "kota42_sapa_ma_fu",
+        "kota42_tumbuh_kayu",
+        "kota42_tumbuh_ma_fu"
+      ],
+      "alur": []
+    },
+    {
+      "id": "lao_geng",
+      "nama_han": "老更",
+      "peran": "penjaga_malam",
+      "perempuan": false,
+      "umur": 72,
+      "watak": "jujur",
+      "suara": "elder",
+      "suara_tubuh": 1,
+      "abadi": false,
+      "tempat": "ibukota",
+      "lokasi": [
+        "ronda_1",
+        "gerbang"
+      ],
+      "kebiasaan": [
+        "pecinta_teh",
+        "tidur_siang"
+      ],
+      "keluarga": [
+        {
+          "hubungan": "murid",
+          "tokoh": "xiao_bang"
+        }
+      ],
+      "jadwal": "ronda",
+      "hewan": false,
+      "rupa": "",
+      "nama": "kultivator.cerita.tokoh.lao_geng",
+      "gelar": "kultivator.cerita.tokoh.lao_geng.gelar",
+      "riwayat": "kultivator.kota42.tokoh.lao_geng.riwayat",
+      "dialog": [
+        "kota42_geng_pamit",
+        "kota42_geng_sapa"
+      ],
+      "alur": [
+        "kota42_lentera_lao_geng"
+      ]
+    },
+    {
+      "id": "xiao_bang",
+      "nama_han": "小梆",
+      "peran": "penjaga_malam",
+      "perempuan": false,
+      "umur": 16,
+      "watak": "penakut",
+      "suara": "m3",
+      "suara_tubuh": 2,
+      "abadi": false,
+      "tempat": "ibukota",
+      "lokasi": [
+        "ronda_1",
+        "gerbang"
+      ],
+      "kebiasaan": [],
+      "keluarga": [
+        {
+          "hubungan": "guru",
+          "tokoh": "lao_geng"
+        }
+      ],
+      "jadwal": "ronda",
+      "hewan": false,
+      "rupa": "",
+      "nama": "kultivator.cerita.tokoh.xiao_bang",
+      "gelar": "kultivator.cerita.tokoh.xiao_bang.gelar",
+      "riwayat": "kultivator.kota42.tokoh.xiao_bang.riwayat",
+      "dialog": [
+        "kota42_geng_ajari",
+        "kota42_geng_ziarah",
+        "kota42_sapa_xiao_bang"
+      ],
+      "alur": []
+    },
+    {
+      "id": "bibi_mei",
+      "nama_han": "梅婆",
+      "peran": "mak_comblang",
+      "perempuan": true,
+      "umur": 58,
+      "watak": "licik",
+      "suara": "f2",
+      "suara_tubuh": 4,
+      "abadi": true,
+      "tempat": "ibukota",
+      "lokasi": [
+        "sumur",
+        "teh"
+      ],
+      "kebiasaan": [
+        "gosip_sumur",
+        "pesolek"
+      ],
+      "keluarga": [],
+      "jadwal": "sumur",
+      "hewan": false,
+      "rupa": "",
+      "nama": "kultivator.cerita.tokoh.bibi_mei",
+      "gelar": "kultivator.cerita.tokoh.bibi_mei.gelar",
+      "riwayat": "kultivator.kota42.tokoh.bibi_mei.riwayat",
+      "dialog": [
+        "kota42_dua_bibi_mei",
+        "kota42_feihu_comblang",
+        "kota42_sapa_bibi_mei"
+      ],
+      "alur": []
+    },
+    {
+      "id": "bibi_zhang",
+      "nama_han": "张婶",
+      "peran": "warga",
+      "perempuan": true,
+      "umur": 46,
+      "watak": "ramah",
+      "suara": "f1",
+      "suara_tubuh": 3,
+      "abadi": true,
+      "tempat": "ibukota",
+      "lokasi": [
+        "sumur"
+      ],
+      "kebiasaan": [
+        "gosip_sumur",
+        "dermawan"
+      ],
+      "keluarga": [
+        {
+          "hubungan": "keponakan",
+          "tokoh": "zhang_shan"
+        }
+      ],
+      "jadwal": "sumur",
+      "hewan": false,
+      "rupa": "",
+      "nama": "kultivator.cerita.tokoh.bibi_zhang",
+      "gelar": "kultivator.cerita.tokoh.bibi_zhang.gelar",
+      "riwayat": "kultivator.kota42.tokoh.bibi_zhang.riwayat",
+      "dialog": [
+        "kota42_dua_bibi_zhang",
+        "kota42_sapa_bibi_zhang"
+      ],
+      "alur": [
+        "kota42_dua_keluarga",
+        "kota42_zhuazhou_damai"
+      ]
+    },
+    {
+      "id": "bibi_li",
+      "nama_han": "李婶",
+      "peran": "warga",
+      "perempuan": true,
+      "umur": 50,
+      "watak": "curiga",
+      "suara": "f2",
+      "suara_tubuh": 4,
+      "abadi": true,
+      "tempat": "ibukota",
+      "lokasi": [
+        "sumur"
+      ],
+      "kebiasaan": [
+        "gosip_sumur",
+        "pengintip"
+      ],
+      "keluarga": [],
+      "jadwal": "sumur",
+      "hewan": false,
+      "rupa": "",
+      "nama": "kultivator.cerita.tokoh.bibi_li",
+      "gelar": "kultivator.cerita.tokoh.bibi_li.gelar",
+      "riwayat": "kultivator.kota42.tokoh.bibi_li.riwayat",
+      "dialog": [
+        "kota42_dua_bibi_li",
+        "kota42_jari_telusur",
+        "kota42_sapa_bibi_li"
+      ],
+      "alur": []
+    },
+    {
+      "id": "bibi_wang",
+      "nama_han": "王婶",
+      "peran": "warga",
+      "perempuan": true,
+      "umur": 42,
+      "watak": "penakut",
+      "suara": "f3",
+      "suara_tubuh": 5,
+      "abadi": true,
+      "tempat": "ibukota",
+      "lokasi": [
+        "sumur"
+      ],
+      "kebiasaan": [
+        "gosip_sumur",
+        "takhayul"
+      ],
+      "keluarga": [],
+      "jadwal": "sumur",
+      "hewan": false,
+      "rupa": "",
+      "nama": "kultivator.cerita.tokoh.bibi_wang",
+      "gelar": "kultivator.cerita.tokoh.bibi_wang.gelar",
+      "riwayat": "kultivator.kota42.tokoh.bibi_wang.riwayat",
+      "dialog": [
+        "kota42_dua_putusan",
+        "kota42_jari_mulai",
+        "kota42_sapa_bibi_wang",
+        "kota42_wayang_telusur"
+      ],
+      "alur": [
+        "kota42_seribu_jari"
+      ]
+    },
+    {
+      "id": "kakek_xiang",
+      "nama_han": "象爷",
+      "peran": "warga",
+      "perempuan": false,
+      "umur": 74,
+      "watak": "bijak",
+      "suara": "elder",
+      "suara_tubuh": 1,
+      "abadi": false,
+      "tempat": "ibukota",
+      "lokasi": [
+        "catur"
+      ],
+      "kebiasaan": [
+        "kakek_catur",
+        "tai_chi"
+      ],
+      "keluarga": [
+        {
+          "hubungan": "sahabat",
+          "tokoh": "kakek_che"
+        }
+      ],
+      "jadwal": "catur",
+      "hewan": false,
+      "rupa": "",
+      "nama": "kultivator.cerita.tokoh.kakek_xiang",
+      "gelar": "kultivator.cerita.tokoh.kakek_xiang.gelar",
+      "riwayat": "kultivator.kota42.tokoh.kakek_xiang.riwayat",
+      "dialog": [
+        "kota42_dua_kakek_xiang",
+        "kota42_duka_kakek_xiang",
+        "kota42_sapa_kakek_xiang"
+      ],
+      "alur": []
+    },
+    {
+      "id": "kakek_che",
+      "nama_han": "车爷",
+      "peran": "warga",
+      "perempuan": false,
+      "umur": 77,
+      "watak": "sombong",
+      "suara": "elder",
+      "suara_tubuh": 1,
+      "abadi": false,
+      "tempat": "ibukota",
+      "lokasi": [
+        "catur"
+      ],
+      "kebiasaan": [
+        "kakek_catur",
+        "pemarah"
+      ],
+      "keluarga": [
+        {
+          "hubungan": "sahabat",
+          "tokoh": "kakek_xiang"
+        }
+      ],
+      "jadwal": "catur",
+      "hewan": false,
+      "rupa": "",
+      "nama": "kultivator.cerita.tokoh.kakek_che",
+      "gelar": "kultivator.cerita.tokoh.kakek_che.gelar",
+      "riwayat": "kultivator.kota42.tokoh.kakek_che.riwayat",
+      "dialog": [
+        "kota42_duka_kakek_che",
+        "kota42_sapa_kakek_che"
+      ],
+      "alur": []
+    },
+    {
+      "id": "li_zuixian",
+      "nama_han": "李醉仙",
+      "peran": "sastrawan",
+      "perempuan": false,
+      "umur": 38,
+      "watak": "sombong",
+      "suara": "m1",
+      "suara_tubuh": 0,
+      "abadi": true,
+      "tempat": "ibukota",
+      "lokasi": [
+        "teh",
+        "rumah_makan"
+      ],
+      "kebiasaan": [
+        "pemabuk",
+        "penyair"
+      ],
+      "keluarga": [],
+      "jadwal": "kedai_malam",
+      "hewan": false,
+      "rupa": "",
+      "nama": "kultivator.cerita.tokoh.li_zuixian",
+      "gelar": "kultivator.cerita.tokoh.li_zuixian.gelar",
+      "riwayat": "kultivator.kota42.tokoh.li_zuixian.riwayat",
+      "dialog": [
+        "kota42_zuixian_giok",
+        "kota42_zuixian_sapa"
+      ],
+      "alur": [
+        "kota42_tujuh_malam"
+      ]
+    },
+    {
+      "id": "shi_xiaoqian",
+      "nama_han": "千手鼠",
+      "peran": "pencopet",
+      "perempuan": false,
+      "umur": 26,
+      "watak": "licik",
+      "suara": "m3",
+      "suara_tubuh": 2,
+      "abadi": true,
+      "tempat": "ibukota",
+      "lokasi": [
+        "kumuh",
+        "pasar_hantu_1"
+      ],
+      "kebiasaan": [
+        "penjudi"
+      ],
+      "keluarga": [],
+      "jadwal": "kumuh",
+      "hewan": false,
+      "rupa": "",
+      "nama": "kultivator.cerita.tokoh.shi_xiaoqian",
+      "gelar": "kultivator.cerita.tokoh.shi_xiaoqian.gelar",
+      "riwayat": "kultivator.kota42.tokoh.shi_xiaoqian.riwayat",
+      "dialog": [
+        "kota42_jari_modal",
+        "kota42_jari_sarang",
+        "kota42_sapa_shi_xiaoqian"
+      ],
+      "alur": []
+    },
+    {
+      "id": "lentera_hijau",
+      "nama_han": "绿灯先生",
+      "peran": "makelar_gelap",
+      "perempuan": false,
+      "umur": 0,
+      "watak": "licik",
+      "suara": "demon",
+      "suara_tubuh": 2,
+      "abadi": true,
+      "tempat": "ibukota",
+      "lokasi": [
+        "pasar_hantu_1",
+        "pasar_hantu_2"
+      ],
+      "kebiasaan": [],
+      "keluarga": [],
+      "jadwal": "pasar_hantu",
+      "hewan": false,
+      "rupa": "topeng_kertas",
+      "nama": "kultivator.cerita.tokoh.lentera_hijau",
+      "gelar": "kultivator.cerita.tokoh.lentera_hijau.gelar",
+      "riwayat": "kultivator.kota42.tokoh.lentera_hijau.riwayat",
+      "dialog": [
+        "kota42_jari_lentera",
+        "kota42_sapa_lentera_hijau",
+        "kota42_wayang_lentera",
+        "kota42_wayang_rebut"
+      ],
+      "alur": []
+    },
+    {
+      "id": "gong_shu",
+      "nama_han": "公输",
+      "peran": "tukang",
+      "perempuan": false,
+      "umur": 60,
+      "watak": "jujur",
+      "suara": "elder",
+      "suara_tubuh": 1,
+      "abadi": true,
+      "tempat": "ibukota",
+      "lokasi": [
+        "kavling",
+        "perbaikan"
+      ],
+      "kebiasaan": [
+        "pekerja_keras"
+      ],
+      "keluarga": [],
+      "jadwal": "mandor",
+      "hewan": false,
+      "rupa": "",
+      "nama": "kultivator.cerita.tokoh.gong_shu",
+      "gelar": "kultivator.cerita.tokoh.gong_shu.gelar",
+      "riwayat": "kultivator.kota42.tokoh.gong_shu.riwayat",
+      "dialog": [
+        "kota42_banjir_lapor",
+        "kota42_banjir_mulai",
+        "kota42_sapa_gong_shu",
+        "kota42_tumbuh_mulai",
+        "kota42_tumbuh_resmi"
+      ],
+      "alur": [
+        "kota42_banjir_musim_semi",
+        "kota42_kota_tumbuh"
+      ]
+    },
+    {
+      "id": "shen_wan",
+      "nama_han": "沈万",
+      "peran": "pialang",
+      "perempuan": false,
+      "umur": 52,
+      "watak": "serakah",
+      "suara": "m2",
+      "suara_tubuh": 1,
+      "abadi": true,
+      "tempat": "ibukota",
+      "lokasi": [
+        "bank",
+        "pegadaian"
+      ],
+      "kebiasaan": [
+        "penabung",
+        "pelit"
+      ],
+      "keluarga": [
+        {
+          "hubungan": "keponakan",
+          "tokoh": "shen_ziyu"
+        }
+      ],
+      "jadwal": "rumah_uang",
+      "hewan": false,
+      "rupa": "",
+      "nama": "kultivator.cerita.tokoh.shen_wan",
+      "gelar": "kultivator.cerita.tokoh.shen_wan.gelar",
+      "riwayat": "kultivator.kota42.tokoh.shen_wan.riwayat",
+      "dialog": [
+        "kota42_pejabat_shen",
+        "kota42_sapa_shen_wan",
+        "kota42_utang_shen"
+      ],
+      "alur": []
+    },
+    {
+      "id": "shen_ziyu",
+      "nama_han": "沈子玉",
+      "peran": "tuan_muda",
+      "perempuan": false,
+      "umur": 23,
+      "watak": "sombong",
+      "suara": "m1",
+      "suara_tubuh": 0,
+      "abadi": false,
+      "tempat": "ibukota",
+      "lokasi": [
+        "bank",
+        "teh"
+      ],
+      "kebiasaan": [
+        "pesolek"
+      ],
+      "keluarga": [
+        {
+          "hubungan": "paman",
+          "tokoh": "shen_wan"
+        }
+      ],
+      "jadwal": "tuan_muda",
+      "hewan": false,
+      "rupa": "",
+      "nama": "kultivator.cerita.tokoh.shen_ziyu",
+      "gelar": "kultivator.cerita.tokoh.shen_ziyu.gelar",
+      "riwayat": "kultivator.kota42.tokoh.shen_ziyu.riwayat",
+      "dialog": [
+        "kota42_sapa_shen_ziyu"
+      ],
+      "alur": []
+    },
+    {
+      "id": "qiu_panitera",
+      "nama_han": "秋书吏",
+      "peran": "menteri",
+      "perempuan": false,
+      "umur": 44,
+      "watak": "jujur",
+      "suara": "m1",
+      "suara_tubuh": 0,
+      "abadi": true,
+      "tempat": "ibukota",
+      "lokasi": [
+        "yamen",
+        "cukai"
+      ],
+      "kebiasaan": [
+        "kutu_buku"
+      ],
+      "keluarga": [],
+      "jadwal": "yamen",
+      "hewan": false,
+      "rupa": "",
+      "nama": "kultivator.cerita.tokoh.qiu_panitera",
+      "gelar": "kultivator.cerita.tokoh.qiu_panitera.gelar",
+      "riwayat": "kultivator.kota42.tokoh.qiu_panitera.riwayat",
+      "dialog": [
+        "kota42_catatan_lapor",
+        "kota42_catatan_mulai",
+        "kota42_pejabat_qiu",
+        "kota42_sapa_qiu",
+        "kota42_utang_qiu"
+      ],
+      "alur": [
+        "kota42_catatan_kota",
+        "kota42_pejabat_jujur"
+      ]
+    },
+    {
+      "id": "nenek_tang",
+      "nama_han": "汤婆婆",
+      "peran": "koki",
+      "perempuan": true,
+      "umur": 81,
+      "watak": "ramah",
+      "suara": "f2",
+      "suara_tubuh": 4,
+      "abadi": false,
+      "tempat": "ibukota",
+      "lokasi": [
+        "warung",
+        "dapur_umum"
+      ],
+      "kebiasaan": [
+        "dermawan",
+        "pendoa_kuil"
+      ],
+      "keluarga": [
+        {
+          "hubungan": "cucu",
+          "tokoh": "tang_xiaomi"
+        }
+      ],
+      "jadwal": "warung_sup",
+      "hewan": false,
+      "rupa": "",
+      "nama": "kultivator.cerita.tokoh.nenek_tang",
+      "gelar": "kultivator.cerita.tokoh.nenek_tang.gelar",
+      "riwayat": "kultivator.kota42.tokoh.nenek_tang.riwayat",
+      "dialog": [
+        "kota42_sapa_nenek_tang",
+        "kota42_sup_mulai"
+      ],
+      "alur": [
+        "kota42_sup_hangat"
+      ]
+    },
+    {
+      "id": "tang_xiaomi",
+      "nama_han": "汤小米",
+      "peran": "pelayan",
+      "perempuan": true,
+      "umur": 18,
+      "watak": "jujur",
+      "suara": "f1",
+      "suara_tubuh": 3,
+      "abadi": false,
+      "tempat": "ibukota",
+      "lokasi": [
+        "warung",
+        "dapur_umum"
+      ],
+      "kebiasaan": [],
+      "keluarga": [
+        {
+          "hubungan": "nenek",
+          "tokoh": "nenek_tang"
+        }
+      ],
+      "jadwal": "warung_sup",
+      "hewan": false,
+      "rupa": "",
+      "nama": "kultivator.cerita.tokoh.tang_xiaomi",
+      "gelar": "kultivator.cerita.tokoh.tang_xiaomi.gelar",
+      "riwayat": "kultivator.kota42.tokoh.tang_xiaomi.riwayat",
+      "dialog": [
+        "kota42_sapa_tang_xiaomi",
+        "kota42_sup_cucu"
+      ],
+      "alur": []
+    },
+    {
+      "id": "paman_bai",
+      "nama_han": "白叔",
+      "peran": "pengurus_duka",
+      "perempuan": false,
+      "umur": 63,
+      "watak": "bijak",
+      "suara": "elder",
+      "suara_tubuh": 1,
+      "abadi": true,
+      "tempat": "ibukota",
+      "lokasi": [
+        "kuil",
+        "kuil_dewa_kota"
+      ],
+      "kebiasaan": [
+        "pendoa_kuil"
+      ],
+      "keluarga": [],
+      "jadwal": "kuil",
+      "hewan": false,
+      "rupa": "",
+      "nama": "kultivator.cerita.tokoh.paman_bai",
+      "gelar": "kultivator.cerita.tokoh.paman_bai.gelar",
+      "riwayat": "kultivator.kota42.tokoh.paman_bai.riwayat",
+      "dialog": [
+        "kota42_sapa_paman_bai",
+        "kota42_sup_bagi"
+      ],
+      "alur": []
+    },
+    {
+      "id": "guru_zhou",
+      "nama_han": "周书",
+      "peran": "guru_sekolah",
+      "perempuan": false,
+      "umur": 48,
+      "watak": "bijak",
+      "suara": "m2",
+      "suara_tubuh": 1,
+      "abadi": true,
+      "tempat": "ibukota",
+      "lokasi": [
+        "sekolah",
+        "perpustakaan"
+      ],
+      "kebiasaan": [
+        "kutu_buku",
+        "tai_chi"
+      ],
+      "keluarga": [],
+      "jadwal": "sekolah",
+      "hewan": false,
+      "rupa": "",
+      "nama": "kultivator.cerita.tokoh.guru_zhou",
+      "gelar": "kultivator.cerita.tokoh.guru_zhou.gelar",
+      "riwayat": "kultivator.kota42.tokoh.guru_zhou.riwayat",
+      "dialog": [
+        "kota42_akar_guru",
+        "kota42_sapa_guru_zhou"
+      ],
+      "alur": [
+        "kota42_akar_langit"
+      ]
+    },
+    {
+      "id": "fang_gudang",
+      "nama_han": "方娘子",
+      "peran": "penjaga_gudang",
+      "perempuan": true,
+      "umur": 46,
+      "watak": "curiga",
+      "suara": "f1",
+      "suara_tubuh": 3,
+      "abadi": true,
+      "tempat": "ibukota",
+      "lokasi": [
+        "gudang_kafilah",
+        "kontrak"
+      ],
+      "kebiasaan": [
+        "penabung"
+      ],
+      "keluarga": [],
+      "jadwal": "gudang",
+      "hewan": false,
+      "rupa": "",
+      "nama": "kultivator.cerita.tokoh.fang_gudang",
+      "gelar": "kultivator.cerita.tokoh.fang_gudang.gelar",
+      "riwayat": "kultivator.kota42.tokoh.fang_gudang.riwayat",
+      "dialog": [
+        "kota42_pejabat_fang",
+        "kota42_sapa_fang_gudang"
+      ],
+      "alur": []
+    },
+    {
+      "id": "gao_senior",
+      "nama_han": "高师兄",
+      "peran": "murid_sekte_dalam",
+      "perempuan": false,
+      "umur": 24,
+      "watak": "sombong",
+      "suara": "m1",
+      "suara_tubuh": 0,
+      "abadi": true,
+      "tempat": "ibukota",
+      "lokasi": [
+        "teh",
+        "gerbang"
+      ],
+      "kebiasaan": [
+        "pesolek"
+      ],
+      "keluarga": [],
+      "jadwal": "perekrut",
+      "hewan": false,
+      "rupa": "",
+      "nama": "kultivator.cerita.tokoh.gao_senior",
+      "gelar": "kultivator.cerita.tokoh.gao_senior.gelar",
+      "riwayat": "kultivator.kota42.tokoh.gao_senior.riwayat",
+      "dialog": [
+        "kota42_akar_gao",
+        "kota42_sapa_gao_senior"
+      ],
+      "alur": []
+    },
+    {
+      "id": "xiao_yu",
+      "nama_han": "小雨",
+      "peran": "anak",
+      "perempuan": true,
+      "umur": 9,
+      "watak": "ramah",
+      "suara": "f1",
+      "suara_tubuh": 3,
+      "abadi": false,
+      "tempat": "ibukota",
+      "lokasi": [
+        "kumuh_anak",
+        "sekolah"
+      ],
+      "kebiasaan": [
+        "pemuja_kultivator"
+      ],
+      "keluarga": [
+        {
+          "hubungan": "ayah",
+          "tokoh": "yu_laosan"
+        },
+        {
+          "hubungan": "ibu",
+          "tokoh": "yu_xiuniang"
+        }
+      ],
+      "jadwal": "anak",
+      "hewan": false,
+      "rupa": "",
+      "nama": "kultivator.cerita.tokoh.xiao_yu",
+      "gelar": "kultivator.cerita.tokoh.xiao_yu.gelar",
+      "riwayat": "kultivator.kota42.tokoh.xiao_yu.riwayat",
+      "dialog": [
+        "kota42_akar_xiao_yu",
+        "kota42_sapa_xiao_yu"
+      ],
+      "alur": []
+    },
+    {
+      "id": "yu_laosan",
+      "nama_han": "于老三",
+      "peran": "kuli",
+      "perempuan": false,
+      "umur": 36,
+      "watak": "licik",
+      "suara": "m3",
+      "suara_tubuh": 2,
+      "abadi": false,
+      "tempat": "ibukota",
+      "lokasi": [
+        "kumuh",
+        "judi_batu"
+      ],
+      "kebiasaan": [
+        "penjudi"
+      ],
+      "keluarga": [
+        {
+          "hubungan": "istri",
+          "tokoh": "yu_xiuniang"
+        },
+        {
+          "hubungan": "anak",
+          "tokoh": "xiao_yu"
+        }
+      ],
+      "jadwal": "kuli",
+      "hewan": false,
+      "rupa": "",
+      "nama": "kultivator.cerita.tokoh.yu_laosan",
+      "gelar": "kultivator.cerita.tokoh.yu_laosan.gelar",
+      "riwayat": "kultivator.kota42.tokoh.yu_laosan.riwayat",
+      "dialog": [
+        "kota42_akar_ayah",
+        "kota42_sapa_yu_laosan"
+      ],
+      "alur": []
+    },
+    {
+      "id": "yu_xiuniang",
+      "nama_han": "于秀娘",
+      "peran": "warga",
+      "perempuan": true,
+      "umur": 33,
+      "watak": "ramah",
+      "suara": "f2",
+      "suara_tubuh": 4,
+      "abadi": false,
+      "tempat": "ibukota",
+      "lokasi": [
+        "kumuh",
+        "pasar_pagi_1"
+      ],
+      "kebiasaan": [
+        "pelukis_gula"
+      ],
+      "keluarga": [
+        {
+          "hubungan": "suami",
+          "tokoh": "yu_laosan"
+        },
+        {
+          "hubungan": "anak",
+          "tokoh": "xiao_yu"
+        }
+      ],
+      "jadwal": "pasar_pagi",
+      "hewan": false,
+      "rupa": "",
+      "nama": "kultivator.cerita.tokoh.yu_xiuniang",
+      "gelar": "kultivator.cerita.tokoh.yu_xiuniang.gelar",
+      "riwayat": "kultivator.kota42.tokoh.yu_xiuniang.riwayat",
+      "dialog": [
+        "kota42_akar_ibu",
+        "kota42_akar_ibu_cara",
+        "kota42_sapa_yu_xiuniang"
+      ],
+      "alur": []
+    },
+    {
+      "id": "lao_hua",
+      "nama_han": "老花",
+      "peran": "warga",
+      "perempuan": false,
+      "umur": 6,
+      "watak": "",
+      "suara": "kucing",
+      "suara_tubuh": 0,
+      "abadi": false,
+      "tempat": "ibukota",
+      "lokasi": [
+        "kucing_tidur",
+        "penjual_ikan"
+      ],
+      "kebiasaan": [],
+      "keluarga": [],
+      "jadwal": "kucing",
+      "hewan": true,
+      "rupa": "",
+      "nama": "kultivator.cerita.tokoh.lao_hua",
+      "gelar": "kultivator.cerita.tokoh.lao_hua.gelar",
+      "riwayat": "kultivator.kota42.tokoh.lao_hua.riwayat",
+      "dialog": [],
+      "alur": []
+    },
+    {
+      "id": "zhang_shan",
+      "nama_han": "张山",
+      "peran": "tukang",
+      "perempuan": false,
+      "umur": 20,
+      "watak": "jujur",
+      "suara": "m3",
+      "suara_tubuh": 2,
+      "abadi": false,
+      "tempat": "ibukota",
+      "lokasi": [
+        "sumur",
+        "warung"
+      ],
+      "kebiasaan": [
+        "pekerja_keras"
+      ],
+      "keluarga": [
+        {
+          "hubungan": "ayah",
+          "tokoh": "zhang_laotou"
+        },
+        {
+          "hubungan": "bibi",
+          "tokoh": "bibi_zhang"
+        }
+      ],
+      "jadwal": "keluarga_tahu",
+      "hewan": false,
+      "rupa": "",
+      "nama": "kultivator.cerita.tokoh.zhang_shan",
+      "gelar": "kultivator.cerita.tokoh.zhang_shan.gelar",
+      "riwayat": "kultivator.kota42.tokoh.zhang_shan.riwayat",
+      "dialog": [
+        "kota42_dua_lari_zhang_shan",
+        "kota42_dua_tebus",
+        "kota42_dua_zhang_shan",
+        "kota42_sapa_zhang_shan"
+      ],
+      "alur": []
+    },
+    {
+      "id": "li_ying",
+      "nama_han": "李莺",
+      "peran": "pelayan",
+      "perempuan": true,
+      "umur": 19,
+      "watak": "ramah",
+      "suara": "f1",
+      "suara_tubuh": 3,
+      "abadi": false,
+      "tempat": "ibukota",
+      "lokasi": [
+        "sumur",
+        "rumah_makan"
+      ],
+      "kebiasaan": [
+        "penyulam"
+      ],
+      "keluarga": [
+        {
+          "hubungan": "ayah",
+          "tokoh": "li_laoban"
+        }
+      ],
+      "jadwal": "keluarga_arak",
+      "hewan": false,
+      "rupa": "",
+      "nama": "kultivator.cerita.tokoh.li_ying",
+      "gelar": "kultivator.cerita.tokoh.li_ying.gelar",
+      "riwayat": "kultivator.kota42.tokoh.li_ying.riwayat",
+      "dialog": [
+        "kota42_dua_li_ying",
+        "kota42_sapa_li_ying"
+      ],
+      "alur": []
+    },
+    {
+      "id": "zhang_laotou",
+      "nama_han": "张老头",
+      "peran": "koki",
+      "perempuan": false,
+      "umur": 52,
+      "watak": "jujur",
+      "suara": "m2",
+      "suara_tubuh": 1,
+      "abadi": false,
+      "tempat": "ibukota",
+      "lokasi": [
+        "warung"
+      ],
+      "kebiasaan": [
+        "pemarah",
+        "pekerja_keras"
+      ],
+      "keluarga": [
+        {
+          "hubungan": "anak",
+          "tokoh": "zhang_shan"
+        }
+      ],
+      "jadwal": "keluarga_tahu",
+      "hewan": false,
+      "rupa": "",
+      "nama": "kultivator.cerita.tokoh.zhang_laotou",
+      "gelar": "kultivator.cerita.tokoh.zhang_laotou.gelar",
+      "riwayat": "kultivator.kota42.tokoh.zhang_laotou.riwayat",
+      "dialog": [
+        "kota42_dua_zhang_laotou",
+        "kota42_sapa_zhang_laotou",
+        "kota42_zhuazhou_zhang_laotou"
+      ],
+      "alur": []
+    },
+    {
+      "id": "li_laoban",
+      "nama_han": "李老板",
+      "peran": "pemilik_teh",
+      "perempuan": false,
+      "umur": 55,
+      "watak": "sombong",
+      "suara": "m1",
+      "suara_tubuh": 0,
+      "abadi": false,
+      "tempat": "ibukota",
+      "lokasi": [
+        "rumah_makan",
+        "teh"
+      ],
+      "kebiasaan": [
+        "pemabuk"
+      ],
+      "keluarga": [
+        {
+          "hubungan": "anak",
+          "tokoh": "li_ying"
+        }
+      ],
+      "jadwal": "keluarga_arak",
+      "hewan": false,
+      "rupa": "",
+      "nama": "kultivator.cerita.tokoh.li_laoban",
+      "gelar": "kultivator.cerita.tokoh.li_laoban.gelar",
+      "riwayat": "kultivator.kota42.tokoh.li_laoban.riwayat",
+      "dialog": [
+        "kota42_dua_li_laoban",
+        "kota42_dua_li_laoban_damai",
+        "kota42_sapa_li_laoban",
+        "kota42_zhuazhou_li_laoban"
+      ],
+      "alur": []
+    },
+    {
+      "id": "wu_dalang",
+      "nama_han": "吴大郎",
+      "peran": "koki",
+      "perempuan": false,
+      "umur": 41,
+      "watak": "jujur",
+      "suara": "m2",
+      "suara_tubuh": 1,
+      "abadi": false,
+      "tempat": "ibukota",
+      "lokasi": [
+        "rumah_makan",
+        "warung"
+      ],
+      "kebiasaan": [
+        "pekerja_keras"
+      ],
+      "keluarga": [
+        {
+          "hubungan": "istri",
+          "tokoh": "wu_niangzi"
+        }
+      ],
+      "jadwal": "warung",
+      "hewan": false,
+      "rupa": "",
+      "nama": "kultivator.cerita.tokoh.wu_dalang",
+      "gelar": "kultivator.cerita.tokoh.wu_dalang.gelar",
+      "riwayat": "kultivator.kota42.tokoh.wu_dalang.riwayat",
+      "dialog": [
+        "kota42_sapa_wu_dalang",
+        "kota42_utang_modal",
+        "kota42_utang_wu_dalang"
+      ],
+      "alur": []
+    },
+    {
+      "id": "wu_niangzi",
+      "nama_han": "吴娘子",
+      "peran": "pelayan",
+      "perempuan": true,
+      "umur": 38,
+      "watak": "penakut",
+      "suara": "f2",
+      "suara_tubuh": 4,
+      "abadi": false,
+      "tempat": "ibukota",
+      "lokasi": [
+        "rumah_makan",
+        "warung"
+      ],
+      "kebiasaan": [
+        "penabung"
+      ],
+      "keluarga": [
+        {
+          "hubungan": "suami",
+          "tokoh": "wu_dalang"
+        }
+      ],
+      "jadwal": "warung",
+      "hewan": false,
+      "rupa": "",
+      "nama": "kultivator.cerita.tokoh.wu_niangzi",
+      "gelar": "kultivator.cerita.tokoh.wu_niangzi.gelar",
+      "riwayat": "kultivator.kota42.tokoh.wu_niangzi.riwayat",
+      "dialog": [
+        "kota42_sapa_wu_niangzi",
+        "kota42_utang_minta"
+      ],
+      "alur": [
+        "kota42_utang_tiga_generasi"
+      ]
+    },
+    {
+      "id": "dalang_su",
+      "nama_han": "苏师傅",
+      "peran": "pemusik",
+      "perempuan": false,
+      "umur": 57,
+      "watak": "bijak",
+      "suara": "m2",
+      "suara_tubuh": 1,
+      "abadi": true,
+      "tempat": "ibukota",
+      "lokasi": [
+        "panggung"
+      ],
+      "kebiasaan": [
+        "penggemar_opera"
+      ],
+      "keluarga": [],
+      "jadwal": "teater",
+      "hewan": false,
+      "rupa": "",
+      "nama": "kultivator.cerita.tokoh.dalang_su",
+      "gelar": "kultivator.cerita.tokoh.dalang_su.gelar",
+      "riwayat": "kultivator.kota42.tokoh.dalang_su.riwayat",
+      "dialog": [
+        "kota42_wayang_perdana",
+        "kota42_wayang_su"
+      ],
+      "alur": [
+        "kota42_malam_wayang"
+      ]
+    },
+    {
+      "id": "tetua_he",
+      "nama_han": "何老",
+      "peran": "tetua_desa",
+      "perempuan": false,
+      "umur": 68,
+      "watak": "jujur",
+      "suara": "elder",
+      "suara_tubuh": 1,
+      "abadi": true,
+      "tempat": "kota34",
+      "lokasi": [
+        "gerbang",
+        "kuil"
+      ],
+      "kebiasaan": [],
+      "keluarga": [],
+      "jadwal": "tetua",
+      "hewan": false,
+      "rupa": "",
+      "nama": "kultivator.cerita.tokoh.tetua_he",
+      "gelar": "kultivator.cerita.tokoh.tetua_he.gelar",
+      "riwayat": "kultivator.kota42.tokoh.tetua_he.riwayat",
+      "dialog": [
+        "kota42_pelindung_he",
+        "kota42_pelindung_panji",
+        "kota42_sapa_tetua_he"
+      ],
+      "alur": [
+        "kota42_pelindung_baru"
+      ]
+    }
+  ]
+}

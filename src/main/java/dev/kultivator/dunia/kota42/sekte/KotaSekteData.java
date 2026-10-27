@@ -28,6 +28,8 @@ public final class KotaSekteData extends KotaBagianData {
 	public static final String CABANG = "cabang";
 	/** Sub-module key {@code "murid"}. */
 	public static final String MURID = "murid";
+	/** Sub-module key {@code "restu"}: player uuid -> id of the resident the office sent to the "Restu Ayah" quest. */
+	public static final String RESTU = "restu";
 
 	public KotaSekteData() {
 	}

@@ -1,0 +1,242 @@
+{
+  "id": "keluh_ragam",
+  "jenis": "realisasi",
+  "_catatan": "D-42K: KELUH over eight topics with the glue opener/tail, across registers and dialects (a rainy evening).",
+  "benih_dunia": 42,
+  "masukan": {
+    "niat": "KELUH",
+    "pembicara": 311,
+    "hari": 120,
+    "now": 2880000,
+    "cuaca": "hujan",
+    "musim": "gugur",
+    "situasi": {
+      "jam": "sore",
+      "cuaca": "hujan",
+      "musim": "gugur",
+      "kelompok": "pekerja",
+      "watak": "curiga",
+      "kebiasaan": [],
+      "sifat": {
+        "H": 10,
+        "E": 30,
+        "X": -20,
+        "A": -30,
+        "C": 20,
+        "O": -30
+      },
+      "wajah": "sedih",
+      "tempat": "kota_besar"
+    },
+    "pendengar": {
+      "nama": "Han",
+      "kelamin": "l",
+      "tahap": "dewasa",
+      "pemain": true
+    },
+    "kesan": "kenal",
+    "tahu_nama": false,
+    "register": "biasa",
+    "dialek": "kampung",
+    "kelamin": "l",
+    "tahap": "dewasa",
+    "nilai": {
+      "konteks.cuaca": "hujan",
+      "konteks.arah": "utara",
+      "konteks.barang_mahal": "minecraft:honey_bottle",
+      "konteks.barang_murah": "minecraft:carrot"
+    }
+  },
+  "langkah": [
+    {
+      "ubah": {
+        "topik": "cuaca"
+      },
+      "harap": {
+        "k": "kultivator.cakap.keluh.cuaca.1",
+        "a": [
+          {
+            "k": "kultivator.cakap.awal.keluh.2",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "keluh.cuaca",
+      "gestur": "geleng",
+      "seru": "kota42.seru.aduh_l",
+      "tik": null,
+      "id_id": "Dengar, ya. Kalau cuaca begini terus, panen bisa gagal. Lalu apa?",
+      "en_us": "Listen. If the weather stays like this, the harvest could fail. Then what?"
+    },
+    {
+      "ubah": {
+        "topik": "kerja",
+        "register": "kasar"
+      },
+      "harap": {
+        "k": "kultivator.cakap.keluh.lagi.kerja.2",
+        "a": [
+          {
+            "t": ""
+          },
+          {
+            "k": "kultivator.cakap.ekor.keluh.0",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "keluh.lagi.kerja",
+      "gestur": "seka_keringat",
+      "seru": "kota42.seru.aduh_l",
+      "tik": null,
+      "id_id": "Dua hari ini aku tidak sempat makan siang. Perutku sudah berhenti protes. Entah sampai kapan begini.",
+      "en_us": "For two days I've had no time for lunch. My stomach has stopped protesting. Who knows how long it'll stay like this."
+    },
+    {
+      "ubah": {
+        "topik": "pejabat",
+        "dialek": "ibukota",
+        "register": "sopan"
+      },
+      "harap": {
+        "k": "kultivator.cakap.keluh.pejabat.2",
+        "a": [
+          {
+            "k": "kultivator.cakap.awal.keluh.23",
+            "a": []
+          },
+          {
+            "t": ""
+          }
+        ]
+      },
+      "aturan": "keluh.pejabat",
+      "gestur": "geleng",
+      "seru": null,
+      "tik": null,
+      "id_id": "Maaf, hati ini sedang berat. Kalau mau keadilan, bawa uang. Kalau tidak punya uang, bawa kesabaran.",
+      "en_us": "Forgive me, my heart is heavy today. Want justice, bring money. No money, bring patience."
+    },
+    {
+      "ubah": {
+        "topik": "uang",
+        "register": "kuno",
+        "dialek": "gunung"
+      },
+      "harap": {
+        "k": "kultivator.cakap.keluh.uang.1",
+        "a": [
+          {
+            "k": "kultivator.cakap.awal.keluh.9",
+            "a": []
+          },
+          {
+            "t": ""
+          }
+        ]
+      },
+      "aturan": "keluh.uang",
+      "gestur": "hitung_koin",
+      "seru": "kota42.seru.aduh_l",
+      "tik": null,
+      "id_id": "Ah, derita fana. Rentenir datang lagi kemarin. Bunganya saja sudah lebih besar dari utangnya.",
+      "en_us": "Ah, the sorrows of mortal life. The lender came again yesterday. The interest alone is bigger than the debt."
+    },
+    {
+      "ubah": {
+        "topik": "harga",
+        "register": "kasar",
+        "dialek": "pelabuhan"
+      },
+      "harap": {
+        "k": "kultivator.cakap.keluh.lagi.harga.4",
+        "a": [
+          {
+            "t": ""
+          },
+          {
+            "k": "kultivator.cakap.ekor.keluh.8",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "keluh.lagi.harga",
+      "gestur": "geleng",
+      "seru": "kota42.seru.aduh_l",
+      "tik": null,
+      "id_id": "Anakku menangis minta manisan. Aku hanya bisa menunjuk ke bulan. Sudah, jangan dibahas lagi.",
+      "en_us": "My child cried for sweets. All I could do was point at the moon. Enough, let's drop it."
+    },
+    {
+      "ubah": {
+        "topik": "kejahatan",
+        "dialek": "iblis"
+      },
+      "harap": {
+        "k": "kultivator.cakap.keluh.kejahatan.1.iblis",
+        "a": [
+          {
+            "t": ""
+          },
+          {
+            "t": ""
+          }
+        ]
+      },
+      "aturan": "keluh.kejahatan",
+      "gestur": "geleng",
+      "seru": null,
+      "tik": null,
+      "id_id": "Kejahatan? Di sini itu namanya berdagang. Masalahnya kalau yang dirampok aku.",
+      "en_us": "Crime? Here it's called trading. Problem is when I'm the one robbed."
+    },
+    {
+      "ubah": {
+        "topik": "begal",
+        "dialek": "oasis"
+      },
+      "harap": {
+        "k": "kultivator.cakap.begal.keluh.0",
+        "a": [
+          {
+            "t": ""
+          },
+          {
+            "k": "kultivator.cakap.lex.arah.utara",
+            "a": []
+          },
+          {
+            "t": ""
+          }
+        ]
+      },
+      "aturan": "begal.keluh",
+      "gestur": "geleng",
+      "seru": "kota42.seru.aduh_l",
+      "tik": null,
+      "id_id": "Gara-gara begal di jalan utara, gerobak kami harus memutar dua hari. ",
+      "en_us": "Because of the bandits on the north road, our carts must detour two days. "
+    },
+    {
+      "ubah": {
+        "topik": "panen",
+        "kelamin": "p"
+      },
+      "harap": {
+        "k": "kultivator.cakap.keluh.lagi.panen.4",
+        "a": [
+          {
+            "k": "kultivator.cakap.awal.keluh.0",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "keluh.lagi.panen",
+      "gestur": "geleng",
+      "seru": "kota42.seru.aduh_p",
+      "tik": null,
+      "id_id": "Hhh. Anakku tidak mau melanjutkan ladang. Kata dia, dia mau jadi murid sekte. Ladang ini untuk siapa?",
+      "en_us": "Hhh. My child won't carry on the field. Says they want to be a sect disciple. Who is this field for?"
+    }
+  ]
+}

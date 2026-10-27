@@ -153,10 +153,51 @@ final class Perancah {
 			seen.add(id);
 		}
 		for (Job job : JOBS.values()) {
-			if (!seen.contains(job.id)) {
+			if (!seen.contains(job.id) && !KAVLING.contains(job.id)) {
 				job.leaving = true;
 			}
 		}
+	}
+
+	/** Ids of the plot scaffolds of Kota yang Hidup (42.9.4): a repair list never takes them down. */
+	private static final Set<Long> KAVLING = new HashSet<>();
+
+	/**
+	 * The plots under construction (stage 2-4) near this player: the same scaffold as a repair job (a hired crew's indigo
+	 * tarp), rising with the stage. The full set each call: a plot that is not listed any more comes down.
+	 */
+	static void kavling(java.util.Collection<PerbaikanClient.Lahan> lahan) {
+		Set<Long> sekarang = new HashSet<>();
+		for (PerbaikanClient.Lahan l : lahan) {
+			long id = ~l.id();
+			Job job = JOBS.get(id);
+			if (job == null) {
+				if (JOBS.size() >= MAX_JOBS) {
+					continue;
+				}
+				job = new Job(id);
+				JOBS.put(id, job);
+				job.shown = l.progres();
+			}
+			job.minX = Math.min(l.min().getX(), l.max().getX());
+			job.minY = Math.min(l.min().getY(), l.max().getY());
+			job.minZ = Math.min(l.min().getZ(), l.max().getZ());
+			job.maxX = Math.max(l.min().getX(), l.max().getX());
+			job.maxY = Math.max(l.min().getY(), l.max().getY());
+			job.maxZ = Math.max(l.min().getZ(), l.max().getZ());
+			job.progress = Mth.clamp(l.progres(), 0.0F, 1.0F);
+			job.flags = PerancahNet.F_SEWA;
+			job.leaving = false;
+			sekarang.add(id);
+		}
+		for (long id : KAVLING) {
+			Job job = JOBS.get(id);
+			if (job != null && !sekarang.contains(id)) {
+				job.leaving = true;
+			}
+		}
+		KAVLING.clear();
+		KAVLING.addAll(sekarang);
 	}
 
 	static void tick(Minecraft client) {
@@ -187,6 +228,7 @@ final class Perancah {
 
 	static void clear() {
 		JOBS.clear();
+		KAVLING.clear();
 		seenLevel = null;
 	}
 

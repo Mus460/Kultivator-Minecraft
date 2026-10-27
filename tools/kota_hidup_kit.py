@@ -43,6 +43,7 @@ import sys
 import zlib
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import nbt  # noqa: E402
 import structgen  # noqa: E402
 import tempat_lib as tl  # noqa: E402
 
@@ -65,6 +66,11 @@ TITIK_42 = (
 )
 TITIK_BERNOMOR = ("ronda", "pasar_pagi", "pasar_hantu", "lapak_sewa", "nisan")   # <jenis>_<n>, n = 0, 1, 2, ...
 ALAT_42 = ("wajan", "talenan", "guci", "laci", "gunting", "kukus", "jimat", "konter")   # new kerja:<alat> tools
+# The mod's work lookup (TempatHuni.kerja) matches the exact type of KerjaPeran, so a 42-only tool is stored under the 38
+# type whose clip fits it (data alat keeps the design name); every 42 generator keeps calling the design name.
+ALIAS_ALAT = {"kerja:wajan": "kerja:kuali", "kerja:talenan": "kerja:tungku", "kerja:guci": "kerja:teko",
+              "kerja:laci": "meja_tulis", "kerja:gunting": "kerja:tenun", "kerja:kukus": "kerja:kuali",
+              "kerja:jimat": "meja_tulis", "kerja:konter": "lapak"}
 TITIK_KOTAK_42 = ("kavling",)
 # pajangan:<jenis>: the 42.9.1 list + existing 42 hand props (42.12.4 ids 170, 178, 182, 195, 199, 204)
 PAJANGAN = ("mangkuk", "mi", "teko", "botol_pil", "herba", "kain", "pedang", "papan", "ikan", "bakpao", "lentera_kertas",
@@ -124,6 +130,7 @@ def pasang():
 
     tl.titik_sah = _sah
     tl.TITIK_KOTAK = tuple(tl.TITIK_KOTAK) + tuple(t for t in TITIK_KOTAK_42 if t not in tl.TITIK_KOTAK)
+    nbt.TITIK_ALIAS.update(ALIAS_ALAT)
     tl._kota_hidup_kit = True
 
 

@@ -1,0 +1,58 @@
+{
+  "pembicara": [
+    "tokoh:lao_geng"
+  ],
+  "prioritas": 10,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "383",
+      "prop": "191",
+      "suara": "kota42.ronda_geng1",
+      "pilihan": [
+        {
+          "syarat": [
+            "quest kota42_lentera_lao_geng baru"
+          ],
+          "akibat": [
+            "quest_mulai kota42_lentera_lao_geng"
+          ],
+          "ke": "ikut"
+        },
+        {
+          "ke": "seruan"
+        },
+        {
+          "ke": "murid"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "ikut",
+      "gestur": "384",
+      "suara": "kota42.ronda_geng2"
+    },
+    {
+      "id": "seruan",
+      "gestur": "384",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "murid",
+      "gestur": "tepuk_bahu",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

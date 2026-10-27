@@ -1,0 +1,65 @@
+{
+  "pembicara": [
+    "tokoh:yu_xiuniang"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest kota42_akar_langit tahap kenangan"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "365",
+      "prop": "180",
+      "suara": "kota42.zhuazhou_kuas",
+      "pilihan": [
+        {
+          "ke": "ingin"
+        }
+      ]
+    },
+    {
+      "id": "ingin",
+      "gestur": "bicara_tangan",
+      "pilihan": [
+        {
+          "akibat": [
+            "bendera kota42.akar.pemain",
+            "bendera kota42.akar.pilih",
+            "quest_maju kota42_akar_langit"
+          ],
+          "ke": "pilih_pemain"
+        },
+        {
+          "akibat": [
+            "bendera kota42.akar.gao",
+            "bendera kota42.akar.pilih",
+            "quest_maju kota42_akar_langit"
+          ],
+          "ke": "pilih_gao"
+        },
+        {
+          "akibat": [
+            "bendera kota42.akar.tinggal",
+            "bendera kota42.akar.pilih",
+            "quest_maju kota42_akar_langit"
+          ],
+          "ke": "pilih_tinggal"
+        }
+      ]
+    },
+    {
+      "id": "pilih_pemain",
+      "gestur": "407"
+    },
+    {
+      "id": "pilih_gao",
+      "gestur": "menangis"
+    },
+    {
+      "id": "pilih_tinggal",
+      "gestur": "tertawa"
+    }
+  ]
+}

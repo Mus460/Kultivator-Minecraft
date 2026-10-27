@@ -1,0 +1,52 @@
+{
+  "pembicara": [
+    "tokoh:yan_feiyan"
+  ],
+  "prioritas": 5,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "372",
+      "prop": "189",
+      "pilihan": [
+        {
+          "syarat": [
+            "quest kota42_hati_feihu baru"
+          ],
+          "akibat": [
+            "quest_mulai kota42_hati_feihu"
+          ]
+        },
+        {
+          "ke": "latihan"
+        },
+        {
+          "ke": "sekolah"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "latihan",
+      "gestur": "372",
+      "prop": "189",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "sekolah",
+      "gestur": "bicara_tangan",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

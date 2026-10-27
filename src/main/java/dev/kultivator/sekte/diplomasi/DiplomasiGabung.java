@@ -804,7 +804,7 @@ public final class DiplomasiGabung {
 		}
 		g.setDirty();
 		data.addNews(hari, Component.translatable(KEY + (merosot ? "berita.merosot" : "berita.bangkit"), sect.name()));
-		Politik.kabar(server, merosot ? "gabung.merosot" : "gabung.bangkit", sect.name());
+		Politik.kabar(server, merosot ? "gabung.merosot" : "gabung.bangkit", "sekte:" + sect.id);
 		Politik.kabarAnggota(server, sekte, Component.translatable(KEY + (merosot ? "pesan.merosot" : "pesan.bangkit"), sect.name()),
 				merosot ? ChatFormatting.DARK_RED : ChatFormatting.GOLD);
 	}

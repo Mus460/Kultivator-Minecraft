@@ -1,0 +1,29 @@
+{
+  "pembicara": [
+    "tokoh:lao_geng"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest kota42_lentera_lao_geng tahap pensiun"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "408",
+      "suara": "kota42.lao_geng_pamit",
+      "pilihan": [
+        {
+          "ke": "terima"
+        }
+      ]
+    },
+    {
+      "id": "terima",
+      "gestur": "hormat_dalam",
+      "akibat": [
+        "bendera kota42.geng.pamit"
+      ]
+    }
+  ]
+}

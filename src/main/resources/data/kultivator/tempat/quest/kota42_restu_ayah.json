@@ -1,0 +1,36 @@
+{
+  "pemberi": "peran:warga",
+  "tempat": "kota42",
+  "ulang": true,
+  "tahap": [
+    {
+      "id": "dengar",
+      "tujuan": [
+        "bicara_warga tahap:dewasa"
+      ]
+    },
+    {
+      "id": "bukti",
+      "tujuan": [
+        "tolong *"
+      ]
+    },
+    {
+      "id": "hadiah",
+      "tujuan": [
+        "beri_warga *"
+      ]
+    },
+    {
+      "id": "restu",
+      "tujuan": [
+        "bicara_warga tahap:dewasa"
+      ],
+      "akibat": [
+        "kota42.restu",
+        "bendera kota42.restu_ayah",
+        "nama_baik 3"
+      ]
+    }
+  ]
+}

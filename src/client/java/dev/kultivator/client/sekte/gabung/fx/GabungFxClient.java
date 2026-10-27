@@ -8,8 +8,10 @@ import dev.kultivator.Kultivator;
 import dev.kultivator.client.EffectQuality;
 import dev.kultivator.client.epic.ShaderCompat;
 import dev.kultivator.client.epic.render.EpicRenderTypes;
+import dev.kultivator.sekte.gabung.GabungTitik;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.minecraft.client.Minecraft;
@@ -150,6 +152,12 @@ public final class GabungFxClient {
 		LevelRenderEvents.COLLECT_SUBMITS.register(GabungFxClient::collect);
 		ClientTickEvents.END_CLIENT_TICK.register(minecraft -> tick(minecraft));
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> clear());
+		// where the halls stand: the dome over the aula and the crown over the puncak (GabungTitik, D-41V)
+		ClientPlayNetworking.registerGlobalReceiver(GabungTitik.TitikKelas.TYPE, (payload, context) -> {
+			for (GabungTitik.Entri e : payload.entri()) {
+				VisualKelas.titik(e.sekte(), e.aula(), e.puncak());
+			}
+		});
 	}
 
 	private static void tick(Minecraft minecraft) {

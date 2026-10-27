@@ -13,6 +13,7 @@ import dev.kultivator.dunia.tempat.Titik;
 import dev.kultivator.dunia.tempat.ekonomi.EkonomiApi;
 import dev.kultivator.dunia.tempat.ekonomi.KasKota;
 import dev.kultivator.dunia.tempat.hidup.Pemanggil;
+import dev.kultivator.dunia.tempat.hidup.Penduduk;
 import dev.kultivator.dunia.tempat.hidup.TempatHuni;
 import dev.kultivator.dunia.tempat.perbaikan.PerbaikanApi;
 import dev.kultivator.util.Msg;
@@ -102,6 +103,7 @@ public final class BangunKembali {
 		TENDA.values().forEach(list -> list.forEach(TendaPengungsiEntity::discard));
 		TENDA.clear();
 		KASUR.clear();
+		TukangPendatang.lupakan();
 	}
 
 	// ================================================================== damage in
@@ -120,6 +122,7 @@ public final class BangunKembali {
 		}
 		c.putInt("rusak", c.getIntOr("rusak", 0) + blok);
 		boolean house = false;
+		boolean baru = false;
 		for (Titik t : TempatApi.titik(level, situs, "bangunan")) {
 			BoundingBox b = t.kotak();
 			if (!b.intersects(gugus)) {
@@ -132,28 +135,33 @@ public final class BangunKembali {
 			int shell = 2 * (w * d + w * h + d * h);
 			if (blok >= RUMAH_RUSAK * shell) {
 				house = true;
-				catatRumah(c, b);
+				baru |= catatRumah(c, b);
 			}
 		}
 		if (c.getBooleanOr("on", false)) {
 			c.putInt("tot", c.getIntOr("tot", 0) + blok);
+			if (baru) {
+				segarKasur(situs);
+			}
 		} else if (house || c.getIntOr("rusak", 0) > KotaConfig.tumbuh().ambangProyek) {
 			mulai(server, level, situs, c.getIntOr("rusak", blok));
 		}
 		KotaTumbuhData.get(server).ubah();
 	}
 
-	private static void catatRumah(CompoundTag c, BoundingBox b) {
+	private static boolean catatRumah(CompoundTag c, BoundingBox b) {
 		ListTag list = c.getListOrEmpty("rumah");
 		for (Tag t : list) {
 			if (t instanceof IntArrayTag a && a.getAsIntArray().length == 6 && a.getAsIntArray()[0] == b.minX() && a.getAsIntArray()[2] == b.minZ()) {
-				return;
+				return false;
 			}
 		}
-		if (list.size() < 32) {
-			list.add(new IntArrayTag(new int[]{b.minX(), b.minY(), b.minZ(), b.maxX(), b.maxY(), b.maxZ()}));
+		if (list.size() >= 32) {
+			return false;
 		}
+		list.add(new IntArrayTag(new int[]{b.minX(), b.minY(), b.minZ(), b.maxX(), b.maxY(), b.maxZ()}));
 		c.put("rumah", list);
+		return true;
 	}
 
 	/** Starts a project (also {@code uji kota_hidup tumbuh rusak_proyek}). */
@@ -196,19 +204,61 @@ public final class BangunKembali {
 				if (left == 0 && level.getGameTime() - c.getLongOr("t0", 0L) > 1200L) {
 					selesai(server, level, situs, c);
 				} else {
-					tenda(level, situs, c);
+					tenda(level, situs);
+					TukangPendatang.tick(server, level, situs);
 				}
 			} catch (RuntimeException exception) {
 				Kultivator.LOGGER.error("Kultivator: rebuild project of {} failed this second", situs, exception);
 			}
 		}
+		try {
+			Blokade.tick(server);
+			for (long situs : Blokade.situsPengungsi(server)) {
+				if (!aktif(server, situs)) {
+					tenda(level, situs);
+				}
+			}
+		} catch (RuntimeException exception) {
+			Kultivator.LOGGER.error("Kultivator: blockade refugees failed this second", exception);
+		}
+		TukangPendatang.bersihkan(server);
 		TENDA.keySet().removeIf(situs -> {
-			if (!aktif(server, situs)) {
+			if (!pengungsi(server, situs)) {
 				TENDA.get(situs).forEach(TendaPengungsiEntity::discard);
 				return true;
 			}
 			return false;
 		});
+	}
+
+	/** True while refugees camp on the square of {@code situs}: a rebuild project or a blockade with its refugee houses. */
+	static boolean pengungsi(MinecraftServer server, long situs) {
+		return aktif(server, situs) || !Blokade.rumah(server, situs).isEmpty();
+	}
+
+	/** Boxes of the houses the running project must rebuild (empty without a project). */
+	static List<BoundingBox> rumahProyek(MinecraftServer server, long situs) {
+		List<BoundingBox> out = new ArrayList<>();
+		if (aktif(server, situs)) {
+			for (Tag t : data(server, situs).getListOrEmpty("rumah")) {
+				if (t instanceof IntArrayTag a && a.getAsIntArray().length == 6) {
+					int[] v = a.getAsIntArray();
+					out.add(new BoundingBox(v[0], v[1], v[2], v[3], v[4], v[5]));
+				}
+			}
+		}
+		return out;
+	}
+
+	/** Boxes of the houses whose households are refugees now: the project's destroyed houses and the war refugees'. */
+	static List<BoundingBox> rumahPengungsi(MinecraftServer server, long situs) {
+		List<BoundingBox> out = rumahProyek(server, situs);
+		for (BoundingBox b : Blokade.rumah(server, situs)) {
+			if (!out.contains(b)) {
+				out.add(b);
+			}
+		}
+		return out;
 	}
 
 	private static void selesai(MinecraftServer server, ServerLevel level, long situs, CompoundTag c) {
@@ -246,13 +296,14 @@ public final class BangunKembali {
 		segarKasur(situs);
 		siar(level, situs, Component.translatable("kultivator.kota42.tumbuh.bangun.selesai", c.getIntOr("tot", 0)).withStyle(ChatFormatting.GOLD));
 		GosipWarga.lahir(level, situs, "ACARA", 0, Fakta.Kebenaran.BENAR, List.of("syukur_bangun"), null, Fakta.Rujuk.tempat(situs));
+		Peresmian.syukur(server, level, situs);
 	}
 
-	/** Keeps the refugee tents standing on the square while a player is near. */
-	private static void tenda(ServerLevel level, long situs, CompoundTag c) {
+	/** Keeps the refugee tents standing on the square while a player is near (one tent per refugee household). */
+	private static void tenda(ServerLevel level, long situs) {
 		List<TendaPengungsiEntity> tents = TENDA.computeIfAbsent(situs, k -> new ArrayList<>());
 		tents.removeIf(TendaPengungsiEntity::isRemoved);
-		List<Titik> beds = kasurTenda(level, situs, c);
+		List<Titik> beds = kasurTenda(level, situs);
 		if (beds.isEmpty()) {
 			return;
 		}
@@ -262,8 +313,15 @@ public final class BangunKembali {
 			tents.clear();
 			return;
 		}
+		// the first bed of each tent stands under the cloth, the other family members' mats lie beside it
+		List<Titik> spots = new ArrayList<>();
+		for (Titik bed : beds) {
+			if (bed.angka("anggota", 0) == 0) {
+				spots.add(bed);
+			}
+		}
 		boolean night = level.isDarkOutside();
-		for (int i = tents.size(); i < beds.size(); i++) {
+		for (int i = tents.size(); i < spots.size(); i++) {
 			if (DuniaBudget.count(KotaAcaraEntities.ANGGARAN) >= DuniaBudget.cap(KotaAcaraEntities.ANGGARAN)) {
 				break;
 			}
@@ -271,7 +329,7 @@ public final class BangunKembali {
 			if (tent == null) {
 				break;
 			}
-			Titik bed = beds.get(i);
+			Titik bed = spots.get(i);
 			tent.ikat(situs, bed.pos().asLong());
 			tent.pindah(Vec3.atBottomCenterOf(bed.pos()), bed.hadap().getOpposite().toYRot());
 			tent.setVarian(Math.floorMod((int) (situs ^ i), TendaPengungsiEntity.VARIAN_JUMLAH));
@@ -284,44 +342,80 @@ public final class BangunKembali {
 		}
 	}
 
+	/** Mats per tent: a household of more than three lets the rest sleep on the floor of the cook shed (no bed). */
+	private static final int ANGGOTA_MAKS = 3;
+
 	/**
-	 * The tent beds of a running project: one per damaged house (2-8), in two rows on the first square anchor found
-	 * (well, morning market, play spot, chat corner, arrival point), each tent's mouth toward the anchor.
+	 * The tent beds of the refugees (project houses and war refugees): one tent per refugee house (2-8), in two rows on the
+	 * first square anchor found (well, morning market, play spot, chat corner, arrival point), each tent's mouth toward the
+	 * anchor, and one bed per resident of that house (at most {@link #ANGGOTA_MAKS}): the first under the tent
+	 * ({@code anggota=0}), the others on mats beside it. Houses beyond the eighth share the tents. Not cached while 38NL has
+	 * not read the houses' residents yet (the first titik pass of a place), so the families are never lost to a race.
+	 * shortcut: 38NL gives a bed to a resident by a hash of the bed's position, so which resident takes which free bed is
+	 * its own matter (the beds of the vetoed houses' owners are the ones left free); exact household-to-tent binding needs a
+	 * {@code TempatHuni} hook that returns the bed of a resident, then the tent index {@code tenda} in the titik data is read.
 	 */
-	private static List<Titik> kasurTenda(ServerLevel level, long situs, CompoundTag c) {
+	private static List<Titik> kasurTenda(ServerLevel level, long situs) {
 		List<Titik> cached = KASUR.get(situs);
 		if (cached != null) {
 			return cached;
 		}
-		BlockPos anchor = null;
-		for (String type : ALUN) {
-			List<Titik> found = TempatApi.titik(level, situs, type);
-			if (!found.isEmpty()) {
-				anchor = found.get(0).pos();
-				break;
-			}
-		}
+		BlockPos anchor = alun(level, situs);
 		if (anchor == null) {
 			return List.of();
 		}
-		int n = Math.max(TENDA_MIN, Math.min(TENDA_MAKS, c.getListOrEmpty("rumah").size()));
+		List<BoundingBox> houses = rumahPengungsi(level.getServer(), situs);
+		int n = Math.max(TENDA_MIN, Math.min(TENDA_MAKS, houses.size()));
+		int[] anggota = new int[n];
+		boolean dibaca = houses.isEmpty();
+		TempatHuni huni = Pemanggil.huni(situs);
+		if (huni != null && !houses.isEmpty()) {
+			for (Penduduk p : huni.penduduk()) {
+				Titik rumah = huni.rumah(p);
+				int idx = rumah == null ? -1 : houses.indexOf(rumah.kotak());
+				if (idx >= 0) {
+					dibaca = true;
+					anggota[idx % n] = Math.min(ANGGOTA_MAKS, anggota[idx % n] + 1);
+				}
+			}
+		}
 		List<Titik> out = new ArrayList<>();
-		for (int i = 0; i < n && out.size() < n; i++) {
+		for (int i = 0; i < n; i++) {
 			int dx = (i / 2 - (n / 2 - 1) / 2) * 3;
 			int dz = (i % 2 == 0 ? -3 : 3);
-			BlockPos spot = TempatApi.groundSpot(level, anchor.getX() + dx, anchor.getZ() + dz, anchor.getY());
-			if (spot == null) {
-				spot = new BlockPos(anchor.getX() + dx, anchor.getY(), anchor.getZ() + dz);
-			}
 			Direction mouth = dz < 0 ? Direction.NORTH : Direction.SOUTH;
-			out.add(new Titik("kasur", spot, mouth, Map.of("tenda", "1")));
+			int mats = Math.max(1, anggota[i]);
+			for (int m = 0; m < mats; m++) {
+				// mats lie east and west of the tent, one block each
+				int sx = m == 0 ? 0 : m == 1 ? 1 : -1;
+				int x = anchor.getX() + dx + sx;
+				int z = anchor.getZ() + dz + (m == 0 ? 0 : (dz < 0 ? 1 : -1));
+				BlockPos spot = TempatApi.groundSpot(level, x, z, anchor.getY());
+				if (spot == null) {
+					spot = new BlockPos(x, anchor.getY(), z);
+				}
+				out.add(new Titik("kasur", spot, mouth, Map.of("tenda", Integer.toString(i), "anggota", Integer.toString(m))));
+			}
 		}
 		List<Titik> done = List.copyOf(out);
-		KASUR.put(situs, done);
+		if (dibaca) {
+			KASUR.put(situs, done);
+		}
 		return done;
 	}
 
-	private static void segarKasur(long situs) {
+	/** The square of a place: the first of the well, morning market, play spot, chat corner or arrival point; null when none. */
+	static @Nullable BlockPos alun(ServerLevel level, long situs) {
+		for (String type : ALUN) {
+			List<Titik> found = TempatApi.titik(level, situs, type);
+			if (!found.isEmpty()) {
+				return found.get(0).pos();
+			}
+		}
+		return null;
+	}
+
+	static void segarKasur(long situs) {
 		KASUR.remove(situs);
 		TempatHuni huni = Pemanggil.huni(situs);
 		if (huni != null) {
@@ -329,33 +423,27 @@ public final class BangunKembali {
 		}
 	}
 
-	/**
-	 * {@code TempatHuni.addSumberTitik}: the tent beds while a project runs (none otherwise).
-	 * shortcut: any resident may take a tent bed (38NL hands beds out by slot), not only the refugee households; tie beds to
-	 * the damaged houses' households when 42A exposes the household of a bed.
-	 */
+	/** {@code TempatHuni.addSumberTitik}: the tent beds while refugees camp (none otherwise). */
 	static List<Titik> titikTenda(MinecraftServer server, TempatHuni huni) {
-		if (!aktif(server, huni.situsId)) {
+		if (!pengungsi(server, huni.situsId)) {
 			return List.of();
 		}
-		return kasurTenda(server.overworld(), huni.situsId, data(server, huni.situsId));
+		return kasurTenda(server.overworld(), huni.situsId);
 	}
 
-	/** {@code TempatHuni.addPenolakTitik}: a bed inside a destroyed house is not slept in while the project runs. */
+	/** {@code TempatHuni.addPenolakTitik}: a bed inside a refugee house is not slept in while the refugees camp. */
 	static boolean rumahRusak(MinecraftServer server, TempatHuni huni, BlockPos pos) {
-		if (!aktif(server, huni.situsId)) {
+		if (!pengungsi(server, huni.situsId)) {
 			return false;
 		}
-		for (Tag t : data(server, huni.situsId).getListOrEmpty("rumah")) {
-			if (t instanceof IntArrayTag a && a.getAsIntArray().length == 6) {
-				int[] v = a.getAsIntArray();
-				if (new BoundingBox(v[0], v[1], v[2], v[3], v[4], v[5]).isInside(pos)) {
-					return true;
-				}
+		for (BoundingBox b : rumahPengungsi(server, huni.situsId)) {
+			if (b.isInside(pos)) {
+				return true;
 			}
 		}
 		return false;
 	}
+
 
 	// ================================================================== speed
 
@@ -433,7 +521,7 @@ public final class BangunKembali {
 		return null;
 	}
 
-	private static void siar(ServerLevel level, long situs, Component text) {
+	static void siar(ServerLevel level, long situs, Component text) {
 		TempatHuni huni = Pemanggil.huni(situs);
 		if (huni == null) {
 			return;

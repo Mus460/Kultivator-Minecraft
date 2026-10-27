@@ -1,0 +1,66 @@
+{
+  "nama": "kultivator.kota42.perkara.t.sewa_kuda.nama",
+  "teks": "kultivator.kota42.perkara.t.sewa_kuda.teks",
+  "penggugat": {
+    "klaim": "kultivator.kota42.perkara.t.sewa_kuda.klaim_a",
+    "peran": [
+      "pedagang_keliling",
+      "petani"
+    ]
+  },
+  "tergugat": {
+    "klaim": "kultivator.kota42.perkara.t.sewa_kuda.klaim_b",
+    "peran": [
+      "pedagang_keliling",
+      "pengembara"
+    ]
+  },
+  "benar": "acak",
+  "saksi": 2,
+  "kesaksian": {
+    "penggugat": [
+      "kultivator.kota42.perkara.t.sewa_kuda.saksi_a1",
+      "kultivator.kota42.perkara.t.sewa_kuda.saksi_a2"
+    ],
+    "tergugat": [
+      "kultivator.kota42.perkara.t.sewa_kuda.saksi_b1",
+      "kultivator.kota42.perkara.t.sewa_kuda.saksi_b2"
+    ]
+  },
+  "dusta": "kultivator.kota42.perkara.t.sewa_kuda.dusta",
+  "bukti": [
+    {
+      "jenis": "barang",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.sewa_kuda.bukti1_a",
+        "tergugat": "kultivator.kota42.perkara.t.sewa_kuda.bukti1_b"
+      },
+      "barang": "minecraft:saddle"
+    },
+    {
+      "jenis": "gosip",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.sewa_kuda.bukti2_a",
+        "tergugat": "kultivator.kota42.perkara.t.sewa_kuda.bukti2_b"
+      }
+    }
+  ],
+  "putusan": [
+    {
+      "untuk": "penggugat",
+      "teks": "kultivator.kota42.perkara.t.sewa_kuda.putusan1",
+      "akibat": "kultivator.kota42.perkara.t.sewa_kuda.putusan1_akibat"
+    },
+    {
+      "untuk": "tergugat",
+      "teks": "kultivator.kota42.perkara.t.sewa_kuda.putusan2",
+      "akibat": "kultivator.kota42.perkara.t.sewa_kuda.putusan2_akibat"
+    },
+    {
+      "untuk": "damai",
+      "teks": "kultivator.kota42.perkara.t.sewa_kuda.putusan3",
+      "akibat": "kultivator.kota42.perkara.t.sewa_kuda.putusan3_akibat"
+    }
+  ],
+  "suap": 0.3
+}

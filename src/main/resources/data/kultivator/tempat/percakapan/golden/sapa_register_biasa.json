@@ -48,6 +48,9 @@
           {
             "k": "kultivator.cakap.lex.kakak.kampung",
             "a": []
+          },
+          {
+            "t": ""
           }
         ]
       },
@@ -73,6 +76,9 @@
           {
             "k": "kultivator.cakap.lex.kakak.kampung.p",
             "a": []
+          },
+          {
+            "t": ""
           }
         ]
       },
@@ -101,6 +107,9 @@
                 "t": "Han"
               }
             ]
+          },
+          {
+            "t": ""
           }
         ]
       },

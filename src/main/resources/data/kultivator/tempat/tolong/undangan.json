@@ -1,0 +1,10 @@
+{
+  "nama": "kultivator.kota42.tolong.undangan.nama",
+  "teks": [
+    "kultivator.kota42.tolong.undangan.teks.0",
+    "kultivator.kota42.tolong.undangan.teks.1"
+  ],
+  "imbalan": "kultivator.kota42.tolong.undangan.imbalan",
+  "batas_hari": 3,
+  "peluang": 1.0
+}

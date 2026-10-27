@@ -1,0 +1,67 @@
+{
+  "nama": "kultivator.kota42.perkara.t.surat_wasiat.nama",
+  "teks": "kultivator.kota42.perkara.t.surat_wasiat.teks",
+  "penggugat": {
+    "klaim": "kultivator.kota42.perkara.t.surat_wasiat.klaim_a",
+    "peran": [
+      "guru_sekolah",
+      "sastrawan",
+      "warga"
+    ]
+  },
+  "tergugat": {
+    "klaim": "kultivator.kota42.perkara.t.surat_wasiat.klaim_b",
+    "peran": [
+      "warga",
+      "petani"
+    ]
+  },
+  "benar": "acak",
+  "saksi": 2,
+  "kesaksian": {
+    "penggugat": [
+      "kultivator.kota42.perkara.t.surat_wasiat.saksi_a1",
+      "kultivator.kota42.perkara.t.surat_wasiat.saksi_a2"
+    ],
+    "tergugat": [
+      "kultivator.kota42.perkara.t.surat_wasiat.saksi_b1",
+      "kultivator.kota42.perkara.t.surat_wasiat.saksi_b2"
+    ]
+  },
+  "dusta": "kultivator.kota42.perkara.t.surat_wasiat.dusta",
+  "bukti": [
+    {
+      "jenis": "catatan",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.surat_wasiat.bukti1_a",
+        "tergugat": "kultivator.kota42.perkara.t.surat_wasiat.bukti1_b"
+      }
+    },
+    {
+      "jenis": "barang",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.surat_wasiat.bukti2_a",
+        "tergugat": "kultivator.kota42.perkara.t.surat_wasiat.bukti2_b"
+      },
+      "barang": "minecraft:paper"
+    }
+  ],
+  "putusan": [
+    {
+      "untuk": "penggugat",
+      "teks": "kultivator.kota42.perkara.t.surat_wasiat.putusan1",
+      "akibat": "kultivator.kota42.perkara.t.surat_wasiat.putusan1_akibat"
+    },
+    {
+      "untuk": "tergugat",
+      "teks": "kultivator.kota42.perkara.t.surat_wasiat.putusan2",
+      "akibat": "kultivator.kota42.perkara.t.surat_wasiat.putusan2_akibat"
+    },
+    {
+      "untuk": "damai",
+      "teks": "kultivator.kota42.perkara.t.surat_wasiat.putusan3",
+      "akibat": "kultivator.kota42.perkara.t.surat_wasiat.putusan3_akibat"
+    }
+  ],
+  "suap": 0.35
+}

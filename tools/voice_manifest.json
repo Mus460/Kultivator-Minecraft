@@ -5973,6 +5973,1070 @@
    "style": 11
   },
   {
+   "event": "voice.gabung.gerbang_panggil",
+   "ja": "入門試験を受ける者は、前へ出よ！",
+   "en": "Those taking the entrance exam, step forward!",
+   "id": "Yang ikut ujian masuk, maju!",
+   "speaker": "Sect Gate Guard",
+   "style": 34
+  },
+  {
+   "event": "voice.gabung.tangga_tekanan",
+   "ja": "心を静めよ。山はお前を試している。",
+   "en": "Still your heart. The mountain is testing you.",
+   "id": "Tenangkan hatimu. Gunung sedang mengujimu.",
+   "speaker": "Admissions Elder",
+   "style": 42
+  },
+  {
+   "event": "voice.gabung.ujian_mulai",
+   "ja": "試験、始め！",
+   "en": "The test, begin!",
+   "id": "Ujian, mulai!",
+   "speaker": "Proctor Disciple",
+   "style": 11
+  },
+  {
+   "event": "voice.gabung.ujian_lulus",
+   "ja": "ふむ…悪くない。",
+   "en": "Hmm... not bad.",
+   "id": "Hmm... tidak buruk.",
+   "speaker": "Admissions Elder",
+   "style": 42
+  },
+  {
+   "event": "voice.gabung.ujian_gagal",
+   "ja": "縁がなかったようだな。三日後にまた来い。",
+   "en": "It seems fate is not with you yet. Come back in three days.",
+   "id": "Tampaknya belum berjodoh. Datanglah tiga hari lagi.",
+   "speaker": "Admissions Elder",
+   "style": 42
+  },
+  {
+   "event": "voice.gabung.diterima",
+   "ja": "今日より、お前は我が宗門の弟子だ。",
+   "en": "From this day on, you are a disciple of our sect.",
+   "id": "Mulai hari ini, kau murid sekte kami.",
+   "speaker": "Admissions Elder",
+   "style": 42
+  },
+  {
+   "event": "voice.gabung.istimewa",
+   "ja": "これほどの才…誰が弟子に取るか、揉めそうだな。",
+   "en": "Talent like this... the elders will fight over who takes you.",
+   "id": "Bakat sebesar ini... para tetua akan berebut.",
+   "speaker": "Admissions Elder",
+   "style": 42
+  },
+  {
+   "event": "voice.gabung.sumpah_aturan_1",
+   "ja": "同門を害するなかれ。",
+   "en": "Never harm a fellow disciple.",
+   "id": "Jangan mencelakai saudara seperguruan.",
+   "speaker": "Law Elder",
+   "style": 42
+  },
+  {
+   "event": "voice.gabung.sumpah_aturan_2",
+   "ja": "宗門の秘伝を漏らすなかれ。",
+   "en": "Never betray the sect's secret teachings.",
+   "id": "Jangan membocorkan warisan rahasia sekte.",
+   "speaker": "Law Elder",
+   "style": 42
+  },
+  {
+   "event": "voice.gabung.sumpah_aturan_3",
+   "ja": "宗門の危機には、必ず駆けつけよ。",
+   "en": "When the sect is in danger, come without fail.",
+   "id": "Saat sekte dalam bahaya, datanglah tanpa ragu.",
+   "speaker": "Law Elder",
+   "style": 42
+  },
+  {
+   "event": "voice.gabung.shifu_pilih",
+   "ja": "わしの弟子にならぬか？",
+   "en": "Will you become my disciple?",
+   "id": "Maukah kau menjadi muridku?",
+   "speaker": "Master",
+   "style": 42
+  },
+  {
+   "event": "voice.gabung.shifu_lindungi",
+   "ja": "わしの弟子に手を出すとは、いい度胸だ。",
+   "en": "You have nerve, laying a hand on my disciple.",
+   "id": "Berani sekali menyentuh muridku.",
+   "speaker": "Master",
+   "style": 42
+  },
+  {
+   "event": "voice.gabung.shifu_lampaui",
+   "ja": "はっはっは！弟子が師を超えたか！",
+   "en": "Hahaha! The disciple has surpassed the master!",
+   "id": "Hahaha! Murid sudah melampaui guru!",
+   "speaker": "Master",
+   "style": 42
+  },
+  {
+   "event": "voice.gabung.sapa_adik",
+   "ja": "師弟、おはよう！",
+   "en": "Good morning, little martial brother!",
+   "id": "Adik seperguruan, selamat pagi!",
+   "speaker": "Senior Sister",
+   "style": 0
+  },
+  {
+   "event": "voice.gabung.sapa_kakak",
+   "ja": "師兄、お疲れ様です。",
+   "en": "Senior brother, thank you for your hard work.",
+   "id": "Kakak senior, terima kasih atas kerja kerasnya.",
+   "speaker": "Junior Brother",
+   "style": 52
+  },
+  {
+   "event": "voice.gabung.saingan_ejek",
+   "ja": "雑用係がここで何をしている？",
+   "en": "What is an errand boy doing here?",
+   "id": "Pesuruh sedang apa di sini?",
+   "speaker": "Rival Disciple",
+   "style": 52
+  },
+  {
+   "event": "voice.gabung.panggilan_perang",
+   "ja": "敵が山門に迫っている！弟子たちよ、集え！",
+   "en": "The enemy nears the mountain gate! Disciples, assemble!",
+   "id": "Musuh mendekati gerbang! Para murid, berkumpul!",
+   "speaker": "Sect Gate Guard",
+   "style": 34
+  },
+  {
+   "event": "voice.gabung.hukum_tegur",
+   "ja": "門規を忘れたか。",
+   "en": "Have you forgotten the sect's rules?",
+   "id": "Sudah lupa aturan sekte?",
+   "speaker": "Law Elder",
+   "style": 42
+  },
+  {
+   "event": "voice.gabung.hukum_kurung",
+   "ja": "思過崖で己を省みよ。",
+   "en": "Reflect on yourself at the Cliff of Contemplation.",
+   "id": "Renungkan dirimu di Tebing Renungan.",
+   "speaker": "Law Elder",
+   "style": 42
+  },
+  {
+   "event": "voice.gabung.usir",
+   "ja": "今日をもって、お前を破門とする。二度と我が名を口にするな。",
+   "en": "As of today you are expelled. Never speak my name again.",
+   "id": "Mulai hari ini kau diusir. Jangan pernah sebut namaku lagi.",
+   "speaker": "Sect Master",
+   "style": 42
+  },
+  {
+   "event": "voice.gabung.pamit",
+   "ja": "行くがよい。道は一つではない。",
+   "en": "Go. There is more than one road.",
+   "id": "Pergilah. Jalan tidak hanya satu.",
+   "speaker": "Master",
+   "style": 42
+  },
+  {
+   "event": "voice.gabung.pemburu",
+   "ja": "裏切り者め、宗門の名において捕らえる！",
+   "en": "Traitor, in the name of the sect, you are under arrest!",
+   "id": "Pengkhianat, atas nama sekte kau kutangkap!",
+   "speaker": "Sect Hunter",
+   "style": 34
+  },
+  {
+   "event": "voice.gabung.ketua_serah",
+   "ja": "この衣と鉢を、お前に託そう。",
+   "en": "This robe and this bowl, I entrust to you.",
+   "id": "Jubah dan mangkuk ini, kuserahkan padamu.",
+   "speaker": "Old Sect Master",
+   "style": 53
+  },
+  {
+   "event": "voice.gabung.ketua_baru",
+   "ja": "新宗主に、拝礼！",
+   "en": "Pay respects to the new Sect Master!",
+   "id": "Hormat kepada Ketua baru!",
+   "speaker": "Proctor Disciple",
+   "style": 39
+  },
+  {
+   "event": "voice.gabung.tamu_sambut",
+   "ja": "客卿長老、ようこそお越しくださいました。",
+   "en": "Welcome, Guest Elder.",
+   "id": "Selamat datang, Tetua Tamu.",
+   "speaker": "Proctor Disciple",
+   "style": 11
+  },
+  {
+   "event": "voice.gabung.naik_kelas",
+   "ja": "一宗、天に名を連ねる。",
+   "en": "A sect writes its name among the heavens.",
+   "id": "Satu sekte mencatatkan namanya di langit.",
+   "speaker": "Heaven",
+   "style": 13
+  },
+  {
+   "event": "voice.gabung.turnamen_juara",
+   "ja": "見事だ。今日より、お前が門内一の弟子だ。",
+   "en": "Splendid. From today you are the first disciple of this school.",
+   "id": "Luar biasa. Mulai hari ini, kaulah murid terbaik perguruan.",
+   "speaker": "Sect Elder",
+   "style": 42
+  },
+  {
+   "event": "voice.gabung.pelajaran_mulai",
+   "ja": "座れ。今日は一つ、大事なことを教えよう。",
+   "en": "Sit. Today I will teach you one thing that matters.",
+   "id": "Duduklah. Hari ini akan kuajarkan satu hal penting.",
+   "speaker": "Master",
+   "style": 42
+  },
+  {
+   "event": "voice.kota42.sapa_pagi",
+   "ja": "おはようございます！今日もいい天気ですね。",
+   "en": "Good morning! Lovely weather today.",
+   "id": "Selamat pagi! Cuacanya bagus hari ini.",
+   "speaker": "Townswoman",
+   "style": 0
+  },
+  {
+   "event": "voice.kota42.sapa_kenal",
+   "ja": "おや、旦那！また来てくださったんですね。",
+   "en": "Why, sir! Back again, I see.",
+   "id": "Wah, Tuan! Datang lagi rupanya.",
+   "speaker": "Regular Merchant",
+   "style": 39
+  },
+  {
+   "event": "voice.kota42.sapa_asing",
+   "ja": "見かけない顔だな。旅のお方かい？",
+   "en": "Don't know your face. A traveller, eh?",
+   "id": "Wajahmu asing. Pengembara, ya?",
+   "speaker": "Wary Townsman",
+   "style": 52
+  },
+  {
+   "event": "voice.kota42.sapa_akrab",
+   "ja": "あら、いらっしゃい！お茶でも飲んでいって。",
+   "en": "Oh, come in! Have some tea first.",
+   "id": "Wah, mampir! Minum teh dulu.",
+   "speaker": "Neighbour Auntie",
+   "style": 8
+  },
+  {
+   "event": "voice.kota42.terima_kasih",
+   "ja": "本当にありがとうございます。このご恩は忘れません。",
+   "en": "Thank you, truly. I won't forget this kindness.",
+   "id": "Terima kasih sungguh. Budi ini takkan kulupakan.",
+   "speaker": "Grateful Townswoman",
+   "style": 0
+  },
+  {
+   "event": "voice.kota42.diselamatkan",
+   "ja": "あの火事のとき、あなたがいなければ…！",
+   "en": "That fire... if it weren't for you, sir...!",
+   "id": "Waktu kebakaran itu, kalau bukan karena Tuan...!",
+   "speaker": "Rescued Townsman",
+   "style": 41
+  },
+  {
+   "event": "voice.kota42.anak_kagum",
+   "ja": "すごい！お兄さん、空を飛べるの？",
+   "en": "Wow! Can you really fly?",
+   "id": "Hebat! Kakak bisa terbang?",
+   "speaker": "Town Child",
+   "style": 0
+  },
+  {
+   "event": "voice.kota42.tanya_jalan",
+   "ja": "ああ、それなら東へまっすぐ、橋を渡った先ですよ。",
+   "en": "Oh, that's straight east, just across the bridge.",
+   "id": "Oh, itu lurus ke timur, di seberang jembatan.",
+   "speaker": "Helpful Townsman",
+   "style": 12
+  },
+  {
+   "event": "voice.kota42.tidak_tahu",
+   "ja": "ごめんなさい、私も来たばかりで…井戸の奥さんたちに聞いてみて。",
+   "en": "Sorry, I've only just arrived too... ask the women at the well.",
+   "id": "Maaf, aku juga baru datang... tanyakan ibu-ibu di sumur.",
+   "speaker": "Newcomer",
+   "style": 46
+  },
+  {
+   "event": "voice.kota42.gosip_bisik",
+   "ja": "ねえ、聞いた？張さんの息子と李さんの娘がね…",
+   "en": "Psst, heard the news? The Zhang boy and the Li girl...",
+   "id": "Hei, sudah dengar? Putra keluarga Zhang dan putri keluarga Li...",
+   "speaker": "Well Gossip",
+   "style": 8
+  },
+  {
+   "event": "voice.kota42.gosip_tawa",
+   "ja": "まあ、大げさなんだから！",
+   "en": "Oh, she always blows things up!",
+   "id": "Ah, dia memang suka melebih-lebihkan!",
+   "speaker": "Well Gossip",
+   "style": 0
+  },
+  {
+   "event": "voice.kota42.duka",
+   "ja": "父が…昨夜、亡くなりました。",
+   "en": "Father... passed away last night.",
+   "id": "Ayah... wafat semalam.",
+   "speaker": "Grieving Son",
+   "style": 41
+  },
+  {
+   "event": "voice.kota42.bayi_lahir",
+   "ja": "生まれた！男の子だ！みんな、赤い卵だよ！",
+   "en": "It's born! A boy! Everyone, red eggs!",
+   "id": "Sudah lahir! Laki-laki! Semua, ini telur merah!",
+   "speaker": "New Father",
+   "style": 32
+  },
+  {
+   "event": "voice.kota42.nikah_undang",
+   "ja": "明日、娘が嫁ぐんです。ぜひいらしてください。",
+   "en": "My daughter marries tomorrow. Please come.",
+   "id": "Besok putriku menikah. Datanglah.",
+   "speaker": "Bride's Mother",
+   "style": 8
+  },
+  {
+   "event": "voice.kota42.takut_serangan",
+   "ja": "早く中へ！獣が城壁の外まで来てる！",
+   "en": "Get inside, quick! The beasts are right outside the walls!",
+   "id": "Cepat masuk! Binatang sudah sampai di luar tembok!",
+   "speaker": "Frightened Townswoman",
+   "style": 46
+  },
+  {
+   "event": "voice.kota42.marah",
+   "ja": "なんだと！もう一度言ってみろ！",
+   "en": "What did you say! Say that again!",
+   "id": "Apa katamu! Ulangi sekali lagi!",
+   "speaker": "Angry Townsman",
+   "style": 52
+  },
+  {
+   "event": "voice.kota42.mabuk",
+   "ja": "ひっく…月が…二つ…いや、一つか…",
+   "en": "Hic... two... moons... no, one...",
+   "id": "Hik... bulannya... dua... bukan, satu...",
+   "speaker": "Drunkard",
+   "style": 12
+  },
+  {
+   "event": "voice.kota42.catur_skak",
+   "ja": "王手！どうだ、参ったか！",
+   "en": "Check! Well, do you give up?",
+   "id": "Skak! Bagaimana, menyerah?",
+   "speaker": "Old Chess Player",
+   "style": 42
+  },
+  {
+   "event": "voice.kota42.catur_kalah",
+   "ja": "むう…今日は風が悪い。",
+   "en": "Hmm... the wind's against me today.",
+   "id": "Hmm... anginnya sedang buruk hari ini.",
+   "speaker": "Old Chess Player",
+   "style": 42
+  },
+  {
+   "event": "voice.kota42.pedagang_seru",
+   "ja": "安いよ安いよ！今朝採れたての野菜だよ！",
+   "en": "Cheap, cheap! Vegetables picked this morning!",
+   "id": "Murah, murah! Sayur baru dipetik pagi ini!",
+   "speaker": "Greengrocer",
+   "style": 39
+  },
+  {
+   "event": "voice.kota42.harga_naik",
+   "ja": "お米がまた上がったのよ。困ったわねえ。",
+   "en": "Rice went up again. What a bother.",
+   "id": "Beras naik lagi. Repot sekali.",
+   "speaker": "Housewife",
+   "style": 8
+  },
+  {
+   "event": "voice.kota42.ronda_geng1",
+   "ja": "てんかわき、ものかわく。ひのようじん！",
+   "en": "Dry skies, dry things, mind the fire!",
+   "id": "Udara kering, hati-hati api dan lilin!",
+   "speaker": "Lao Geng, Night Watchman",
+   "style": 42
+  },
+  {
+   "event": "voice.kota42.ronda_geng2",
+   "ja": "二更、平安無事でござーい！",
+   "en": "Second watch, and all is well!",
+   "id": "Geng kedua, semua aman!",
+   "speaker": "Lao Geng, Night Watchman",
+   "style": 42
+  },
+  {
+   "event": "voice.kota42.ronda_geng3",
+   "ja": "戸締まり用心、泥棒に気をつけよ！",
+   "en": "Lock your doors, beware of thieves!",
+   "id": "Kunci pintu, waspada pencuri!",
+   "speaker": "Lao Geng, Night Watchman",
+   "style": 42
+  },
+  {
+   "event": "voice.kota42.ronda_geng4",
+   "ja": "四更でございます。安らかにお休みなされ。",
+   "en": "The fourth watch. Sleep in peace.",
+   "id": "Geng keempat. Tidurlah dengan tenang.",
+   "speaker": "Xiao Bang, Watch Apprentice",
+   "style": 52
+  },
+  {
+   "event": "voice.kota42.ronda_geng5",
+   "ja": "五更！夜明けは近いぞ。",
+   "en": "Fifth watch! Dawn is near.",
+   "id": "Geng kelima! Fajar sudah dekat.",
+   "speaker": "Lao Geng, Night Watchman",
+   "style": 42
+  },
+  {
+   "event": "voice.kota42.copet_teriak",
+   "ja": "スリだ！誰か捕まえて！",
+   "en": "Pickpocket! Somebody stop him!",
+   "id": "Copet! Tolong tangkap!",
+   "speaker": "Pickpocket Victim",
+   "style": 2
+  },
+  {
+   "event": "voice.kota42.copet_tabrak",
+   "ja": "おっと、失礼！",
+   "en": "Oops, pardon me!",
+   "id": "Ups, maaf!",
+   "speaker": "Pickpocket",
+   "style": 52
+  },
+  {
+   "event": "voice.kota42.copet_tertangkap",
+   "ja": "ま、参った！返します、返しますから！",
+   "en": "M-mercy! I'll give it back, I'll give it back!",
+   "id": "A-ampun! Kukembalikan, kukembalikan!",
+   "speaker": "Pickpocket",
+   "style": 52
+  },
+  {
+   "event": "voice.kota42.kebakaran",
+   "ja": "火事だ！水を持ってこい！",
+   "en": "Fire! Bring water!",
+   "id": "Kebakaran! Bawa air!",
+   "speaker": "Panicked Townsman",
+   "style": 33
+  },
+  {
+   "event": "voice.kota42.api_padam",
+   "ja": "消えた…助かった…ありがとうございます！",
+   "en": "It's out... we're saved... thank you!",
+   "id": "Padam... selamat... terima kasih!",
+   "speaker": "Homeowner",
+   "style": 39
+  },
+  {
+   "event": "voice.kota42.gerobak",
+   "ja": "ああ、荷が！誰か手を貸してくれ！",
+   "en": "Oh no, my load! Someone lend a hand!",
+   "id": "Aduh, muatanku! Tolong bantu!",
+   "speaker": "Carter",
+   "style": 41
+  },
+  {
+   "event": "voice.kota42.lerai",
+   "ja": "やめろ！二人とも、やめるんだ！",
+   "en": "Stop it! Both of you, stop!",
+   "id": "Hentikan! Kalian berdua, hentikan!",
+   "speaker": "Peacemaker",
+   "style": 52
+  },
+  {
+   "event": "voice.kota42.lao_shuo_buka",
+   "ja": "さてさて、今日お話しするのは…",
+   "en": "Now then, now then, today's tale is...",
+   "id": "Nah, nah, yang akan kuceritakan hari ini...",
+   "speaker": "Lao Shuo, Storyteller",
+   "style": 42
+  },
+  {
+   "event": "voice.kota42.lao_shuo_tutup",
+   "ja": "続きは、また明日のお楽しみ！",
+   "en": "For the rest, come back tomorrow!",
+   "id": "Lanjutannya, nantikan besok!",
+   "speaker": "Lao Shuo, Storyteller",
+   "style": 42
+  },
+  {
+   "event": "voice.kota42.akrobat_buka",
+   "ja": "さあさあ、お立ち会い！三日月一座の妙技、とくとご覧あれ！",
+   "en": "Roll up, roll up, behold the wonders of the Crescent Moon Troupe!",
+   "id": "Ayo, ayo, saksikan kehebatan Rombongan Bulan Sabit!",
+   "speaker": "Madam Hong Ling",
+   "style": 0
+  },
+  {
+   "event": "voice.kota42.penjual_obat",
+   "ja": "この膏薬ひと塗りで、腰の痛みもたちまち消える！",
+   "en": "One dab of this plaster and your back pain is gone!",
+   "id": "Sekali oles plester ini, sakit pinggang langsung hilang!",
+   "speaker": "Medicine Hawker",
+   "style": 39
+  },
+  {
+   "event": "voice.kota42.sekolah_hafal",
+   "ja": "じんしのしょ、せいほんぜん。せいあいちかく、ならいあいとおし。",
+   "en": "Men at their birth are good by nature; nature is close, habit sets apart.",
+   "id": "Manusia pada awalnya berwatak baik; wataknya dekat, kebiasaannya menjauhkan.",
+   "speaker": "Schoolchild",
+   "style": 2
+  },
+  {
+   "event": "voice.kota42.guru_panggil",
+   "ja": "さあ、みんな並んで。学堂へ行くよ。",
+   "en": "Line up, everyone. We're off to school.",
+   "id": "Ayo semua berbaris. Kita ke sekolah.",
+   "speaker": "Schoolteacher",
+   "style": 11
+  },
+  {
+   "event": "voice.kota42.taichi",
+   "ja": "ゆっくり息を吸って…吐いて…",
+   "en": "Breathe in slowly... and out...",
+   "id": "Tarik napas pelan... hembuskan...",
+   "speaker": "Tai Chi Elder",
+   "style": 42
+  },
+  {
+   "event": "voice.kota42.comblang",
+   "ja": "いいご縁がありますよ。任せてちょうだい！",
+   "en": "There's a fine match for you. Leave it to me!",
+   "id": "Ada jodoh yang bagus. Serahkan padaku!",
+   "speaker": "Auntie Mei, Matchmaker",
+   "style": 8
+  },
+  {
+   "event": "voice.kota42.nikah_jemput",
+   "ja": "花嫁のお迎えだ！道を開けてくれ！",
+   "en": "Here comes the bride's escort! Make way!",
+   "id": "Penjemputan pengantin! Beri jalan!",
+   "speaker": "Bridal Escort",
+   "style": 32
+  },
+  {
+   "event": "voice.kota42.nikah_sembah",
+   "ja": "いっぱい、てんち！にはい、こうどう！ふうふ、たいはい！",
+   "en": "Bow to Heaven and Earth! Bow to the parents! Bow to each other!",
+   "id": "Sembah langit dan bumi! Sembah orang tua! Saling bersembah!",
+   "speaker": "Master of Ceremonies",
+   "style": 42
+  },
+  {
+   "event": "voice.kota42.bersulang",
+   "ja": "新郎新婦に、乾杯！",
+   "en": "To the bride and groom, cheers!",
+   "id": "Untuk kedua mempelai, bersulang!",
+   "speaker": "Wedding Guest",
+   "style": 39
+  },
+  {
+   "event": "voice.kota42.makam_pimpin",
+   "ja": "故人を偲び、皆で送りましょう。",
+   "en": "Let us remember the departed and see them off together.",
+   "id": "Mari kita kenang almarhum dan mengantarnya bersama.",
+   "speaker": "Funeral Master",
+   "style": 42
+  },
+  {
+   "event": "voice.kota42.makam_ratap",
+   "ja": "どうして…どうして先に逝ってしまったの…",
+   "en": "Why... why did you go first...",
+   "id": "Kenapa... kenapa pergi lebih dulu...",
+   "speaker": "Grieving Widow",
+   "style": 8
+  },
+  {
+   "event": "voice.kota42.zhuazhou_kuas",
+   "ja": "見て！筆を掴んだわ！きっと学者になるわね！",
+   "en": "Look! He grabbed the brush! He'll be a scholar for sure!",
+   "id": "Lihat! Dia meraih kuas! Pasti jadi sarjana!",
+   "speaker": "Baby's Mother",
+   "style": 0
+  },
+  {
+   "event": "voice.kota42.zhuazhou_pedang",
+   "ja": "剣を掴んだぞ！この子は仙人になるかもしれん！",
+   "en": "He grabbed the sword! This child might become a cultivator!",
+   "id": "Dia meraih pedang! Anak ini mungkin jadi kultivator!",
+   "speaker": "Baby's Father",
+   "style": 32
+  },
+  {
+   "event": "voice.kota42.rekrut_terima",
+   "ja": "おめでとう。今日から君は我が宗門の候補だ。",
+   "en": "Congratulations. From today you are a candidate of our sect.",
+   "id": "Selamat. Mulai hari ini kau calon murid sekte kami.",
+   "speaker": "Recruitment Officer",
+   "style": 39
+  },
+  {
+   "event": "voice.kota42.rekrut_pamit",
+   "ja": "お父さん、お母さん…行ってきます！",
+   "en": "Father, Mother... I'm off!",
+   "id": "Ayah, Ibu... aku berangkat!",
+   "speaker": "Young Recruit",
+   "style": 2
+  },
+  {
+   "event": "voice.kota42.restu_tolak",
+   "ja": "息子は店を継ぐんだ。仙人なんぞにはやらん！",
+   "en": "My son inherits the shop. I won't hand him to the immortals!",
+   "id": "Putraku akan mewarisi toko. Takkan kuserahkan jadi kultivator!",
+   "speaker": "Shopkeeper Father",
+   "style": 52
+  },
+  {
+   "event": "voice.kota42.pelindung_sapa",
+   "ja": "守護宗門の方だ！ありがたい！",
+   "en": "It's someone from the protecting sect! Thank heavens!",
+   "id": "Itu orang dari sekte pelindung! Syukurlah!",
+   "speaker": "Townsman",
+   "style": 32
+  },
+  {
+   "event": "voice.kota42.bela_panggil",
+   "ja": "獣の群れが町に迫っています！どうかお助けを！",
+   "en": "A beast horde is closing in on the town! Please, help us!",
+   "id": "Kawanan binatang mendekati kota! Tolonglah kami!",
+   "speaker": "Town Messenger",
+   "style": 11
+  },
+  {
+   "event": "voice.kota42.bela_menang",
+   "ja": "町は守られた！宗門万歳！",
+   "en": "The town is saved! Long live the sect!",
+   "id": "Kota terselamatkan! Hidup sekte!",
+   "speaker": "Town Messenger",
+   "style": 39
+  },
+  {
+   "event": "voice.kota42.panji_naik",
+   "ja": "今日よりこの町は、貴宗の庇護を受けます。",
+   "en": "From this day, this town lies under your sect's protection.",
+   "id": "Mulai hari ini kota ini di bawah naungan sekte Tuan.",
+   "speaker": "Mayor",
+   "style": 42
+  },
+  {
+   "event": "voice.kota42.mandor",
+   "ja": "礎がしっかりしてこそ、家は百年もつ。",
+   "en": "Only on firm foundations does a house stand a hundred years.",
+   "id": "Hanya bila pondasinya kokoh, rumah bertahan seratus tahun.",
+   "speaker": "Master Builder",
+   "style": 42
+  },
+  {
+   "event": "voice.kota42.kavling_selesai",
+   "ja": "新しい家が建ったぞ！祝いだ！",
+   "en": "The new house is up! Let's celebrate!",
+   "id": "Rumah baru sudah berdiri! Mari rayakan!",
+   "speaker": "Builder",
+   "style": 32
+  },
+  {
+   "event": "voice.kota42.bangun_kembali",
+   "ja": "壊れても、また建てればいい。みんなでな。",
+   "en": "If it falls, we build it again. Together.",
+   "id": "Kalau hancur, kita bangun lagi. Bersama-sama.",
+   "speaker": "Builder",
+   "style": 11
+  },
+  {
+   "event": "voice.kota42.sandi_malam",
+   "ja": "月のない夜、石の下で水が眠る…",
+   "en": "On a moonless night, water sleeps beneath the stone...",
+   "id": "Malam tanpa bulan, air tidur di bawah batu...",
+   "speaker": "Ghost Market Keeper",
+   "style": 21
+  },
+  {
+   "event": "voice.kota42.lentera_hijau",
+   "ja": "顔は見ない、名は聞かない。それがここの決まりだ。",
+   "en": "We don't look at faces, we don't ask names. That's the rule here.",
+   "id": "Tak melihat wajah, tak bertanya nama. Itu aturan di sini.",
+   "speaker": "Ghost Market Keeper",
+   "style": 21
+  },
+  {
+   "event": "voice.kota42.razia",
+   "ja": "役人だ！逃げろ！",
+   "en": "Officials! Run!",
+   "id": "Petugas! Lari!",
+   "speaker": "Black Market Trader",
+   "style": 33
+  },
+  {
+   "event": "voice.kota42.dadu_besar",
+   "ja": "大だ！大が来たぞ！",
+   "en": "Big! Big came up!",
+   "id": "Besar! Keluar besar!",
+   "speaker": "Gambler",
+   "style": 52
+  },
+  {
+   "event": "voice.kota42.dadu_kecil",
+   "ja": "くそっ、また小か…",
+   "en": "Damn it, small again...",
+   "id": "Sial, kecil lagi...",
+   "speaker": "Gambler",
+   "style": 52
+  },
+  {
+   "event": "voice.kota42.huaquan",
+   "ja": "ごかいしゅ！ろくろくじゅん！",
+   "en": "Five champions! Six-six smooth sailing!",
+   "id": "Lima juara! Enam-enam lancar!",
+   "speaker": "Tavern Drinker",
+   "style": 32
+  },
+  {
+   "event": "voice.kota42.wayang_buka",
+   "ja": "影絵芝居の始まり始まり！",
+   "en": "The shadow play begins, it begins!",
+   "id": "Pertunjukan wayang bayang dimulai!",
+   "speaker": "Shadow Puppeteer",
+   "style": 39
+  },
+  {
+   "event": "voice.kota42.sup_nenek",
+   "ja": "寒かったろう。熱いスープをお飲み。",
+   "en": "Cold out, wasn't it? Drink some hot soup.",
+   "id": "Dingin, kan? Minumlah sup panas ini.",
+   "speaker": "Granny Tang",
+   "style": 8
+  },
+  {
+   "event": "voice.kota42.laba",
+   "ja": "ろうはちの粥だ。誰でも並びなされ。",
+   "en": "Here is Laba porridge. Everyone, line up.",
+   "id": "Ini bubur Laba. Siapa saja silakan antre.",
+   "speaker": "Temple Abbot",
+   "style": 42
+  },
+  {
+   "event": "voice.kota42.tahun_baru",
+   "ja": "新年おめでとう！お年玉ちょうだい！",
+   "en": "Happy New Year! Red envelope, please!",
+   "id": "Selamat tahun baru! Minta angpao!",
+   "speaker": "Town Child",
+   "style": 0
+  },
+  {
+   "event": "voice.kota42.pindah",
+   "ja": "水の都に仕事があるそうで…家族で引っ越します。",
+   "en": "They say there's work in the Water City... the whole family is moving.",
+   "id": "Katanya ada kerja di Kota Air... sekeluarga kami pindah.",
+   "speaker": "Departing Townsman",
+   "style": 11
+  },
+  {
+   "event": "voice.kota42.pejabat_sapa",
+   "ja": "これは、お役人様！",
+   "en": "Oh, Lord Official!",
+   "id": "Wah, Tuan Pejabat!",
+   "speaker": "Townsman",
+   "style": 12
+  },
+  {
+   "event": "voice.kota42.putusan",
+   "ja": "判決を下す！",
+   "en": "The verdict is passed!",
+   "id": "Putusan dijatuhkan!",
+   "speaker": "Town Magistrate",
+   "style": 42
+  },
+  {
+   "event": "voice.kota42.suap",
+   "ja": "まあまあ、これはほんの気持ちで…",
+   "en": "Now, now, this is just a small token of thanks...",
+   "id": "Sudahlah, ini sekadar tanda terima kasih...",
+   "speaker": "Briber",
+   "style": 52
+  },
+  {
+   "event": "voice.kota42.pajak_keluh",
+   "ja": "また税が上がるのか…",
+   "en": "Taxes up again?...",
+   "id": "Pajak naik lagi?...",
+   "speaker": "Merchant",
+   "style": 52
+  },
+  {
+   "event": "voice.kota42.cucu_cerita",
+   "ja": "おじいちゃんの若い頃にな、空飛ぶ剣士が町を救ってくれたんじゃ。",
+   "en": "When Grandpa was young, a flying swordsman saved this town.",
+   "id": "Waktu Kakek masih muda, seorang pendekar terbang menyelamatkan kota ini.",
+   "speaker": "Storytelling Grandfather",
+   "style": 42
+  },
+  {
+   "event": "voice.kota42.ah_qin",
+   "ja": "この曲は、亡き師匠の曲です。",
+   "en": "This tune was my late master's.",
+   "id": "Lagu ini lagu almarhum guruku.",
+   "speaker": "Ah Qin, Street Musician",
+   "style": 8
+  },
+  {
+   "event": "voice.kota42.lao_geng_pamit",
+   "ja": "わしの拍子木も、今夜で最後か…",
+   "en": "My clapper too... tonight is its last...",
+   "id": "Kentonganku pun, malam ini yang terakhir...",
+   "speaker": "Lao Geng, Night Watchman",
+   "style": 42
+  },
+  {
+   "event": "voice.kota42.xiao_bang",
+   "ja": "師匠、見ててください。僕が町の夜を守ります！",
+   "en": "Master, watch me. I'll guard the town's nights!",
+   "id": "Guru, lihatlah. Aku yang akan menjaga malam kota!",
+   "speaker": "Xiao Bang, Watch Apprentice",
+   "style": 52
+  },
+  {
+   "event": "voice.kota42.xiao_yu",
+   "ja": "葉っぱがね、私の手の上で浮かぶの！",
+   "en": "The leaf floats above my hand!",
+   "id": "Daunnya melayang di atas tanganku!",
+   "speaker": "Xiao Yu",
+   "style": 0
+  },
+  {
+   "event": "voice.kota42.seru.ya_l",
+   "ja": "はい。",
+   "en": "Yes.",
+   "id": "Ya.",
+   "speaker": "Townsman",
+   "style": 11
+  },
+  {
+   "event": "voice.kota42.seru.ya_p",
+   "ja": "はい。",
+   "en": "Yes.",
+   "id": "Ya.",
+   "speaker": "Townswoman",
+   "style": 2
+  },
+  {
+   "event": "voice.kota42.seru.eh_l",
+   "ja": "ええっ？",
+   "en": "Huh?",
+   "id": "Hah?",
+   "speaker": "Townsman",
+   "style": 52
+  },
+  {
+   "event": "voice.kota42.seru.eh_p",
+   "ja": "ええっ？",
+   "en": "Huh?",
+   "id": "Hah?",
+   "speaker": "Townswoman",
+   "style": 8
+  },
+  {
+   "event": "voice.kota42.seru.hmm_l",
+   "ja": "ふむ…",
+   "en": "Hmm...",
+   "id": "Hmm...",
+   "speaker": "Townsman",
+   "style": 11
+  },
+  {
+   "event": "voice.kota42.seru.hmm_p",
+   "ja": "うーん…",
+   "en": "Hmm...",
+   "id": "Hmm...",
+   "speaker": "Townswoman",
+   "style": 8
+  },
+  {
+   "event": "voice.kota42.seru.oh_l",
+   "ja": "へえ！",
+   "en": "Oh, really!",
+   "id": "Oh ya!",
+   "speaker": "Townsman",
+   "style": 32
+  },
+  {
+   "event": "voice.kota42.seru.oh_p",
+   "ja": "へえ！",
+   "en": "Oh, really!",
+   "id": "Oh ya!",
+   "speaker": "Townswoman",
+   "style": 0
+  },
+  {
+   "event": "voice.kota42.seru.tawa_l",
+   "ja": "あははっ！",
+   "en": "Hahaha!",
+   "id": "Hahaha!",
+   "speaker": "Townsman",
+   "style": 32
+  },
+  {
+   "event": "voice.kota42.seru.tawa_p",
+   "ja": "あははっ！",
+   "en": "Hahaha!",
+   "id": "Hahaha!",
+   "speaker": "Townswoman",
+   "style": 0
+  },
+  {
+   "event": "voice.kota42.seru.cih",
+   "ja": "ちっ。",
+   "en": "Tch.",
+   "id": "Cih.",
+   "speaker": "Townsman",
+   "style": 52
+  },
+  {
+   "event": "voice.kota42.seru.aduh_l",
+   "ja": "やれやれ…",
+   "en": "Oh dear...",
+   "id": "Aduh...",
+   "speaker": "Townsman",
+   "style": 41
+  },
+  {
+   "event": "voice.kota42.seru.aduh_p",
+   "ja": "やれやれ…",
+   "en": "Oh dear...",
+   "id": "Aduh...",
+   "speaker": "Townswoman",
+   "style": 8
+  },
+  {
+   "event": "voice.kota42.seru.terima_kasih_l",
+   "ja": "どうも！",
+   "en": "Thanks!",
+   "id": "Terima kasih!",
+   "speaker": "Townsman",
+   "style": 39
+  },
+  {
+   "event": "voice.kota42.seru.terima_kasih_p",
+   "ja": "どうも！",
+   "en": "Thanks!",
+   "id": "Terima kasih!",
+   "speaker": "Townswoman",
+   "style": 0
+  },
+  {
+   "event": "voice.kota42.seru.maaf_l",
+   "ja": "すみません…",
+   "en": "Sorry...",
+   "id": "Maaf...",
+   "speaker": "Townsman",
+   "style": 52
+  },
+  {
+   "event": "voice.kota42.seru.maaf_p",
+   "ja": "すみません…",
+   "en": "Sorry...",
+   "id": "Maaf...",
+   "speaker": "Townswoman",
+   "style": 46
+  },
+  {
+   "event": "voice.kota42.seru.wah_anak",
+   "ja": "わあっ！",
+   "en": "Wow!",
+   "id": "Wah!",
+   "speaker": "Child",
+   "style": 0
+  },
+  {
+   "event": "voice.kota42.seru.tetua_hmm",
+   "ja": "ほっほっ。",
+   "en": "Ho ho.",
+   "id": "Ho ho.",
+   "speaker": "Elder",
+   "style": 42
+  },
+  {
+   "event": "voice.kota42.seru.tetua_marah",
+   "ja": "馬鹿者！",
+   "en": "You fool!",
+   "id": "Dasar bodoh!",
+   "speaker": "Elder",
+   "style": 42
+  },
+  {
+   "event": "voice.kota42.seru.mabuk",
+   "ja": "ひっく。",
+   "en": "Hic.",
+   "id": "Hik.",
+   "speaker": "Townsman",
+   "style": 12
+  },
+  {
+   "event": "voice.kota42.seru.bisik_p",
+   "ja": "しーっ。",
+   "en": "Shh.",
+   "id": "Sst.",
+   "speaker": "Townswoman",
+   "style": 8
+  },
+  {
+   "event": "voice.kota42.seru.takut_p",
+   "ja": "ひっ…！",
+   "en": "Eek...!",
+   "id": "Hii...!",
+   "speaker": "Townswoman",
+   "style": 46
+  },
+  {
+   "event": "voice.kota42.seru.setuju_l",
+   "ja": "そうだそうだ！",
+   "en": "Right, right!",
+   "id": "Betul, betul!",
+   "speaker": "Townsman",
+   "style": 32
+  },
+  {
+   "event": "voice.kota42.nikah_selamat",
+   "ja": "ご結婚おめでとうございます！末永くお幸せに！",
+   "en": "Congratulations on your wedding! May you be happy forever!",
+   "id": "Selamat atas pernikahan kalian! Semoga bahagia selamanya!",
+   "speaker": "Wedding Guest",
+   "style": 0
+  },
+  {
+   "event": "voice.kota42.makam_sujud",
+   "ja": "どうか、安らかに眠ってください…。",
+   "en": "May you rest in peace...",
+   "id": "Semoga beristirahat dengan tenang...",
+   "speaker": "Bereaved Family",
+   "style": 52
+  },
+  {
+   "event": "voice.kota42.sebulan_selamat",
+   "ja": "満月おめでとう。丈夫に育つんだよ。",
+   "en": "Happy one month! Grow up healthy, little one.",
+   "id": "Selamat sebulan! Tumbuhlah sehat, ya.",
+   "speaker": "Elderly Neighbour",
+   "style": 42
+  },
+  {
    "event": "voice.sekte_langit.bajak_datang",
    "ja": "倉の中身を差し出せ！さもなくばこの島を焼き払う！",
    "en": "Hand over your storehouse, or we burn this island!",

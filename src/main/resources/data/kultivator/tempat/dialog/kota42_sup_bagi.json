@@ -1,0 +1,31 @@
+{
+  "pembicara": [
+    "tokoh:paman_bai"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest kota42_sup_hangat tahap bagi"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "415",
+      "prop": "211",
+      "suara": "kota42.laba",
+      "pilihan": [
+        {
+          "akibat": [
+            "bendera kota42.sup.bagi",
+            "klip k:bagi_bubur k:mangkuk_bubur"
+          ],
+          "ke": "selesai"
+        }
+      ]
+    },
+    {
+      "id": "selesai",
+      "gestur": "hormat"
+    }
+  ]
+}

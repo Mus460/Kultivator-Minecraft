@@ -1,0 +1,53 @@
+{
+  "pembicara": [
+    "tokoh:tetua_he"
+  ],
+  "prioritas": 40,
+  "syarat": [
+    "ranah 2"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "berlutut",
+      "pilihan": [
+        {
+          "syarat": [
+            "quest kota42_pelindung_baru baru"
+          ],
+          "akibat": [
+            "quest_mulai kota42_pelindung_baru",
+            "quest_maju kota42_pelindung_baru"
+          ],
+          "ke": "terima"
+        },
+        {
+          "ke": "kenapa"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kenapa",
+      "gestur": "menangis",
+      "pilihan": [
+        {
+          "syarat": [
+            "quest kota42_pelindung_baru baru"
+          ],
+          "akibat": [
+            "quest_mulai kota42_pelindung_baru",
+            "quest_maju kota42_pelindung_baru"
+          ],
+          "ke": "terima"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "terima",
+      "gestur": "hormat_dalam"
+    }
+  ]
+}

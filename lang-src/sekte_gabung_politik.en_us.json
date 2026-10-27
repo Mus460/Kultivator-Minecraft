@@ -216,5 +216,17 @@
   "kultivator.gabung.politik.usul_terkirim": "Your proposal was passed to the master.",
   "kultivator.gabung.politik.veto.perang": "You are bound to %s; declaring war on your own school is refused.",
   "kultivator.gabung.politik.veto.tuntut": "Tribute cannot be demanded from %s, your hall's mother school.",
-  "kultivator.gabung.riwayat.sumbang": "Donated %s PK to the sect treasury (%s)"
+  "kultivator.gabung.riwayat.sumbang": "Donated %s PK to the sect treasury (%s)",
+  "kultivator.gabung.politik.kabar.merosot_1": "%s is sinking: half its disciples have gone and the pavilion stands quiet. They say the mountain has lost its breath.",
+  "kultivator.gabung.politik.kabar.merosot_2": "Bad news from the gate of %s. Its disciples leave the mountain one by one, and the morning bell tolls for empty benches.",
+  "kultivator.gabung.politik.kabar.merosot_3": "A merchant passing the gate of %s says, 'It used to be busy. Now there are only old guards and dust.'",
+  "kultivator.gabung.politik.kabar.bangkit_1": "%s rises again! Its gate is repainted and its disciples are coming home.",
+  "kultivator.gabung.politik.kabar.bangkit_2": "People talk of %s standing up after its dark days. Incense smoke climbs from its hall once more.",
+  "kultivator.gabung.politik.kabar.bangkit_3": "The bell of %s rings again at dawn. The merchants say that mountain was never dead.",
+  "kultivator.gabung.politik.kabar.peringkat_1": "%s is now the strongest sect in the land, up from rank %s. Applicants queue on the steps of its mountain.",
+  "kultivator.gabung.politik.kabar.peringkat_2": "The ranking has changed: %s takes the top place (it was rank %s). The other sects grow uneasy.",
+  "kultivator.gabung.politik.kabar.peringkat_3": "In the teahouse everyone is talking about %s, risen from rank %s to first.",
+  "kultivator.gabung.politik.kabar.serap_1": "%s has been absorbed into the hall of %s. Its old banner comes down and the new one is raised over the same gate.",
+  "kultivator.gabung.politik.kabar.serap_2": "The gate of %s no longer stands alone: %s has merged it into their hall. Its disciples now wear new robes.",
+  "kultivator.gabung.politik.kabar.serap_3": "News from the mountain: %s is merged into the hall of %s. Some weep, some raise a cup."
 }

@@ -1,0 +1,42 @@
+{
+  "pembicara": [
+    "tokoh:shi_xiaoqian"
+  ],
+  "prioritas": 5,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "358",
+      "pilihan": [
+        {
+          "ke": "jari"
+        },
+        {
+          "ke": "anak"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "jari",
+      "gestur": "358",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "anak",
+      "gestur": "marah_tunjuk",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

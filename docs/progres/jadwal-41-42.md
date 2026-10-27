@@ -10,6 +10,7 @@ Order (42.16 K10): all of 41 first, then 42, then one detail wave for both. The 
 - [x] Read 41.0, 41.1, 41.11-41.16 and 42.0, 42.1, 42.4.13-42.4A, 42.12.1-42.12.5, 42.15, 42.16
 - [x] Verified repo facts (section 0) in code
 - [x] (1) conflict matrix, (2) dependency graph, (3) waves, (4) finish steps, (5) prompt notes
+- [x] F-END done (see m2-F-END.md); orchestrator commits and copies the jar
 - [ ] Orchestrator: run 41-G0 + F41-0, 41-G1 + F41-1, 42-G0 + F42-0, 42-G1 + F42-1, 42-G2 + F42-2, D-41-42 + F-END
 
 ---------------------------------------------------------------------------------------------------------------------
@@ -120,6 +121,17 @@ Order (42.16 K10): all of 41 first, then 42, then one detail wave for both. The 
   Di Sini sheet of the Gulungan (`Page`, kit `screen/ui`, `HubPages`, `DiSini`, `HubNav.buka`), never a `Screen`
   subclass or a `HubCards` card; the "existing screen" names above may have been folded into Gulungan pages by 43 (map
   to the page that absorbed them, per 43.11/43.12). Every other 42-G2/D label also uses only the 43 kit.
+- **Real animation for every activity (user, 2026-10-27, binding for 42-G2 and D-41-42):** an NPC/disciple doing a job
+  must visibly do it (clip + prop + at the work spot, facing it), never only a text line. Audit with the gaps:
+  `C:\Users\Musyaffa\AppData\Roaming\Claude\side-session-notes\local_e7ec9d51-d5dc-49b4-9550-e5d9ad28bb66\audit-animasi-kegiatan.md`.
+  42 labels fix the 42 items there in their own files: the 13 roles without a `KerjaPeran` entry, the 5 data rows with
+  the wrong clip, and trigger the unused 42 clips (`LERAI`, `SIRAM_API`, the ceremony clips once Upacara is real). Items
+  outside 41/42 files (SosokApi MEMANDANG for non-disciples, DutyPoses, away-disciple stand-ins) are done by the
+  orchestrator after F-END; do not touch them.
+- **Resume state (2026-10-27):** 43 is built and committed (999b46d2; retired GUI classes removed from the tree, still in
+  history). 42-G2 files contain stubs marked `stub F42-2-kompil` (list: `docs/progres/m2-F42-2-kompil.md`): each owner
+  replaces its stubs with the real code. New 42 sheets draw with `screen/ui` (Lukis, TabBar.Tab, TalismanButton,
+  GulirIsi, PageKomposit), never the old kit-38 classes in `tempat/ui/kit` (they are being retired).
 - **Progress files** (orchestrator protocol, overrides the designs' `gabung-*`/`kota42-*` names):
   `docs/progres/m2-<label>.md`, e.g. `m2-41A0.md`, `m2-41B-C.md`, `m2-42W-B.md`, `m2-D-41AD.md`, `m2-F41-1.md`.
   Checklist, "Langkah berikutnya", "Butuh dari modul lain", < ~150 lines, LF, updated after every sub-task.

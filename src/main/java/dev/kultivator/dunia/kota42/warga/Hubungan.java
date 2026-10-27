@@ -16,7 +16,7 @@ import java.util.Map;
  * ({@link JenisHubungan#kemas}); family is read from the tree and never stored. A bond is kept on both sides with the same
  * strength. Each Hari Warga every resident has two meetings with residents who share a context with it (neighbours, the
  * same work, the same habit, children at play, the temple); the strength moves by the temperament match
- * {@link #KECOCOKAN} + {@code random(-2..+3)} + 2 per shared habit - 2 for a trade rival, and the bond kind follows the
+ * 2 x {@link #KECOCOKAN} + {@code random(-2..+3)} + 2 per shared habit - 2 for a trade rival (half the first meetings are with someone already known), and the bond kind follows the
  * strength: {@code SAHABAT} >= 40, {@code KEKASIH} >= 60 (one single man and one single woman 16-45 whose temperaments do not
  * clash, 42.16 K9), {@code MUSUH} <= -40, {@code SAINGAN} <= -20 (same trade), {@code KENALAN} in between.
  * {@code PASANGAN} (marriage) and {@code GURU_MURID} (apprenticeship) are set by events, never by strength.
@@ -196,15 +196,35 @@ public final class Hubungan {
 		for (Warga w : hidup) {
 			int uw = umur.getOrDefault(w.id, 0);
 			for (int t = 0; t < TEMU; t++) {
-				Warga other = pasangan(w, uw, hidup, posisi, perPeran, perKebiasaan, anak, kuil, random);
+				// a friendship grows by meeting again: half of the first meetings are with a known person (the better liked of two)
+				Warga other = t == 0 && random.nextBoolean() ? kenalLama(data, w, random) : null;
+				if (other == null) {
+					other = pasangan(w, uw, hidup, posisi, perPeran, perKebiasaan, anak, kuil, random);
+				}
 				if (other == null || other == w || keluarga(data, w, other)) {
 					continue;
 				}
 				int uo = umur.getOrDefault(other.id, 0);
-				int delta = cocok(w, other) + random.nextInt(6) - 2 + (kebiasaanSama(w, other) ? 2 : 0) - (saingan(w, other) ? 2 : 0);
+				int delta = 2 * cocok(w, other) + random.nextInt(6) - 2 + (kebiasaanSama(w, other) ? 2 : 0) - (saingan(w, other) ? 2 : 0);
 				ubah(data, w, other, delta, hari, uw, uo);
 			}
 		}
+	}
+
+	/** A living person {@code w} already knows and does not dislike (not a spouse or a master): the better liked of two random bonds, or null. */
+	private static @Nullable Warga kenalLama(WargaData data, Warga w, RandomSource random) {
+		if (w.hubungan.length == 0) {
+			return null;
+		}
+		long a = w.hubungan[random.nextInt(w.hubungan.length)];
+		long b = w.hubungan[random.nextInt(w.hubungan.length)];
+		long bond = JenisHubungan.kekuatan(a) >= JenisHubungan.kekuatan(b) ? a : b;
+		if (JenisHubungan.kekuatan(bond) < 0) {
+			return null; // nobody seeks out someone they dislike
+		}
+		JenisHubungan jenis = JenisHubungan.jenis(bond);
+		Warga other = jenis == JenisHubungan.PASANGAN || jenis == JenisHubungan.GURU_MURID ? null : data.byId(JenisHubungan.idLain(bond));
+		return other != null && other.status == Warga.Status.HIDUP ? other : null;
 	}
 
 	/** One meeting partner for {@code w}: a neighbour, a co-worker, a habit mate, a playmate or a temple goer. */

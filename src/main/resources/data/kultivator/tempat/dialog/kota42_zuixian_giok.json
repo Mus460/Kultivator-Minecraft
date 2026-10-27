@@ -1,0 +1,19 @@
+{
+  "pembicara": [
+    "tokoh:li_zuixian"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest kota42_tujuh_malam tahap giok"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "369",
+      "akibat": [
+        "bendera kota42.zuixian.giok"
+      ]
+    }
+  ]
+}

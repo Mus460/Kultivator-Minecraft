@@ -148,11 +148,12 @@ public final class MetrikRagam {
 		h = h * 31 + k.propPunggung();
 		h ^= h >>> 16;
 		h &= ~(INTI | RUTIN);
-		if (Kegiatan.KERJA.equals(k.tujuan()) || k.kunci().equals("kerja") || k.kunci().startsWith("kerja_")) {
+		if (Kegiatan.KERJA.equals(k.tujuan()) || k.kunci().equals("kerja") || k.kunci().startsWith("kerja_") || RencanaHarian.kunciInti(k.kunci())) {
 			h |= INTI;
 		}
+		// routine: sleep, washing, the three meals and the hourly drink are part of any day, not variety to ask for
 		if (k.dalam() || Kegiatan.KASUR.equals(k.tujuan()) || k.kunci().equals("tidur") || k.kunci().equals("pulang")
-				|| k.kunci().equals("basuh_muka")) {
+				|| k.kunci().equals("basuh_muka") || k.kunci().equals("makan") || k.kunci().equals("minum")) {
 			h |= RUTIN;
 		}
 		synchronized (NAMA) {
@@ -385,13 +386,13 @@ public final class MetrikRagam {
 			for (ServerPlayer player : players) {
 				double dx = player.getX() - c.getX();
 				double dz = player.getZ() - c.getZ();
-				if (dx * dx + dz * dz <= 128.0D * 128.0D && (h.occ(z) > 0 || perZona[z] > 0)) {
+				if (dx * dx + dz * dz <= 128.0D * 128.0D && (h.luar(z) > 0 || perZona[z] > 0)) {
 					visible.add(z);
 					break;
 				}
 			}
 		}
-		return tubuhDari(visible, perZona, h.occ, h.acaraZona);
+		return tubuhDari(visible, perZona, h.luar, h.acaraZona);
 	}
 
 	/** The fullest zone among {@code visible} (the event zone left out) against its fair share. */

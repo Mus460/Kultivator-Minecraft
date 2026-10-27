@@ -32,7 +32,16 @@ public final class LimaPilar extends UjianDasar {
 	public static final int TICK_PILAR = 15 * 20;
 	private static final double DEKAT = 2.6D;
 	private static final double JARI = 4.5D;
-	private static final int TAHAN_SISA = 6;
+	/** The use key repeats every 4 ticks on the client; 5 ticks bridge the gap with one tick of slack. */
+	private static final int TAHAN_SISA = 5;
+	/**
+	 * Needle physics (per tick): the pull while held, the sink while not, the damping. The terminal speed is about 0.4 of
+	 * the bar per second, so the lag of the key repeat (5 ticks, 0.1 of the bar) stays inside even the narrowest band
+	 * (12 %, so 6 % either side) with a steady hand.
+	 */
+	private static final double TARIK = 0.0022D;
+	private static final double TURUN = 0.0020D;
+	private static final double REDAM = 0.90D;
 
 	private final PilarQiEntity[] pilar = new PilarQiEntity[5];
 	private final double[] ketepatan = new double[5];
@@ -140,10 +149,11 @@ public final class LimaPilar extends UjianDasar {
 		PilarQiEntity p = pilar[aktif];
 		boolean tahan = umur - tahanTerakhir <= TAHAN_SISA && pemain.position().distanceTo(p.position()) <= DEKAT + 1.5D;
 		double detik = tickPilar / 20.0D;
-		pita = Mth.clamp(0.5D + 0.24D * Math.sin(fase1 + detik * 0.9D + aktif) + 0.10D * Math.sin(fase2 + detik * 2.3D), lebar / 2.0D, 1.0D - lebar / 2.0D);
+		// the band wanders slowly (its peak speed is 0.3 of the bar per second, under the needle's 0.4)
+		pita = Mth.clamp(0.5D + 0.24D * Math.sin(fase1 + detik * 0.6D + aktif) + 0.10D * Math.sin(fase2 + detik * 1.5D), lebar / 2.0D, 1.0D - lebar / 2.0D);
 		Random r = acak();
-		laju += tahan ? 0.0045D : -0.0040D;
-		laju *= 0.90D;
+		laju += tahan ? TARIK : -TURUN;
+		laju *= REDAM;
 		jarum += laju + (r.nextDouble() - 0.5D) * 0.008D;
 		if (jarum <= 0.0D || jarum >= 1.0D) {
 			jarum = Mth.clamp(jarum, 0.0D, 1.0D);

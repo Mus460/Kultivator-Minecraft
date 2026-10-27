@@ -258,6 +258,7 @@ final class SikapTabel {
 	 */
 	static void pilih(String kunci, Sosok sosok, Gaya gaya, int pangkat, boolean pemimpin, boolean murid, int benih, Hasil h) {
 		boolean p = sosok.perempuan();
+		kunci = kunci == null ? null : dev.kultivator.sosok.RupaKunci.tanpaGaya(kunci);
 		Baris baris = kunci == null ? null : TABEL.get(kunci);
 		if (baris == null && kunci != null && kunci.startsWith("liar")) {
 			baris = TABEL.get("liar");

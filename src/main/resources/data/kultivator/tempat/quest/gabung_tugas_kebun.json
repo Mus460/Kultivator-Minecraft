@@ -1,0 +1,39 @@
+{
+  "pemberi": "peran:tetua_sekte",
+  "tempat": "gabung_sekte",
+  "tahap": [
+    {
+      "id": "siram",
+      "tujuan": [
+        "tanda gabung_tugas_kebun x2"
+      ],
+      "akibat": [
+        "gabung.sikap obat 3"
+      ]
+    },
+    {
+      "id": "akar",
+      "tujuan": [
+        "tanda gabung_tugas_kebun"
+      ],
+      "akibat": [
+        "gabung.pk 16",
+        "gabung.sikap obat 4",
+        "efek minecraft:regeneration 300 0"
+      ],
+      "batas_hari": 7,
+      "gagal_ke": "kering",
+      "ke": "selesai"
+    },
+    {
+      "id": "kering",
+      "tujuan": [
+        "tanda gabung_tugas"
+      ],
+      "akibat": [
+        "gabung.pk 4"
+      ],
+      "ke": "selesai"
+    }
+  ]
+}

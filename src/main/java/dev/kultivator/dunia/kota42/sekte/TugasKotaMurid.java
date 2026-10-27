@@ -11,6 +11,7 @@ import dev.kultivator.dunia.kota42.KotaHidup;
 import dev.kultivator.dunia.kota42.api.WargaApi;
 import dev.kultivator.dunia.kota42.cakap.Fakta;
 import dev.kultivator.dunia.kota42.cakap.GosipWarga;
+import dev.kultivator.dunia.kota42.tumbuh.Pembangun;
 import dev.kultivator.dunia.kota42.warga.ArsipWarga;
 import dev.kultivator.dunia.kota42.warga.Warga;
 import dev.kultivator.dunia.tempat.TempatApi;
@@ -22,6 +23,7 @@ import dev.kultivator.sekte.mandiri.api.EntriHarian;
 import dev.kultivator.sekte.mandiri.api.JenisLuka;
 import dev.kultivator.sekte.mandiri.api.MandiriApi;
 import dev.kultivator.sosok.GerakId;
+import dev.kultivator.sosok.PropId;
 import dev.kultivator.sosok.Sosok;
 import dev.kultivator.sosok.SosokApi;
 import dev.kultivator.util.Msg;
@@ -59,7 +61,10 @@ import java.util.UUID;
  * {@link SerbuanKota} grows by the disciple's power.</li>
  * <li>{@link #KERJA_KOTA} (7-day rotation): the keeper of the hall's recruitment office ({@link KantorRekrut}: applicants
  * x1.25) or of its branch ({@link CabangKota}: the branch's work). A player's shop keeps its own disciple clerk (42C
- * {@code TokoPemain.pekerjakanMurid}).</li>
+ * {@code TokoPemain.pekerjakanMurid}). With neither, while the town is being built or rebuilt ({@link Pembangun}) the
+ * disciple goes to the building site as a builder (post {@link #SASARAN_BANGUN}, at most {@link Pembangun#MURID_MAKS}
+ * per town): it carries planks and hammers beside the destroyed houses or the plot, each one a third of a crew
+ * ({@link Pembangun#faktorMurid}, the "laju +1 regu" of 42.9.5), and comes home when the work is over.</li>
  * <li>{@link #BELANJA} is 39's own shopping journey (39.6.6); here only the town prices apply (42C).</li>
  * </ul>
  * On return ({@link #kembali}) the disciple gets a small share of a bar per day served (39 scale, at most 0.3 bars), a
@@ -80,6 +85,8 @@ public final class TugasKotaMurid {
 	public static final String SASARAN_JAGA = "jaga";
 	public static final String SASARAN_KANTOR = "kantor";
 	public static final String SASARAN_CABANG = "cabang";
+	/** Post of a builder disciple (rebuild project or growing plot). */
+	public static final String SASARAN_BANGUN = "bangun";
 	public static final int ROTASI_JAGA = 3;
 	public static final int ROTASI_KERJA = 7;
 	public static final int JAGA_MAKS = 4;
@@ -100,6 +107,7 @@ public final class TugasKotaMurid {
 		long berikut;
 		int titik;
 		long hormat;
+		boolean berjalan;
 
 		Tubuh(DiscipleEntity body, UUID soul) {
 			this.body = body;
@@ -164,6 +172,20 @@ public final class TugasKotaMurid {
 			}
 		}
 		return out;
+	}
+
+	/** Builder disciples (any hall) at work in {@code situs} now. */
+	public static int pembangun(MinecraftServer server, long situs) {
+		if (server == null || !KotaConfig.sekte().aktif || !KotaConfig.sekte().murid) {
+			return 0;
+		}
+		int n = 0;
+		for (Tugas t : semua(server)) {
+			if (t.situs() == situs && SASARAN_BANGUN.equals(t.sasaran())) {
+				n++;
+			}
+		}
+		return n;
 	}
 
 	/** True when sect disciples keep the watch of {@code situs} (42D-P: pickpockets x0.5, shop theft 0). */
@@ -242,10 +264,14 @@ public final class TugasKotaMurid {
 			boolean kantor = KantorRekrut.kantor(situs, owner) != null && penjagaDi(situs, SASARAN_KANTOR, owner) == null;
 			CabangKota.Cabang cabang = CabangKota.cabang(situs);
 			boolean bisaCabang = cabang != null && cabang.pemilik().equals(owner) && penjagaDi(situs, SASARAN_CABANG, owner) == null;
-			if (!kantor && !bisaCabang) {
+			boolean bangun = !kantor && !bisaCabang && Pembangun.adaKerja(server, situs);
+			if (bangun && pembangun(server, situs) >= Pembangun.MURID_MAKS) {
+				return KotaSekte.Hasil.gagal("murid.bangun_penuh", Pembangun.MURID_MAKS).kirim(player);
+			}
+			if (!kantor && !bisaCabang && !bangun) {
 				return KotaSekte.Hasil.gagal("murid.tanpa_kerja").kirim(player);
 			}
-			sasaran = kantor ? SASARAN_KANTOR : SASARAN_CABANG;
+			sasaran = kantor ? SASARAN_KANTOR : bisaCabang ? SASARAN_CABANG : SASARAN_BANGUN;
 			rotasi = ROTASI_KERJA;
 		} else {
 			return KotaSekte.Hasil.gagal("murid.tugas").kirim(player);
@@ -277,8 +303,9 @@ public final class TugasKotaMurid {
 		Halls.storeAway(owner, d, now + rotasi * 24000L, ALASAN, info);
 		bagian(server).put(jiwa.toString(), t);
 		KotaSekteData.get(server).ubah();
-		Fx.burst((ServerLevel) player.level(), player.position().add(0.0D, 1.0D, 0.0D), 0xD8C8A8, 8, 0.5F);
-		return KotaSekte.Hasil.berhasil("murid.ditugaskan." + tugas, nama, KotaSekte.namaTempat(server, situs), rotasi).kirim(player);
+		Fx.burst(player.level(), player.position().add(0.0D, 1.0D, 0.0D), 0xD8C8A8, 8, 0.5F);
+		return KotaSekte.Hasil.berhasil("murid.ditugaskan." + (SASARAN_BANGUN.equals(sasaran) ? "bangun" : tugas), nama,
+				KotaSekte.namaTempat(server, situs), rotasi).kirim(player);
 	}
 
 	/** {@code tarik_murid:SOUL}: calls a disciple home now (it arrives at the hall within a few seconds). */
@@ -385,10 +412,11 @@ public final class TugasKotaMurid {
 				Warga sahabat = sahabat(server, soul);
 				int jam = (int) ((Kota.timeOfDay(server) / 1000L + 6L) % 24L);
 				String tugas = info.getStringOr("tugas", t.getStringOr("tugas", JAGA_KOTA));
+				String kunci = SASARAN_BANGUN.equals(t.getStringOr("sasaran", "")) ? "kerja_bangun" : tugas;
 				List<String> arg = sahabat == null ? List.of(tempat, Long.toString(hariBertugas))
 						: List.of(tempat, Long.toString(hariBertugas), WargaApi.nama(sahabat).getString());
 				MandiriApi.simpanHarian(server, owner, soul, new EntriHarian(hari, jam, "kota." + tugas,
-						"kultivator.kota42.sekte.harian." + tugas + (sahabat == null ? "" : "_sahabat"), arg, EntriHarian.Suasana.TENANG,
+						"kultivator.kota42.sekte.harian." + kunci + (sahabat == null ? "" : "_sahabat"), arg, EntriHarian.Suasana.TENANG,
 						false));
 			}
 		}
@@ -425,6 +453,17 @@ public final class TugasKotaMurid {
 			if (owner == null || !masihPergi(owner, soul) && hari > t.getLongOr("sampai", 0L) + 1L) {
 				part.remove(key);
 				continue;
+			}
+			if (!t.getBooleanOr("pulang", false) && SASARAN_BANGUN.equals(t.getStringOr("sasaran", ""))) {
+				// the site is quiet two days running: the builder goes home
+				if (Pembangun.adaKerja(server, t.getLongOr("situs", 0L))) {
+					t.putInt("sepi", 0);
+				} else if (t.getIntOr("sepi", 0) >= 1) {
+					pulangkan(server, owner, soul, t);
+					continue;
+				} else {
+					t.putInt("sepi", 1);
+				}
 			}
 			if (t.getBooleanOr("pulang", false) || t.getIntOr("sahabat", 0) != 0) {
 				continue;
@@ -547,6 +586,9 @@ public final class TugasKotaMurid {
 			case SASARAN_CABANG -> {
 				return CabangKota.posPenjaga(server, tugas.situs());
 			}
+			case SASARAN_BANGUN -> {
+				return Pembangun.titikKerja(level, tugas.situs(), i + 3 * pembangunUrut(server, tugas));
+			}
 			default -> {
 				List<BlockPos> jaga = posJaga(level, tugas.situs());
 				if (jaga.isEmpty()) {
@@ -582,6 +624,18 @@ public final class TugasKotaMurid {
 		return out;
 	}
 
+	/** Rank of a builder among the builders of its town (soul order), so two do not stand on the same spot. */
+	private static int pembangunUrut(MinecraftServer server, Tugas tugas) {
+		List<Tugas> sama = new ArrayList<>();
+		for (Tugas t : semua(server)) {
+			if (t.situs() == tugas.situs() && SASARAN_BANGUN.equals(t.sasaran())) {
+				sama.add(t);
+			}
+		}
+		sama.sort(Comparator.comparing(x -> x.soul().toString()));
+		return Math.max(0, sama.indexOf(tugas));
+	}
+
 	private static int penjagaUrut(MinecraftServer server, Tugas tugas) {
 		List<Tugas> sama = penjagaKota(server, tugas.situs(), tugas.pemilik());
 		sama.sort(Comparator.comparing(x -> x.soul().toString()));
@@ -602,6 +656,23 @@ public final class TugasKotaMurid {
 			return;
 		}
 		t.berikut = now + 600L;
+		if (SASARAN_BANGUN.equals(tugas.sasaran())) {
+			if (t.berjalan) {
+				// arrived at the next spot: hammer there for a while
+				t.berjalan = false;
+				t.berikut = now + 900L;
+				pose(t, tugas, now);
+				return;
+			}
+			BlockPos ke = pos(level, tugas, ++t.titik);
+			if (ke != null) {
+				SosokApi.gerak(t.body, GerakId.ANGKAT_PAPAN, 0, 0, PropId.PAPAN_KAYU, PropId.TIDAK_ADA, PropId.TIDAK_ADA);
+				t.body.getNavigation().moveTo(ke.getX() + 0.5D, ke.getY(), ke.getZ() + 0.5D, 0.6D);
+				t.berjalan = true;
+				t.berikut = now + 160L;
+				return;
+			}
+		}
 		if (SASARAN_JAGA.equals(tugas.sasaran())) {
 			long jam = (Kota.timeOfDay(server) / 1000L + 6L) % 24L;
 			boolean siang = jam >= 6L && jam < 18L;
@@ -621,6 +692,17 @@ public final class TugasKotaMurid {
 	private static void pose(Tubuh t, Tugas tugas, long now) {
 		switch (tugas.sasaran()) {
 			case SASARAN_KANTOR -> SosokApi.gerak(t.body, Math.floorMod(now / 600L, 3L) == 0L ? GerakId.SERU_DAGANG : GerakId.HITUNG_SEMPOA, 0, 0);
+			case SASARAN_BANGUN -> {
+				boolean palu = Math.floorMod(now / 900L, 2L) == 0L;
+				if (t.body.level() instanceof ServerLevel level) {
+					for (BoundingBox b : Pembangun.lokasi(level.getServer(), tugas.situs())) {
+						t.body.getLookControl().setLookAt(b.getCenter().getX() + 0.5D, b.getCenter().getY() + 1.0D, b.getCenter().getZ() + 0.5D);
+						break;
+					}
+				}
+				SosokApi.gerak(t.body, palu ? GerakId.PERBAIKI_PALU : GerakId.PERBAIKI_PLESTER, 0, 0, palu ? PropId.PALU : PropId.SENDOK_PLESTER,
+						PropId.TIDAK_ADA, PropId.TIDAK_ADA);
+			}
 			case SASARAN_CABANG -> {
 				CabangKota.Cabang c = CabangKota.cabang(tugas.situs());
 				int klip = c != null && CabangKota.BALAI_LATIHAN.equals(c.jenis()) ? GerakId.MENGAJAR : GerakId.HITUNG_SEMPOA;

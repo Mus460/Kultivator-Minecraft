@@ -25247,3 +25247,67 @@ GUI berbeda dengan fungsi yang sama.
   peringatan cahaya; Pengaturan › Kontrol mengubah tombol di tempat.
 * Server hanya S1-S3 dari 43.14 (`OpenScreen.DUNIA_DUEL`, jawaban duel `ANSWER_CATATAN` → `DuelCatatan`, daftar
   `saudara` di `HallInfo`); semua payload, registri dan kunci lembar lain tetap. Lang di `lang-src/gui43*.{id_id,en_us}.json`.
+
+## 41. Gabung Sekte (bergabung dengan sekte NPC)
+
+Kontrak lengkap: **`docs/rancangan/41-gabung-sekte.md`** (41.0-41.16, keputusan 41.15 semua bawaan). Daftar uji `docs/uji/FASE-41.md`.
+Panduan pemain: `docs/PANDUAN.md` bab 75; Kitab Panduan di game bab 22.
+
+Permintaan pengguna (2026-10-23): selain mendirikan sekte sendiri, pemain bisa **bergabung ke sekte NPC**, dan sekte itu
+mengikuti pengaturan dengan berbagai kelas. Delapan sekte NPC (DESIGN 36.2.9) menjadi perguruan yang bisa dimasuki.
+
+* **Kelas dan corak** (`sekte/gabung/api`): Kecil sampai Abadi mengikuti tingkat 1-9; sebaran `seimbang` menaruh tingkat 8 dan 7
+  tepat pada dua sekte beristana awan `LangitNpcPlan.of(seed)`. Sepuluh corak menentukan ujian masuk dan wajah sekte.
+* **Alur** (`sekte/gabung/masuk`, 41B): direktori dan lamaran lewat gerbang, token, undangan, jalur pelayan atau tamu; Hari
+  Ujian dengan tangga ilusi, sepuluh Ujian Corak (Seratus Tebasan, Lima Pilar, Kolam Darah, ...), wawancara per aliran, Upacara
+  Sumpah, Putusan dan Shifu bernama; surat Undangan dari Turnamen Agung (juara) dan utusan sekte.
+* **Hidup sebagai anggota** (`sekte/gabung/hidup`, 41C): Poin Kontribusi pribadi, Papan Misi (jenis misi per kelas), tugas harian
+  (sapu, kebun, gerbang), Paviliun Jasa dengan stok per kelas dan corak, Gua Kediaman dan kolam roh, pelajaran Shifu, Turnamen
+  Murid dengan juara.
+* **Pangkat, hukum, keluar, politik** (`sekte/gabung`, `.../politik`, 41A dan 41D): Murid Pelayan sampai Ketua dengan ujian naik
+  (`UjianPangkat`, `Promosi`), Balai Hukum (tegur, kurung, usir), pamit, usir dan pembelot dengan Pemburu Sekte, Panggilan
+  Perang dan misi perang (`Perang`), cabang, Tetua Tamu, suksesi, peleburan (`Penyatuan`), peringkat sekte, Tetua bernama.
+* **Dunia dan cerita** (`sekte/gabung/dunia`, 41W): kompleks sekte NPC diperkaya (paviliun jasa, gua kediaman, gua meditasi;
+  `tools/gen_tempat_kompleks.py`), tokoh bernama dan rantai cerita (`tools/gen_gabung_cerita.py`: Permintaan Guru, Tebus Dosa,
+  Dua Topeng, kenangan tetua).
+* **Antarmuka** (41U): halaman Gulungan Utama (kit 38 `LayarGabungDasar` dengan skala 2/3/4, `gabung skala <0|2|3|4> [layar]`);
+  **visual** (41V): jubah dan seragam per corak, kubah dan mahkota kelas di atas aula dan puncak, 20 klip gerak baru
+  (`GabungGerakId`), 28 baris suara Jepang (`gabung.*`).
+* Aturan: blok runtime hanya lewat `BuildPlacer`/`WorldBreaker`; mekanisme adalah entitas; layanan, toko dan misi memakai `HidupApi.tubuhStaf`; PK dan batu mengikuti ekonomi
+  terpadu (1 PK = 2 NB); semua registri selalu terdaftar, `gabungSekte.aktif` hanya menutup perilaku.
+
+Celah yang diketahui (lihat `docs/progres/m2-F-END.md`): beberapa klip pemain untuk tugas harian, ujian Murid Dalam hanya duel,
+jubah dan lambang sekte yang diserap (klien), kamera suksesi, pergantian tokoh tetua saat suksesi/perang.
+
+## 42. Kota yang Hidup (warga, ekonomi, kehidupan, sekte di kota, kota tumbuh)
+
+Kontrak lengkap: **`docs/rancangan/42-kota-hidup.md`** (42.0-42.17 termasuk 42.4A sebaran merata, 42.5A mesin percakapan tanpa
+LLM, 42.12.1A kompatibilitas mod dunia; keputusan 42.16: K9 = tidak ada pasangan sesama jenis, selebihnya bawaan). Daftar uji
+`docs/uji/FASE-42.md`. Panduan pemain: `docs/PANDUAN.md` bab 76; Kitab Panduan di game bab 23.
+
+Permintaan pengguna (2026-10-24): kelompok ide A, C, D, F, H untuk kota, dengan konten nyata dan sangat detail.
+
+* **Warga** (`dunia/kota42/warga`, 42A): penduduk tersimpan (nama marga, umur, keluarga, sahabat dan musuh, ingatan tentang
+  pemain, suasana hati, kebiasaan unik); lahir, menikah, pindah, menua dan meninggal; kota berganti generasi dalam sekitar 150 hari.
+* **Sebaran** (`kota42/ragam`, 42S): rencana harian merata, kapasitas per zona, penyeimbang dan kegiatan selingan supaya warga
+  tidak menumpuk atau monoton; uji `uji kota_hidup sebaran simulasi 7`.
+* **Percakapan** (`kota42/cakap`, 42K, **tanpa LLM**): mesin tata bahasa deterministik (401 aturan, 1682 kerangka, 60 maksud,
+  7 dialek, 49 berkas golden; `tools/gen_kota_hidup_cakap.py` dan `tools/kota_cakap_sumber/`, uji `uji kota_hidup cakap golden`),
+  gosip antar-warga, dialog lembar `bicara` (42B) dengan tujuan, akibat, pinjaman dan nama jalan buatan pemain.
+* **Ekonomi** (`kota42/ekonomi`, 42C): rumah dan toko pemain, harga dinamis, investasi, gudang dan kontrak dagang, pajak,
+  jabatan (hakim, kepala desa, tetua, menteri), Perkara Kota, Pasar Hantu; batas keran mingguan 42.6.0.
+* **Kehidupan** (`kota42/acara`, 42D): rombongan keliling, rutinitas pagi, ronda malam (Lao Geng dan Xiao Bang), copet,
+  perkelahian, upacara pernikahan/pemakaman/sebulan, kalender festival, musim, teater bayang, hewan kota.
+* **Sekte dan kota** (`kota42/sekte`, 42E): kantor rekrutmen, pakta perlindungan dengan upeti, murid di kota, cabang sekte.
+* **Kota tumbuh** (`kota42/tumbuh`, 42F): kavling bertahap dengan tukang, peresmian, bangun kembali hanya untuk kerusakan nyata
+  (`WorldBreaker.submitRestore`), tugu kenangan, blokade.
+* **Bangunan dan visual** (42W, 42V): interior per profesi dengan kit (`tools/kota_hidup_kit.py`, `kota_besar_kit.py`), kavling
+  per gaya, lentera, cerobong, panji (`gen_kota_hidup_assets.py`), model dan animasi baru (`GerakId` 350-469, `PropId` 170-239),
+  delapan hewan (`gen_kota_hidup_hewan.py`), 65 suara sintetis dan 11 melodi (`gen_kota_hidup_suara.py`), 105 baris suara Jepang
+  (`kota42.*`).
+* **Antarmuka** (42U): lembar sebagai halaman Gulungan Utama (Jabatan, Perkara, Kantor, Pakta, Cabang, Upacara, Kavling, Toko,
+  Gudang), terdaftar lewat baris Jasa dialog.
+* Aturan: blok runtime hanya lewat `WorldBreaker`/`BuildPlacer`; worldgen hanya di chunk baru; tanpa petir, cuaca, waktu atau
+  tick-rate; mekanisme adalah entitas; Sibuk memakai `dev.kultivator.util.Sibuk`; layanan, toko dan misi memakai
+  `HidupApi.tubuhStaf`; kompatibilitas Terralith, Tectonic, Structory, Dungeons and Taverns, Lithostitched, Amplified Nether
+  dan Nullscape terjaga (`tools/gen_kompat_bioma.py`, `tools/cek_kompat_mod.py`).

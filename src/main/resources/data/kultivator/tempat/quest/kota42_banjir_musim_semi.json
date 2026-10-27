@@ -1,0 +1,43 @@
+{
+  "pemberi": "tokoh:gong_shu",
+  "tempat": "kota42",
+  "alur": true,
+  "tahap": [
+    {
+      "id": "pasir",
+      "tujuan": [
+        "antar minecraft:sand tokoh:gong_shu x64"
+      ]
+    },
+    {
+      "id": "balok",
+      "tujuan": [
+        "antar minecraft:oak_log tokoh:gong_shu x32"
+      ]
+    },
+    {
+      "id": "tolong",
+      "tujuan": [
+        "tolong * x2"
+      ]
+    },
+    {
+      "id": "jaga",
+      "tujuan": [
+        "ronda_geng * x1"
+      ]
+    },
+    {
+      "id": "lapor",
+      "tujuan": [
+        "bicara tokoh:gong_shu"
+      ],
+      "akibat": [
+        "bendera kota42.banjir_semi",
+        "nama_baik 8",
+        "beri_nb_pita 60",
+        "kota42.kesan tokoh:gong_shu 30"
+      ]
+    }
+  ]
+}

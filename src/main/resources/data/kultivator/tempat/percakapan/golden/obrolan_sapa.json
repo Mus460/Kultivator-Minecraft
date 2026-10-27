@@ -66,6 +66,13 @@
         "k": "kultivator.cakap.kerja.pekerja.0.kampung",
         "a": [
           {
+            "k": "kultivator.cakap.awal.basa.2",
+            "a": []
+          },
+          {
+            "t": ""
+          },
+          {
             "k": "kultivator.cakap.lex.bapak.kampung",
             "a": []
           }
@@ -75,8 +82,8 @@
       "gestur": "seka_keringat",
       "seru": null,
       "tik": null,
-      "id_id": "Habis nyangkul dari subuh, Nak. Pinggang rasanya mau copot.",
-      "en_us": "Been hoeing since dawn, child. My hips feel ready to fall off."
+      "id_id": "Hm, bicara soal itu. Habis nyangkul dari subuh, Nak. Pinggang rasanya mau copot.",
+      "en_us": "Hm, speaking of which. Been hoeing since dawn, child. My hips feel ready to fall off."
     },
     {
       "ubah": {
@@ -89,6 +96,10 @@
           {
             "k": "kultivator.cakap.lex.kakek.kampung",
             "a": []
+          },
+          {
+            "k": "kultivator.cakap.ekor.sapa.3",
+            "a": []
           }
         ]
       },
@@ -96,8 +107,8 @@
       "gestur": "seka_keringat",
       "seru": null,
       "tik": null,
-      "id_id": "Oh, Mbah. Maaf, tanganku kotor. Salam!",
-      "en_us": "Oh, Gramps. Sorry, my hands are dirty. Greetings!"
+      "id_id": "Oh, Mbah. Maaf, tanganku kotor. Salam! Jangan membuat masalah, ya.",
+      "en_us": "Oh, Gramps. Sorry, my hands are dirty. Greetings! Don't make trouble, will you."
     }
   ]
 }

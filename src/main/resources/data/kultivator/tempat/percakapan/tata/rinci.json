@@ -1,0 +1,3956 @@
+{
+  "_dibuat": "tools/gen_kota_hidup_cakap.py dari tools/kota_cakap_sumber (jangan disunting tangan)",
+  "kelompok": "rinci",
+  "isi": [
+    {
+      "aturan": "awal.kabar",
+      "bingkai": [
+        {
+          "kunci": "awal.kabar.0",
+          "slot": [],
+          "bobot": 2,
+          "register": [
+            "biasa",
+            "kasar"
+          ],
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "awal.kabar.1",
+          "slot": [],
+          "bobot": 2,
+          "register": [
+            "biasa",
+            "kasar"
+          ],
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "awal.kabar.2",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa",
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "awal.kabar.3",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa",
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "awal.kabar.4",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa"
+          ]
+        },
+        {
+          "kunci": "awal.kabar.5",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa"
+          ],
+          "varian": [
+            "air"
+          ]
+        },
+        {
+          "kunci": "awal.kabar.6",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "sopan",
+            "kuno"
+          ],
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "awal.kabar.7",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "awal.kabar.8",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa",
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "awal.kabar.9",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa"
+          ],
+          "varian": [
+            "ibukota"
+          ]
+        },
+        {
+          "kunci": "awal.kabar.10",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa"
+          ]
+        },
+        {
+          "kunci": "awal.kabar.11",
+          "slot": [],
+          "bobot": 1,
+          "dialek": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "awal.kabar.12",
+          "slot": [],
+          "bobot": 1,
+          "dialek": [
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "awal.kabar.13",
+          "slot": [],
+          "bobot": 1,
+          "dialek": [
+            "gunung"
+          ]
+        },
+        {
+          "kunci": "awal.kabar.14",
+          "slot": [],
+          "bobot": 1,
+          "dialek": [
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "awal.kabar.15",
+          "slot": [],
+          "bobot": 1,
+          "dialek": [
+            "kampung"
+          ]
+        }
+      ],
+      "slot": {}
+    },
+    {
+      "aturan": "ekor.kabar",
+      "bingkai": [
+        {
+          "kunci": "ekor.kabar.0",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "ekor.kabar.1",
+          "slot": [],
+          "bobot": 2,
+          "register": [
+            "biasa",
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "ekor.kabar.2",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa",
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "ekor.kabar.3",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa"
+          ],
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "ekor.kabar.4",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa",
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "ekor.kabar.5",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa"
+          ],
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "ekor.kabar.6",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa",
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "ekor.kabar.7",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa"
+          ]
+        },
+        {
+          "kunci": "ekor.kabar.8",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa",
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "ekor.kabar.9",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa"
+          ]
+        },
+        {
+          "kunci": "ekor.kabar.10",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "ekor.kabar.11",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "sopan",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "ekor.kabar.12",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "ekor.kabar.13",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "ekor.kabar.14",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa"
+          ]
+        },
+        {
+          "kunci": "ekor.kabar.15",
+          "slot": [],
+          "bobot": 1,
+          "dialek": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "ekor.kabar.16",
+          "slot": [],
+          "bobot": 1,
+          "dialek": [
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "ekor.kabar.17",
+          "slot": [],
+          "bobot": 1,
+          "dialek": [
+            "gunung"
+          ]
+        },
+        {
+          "kunci": "ekor.kabar.18",
+          "slot": [],
+          "bobot": 1,
+          "dialek": [
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "ekor.kabar.19",
+          "slot": [],
+          "bobot": 1,
+          "dialek": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "ekor.kabar.20",
+          "slot": [],
+          "bobot": 1,
+          "dialek": [
+            "air"
+          ]
+        }
+      ],
+      "slot": {}
+    },
+    {
+      "aturan": "awal.keluh",
+      "bingkai": [
+        {
+          "kunci": "awal.keluh.0",
+          "slot": [],
+          "bobot": 2,
+          "register": [
+            "biasa",
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "awal.keluh.1",
+          "slot": [],
+          "bobot": 2,
+          "register": [
+            "biasa",
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "awal.keluh.2",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa",
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "awal.keluh.3",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa"
+          ]
+        },
+        {
+          "kunci": "awal.keluh.4",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa"
+          ],
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "awal.keluh.5",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa"
+          ]
+        },
+        {
+          "kunci": "awal.keluh.6",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa",
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "awal.keluh.7",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "awal.keluh.8",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "sopan",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "awal.keluh.9",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "awal.keluh.10",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa"
+          ]
+        },
+        {
+          "kunci": "awal.keluh.11",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa",
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "awal.keluh.12",
+          "slot": [],
+          "bobot": 1,
+          "dialek": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "awal.keluh.13",
+          "slot": [],
+          "bobot": 1,
+          "dialek": [
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "awal.keluh.14",
+          "slot": [],
+          "bobot": 1,
+          "dialek": [
+            "gunung"
+          ]
+        },
+        {
+          "kunci": "awal.keluh.15",
+          "slot": [],
+          "bobot": 1,
+          "dialek": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "awal.keluh.16",
+          "slot": [],
+          "bobot": 1,
+          "dialek": [
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "awal.keluh.17",
+          "slot": [],
+          "bobot": 1,
+          "dialek": [
+            "air"
+          ]
+        },
+        {
+          "kunci": "awal.keluh.18",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa"
+          ]
+        },
+        {
+          "kunci": "awal.keluh.19",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa",
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "awal.keluh.20",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa",
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "awal.keluh.21",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "awal.keluh.22",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa"
+          ]
+        },
+        {
+          "kunci": "awal.keluh.23",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "awal.keluh.24",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa",
+            "kasar"
+          ]
+        }
+      ],
+      "slot": {}
+    },
+    {
+      "aturan": "ekor.keluh",
+      "bingkai": [
+        {
+          "kunci": "ekor.keluh.0",
+          "slot": [],
+          "bobot": 2
+        },
+        {
+          "kunci": "ekor.keluh.1",
+          "slot": [],
+          "bobot": 2,
+          "register": [
+            "biasa",
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "ekor.keluh.2",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa"
+          ]
+        },
+        {
+          "kunci": "ekor.keluh.3",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa",
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "ekor.keluh.4",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa"
+          ]
+        },
+        {
+          "kunci": "ekor.keluh.5",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa",
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "ekor.keluh.6",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa"
+          ]
+        },
+        {
+          "kunci": "ekor.keluh.7",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa"
+          ],
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "ekor.keluh.8",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "ekor.keluh.9",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "ekor.keluh.10",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "sopan",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "ekor.keluh.11",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "ekor.keluh.12",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa"
+          ]
+        },
+        {
+          "kunci": "ekor.keluh.13",
+          "slot": [],
+          "bobot": 1,
+          "dialek": [
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "ekor.keluh.14",
+          "slot": [],
+          "bobot": 1,
+          "dialek": [
+            "gunung"
+          ]
+        },
+        {
+          "kunci": "ekor.keluh.15",
+          "slot": [],
+          "bobot": 1,
+          "dialek": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "ekor.keluh.16",
+          "slot": [],
+          "bobot": 1,
+          "dialek": [
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "ekor.keluh.17",
+          "slot": [],
+          "bobot": 1,
+          "dialek": [
+            "air"
+          ]
+        },
+        {
+          "kunci": "ekor.keluh.18",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa"
+          ]
+        },
+        {
+          "kunci": "ekor.keluh.19",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa",
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "ekor.keluh.20",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa",
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "ekor.keluh.21",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa"
+          ]
+        },
+        {
+          "kunci": "ekor.keluh.22",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "ekor.keluh.23",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "sopan",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "ekor.keluh.24",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa"
+          ]
+        }
+      ],
+      "slot": {}
+    },
+    {
+      "aturan": "ekor.sapa",
+      "bingkai": [
+        {
+          "kunci": "ekor.sapa.0",
+          "slot": [],
+          "bobot": 2,
+          "register": [
+            "biasa",
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "ekor.sapa.1",
+          "slot": [],
+          "bobot": 2,
+          "register": [
+            "biasa"
+          ]
+        },
+        {
+          "kunci": "ekor.sapa.2",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa",
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "ekor.sapa.3",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa",
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "ekor.sapa.4",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa"
+          ]
+        },
+        {
+          "kunci": "ekor.sapa.5",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa"
+          ]
+        },
+        {
+          "kunci": "ekor.sapa.6",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa",
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "ekor.sapa.7",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa",
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "ekor.sapa.8",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "ekor.sapa.9",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "sopan",
+            "kuno"
+          ],
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "ekor.sapa.10",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "ekor.sapa.11",
+          "slot": [],
+          "bobot": 1,
+          "dialek": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "ekor.sapa.12",
+          "slot": [],
+          "bobot": 1,
+          "dialek": [
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "ekor.sapa.13",
+          "slot": [],
+          "bobot": 1,
+          "dialek": [
+            "gunung"
+          ]
+        },
+        {
+          "kunci": "ekor.sapa.14",
+          "slot": [],
+          "bobot": 1,
+          "dialek": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "ekor.sapa.15",
+          "slot": [],
+          "bobot": 1,
+          "dialek": [
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "ekor.sapa.16",
+          "slot": [],
+          "bobot": 1,
+          "dialek": [
+            "air"
+          ]
+        },
+        {
+          "kunci": "ekor.sapa.17",
+          "slot": [],
+          "bobot": 1,
+          "dialek": [
+            "ibukota"
+          ]
+        }
+      ],
+      "slot": {}
+    },
+    {
+      "aturan": "awal.basa",
+      "bingkai": [
+        {
+          "kunci": "awal.basa.0",
+          "slot": [],
+          "bobot": 2,
+          "register": [
+            "biasa",
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "awal.basa.1",
+          "slot": [],
+          "bobot": 2,
+          "register": [
+            "biasa"
+          ]
+        },
+        {
+          "kunci": "awal.basa.2",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa",
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "awal.basa.3",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa"
+          ]
+        },
+        {
+          "kunci": "awal.basa.4",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa"
+          ]
+        },
+        {
+          "kunci": "awal.basa.5",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa",
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "awal.basa.6",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "sopan",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "awal.basa.7",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa"
+          ]
+        },
+        {
+          "kunci": "awal.basa.8",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa"
+          ]
+        },
+        {
+          "kunci": "awal.basa.9",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "awal.basa.10",
+          "slot": [],
+          "bobot": 1,
+          "dialek": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "awal.basa.11",
+          "slot": [],
+          "bobot": 1,
+          "dialek": [
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "awal.basa.12",
+          "slot": [],
+          "bobot": 1,
+          "dialek": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "awal.basa.13",
+          "slot": [],
+          "bobot": 1,
+          "dialek": [
+            "gunung"
+          ]
+        },
+        {
+          "kunci": "awal.basa.14",
+          "slot": [],
+          "bobot": 1,
+          "dialek": [
+            "air"
+          ]
+        },
+        {
+          "kunci": "awal.basa.15",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa"
+          ]
+        },
+        {
+          "kunci": "awal.basa.16",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa",
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "awal.basa.17",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa"
+          ]
+        },
+        {
+          "kunci": "awal.basa.18",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa",
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "awal.basa.19",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "awal.basa.20",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa"
+          ]
+        }
+      ],
+      "slot": {}
+    },
+    {
+      "aturan": "ekor.basa",
+      "bingkai": [
+        {
+          "kunci": "ekor.basa.0",
+          "slot": [],
+          "bobot": 2,
+          "register": [
+            "biasa"
+          ]
+        },
+        {
+          "kunci": "ekor.basa.1",
+          "slot": [],
+          "bobot": 2,
+          "register": [
+            "biasa",
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "ekor.basa.2",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa",
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "ekor.basa.3",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa"
+          ]
+        },
+        {
+          "kunci": "ekor.basa.4",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa",
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "ekor.basa.5",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa"
+          ]
+        },
+        {
+          "kunci": "ekor.basa.6",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "ekor.basa.7",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "sopan",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "ekor.basa.8",
+          "slot": [],
+          "bobot": 1,
+          "dialek": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "ekor.basa.9",
+          "slot": [],
+          "bobot": 1,
+          "dialek": [
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "ekor.basa.10",
+          "slot": [],
+          "bobot": 1,
+          "dialek": [
+            "gunung"
+          ]
+        },
+        {
+          "kunci": "ekor.basa.11",
+          "slot": [],
+          "bobot": 1,
+          "dialek": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "ekor.basa.12",
+          "slot": [],
+          "bobot": 1,
+          "dialek": [
+            "air"
+          ]
+        },
+        {
+          "kunci": "ekor.basa.13",
+          "slot": [],
+          "bobot": 1,
+          "dialek": [
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "ekor.basa.14",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa"
+          ]
+        },
+        {
+          "kunci": "ekor.basa.15",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa",
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "ekor.basa.16",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa",
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "ekor.basa.17",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "biasa"
+          ]
+        },
+        {
+          "kunci": "ekor.basa.18",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "ekor.basa.19",
+          "slot": [],
+          "bobot": 1,
+          "register": [
+            "sopan"
+          ]
+        }
+      ],
+      "slot": {}
+    },
+    {
+      "aturan": "keluh.lagi.cuaca",
+      "niat": "KELUH",
+      "topik": "cuaca",
+      "bingkai": [
+        {
+          "kunci": "keluh.lagi.cuaca.0",
+          "slot": [
+            "$awal",
+            "$cuaca",
+            "$ekor"
+          ],
+          "bobot": 2,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "keluh.lagi.cuaca.1",
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "keluh.lagi.cuaca.2",
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
+          "bobot": 1,
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "keluh.lagi.cuaca.3",
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
+          "bobot": 1
+        },
+        {
+          "kunci": "keluh.lagi.cuaca.4",
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
+          "bobot": 1,
+          "varian": [
+            "p"
+          ]
+        }
+      ],
+      "slot": {
+        "$cuaca": {
+          "tipe": "cuaca",
+          "dari": "konteks.cuaca"
+        },
+        "$awal": {
+          "aturan": "awal.keluh",
+          "opsional": 0.45
+        },
+        "$ekor": {
+          "aturan": "ekor.keluh",
+          "opsional": 0.4
+        }
+      },
+      "gestur": "geleng",
+      "seru": "aduh"
+    },
+    {
+      "aturan": "keluh.lagi.kerja",
+      "niat": "KELUH",
+      "topik": "kerja",
+      "bingkai": [
+        {
+          "kunci": "keluh.lagi.kerja.0",
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
+          "bobot": 2,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "keluh.lagi.kerja.1",
+          "slot": [
+            "$awal"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "keluh.lagi.kerja.2",
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
+          "bobot": 1,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "keluh.lagi.kerja.3",
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "keluh.lagi.kerja.4",
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
+          "bobot": 1,
+          "varian": [
+            "iblis"
+          ]
+        }
+      ],
+      "slot": {
+        "$awal": {
+          "aturan": "awal.keluh",
+          "opsional": 0.45
+        },
+        "$ekor": {
+          "aturan": "ekor.keluh",
+          "opsional": 0.4
+        }
+      },
+      "gestur": "seka_keringat",
+      "seru": "aduh"
+    },
+    {
+      "aturan": "keluh.lagi.pejabat",
+      "niat": "KELUH",
+      "topik": "pejabat",
+      "bingkai": [
+        {
+          "kunci": "keluh.lagi.pejabat.0",
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
+          "bobot": 2,
+          "varian": [
+            "ibukota"
+          ]
+        },
+        {
+          "kunci": "keluh.lagi.pejabat.1",
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "keluh.lagi.pejabat.2",
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
+          "bobot": 1
+        },
+        {
+          "kunci": "keluh.lagi.pejabat.3",
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "keluh.lagi.pejabat.4",
+          "slot": [
+            "$awal"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        }
+      ],
+      "slot": {
+        "$awal": {
+          "aturan": "awal.keluh",
+          "opsional": 0.45
+        },
+        "$ekor": {
+          "aturan": "ekor.keluh",
+          "opsional": 0.4
+        }
+      },
+      "gestur": "geleng"
+    },
+    {
+      "aturan": "keluh.lagi.uang",
+      "niat": "KELUH",
+      "topik": "uang",
+      "bingkai": [
+        {
+          "kunci": "keluh.lagi.uang.0",
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
+          "bobot": 2,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "keluh.lagi.uang.1",
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
+          "bobot": 1,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "keluh.lagi.uang.2",
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "keluh.lagi.uang.3",
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
+          "bobot": 1
+        },
+        {
+          "kunci": "keluh.lagi.uang.4",
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
+          "bobot": 1,
+          "varian": [
+            "iblis"
+          ]
+        }
+      ],
+      "slot": {
+        "$awal": {
+          "aturan": "awal.keluh",
+          "opsional": 0.45
+        },
+        "$ekor": {
+          "aturan": "ekor.keluh",
+          "opsional": 0.4
+        }
+      },
+      "gestur": "hitung_koin",
+      "seru": "aduh"
+    },
+    {
+      "aturan": "keluh.lagi.harga",
+      "niat": "KELUH",
+      "topik": "harga",
+      "bingkai": [
+        {
+          "kunci": "keluh.lagi.harga.0",
+          "slot": [
+            "$awal",
+            "$barang_mahal",
+            "$ekor"
+          ],
+          "bobot": 2,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "keluh.lagi.harga.1",
+          "slot": [
+            "$awal",
+            "$barang_murah",
+            "$ekor"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "keluh.lagi.harga.2",
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
+          "bobot": 1
+        },
+        {
+          "kunci": "keluh.lagi.harga.3",
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
+          "bobot": 1,
+          "varian": [
+            "ibukota"
+          ]
+        },
+        {
+          "kunci": "keluh.lagi.harga.4",
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
+          "bobot": 1,
+          "varian": [
+            "p"
+          ]
+        }
+      ],
+      "slot": {
+        "$barang_mahal": {
+          "tipe": "barang",
+          "dari": "konteks.barang_mahal",
+          "fitur": [
+            "jamak"
+          ]
+        },
+        "$barang_murah": {
+          "tipe": "barang",
+          "dari": "konteks.barang_murah"
+        },
+        "$awal": {
+          "aturan": "awal.keluh",
+          "opsional": 0.45
+        },
+        "$ekor": {
+          "aturan": "ekor.keluh",
+          "opsional": 0.4
+        }
+      },
+      "gestur": "geleng",
+      "seru": "aduh"
+    },
+    {
+      "aturan": "keluh.lagi.kejahatan",
+      "niat": "KELUH",
+      "topik": "kejahatan",
+      "bingkai": [
+        {
+          "kunci": "keluh.lagi.kejahatan.0",
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
+          "bobot": 2,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "keluh.lagi.kejahatan.1",
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "keluh.lagi.kejahatan.2",
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
+          "bobot": 1,
+          "varian": [
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "keluh.lagi.kejahatan.3",
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
+          "bobot": 1
+        },
+        {
+          "kunci": "keluh.lagi.kejahatan.4",
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
+          "bobot": 1,
+          "varian": [
+            "pelabuhan"
+          ]
+        }
+      ],
+      "slot": {
+        "$awal": {
+          "aturan": "awal.keluh",
+          "opsional": 0.45
+        },
+        "$ekor": {
+          "aturan": "ekor.keluh",
+          "opsional": 0.4
+        }
+      },
+      "gestur": "geleng"
+    },
+    {
+      "aturan": "keluh.lagi.begal",
+      "niat": "KELUH",
+      "topik": "begal",
+      "bingkai": [
+        {
+          "kunci": "keluh.lagi.begal.0",
+          "slot": [
+            "$awal",
+            "$arah",
+            "$ekor"
+          ],
+          "bobot": 2,
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "keluh.lagi.begal.1",
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
+          "bobot": 1
+        },
+        {
+          "kunci": "keluh.lagi.begal.2",
+          "slot": [
+            "$awal",
+            "$arah",
+            "$ekor"
+          ],
+          "bobot": 1,
+          "varian": [
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "keluh.lagi.begal.3",
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
+          "bobot": 1
+        },
+        {
+          "kunci": "keluh.lagi.begal.4",
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
+          "bobot": 1,
+          "varian": [
+            "pelabuhan"
+          ]
+        }
+      ],
+      "slot": {
+        "$arah": {
+          "tipe": "arah",
+          "dari": "konteks.arah"
+        },
+        "$awal": {
+          "aturan": "awal.keluh",
+          "opsional": 0.45
+        },
+        "$ekor": {
+          "aturan": "ekor.keluh",
+          "opsional": 0.4
+        }
+      },
+      "gestur": "geleng",
+      "seru": "aduh"
+    },
+    {
+      "aturan": "keluh.lagi.panen",
+      "niat": "KELUH",
+      "topik": "panen",
+      "bingkai": [
+        {
+          "kunci": "keluh.lagi.panen.0",
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
+          "bobot": 2,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "keluh.lagi.panen.1",
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
+          "bobot": 1
+        },
+        {
+          "kunci": "keluh.lagi.panen.2",
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "keluh.lagi.panen.3",
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "keluh.lagi.panen.4",
+          "slot": [
+            "$awal"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$awal": {
+          "aturan": "awal.keluh",
+          "opsional": 0.45
+        },
+        "$ekor": {
+          "aturan": "ekor.keluh",
+          "opsional": 0.4
+        }
+      },
+      "gestur": "geleng",
+      "seru": "aduh"
+    },
+    {
+      "aturan": "keluh.lagi.curhat",
+      "niat": "KELUH",
+      "topik": "curhat",
+      "bingkai": [
+        {
+          "kunci": "keluh.lagi.curhat.0",
+          "slot": [
+            "$awal",
+            "$lawan",
+            "$ekor"
+          ],
+          "bobot": 2
+        },
+        {
+          "kunci": "keluh.lagi.curhat.1",
+          "slot": [
+            "$awal"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "keluh.lagi.curhat.2",
+          "slot": [
+            "$awal",
+            "$lawan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "keluh.lagi.curhat.3",
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
+          "bobot": 1,
+          "varian": [
+            "p"
+          ]
+        },
+        {
+          "kunci": "keluh.lagi.curhat.4",
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$lawan": {
+          "tipe": "nama_warga",
+          "dari": "lawan"
+        },
+        "$awal": {
+          "aturan": "awal.keluh",
+          "opsional": 0.45
+        },
+        "$ekor": {
+          "aturan": "ekor.keluh",
+          "opsional": 0.4
+        }
+      },
+      "gestur": "menangis",
+      "seru": "aduh"
+    },
+    {
+      "aturan": "keluh.lagi.dagang",
+      "niat": "KELUH",
+      "topik": "dagang",
+      "bingkai": [
+        {
+          "kunci": "keluh.lagi.dagang.0",
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
+          "bobot": 2,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "keluh.lagi.dagang.1",
+          "slot": [
+            "$awal",
+            "$barang_murah",
+            "$ekor"
+          ],
+          "bobot": 1
+        },
+        {
+          "kunci": "keluh.lagi.dagang.2",
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
+          "bobot": 1,
+          "varian": [
+            "ibukota"
+          ]
+        },
+        {
+          "kunci": "keluh.lagi.dagang.3",
+          "slot": [
+            "$awal"
+          ],
+          "bobot": 1,
+          "varian": [
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "keluh.lagi.dagang.4",
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$barang_murah": {
+          "tipe": "barang",
+          "dari": "konteks.barang_murah"
+        },
+        "$awal": {
+          "aturan": "awal.keluh",
+          "opsional": 0.45
+        },
+        "$ekor": {
+          "aturan": "ekor.keluh",
+          "opsional": 0.4
+        }
+      },
+      "gestur": "hitung_koin",
+      "seru": "aduh"
+    },
+    {
+      "aturan": "maaf.lagi",
+      "niat": "MAAF",
+      "bingkai": [
+        {
+          "kunci": "maaf.lagi.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "varian": [
+            "kasar",
+            "kuno",
+            "gunung"
+          ]
+        },
+        {
+          "kunci": "maaf.lagi.1",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "pelabuhan",
+            "p"
+          ]
+        },
+        {
+          "kunci": "maaf.lagi.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "air",
+            "oasis"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "sikap_tunduk",
+      "seru": "maaf"
+    },
+    {
+      "aturan": "tolak.lagi",
+      "niat": "TOLAK",
+      "topik": "minta",
+      "bingkai": [
+        {
+          "kunci": "tolak.lagi.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "tolak.lagi.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "ibukota",
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "tolak.lagi.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kampung",
+            "p"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "geleng"
+    },
+    {
+      "aturan": "marah.lagi",
+      "niat": "MARAH",
+      "bingkai": [
+        {
+          "kunci": "marah.lagi.0",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "kasar",
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "marah.lagi.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kuno",
+            "iblis"
+          ]
+        },
+        {
+          "kunci": "marah.lagi.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "p",
+            "kampung"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "marah_hentak",
+      "seru": "cih"
+    },
+    {
+      "aturan": "takut.lagi",
+      "niat": "TAKUT",
+      "bingkai": [
+        {
+          "kunci": "takut.lagi.0",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "takut.lagi.1",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "p",
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "takut.lagi.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "iblis",
+            "air"
+          ]
+        }
+      ],
+      "slot": {},
+      "gestur": "takut_sembunyi",
+      "seru": "takut"
+    },
+    {
+      "aturan": "kecewa.lagi",
+      "niat": "KECEWA",
+      "bingkai": [
+        {
+          "kunci": "kecewa.lagi.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "kecewa.lagi.1",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "p",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "kecewa.lagi.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "air"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "sikap_tunduk",
+      "seru": "aduh"
+    },
+    {
+      "aturan": "hina.lagi",
+      "niat": "HINA",
+      "topik": "pemain",
+      "bingkai": [
+        {
+          "kunci": "hina.lagi.0",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "kuno",
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "hina.lagi.1",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "hina.lagi.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "iblis",
+            "oasis"
+          ]
+        }
+      ],
+      "slot": {},
+      "gestur": "marah_tunjuk",
+      "seru": "cih"
+    },
+    {
+      "aturan": "selamat.lagi",
+      "niat": "SELAMAT",
+      "bingkai": [
+        {
+          "kunci": "selamat.lagi.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "selamat.lagi.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "oasis",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "selamat.lagi.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "pelabuhan"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "ucap_selamat",
+      "seru": "oh"
+    },
+    {
+      "aturan": "belasungkawa.lagi",
+      "niat": "BELASUNGKAWA",
+      "bingkai": [
+        {
+          "kunci": "belasungkawa.lagi.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "belasungkawa.lagi.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "gunung",
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "belasungkawa.lagi.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "kampung",
+            "p"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "sikap_tunduk"
+    },
+    {
+      "aturan": "perkenalan.lagi",
+      "niat": "PERKENALAN",
+      "bingkai": [
+        {
+          "kunci": "perkenalan.lagi.0",
+          "slot": [
+            "$nama",
+            "$kerja",
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "perkenalan.lagi.1",
+          "slot": [
+            "$sebutan",
+            "$nama",
+            "$kerja"
+          ],
+          "bobot": 1,
+          "varian": [
+            "gunung",
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "perkenalan.lagi.2",
+          "slot": [
+            "$sebutan",
+            "$nama",
+            "$kerja"
+          ],
+          "bobot": 1,
+          "varian": [
+            "p"
+          ]
+        }
+      ],
+      "slot": {
+        "$nama": {
+          "tipe": "nama_warga",
+          "dari": "pembicara"
+        },
+        "$kerja": {
+          "tipe": "pekerjaan",
+          "dari": "pembicara"
+        },
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "hormat"
+    },
+    {
+      "aturan": "minta.lagi",
+      "niat": "MINTA",
+      "bingkai": [
+        {
+          "kunci": "minta.lagi.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "minta.lagi.1",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "minta.lagi.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "ibukota"
+          ]
+        },
+        {
+          "kunci": "minta.lagi.3",
+          "slot": [],
+          "bobot": 1
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "bicara_tangan"
+    },
+    {
+      "aturan": "kembali.lagi",
+      "niat": "KEMBALI",
+      "bingkai": [
+        {
+          "kunci": "kembali.lagi.0",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "kasar",
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "kembali.lagi.1",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "kembali.lagi.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "p"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "bicara_tangan"
+    },
+    {
+      "aturan": "tawa.lagi",
+      "niat": "TAWA",
+      "bingkai": [
+        {
+          "kunci": "tawa.lagi.0",
+          "slot": [],
+          "bobot": 2,
+          "varian": [
+            "kasar",
+            "kuno",
+            "p"
+          ]
+        },
+        {
+          "kunci": "tawa.lagi.1",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "tawa.lagi.2",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "kampung"
+          ]
+        }
+      ],
+      "slot": {},
+      "gestur": "tertawa",
+      "seru": "tawa"
+    },
+    {
+      "aturan": "terima_kasih.lagi",
+      "niat": "TERIMA_KASIH",
+      "bingkai": [
+        {
+          "kunci": "terima_kasih.lagi.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "varian": [
+            "kasar",
+            "kuno",
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "terima_kasih.lagi.1",
+          "slot": [],
+          "bobot": 1,
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "terima_kasih.lagi.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "air",
+            "oasis"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "hormat",
+      "seru": "terima_kasih"
+    },
+    {
+      "aturan": "tanya.harga.lagi",
+      "niat": "TANYA",
+      "topik": "harga",
+      "bingkai": [
+        {
+          "kunci": "tanya.harga.lagi.0",
+          "slot": [
+            "$sebutan",
+            "$barang_mahal"
+          ],
+          "bobot": 2,
+          "varian": [
+            "kasar"
+          ]
+        },
+        {
+          "kunci": "tanya.harga.lagi.1",
+          "slot": [
+            "$barang_murah",
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "ibukota"
+          ]
+        },
+        {
+          "kunci": "tanya.harga.lagi.2",
+          "slot": [
+            "$barang_mahal",
+            "$sebutan"
+          ],
+          "bobot": 1,
+          "varian": [
+            "oasis"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        },
+        "$barang_murah": {
+          "tipe": "barang",
+          "dari": "konteks.barang_murah"
+        },
+        "$barang_mahal": {
+          "tipe": "barang",
+          "dari": "konteks.barang_mahal",
+          "fitur": [
+            "jamak"
+          ]
+        }
+      },
+      "gestur": "bicara_tangan"
+    },
+    {
+      "aturan": "sapa.sopan.subuh",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "jam": [
+          "subuh"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.sopan.subuh.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "register": [
+            "sopan"
+          ],
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "sapa.sopan.subuh.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "register": [
+            "sopan"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "hormat"
+    },
+    {
+      "aturan": "sapa.sopan.pagi",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "jam": [
+          "pagi"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.sopan.pagi.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "register": [
+            "sopan"
+          ],
+          "varian": [
+            "ibukota"
+          ]
+        },
+        {
+          "kunci": "sapa.sopan.pagi.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "register": [
+            "sopan"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "hormat"
+    },
+    {
+      "aturan": "sapa.sopan.siang",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "jam": [
+          "siang"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.sopan.siang.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "register": [
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "sapa.sopan.siang.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "register": [
+            "sopan"
+          ],
+          "varian": [
+            "oasis"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "hormat"
+    },
+    {
+      "aturan": "sapa.sopan.sore",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "jam": [
+          "sore"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.sopan.sore.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "register": [
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "sapa.sopan.sore.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "register": [
+            "sopan"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "hormat"
+    },
+    {
+      "aturan": "sapa.sopan.malam",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "jam": [
+          "malam"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.sopan.malam.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "register": [
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "sapa.sopan.malam.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "register": [
+            "sopan"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "hormat"
+    },
+    {
+      "aturan": "sapa.sopan.larut",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "jam": [
+          "larut"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.sopan.larut.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "register": [
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "sapa.sopan.larut.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "register": [
+            "sopan"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "hormat"
+    },
+    {
+      "aturan": "sapa.sopan.asing",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "kesan": [
+          "asing"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.sopan.asing.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "register": [
+            "sopan"
+          ],
+          "varian": [
+            "kampung"
+          ]
+        },
+        {
+          "kunci": "sapa.sopan.asing.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "register": [
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "sapa.sopan.asing.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "register": [
+            "sopan"
+          ],
+          "varian": [
+            "iblis"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "hormat"
+    },
+    {
+      "aturan": "sapa.sopan.pedagang",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "kelompok": [
+          "pedagang"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.sopan.pedagang.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "register": [
+            "sopan"
+          ],
+          "varian": [
+            "pelabuhan",
+            "oasis"
+          ]
+        },
+        {
+          "kunci": "sapa.sopan.pedagang.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "register": [
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "sapa.sopan.pedagang.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "register": [
+            "sopan"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "hormat"
+    },
+    {
+      "aturan": "sapa.sopan.pejabat",
+      "niat": "SAPA",
+      "topik": "sapa",
+      "syarat": {
+        "kelompok": [
+          "pejabat"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "sapa.sopan.pejabat.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "register": [
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "sapa.sopan.pejabat.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "register": [
+            "sopan"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "hormat"
+    },
+    {
+      "aturan": "tutup.sopan.pamit",
+      "niat": "TUTUP",
+      "topik": "pamit",
+      "bingkai": [
+        {
+          "kunci": "tutup.sopan.pamit.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "register": [
+            "sopan"
+          ],
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "tutup.sopan.pamit.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "register": [
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "tutup.sopan.pamit.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "register": [
+            "sopan"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "hormat"
+    },
+    {
+      "aturan": "tutup.sopan.sabar",
+      "niat": "TUTUP",
+      "topik": "sabar_habis",
+      "bingkai": [
+        {
+          "kunci": "tutup.sopan.sabar.0",
+          "slot": [
+            "$sebutan",
+            "$alasan_pergi"
+          ],
+          "bobot": 3,
+          "register": [
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "tutup.sopan.sabar.1",
+          "slot": [
+            "$sebutan",
+            "$alasan_pergi"
+          ],
+          "bobot": 2,
+          "register": [
+            "sopan"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        },
+        "$alasan_pergi": {
+          "aturan": "frag.alasan_pergi"
+        }
+      },
+      "gestur": "pamit_lambai"
+    },
+    {
+      "aturan": "terima_kasih.sopan",
+      "niat": "TERIMA_KASIH",
+      "bingkai": [
+        {
+          "kunci": "terima_kasih.sopan.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "register": [
+            "sopan"
+          ],
+          "varian": [
+            "kuno"
+          ]
+        },
+        {
+          "kunci": "terima_kasih.sopan.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "register": [
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "terima_kasih.sopan.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "register": [
+            "sopan"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "hormat",
+      "seru": "terima_kasih"
+    },
+    {
+      "aturan": "tolak.sopan",
+      "niat": "TOLAK",
+      "topik": "minta",
+      "bingkai": [
+        {
+          "kunci": "tolak.sopan.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "register": [
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "tolak.sopan.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "register": [
+            "sopan"
+          ],
+          "varian": [
+            "ibukota"
+          ]
+        },
+        {
+          "kunci": "tolak.sopan.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "register": [
+            "sopan"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "hormat"
+    },
+    {
+      "aturan": "maaf.sopan",
+      "niat": "MAAF",
+      "bingkai": [
+        {
+          "kunci": "maaf.sopan.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "register": [
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "maaf.sopan.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "register": [
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "maaf.sopan.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "register": [
+            "sopan"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "sikap_tunduk",
+      "seru": "maaf"
+    },
+    {
+      "aturan": "minta.sopan",
+      "niat": "MINTA",
+      "bingkai": [
+        {
+          "kunci": "minta.sopan.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "register": [
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "minta.sopan.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "register": [
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "minta.sopan.2",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "register": [
+            "sopan"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "hormat"
+    },
+    {
+      "aturan": "tawaran.sopan",
+      "niat": "TAWARAN",
+      "topik": "dagang",
+      "syarat": {
+        "kelompok": [
+          "pedagang"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "tawaran.sopan.0",
+          "slot": [
+            "$sebutan",
+            "$barang",
+            "$harga"
+          ],
+          "bobot": 3,
+          "register": [
+            "sopan"
+          ],
+          "varian": [
+            "pelabuhan"
+          ]
+        },
+        {
+          "kunci": "tawaran.sopan.1",
+          "slot": [
+            "$sebutan",
+            "$barang",
+            "$harga"
+          ],
+          "bobot": 2,
+          "register": [
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "tawaran.sopan.2",
+          "slot": [
+            "$sebutan",
+            "$barang"
+          ],
+          "bobot": 2,
+          "register": [
+            "sopan"
+          ]
+        }
+      ],
+      "slot": {
+        "$barang": {
+          "tipe": "barang",
+          "dari": "konteks.barang"
+        },
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        },
+        "$harga": {
+          "tipe": "harga",
+          "dari": "konteks.harga"
+        }
+      },
+      "gestur": "seru_dagang"
+    },
+    {
+      "aturan": "tawar_balik.sopan",
+      "niat": "TAWAR_BALIK",
+      "topik": "dagang",
+      "syarat": {
+        "kelompok": [
+          "pedagang"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "tawar_balik.sopan.0",
+          "slot": [
+            "$sebutan",
+            "$harga"
+          ],
+          "bobot": 3,
+          "register": [
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "tawar_balik.sopan.1",
+          "slot": [
+            "$sebutan",
+            "$harga"
+          ],
+          "bobot": 2,
+          "register": [
+            "sopan"
+          ],
+          "varian": [
+            "ibukota"
+          ]
+        },
+        {
+          "kunci": "tawar_balik.sopan.2",
+          "slot": [
+            "$sebutan",
+            "$harga"
+          ],
+          "bobot": 2,
+          "register": [
+            "sopan"
+          ]
+        }
+      ],
+      "slot": {
+        "$harga": {
+          "tipe": "harga",
+          "dari": "konteks.harga"
+        },
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "hitung_koin"
+    },
+    {
+      "aturan": "tawar.sopan",
+      "niat": "TAWAR",
+      "topik": "dagang",
+      "syarat": {
+        "kelompok": [
+          "pekerja",
+          "pedagang",
+          "tetua",
+          "anak",
+          "penjaga"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "tawar.sopan.0",
+          "slot": [
+            "$harga",
+            "$harga_tawar"
+          ],
+          "bobot": 3,
+          "register": [
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "tawar.sopan.1",
+          "slot": [
+            "$harga",
+            "$harga_tawar"
+          ],
+          "bobot": 2,
+          "register": [
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "tawar.sopan.2",
+          "slot": [
+            "$harga_tawar"
+          ],
+          "bobot": 2,
+          "register": [
+            "sopan"
+          ]
+        }
+      ],
+      "slot": {
+        "$harga": {
+          "tipe": "harga",
+          "dari": "konteks.harga"
+        },
+        "$harga_tawar": {
+          "tipe": "harga",
+          "dari": "konteks.harga_tawar"
+        }
+      },
+      "gestur": "tawar"
+    },
+    {
+      "aturan": "perkenalan.sopan",
+      "niat": "PERKENALAN",
+      "bingkai": [
+        {
+          "kunci": "perkenalan.sopan.0",
+          "slot": [
+            "$nama",
+            "$kerja",
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "register": [
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "perkenalan.sopan.1",
+          "slot": [
+            "$nama",
+            "$kerja",
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "register": [
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "perkenalan.sopan.2",
+          "slot": [
+            "$sebutan",
+            "$nama",
+            "$kerja"
+          ],
+          "bobot": 2,
+          "register": [
+            "sopan"
+          ]
+        }
+      ],
+      "slot": {
+        "$nama": {
+          "tipe": "nama_warga",
+          "dari": "pembicara"
+        },
+        "$kerja": {
+          "tipe": "pekerjaan",
+          "dari": "pembicara"
+        },
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "hormat"
+    },
+    {
+      "aturan": "kembali.sopan",
+      "niat": "KEMBALI",
+      "bingkai": [
+        {
+          "kunci": "kembali.sopan.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "register": [
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "kembali.sopan.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "register": [
+            "sopan"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "hormat"
+    },
+    {
+      "aturan": "selamat.sopan",
+      "niat": "SELAMAT",
+      "bingkai": [
+        {
+          "kunci": "selamat.sopan.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "register": [
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "selamat.sopan.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "register": [
+            "sopan"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "ucap_selamat",
+      "seru": "oh"
+    },
+    {
+      "aturan": "kecewa.sopan",
+      "niat": "KECEWA",
+      "bingkai": [
+        {
+          "kunci": "kecewa.sopan.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "register": [
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "kecewa.sopan.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "register": [
+            "sopan"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "sikap_tunduk",
+      "seru": "aduh"
+    },
+    {
+      "aturan": "belasungkawa.sopan",
+      "niat": "BELASUNGKAWA",
+      "bingkai": [
+        {
+          "kunci": "belasungkawa.sopan.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "register": [
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "belasungkawa.sopan.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "register": [
+            "sopan"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "sikap_tunduk"
+    },
+    {
+      "aturan": "tanya.harga.sopan",
+      "niat": "TANYA",
+      "topik": "harga",
+      "bingkai": [
+        {
+          "kunci": "tanya.harga.sopan.0",
+          "slot": [
+            "$sebutan",
+            "$barang_mahal"
+          ],
+          "bobot": 3,
+          "register": [
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "tanya.harga.sopan.1",
+          "slot": [
+            "$sebutan",
+            "$barang_mahal"
+          ],
+          "bobot": 2,
+          "register": [
+            "sopan"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        },
+        "$barang_mahal": {
+          "tipe": "barang",
+          "dari": "konteks.barang_mahal",
+          "fitur": [
+            "jamak"
+          ]
+        }
+      },
+      "gestur": "bicara_tangan"
+    },
+    {
+      "aturan": "peringat.sopan",
+      "niat": "PERINGATAN",
+      "topik": "bahaya",
+      "bingkai": [
+        {
+          "kunci": "peringat.sopan.0",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 3,
+          "register": [
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "peringat.sopan.1",
+          "slot": [
+            "$sebutan"
+          ],
+          "bobot": 2,
+          "register": [
+            "sopan"
+          ]
+        }
+      ],
+      "slot": {
+        "$sebutan": {
+          "tipe": "sebutan_pendengar",
+          "dari": "pendengar"
+        }
+      },
+      "gestur": "bisik"
+    },
+    {
+      "aturan": "basa.sopan.cerah",
+      "niat": "BASA_BASI",
+      "topik": "cuaca",
+      "syarat": {
+        "cuaca": [
+          "cerah"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "basa.sopan.cerah.0",
+          "slot": [],
+          "bobot": 3,
+          "register": [
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "basa.sopan.cerah.1",
+          "slot": [],
+          "bobot": 2,
+          "register": [
+            "sopan"
+          ]
+        }
+      ],
+      "slot": {},
+      "gestur": "tatap_langit"
+    },
+    {
+      "aturan": "basa.sopan.hujan",
+      "niat": "BASA_BASI",
+      "topik": "cuaca",
+      "syarat": {
+        "cuaca": [
+          "hujan"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "basa.sopan.hujan.0",
+          "slot": [],
+          "bobot": 3,
+          "register": [
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "basa.sopan.hujan.1",
+          "slot": [],
+          "bobot": 2,
+          "register": [
+            "sopan"
+          ]
+        }
+      ],
+      "slot": {},
+      "gestur": "tatap_langit"
+    },
+    {
+      "aturan": "basa.sopan.badai",
+      "niat": "BASA_BASI",
+      "topik": "cuaca",
+      "syarat": {
+        "cuaca": [
+          "badai"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "basa.sopan.badai.0",
+          "slot": [],
+          "bobot": 3,
+          "register": [
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "basa.sopan.badai.1",
+          "slot": [],
+          "bobot": 2,
+          "register": [
+            "sopan"
+          ]
+        }
+      ],
+      "slot": {},
+      "gestur": "tatap_langit"
+    },
+    {
+      "aturan": "basa.sopan.salju",
+      "niat": "BASA_BASI",
+      "topik": "cuaca",
+      "syarat": {
+        "cuaca": [
+          "salju"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "basa.sopan.salju.0",
+          "slot": [],
+          "bobot": 3,
+          "register": [
+            "sopan"
+          ]
+        },
+        {
+          "kunci": "basa.sopan.salju.1",
+          "slot": [],
+          "bobot": 2,
+          "register": [
+            "sopan"
+          ]
+        }
+      ],
+      "slot": {},
+      "gestur": "tatap_langit"
+    },
+    {
+      "aturan": "basa.sopan.semi",
+      "niat": "BASA_BASI",
+      "topik": "musim",
+      "syarat": {
+        "musim": [
+          "semi"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "basa.sopan.semi.0",
+          "slot": [],
+          "bobot": 3,
+          "register": [
+            "sopan"
+          ]
+        }
+      ],
+      "slot": {},
+      "gestur": "tatap_langit"
+    },
+    {
+      "aturan": "basa.sopan.panas",
+      "niat": "BASA_BASI",
+      "topik": "musim",
+      "syarat": {
+        "musim": [
+          "panas"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "basa.sopan.panas.0",
+          "slot": [],
+          "bobot": 3,
+          "register": [
+            "sopan"
+          ]
+        }
+      ],
+      "slot": {},
+      "gestur": "tatap_langit"
+    },
+    {
+      "aturan": "basa.sopan.gugur",
+      "niat": "BASA_BASI",
+      "topik": "musim",
+      "syarat": {
+        "musim": [
+          "gugur"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "basa.sopan.gugur.0",
+          "slot": [],
+          "bobot": 3,
+          "register": [
+            "sopan"
+          ]
+        }
+      ],
+      "slot": {},
+      "gestur": "tatap_langit"
+    },
+    {
+      "aturan": "basa.sopan.dingin",
+      "niat": "BASA_BASI",
+      "topik": "musim",
+      "syarat": {
+        "musim": [
+          "dingin"
+        ]
+      },
+      "bingkai": [
+        {
+          "kunci": "basa.sopan.dingin.0",
+          "slot": [],
+          "bobot": 3,
+          "register": [
+            "sopan"
+          ]
+        }
+      ],
+      "slot": {},
+      "gestur": "tatap_langit"
+    }
+  ]
+}

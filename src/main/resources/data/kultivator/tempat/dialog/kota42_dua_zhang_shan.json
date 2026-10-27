@@ -1,0 +1,33 @@
+{
+  "pembicara": [
+    "tokoh:zhang_shan"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest kota42_dua_keluarga aktif",
+    "bendera kota42.dua.surat",
+    "!bendera kota42.dua.baca"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "membaca",
+      "pilihan": [
+        {
+          "ke": "restu"
+        },
+        {
+          "ke": "restu"
+        }
+      ]
+    },
+    {
+      "id": "restu",
+      "gestur": "hormat",
+      "akibat": [
+        "bendera kota42.dua.baca"
+      ]
+    }
+  ]
+}

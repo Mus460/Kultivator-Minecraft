@@ -1,0 +1,44 @@
+{
+  "pembicara": [
+    "tokoh:shen_ziyu"
+  ],
+  "prioritas": 5,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "kipas",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "paman"
+        },
+        {
+          "ke": "jodoh"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "paman",
+      "gestur": "363",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "jodoh",
+      "gestur": "kipas",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

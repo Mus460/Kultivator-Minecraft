@@ -92,6 +92,10 @@ public final class Gabung {
 		});
 		// 41W's compound spots (new titik and their stand-ins) come before GabungApi's own compound/gate steps.
 		GabungApi.addPenyediaTitik((s, sekte, titik) -> dev.kultivator.sekte.gabung.dunia.TitikGabung.kompleks(sekte, titik));
+		// 41V uniforms: tetua_sekte / ketua_sekte / murid.N of an NPC sect get the sect style's row (D-41V)
+		GabungRupa.init();
+		// 41V class visuals: where the halls stand (dome over the aula, crown over the puncak)
+		GabungTitik.init();
 		// 41B Masuk & Ujian:
 		dev.kultivator.sekte.gabung.masuk.Masuk.init();
 		// 41C Hidup Anggota:
@@ -111,6 +115,7 @@ public final class Gabung {
 		}
 		content = true;
 		GabungPayloads.daftarJenis();
+		GabungTitik.daftarJenis();
 		dev.kultivator.sekte.gabung.masuk.Masuk.registerContent();
 	}
 

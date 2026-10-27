@@ -1,0 +1,47 @@
+{
+  "pembicara": [
+    "tokoh:shen_wan"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest kota42_pejabat_jujur tahap besar"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "419",
+      "prop": "198",
+      "suara": "kota42.suap",
+      "pilihan": [
+        {
+          "syarat": [
+            "bendera kota42.pejabat.bukti"
+          ],
+          "akibat": [
+            "bendera kota42.pejabat.sita",
+            "quest_maju kota42_pejabat_jujur"
+          ],
+          "ke": "tolak",
+          "tampil": true,
+          "alasan": "kultivator.cerita.kota42_pejabat_shen.mulai.1.alasan"
+        },
+        {
+          "akibat": [
+            "bendera kota42.pejabat.suap",
+            "quest_maju kota42_pejabat_jujur"
+          ],
+          "ke": "terima"
+        }
+      ]
+    },
+    {
+      "id": "tolak",
+      "gestur": "marah_tunjuk"
+    },
+    {
+      "id": "terima",
+      "gestur": "hormat"
+    }
+  ]
+}

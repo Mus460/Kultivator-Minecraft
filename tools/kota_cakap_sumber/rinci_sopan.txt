@@ -1,0 +1,303 @@
+# rinci_sopan: D-42K detail pass. The register "sopan" is what traders, careful people, officials and anyone facing a stranger
+# speak (Topik.register), yet the corpus had almost no sopan frames: they fell back to the plain base text. These frames are
+# tagged [sopan] (only said in that register); every rule shares niat/topik/syarat with an old one, so the planner pools them.
+@kelompok rinci
+
+== sapa.sopan.subuh
+niat: SAPA
+topik: sapa
+syarat: jam=subuh
+gestur: hormat
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3 sopan] Selamat pagi, {$sebutan}. Pagi sekali Anda sudah berjalan. || Good morning, {$sebutan}. You're up and about very early.
+  ~ pelabuhan: Selamat pagi, {$sebutan}. Pelabuhan baru saja bangun. || Good morning, {$sebutan}. The harbour has only just woken.
+- [2 sopan] Selamat subuh, {$sebutan}. Mohon hati-hati, kabut masih tebal. || Good early morning, {$sebutan}. Please take care; the mist is still thick.
+
+== sapa.sopan.pagi
+niat: SAPA
+topik: sapa
+syarat: jam=pagi
+gestur: hormat
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3 sopan] Selamat pagi, {$sebutan}. Semoga hari Anda menyenangkan. || Good morning, {$sebutan}. May your day be pleasant.
+  ~ ibukota: Selamat pagi, {$sebutan}. Semoga urusan Anda di kota ini lancar. || Good morning, {$sebutan}. May your business in this city go well.
+- [2 sopan] Selamat pagi. Silakan, jangan sungkan bila memerlukan sesuatu, {$sebutan}. || Good morning. Please, do not hesitate if you need anything, {$sebutan}.
+
+== sapa.sopan.siang
+niat: SAPA
+topik: sapa
+syarat: jam=siang
+gestur: hormat
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3 sopan] Selamat siang, {$sebutan}. Mataharinya terik, mohon berteduh sebentar bila perlu. || Good afternoon, {$sebutan}. The sun is fierce; do take shade a moment if you need.
+- [2 sopan] Selamat siang, {$sebutan}. Sudah makan siang? Kedai di sebelah menyajikan sup hangat. || Good afternoon, {$sebutan}. Had lunch yet? The tavern next door serves warm soup.
+  ~ oasis: Selamat siang, {$sebutan}. Mohon beristirahat di tempat teduh; kami punya air dingin. || Good afternoon, {$sebutan}. Please rest in the shade; we have cool water.
+
+== sapa.sopan.sore
+niat: SAPA
+topik: sapa
+syarat: jam=sore
+gestur: hormat
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3 sopan] Selamat sore, {$sebutan}. Semoga hari ini berjalan baik untuk Anda. || Good evening, {$sebutan}. I hope today went well for you.
+- [2 sopan] Selamat sore, {$sebutan}. Hari mulai gelap; kami menyalakan lentera sebentar lagi. || Good evening, {$sebutan}. Dusk is near; we light the lanterns shortly.
+
+== sapa.sopan.malam
+niat: SAPA
+topik: sapa
+syarat: jam=malam
+gestur: hormat
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3 sopan] Selamat malam, {$sebutan}. Mohon berhati-hati di jalan yang gelap. || Good evening, {$sebutan}. Please take care on the dark roads.
+- [2 sopan] Selamat malam, {$sebutan}. Bila mencari penginapan, ada yang masih buka di ujung jalan. || Good evening, {$sebutan}. If you seek lodging, one is still open at the end of the lane.
+
+== sapa.sopan.larut
+niat: SAPA
+topik: sapa
+syarat: jam=larut
+gestur: hormat
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3 sopan] Selarut ini, {$sebutan}? Mohon maaf, saya tidak bisa menjamu; lebih baik beristirahat. || This late, {$sebutan}? Forgive me, I can't host you; better to rest.
+- [2 sopan] Selamat malam, {$sebutan}. Penjaga malam sedang ronda; tolong jangan kaget bila ditegur. || Good night, {$sebutan}. The night watch is on its round; please don't be startled if challenged.
+
+== sapa.sopan.asing
+niat: SAPA
+topik: sapa
+syarat: kesan=asing
+gestur: hormat
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3 sopan] Maaf, sepertinya kita belum pernah bertemu. Selamat datang, {$sebutan}. || Pardon, I don't think we've met. Welcome, {$sebutan}.
+  ~ kampung: Maaf, sepertinya kita belum pernah ketemu. Selamat datang di desa kami, {$sebutan}. || Pardon, I don't think we've met. Welcome to our village, {$sebutan}.
+- [3 sopan] Selamat datang, {$sebutan}. Bila ada yang bisa saya bantu, silakan bertanya. || Welcome, {$sebutan}. If there is anything I can help with, please ask.
+- [2 sopan] Salam hormat, {$sebutan}. Pendatang baru? Kota ini ramah pada yang tahu aturan. || Respectful greetings, {$sebutan}. A newcomer? This town is kind to those who know its ways.
+  ~ iblis: Salam. Pendatang baru? Di sini kami ramah pada yang tahu tempatnya. || Greetings. A newcomer? Here we're kind to those who know their place.
+
+== sapa.sopan.pedagang
+niat: SAPA
+topik: sapa
+syarat: kelompok=pedagang
+gestur: hormat
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3 sopan] Silakan masuk, {$sebutan}. Lihat-lihat dahulu, tidak membeli pun tidak mengapa. || Please come in, {$sebutan}. Do look around; no obligation to buy.
+  ~ pelabuhan: Silakan mampir, {$sebutan}. Dagangan kami baru turun dari kapal. || Please step in, {$sebutan}. Our goods just came off the ship.
+  ~ oasis: Silakan duduk, {$sebutan}. Minum teh dahulu, baru kita bicara barang. || Please sit, {$sebutan}. Tea first, then we talk goods.
+- [3 sopan] Selamat datang di toko kami, {$sebutan}. Ada yang sedang Anda cari? || Welcome to our shop, {$sebutan}. Is there something you are looking for?
+- [2 sopan] Beruntung sekali, {$sebutan}; Anda datang pada waktu yang tepat. Barang terbaik baru saja tiba. || How fortunate, {$sebutan}; you come at the right time. The best goods have just arrived.
+
+== sapa.sopan.pejabat
+niat: SAPA
+topik: sapa
+syarat: kelompok=pejabat
+gestur: hormat
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3 sopan] Selamat datang, {$sebutan}. Mohon maaf, urusan kantor sedang padat. || Welcome, {$sebutan}. Pardon me; office business is heavy.
+- [2 sopan] Salam hormat, {$sebutan}. Bila ada urusan, silakan sampaikan dengan tertib. || Respectful greetings, {$sebutan}. If you have business, please state it in order.
+
+== tutup.sopan.pamit
+niat: TUTUP
+topik: pamit
+gestur: hormat
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3 sopan] Terima kasih atas waktunya, {$sebutan}. Sampai jumpa lagi. || Thank you for your time, {$sebutan}. Until we meet again.
+  ~ pelabuhan: Terima kasih atas waktunya, {$sebutan}. Semoga angin baik menyertai perjalanan Anda. || Thank you for your time, {$sebutan}. May fair winds go with your journey.
+- [2 sopan] Selamat jalan, {$sebutan}. Mohon kembali bila memerlukan sesuatu. || Safe journey, {$sebutan}. Please return if you need anything.
+- [2 sopan] Senang berbincang dengan Anda, {$sebutan}. Mohon maaf bila ada yang kurang berkenan. || A pleasure speaking with you, {$sebutan}. Forgive me if anything displeased you.
+
+== tutup.sopan.sabar
+niat: TUTUP
+topik: sabar_habis
+gestur: pamit_lambai
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+$alasan_pergi: aturan=frag.alasan_pergi
+- [3 sopan] Mohon maaf, {$sebutan}, {$alasan_pergi}. Semoga kita dapat melanjutkan lain waktu. || Pardon me, {$sebutan}, {$alasan_pergi}. I hope we may continue another time.
+- [2 sopan] Maafkan saya, {$sebutan}; {$alasan_pergi}. Dengan hormat, saya undur diri. || Forgive me, {$sebutan}; {$alasan_pergi}. With respect, I take my leave.
+
+== terima_kasih.sopan
+niat: TERIMA_KASIH
+gestur: hormat
+seru: terima_kasih
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3 sopan] Terima kasih banyak atas kebaikan Anda, {$sebutan}. Sungguh berarti bagi saya. || Thank you very much for your kindness, {$sebutan}. It truly means a lot to me.
+  ~ kuno: Hamba berterima kasih atas budi {$sebutan}. Semoga langit membalasnya. || This one thanks you for your kindness, {$sebutan}. May heaven repay it.
+- [2 sopan] Saya sangat berterima kasih, {$sebutan}. Mohon izinkan saya membalasnya suatu hari. || I am very grateful, {$sebutan}. Please allow me to repay it someday.
+- [2 sopan] Terima kasih, {$sebutan}. Anda sangat murah hati. || Thank you, {$sebutan}. You are most generous.
+
+== tolak.sopan
+niat: TOLAK
+topik: minta
+gestur: hormat
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3 sopan] Mohon maaf, {$sebutan}, saya tidak dapat memenuhinya. || I'm sorry, {$sebutan}, I'm unable to fulfil that.
+- [2 sopan] Dengan berat hati saya harus menolak, {$sebutan}. Mohon dimaklumi. || With a heavy heart I must decline, {$sebutan}. Please understand.
+  ~ ibukota: Sesuai peraturan distrik, saya tidak berwenang, {$sebutan}. Mohon dimaklumi. || By district rules I have no authority, {$sebutan}. Please understand.
+- [2 sopan] Maaf, {$sebutan}, permintaan itu di luar kemampuan saya. Mungkin pihak lain dapat membantu. || Sorry, {$sebutan}, that request is beyond me. Perhaps someone else can help.
+
+== maaf.sopan
+niat: MAAF
+gestur: sikap_tunduk
+seru: maaf
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3 sopan] Mohon maaf atas kelancangan saya, {$sebutan}. Itu tidak akan terulang. || Please forgive my presumption, {$sebutan}. It won't happen again.
+- [2 sopan] Saya sungguh menyesal, {$sebutan}. Izinkan saya memperbaikinya. || I am truly sorry, {$sebutan}. Allow me to make it right.
+- [2 sopan] Maafkan kekhilafan saya, {$sebutan}. Saya hanya manusia biasa. || Forgive my lapse, {$sebutan}. I am only an ordinary person.
+
+== minta.sopan
+niat: MINTA
+gestur: hormat
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3 sopan] Maaf mengganggu, {$sebutan}. Bolehkah saya meminta bantuan Anda sebentar? || Sorry to trouble you, {$sebutan}. May I ask your help a moment?
+- [2 sopan] Bila tidak merepotkan, {$sebutan}, tolong bantu saya mengangkat barang ini. || If it's no trouble, {$sebutan}, please help me lift these goods.
+- [2 sopan] Mohon kesediaan Anda, {$sebutan}, untuk menyampaikan pesan ini ke gerbang selatan. || I beg your kindness, {$sebutan}, to carry this message to the south gate.
+
+== tawaran.sopan
+niat: TAWARAN
+topik: dagang
+syarat: kelompok=pedagang
+gestur: seru_dagang
+$barang: tipe=barang dari=konteks.barang
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+$harga: tipe=harga dari=konteks.harga
+- [3 sopan] Silakan, {$sebutan}, {$barang} ini pilihan terbaik kami. Harganya hanya {$harga}. || Please, {$sebutan}, this {$barang} is our best choice. The price is only {$harga}.
+  ~ pelabuhan: Silakan, {$sebutan}. {$barang} langsung dari kapal, hanya {$harga}. || Please, {$sebutan}. {$barang} straight off the ship, only {$harga}.
+- [2 sopan] Bila berkenan, {$sebutan}, saya sarankan {$barang}. Kualitasnya terjamin, harganya {$harga}. || If you please, {$sebutan}, I recommend {$barang}. Its quality is assured, at {$harga}.
+- [2 sopan] Terima kasih telah singgah, {$sebutan}. {$barang} tinggal sedikit; mohon segera dipertimbangkan. || Thank you for stopping by, {$sebutan}. There's little {$barang} left; please consider soon.
+
+== tawar_balik.sopan
+niat: TAWAR_BALIK
+topik: dagang
+syarat: kelompok=pedagang
+gestur: hitung_koin
+$harga: tipe=harga dari=konteks.harga
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3 sopan] Mohon maaf, {$sebutan}, harga itu terlalu rendah bagi kami. {$harga} adalah harga paling pantas. || Pardon, {$sebutan}, that price is too low for us. {$harga} is the fairest price.
+- [2 sopan] Saya menghargai tawaran Anda, {$sebutan}. Namun {$harga} adalah batas kami. || I appreciate your offer, {$sebutan}. But {$harga} is our limit.
+  ~ ibukota: Kami terikat tarif pasar, {$sebutan}. Harganya {$harga}; mohon dimaklumi. || We are bound by the market tariff, {$sebutan}. The price is {$harga}; please understand.
+- [2 sopan] Demi hubungan baik, {$sebutan}, saya berikan {$harga}. Itu sudah paling rendah. || For goodwill, {$sebutan}, I'll give {$harga}. That is already the lowest.
+
+== tawar.sopan
+niat: TAWAR
+topik: dagang
+syarat: kelompok=pekerja,pedagang,tetua,anak,penjaga
+gestur: tawar
+$harga: tipe=harga dari=konteks.harga
+$harga_tawar: tipe=harga dari=konteks.harga_tawar
+- [3 sopan] Mohon maaf, apakah harganya dapat diturunkan dari {$harga} menjadi {$harga_tawar}? || Pardon me, could the price come down from {$harga} to {$harga_tawar}?
+- [2 sopan] Barangnya bagus, tetapi {$harga} agak berat bagi saya. Bagaimana bila {$harga_tawar}? || The goods are fine, but {$harga} is rather heavy for me. How about {$harga_tawar}?
+- [2 sopan] Saya akan membeli bila Anda berkenan menurunkan harga ke {$harga_tawar}. || I shall buy if you would kindly lower the price to {$harga_tawar}.
+
+== perkenalan.sopan
+niat: PERKENALAN
+gestur: hormat
+$nama: tipe=nama_warga dari=pembicara
+$kerja: tipe=pekerjaan dari=pembicara
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3 sopan] Perkenalkan, nama saya {$nama}, {$kerja} di sini. Senang bertemu Anda, {$sebutan}. || Allow me to introduce myself: I'm {$nama}, a {$kerja} here. Pleased to meet you, {$sebutan}.
+- [2 sopan] Saya {$nama}, {$kerja}. Mohon bimbingannya, {$sebutan}. || I am {$nama}, a {$kerja}. I look forward to your guidance, {$sebutan}.
+- [2 sopan] Izinkan saya memperkenalkan diri, {$sebutan}: {$nama}, {$kerja} yang sederhana. || Allow me to introduce myself, {$sebutan}: {$nama}, a modest {$kerja}.
+
+== kembali.sopan
+niat: KEMBALI
+gestur: hormat
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3 sopan] Mohon maaf atas jeda tadi, {$sebutan}. Mari kita lanjutkan. || Pardon the pause, {$sebutan}. Let us continue.
+- [2 sopan] Maaf, saya sempat teralihkan. Bisakah Anda mengulang, {$sebutan}? || Sorry, I was distracted. Could you repeat, {$sebutan}?
+
+== selamat.sopan
+niat: SELAMAT
+gestur: ucap_selamat
+seru: oh
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3 sopan] Selamat atas pencapaian Anda, {$sebutan}. Sungguh patut dihormati. || Congratulations on your achievement, {$sebutan}. Truly worthy of respect.
+- [2 sopan] Saya turut berbahagia, {$sebutan}. Semoga keberhasilan ini berlanjut. || I'm happy for you, {$sebutan}. May this success continue.
+
+== kecewa.sopan
+niat: KECEWA
+gestur: sikap_tunduk
+seru: aduh
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3 sopan] Begitu rupanya. Saya mengerti, {$sebutan}, walau saya sempat berharap lain. || I see. I understand, {$sebutan}, though I had hoped otherwise.
+- [2 sopan] Tidak mengapa, {$sebutan}. Mungkin lain kali ada kesempatan. || It's quite all right, {$sebutan}. Perhaps another time.
+
+== belasungkawa.sopan
+niat: BELASUNGKAWA
+gestur: sikap_tunduk
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3 sopan] Saya turut berduka cita, {$sebutan}. Semoga Anda diberi ketabahan. || My deepest condolences, {$sebutan}. May you be granted strength.
+- [2 sopan] Mohon terima belasungkawa saya, {$sebutan}. Kehilangan ini terasa oleh kita semua. || Please accept my condolences, {$sebutan}. This loss is felt by all of us.
+
+== tanya.harga.sopan
+niat: TANYA
+topik: harga
+gestur: bicara_tangan
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+$barang_mahal: tipe=barang dari=konteks.barang_mahal fitur=jamak
+- [3 sopan] Mohon maaf, {$sebutan}, apakah Anda tahu berapa harga {$barang_mahal} di kota-kota lain? || Pardon me, {$sebutan}, might you know what {$barang_mahal} costs in other towns?
+- [2 sopan] Bila Anda sering bepergian, {$sebutan}, di mana {$barang_mahal} dijual dengan harga wajar? || If you travel often, {$sebutan}, where is {$barang_mahal} sold at a fair price?
+
+== peringat.sopan
+niat: PERINGATAN
+topik: bahaya
+gestur: bisik
+$sebutan: tipe=sebutan_pendengar dari=pendengar
+- [3 sopan] Mohon berhati-hati, {$sebutan}. Belakangan ada orang tak dikenal yang bertanya-tanya tentang Anda. || Please take care, {$sebutan}. Lately unknown people have been asking about you.
+- [2 sopan] Maaf lancang, {$sebutan}, tetapi sebaiknya Anda tidak berjalan sendirian setelah gelap. || Forgive my boldness, {$sebutan}, but you'd best not walk alone after dark.
+
+== basa.sopan.cerah
+niat: BASA_BASI
+topik: cuaca
+syarat: cuaca=cerah
+gestur: tatap_langit
+- [3 sopan] Cuaca hari ini sangat baik. Semoga perjalanan Anda menyenangkan. || The weather is very fine today. I hope your journey is pleasant.
+- [2 sopan] Langitnya begitu cerah. Rasanya semua urusan akan lancar hari ini. || The sky is so bright. It feels like all business will go smoothly today.
+
+== basa.sopan.hujan
+niat: BASA_BASI
+topik: cuaca
+syarat: cuaca=hujan
+gestur: tatap_langit
+- [3 sopan] Hujan turun cukup deras. Silakan berteduh dahulu bila Anda tidak terburu-buru. || The rain falls quite hard. Please take shelter first if you are not in a hurry.
+- [2 sopan] Mohon maaf jalanan becek karena hujan. Semoga sepatu Anda tidak basah. || Sorry the lanes are muddy with the rain. I hope your shoes stay dry.
+
+== basa.sopan.badai
+niat: BASA_BASI
+topik: cuaca
+syarat: cuaca=badai
+gestur: tatap_langit
+- [3 sopan] Badai ini sungguh mengkhawatirkan. Mohon Anda mencari tempat aman. || This storm is truly worrying. Please find somewhere safe.
+- [2 sopan] Angin kencang begini, sebaiknya kita tidak berlama-lama di luar. || With wind this fierce, we had better not linger outside.
+
+== basa.sopan.salju
+niat: BASA_BASI
+topik: cuaca
+syarat: cuaca=salju
+gestur: tatap_langit
+- [3 sopan] Salju mulai turun. Mohon kenakan pakaian hangat, udaranya menusuk. || Snow has begun to fall. Please wear warm clothes; the air bites.
+- [2 sopan] Indah sekali salju pertama ini, bukan? Semoga rumah Anda hangat. || This first snow is lovely, isn't it? May your home be warm.
+
+== basa.sopan.semi
+niat: BASA_BASI
+topik: musim
+syarat: musim=semi
+gestur: tatap_langit
+- [3 sopan] Musim semi telah tiba. Bunga-bunga di taman kota mulai mekar. || Spring has arrived. The flowers in the town gardens are beginning to bloom.
+
+== basa.sopan.panas
+niat: BASA_BASI
+topik: musim
+syarat: musim=panas
+gestur: tatap_langit
+- [3 sopan] Musim panas begini, mohon sering minum agar tidak kelelahan. || In summer like this, please drink often so as not to tire.
+
+== basa.sopan.gugur
+niat: BASA_BASI
+topik: musim
+syarat: musim=gugur
+gestur: tatap_langit
+- [3 sopan] Daun-daun mulai gugur. Musim ini selalu membuat saya merenung. || The leaves begin to fall. This season always makes me reflect.
+
+== basa.sopan.dingin
+niat: BASA_BASI
+topik: musim
+syarat: musim=dingin
+gestur: tatap_langit
+- [3 sopan] Musim dingin telah tiba. Mohon jaga kesehatan Anda. || Winter has arrived. Please look after your health.

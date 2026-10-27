@@ -9,17 +9,19 @@ syarat: kelompok=pekerja
 lanjut: harga keluarga
 gestur: seka_keringat
 $sebutan: tipe=sebutan_pendengar dari=pendengar
-- [3] Pekerjaan hari ini berat. Punggungku seperti dipukul palu. || Today's work is heavy. My back feels hammered.
-  ~ kasar: Kerja, kerja, kerja. Upah segitu-segitu saja. || Work, work, work. Same pittance.
-  ~ kuno: Keringat orang kecil inilah yang menopang kota, {$sebutan}. || It's the sweat of small folk that holds the town up, {$sebutan}.
-  ~ kampung: Habis nyangkul dari subuh, Nak. Pinggang rasanya mau copot. || Been hoeing since dawn, child. My hips feel ready to fall off.
-  ~ pelabuhan: Bongkar muat dari subuh, Bung. Karung garam beratnya minta ampun. || Loading since dawn, mate. The salt sacks weigh a ton.
-- [2] Mandor bilang kalau selesai sebelum gelap, ada upah tambahan. Semoga benar. || The foreman says finish before dark and there's extra pay. I hope so.
-  ~ oasis: Mandor kafilah menjanjikan air tambahan kalau selesai sebelum terik, Saudara. || The caravan foreman promised extra water if we finish before the heat, friend.
-- Kerja keras tidak apa-apa, asal anak-anak bisa makan. || Hard work's fine, as long as the children eat.
-  ~ p: Kerja keras tidak apa-apa. Yang penting anak-anak bisa sekolah. || Hard work's fine. What matters is the children go to school.
-- Tanganku penuh kapal, tapi lihat: tembok itu aku yang bangun. || My hands are all calluses, but look: I built that wall.
-- Istirahat sebentar dulu. Kalau dipaksa, besok malah tidak bisa bangun. || A short rest first. Push too hard and you can't get up tomorrow.
+$awal: aturan=awal.basa opsional=0.4
+$ekor: aturan=ekor.basa opsional=0.4
+- [3] {$awal}Pekerjaan hari ini berat. Punggungku seperti dipukul palu.{$ekor} || {$awal}Today's work is heavy. My back feels hammered.{$ekor}
+  ~ kasar: {$awal}Kerja, kerja, kerja. Upah segitu-segitu saja.{$ekor} || {$awal}Work, work, work. Same pittance.{$ekor}
+  ~ kuno: {$awal}Keringat orang kecil inilah yang menopang kota, {$sebutan}.{$ekor} || {$awal}It's the sweat of small folk that holds the town up, {$sebutan}.{$ekor}
+  ~ kampung: {$awal}Habis nyangkul dari subuh, Nak. Pinggang rasanya mau copot.{$ekor} || {$awal}Been hoeing since dawn, child. My hips feel ready to fall off.{$ekor}
+  ~ pelabuhan: {$awal}Bongkar muat dari subuh, Bung. Karung garam beratnya minta ampun.{$ekor} || {$awal}Loading since dawn, mate. The salt sacks weigh a ton.{$ekor}
+- [2] {$awal}Mandor bilang kalau selesai sebelum gelap, ada upah tambahan. Semoga benar.{$ekor} || {$awal}The foreman says finish before dark and there's extra pay. I hope so.{$ekor}
+  ~ oasis: {$awal}Mandor kafilah menjanjikan air tambahan kalau selesai sebelum terik, Saudara.{$ekor} || {$awal}The caravan foreman promised extra water if we finish before the heat, friend.{$ekor}
+- {$awal}Kerja keras tidak apa-apa, asal anak-anak bisa makan.{$ekor} || {$awal}Hard work's fine, as long as the children eat.{$ekor}
+  ~ p: {$awal}Kerja keras tidak apa-apa. Yang penting anak-anak bisa sekolah.{$ekor} || {$awal}Hard work's fine. What matters is the children go to school.{$ekor}
+- {$awal}Tanganku penuh kapal, tapi lihat: tembok itu aku yang bangun.{$ekor} || {$awal}My hands are all calluses, but look: I built that wall.{$ekor}
+- {$awal}Istirahat sebentar dulu. Kalau dipaksa, besok malah tidak bisa bangun.{$ekor} || {$awal}A short rest first. Push too hard and you can't get up tomorrow.{$ekor}
 
 == kerja.pedagang
 niat: BASA_BASI
@@ -29,16 +31,18 @@ lanjut: dagang harga
 gestur: hitung_koin
 $sebutan: tipe=sebutan_pendengar dari=pendengar
 $barang_murah: tipe=barang dari=konteks.barang_murah
-- [3] Dagang itu seperti cuaca, {$sebutan}. Kadang cerah, kadang badai. || Trade's like weather, {$sebutan}. Sometimes clear, sometimes storm.
-  ~ kasar: Untung tipis, pajak tebal. Begitulah dagang. || Thin profit, thick tax. That's trade.
-  ~ kuno: Jual-beli adalah jalan hamba, {$sebutan}. Tidak setinggi Dao, tapi jujur. || Buying and selling is this one's path, {$sebutan}. Not as high as the Dao, but honest.
-  ~ oasis: Di bazar, setiap koin punya cerita, Saudara. || At the bazaar, every coin has a story, friend.
-- [2] Hari ini aku menjual {$barang_murah} lebih banyak dari biasanya. Mungkin pertanda baik. || I sold more {$barang_murah} than usual today. Maybe a good sign.
-  ~ pelabuhan: Muatan {$barang_murah} dari kapal kemarin laku keras, Bung. || The {$barang_murah} from yesterday's ship sold like mad, mate.
-- Pelanggan setia itu harta. Satu pelanggan setia lebih baik dari sepuluh yang lewat. || A loyal customer is treasure. One loyal customer beats ten passers-by.
-- Kalau mau tahu kabar kota, tanya pedagang. Kami dengar semua dari pembeli. || Want town news, ask a merchant. We hear it all from buyers.
-  ~ p: Kalau mau tahu kabar kota, tanya aku. Pembeli perempuan cerita semuanya. Hihi. || Want town news, ask me. Lady customers tell me everything. Hehe.
-- Ayahku dulu berdagang di lapak yang sama. Kakekku juga. Tiga keturunan di sini. || My father traded at this same stall. My grandfather too. Three generations here.
+$awal: aturan=awal.basa opsional=0.4
+$ekor: aturan=ekor.basa opsional=0.4
+- [3] {$awal}Dagang itu seperti cuaca, {$sebutan}. Kadang cerah, kadang badai.{$ekor} || {$awal}Trade's like weather, {$sebutan}. Sometimes clear, sometimes storm.{$ekor}
+  ~ kasar: {$awal}Untung tipis, pajak tebal. Begitulah dagang.{$ekor} || {$awal}Thin profit, thick tax. That's trade.{$ekor}
+  ~ kuno: {$awal}Jual-beli adalah jalan hamba, {$sebutan}. Tidak setinggi Dao, tapi jujur.{$ekor} || {$awal}Buying and selling is this one's path, {$sebutan}. Not as high as the Dao, but honest.{$ekor}
+  ~ oasis: {$awal}Di bazar, setiap koin punya cerita, Saudara.{$ekor} || {$awal}At the bazaar, every coin has a story, friend.{$ekor}
+- [2] {$awal}Hari ini aku menjual {$barang_murah} lebih banyak dari biasanya. Mungkin pertanda baik.{$ekor} || {$awal}I sold more {$barang_murah} than usual today. Maybe a good sign.{$ekor}
+  ~ pelabuhan: {$awal}Muatan {$barang_murah} dari kapal kemarin laku keras, Bung.{$ekor} || {$awal}The {$barang_murah} from yesterday's ship sold like mad, mate.{$ekor}
+- {$awal}Pelanggan setia itu harta. Satu pelanggan setia lebih baik dari sepuluh yang lewat.{$ekor} || {$awal}A loyal customer is treasure. One loyal customer beats ten passers-by.{$ekor}
+- {$awal}Kalau mau tahu kabar kota, tanya pedagang. Kami dengar semua dari pembeli.{$ekor} || {$awal}Want town news, ask a merchant. We hear it all from buyers.{$ekor}
+  ~ p: {$awal}Kalau mau tahu kabar kota, tanya aku. Pembeli perempuan cerita semuanya. Hihi.{$ekor} || {$awal}Want town news, ask me. Lady customers tell me everything. Hehe.{$ekor}
+- {$awal}Ayahku dulu berdagang di lapak yang sama. Kakekku juga. Tiga keturunan di sini.{$ekor} || {$awal}My father traded at this same stall. My grandfather too. Three generations here.{$ekor}
 
 == kerja.penjaga
 niat: BASA_BASI
@@ -47,15 +51,17 @@ syarat: kelompok=penjaga
 lanjut: bahaya kejahatan
 gestur: sikap_tombak
 $sebutan: tipe=sebutan_pendengar dari=pendengar
-- [3] Semua aman, {$sebutan}. Selama aku berdiri di sini, tidak ada yang macam-macam. || All's safe, {$sebutan}. While I stand here, nobody tries anything.
-  ~ kasar: Jangan buat onar. Aku sedang berjaga. || Make no trouble. I'm on watch.
-  ~ kuno: Tombak ini telah menjaga gerbang dua puluh tahun. Belum sekali pun mundur. || This spear has guarded the gate twenty years. Never once retreated.
-  ~ ibukota: Penjagaan di ibu kota berlapis tiga, {$sebutan}. Tidak ada yang lolos. || Capital security runs three layers deep, {$sebutan}. Nothing slips through.
-- [2] Semalam ada yang mencoba memanjat tembok timur. Kami usir sebelum sempat turun. || Last night someone tried scaling the east wall. We drove them off before they got down.
-  ~ pelabuhan: Semalam ada perahu tanpa lentera mendekat ke dermaga. Kami usir dengan panah api. || Last night a boat with no lantern crept to the dock. We drove it off with fire arrows.
-- Berdiri seharian itu lebih berat dari kelihatannya. Kakiku sudah bengkak. || Standing all day is harder than it looks. My feet are swollen.
-- Kapten bilang ronda malam ditambah. Katanya ada kabar binatang roh di hutan. || The captain says night rounds are doubled. Word of spirit beasts in the woods.
-- Gajinya kecil, tapi kalau kota aman, aku bisa tidur tenang. || The pay is small, but if the town's safe I can sleep easy.
+$awal: aturan=awal.basa opsional=0.4
+$ekor: aturan=ekor.basa opsional=0.4
+- [3] {$awal}Semua aman, {$sebutan}. Selama aku berdiri di sini, tidak ada yang macam-macam.{$ekor} || {$awal}All's safe, {$sebutan}. While I stand here, nobody tries anything.{$ekor}
+  ~ kasar: {$awal}Jangan buat onar. Aku sedang berjaga.{$ekor} || {$awal}Make no trouble. I'm on watch.{$ekor}
+  ~ kuno: {$awal}Tombak ini telah menjaga gerbang dua puluh tahun. Belum sekali pun mundur.{$ekor} || {$awal}This spear has guarded the gate twenty years. Never once retreated.{$ekor}
+  ~ ibukota: {$awal}Penjagaan di ibu kota berlapis tiga, {$sebutan}. Tidak ada yang lolos.{$ekor} || {$awal}Capital security runs three layers deep, {$sebutan}. Nothing slips through.{$ekor}
+- [2] {$awal}Semalam ada yang mencoba memanjat tembok timur. Kami usir sebelum sempat turun.{$ekor} || {$awal}Last night someone tried scaling the east wall. We drove them off before they got down.{$ekor}
+  ~ pelabuhan: {$awal}Semalam ada perahu tanpa lentera mendekat ke dermaga. Kami usir dengan panah api.{$ekor} || {$awal}Last night a boat with no lantern crept to the dock. We drove it off with fire arrows.{$ekor}
+- {$awal}Berdiri seharian itu lebih berat dari kelihatannya. Kakiku sudah bengkak.{$ekor} || {$awal}Standing all day is harder than it looks. My feet are swollen.{$ekor}
+- {$awal}Kapten bilang ronda malam ditambah. Katanya ada kabar binatang roh di hutan.{$ekor} || {$awal}The captain says night rounds are doubled. Word of spirit beasts in the woods.{$ekor}
+- {$awal}Gajinya kecil, tapi kalau kota aman, aku bisa tidur tenang.{$ekor} || {$awal}The pay is small, but if the town's safe I can sleep easy.{$ekor}
 
 == kerja.tetua
 niat: BASA_BASI
@@ -64,14 +70,16 @@ syarat: kelompok=tetua
 lanjut: kota keluarga
 gestur: sikap_tua
 $sebutan: tipe=sebutan_pendengar dari=pendengar
-- [3] Dulu kota ini cuma sepuluh rumah. Aku ingat waktu jalan utama masih lumpur. || This town was once ten houses. I remember when the main road was mud.
-  ~ kasar: Anak muda sekarang tidak tahu susahnya dulu. || Young folk today don't know how hard it was.
-  ~ kuno: Usia mengajarkan kesabaran, {$sebutan}. Dan lutut yang sakit. Hehe. || Age teaches patience, {$sebutan}. And aching knees. Heh.
-  ~ kampung: Simbah ini sudah lihat tiga kepala desa ganti, Nak. Yang sekarang lumayan. || Granny's seen three headmen come and go, child. This one's not bad.
-- [2] Orang-orang masih datang minta nasihatku. Padahal aku sering lupa makan siang. || Folk still come to me for advice. Though I often forget lunch.
-  ~ gunung: Aku menyapu halaman biara ini sejak muda. Daunnya tidak pernah habis. Amitaba. || I've swept this monastery yard since youth. The leaves never run out. Amitabha.
-- Kalau ada perselisihan di gang, orang membawanya padaku dulu sebelum ke hakim. || When there's a quarrel in the lane, folk bring it to me before the magistrate.
-- Kakiku tidak kuat lagi berjalan jauh. Jadi aku duduk di sini dan melihat dunia lewat. || My legs can't walk far now. So I sit here and watch the world go by.
+$awal: aturan=awal.basa opsional=0.4
+$ekor: aturan=ekor.basa opsional=0.4
+- [3] {$awal}Dulu kota ini cuma sepuluh rumah. Aku ingat waktu jalan utama masih lumpur.{$ekor} || {$awal}This town was once ten houses. I remember when the main road was mud.{$ekor}
+  ~ kasar: {$awal}Anak muda sekarang tidak tahu susahnya dulu.{$ekor} || {$awal}Young folk today don't know how hard it was.{$ekor}
+  ~ kuno: {$awal}Usia mengajarkan kesabaran, {$sebutan}. Dan lutut yang sakit. Hehe.{$ekor} || {$awal}Age teaches patience, {$sebutan}. And aching knees. Heh.{$ekor}
+  ~ kampung: {$awal}Simbah ini sudah lihat tiga kepala desa ganti, Nak. Yang sekarang lumayan.{$ekor} || {$awal}Granny's seen three headmen come and go, child. This one's not bad.{$ekor}
+- [2] {$awal}Orang-orang masih datang minta nasihatku. Padahal aku sering lupa makan siang.{$ekor} || {$awal}Folk still come to me for advice. Though I often forget lunch.{$ekor}
+  ~ gunung: {$awal}Aku menyapu halaman biara ini sejak muda. Daunnya tidak pernah habis. Amitaba.{$ekor} || {$awal}I've swept this monastery yard since youth. The leaves never run out. Amitabha.{$ekor}
+- {$awal}Kalau ada perselisihan di gang, orang membawanya padaku dulu sebelum ke hakim.{$ekor} || {$awal}When there's a quarrel in the lane, folk bring it to me before the magistrate.{$ekor}
+- {$awal}Kakiku tidak kuat lagi berjalan jauh. Jadi aku duduk di sini dan melihat dunia lewat.{$ekor} || {$awal}My legs can't walk far now. So I sit here and watch the world go by.{$ekor}
 
 == kerja.kultivator
 niat: BASA_BASI
@@ -80,15 +88,17 @@ syarat: kelompok=kultivator
 lanjut: sekte dunia
 gestur: napas_meditasi
 $sebutan: tipe=sebutan_pendengar dari=pendengar
-- [3] Qi di kota ini tipis. Bersemedi di sini seperti minum dari cawan bocor. || The Qi in this town is thin. Meditating here is like drinking from a leaky cup.
-  ~ kasar: Jangan ganggu. Aku sedang menenangkan Qi. || Don't disturb me. I'm settling my Qi.
-  ~ kuno: Jalan Dao panjang, {$sebutan}. Setiap hari hanya selangkah. || The road of the Dao is long, {$sebutan}. Only a step each day.
-  ~ iblis: Teknik darahku butuh bahan. Kota ini penuh bahan. Bercanda. Mungkin. || My blood art needs materials. This city is full of them. Joking. Perhaps.
-- [2] Aku turun gunung untuk membeli bahan pil. Harga di sini lebih murah dari pasar sekte. || I came down the mountain to buy pill ingredients. Cheaper here than the sect market.
-  ~ gunung: Para biksu mengizinkanku bersemedi di gua belakang. Qi di sana bersih. || The monks let me meditate in the cave behind. The Qi there is clean.
-- Kemacetan di meridian ketiga belum juga terbuka. Mungkin aku butuh pil. || The blockage in my third meridian still won't open. Maybe I need a pill.
-- Kultivator yang lupa pada orang fana akan kehilangan akarnya. Guruku bilang begitu. || A cultivator who forgets mortals loses their roots. My master said so.
-  ~ kuno: Kultivator yang melupakan dunia fana akan tercabut akarnya. Demikian ajaran guruku. || A cultivator who forgets the mortal world is uprooted. Thus my master taught.
+$awal: aturan=awal.basa opsional=0.4
+$ekor: aturan=ekor.basa opsional=0.4
+- [3] {$awal}Qi di kota ini tipis. Bersemedi di sini seperti minum dari cawan bocor.{$ekor} || {$awal}The Qi in this town is thin. Meditating here is like drinking from a leaky cup.{$ekor}
+  ~ kasar: {$awal}Jangan ganggu. Aku sedang menenangkan Qi.{$ekor} || {$awal}Don't disturb me. I'm settling my Qi.{$ekor}
+  ~ kuno: {$awal}Jalan Dao panjang, {$sebutan}. Setiap hari hanya selangkah.{$ekor} || {$awal}The road of the Dao is long, {$sebutan}. Only a step each day.{$ekor}
+  ~ iblis: {$awal}Teknik darahku butuh bahan. Kota ini penuh bahan. Bercanda. Mungkin.{$ekor} || {$awal}My blood art needs materials. This city is full of them. Joking. Perhaps.{$ekor}
+- [2] {$awal}Aku turun gunung untuk membeli bahan pil. Harga di sini lebih murah dari pasar sekte.{$ekor} || {$awal}I came down the mountain to buy pill ingredients. Cheaper here than the sect market.{$ekor}
+  ~ gunung: {$awal}Para biksu mengizinkanku bersemedi di gua belakang. Qi di sana bersih.{$ekor} || {$awal}The monks let me meditate in the cave behind. The Qi there is clean.{$ekor}
+- {$awal}Kemacetan di meridian ketiga belum juga terbuka. Mungkin aku butuh pil.{$ekor} || {$awal}The blockage in my third meridian still won't open. Maybe I need a pill.{$ekor}
+- {$awal}Kultivator yang lupa pada orang fana akan kehilangan akarnya. Guruku bilang begitu.{$ekor} || {$awal}A cultivator who forgets mortals loses their roots. My master said so.{$ekor}
+  ~ kuno: {$awal}Kultivator yang melupakan dunia fana akan tercabut akarnya. Demikian ajaran guruku.{$ekor} || {$awal}A cultivator who forgets the mortal world is uprooted. Thus my master taught.{$ekor}
 
 == kerja.cendekia
 niat: BASA_BASI
@@ -97,14 +107,16 @@ syarat: kelompok=cendekia
 lanjut: kota dunia
 gestur: membaca
 $sebutan: tipe=sebutan_pendengar dari=pendengar
-- [3] Aku sedang menyalin kitab tua. Tintanya sudah pudar, mataku juga. || I'm copying an old book. The ink has faded, and so have my eyes.
-  ~ kasar: Jangan sentuh gulungan itu. Seribu tahun umurnya. || Don't touch that scroll. It's a thousand years old.
-  ~ kuno: Ilmu adalah pelita di jalan gelap, {$sebutan}. Setiap kitab adalah minyaknya. || Learning is a lamp on a dark road, {$sebutan}. Every book is its oil.
-  ~ ibukota: Ujian negara tinggal dua bulan. Aku menghafal tiga ratus puisi klasik. || The state exam is in two months. I'm memorising three hundred classic poems.
-- [2] Tahukah {$sebutan}, kota ini dulu bernama lain? Ada di catatan dinasti lama. || Did you know this town once had another name, {$sebutan}? It's in the old dynasty records.
-  ~ gunung: Perpustakaan biara menyimpan sutra yang belum pernah dibaca orang luar. || The monastery library keeps sutras no outsider has ever read.
-- Anak-anak di sekolah lebih suka bermain daripada menghafal. Dulu aku juga. || The schoolchildren prefer play to memorising. So did I once.
-- Kalau ada pertanyaan tentang sejarah, tanyakan saja. Aku senang ditanya. || If you have questions on history, just ask. I love being asked.
+$awal: aturan=awal.basa opsional=0.4
+$ekor: aturan=ekor.basa opsional=0.4
+- [3] {$awal}Aku sedang menyalin kitab tua. Tintanya sudah pudar, mataku juga.{$ekor} || {$awal}I'm copying an old book. The ink has faded, and so have my eyes.{$ekor}
+  ~ kasar: {$awal}Jangan sentuh gulungan itu. Seribu tahun umurnya.{$ekor} || {$awal}Don't touch that scroll. It's a thousand years old.{$ekor}
+  ~ kuno: {$awal}Ilmu adalah pelita di jalan gelap, {$sebutan}. Setiap kitab adalah minyaknya.{$ekor} || {$awal}Learning is a lamp on a dark road, {$sebutan}. Every book is its oil.{$ekor}
+  ~ ibukota: {$awal}Ujian negara tinggal dua bulan. Aku menghafal tiga ratus puisi klasik.{$ekor} || {$awal}The state exam is in two months. I'm memorising three hundred classic poems.{$ekor}
+- [2] {$awal}Tahukah {$sebutan}, kota ini dulu bernama lain? Ada di catatan dinasti lama.{$ekor} || {$awal}Did you know this town once had another name, {$sebutan}? It's in the old dynasty records.{$ekor}
+  ~ gunung: {$awal}Perpustakaan biara menyimpan sutra yang belum pernah dibaca orang luar.{$ekor} || {$awal}The monastery library keeps sutras no outsider has ever read.{$ekor}
+- {$awal}Anak-anak di sekolah lebih suka bermain daripada menghafal. Dulu aku juga.{$ekor} || {$awal}The schoolchildren prefer play to memorising. So did I once.{$ekor}
+- {$awal}Kalau ada pertanyaan tentang sejarah, tanyakan saja. Aku senang ditanya.{$ekor} || {$awal}If you have questions on history, just ask. I love being asked.{$ekor}
 
 == kerja.rahib
 niat: BASA_BASI
@@ -113,14 +125,16 @@ syarat: kelompok=rahib
 lanjut: kota duka
 gestur: sikap_doa
 $sebutan: tipe=sebutan_pendengar dari=pendengar
-- [3] Dupa pagi sudah dinyalakan. Semoga kota ini damai hari ini. || The morning incense is lit. May this town be at peace today.
-  ~ kasar: Jangan berisik di halaman kuil. || No noise in the temple yard.
-  ~ kuno: Setiap doa adalah benih, {$sebutan}. Tumbuhnya bukan urusan kita. || Every prayer is a seed, {$sebutan}. Its growing is not our concern.
-  ~ gunung: Amitaba. Lonceng pagi, sapu halaman, sutra siang. Begitu setiap hari. || Amitabha. Morning bell, sweep the yard, noon sutras. So every day.
-- [2] Banyak yang datang berdoa akhir-akhir ini. Pertanda hati orang sedang gelisah. || Many come to pray lately. A sign that hearts are uneasy.
-  ~ pelabuhan: Para pelaut membawa persembahan sebelum berlayar. Dewa laut harus dibujuk. || The sailors bring offerings before sailing. The sea god must be coaxed.
-- Kuil butuh atap baru sebelum musim hujan. Kalau {$sebutan} ingin beramal... || The temple needs a new roof before the rains. If you wish to give alms, {$sebutan}...
-- Kemarin ada yang datang menangis semalaman. Aku duduk menemaninya. Itu juga doa. || Yesterday someone came and wept all night. I sat with them. That too is prayer.
+$awal: aturan=awal.basa opsional=0.4
+$ekor: aturan=ekor.basa opsional=0.4
+- [3] {$awal}Dupa pagi sudah dinyalakan. Semoga kota ini damai hari ini.{$ekor} || {$awal}The morning incense is lit. May this town be at peace today.{$ekor}
+  ~ kasar: {$awal}Jangan berisik di halaman kuil.{$ekor} || {$awal}No noise in the temple yard.{$ekor}
+  ~ kuno: {$awal}Setiap doa adalah benih, {$sebutan}. Tumbuhnya bukan urusan kita.{$ekor} || {$awal}Every prayer is a seed, {$sebutan}. Its growing is not our concern.{$ekor}
+  ~ gunung: Amitaba. Lonceng pagi, sapu halaman, sutra siang. Begitu setiap hari.{$ekor} || Amitabha. Morning bell, sweep the yard, noon sutras. So every day.{$ekor}
+- [2] {$awal}Banyak yang datang berdoa akhir-akhir ini. Pertanda hati orang sedang gelisah.{$ekor} || {$awal}Many come to pray lately. A sign that hearts are uneasy.{$ekor}
+  ~ pelabuhan: {$awal}Para pelaut membawa persembahan sebelum berlayar. Dewa laut harus dibujuk.{$ekor} || {$awal}The sailors bring offerings before sailing. The sea god must be coaxed.{$ekor}
+- {$awal}Kuil butuh atap baru sebelum musim hujan. Kalau {$sebutan} ingin beramal...{$ekor} || {$awal}The temple needs a new roof before the rains. If you wish to give alms, {$sebutan}...{$ekor}
+- {$awal}Kemarin ada yang datang menangis semalaman. Aku duduk menemaninya. Itu juga doa.{$ekor} || {$awal}Yesterday someone came and wept all night. I sat with them. That too is prayer.{$ekor}
 
 == kerja.pejabat
 niat: BASA_BASI
@@ -129,13 +143,15 @@ syarat: kelompok=pejabat
 lanjut: pejabat kota
 gestur: sikap_tangan_belakang
 $sebutan: tipe=sebutan_pendengar dari=pendengar
-- [3] Laporan pajak menumpuk di mejaku. Kota ini tumbuh lebih cepat dari tintaku. || Tax reports pile on my desk. This town grows faster than my ink.
-  ~ kasar: Kalau mau mengadu, datang ke kantor. Ada antreannya. || If you've a complaint, come to the office. There's a queue.
-  ~ kuno: Memerintah adalah memikul gunung, {$sebutan}. Sedikit lengah, rakyat yang tertimpa. || Governing is shouldering a mountain, {$sebutan}. One lapse and the people are crushed.
-  ~ ibukota: Menteri meminta laporan sebelum bulan purnama. Kami bekerja sampai larut. || The minister wants reports before the full moon. We work late into the night.
-- [2] Jembatan barat harus diperbaiki. Kas kota tipis, tapi akan kuusahakan. || The west bridge needs repair. The town treasury is thin, but I'll manage.
-- Orang mengira pejabat hidup senang. Coba duduk di kursiku sehari. || Folk think officials live easy. Try sitting in my chair for a day.
-- Kalau ada warga yang punya keluhan, aku mau mendengar. Langsung, bukan lewat calo. || If any townsfolk have complaints, I'll listen. Directly, not through middlemen.
+$awal: aturan=awal.basa opsional=0.4
+$ekor: aturan=ekor.basa opsional=0.4
+- [3] {$awal}Laporan pajak menumpuk di mejaku. Kota ini tumbuh lebih cepat dari tintaku.{$ekor} || {$awal}Tax reports pile on my desk. This town grows faster than my ink.{$ekor}
+  ~ kasar: {$awal}Kalau mau mengadu, datang ke kantor. Ada antreannya.{$ekor} || {$awal}If you've a complaint, come to the office. There's a queue.{$ekor}
+  ~ kuno: {$awal}Memerintah adalah memikul gunung, {$sebutan}. Sedikit lengah, rakyat yang tertimpa.{$ekor} || {$awal}Governing is shouldering a mountain, {$sebutan}. One lapse and the people are crushed.{$ekor}
+  ~ ibukota: {$awal}Menteri meminta laporan sebelum bulan purnama. Kami bekerja sampai larut.{$ekor} || {$awal}The minister wants reports before the full moon. We work late into the night.{$ekor}
+- [2] {$awal}Jembatan barat harus diperbaiki. Kas kota tipis, tapi akan kuusahakan.{$ekor} || {$awal}The west bridge needs repair. The town treasury is thin, but I'll manage.{$ekor}
+- {$awal}Orang mengira pejabat hidup senang. Coba duduk di kursiku sehari.{$ekor} || {$awal}Folk think officials live easy. Try sitting in my chair for a day.{$ekor}
+- {$awal}Kalau ada warga yang punya keluhan, aku mau mendengar. Langsung, bukan lewat calo.{$ekor} || {$awal}If any townsfolk have complaints, I'll listen. Directly, not through middlemen.{$ekor}
 
 == kerja.anak
 niat: BASA_BASI
@@ -143,14 +159,16 @@ topik: kerja
 syarat: kelompok=anak
 lanjut: cita
 gestur: main_lompat
-- [3] Aku disuruh ibu menjaga adik. Tapi adik tidur, jadi aku main! || Mother told me to mind my little brother. But he's asleep, so I'm playing!
-  ~ kasar: Kakak mau apa? Aku sibuk main. || What do you want? I'm busy playing.
-  ~ kuno: Ibu bilang anak yang baik harus membantu di rumah. Aku sudah menyapu! || Mother says good children help at home. I already swept!
-  ~ kampung: Aku habis angon bebek, Kak! Bebeknya ada tiga puluh! || I've been herding ducks, mister! Thirty of them!
-- [2] Guru di sekolah galak. Kalau salah menulis, disuruh berdiri di pojok. || The teacher at school is fierce. Write it wrong and you stand in the corner.
-  ~ pelabuhan: Aku bantu ayah menjemur ikan! Tanganku bau, cium! Hehe. || I help Father dry fish! My hands stink, smell! Hehe.
-- Aku punya rahasia: ada sarang burung di atap kuil. Telurnya tiga! || I've got a secret: there's a bird's nest on the temple roof. Three eggs!
-- Kakak mau main gasing? Aku paling jago se-gang! || Want to play tops? I'm the best in the lane!
+$awal: aturan=awal.basa opsional=0.4
+$ekor: aturan=ekor.basa opsional=0.4
+- [3] {$awal}Aku disuruh ibu menjaga adik. Tapi adik tidur, jadi aku main!{$ekor} || {$awal}Mother told me to mind my little brother. But he's asleep, so I'm playing!{$ekor}
+  ~ kasar: Kakak mau apa? Aku sibuk main.{$ekor} || What do you want? I'm busy playing.{$ekor}
+  ~ kuno: {$awal}Ibu bilang anak yang baik harus membantu di rumah. Aku sudah menyapu!{$ekor} || {$awal}Mother says good children help at home. I already swept!{$ekor}
+  ~ kampung: {$awal}Aku habis angon bebek, Kak! Bebeknya ada tiga puluh!{$ekor} || {$awal}I've been herding ducks, mister! Thirty of them!{$ekor}
+- [2] {$awal}Guru di sekolah galak. Kalau salah menulis, disuruh berdiri di pojok.{$ekor} || {$awal}The teacher at school is fierce. Write it wrong and you stand in the corner.{$ekor}
+  ~ pelabuhan: {$awal}Aku bantu ayah menjemur ikan! Tanganku bau, cium! Hehe.{$ekor} || {$awal}I help Father dry fish! My hands stink, smell! Hehe.{$ekor}
+- {$awal}Aku punya rahasia: ada sarang burung di atap kuil. Telurnya tiga!{$ekor} || {$awal}I've got a secret: there's a bird's nest on the temple roof. Three eggs!{$ekor}
+- Kakak mau main gasing? Aku paling jago se-gang!{$ekor} || Want to play tops? I'm the best in the lane!{$ekor}
 
 == kerja.khusus
 niat: BASA_BASI
@@ -159,13 +177,15 @@ syarat: kelompok=khusus
 lanjut: kota dunia
 gestur: bicara_tangan
 $sebutan: tipe=sebutan_pendengar dari=pendengar
-- [3] Pekerjaanku tidak biasa, {$sebutan}. Tapi seseorang harus melakukannya. || My work isn't ordinary, {$sebutan}. But someone has to do it.
-  ~ kasar: Jangan tanya pekerjaanku. Lebih aman untukmu. || Don't ask what I do. Safer for you.
-  ~ kuno: Setiap orang punya peran di bawah langit. Peranku agak... khusus. || Everyone has a role under heaven. Mine is somewhat... particular.
-  ~ iblis: Aku menyelesaikan masalah orang. Dengan cara yang tidak ditanyakan. || I solve people's problems. In ways that aren't asked about.
-- [2] Orang jarang menyapaku. Jadi terima kasih sudah berhenti. || People rarely greet me. So thank you for stopping.
-- Hari ini sepi. Kalau sepi, berarti pekerjaanku berhasil. || Quiet today. When it's quiet, my work has succeeded.
-- Aku melihat banyak hal yang tidak dilihat orang lain di kota ini. || I see a lot in this town that others don't.
+$awal: aturan=awal.basa opsional=0.4
+$ekor: aturan=ekor.basa opsional=0.4
+- [3] {$awal}Pekerjaanku tidak biasa, {$sebutan}. Tapi seseorang harus melakukannya.{$ekor} || {$awal}My work isn't ordinary, {$sebutan}. But someone has to do it.{$ekor}
+  ~ kasar: {$awal}Jangan tanya pekerjaanku. Lebih aman untukmu.{$ekor} || {$awal}Don't ask what I do. Safer for you.{$ekor}
+  ~ kuno: {$awal}Setiap orang punya peran di bawah langit. Peranku agak... khusus.{$ekor} || {$awal}Everyone has a role under heaven. Mine is somewhat... particular.{$ekor}
+  ~ iblis: {$awal}Aku menyelesaikan masalah orang. Dengan cara yang tidak ditanyakan.{$ekor} || {$awal}I solve people's problems. In ways that aren't asked about.{$ekor}
+- [2] {$awal}Orang jarang menyapaku. Jadi terima kasih sudah berhenti.{$ekor} || {$awal}People rarely greet me. So thank you for stopping.{$ekor}
+- {$awal}Hari ini sepi. Kalau sepi, berarti pekerjaanku berhasil.{$ekor} || {$awal}Quiet today. When it's quiet, my work has succeeded.{$ekor}
+- {$awal}Aku melihat banyak hal yang tidak dilihat orang lain di kota ini.{$ekor} || {$awal}I see a lot in this town that others don't.{$ekor}
 
 == kerja.pandai
 niat: BASA_BASI
@@ -174,14 +194,16 @@ syarat: peran=pandai_pusaka,empu,pandai_desa,pedagang_senjata
 lanjut: dagang
 gestur: palu_landasan
 $sebutan: tipe=sebutan_pendengar dari=pendengar
-- [3] Besi ini keras kepala. Sudah tiga kali kutempa, masih belum mau lurus. || This iron is stubborn. Forged it three times and it still won't straighten.
-  ~ kasar: Jangan berdiri dekat tungku kalau tidak mau gosong. || Don't stand near the forge unless you want to be scorched.
-  ~ kuno: Pedang yang baik lahir dari api, air dan kesabaran, {$sebutan}. || A good blade is born of fire, water and patience, {$sebutan}.
-  ~ kampung: Cangkul Pak Lurah patah lagi. Dia kira tanah itu batu kali. || The headman's hoe broke again. He thinks the soil is river stone.
-- [2] Bunyi palu ini sudah seperti detak jantungku sendiri. || The ring of this hammer is like my own heartbeat now.
-  ~ iblis: Pedang buatanku sudah meminum darah seratus orang. Bukan aku yang mengayun, tentu. || My blades have drunk the blood of a hundred. Not swung by me, of course.
-- Kalau {$sebutan} punya senjata yang retak, bawa ke sini. Kutambal sampai seperti baru. || If you have a cracked weapon, {$sebutan}, bring it here. I'll mend it like new.
-- Arang mahal sekarang. Tungku harus menyala, untung atau rugi. || Charcoal's dear now. The forge must burn, profit or loss.
+$awal: aturan=awal.basa opsional=0.4
+$ekor: aturan=ekor.basa opsional=0.4
+- [3] {$awal}Besi ini keras kepala. Sudah tiga kali kutempa, masih belum mau lurus.{$ekor} || {$awal}This iron is stubborn. Forged it three times and it still won't straighten.{$ekor}
+  ~ kasar: {$awal}Jangan berdiri dekat tungku kalau tidak mau gosong.{$ekor} || {$awal}Don't stand near the forge unless you want to be scorched.{$ekor}
+  ~ kuno: {$awal}Pedang yang baik lahir dari api, air dan kesabaran, {$sebutan}.{$ekor} || {$awal}A good blade is born of fire, water and patience, {$sebutan}.{$ekor}
+  ~ kampung: {$awal}Cangkul Pak Lurah patah lagi. Dia kira tanah itu batu kali.{$ekor} || {$awal}The headman's hoe broke again. He thinks the soil is river stone.{$ekor}
+- [2] {$awal}Bunyi palu ini sudah seperti detak jantungku sendiri.{$ekor} || {$awal}The ring of this hammer is like my own heartbeat now.{$ekor}
+  ~ iblis: {$awal}Pedang buatanku sudah meminum darah seratus orang. Bukan aku yang mengayun, tentu.{$ekor} || {$awal}My blades have drunk the blood of a hundred. Not swung by me, of course.{$ekor}
+- {$awal}Kalau {$sebutan} punya senjata yang retak, bawa ke sini. Kutambal sampai seperti baru.{$ekor} || {$awal}If you have a cracked weapon, {$sebutan}, bring it here. I'll mend it like new.{$ekor}
+- {$awal}Arang mahal sekarang. Tungku harus menyala, untung atau rugi.{$ekor} || {$awal}Charcoal's dear now. The forge must burn, profit or loss.{$ekor}
 
 == kerja.petani
 niat: BASA_BASI
@@ -190,14 +212,16 @@ syarat: peran=petani,pemetik_teh,pemetik_herba,penjaga_kebun
 lanjut: musim harga
 gestur: mencangkul
 $sebutan: tipe=sebutan_pendengar dari=pendengar
-- [3] Padi tahun ini bagus. Kalau tidak ada hama, lumbung penuh. || The rice is good this year. Without pests, the granary will be full.
-  ~ kasar: Tanah keras, hujan telat. Petani selalu kalah. || Hard soil, late rain. Farmers always lose.
-  ~ kuno: Bumi memberi kepada yang sabar, {$sebutan}. Benih hari ini adalah nasi musim depan. || The earth gives to the patient, {$sebutan}. Today's seed is next season's rice.
-  ~ kampung: Gabah sudah kuning, Nak. Minggu depan panen. Ikut bantu, ya? || The grain's gone gold, child. Harvest next week. Come help?
-- [2] Burung-burung pipit itu lebih rakus dari pemungut pajak. Hehe. || Those sparrows are greedier than the tax collector. Heh.
-  ~ gunung: Daun teh di lereng ini dipetik dengan tangan, satu-satu. Itu sebabnya harum. || The tea leaves on this slope are hand-picked, one by one. That's why they're fragrant.
-- Kerbauku sudah tua. Seperti aku. Kami bekerja pelan-pelan bersama. || My buffalo is old. Like me. We work slowly together.
-- Kalau hujan turun malam ini, besok aku tanam. Kalau tidak, aku menunggu lagi. || If it rains tonight, I plant tomorrow. If not, I wait again.
+$awal: aturan=awal.basa opsional=0.4
+$ekor: aturan=ekor.basa opsional=0.4
+- [3] {$awal}Padi tahun ini bagus. Kalau tidak ada hama, lumbung penuh.{$ekor} || {$awal}The rice is good this year. Without pests, the granary will be full.{$ekor}
+  ~ kasar: {$awal}Tanah keras, hujan telat. Petani selalu kalah.{$ekor} || {$awal}Hard soil, late rain. Farmers always lose.{$ekor}
+  ~ kuno: {$awal}Bumi memberi kepada yang sabar, {$sebutan}. Benih hari ini adalah nasi musim depan.{$ekor} || {$awal}The earth gives to the patient, {$sebutan}. Today's seed is next season's rice.{$ekor}
+  ~ kampung: {$awal}Gabah sudah kuning, Nak. Minggu depan panen. Ikut bantu, ya? || {$awal}The grain's gone gold, child. Harvest next week. Come help?
+- [2] {$awal}Burung-burung pipit itu lebih rakus dari pemungut pajak. Hehe.{$ekor} || {$awal}Those sparrows are greedier than the tax collector. Heh.{$ekor}
+  ~ gunung: {$awal}Daun teh di lereng ini dipetik dengan tangan, satu-satu. Itu sebabnya harum.{$ekor} || {$awal}The tea leaves on this slope are hand-picked, one by one. That's why they're fragrant.{$ekor}
+- {$awal}Kerbauku sudah tua. Seperti aku. Kami bekerja pelan-pelan bersama.{$ekor} || {$awal}My buffalo is old. Like me. We work slowly together.{$ekor}
+- {$awal}Kalau hujan turun malam ini, besok aku tanam. Kalau tidak, aku menunggu lagi.{$ekor} || {$awal}If it rains tonight, I plant tomorrow. If not, I wait again.{$ekor}
 
 == kerja.nelayan
 niat: BASA_BASI
@@ -206,14 +230,16 @@ syarat: peran=nelayan,pelaut,nakhoda,nakhoda_laut,penjual_ikan,pendayung,tukang_
 lanjut: cuaca dagang
 gestur: tarik_jala
 $sebutan: tipe=sebutan_pendengar dari=pendengar
-- [3] Ikan sedang menjauh ke laut dalam. Tanda air akan dingin. || The fish have moved to deep water. A sign the sea will turn cold.
-  ~ kasar: Jala robek, ikan sedikit. Hari sial. || Torn net, few fish. Rotten day.
-  ~ kuno: Laut memberi dan mengambil, {$sebutan}. Nelayan hanya belajar menerima. || The sea gives and takes, {$sebutan}. A fisher only learns to accept.
-  ~ pelabuhan: Tangkapan pagi ini lumayan, Bung! Tuna sebesar anak sapi! || Not bad this morning, mate! A tuna big as a calf!
-  ~ air: Ikan di kanal kecil-kecil, Kakak... tapi manis kalau dibakar... || The canal fish are small, dear... but sweet when grilled...
-- [2] Bulan baru, ikan naik. Malam ini aku melaut sampai subuh. || New moon, the fish rise. Tonight I'm at sea till dawn.
-- Perahuku sudah tua, tapi masih setia. Seperti anjing yang baik. || My boat is old but still faithful. Like a good dog.
-- Kalau mendengar camar ribut di pagi hari, jangan berlayar. Badai sudah dekat. || If the gulls are loud at dawn, don't sail. A storm is near.
+$awal: aturan=awal.basa opsional=0.4
+$ekor: aturan=ekor.basa opsional=0.4
+- [3] {$awal}Ikan sedang menjauh ke laut dalam. Tanda air akan dingin.{$ekor} || {$awal}The fish have moved to deep water. A sign the sea will turn cold.{$ekor}
+  ~ kasar: {$awal}Jala robek, ikan sedikit. Hari sial.{$ekor} || {$awal}Torn net, few fish. Rotten day.{$ekor}
+  ~ kuno: {$awal}Laut memberi dan mengambil, {$sebutan}. Nelayan hanya belajar menerima.{$ekor} || {$awal}The sea gives and takes, {$sebutan}. A fisher only learns to accept.{$ekor}
+  ~ pelabuhan: {$awal}Tangkapan pagi ini lumayan, Bung! Tuna sebesar anak sapi!{$ekor} || {$awal}Not bad this morning, mate! A tuna big as a calf!{$ekor}
+  ~ air: {$awal}Ikan di kanal kecil-kecil, Kakak... tapi manis kalau dibakar...{$ekor} || {$awal}The canal fish are small, dear... but sweet when grilled...{$ekor}
+- [2] {$awal}Bulan baru, ikan naik. Malam ini aku melaut sampai subuh.{$ekor} || {$awal}New moon, the fish rise. Tonight I'm at sea till dawn.{$ekor}
+- {$awal}Perahuku sudah tua, tapi masih setia. Seperti anjing yang baik.{$ekor} || {$awal}My boat is old but still faithful. Like a good dog.{$ekor}
+- {$awal}Kalau mendengar camar ribut di pagi hari, jangan berlayar. Badai sudah dekat.{$ekor} || {$awal}If the gulls are loud at dawn, don't sail. A storm is near.{$ekor}
 
 == kerja.koki
 niat: BASA_BASI
@@ -222,14 +248,16 @@ syarat: peran=koki,pemilik_penginapan,pelayan,pemilik_teh,ahli_teh
 lanjut: dagang tetangga
 gestur: masak
 $sebutan: tipe=sebutan_pendengar dari=pendengar
-- [3] Kuahnya sudah kurebus sejak subuh. Rahasianya tulang dan kesabaran. || I've simmered the broth since dawn. The secret is bones and patience.
-  ~ kasar: Duduk atau keluar. Dapur bukan tempat menonton. || Sit or get out. A kitchen isn't for watching.
-  ~ kuno: Masakan yang baik menenangkan Qi, {$sebutan}. Bahkan kultivator pun lapar. || Good food calms the Qi, {$sebutan}. Even cultivators get hungry.
-  ~ oasis: Daging kambing dengan rempah gurun, Saudara. Lima puluh rempah, resep nenekku. || Mutton with desert spices, friend. Fifty spices, my grandmother's recipe.
-- [2] Pelanggan tadi mengeluh asin. Padahal kemarin dia minta tambah garam! || The customer earlier said too salty. Yesterday he asked for more salt!
-  ~ p: Kue bulan buatanku habis sebelum siang. Besok kubuat dua kali lipat. || My mooncakes sold out before noon. Tomorrow I'll make double.
-- Teh dari daun pertama musim semi. Coba cium. Harum, kan? || Tea from the first spring leaves. Smell it. Fragrant, isn't it?
-- Kamar atas penuh semua. Kafilah datang semalam. || The upstairs rooms are all full. A caravan came last night.
+$awal: aturan=awal.basa opsional=0.4
+$ekor: aturan=ekor.basa opsional=0.4
+- [3] {$awal}Kuahnya sudah kurebus sejak subuh. Rahasianya tulang dan kesabaran.{$ekor} || {$awal}I've simmered the broth since dawn. The secret is bones and patience.{$ekor}
+  ~ kasar: {$awal}Duduk atau keluar. Dapur bukan tempat menonton.{$ekor} || {$awal}Sit or get out. A kitchen isn't for watching.{$ekor}
+  ~ kuno: {$awal}Masakan yang baik menenangkan Qi, {$sebutan}. Bahkan kultivator pun lapar.{$ekor} || {$awal}Good food calms the Qi, {$sebutan}. Even cultivators get hungry.{$ekor}
+  ~ oasis: {$awal}Daging kambing dengan rempah gurun, Saudara. Lima puluh rempah, resep nenekku.{$ekor} || {$awal}Mutton with desert spices, friend. Fifty spices, my grandmother's recipe.{$ekor}
+- [2] {$awal}Pelanggan tadi mengeluh asin. Padahal kemarin dia minta tambah garam!{$ekor} || {$awal}The customer earlier said too salty. Yesterday he asked for more salt!{$ekor}
+  ~ p: {$awal}Kue bulan buatanku habis sebelum siang. Besok kubuat dua kali lipat.{$ekor} || {$awal}My mooncakes sold out before noon. Tomorrow I'll make double.{$ekor}
+- {$awal}Teh dari daun pertama musim semi. Coba cium. Harum, kan? || {$awal}Tea from the first spring leaves. Smell it. Fragrant, isn't it?
+- {$awal}Kamar atas penuh semua. Kafilah datang semalam.{$ekor} || {$awal}The upstairs rooms are all full. A caravan came last night.{$ekor}
 
 == kerja.tabib
 niat: BASA_BASI
@@ -238,14 +266,16 @@ syarat: peran=tabib,alkemis,pedagang_pil,penjual_obat
 lanjut: kesehatan dagang
 gestur: racik_herba
 $sebutan: tipe=sebutan_pendengar dari=pendengar
-- [3] Banyak yang batuk musim ini. Ramuan jahe dan madu habis terus. || Many are coughing this season. The ginger and honey remedy keeps selling out.
-  ~ kasar: Sakit? Bayar dulu, baru kuperiksa. || Sick? Pay first, then I'll look.
-  ~ kuno: Penyakit tubuh berakar pada Qi yang tak seimbang, {$sebutan}. || Bodily illness is rooted in unbalanced Qi, {$sebutan}.
-  ~ gunung: Herba dari tebing gunung ini paling manjur. Tapi memetiknya bisa mematikan. || Herbs from these mountain cliffs work best. But picking them can kill.
-- [2] Pil penyembuh kecil, lima keping. Murah untuk nyawa, bukan? || A minor healing pill, five coins. Cheap for a life, no?
-  ~ iblis: Obatku menyembuhkan. Atau sebaliknya. Tergantung siapa yang membayar. || My medicine heals. Or the opposite. Depends who's paying.
-- Tungku pilku meledak lagi kemarin. Alisku belum tumbuh. Hehe. || My pill furnace exploded again yesterday. My eyebrows haven't grown back. Heh.
-- Kalau {$sebutan} terluka, jangan malu datang. Luka kecil jadi besar kalau dibiarkan. || If you're hurt, {$sebutan}, don't be shy to come. Small wounds grow if neglected.
+$awal: aturan=awal.basa opsional=0.4
+$ekor: aturan=ekor.basa opsional=0.4
+- [3] {$awal}Banyak yang batuk musim ini. Ramuan jahe dan madu habis terus.{$ekor} || {$awal}Many are coughing this season. The ginger and honey remedy keeps selling out.{$ekor}
+  ~ kasar: {$awal}Sakit? Bayar dulu, baru kuperiksa.{$ekor} || {$awal}Sick? Pay first, then I'll look.{$ekor}
+  ~ kuno: {$awal}Penyakit tubuh berakar pada Qi yang tak seimbang, {$sebutan}.{$ekor} || {$awal}Bodily illness is rooted in unbalanced Qi, {$sebutan}.{$ekor}
+  ~ gunung: {$awal}Herba dari tebing gunung ini paling manjur. Tapi memetiknya bisa mematikan.{$ekor} || {$awal}Herbs from these mountain cliffs work best. But picking them can kill.{$ekor}
+- [2] {$awal}Pil penyembuh kecil, lima keping. Murah untuk nyawa, bukan? || {$awal}A minor healing pill, five coins. Cheap for a life, no?
+  ~ iblis: {$awal}Obatku menyembuhkan. Atau sebaliknya. Tergantung siapa yang membayar. || {$awal}My medicine heals. Or the opposite. Depends who's paying.
+- {$awal}Tungku pilku meledak lagi kemarin. Alisku belum tumbuh. Hehe.{$ekor} || {$awal}My pill furnace exploded again yesterday. My eyebrows haven't grown back. Heh.{$ekor}
+- {$awal}Kalau {$sebutan} terluka, jangan malu datang. Luka kecil jadi besar kalau dibiarkan.{$ekor} || {$awal}If you're hurt, {$sebutan}, don't be shy to come. Small wounds grow if neglected.{$ekor}
 
 == kerja.kuli
 niat: BASA_BASI
@@ -254,14 +284,16 @@ syarat: peran=kuli,kuli_gunung,penjaga_gudang,penuntun_unta,penjaga_lift
 lanjut: harga
 gestur: angkat_bawa
 $sebutan: tipe=sebutan_pendengar dari=pendengar
-- [3] Karung ketiga puluh hari ini. Masih dua puluh lagi. || Thirtieth sack today. Twenty more to go.
-  ~ kasar: Minggir! Barang berat lewat! || Out of the way! Heavy load coming!
-  ~ kuno: Bahu ini sudah memikul separuh kota, {$sebutan}. Masih kuat. || These shoulders have carried half the town, {$sebutan}. Still strong.
-  ~ gunung: Tangga ke biara ada seribu delapan anak tangga. Aku naik tiga kali sehari. || There are a thousand and eight steps to the monastery. I climb them three times a day.
-  ~ oasis: Unta ini lebih pintar dari mandorku, Saudara. Tahu kapan harus berhenti minum. || This camel is cleverer than my foreman, friend. Knows when to stop drinking.
-- [2] Kalau ada kafilah datang, kuli makan enak. Kalau tidak, makan angin. || When caravans come, porters eat well. When not, we eat air.
-- Upah hari ini cukup untuk bakpao dan teh. Besok cari lagi. || Today's pay covers buns and tea. Tomorrow I find more.
-- Punggungku tidak pernah lurus lagi. Tapi anak-anakku tumbuh tegak. Itu cukup. || My back's never been straight since. But my children grow tall. That's enough.
+$awal: aturan=awal.basa opsional=0.4
+$ekor: aturan=ekor.basa opsional=0.4
+- [3] {$awal}Karung ketiga puluh hari ini. Masih dua puluh lagi.{$ekor} || {$awal}Thirtieth sack today. Twenty more to go.{$ekor}
+  ~ kasar: {$awal}Minggir! Barang berat lewat!{$ekor} || {$awal}Out of the way! Heavy load coming!{$ekor}
+  ~ kuno: {$awal}Bahu ini sudah memikul separuh kota, {$sebutan}. Masih kuat.{$ekor} || {$awal}These shoulders have carried half the town, {$sebutan}. Still strong.{$ekor}
+  ~ gunung: {$awal}Tangga ke biara ada seribu delapan anak tangga. Aku naik tiga kali sehari.{$ekor} || {$awal}There are a thousand and eight steps to the monastery. I climb them three times a day.{$ekor}
+  ~ oasis: {$awal}Unta ini lebih pintar dari mandorku, Saudara. Tahu kapan harus berhenti minum.{$ekor} || {$awal}This camel is cleverer than my foreman, friend. Knows when to stop drinking.{$ekor}
+- [2] {$awal}Kalau ada kafilah datang, kuli makan enak. Kalau tidak, makan angin.{$ekor} || {$awal}When caravans come, porters eat well. When not, we eat air.{$ekor}
+- {$awal}Upah hari ini cukup untuk bakpao dan teh. Besok cari lagi.{$ekor} || {$awal}Today's pay covers buns and tea. Tomorrow I find more.{$ekor}
+- {$awal}Punggungku tidak pernah lurus lagi. Tapi anak-anakku tumbuh tegak. Itu cukup.{$ekor} || {$awal}My back's never been straight since. But my children grow tall. That's enough.{$ekor}
 
 == kerja.hiburan
 niat: BASA_BASI
@@ -270,14 +302,16 @@ syarat: peran=pendongeng,pengamen,akrobat,penari,pemusik,penari_gurun,sastrawan
 lanjut: acara kota
 gestur: tepuk_tangan
 $sebutan: tipe=sebutan_pendengar dari=pendengar
-- [3] Malam ini aku bercerita tentang Raja Kera di kedai teh. Datanglah! || Tonight I tell of the Monkey King at the teahouse. Come!
-  ~ kasar: Mau dengar lagu? Bayar dulu. || Want a song? Pay first.
-  ~ kuno: Setiap kisah adalah cermin, {$sebutan}. Yang mendengar melihat dirinya sendiri. || Every tale is a mirror, {$sebutan}. The listener sees themself.
-  ~ oasis: Tarian gurun menceritakan angin dan pasir, Saudara. Lihat nanti di api unggun. || The desert dance tells of wind and sand, friend. Watch at the bonfire later.
-- [2] Kemarin penonton memberi koin banyak sekali. Hari ini sepi. Begitulah seniman. || Yesterday the crowd threw so many coins. Today it's empty. That's the artist's life.
-  ~ p: Aku berlatih tarian kipas baru. Kalau gagal, kipasnya terbang ke atap. Hihi. || I'm practising a new fan dance. If I slip, the fan flies onto the roof. Hehe.
-- Erhu ini warisan guruku. Senarnya sudah kuganti tujuh kali, tapi suaranya tetap dia. || This erhu was my master's. I've changed the strings seven times, but it still sounds like him.
-- Anak-anak suka akrobat piring. Orang tua suka cerita sedih. Aku menyiapkan keduanya. || Children love plate tricks. Old folk love sad tales. I prepare both.
+$awal: aturan=awal.basa opsional=0.4
+$ekor: aturan=ekor.basa opsional=0.4
+- [3] {$awal}Malam ini aku bercerita tentang Raja Kera di kedai teh. Datanglah!{$ekor} || {$awal}Tonight I tell of the Monkey King at the teahouse. Come!{$ekor}
+  ~ kasar: {$awal}Mau dengar lagu? Bayar dulu.{$ekor} || {$awal}Want a song? Pay first.{$ekor}
+  ~ kuno: {$awal}Setiap kisah adalah cermin, {$sebutan}. Yang mendengar melihat dirinya sendiri.{$ekor} || {$awal}Every tale is a mirror, {$sebutan}. The listener sees themself.{$ekor}
+  ~ oasis: {$awal}Tarian gurun menceritakan angin dan pasir, Saudara. Lihat nanti di api unggun.{$ekor} || {$awal}The desert dance tells of wind and sand, friend. Watch at the bonfire later.{$ekor}
+- [2] {$awal}Kemarin penonton memberi koin banyak sekali. Hari ini sepi. Begitulah seniman.{$ekor} || {$awal}Yesterday the crowd threw so many coins. Today it's empty. That's the artist's life.{$ekor}
+  ~ p: {$awal}Aku berlatih tarian kipas baru. Kalau gagal, kipasnya terbang ke atap. Hihi.{$ekor} || {$awal}I'm practising a new fan dance. If I slip, the fan flies onto the roof. Hehe.{$ekor}
+- {$awal}Erhu ini warisan guruku. Senarnya sudah kuganti tujuh kali, tapi suaranya tetap dia.{$ekor} || {$awal}This erhu was my master's. I've changed the strings seven times, but it still sounds like him.{$ekor}
+- {$awal}Anak-anak suka akrobat piring. Orang tua suka cerita sedih. Aku menyiapkan keduanya.{$ekor} || {$awal}Children love plate tricks. Old folk love sad tales. I prepare both.{$ekor}
 
 == kerja.malam
 niat: BASA_BASI
@@ -286,13 +320,15 @@ syarat: peran=penjaga_malam,penjaga_suar,penjaga_formasi
 lanjut: bahaya
 gestur: pukul_kentongan
 $sebutan: tipe=sebutan_pendengar dari=pendengar
-- [3] Orang lain tidur, aku berjaga. Malam ini bulan terang, jadi mudah. || Others sleep, I keep watch. The moon is bright tonight, so it's easy.
-  ~ kasar: Jangan berkeliaran malam-malam. Nanti kukira maling. || Don't wander at night. I'll mistake you for a thief.
-  ~ kuno: Malam punya suara sendiri, {$sebutan}. Penjaga belajar mendengarnya. || The night has its own voice, {$sebutan}. A watchman learns to hear it.
-  ~ pelabuhan: Lampu suar harus menyala sampai subuh, Bung. Satu malam padam, satu kapal karam. || The lighthouse must burn till dawn, mate. One dark night, one wreck.
-- [2] Jam kedua sudah lewat. Tiga kali lagi kupukul kentongan, lalu tidur. || The second watch is past. Three more strikes of the drum, then sleep.
-- Kucing hitam itu menemaniku setiap malam. Satu-satunya temanku di jam begini. || That black cat keeps me company every night. My only friend at this hour.
-- Formasi pelindung kota harus diperiksa setiap malam. Retak sedikit, binatang masuk. || The town's ward formation must be checked every night. A small crack and beasts get in.
+$awal: aturan=awal.basa opsional=0.4
+$ekor: aturan=ekor.basa opsional=0.4
+- [3] {$awal}Orang lain tidur, aku berjaga. Malam ini bulan terang, jadi mudah.{$ekor} || {$awal}Others sleep, I keep watch. The moon is bright tonight, so it's easy.{$ekor}
+  ~ kasar: {$awal}Jangan berkeliaran malam-malam. Nanti kukira maling.{$ekor} || {$awal}Don't wander at night. I'll mistake you for a thief.{$ekor}
+  ~ kuno: {$awal}Malam punya suara sendiri, {$sebutan}. Penjaga belajar mendengarnya.{$ekor} || {$awal}The night has its own voice, {$sebutan}. A watchman learns to hear it.{$ekor}
+  ~ pelabuhan: {$awal}Lampu suar harus menyala sampai subuh, Bung. Satu malam padam, satu kapal karam.{$ekor} || {$awal}The lighthouse must burn till dawn, mate. One dark night, one wreck.{$ekor}
+- [2] {$awal}Jam kedua sudah lewat. Tiga kali lagi kupukul kentongan, lalu tidur.{$ekor} || {$awal}The second watch is past. Three more strikes of the drum, then sleep.{$ekor}
+- {$awal}Kucing hitam itu menemaniku setiap malam. Satu-satunya temanku di jam begini.{$ekor} || {$awal}That black cat keeps me company every night. My only friend at this hour.{$ekor}
+- {$awal}Formasi pelindung kota harus diperiksa setiap malam. Retak sedikit, binatang masuk.{$ekor} || {$awal}The town's ward formation must be checked every night. A small crack and beasts get in.{$ekor}
 
 == kerja.comblang
 niat: BASA_BASI
@@ -301,13 +337,15 @@ syarat: peran=mak_comblang,pengurus_duka
 lanjut: asmara keluarga
 gestur: bicara_tangan
 $sebutan: tipe=sebutan_pendengar dari=pendengar
-- [3] Musim ini aku menjodohkan lima pasang! Langit senang denganku. || I matched five couples this season! Heaven is pleased with me.
-  ~ kasar: Lajang? Sudah umur begini masih lajang? Kemari, kucarikan. || Single? At your age, still single? Come here, I'll find someone.
-  ~ kuno: Benang merah tidak bisa dipaksa, {$sebutan}. Tapi bisa sedikit didorong. Hehe. || The red thread can't be forced, {$sebutan}. But it can be nudged. Heh.
-- [2] Kalau {$sebutan} mencari jodoh, aku punya daftar. Panjang sekali. || If you're seeking a match, {$sebutan}, I have a list. A very long one.
-  ~ kampung: Ada gadis baik di ujung kampung, Nak. Pintar masak, rajin. Mau kukenalkan? || There's a good girl at the end of the village, child. Cooks well, hardworking. Shall I introduce you?
-- Upacara duka pun harus rapi. Kehidupan dimulai dan diakhiri dengan upacara. || Even mourning rites must be done properly. Life begins and ends with ceremony.
-- Pasangan yang kujodohkan tahun lalu sudah punya bayi. Itu bayaran terbaikku. || A couple I matched last year has a baby now. That's my best payment.
+$awal: aturan=awal.basa opsional=0.4
+$ekor: aturan=ekor.basa opsional=0.4
+- [3] {$awal}Musim ini aku menjodohkan lima pasang! Langit senang denganku.{$ekor} || {$awal}I matched five couples this season! Heaven is pleased with me.{$ekor}
+  ~ kasar: {$awal}Lajang? Sudah umur begini masih lajang? Kemari, kucarikan.{$ekor} || {$awal}Single? At your age, still single? Come here, I'll find someone.{$ekor}
+  ~ kuno: {$awal}Benang merah tidak bisa dipaksa, {$sebutan}. Tapi bisa sedikit didorong. Hehe.{$ekor} || {$awal}The red thread can't be forced, {$sebutan}. But it can be nudged. Heh.{$ekor}
+- [2] {$awal}Kalau {$sebutan} mencari jodoh, aku punya daftar. Panjang sekali.{$ekor} || {$awal}If you're seeking a match, {$sebutan}, I have a list. A very long one.{$ekor}
+  ~ kampung: {$awal}Ada gadis baik di ujung kampung, Nak. Pintar masak, rajin. Mau kukenalkan? || {$awal}There's a good girl at the end of the village, child. Cooks well, hardworking. Shall I introduce you?
+- {$awal}Upacara duka pun harus rapi. Kehidupan dimulai dan diakhiri dengan upacara.{$ekor} || {$awal}Even mourning rites must be done properly. Life begins and ends with ceremony.{$ekor}
+- {$awal}Pasangan yang kujodohkan tahun lalu sudah punya bayi. Itu bayaran terbaikku.{$ekor} || {$awal}A couple I matched last year has a baby now. That's my best payment.{$ekor}
 
 == kerja.pengemis
 niat: BASA_BASI
@@ -316,13 +354,15 @@ syarat: peran=pengemis,pencopet,tawanan
 lanjut: kota kejahatan
 gestur: sikap_tunduk
 $sebutan: tipe=sebutan_pendengar dari=pendengar
-- [3] Sekeping saja, {$sebutan}... untuk semangkuk bubur... || Just one coin, {$sebutan}... for a bowl of porridge...
-  ~ kasar: Apa lihat-lihat? Kalau tidak memberi, pergi. || What are you staring at? Not giving, then go.
-  ~ kuno: Dahulu hamba juga punya rumah, {$sebutan}. Nasib berputar seperti roda. || This one once had a house too, {$sebutan}. Fate turns like a wheel.
-- [2] Pejalan kaki di gerbang hari ini pelit-pelit. Mungkin karena hujan. || The gate walkers are stingy today. Maybe because of the rain.
-  ~ iblis: Aku tahu semua jalan tikus di kota ini. Informasi lebih mahal dari bubur. || I know every rat-run in this city. Information costs more than porridge.
-- Kalau mau tahu siapa keluar-masuk kota malam ini, tanya aku. Mataku selalu terbuka. || If you want to know who goes in and out tonight, ask me. My eyes are always open.
-- Dulu aku pedagang. Lalu satu musim buruk. Sekarang begini. || I was a merchant once. Then one bad season. Now this.
+$awal: aturan=awal.basa opsional=0.4
+$ekor: aturan=ekor.basa opsional=0.4
+- [3] {$awal}Sekeping saja, {$sebutan}... untuk semangkuk bubur...{$ekor} || {$awal}Just one coin, {$sebutan}... for a bowl of porridge...{$ekor}
+  ~ kasar: {$awal}Apa lihat-lihat? Kalau tidak memberi, pergi.{$ekor} || {$awal}What are you staring at? Not giving, then go.{$ekor}
+  ~ kuno: {$awal}Dahulu hamba juga punya rumah, {$sebutan}. Nasib berputar seperti roda.{$ekor} || {$awal}This one once had a house too, {$sebutan}. Fate turns like a wheel.{$ekor}
+- [2] {$awal}Pejalan kaki di gerbang hari ini pelit-pelit. Mungkin karena hujan.{$ekor} || {$awal}The gate walkers are stingy today. Maybe because of the rain.{$ekor}
+  ~ iblis: {$awal}Aku tahu semua jalan tikus di kota ini. Informasi lebih mahal dari bubur.{$ekor} || {$awal}I know every rat-run in this city. Information costs more than porridge.{$ekor}
+- {$awal}Kalau mau tahu siapa keluar-masuk kota malam ini, tanya aku. Mataku selalu terbuka.{$ekor} || {$awal}If you want to know who goes in and out tonight, ask me. My eyes are always open.{$ekor}
+- {$awal}Dulu aku pedagang. Lalu satu musim buruk. Sekarang begini.{$ekor} || {$awal}I was a merchant once. Then one bad season. Now this.{$ekor}
 
 == kerja.guru_sekolah
 niat: BASA_BASI
@@ -331,9 +371,11 @@ syarat: peran=guru_sekolah,pustakawan,penguji
 lanjut: cita kota
 gestur: mengajar
 $sebutan: tipe=sebutan_pendengar dari=pendengar
-- [3] Murid-muridku hari ini belajar menulis nama sendiri. Tiga anak menulis nama ayam. || My pupils learned to write their own names today. Three wrote the chicken's name.
-  ~ kasar: Anak-anak itu! Lebih mudah mengajar kerbau. || Those children! Easier to teach a buffalo.
-  ~ kuno: Mendidik anak adalah menanam pohon yang buahnya tidak sempat kita petik. || Educating children is planting trees whose fruit we'll never pick.
-- [2] Perpustakaan kota butuh lebih banyak kitab. Kalau {$sebutan} punya gulungan lama... || The town library needs more books. If you have old scrolls, {$sebutan}...
-- Ada anak di kelasku yang jenius. Kalau saja keluarganya mampu menyekolahkannya lebih tinggi. || There's a genius in my class. If only the family could afford further schooling.
-- Ujian akar roh minggu depan. Anak-anak gugup, orang tuanya lebih gugup. || Spirit root testing next week. The children are nervous; the parents more so.
+$awal: aturan=awal.basa opsional=0.4
+$ekor: aturan=ekor.basa opsional=0.4
+- [3] {$awal}Murid-muridku hari ini belajar menulis nama sendiri. Tiga anak menulis nama ayam.{$ekor} || {$awal}My pupils learned to write their own names today. Three wrote the chicken's name.{$ekor}
+  ~ kasar: {$awal}Anak-anak itu! Lebih mudah mengajar kerbau.{$ekor} || {$awal}Those children! Easier to teach a buffalo.{$ekor}
+  ~ kuno: {$awal}Mendidik anak adalah menanam pohon yang buahnya tidak sempat kita petik.{$ekor} || {$awal}Educating children is planting trees whose fruit we'll never pick.{$ekor}
+- [2] {$awal}Perpustakaan kota butuh lebih banyak kitab. Kalau {$sebutan} punya gulungan lama...{$ekor} || {$awal}The town library needs more books. If you have old scrolls, {$sebutan}...{$ekor}
+- {$awal}Ada anak di kelasku yang jenius. Kalau saja keluarganya mampu menyekolahkannya lebih tinggi.{$ekor} || {$awal}There's a genius in my class. If only the family could afford further schooling.{$ekor}
+- {$awal}Ujian akar roh minggu depan. Anak-anak gugup, orang tuanya lebih gugup.{$ekor} || {$awal}Spirit root testing next week. The children are nervous; the parents more so.{$ekor}

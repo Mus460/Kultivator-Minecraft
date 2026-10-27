@@ -1,0 +1,18 @@
+{
+  "pembicara": [
+    "tokoh:zhang_shan"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest kota42_dua_keluarga tahap tebus",
+    "!punya kultivator:teh_penenang_hati"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "351",
+      "suara": "kota42.mabuk"
+    }
+  ]
+}

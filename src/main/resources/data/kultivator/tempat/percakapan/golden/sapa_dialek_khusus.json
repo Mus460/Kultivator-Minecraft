@@ -64,14 +64,19 @@
       },
       "harap": {
         "k": "kultivator.cakap.sapa.pekerja.pagi.1",
-        "a": []
+        "a": [
+          {
+            "k": "kultivator.cakap.ekor.sapa.0",
+            "a": []
+          }
+        ]
       },
       "aturan": "sapa.pekerja.pagi",
       "gestur": "lambai",
       "seru": null,
       "tik": null,
-      "id_id": "Pagi! Tungku sudah panas sejak subuh.",
-      "en_us": "Morning! The forge has been hot since dawn."
+      "id_id": "Pagi! Tungku sudah panas sejak subuh. Semoga harimu lancar.",
+      "en_us": "Morning! The forge has been hot since dawn. May your day go smoothly."
     },
     {
       "ubah": {
@@ -101,6 +106,10 @@
           {
             "k": "kultivator.cakap.lex.kakak.gunung",
             "a": []
+          },
+          {
+            "k": "kultivator.cakap.ekor.sapa.13",
+            "a": []
           }
         ]
       },
@@ -108,8 +117,8 @@
       "gestur": "lambai",
       "seru": null,
       "tik": null,
-      "id_id": "Pagi, Saudara. Kalau mau sesuatu dibuat, pagi begini aku masih segar.",
-      "en_us": "Morning, Brother. If you want something made, I'm still fresh this early."
+      "id_id": "Pagi, Saudara. Kalau mau sesuatu dibuat, pagi begini aku masih segar. Amitaba. Semoga tenang.",
+      "en_us": "Morning, Brother. If you want something made, I'm still fresh this early. Amitabha. Be at peace."
     },
     {
       "ubah": {
@@ -138,6 +147,10 @@
         "a": [
           {
             "k": "kultivator.cakap.lex.kakak.pelabuhan",
+            "a": []
+          },
+          {
+            "k": "kultivator.cakap.ekor.sapa.7",
             "a": []
           }
         ]
@@ -215,6 +228,9 @@
           {
             "k": "kultivator.cakap.lex.kakak.air",
             "a": []
+          },
+          {
+            "t": ""
           }
         ]
       },

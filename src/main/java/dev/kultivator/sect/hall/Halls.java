@@ -1852,6 +1852,15 @@ public final class Halls {
 		if (core == null || !level.getBlockState(pos).is(HallItems.SECT_HALL_STELE)) {
 			return false;
 		}
+		// the same two refusals as founding (onStelePlaced): hall switch and Alam Abadi (D-41AD, audit finding)
+		if (!KultivatorConfig.get().sectHall) {
+			Msg.chat(player, Component.translatable("kultivator.hall.disabled").withStyle(ChatFormatting.RED));
+			return false;
+		}
+		if (dev.kultivator.abadi.Abadi.isImmortalLevel(level)) {
+			Msg.chat(player, Component.translatable("kultivator.spine9.refuse.hall").withStyle(ChatFormatting.RED));
+			return false;
+		}
 		boolean wake = dormant(core);
 		if (!wake && pos.equals(posOf(core)) && level.dimension().equals(dimOf(core))) {
 			return true;
@@ -1873,6 +1882,11 @@ public final class Halls {
 		MOVES.remove(owner);
 		relocate(player, owner, core, level, pos.immutable(), wake);
 		return true;
+	}
+
+	/** Accepts candidate {@code id} of the master's own hall, with no open scroll needed (elder auto-accept, D-41AD). */
+	public static void accept(ServerPlayer master, int id) {
+		Candidates.accept(master, master.getUUID(), id);
 	}
 
 	/** Territory radius of a hall of {@code level}: {@code max(20 + 4L, provided R_t)} (DESIGN 21.17). */

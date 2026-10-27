@@ -1,0 +1,152 @@
+{
+  "pemberi": "tokoh:bibi_zhang",
+  "tempat": "kota42",
+  "alur": true,
+  "tahap": [
+    {
+      "id": "gosip",
+      "tujuan": [
+        "bicara tokoh:li_ying"
+      ]
+    },
+    {
+      "id": "surat",
+      "tujuan": [
+        "bendera kota42.dua.surat",
+        "bicara tokoh:zhang_shan"
+      ]
+    },
+    {
+      "id": "larangan",
+      "tujuan": [
+        "bendera kota42.dua.dengar_zhang",
+        "bendera kota42.dua.dengar_li",
+        "bendera kota42.dua.dengar_mei"
+      ],
+      "akibat_masuk": [
+        "kota42.gosip kota42_pasangan_sumur tokoh:zhang_shan tokoh:li_ying"
+      ]
+    },
+    {
+      "id": "telusur",
+      "tujuan": [
+        "tanda kota42.telusur.kota42_batas_sumur",
+        "bicara tokoh:kakek_xiang"
+      ],
+      "akibat_masuk": [
+        "kota42.gosip kota42_batas_sumur tokoh:zhang_laotou tokoh:li_laoban"
+      ]
+    },
+    {
+      "id": "putusan",
+      "cabang": [
+        {
+          "syarat": [
+            "bendera kota42.dua.damai"
+          ],
+          "ke": "damai"
+        },
+        {
+          "syarat": [
+            "bendera kota42.dua.lari"
+          ],
+          "ke": "lari"
+        }
+      ],
+      "batas_hari": 10,
+      "gagal_ke": "dibiarkan"
+    },
+    {
+      "id": "damai",
+      "tujuan": [
+        "antar kultivator:kwitansi_sumur tokoh:li_laoban"
+      ],
+      "ke": "nikah"
+    },
+    {
+      "id": "nikah",
+      "tujuan": [
+        "hadir_upacara nikah tokoh:zhang_shan"
+      ],
+      "akibat_masuk": [
+        "kota42.nikah tokoh:zhang_shan tokoh:li_ying"
+      ],
+      "akibat": [
+        "kota42.kesan tokoh:zhang_laotou 40",
+        "kota42.kesan tokoh:li_laoban 40",
+        "kota42.kesan tokoh:zhang_shan 40",
+        "kota42.kesan tokoh:li_ying 40",
+        "beri kultivator:kue_pengantin 3",
+        "nama_baik 4",
+        "kabar kota42_dua_damai pemain"
+      ],
+      "ke": "selesai",
+      "batas_hari": 12,
+      "gagal_ke": "nikah_lewat"
+    },
+    {
+      "id": "nikah_lewat",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "kota42.kesan tokoh:zhang_laotou 25",
+        "kota42.kesan tokoh:li_laoban 25",
+        "beri kultivator:kue_pengantin 1",
+        "kabar kota42_dua_damai pemain"
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "lari",
+      "tujuan": [
+        "kawal tokoh:zhang_shan kota_tema/air"
+      ],
+      "batas_hari": 6,
+      "gagal_ke": "dibiarkan",
+      "arah": "kota_tema/air"
+    },
+    {
+      "id": "lari_tiba",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "kota42.nikah tokoh:zhang_shan tokoh:li_ying",
+        "kota42.pindah tokoh:zhang_shan kota_tema/air",
+        "kota42.pindah tokoh:li_ying kota_tema/air",
+        "kota42.kesan tokoh:zhang_shan 40",
+        "kota42.kesan tokoh:li_ying 40",
+        "kota42.kesan tokoh:zhang_laotou -15",
+        "kota42.kesan tokoh:li_laoban -15",
+        "kabar kota42_dua_lari pemain",
+        "quest_mulai kota42_zhuazhou_damai"
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "dibiarkan",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "kota42.nikah tokoh:shen_ziyu tokoh:li_ying",
+        "kota42.kebiasaan tokoh:zhang_shan pemabuk",
+        "kabar kota42_dua_pisah"
+      ],
+      "ke": "tebus"
+    },
+    {
+      "id": "tebus",
+      "tujuan": [
+        "antar kultivator:teh_penenang_hati tokoh:zhang_shan"
+      ],
+      "akibat": [
+        "kota42.kebiasaan tokoh:zhang_shan pemabuk hapus",
+        "kota42.kesan tokoh:zhang_shan 30",
+        "kota42.kesan tokoh:bibi_zhang 20"
+      ],
+      "ke": "selesai"
+    }
+  ]
+}

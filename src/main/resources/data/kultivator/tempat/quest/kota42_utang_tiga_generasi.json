@@ -1,0 +1,105 @@
+{
+  "pemberi": "tokoh:wu_niangzi",
+  "tempat": "kota42",
+  "alur": true,
+  "tahap": [
+    {
+      "id": "minta",
+      "tujuan": [
+        "bicara tokoh:wu_dalang"
+      ]
+    },
+    {
+      "id": "surat",
+      "tujuan": [
+        "antar kultivator:surat_utang tokoh:qiu_panitera"
+      ]
+    },
+    {
+      "id": "pilih",
+      "cabang": [
+        {
+          "syarat": [
+            "bendera kota42.utang.lunas"
+          ],
+          "ke": "lunas"
+        },
+        {
+          "syarat": [
+            "bendera kota42.utang.sidang"
+          ],
+          "ke": "sidang"
+        },
+        {
+          "syarat": [
+            "bendera kota42.utang.modal"
+          ],
+          "ke": "modal"
+        }
+      ]
+    },
+    {
+      "id": "lunas",
+      "tujuan": [
+        "tanda kota42.utang.bayar"
+      ],
+      "ke": "lunas_akhir"
+    },
+    {
+      "id": "lunas_akhir",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "kota42.kesan tokoh:wu_dalang 35",
+        "kota42.kesan tokoh:wu_niangzi 35",
+        "kota42.kesan tokoh:shen_wan 5",
+        "beri kultivator:hidangan/mi_panjang_umur 3",
+        "kabar kota42_utang_lunas pemain"
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "sidang",
+      "tujuan": [
+        "antar kultivator:surat_utang tokoh:bao_qing"
+      ],
+      "ke": "sidang_akhir"
+    },
+    {
+      "id": "sidang_akhir",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "kota42.kesan tokoh:wu_dalang 40",
+        "kota42.kesan tokoh:wu_niangzi 40",
+        "kota42.kesan tokoh:shen_wan -50",
+        "nama_baik 3",
+        "kabar kota42_utang_sidang pemain"
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "modal",
+      "tujuan": [
+        "bendera kota42.utang.modal_bayar",
+        "tunggu 7"
+      ],
+      "ke": "modal_akhir"
+    },
+    {
+      "id": "modal_akhir",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "kota42.saham tokoh:wu_dalang 40",
+        "kota42.kesan tokoh:wu_dalang 30",
+        "kota42.kesan tokoh:wu_niangzi 30",
+        "kabar kota42_utang_modal pemain"
+      ],
+      "ke": "selesai"
+    }
+  ]
+}

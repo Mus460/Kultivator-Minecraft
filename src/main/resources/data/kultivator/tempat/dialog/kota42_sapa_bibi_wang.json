@@ -1,0 +1,51 @@
+{
+  "pembicara": [
+    "tokoh:bibi_wang"
+  ],
+  "prioritas": 5,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "timba_sumur",
+      "pilihan": [
+        {
+          "syarat": [
+            "quest kota42_seribu_jari baru"
+          ],
+          "akibat": [
+            "quest_mulai kota42_seribu_jari"
+          ]
+        },
+        {
+          "ke": "takhayul"
+        },
+        {
+          "ke": "kabar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "takhayul",
+      "gestur": "takut_sembunyi",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "bisik",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

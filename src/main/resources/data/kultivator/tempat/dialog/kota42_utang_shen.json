@@ -1,0 +1,35 @@
+{
+  "pembicara": [
+    "tokoh:shen_wan"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest kota42_utang_tiga_generasi tahap lunas"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "358",
+      "pilihan": [
+        {
+          "syarat": [
+            "nb_pita 20"
+          ],
+          "akibat": [
+            "bayar_pita 20",
+            "peristiwa tanda kota42.utang.bayar"
+          ],
+          "ke": "lunas",
+          "tampil": true,
+          "alasan": "kultivator.cerita.kota42_utang_shen.mulai.1.alasan"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "lunas",
+      "gestur": "hormat"
+    }
+  ]
+}

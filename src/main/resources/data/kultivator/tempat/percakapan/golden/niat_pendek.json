@@ -48,7 +48,7 @@
     {
       "ubah": {},
       "harap": {
-        "k": "kultivator.cakap.terima_kasih.puji.0.air",
+        "k": "kultivator.cakap.terima_kasih.sopan.2",
         "a": [
           {
             "k": "kultivator.cakap.lex.tuan.air",
@@ -56,42 +56,47 @@
           }
         ]
       },
-      "aturan": "terima_kasih.puji",
+      "aturan": "terima_kasih.sopan",
       "gestur": "hormat",
       "seru": "kota42.seru.terima_kasih_p",
       "tik": null,
-      "id_id": "Aduh, Kakak... pipiku jadi panas... terima kasih...",
-      "en_us": "Oh, dear... my cheeks are burning... thank you..."
+      "id_id": "Terima kasih, Kakak. Anda sangat murah hati.",
+      "en_us": "Thank you, Dear Sir. You are most generous."
     },
     {
       "ubah": {
         "niat": "MAAF"
       },
       "harap": {
-        "k": "kultivator.cakap.maaf.1.p",
+        "k": "kultivator.cakap.maaf.lagi.1.p",
         "a": []
       },
-      "aturan": "maaf",
+      "aturan": "maaf.lagi",
       "gestur": "sikap_tunduk",
       "seru": "kota42.seru.maaf_p",
       "tik": null,
-      "id_id": "Maafkan aku, ya. Tadi aku capek sekali.",
-      "en_us": "Forgive me. I was so tired earlier."
+      "id_id": "Tadi aku tidak sopan, ya. Maaf. Mau kubuatkan kue?",
+      "en_us": "I was impolite earlier, wasn't I. Sorry. Shall I bake you a cake?"
     },
     {
       "ubah": {
         "niat": "TOLAK"
       },
       "harap": {
-        "k": "kultivator.cakap.tolak.2",
-        "a": []
+        "k": "kultivator.cakap.tolak.sopan.0",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.tuan.air",
+            "a": []
+          }
+        ]
       },
-      "aturan": "tolak",
-      "gestur": "geleng",
+      "aturan": "tolak.sopan",
+      "gestur": "hormat",
       "seru": null,
       "tik": null,
-      "id_id": "Itu di luar kemampuanku. Coba tanya orang lain.",
-      "en_us": "That's beyond me. Try someone else."
+      "id_id": "Mohon maaf, Kakak, saya tidak dapat memenuhinya.",
+      "en_us": "I'm sorry, Dear Sir, I'm unable to fulfil that."
     },
     {
       "ubah": {
@@ -112,7 +117,7 @@
         "niat": "TANYA"
       },
       "harap": {
-        "k": "kultivator.cakap.dagang.tanya_harga.2",
+        "k": "kultivator.cakap.tanya.harga.sopan.0",
         "a": [
           {
             "k": "kultivator.cakap.lex.tuan.air",
@@ -124,12 +129,12 @@
           }
         ]
       },
-      "aturan": "dagang.tanya_harga",
+      "aturan": "tanya.harga.sopan",
       "gestur": "bicara_tangan",
       "seru": null,
       "tik": null,
-      "id_id": "Menurut Kakak, harga item.minecraft.honey_bottle akan turun sebelum musim berganti?",
-      "en_us": "Do you think item.minecraft.honey_bottle will drop before the season turns, Dear Sir?"
+      "id_id": "Mohon maaf, Kakak, apakah Anda tahu berapa harga item.minecraft.honey_bottle di kota-kota lain?",
+      "en_us": "Pardon me, Dear Sir, might you know what item.minecraft.honey_bottle costs in other towns?"
     },
     {
       "ubah": {

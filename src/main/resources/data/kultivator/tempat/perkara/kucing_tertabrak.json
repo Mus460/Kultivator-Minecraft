@@ -1,0 +1,66 @@
+{
+  "nama": "kultivator.kota42.perkara.t.kucing_tertabrak.nama",
+  "teks": "kultivator.kota42.perkara.t.kucing_tertabrak.teks",
+  "penggugat": {
+    "klaim": "kultivator.kota42.perkara.t.kucing_tertabrak.klaim_a",
+    "peran": [
+      "warga",
+      "penjual_ikan"
+    ]
+  },
+  "tergugat": {
+    "klaim": "kultivator.kota42.perkara.t.kucing_tertabrak.klaim_b",
+    "peran": [
+      "kuli",
+      "pedagang_keliling"
+    ]
+  },
+  "benar": "acak",
+  "saksi": 2,
+  "kesaksian": {
+    "penggugat": [
+      "kultivator.kota42.perkara.t.kucing_tertabrak.saksi_a1",
+      "kultivator.kota42.perkara.t.kucing_tertabrak.saksi_a2"
+    ],
+    "tergugat": [
+      "kultivator.kota42.perkara.t.kucing_tertabrak.saksi_b1",
+      "kultivator.kota42.perkara.t.kucing_tertabrak.saksi_b2"
+    ]
+  },
+  "dusta": "kultivator.kota42.perkara.t.kucing_tertabrak.dusta",
+  "bukti": [
+    {
+      "jenis": "barang",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.kucing_tertabrak.bukti1_a",
+        "tergugat": "kultivator.kota42.perkara.t.kucing_tertabrak.bukti1_b"
+      },
+      "barang": "minecraft:string"
+    },
+    {
+      "jenis": "gosip",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.kucing_tertabrak.bukti2_a",
+        "tergugat": "kultivator.kota42.perkara.t.kucing_tertabrak.bukti2_b"
+      }
+    }
+  ],
+  "putusan": [
+    {
+      "untuk": "penggugat",
+      "teks": "kultivator.kota42.perkara.t.kucing_tertabrak.putusan1",
+      "akibat": "kultivator.kota42.perkara.t.kucing_tertabrak.putusan1_akibat"
+    },
+    {
+      "untuk": "tergugat",
+      "teks": "kultivator.kota42.perkara.t.kucing_tertabrak.putusan2",
+      "akibat": "kultivator.kota42.perkara.t.kucing_tertabrak.putusan2_akibat"
+    },
+    {
+      "untuk": "damai",
+      "teks": "kultivator.kota42.perkara.t.kucing_tertabrak.putusan3",
+      "akibat": "kultivator.kota42.perkara.t.kucing_tertabrak.putusan3_akibat"
+    }
+  ],
+  "suap": 0.15
+}

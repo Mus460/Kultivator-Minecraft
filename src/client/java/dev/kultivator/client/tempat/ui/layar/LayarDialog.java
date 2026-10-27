@@ -1,5 +1,6 @@
 package dev.kultivator.client.tempat.ui.layar;
 
+import dev.kultivator.client.dunia.kota42.ui.layar.DialogKota;
 import dev.kultivator.client.hub.DiSini;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.DaftarGulir;
@@ -11,10 +12,13 @@ import dev.kultivator.client.screen.ui.Potret;
 import dev.kultivator.client.screen.ui.SegelKonfirmasi;
 import dev.kultivator.client.screen.ui.UiSound;
 import dev.kultivator.client.tempat.ui.kit.Lembar;
+import dev.kultivator.dunia.kota42.ui.KotaLembar;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import dev.kultivator.dunia.tempat.ui.LembarKunci.Dialog;
 import java.util.List;
 import java.util.function.Consumer;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
@@ -29,6 +33,10 @@ import org.jetbrains.annotations.Nullable;
  * services with hours, each opening its sheet for the same NPC (the talk stays one step back); sub "Quest" — the quests this
  * NPC gives or takes. "Jasa" and "Quest" only appear when the sheet carries them. When the dialog ended only the closing line
  * remains. Drawn with the single kit (text 1.0: a long line is split into pages, never shrunk).
+ * <p>
+ * A townsperson's conversation ({@code KotaLembar.Dialog#CAKAP}, DESIGN 42.11.1) adds the speaker strip, the tone picker, the
+ * promise mark and the tablets Kabar, Jalan, Hubungan, Tolong and Beri, drawn by {@link DialogKota}; its options send
+ * {@code ucap:NO:NADA}.
  * <p>
  * Bridged sheets ({@code DimensiJembatan}): the ops go to the bridge instead of the 38 server, a choice marked {@link #YAKIN}
  * asks the Gulungan's confirm seal first (medium: hold 1.5 s; was the scroll's 2 s hold), and the help topic is the
@@ -45,6 +53,7 @@ public final class LayarDialog extends LayarInti {
 	private final DaftarGulir daftarQuest = new DaftarGulir();
 	private final @Nullable Consumer<String> jembatan;
 	private final @Nullable String bantuan;
+	private final DialogKota kota = new DialogKota(this::kirim, this::tulisBoleh, this::alasanBaca);
 
 	public LayarDialog(int npcId, CompoundTag lembar) {
 		this(npcId, lembar, null, null);
@@ -59,8 +68,19 @@ public final class LayarDialog extends LayarInti {
 
 	@Override
 	protected List<Tab> daftarTab() {
+		if (cakap()) {
+			return List.of(tab(Dialog.TAB_BICARA, "tab.bicara", Glyphs.Atlas.GULUNGAN), tab(KotaLembar.Dialog.TAB_KABAR, "kota.tab.kabar_dialog", Glyphs.Atlas.PIALA),
+					tab(KotaLembar.Dialog.TAB_JALAN, "kota.tab.jalan", Glyphs.Atlas.KOMPAS), tab(KotaLembar.Dialog.TAB_HUBUNGAN, "kota.tab.hubungan", Glyphs.Atlas.HATI),
+					tab(KotaLembar.Dialog.TAB_TOLONG, "kota.tab.tolong", Glyphs.Atlas.TANYA), tab(KotaLembar.Dialog.TAB_BERI, "kota.tab.beri", Glyphs.Atlas.BINTANG_KOSONG),
+					tab(Dialog.TAB_JASA, "tab.jasa", LembarKunci.Ikon.LONCENG), tab(Dialog.TAB_QUEST, "tab.quest", Glyphs.Atlas.SURAT));
+		}
 		return List.of(tab(Dialog.TAB_BICARA, "tab.bicara", Glyphs.Atlas.GULUNGAN), tab(Dialog.TAB_JASA, "tab.jasa", LembarKunci.Ikon.LONCENG),
 				tab(Dialog.TAB_QUEST, "tab.quest", Glyphs.Atlas.SURAT));
+	}
+
+	/** True when the sheet is the conversation of a townsperson (42.11.1). */
+	private boolean cakap() {
+		return lembar != null && DialogKota.cakap(lembar);
 	}
 
 	@Override
@@ -68,6 +88,9 @@ public final class LayarDialog extends LayarInti {
 		return switch (id) {
 			case Dialog.TAB_JASA -> !lembar.daftar(Dialog.JASA).isEmpty();
 			case Dialog.TAB_QUEST -> !lembar.daftar(Dialog.QUEST).isEmpty();
+			case KotaLembar.Dialog.TAB_JALAN -> !lembar.sub(KotaLembar.Dialog.JALAN).kosongSemua();
+			case KotaLembar.Dialog.TAB_TOLONG -> !lembar.daftar(KotaLembar.Dialog.TOLONG).isEmpty();
+			case KotaLembar.Dialog.TAB_BERI -> !lembar.sub(KotaLembar.Dialog.BERI).kosongSemua();
 			default -> true;
 		};
 	}
@@ -76,6 +99,20 @@ public final class LayarDialog extends LayarInti {
 	protected void tabBerubah() {
 		daftarJasa.mulaiUlang(Util.getMillis());
 		daftarQuest.mulaiUlang(Util.getMillis());
+		kota.tabBerubah();
+	}
+
+	@Override
+	public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+		if (cakap() && kota.roda(tab, mouseX, mouseY, scrollY)) {
+			return true;
+		}
+		return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+	}
+
+	@Override
+	protected boolean tombolLain(KeyEvent event) {
+		return cakap() && kota.tombol(tab, event);
 	}
 
 	@Override
@@ -126,6 +163,10 @@ public final class LayarDialog extends LayarInti {
 		if (!Dialog.TAB_BICARA.equals(tab) || lembar.b(Dialog.AKHIR)) {
 			return false;
 		}
+		// 42.5A.7: Shift + 1..6 picks the tone, plain digits pick the option
+		if (cakap() && Minecraft.getInstance().hasShiftDown()) {
+			return kota.pilihNada(lembar, n);
+		}
 		for (Lembar p : lembar.daftar(Dialog.PILIHAN)) {
 			if (p.i(LembarKunci.NO, -1) == n) {
 				if (gelembung.adaLanjut()) {
@@ -161,7 +202,7 @@ public final class LayarDialog extends LayarInti {
 		if (gelembung.menulis(Util.getMillis())) {
 			gelembung.selesaikan();
 		}
-		String op = LembarKunci.op(Dialog.OP_PILIH, p.i(LembarKunci.NO, 0));
+		String op = cakap() ? kota.opUcap(p.i(LembarKunci.NO, 0)) : LembarKunci.op(Dialog.OP_PILIH, p.i(LembarKunci.NO, 0));
 		if (p.b(YAKIN)) {
 			konfirmasi(SegelKonfirmasi.Tingkat.SEDANG, Component.translatable("kultivator.gui43.konteks.yakin", p.teks(LembarKunci.TEKS)), () -> kirim(op));
 			return;
@@ -185,6 +226,11 @@ public final class LayarDialog extends LayarInti {
 		switch (tab) {
 			case Dialog.TAB_JASA -> jasa(l, x0, y0, x1, y1);
 			case Dialog.TAB_QUEST -> quest(l, x0, y0, x1, y1);
+			case KotaLembar.Dialog.TAB_KABAR -> kota.kabar(l, lembar, x0, y0, x1, y1);
+			case KotaLembar.Dialog.TAB_JALAN -> kota.jalan(l, lembar, x0, y0, x1, y1);
+			case KotaLembar.Dialog.TAB_HUBUNGAN -> kota.hubungan(l, lembar, x0, y0, x1, y1);
+			case KotaLembar.Dialog.TAB_TOLONG -> kota.tolong(l, lembar, x0, y0, x1, y1);
+			case KotaLembar.Dialog.TAB_BERI -> kota.beri(l, lembar, x0, y0, x1, y1);
 			default -> bicara(l, x0, y0, x1, y1);
 		}
 	}
@@ -192,13 +238,18 @@ public final class LayarDialog extends LayarInti {
 	private void bicara(Lukis l, int x0, int y0, int x1, int y1) {
 		Lembar npc = lembar.sub(LembarKunci.NPC);
 		boolean akhir = lembar.b(Dialog.AKHIR);
-		List<DaftarPilihan.Pilihan> pilihan = akhir ? List.of() : DaftarPilihan.Pilihan.dari(lembar.daftar(Dialog.PILIHAN));
+		boolean cakap = cakap();
+		if (cakap) {
+			y0 += kota.kepala(l, npc, x0, y0, x1);
+		}
+		List<DaftarPilihan.Pilihan> pilihan = akhir ? List.of() : cakap ? kota.pilihan(lembar) : DaftarPilihan.Pilihan.dari(lembar.daftar(Dialog.PILIHAN));
 		int n = pilihan.size();
+		int ekstra = cakap && !akhir ? (lembar.sub(KotaLembar.Dialog.NADA).daftar(LembarKunci.DAFTAR).isEmpty() ? 0 : 18) + (lembar.ada(KotaLembar.Dialog.RAUT) ? 12 : 0) : 0;
 		int lebar = x1 - x0 - 8;
 		// the bubble gets what the choices leave; many choices on a short box go into two columns (scale 4)
 		int bawahMin = y0 + Math.min(52, Math.max(30, y1 - y0 - 30));
 		int kolom = DaftarPilihan.kolom(n, lebar, y1 - bawahMin - 6);
-		int blok = akhir ? 18 : n == 0 ? 0 : DaftarPilihan.tinggi(n, kolom, PILIHAN_H) + 6;
+		int blok = akhir ? 18 : n == 0 ? 0 : DaftarPilihan.tinggi(n, kolom, PILIHAN_H) + 6 + ekstra;
 		int batas = Math.max(bawahMin, Math.min(y0 + 96, y1 - blok));
 		int bubbleBottom = gelembung.gambar(l, npc, lembar.teks(LembarKunci.TEKS), x0, y0, x1, batas);
 		int potret = Potret.ukuran(Math.min(56, batas - y0 - 4));
@@ -209,6 +260,10 @@ public final class LayarDialog extends LayarInti {
 		}
 		if (n == 0) {
 			return;
+		}
+		if (cakap) {
+			y += kota.raut(l, lembar, x0 + 4, y - 2, x1 - 4);
+			y += kota.nada(l, lembar, x0 + 4, y, x1 - 4);
 		}
 		// the choices fade in after the line is written (and after its last page)
 		boolean tunggu = gelembung.menulis(l.kini) || gelembung.adaLanjut();

@@ -64,7 +64,7 @@
         "peran": "pedagang_keliling"
       },
       "harap": {
-        "k": "kultivator.cakap.sapa.pagi.5",
+        "k": "kultivator.cakap.sapa.sopan.pedagang.2",
         "a": [
           {
             "k": "kultivator.cakap.lex.tuan.ibukota",
@@ -72,12 +72,12 @@
           }
         ]
       },
-      "aturan": "sapa.pagi",
-      "gestur": "lambai",
+      "aturan": "sapa.sopan.pedagang",
+      "gestur": "hormat",
       "seru": null,
       "tik": null,
-      "id_id": "Pagi, Tuanku. Mau ke mana sepagi ini?",
-      "en_us": "Morning, My Lord. Where are you off to so early?"
+      "id_id": "Beruntung sekali, Tuanku; Anda datang pada waktu yang tepat. Barang terbaik baru saja tiba.",
+      "en_us": "How fortunate, My Lord; you come at the right time. The best goods have just arrived."
     },
     {
       "ubah": {
@@ -102,20 +102,15 @@
         "peran": "petani"
       },
       "harap": {
-        "k": "kultivator.cakap.sapa.kenal.0",
-        "a": [
-          {
-            "k": "kultivator.cakap.lex.tuan.ibukota",
-            "a": []
-          }
-        ]
+        "k": "kultivator.cakap.sapa.pagi.4",
+        "a": []
       },
-      "aturan": "sapa.kenal",
+      "aturan": "sapa.pagi",
       "gestur": "lambai",
       "seru": null,
       "tik": null,
-      "id_id": "Oh, Tuanku, datang lagi.",
-      "en_us": "Oh, My Lord, back again."
+      "id_id": "Pagi! Bubur di ujung jalan sudah matang, cium baunya?",
+      "en_us": "Morning! The porridge down the road is done, smell it?"
     },
     {
       "ubah": {
@@ -175,15 +170,23 @@
         "peran": "tetua_desa"
       },
       "harap": {
-        "k": "kultivator.cakap.sapa.tetua.0",
-        "a": []
+        "k": "kultivator.cakap.sapa.kenal.4",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.tuan.ibukota",
+            "a": []
+          },
+          {
+            "t": ""
+          }
+        ]
       },
-      "aturan": "sapa.tetua",
-      "gestur": "sikap_tua",
-      "seru": "kota42.seru.tetua_hmm",
+      "aturan": "sapa.kenal",
+      "gestur": "lambai",
+      "seru": null,
       "tik": null,
-      "id_id": "Ho ho. Anak muda, datang menjenguk orang tua ini?",
-      "en_us": "Ho ho. Young one, come to visit this old man?"
+      "id_id": "Tuanku. Sudah lama juga, ya.",
+      "en_us": "My Lord. It's been a while, hasn't it."
     },
     {
       "ubah": {
@@ -214,6 +217,9 @@
           {
             "k": "kultivator.cakap.lex.senior.ibukota",
             "a": []
+          },
+          {
+            "t": ""
           }
         ]
       },
@@ -247,7 +253,7 @@
         "peran": "menteri"
       },
       "harap": {
-        "k": "kultivator.cakap.sapa.kenal.1",
+        "k": "kultivator.cakap.sapa.pagi.1.ibukota",
         "a": [
           {
             "k": "kultivator.cakap.lex.tuan.ibukota",
@@ -255,12 +261,12 @@
           }
         ]
       },
-      "aturan": "sapa.kenal",
+      "aturan": "sapa.pagi",
       "gestur": "lambai",
       "seru": null,
       "tik": null,
-      "id_id": "Tuanku! Apa kabar?",
-      "en_us": "My Lord! How are you?"
+      "id_id": "Selamat pagi, Tuanku. Sudahkah Tuanku bersantap pagi?",
+      "en_us": "Good morning, My Lord. Have you breakfasted?"
     }
   ]
 }

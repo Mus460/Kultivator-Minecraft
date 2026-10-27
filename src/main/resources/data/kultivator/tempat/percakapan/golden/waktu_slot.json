@@ -88,6 +88,9 @@
           },
           {
             "t": "Kota Awan"
+          },
+          {
+            "t": ""
           }
         ]
       },
@@ -138,7 +141,14 @@
       },
       "harap": {
         "k": "kultivator.cakap.tetangga.umum.0.kampung",
-        "a": []
+        "a": [
+          {
+            "t": ""
+          },
+          {
+            "t": ""
+          }
+        ]
       },
       "aturan": "tetangga.umum",
       "gestur": "tunjuk",
@@ -189,7 +199,13 @@
         "k": "kultivator.cakap.kabar.pindah.2",
         "a": [
           {
+            "t": ""
+          },
+          {
             "t": "Paman Li"
+          },
+          {
+            "t": ""
           }
         ]
       },
@@ -242,6 +258,10 @@
         "k": "kultivator.cakap.kabar.pindah.0",
         "a": [
           {
+            "k": "kultivator.cakap.awal.kabar.0",
+            "a": []
+          },
+          {
             "t": "Paman Li"
           },
           {
@@ -255,6 +275,9 @@
                 "a": []
               }
             ]
+          },
+          {
+            "t": ""
           }
         ]
       },
@@ -262,8 +285,8 @@
       "gestur": "tunjuk",
       "seru": null,
       "tik": null,
-      "id_id": "Paman Li pindah ke Kota Awan lima hari lalu. Rumahnya sekarang kosong.",
-      "en_us": "Paman Li moved to Kota Awan five days ago. The house stands empty now."
+      "id_id": "Eh, dengar ini. Paman Li pindah ke Kota Awan lima hari lalu. Rumahnya sekarang kosong.",
+      "en_us": "Hey, listen to this. Paman Li moved to Kota Awan five days ago. The house stands empty now."
     },
     {
       "ubah": {
@@ -311,6 +334,9 @@
           },
           {
             "t": "Kota Awan"
+          },
+          {
+            "t": ""
           }
         ]
       },
@@ -361,7 +387,14 @@
       },
       "harap": {
         "k": "kultivator.cakap.tetangga.umum.1",
-        "a": []
+        "a": [
+          {
+            "t": ""
+          },
+          {
+            "t": ""
+          }
+        ]
       },
       "aturan": "tetangga.umum",
       "gestur": "tunjuk",
@@ -412,13 +445,17 @@
         "k": "kultivator.cakap.kabar.pindah.3",
         "a": [
           {
+            "k": "kultivator.cakap.awal.kabar.9",
+            "a": []
+          },
+          {
             "t": "Paman Li"
           },
           {
             "t": "Kota Awan"
           },
           {
-            "k": "kultivator.cakap.frag.doa.6",
+            "k": "kultivator.cakap.frag.doa.4",
             "a": []
           }
         ]
@@ -427,8 +464,8 @@
       "gestur": "tunjuk",
       "seru": null,
       "tik": null,
-      "id_id": "Semoga Paman Li betah di Kota Awan. Semoga panjang umur dan sehat.",
-      "en_us": "I hope Paman Li settles well in Kota Awan. Long life and good health to you."
+      "id_id": "Pasar lagi ramai membicarakan sesuatu. Semoga Paman Li betah di Kota Awan. Semoga leluhur memberkati.",
+      "en_us": "The market is buzzing about something. I hope Paman Li settles well in Kota Awan. May the ancestors bless you."
     }
   ]
 }

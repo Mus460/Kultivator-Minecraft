@@ -1,0 +1,51 @@
+{
+  "pembicara": [
+    "tokoh:kakek_xiang"
+  ],
+  "prioritas": 40,
+  "syarat": [
+    "kota_wafat kakek_che"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "353",
+      "prop": "papan_catur",
+      "suara": "kota42.catur_kalah",
+      "pilihan": [
+        {
+          "ke": "duka"
+        },
+        {
+          "akibat": [
+            "kota42.kesan tokoh:kakek_xiang 10"
+          ],
+          "ke": "main"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "duka",
+      "gestur": "bicara_tangan",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "main",
+      "gestur": "353",
+      "suara": "kota42.catur_skak",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

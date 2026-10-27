@@ -1,0 +1,21 @@
+{
+  "pembicara": [
+    "tokoh:fang_gudang"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest kota42_pejabat_jujur tahap paceklik",
+    "!bendera kota42.pejabat.bukti"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "416",
+      "prop": "204",
+      "akibat": [
+        "bendera kota42.pejabat.bukti"
+      ]
+    }
+  ]
+}

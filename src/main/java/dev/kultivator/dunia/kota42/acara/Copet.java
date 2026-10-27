@@ -386,6 +386,7 @@ final class Copet extends PeristiwaJalan.Kejadian {
 		GosipWarga.lahir(level, situs, "COPET_TERTANGKAP", (int) curian, Fakta.Kebenaran.BENAR, List.of(), null, Fakta.Rujuk.tempat(situs),
 				Fakta.Rujuk.pemain(PeristiwaJalan.indeks(catcher)));
 		Advancements.grant(catcher, "tempat/kota42_copet");
+		dev.kultivator.dunia.kota42.bicara.TujuanKota.kejarCopet(catcher, situs);
 		Msg.chat(catcher, Component.translatable(PeristiwaJalan.L + (tanganMerah ? "copet.tangan_merah" : "copet.tertangkap"))
 				.withStyle(ChatFormatting.GOLD));
 		lepasPengejar(server);

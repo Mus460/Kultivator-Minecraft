@@ -84,6 +84,9 @@
           {
             "k": "kultivator.cakap.lex.kakak.kampung",
             "a": []
+          },
+          {
+            "t": ""
           }
         ]
       },
@@ -105,6 +108,10 @@
           {
             "k": "kultivator.cakap.lex.kawan.kampung",
             "a": []
+          },
+          {
+            "k": "kultivator.cakap.ekor.sapa.0",
+            "a": []
           }
         ]
       },
@@ -112,8 +119,8 @@
       "gestur": "seka_keringat",
       "seru": null,
       "tik": null,
-      "id_id": "Oh, Kang. Maaf, tanganku kotor. Salam!",
-      "en_us": "Oh, Pal. Sorry, my hands are dirty. Greetings!"
+      "id_id": "Oh, Kang. Maaf, tanganku kotor. Salam! Semoga harimu lancar.",
+      "en_us": "Oh, Pal. Sorry, my hands are dirty. Greetings! May your day go smoothly."
     },
     {
       "ubah": {
@@ -126,6 +133,10 @@
           {
             "k": "kultivator.cakap.lex.kawan.kampung",
             "a": []
+          },
+          {
+            "k": "kultivator.cakap.ekor.sapa.2",
+            "a": []
           }
         ]
       },
@@ -133,8 +144,8 @@
       "gestur": "peluk",
       "seru": null,
       "tik": null,
-      "id_id": "Wah, Kang! Kursi terbaik untukmu, tentu saja.",
-      "en_us": "Ah, Pal! The best seat for you, of course."
+      "id_id": "Wah, Kang! Kursi terbaik untukmu, tentu saja. Jaga dirimu baik-baik.",
+      "en_us": "Ah, Pal! The best seat for you, of course. Take good care of yourself."
     },
     {
       "ubah": {

@@ -50,72 +50,28 @@
     {
       "ubah": {},
       "harap": {
-        "k": "kultivator.cakap.sapa.kenal.1.kampung",
+        "k": "kultivator.cakap.sapa.kenal.0",
         "a": [
           {
             "k": "kultivator.cakap.lex.tuan.kampung",
-            "a": []
-          }
-        ]
-      },
-      "aturan": "sapa.kenal",
-      "gestur": "lambai",
-      "seru": null,
-      "tik": null,
-      "id_id": "Lho, Pak! Sehat, Nak?",
-      "en_us": "Well, Mister! Keeping well, child?"
-    },
-    {
-      "ubah": {},
-      "harap": {
-        "k": "kultivator.cakap.sapa.cemas.2",
-        "a": [
-          {
-            "k": "kultivator.cakap.lex.tuan.kampung",
-            "a": []
-          }
-        ]
-      },
-      "aturan": "sapa.cemas",
-      "gestur": "lihat_sekeliling",
-      "seru": null,
-      "tik": null,
-      "id_id": "S-salam, Pak. Maaf, pikiranku sedang ke mana-mana.",
-      "en_us": "G-greetings, Mister. Sorry, my mind is all over the place."
-    },
-    {
-      "ubah": {},
-      "harap": {
-        "k": "kultivator.cakap.bungkus.awal",
-        "a": [
-          {
-            "k": "kultivator.cakap.tik.anu",
             "a": []
           },
           {
-            "k": "kultivator.cakap.sapa.kenal.0",
-            "a": [
-              {
-                "k": "kultivator.cakap.lex.tuan.kampung",
-                "a": []
-              }
-            ]
+            "t": ""
           }
         ]
       },
       "aturan": "sapa.kenal",
       "gestur": "lambai",
       "seru": null,
-      "tik": "anu",
-      "id_id": "Anu... Oh, Pak, datang lagi.",
-      "en_us": "Um... Oh, Mister, back again."
+      "tik": null,
+      "id_id": "Oh, Pak, datang lagi.",
+      "en_us": "Oh, Mister, back again."
     },
     {
-      "ubah": {
-        "tik_terakhir": "gagap"
-      },
+      "ubah": {},
       "harap": {
-        "k": "kultivator.cakap.sapa.pagi.1.kampung",
+        "k": "kultivator.cakap.sapa.pagi.5",
         "a": [
           {
             "k": "kultivator.cakap.lex.tuan.kampung",
@@ -127,8 +83,55 @@
       "gestur": "lambai",
       "seru": null,
       "tik": null,
-      "id_id": "Pagi, Nak. Sudah makan? Jangan jalan dengan perut kosong.",
-      "en_us": "Morning, child. Eaten? Don't walk on an empty belly."
+      "id_id": "Pagi, Pak. Mau ke mana sepagi ini?",
+      "en_us": "Morning, Mister. Where are you off to so early?"
+    },
+    {
+      "ubah": {},
+      "harap": {
+        "k": "kultivator.cakap.bungkus.awal",
+        "a": [
+          {
+            "k": "kultivator.cakap.tik.anu",
+            "a": []
+          },
+          {
+            "k": "kultivator.cakap.sapa.cemas.1",
+            "a": [
+              {
+                "k": "kultivator.cakap.lex.tuan.kampung",
+                "a": []
+              }
+            ]
+          }
+        ]
+      },
+      "aturan": "sapa.cemas",
+      "gestur": "lihat_sekeliling",
+      "seru": null,
+      "tik": "anu",
+      "id_id": "Anu... Pak, kau tidak melihat sesuatu yang aneh di jalan tadi?",
+      "en_us": "Um... Mister, did you see anything strange on the road just now?"
+    },
+    {
+      "ubah": {
+        "tik_terakhir": "gagap"
+      },
+      "harap": {
+        "k": "kultivator.cakap.sapa.sopan.pagi.1",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.tuan.kampung",
+            "a": []
+          }
+        ]
+      },
+      "aturan": "sapa.sopan.pagi",
+      "gestur": "hormat",
+      "seru": null,
+      "tik": null,
+      "id_id": "Selamat pagi. Silakan, jangan sungkan bila memerlukan sesuatu, Pak.",
+      "en_us": "Good morning. Please, do not hesitate if you need anything, Mister."
     }
   ]
 }

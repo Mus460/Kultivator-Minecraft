@@ -1,0 +1,42 @@
+{
+  "pembicara": [
+    "tokoh:yan_feihu"
+  ],
+  "prioritas": 5,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "377",
+      "pilihan": [
+        {
+          "ke": "puncak"
+        },
+        {
+          "ke": "menetap"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "puncak",
+      "gestur": "376",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "menetap",
+      "gestur": "451",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

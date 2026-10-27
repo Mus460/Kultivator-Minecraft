@@ -1,0 +1,20 @@
+{
+  "pembicara": [
+    "tokoh:zhang_laotou"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest kota42_zhuazhou_damai aktif",
+    "!bendera kota42.zhuazhou.zhang"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "angguk_dengar",
+      "akibat": [
+        "bendera kota42.zhuazhou.zhang"
+      ]
+    }
+  ]
+}

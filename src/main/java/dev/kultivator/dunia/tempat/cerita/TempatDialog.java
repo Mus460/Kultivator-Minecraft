@@ -6,6 +6,7 @@ import dev.kultivator.dunia.kota.KotaData;
 import dev.kultivator.dunia.kota.KotaNames;
 import dev.kultivator.dunia.kota.KultivatorNpc;
 import dev.kultivator.dunia.kota.NpcRole;
+import dev.kultivator.dunia.kota42.bicara.BicaraWarga;
 import dev.kultivator.dunia.tempat.TempatApi;
 import dev.kultivator.dunia.tempat.TempatInfo;
 import dev.kultivator.dunia.tempat.hidup.HidupApi;
@@ -133,8 +134,9 @@ public final class TempatDialog {
 			return false;
 		}
 		NpcRole role = npc.role();
+		boolean warga42 = BicaraWarga.boleh(player, npc); // DESIGN 42.5.1: every civilian talks (also tags a named character)
 		String tokoh = Tokoh.dari(npc);
-		boolean role38 = role.ordinal() >= NpcRole.PANGERAN_KOTA.ordinal();
+		boolean role38 = warga42 || role.ordinal() >= NpcRole.PANGERAN_KOTA.ordinal();
 		if (!role38 && tokoh.isEmpty()) {
 			return false;
 		}
@@ -151,7 +153,7 @@ public final class TempatDialog {
 		if (dialog != null) {
 			mulai(player, npc, dialog);
 		} else {
-			sapa(player, npc);
+			sapa(player, npc, warga42);
 		}
 		return true;
 	}
@@ -238,12 +240,15 @@ public final class TempatDialog {
 		}
 	}
 
-	private static void sapa(ServerPlayer player, KultivatorNpc npc) {
-		Component line = Kalimat.sapa(player, npc);
+	private static void sapa(ServerPlayer player, KultivatorNpc npc, boolean warga42) {
+		// a 42 resident opens its own talk (BicaraWarga.lembar speaks the engine's first line); the 38 greeting stays for the rest
+		Component line = warga42 ? Component.empty() : Kalimat.sapa(player, npc);
 		SESI.put(player.getUUID(), new Sesi(npc.getId(), SAPA, SAPA_MULAI, npc.town(), line));
-		Voice.say(npc, npc.voiceKey(npc.getRandom().nextBoolean() ? "greet" : "greet_alt"), null);
-		npc.say(line, 80);
-		gerak(npc, Kalimat.gestur(npc), 0);
+		if (!warga42) {
+			Voice.say(npc, npc.voiceKey(npc.getRandom().nextBoolean() ? "greet" : "greet_alt"), null);
+			npc.say(line, 80);
+			gerak(npc, Kalimat.gestur(npc), 0);
+		}
 		CompoundTag sheet = lembar(player, npc);
 		if (sheet != null) {
 			TempatLayar.buka(player, LembarKunci.Dialog.LAYAR, npc.getId(), sheet);
@@ -397,6 +402,10 @@ public final class TempatDialog {
 		if (!quests.isEmpty()) {
 			tag.put(LembarKunci.Dialog.QUEST, quests);
 		}
+		CompoundTag talk42 = SAPA.equals(sesi.dialog) ? BicaraWarga.lembar(player, npc) : null;
+		if (talk42 != null) {
+			tag.merge(talk42); // the 42 tablets over the greeting sheet (keeps the 38 services and quests)
+		}
 		return tag;
 	}
 
@@ -467,8 +476,7 @@ public final class TempatDialog {
 					JurnalCerita.petunjuk(player, quest);
 				}
 			}
-			default -> {
-			}
+			default -> BicaraWarga.aksi(player, npc, op); // the ops of the 42 tablets; the sheet refreshes after every action
 		}
 	}
 

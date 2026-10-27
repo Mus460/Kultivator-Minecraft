@@ -3,6 +3,7 @@ package dev.kultivator.client.sekte.gabung.ui.layar;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.sekte.gabung.ui.IkonGabung;
+import dev.kultivator.client.tempat.ui.kit.DaftarGulir;
 import dev.kultivator.client.tempat.ui.kit.LabelHarga;
 import dev.kultivator.client.tempat.ui.kit.Lembar;
 import dev.kultivator.client.tempat.ui.kit.Lukis;
@@ -30,6 +31,8 @@ public final class LayarPangkat extends LayarGabungDasar {
 
 	/** Grid place of every rank in ordinal order: column 0-7, row 0-1. */
 	private static final int[][] TEMPAT = {{0, 0}, {1, 0}, {2, 0}, {3, 0}, {4, 0}, {5, 0}, {5, 1}, {6, 1}, {7, 1}, {3, 1}};
+
+	private final DaftarGulir syaratGulir = new DaftarGulir();
 
 	public LayarPangkat(int npcId, CompoundTag lembar) {
 		super(PohonPangkat.LAYAR, npcId, lembar, t("pangkat.judul"), TempatWarna.Gaya.GIOK);
@@ -60,7 +63,7 @@ public final class LayarPangkat extends LayarGabungDasar {
 			return;
 		}
 		int pilih = lembar.i(PohonPangkat.PILIH, lembar.i(PohonPangkat.KINI, 0));
-		int bawahPohon = pohon(l, simpul, pilih, x0, y, x1);
+		int bawahPohon = pohon(l, simpul, pilih, x0, y, x1, y1);
 		y = bawahPohon + 2;
 		l.teks(lembar.teks(PohonPangkat.RINGKAS), x0, y, x1 - x0, gaya.teksLemah);
 		y += 10;
@@ -69,32 +72,44 @@ public final class LayarPangkat extends LayarGabungDasar {
 		int by = y1 - 16;
 		boolean dua = tata != Tata.SEMPIT;
 		int kiri1 = dua ? x0 + (x1 - x0) * 3 / 5 - 4 : x1;
-		// requirement lines
-		int sy = y;
-		for (Lembar s : lembar.daftar(LembarKunci.SYARAT)) {
-			int h = barisSyarat(l, s, x0, sy, kiri1, by - (dua ? 4 : 30));
-			if (h == 0) {
-				break;
-			}
-			sy += h;
-		}
-		// rights and cost
-		int hx0 = dua ? kiri1 + 8 : x0;
-		int hy = dua ? y : Math.max(sy + 2, by - 28);
-		PanelTempat.kartu(l.g, gaya, hx0, hy, x1, by - 3, 0.0F, false);
-		l.teks(t("pangkat.hak"), hx0 + 3, hy + 2, x1 - hx0 - 6, gaya.gelap() ? TempatWarna.EMAS_TERANG : gaya.aksen);
-		int ry = hy + 11;
-		for (Lembar h : lembar.daftar(PohonPangkat.HAK)) {
-			if (ry + 8 > by - 14) {
-				break;
-			}
-			l.teks(Component.literal("· ").append(h.teks(LembarKunci.TEKS)), hx0 + 3, ry, x1 - hx0 - 6, gaya.teks);
-			ry += 10;
-		}
+		List<Lembar> syarat = lembar.daftar(LembarKunci.SYARAT);
+		List<Lembar> hak = lembar.daftar(PohonPangkat.HAK);
 		int biaya = lembar.i(LembarKunci.BIAYA, 0);
-		if (biaya > 0) {
-			l.teks(t("pangkat.biaya"), hx0 + 3, by - 13, 40, gaya.teksSamar);
-			LabelHarga.pk(l, biaya, x1 - 3, by - 13, true, 1.0F, lembar.i(LembarKunci.PK, 0) >= biaya ? gaya.teks : TempatWarna.BAHAYA);
+		// rights and cost: a card beside the requirements, under them when the box is tall enough, else more rows of the list
+		boolean kartuHak = dua || by - 31 - y >= 40;
+		int listY1 = dua ? by - 4 : kartuHak ? by - 31 : by - 3;
+		int tambahan = kartuHak ? 0 : (biaya > 0 ? 1 : 0) + hak.size();
+		final int biayaRow = biaya;
+		syaratGulir.gambar(l, "syarat", x0, y, kiri1, listY1, syarat.size() + tambahan, 19, (lk, i, rx0, ry0, rx1, ry1, sorot, sel) -> {
+			if (i < syarat.size()) {
+				barisSyarat(lk, syarat.get(i), rx0 + 2, ry0 + 1, rx1 - 2, ry1);
+				return;
+			}
+			int j = i - syarat.size() - (biayaRow > 0 ? 1 : 0);
+			if (j < 0) {
+				lk.teks(t("pangkat.biaya"), rx0 + 2, ry0 + 5, 40, gaya.teksSamar);
+				LabelHarga.pk(lk, biayaRow, rx1 - 3, ry0 + 5, true, 1.0F, lembar.i(LembarKunci.PK, 0) >= biayaRow ? gaya.teks : TempatWarna.BAHAYA);
+			} else {
+				lk.teks(Component.literal("· ").append(hak.get(j).teks(LembarKunci.TEKS)), rx0 + 2, ry0 + 5, rx1 - rx0 - 6, gaya.teks);
+			}
+		}, null, null);
+		if (kartuHak) {
+			int hx0 = dua ? kiri1 + 8 : x0;
+			int hy = dua ? y : by - 29;
+			PanelTempat.kartu(l.g, gaya, hx0, hy, x1, by - 3, 0.0F, false);
+			l.teks(t("pangkat.hak"), hx0 + 3, hy + 2, x1 - hx0 - 6, gaya.gelap() ? TempatWarna.EMAS_TERANG : gaya.aksen);
+			int ry = hy + 11;
+			for (Lembar h : hak) {
+				if (ry + 8 > by - 14) {
+					break;
+				}
+				l.teks(Component.literal("· ").append(h.teks(LembarKunci.TEKS)), hx0 + 3, ry, x1 - hx0 - 6, gaya.teks);
+				ry += 10;
+			}
+			if (biaya > 0) {
+				l.teks(t("pangkat.biaya"), hx0 + 3, by - 13, 40, gaya.teksSamar);
+				LabelHarga.pk(l, biaya, x1 - 3, by - 13, true, 1.0F, lembar.i(LembarKunci.PK, 0) >= biaya ? gaya.teks : TempatWarna.BAHAYA);
+			}
 		}
 		// buttons: apply, then the challengeable seat holders
 		int bw = Math.min(130, (x1 - x0) / 2 - 2);
@@ -122,8 +137,10 @@ public final class LayarPangkat extends LayarGabungDasar {
 	}
 
 	/** Draws the tree; returns the y under it. */
-	private int pohon(Lukis l, List<Lembar> simpul, int pilih, int x0, int y0, int x1) {
-		int size = Math.max(14, Math.min(22, (x1 - x0 - 16) / 10));
+	private int pohon(Lukis l, List<Lembar> simpul, int pilih, int x0, int y0, int x1, int y1) {
+		// the tree takes at most ~45 % of a short box (GUI scale 4): 2 x size + 31 tall
+		int sizeTinggi = Math.max(12, (Math.round((y1 - y0) * 0.45F) - 31) / 2);
+		int size = Math.max(12, Math.min(22, Math.min((x1 - x0 - 16) / 10, sizeTinggi)));
 		float step = (x1 - x0 - 12 - size) / 7.0F;
 		int baris2 = size + 15;
 		int[] cx = new int[simpul.size()];

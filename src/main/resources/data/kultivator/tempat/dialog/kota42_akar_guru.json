@@ -1,0 +1,48 @@
+{
+  "pembicara": [
+    "tokoh:guru_zhou"
+  ],
+  "prioritas": 40,
+  "syarat": [
+    "quest kota42_akar_langit baru",
+    "hari 5"
+  ],
+  "sekali": true,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "mengajar",
+      "prop": "kitab",
+      "suara": "kota42.guru_panggil",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai kota42_akar_langit"
+          ],
+          "ke": "pesan"
+        },
+        {
+          "ke": "kenapa"
+        }
+      ]
+    },
+    {
+      "id": "kenapa",
+      "gestur": "bicara_tangan",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai kota42_akar_langit"
+          ],
+          "ke": "pesan"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "pesan",
+      "gestur": "hormat"
+    }
+  ]
+}

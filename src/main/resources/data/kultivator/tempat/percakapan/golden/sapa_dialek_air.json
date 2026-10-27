@@ -63,20 +63,23 @@
         }
       },
       "harap": {
-        "k": "kultivator.cakap.sapa.kenal.0",
+        "k": "kultivator.cakap.sapa.subuh.3.air",
         "a": [
           {
             "k": "kultivator.cakap.lex.tuan.air",
             "a": []
+          },
+          {
+            "t": ""
           }
         ]
       },
-      "aturan": "sapa.kenal",
+      "aturan": "sapa.subuh",
       "gestur": "lambai",
       "seru": null,
       "tik": null,
-      "id_id": "Oh, Kakak, datang lagi.",
-      "en_us": "Oh, Dear Sir, back again."
+      "id_id": "Pagi, Kakak... air kanal masih dingin sekali, ya...",
+      "en_us": "Morning, dear... the canal water is still so cold..."
     },
     {
       "ubah": {
@@ -100,7 +103,7 @@
         }
       },
       "harap": {
-        "k": "kultivator.cakap.sapa.pagi.0",
+        "k": "kultivator.cakap.sapa.sopan.pagi.0",
         "a": [
           {
             "k": "kultivator.cakap.lex.tuan.air",
@@ -108,12 +111,12 @@
           }
         ]
       },
-      "aturan": "sapa.pagi",
-      "gestur": "lambai",
+      "aturan": "sapa.sopan.pagi",
+      "gestur": "hormat",
       "seru": null,
       "tik": null,
-      "id_id": "Selamat pagi, Kakak!",
-      "en_us": "Good morning, Dear Sir!"
+      "id_id": "Selamat pagi, Kakak. Semoga hari Anda menyenangkan.",
+      "en_us": "Good morning, Dear Sir. May your day be pleasant."
     },
     {
       "ubah": {
@@ -137,20 +140,15 @@
         }
       },
       "harap": {
-        "k": "kultivator.cakap.sapa.dialek.air.1",
-        "a": [
-          {
-            "k": "kultivator.cakap.lex.tuan.air",
-            "a": []
-          }
-        ]
+        "k": "kultivator.cakap.sapa.dialek.air.0",
+        "a": []
       },
       "aturan": "sapa.dialek.air",
       "gestur": "lambai",
       "seru": null,
       "tik": null,
-      "id_id": "Halo, Kakak... airnya jernih hari ini, ya...",
-      "en_us": "Hello, Dear Sir... the water's so clear today..."
+      "id_id": "Kakak... selamat datang, ya. Mau naik perahu?",
+      "en_us": "Welcome, dear... want a boat ride?"
     },
     {
       "ubah": {
@@ -180,15 +178,20 @@
         }
       },
       "harap": {
-        "k": "kultivator.cakap.sapa.dialek.air.0",
-        "a": []
+        "k": "kultivator.cakap.sapa.dialek.air.1",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.nona.air",
+            "a": []
+          }
+        ]
       },
       "aturan": "sapa.dialek.air",
       "gestur": "lambai",
       "seru": null,
       "tik": null,
-      "id_id": "Kakak... selamat datang, ya. Mau naik perahu?",
-      "en_us": "Welcome, dear... want a boat ride?"
+      "id_id": "Halo, Kakak... airnya jernih hari ini, ya...",
+      "en_us": "Hello, Dear Miss... the water's so clear today..."
     }
   ]
 }

@@ -1,0 +1,19 @@
+{
+  "pembicara": [
+    "tokoh:bibi_li"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest kota42_seribu_jari tahap telusur"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "366",
+      "akibat": [
+        "peristiwa tanda kota42.telusur.kota42_seribu_jari"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "pembicara": [
+    "tokoh:wu_niangzi"
+  ],
+  "prioritas": 5,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "hormat",
+      "pilihan": [
+        {
+          "syarat": [
+            "quest kota42_utang_tiga_generasi baru"
+          ],
+          "akibat": [
+            "quest_mulai kota42_utang_tiga_generasi"
+          ]
+        },
+        {
+          "ke": "kotak"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kotak",
+      "gestur": "416",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

@@ -376,7 +376,7 @@ public final class Meditation {
 	 */
 	public static double gainPerSecond(ServerPlayer player, CultivationData data) {
 		double density = SpiritVeins.density(player.level(), player.blockPosition());
-		return baseRate(data.rank()) * Math.min(MULTIPLIER_CAP, innerMultiplier(player, data)) * sectFactor(player)
+		return baseRate(data.rank()) * Math.min(MULTIPLIER_CAP, innerMultiplier(player, data)) * sectFactor(player) * gainFactor(player)
 				* Math.max(DENSITY_FLOOR, Math.min(DENSITY_XP_CAP, density))
 				* dev.kultivator.sect.Sects.meditationBonus(player) * (1.0D + SECLUSION_BONUS * seclusionStacks(player));
 	}
@@ -411,6 +411,22 @@ public final class Meditation {
 	private static final List<ToDoubleFunction<ServerPlayer>> DRAIN_FACTOR = new ArrayList<>();
 	/** A sect formation never lowers the vein drain below this share. */
 	public static final double SECT_DRAIN_FLOOR = 0.7D;
+
+	private static final List<ToDoubleFunction<ServerPlayer>> GAIN_FACTOR = new ArrayList<>();
+
+	/** A flat multiplier on the meditation gain (product of all providers, 1 = none; 41.6.11 Gua Renungan x0.8). */
+	public static void addGainFactor(ToDoubleFunction<ServerPlayer> provider) {
+		GAIN_FACTOR.add(provider);
+	}
+
+	/** The product of the {@link #addGainFactor} providers. */
+	public static double gainFactor(ServerPlayer player) {
+		double product = 1.0D;
+		for (ToDoubleFunction<ServerPlayer> provider : GAIN_FACTOR) {
+			product *= provider.applyAsDouble(player);
+		}
+		return product;
+	}
 
 	/** A sect gathering factor at the player's seat (product of all providers, 1 = none). */
 	public static void addGatheringProvider(ToDoubleFunction<ServerPlayer> provider) {

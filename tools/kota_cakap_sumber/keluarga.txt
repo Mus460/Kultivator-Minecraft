@@ -11,19 +11,21 @@ syarat: hubungan=pasangan
 lanjut: keluarga kerja
 gestur: bicara_tangan
 $pasangan: tipe=nama_warga dari=konteks.pasangan
-- [3] {$pasangan} sedang di rumah, memasak. Masakannya yang terbaik di gang ini. || {$pasangan} is at home cooking. Best cooking in this lane.
-  ~ kasar: {$pasangan}? Di rumah. Mengomel, mungkin. || {$pasangan}? At home. Nagging, probably.
-  ~ kuno: {$pasangan} adalah pendamping hidupku. Tanpanya, rumah ini hanya dinding. || {$pasangan} is my life's companion. Without them this house is only walls.
-  ~ l: Istriku, {$pasangan}, galak tapi baik hati. Kalau aku pulang larut, piring melayang. Hehe. || My wife, {$pasangan}, is fierce but kind. Come home late and plates fly. Heh.
-  ~ p: Suamiku, {$pasangan}, pendiam. Tapi setiap pagi dia menyiapkan air hangat untukku. || My husband, {$pasangan}, is quiet. But every morning he readies warm water for me.
-- [2] Sudah dua puluh tahun aku bersama {$pasangan}. Masih saja dia membuatku tertawa. || Twenty years with {$pasangan}. They still make me laugh.
-  ~ kampung: Aku sama {$pasangan} dijodohkan orang tua, Nak. Awalnya malu-malu, sekarang tak terpisah. || {$pasangan} and I were matched by our parents, child. Shy at first, inseparable now.
-  ~ pelabuhan: {$pasangan} menunggu di dermaga setiap aku pulang melaut, Bung. Setiap kali. || {$pasangan} waits on the dock every time I come home from sea, mate. Every time.
-  ~ air: {$pasangan} suka mendayung perahu bersamaku di malam hari... kanal jadi milik kami berdua... || {$pasangan} loves rowing with me at night... the canal belongs to just us two...
-- {$pasangan} menyuruhku membeli garam, tapi aku malah mengobrol di sini. Jangan bilang, ya. || {$pasangan} sent me for salt, but here I am chatting. Don't tell.
-  ~ p: {$pasangan} menungguku pulang, tapi biarlah sebentar. Laki-laki juga perlu menunggu. Hihi. || {$pasangan} is waiting for me, but let him wait a bit. Men need practice waiting too. Hehe.
-- Kami bertengkar kemarin soal hal kecil. Sudah baikan, tapi aku masih malu. || We quarrelled yesterday over a small thing. Made up, but I'm still embarrassed.
-- Kalau ditanya rahasia rumah tangga awet: makan bersama setiap malam, apa pun yang terjadi. || If you ask the secret of a lasting marriage: eat together every night, whatever happens.
+$awal: aturan=awal.kabar opsional=0.35
+$ekor: aturan=ekor.kabar opsional=0.4
+- [3] {$awal}{$pasangan} sedang di rumah, memasak. Masakannya yang terbaik di gang ini.{$ekor} || {$awal}{$pasangan} is at home cooking. Best cooking in this lane.{$ekor}
+  ~ kasar: {$awal}{$pasangan}? Di rumah. Mengomel, mungkin.{$ekor} || {$awal}{$pasangan}? At home. Nagging, probably.{$ekor}
+  ~ kuno: {$awal}{$pasangan} adalah pendamping hidupku. Tanpanya, rumah ini hanya dinding.{$ekor} || {$awal}{$pasangan} is my life's companion. Without them this house is only walls.{$ekor}
+  ~ l: {$awal}Istriku, {$pasangan}, galak tapi baik hati. Kalau aku pulang larut, piring melayang. Hehe.{$ekor} || {$awal}My wife, {$pasangan}, is fierce but kind. Come home late and plates fly. Heh.{$ekor}
+  ~ p: {$awal}Suamiku, {$pasangan}, pendiam. Tapi setiap pagi dia menyiapkan air hangat untukku.{$ekor} || {$awal}My husband, {$pasangan}, is quiet. But every morning he readies warm water for me.{$ekor}
+- [2] {$awal}Sudah dua puluh tahun aku bersama {$pasangan}. Masih saja dia membuatku tertawa.{$ekor} || {$awal}Twenty years with {$pasangan}. They still make me laugh.{$ekor}
+  ~ kampung: {$awal}Aku sama {$pasangan} dijodohkan orang tua, Nak. Awalnya malu-malu, sekarang tak terpisah.{$ekor} || {$awal}{$pasangan} and I were matched by our parents, child. Shy at first, inseparable now.{$ekor}
+  ~ pelabuhan: {$awal}{$pasangan} menunggu di dermaga setiap aku pulang melaut, Bung. Setiap kali.{$ekor} || {$awal}{$pasangan} waits on the dock every time I come home from sea, mate. Every time.{$ekor}
+  ~ air: {$awal}{$pasangan} suka mendayung perahu bersamaku di malam hari... kanal jadi milik kami berdua...{$ekor} || {$awal}{$pasangan} loves rowing with me at night... the canal belongs to just us two...{$ekor}
+- {$awal}{$pasangan} menyuruhku membeli garam, tapi aku malah mengobrol di sini. Jangan bilang, ya.{$ekor} || {$awal}{$pasangan} sent me for salt, but here I am chatting. Don't tell.{$ekor}
+  ~ p: {$awal}{$pasangan} menungguku pulang, tapi biarlah sebentar. Laki-laki juga perlu menunggu. Hihi.{$ekor} || {$awal}{$pasangan} is waiting for me, but let him wait a bit. Men need practice waiting too. Hehe.{$ekor}
+- {$awal}Kami bertengkar kemarin soal hal kecil. Sudah baikan, tapi aku masih malu.{$ekor} || {$awal}We quarrelled yesterday over a small thing. Made up, but I'm still embarrassed.{$ekor}
+- {$awal}Kalau ditanya rahasia rumah tangga awet: makan bersama setiap malam, apa pun yang terjadi.{$ekor} || {$awal}If you ask the secret of a lasting marriage: eat together every night, whatever happens.{$ekor}
 
 == keluarga.anak
 niat: BERI_KABAR
@@ -33,17 +35,19 @@ lanjut: keluarga sekte
 gestur: tertawa
 $anak: tipe=nama_warga dari=konteks.anak
 $sebutan: tipe=sebutan_pendengar dari=pendengar
-- [3] {$anak} sudah mulai belajar membaca. Kemarin dia membaca papan toko sendirian! || {$anak} has started learning to read. Yesterday they read a shop sign all alone!
-  ~ kasar: {$anak} nakal sekali. Tapi pintar. Mirip aku. || {$anak} is a terror. But clever. Takes after me.
-  ~ kuno: Buah hatiku, {$anak}, rajin belajar. Semoga kelak berguna bagi kota. || My child, {$anak}, studies diligently. May they serve the town someday.
-  ~ kampung: {$anak} sudah bisa bantu angon kambing, Nak. Bangga aku. || {$anak} can herd the goats now, child. I'm proud.
-- [2] {$anak} ingin jadi kultivator. Setiap hari mengayun-ayunkan tongkat seperti pedang. || {$anak} wants to be a cultivator. Swings a stick like a sword every day.
-  ~ pelabuhan: {$anak} sudah bisa berenang lebih jauh dariku, Bung! Anak laut sejati. || {$anak} swims further than me now, mate! A true child of the sea.
-  ~ p: {$anak} menolong aku memasak tadi pagi. Bubur gosong, tapi niatnya manis. || {$anak} helped me cook this morning. The porridge burned, but the thought was sweet.
-- {$anak} sakit perut kemarin, makan jambu mentah tiga buah. Sudah kubilang! || {$anak} had a bellyache yesterday; ate three green guavas. I told them!
-- Kalau ada kultivator yang mau menguji akar roh {$anak}, aku rela membayar. || If any cultivator would test {$anak}'s spirit roots, I'd gladly pay.
-  ~ kuno: Bila {$sebutan} berkenan memeriksa akar roh {$anak}, hamba akan sangat berterima kasih. || If you would deign to examine {$anak}'s spirit roots, {$sebutan}, I'd be most grateful.
-- Waktu cepat sekali. Kemarin {$anak} masih digendong, sekarang sudah lari ke mana-mana. || Time flies. Yesterday {$anak} was in arms, now running everywhere.
+$awal: aturan=awal.kabar opsional=0.35
+$ekor: aturan=ekor.kabar opsional=0.4
+- [3] {$awal}{$anak} sudah mulai belajar membaca. Kemarin dia membaca papan toko sendirian!{$ekor} || {$awal}{$anak} has started learning to read. Yesterday they read a shop sign all alone!{$ekor}
+  ~ kasar: {$awal}{$anak} nakal sekali. Tapi pintar. Mirip aku.{$ekor} || {$awal}{$anak} is a terror. But clever. Takes after me.{$ekor}
+  ~ kuno: {$awal}Buah hatiku, {$anak}, rajin belajar. Semoga kelak berguna bagi kota.{$ekor} || {$awal}My child, {$anak}, studies diligently. May they serve the town someday.{$ekor}
+  ~ kampung: {$awal}{$anak} sudah bisa bantu angon kambing, Nak. Bangga aku.{$ekor} || {$awal}{$anak} can herd the goats now, child. I'm proud.{$ekor}
+- [2] {$awal}{$anak} ingin jadi kultivator. Setiap hari mengayun-ayunkan tongkat seperti pedang.{$ekor} || {$awal}{$anak} wants to be a cultivator. Swings a stick like a sword every day.{$ekor}
+  ~ pelabuhan: {$awal}{$anak} sudah bisa berenang lebih jauh dariku, Bung! Anak laut sejati.{$ekor} || {$awal}{$anak} swims further than me now, mate! A true child of the sea.{$ekor}
+  ~ p: {$awal}{$anak} menolong aku memasak tadi pagi. Bubur gosong, tapi niatnya manis.{$ekor} || {$awal}{$anak} helped me cook this morning. The porridge burned, but the thought was sweet.{$ekor}
+- {$awal}{$anak} sakit perut kemarin, makan jambu mentah tiga buah. Sudah kubilang!{$ekor} || {$awal}{$anak} had a bellyache yesterday; ate three green guavas. I told them!{$ekor}
+- {$awal}Kalau ada kultivator yang mau menguji akar roh {$anak}, aku rela membayar.{$ekor} || {$awal}If any cultivator would test {$anak}'s spirit roots, I'd gladly pay.{$ekor}
+  ~ kuno: {$awal}Bila {$sebutan} berkenan memeriksa akar roh {$anak}, hamba akan sangat berterima kasih.{$ekor} || {$awal}If you would deign to examine {$anak}'s spirit roots, {$sebutan}, I'd be most grateful.{$ekor}
+- {$awal}Waktu cepat sekali. Kemarin {$anak} masih digendong, sekarang sudah lari ke mana-mana.{$ekor} || {$awal}Time flies. Yesterday {$anak} was in arms, now running everywhere.{$ekor}
 
 == keluarga.cucu
 niat: PAMER
@@ -88,15 +92,17 @@ syarat: hubungan=kekasih
 lanjut: asmara
 gestur: bisik
 $kekasih: tipe=nama_warga dari=konteks.kekasih
-- [3] Jangan bilang siapa-siapa... aku dan {$kekasih} sering bertemu di jembatan. || Don't tell anyone... {$kekasih} and I often meet on the bridge.
+$awal: aturan=awal.kabar opsional=0.35
+$ekor: aturan=ekor.kabar opsional=0.4
+- [3] {$awal}Jangan bilang siapa-siapa... aku dan {$kekasih} sering bertemu di jembatan.{$ekor} || {$awal}Don't tell anyone... {$kekasih} and I often meet on the bridge.{$ekor}
   ~ kasar: Ya, aku dan {$kekasih}. Kenapa? Ada masalah? || Yes, {$kekasih} and me. So? Got a problem?
-  ~ kuno: Hatiku dan hati {$kekasih} telah saling menemukan. Tinggal menunggu restu keluarga. || My heart and {$kekasih}'s have found each other. Only the families' blessing remains.
-  ~ air: {$kekasih} menulis puisi di daun teratai untukku, Kakak... lalu menghanyutkannya ke perahuku... || {$kekasih} writes poems on lotus leaves for me, dear... then floats them to my boat...
-- [2] {$kekasih} memberiku ini kemarin. Cantik, kan? Hihi. || {$kekasih} gave me this yesterday. Pretty, isn't it? Hehe.
-  ~ l: {$kekasih} menjahitkan kantong uang ini untukku. Jahitannya miring, tapi aku suka. || {$kekasih} sewed this purse for me. The stitches are crooked, but I love it.
-  ~ kampung: {$kekasih} kirim jambu lewat adiknya tiap sore. Ibu sudah curiga, Nak. || {$kekasih} sends guavas through their little sibling every evening. Mother suspects, child.
-- Orang tua {$kekasih} belum tahu. Aku takut mereka tidak setuju. || {$kekasih}'s parents don't know yet. I'm afraid they won't approve.
-- Kalau sudah cukup tabungan, aku akan melamar {$kekasih}. Sedikit lagi. || When I've saved enough I'll propose to {$kekasih}. A little more.
+  ~ kuno: {$awal}Hatiku dan hati {$kekasih} telah saling menemukan. Tinggal menunggu restu keluarga.{$ekor} || {$awal}My heart and {$kekasih}'s have found each other. Only the families' blessing remains.{$ekor}
+  ~ air: {$awal}{$kekasih} menulis puisi di daun teratai untukku, Kakak... lalu menghanyutkannya ke perahuku...{$ekor} || {$awal}{$kekasih} writes poems on lotus leaves for me, dear... then floats them to my boat...{$ekor}
+- [2] {$awal}{$kekasih} memberiku ini kemarin. Cantik, kan? Hihi.{$ekor} || {$awal}{$kekasih} gave me this yesterday. Pretty, isn't it? Hehe.{$ekor}
+  ~ l: {$awal}{$kekasih} menjahitkan kantong uang ini untukku. Jahitannya miring, tapi aku suka.{$ekor} || {$awal}{$kekasih} sewed this purse for me. The stitches are crooked, but I love it.{$ekor}
+  ~ kampung: {$awal}{$kekasih} kirim jambu lewat adiknya tiap sore. Ibu sudah curiga, Nak.{$ekor} || {$awal}{$kekasih} sends guavas through their little sibling every evening. Mother suspects, child.{$ekor}
+- {$awal}Orang tua {$kekasih} belum tahu. Aku takut mereka tidak setuju.{$ekor} || {$awal}{$kekasih}'s parents don't know yet. I'm afraid they won't approve.{$ekor}
+- {$awal}Kalau sudah cukup tabungan, aku akan melamar {$kekasih}. Sedikit lagi.{$ekor} || {$awal}When I've saved enough I'll propose to {$kekasih}. A little more.{$ekor}
 
 == keluarga.sahabat
 niat: BERI_KABAR
@@ -105,14 +111,16 @@ syarat: hubungan=sahabat
 lanjut: tetangga
 gestur: tertawa
 $sahabat: tipe=nama_warga dari=konteks.sahabat
-- [3] {$sahabat} dan aku sudah berteman sejak kecil. Dulu kami mencuri jambu bersama. Hehe. || {$sahabat} and I have been friends since childhood. We used to steal guavas together. Heh.
-  ~ kasar: {$sahabat}? Satu-satunya orang di kota ini yang tidak menyebalkan. || {$sahabat}? The only person in this town who isn't irritating.
-  ~ kuno: Persahabatanku dengan {$sahabat} lebih kokoh dari batu gunung. || My friendship with {$sahabat} is firmer than mountain stone.
-  ~ pelabuhan: {$sahabat} pernah menarikku dari laut waktu badai, Bung. Saudara lebih dari darah. || {$sahabat} once pulled me from the sea in a storm, mate. More than blood kin.
-- [2] Nanti malam aku minum teh dengan {$sahabat}. Kalau mau, ikut saja. || Tonight I'm having tea with {$sahabat}. Come along if you like.
-  ~ p: Nanti sore aku menjahit bersama {$sahabat}. Sambil bergosip, tentu. Hihi. || This afternoon I'm sewing with {$sahabat}. And gossiping, of course. Hehe.
-- {$sahabat} tahu semua rahasiaku. Kalau dia mau, aku sudah hancur. Untung dia baik. || {$sahabat} knows all my secrets. If they wished, I'd be ruined. Luckily they're kind.
-- Kalau aku sakit, {$sahabat} yang pertama datang. Selalu begitu. || When I fall ill, {$sahabat} is the first to come. Always.
+$awal: aturan=awal.kabar opsional=0.35
+$ekor: aturan=ekor.kabar opsional=0.4
+- [3] {$awal}{$sahabat} dan aku sudah berteman sejak kecil. Dulu kami mencuri jambu bersama. Hehe.{$ekor} || {$awal}{$sahabat} and I have been friends since childhood. We used to steal guavas together. Heh.{$ekor}
+  ~ kasar: {$awal}{$sahabat}? Satu-satunya orang di kota ini yang tidak menyebalkan.{$ekor} || {$awal}{$sahabat}? The only person in this town who isn't irritating.{$ekor}
+  ~ kuno: {$awal}Persahabatanku dengan {$sahabat} lebih kokoh dari batu gunung.{$ekor} || {$awal}My friendship with {$sahabat} is firmer than mountain stone.{$ekor}
+  ~ pelabuhan: {$awal}{$sahabat} pernah menarikku dari laut waktu badai, Bung. Saudara lebih dari darah.{$ekor} || {$awal}{$sahabat} once pulled me from the sea in a storm, mate. More than blood kin.{$ekor}
+- [2] {$awal}Nanti malam aku minum teh dengan {$sahabat}. Kalau mau, ikut saja.{$ekor} || {$awal}Tonight I'm having tea with {$sahabat}. Come along if you like.{$ekor}
+  ~ p: {$awal}Nanti sore aku menjahit bersama {$sahabat}. Sambil bergosip, tentu. Hihi.{$ekor} || {$awal}This afternoon I'm sewing with {$sahabat}. And gossiping, of course. Hehe.{$ekor}
+- {$awal}{$sahabat} tahu semua rahasiaku. Kalau dia mau, aku sudah hancur. Untung dia baik.{$ekor} || {$awal}{$sahabat} knows all my secrets. If they wished, I'd be ruined. Luckily they're kind.{$ekor}
+- {$awal}Kalau aku sakit, {$sahabat} yang pertama datang. Selalu begitu.{$ekor} || {$awal}When I fall ill, {$sahabat} is the first to come. Always.{$ekor}
 
 == keluarga.musuh
 niat: BERI_KABAR
@@ -122,14 +130,16 @@ lanjut: tetangga
 gestur: marah_tunjuk
 $musuh: tipe=nama_warga dari=konteks.musuh
 $keluh: aturan=seru.keluh opsional=0.5
-- [3] Lihat itu, {$musuh} lewat. Ayamku hilang sejak dia pindah ke sebelah. || Look, {$musuh} is passing. My chickens went missing since they moved next door.
-  ~ kasar: {$musuh}. Cih. Kalau dia mati besok, aku pesta. || {$musuh}. Tch. If they died tomorrow, I'd throw a party.
-  ~ kuno: Antara aku dan {$musuh} ada ganjalan lama. Lebih baik tidak dibahas. || Between {$musuh} and me lies an old grievance. Better not discussed.
-  ~ kampung: Itu si {$musuh}. Dulu dia geser pematang sawahku. Sampai sekarang tidak minta maaf. || That's {$musuh}. Moved my paddy bund once. Still hasn't apologised.
-- [2] Jangan beli dari {$musuh}. Timbangannya curang. Aku tidak bohong. || Don't buy from {$musuh}. The scales cheat. I'm not lying.
-  ~ iblis: {$musuh} punya utang darah denganku. Kalau kau melihatnya terluka di gang, jangan tolong. || {$musuh} owes me a blood debt. If you see them hurt in an alley, don't help.
-- Setiap aku membuka lapak, {$musuh} membuka lapak di seberang. Sengaja! || Every time I open my stall, {$musuh} opens one opposite. On purpose!
-- Dulu kami berteman, aku dan {$musuh}. Lalu uang datang di antara kami. {$keluh} || {$musuh} and I were friends once. Then money came between us. {$keluh}
+$awal: aturan=awal.kabar opsional=0.35
+$ekor: aturan=ekor.kabar opsional=0.4
+- [3] {$awal}Lihat itu, {$musuh} lewat. Ayamku hilang sejak dia pindah ke sebelah.{$ekor} || {$awal}Look, {$musuh} is passing. My chickens went missing since they moved next door.{$ekor}
+  ~ kasar: {$awal}{$musuh}. Cih. Kalau dia mati besok, aku pesta.{$ekor} || {$awal}{$musuh}. Tch. If they died tomorrow, I'd throw a party.{$ekor}
+  ~ kuno: {$awal}Antara aku dan {$musuh} ada ganjalan lama. Lebih baik tidak dibahas.{$ekor} || {$awal}Between {$musuh} and me lies an old grievance. Better not discussed.{$ekor}
+  ~ kampung: {$awal}Itu si {$musuh}. Dulu dia geser pematang sawahku. Sampai sekarang tidak minta maaf.{$ekor} || {$awal}That's {$musuh}. Moved my paddy bund once. Still hasn't apologised.{$ekor}
+- [2] {$awal}Jangan beli dari {$musuh}. Timbangannya curang. Aku tidak bohong.{$ekor} || {$awal}Don't buy from {$musuh}. The scales cheat. I'm not lying.{$ekor}
+  ~ iblis: {$awal}{$musuh} punya utang darah denganku. Kalau kau melihatnya terluka di gang, jangan tolong.{$ekor} || {$awal}{$musuh} owes me a blood debt. If you see them hurt in an alley, don't help.{$ekor}
+- {$awal}Setiap aku membuka lapak, {$musuh} membuka lapak di seberang. Sengaja!{$ekor} || {$awal}Every time I open my stall, {$musuh} opens one opposite. On purpose!{$ekor}
+- {$awal}Dulu kami berteman, aku dan {$musuh}. Lalu uang datang di antara kami. {$keluh} || {$awal}{$musuh} and I were friends once. Then money came between us. {$keluh}
 
 == keluarga.guru
 niat: BERI_KABAR
@@ -139,14 +149,16 @@ lanjut: kerja
 gestur: hormat
 $guru: tipe=nama_warga dari=konteks.guru
 $murid: tipe=nama_warga dari=konteks.murid
-- [3] Guruku, {$guru}, keras sekali. Tapi semua yang kubisa, dia yang mengajarkan. || My master, {$guru}, is very strict. But all I know, they taught me.
-  ~ kasar: {$guru} galak. Tanganku sudah biru dipukul rotan. Tapi aku jadi bisa. || {$guru} is harsh. My hands are bruised from the cane. But I learned.
-  ~ kuno: Budi guruku, {$guru}, setinggi gunung dan sedalam lautan. || The kindness of my master, {$guru}, is high as mountains and deep as seas.
-- [2] Muridku, {$murid}, berbakat. Sebentar lagi dia melampauiku. Dan itu membuatku bangga. || My pupil, {$murid}, is gifted. Soon they'll surpass me. And that makes me proud.
-  ~ kasar: {$murid} lambat. Tapi tidak pernah menyerah. Itu cukup. || {$murid} is slow. But never gives up. That's enough.
-  ~ pelabuhan: {$murid} sudah bisa membaca bintang, Bung. Tahun depan dia pegang kemudi. || {$murid} can read the stars now, mate. Next year they take the helm.
-- {$guru} bilang aku harus mengulang dari awal. Tiga tahun! Tapi dia benar. || {$guru} says I must start again from scratch. Three years! But they're right.
-- Mengajar {$murid} membuatku ingat waktu aku sendiri masih bodoh. Hehe. || Teaching {$murid} reminds me of when I was a fool myself. Heh.
+$awal: aturan=awal.kabar opsional=0.35
+$ekor: aturan=ekor.kabar opsional=0.4
+- [3] {$awal}Guruku, {$guru}, keras sekali. Tapi semua yang kubisa, dia yang mengajarkan.{$ekor} || {$awal}My master, {$guru}, is very strict. But all I know, they taught me.{$ekor}
+  ~ kasar: {$awal}{$guru} galak. Tanganku sudah biru dipukul rotan. Tapi aku jadi bisa.{$ekor} || {$awal}{$guru} is harsh. My hands are bruised from the cane. But I learned.{$ekor}
+  ~ kuno: {$awal}Budi guruku, {$guru}, setinggi gunung dan sedalam lautan.{$ekor} || {$awal}The kindness of my master, {$guru}, is high as mountains and deep as seas.{$ekor}
+- [2] {$awal}Muridku, {$murid}, berbakat. Sebentar lagi dia melampauiku. Dan itu membuatku bangga.{$ekor} || {$awal}My pupil, {$murid}, is gifted. Soon they'll surpass me. And that makes me proud.{$ekor}
+  ~ kasar: {$awal}{$murid} lambat. Tapi tidak pernah menyerah. Itu cukup.{$ekor} || {$awal}{$murid} is slow. But never gives up. That's enough.{$ekor}
+  ~ pelabuhan: {$awal}{$murid} sudah bisa membaca bintang, Bung. Tahun depan dia pegang kemudi.{$ekor} || {$awal}{$murid} can read the stars now, mate. Next year they take the helm.{$ekor}
+- {$awal}{$guru} bilang aku harus mengulang dari awal. Tiga tahun! Tapi dia benar.{$ekor} || {$awal}{$guru} says I must start again from scratch. Three years! But they're right.{$ekor}
+- {$awal}Mengajar {$murid} membuatku ingat waktu aku sendiri masih bodoh. Hehe.{$ekor} || {$awal}Teaching {$murid} reminds me of when I was a fool myself. Heh.{$ekor}
 
 == cita.anak
 niat: CERITA

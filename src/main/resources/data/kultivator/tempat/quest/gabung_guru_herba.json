@@ -21,7 +21,34 @@
       ]
     },
     {
-      "id": "pulang",
+      "id": "temuan",
+      "tujuan": [
+        "gabung pilih:guru_herba"
+      ],
+      "akibat_masuk": [
+        "gabung.cerita guru_herba temuan shifu",
+        "gabung.pilihan guru_herba temuan semua sisakan tunas"
+      ],
+      "cabang": [
+        {
+          "syarat": [
+            "bendera gabung.guru_herba.sisakan"
+          ],
+          "ke": "pulang_sisa"
+        },
+        {
+          "syarat": [
+            "bendera gabung.guru_herba.tunas"
+          ],
+          "ke": "pulang_tunas"
+        }
+      ],
+      "ke": "pulang_semua",
+      "batas_hari": 3,
+      "gagal_ke": "pulang_semua"
+    },
+    {
+      "id": "pulang_semua",
       "tujuan": [
         "gabung temu:shifu"
       ],
@@ -29,10 +56,47 @@
         "gabung.cerita guru_herba pulang"
       ],
       "akibat": [
-        "gabung.cerita guru_herba selesai shifu",
-        "gabung.ikatan 15",
-        "gabung.sikap shifu 10",
+        "gabung.cerita guru_herba selesai_semua shifu",
+        "gabung.ikatan 8",
+        "gabung.sikap shifu -5",
+        "gabung.pk 90"
+      ],
+      "ke": "selesai",
+      "arah": "sekte/kompleks"
+    },
+    {
+      "id": "pulang_sisa",
+      "tujuan": [
+        "gabung temu:shifu"
+      ],
+      "akibat_masuk": [
+        "gabung.cerita guru_herba pulang"
+      ],
+      "akibat": [
+        "gabung.cerita guru_herba selesai_sisa shifu",
+        "gabung.ikatan 22",
+        "gabung.sikap shifu 15",
         "gabung.pk 60"
+      ],
+      "ke": "selesai",
+      "arah": "sekte/kompleks"
+    },
+    {
+      "id": "pulang_tunas",
+      "tujuan": [
+        "gabung temu:shifu"
+      ],
+      "akibat_masuk": [
+        "gabung.cerita guru_herba pulang"
+      ],
+      "akibat": [
+        "gabung.cerita guru_herba selesai_tunas shifu",
+        "gabung.ikatan 12",
+        "gabung.sikap shifu 8",
+        "gabung.sikap obat 12",
+        "gabung.sumber 5",
+        "gabung.kabar gabung_tunas_naga",
+        "gabung.pk 70"
       ],
       "ke": "selesai",
       "arah": "sekte/kompleks"

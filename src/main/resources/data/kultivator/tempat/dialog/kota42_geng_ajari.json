@@ -1,0 +1,31 @@
+{
+  "pembicara": [
+    "tokoh:xiao_bang"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest kota42_lentera_lao_geng tahap ajari"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "383",
+      "prop": "191",
+      "suara": "kota42.ronda_geng4",
+      "pilihan": [
+        {
+          "ke": "coba"
+        }
+      ]
+    },
+    {
+      "id": "coba",
+      "gestur": "tertawa",
+      "suara": "kota42.xiao_bang",
+      "akibat": [
+        "peristiwa tanda kota42.irama_ronda"
+      ]
+    }
+  ]
+}

@@ -31,6 +31,7 @@ import java.util.List;
 public final class LayarLamaran extends LayarGabungDasar {
 
 	private final DaftarGulir syaratGulir = new DaftarGulir();
+	private final DaftarGulir tokenGulir = new DaftarGulir();
 
 	public LayarLamaran(int npcId, CompoundTag lembar) {
 		super(Lamaran.LAYAR, npcId, lembar, t("lamaran.judul_bawaan"), TempatWarna.Gaya.KERTAS);
@@ -53,6 +54,8 @@ public final class LayarLamaran extends LayarGabungDasar {
 	@Override
 	protected void tabBerubah() {
 		syaratGulir.mulaiUlang(Util.getMillis());
+		tokenGulir.mulaiUlang(Util.getMillis());
+		halaman = 0;
 	}
 
 	private Lembar pintu() {
@@ -116,17 +119,23 @@ public final class LayarLamaran extends LayarGabungDasar {
 		PanelTempat.garis(l.g, gaya, x0, x1, y);
 		y += 4;
 		int by = y1 - 18;
-		// tab Token: the tokens of the bag on the right
+		// tab Token: the tokens of the bag on the right (a second page behind two chips in the narrow layout)
 		int sx1 = x1;
-		if (Lamaran.TAB_TOKEN.equals(tab) && tata != Tata.SEMPIT) {
+		boolean adaToken = Lamaran.TAB_TOKEN.equals(tab);
+		boolean halamanToken = false;
+		if (adaToken && tata == Tata.SEMPIT) {
+			y = bilahHalaman(l, x0, y, x1, t("lamaran.hal.syarat"), t("lamaran.hal.token"));
+			halamanToken = halaman == 1;
+		} else if (adaToken) {
 			sx1 = x0 + (x1 - x0) * 3 / 5;
 			token(l, sx1 + 6, y, x1, by - 4);
 		}
-		List<Lembar> syarat = p.daftar(LembarKunci.SYARAT);
 		int yMaks = by - 14;
-		final int fx1 = sx1;
-		syaratGulir.gambar(l, "syarat", x0, y, fx1, yMaks, syarat.size(), 19, (lk, i, rx0, ry0, rx1, ry1, sorot, pilih) ->
-				barisSyarat(lk, syarat.get(i), rx0 + 2, ry0 + 1, rx1 - 2, ry1), null, null);
+		if (halamanToken) {
+			token(l, x0, y, x1, yMaks);
+		} else {
+			daftarSyarat(l, syaratGulir, "syarat", p.daftar(LembarKunci.SYARAT), x0, y, sx1, yMaks);
+		}
 		// the application line
 		Lembar calon = lembar.sub(Lamaran.CALON);
 		Component status;
@@ -138,6 +147,10 @@ public final class LayarLamaran extends LayarGabungDasar {
 			warna = sini ? TempatWarna.OK : TempatWarna.PERINGATAN;
 		} else if (lembar.ada(Lamaran.JEDA)) {
 			status = t("lamaran.jeda", hariKe(lembar.l(Lamaran.JEDA, -1L), hariIni));
+			warna = TempatWarna.PERINGATAN;
+		} else if (!p.b(LembarKunci.BISA) && p.teksAtau(LembarKunci.ALASAN) != null) {
+			// the locked button's reason in plain sight (a disabled button is not a Tab stop)
+			status = p.teks(LembarKunci.ALASAN);
 			warna = TempatWarna.PERINGATAN;
 		} else {
 			status = t("lamaran.catatan_jeda");
@@ -169,7 +182,7 @@ public final class LayarLamaran extends LayarGabungDasar {
 		l.teks(catatan, x0 + bw + 8, by + 4, x1 - x0 - bw - 8 - (kw > 0 ? kw + 4 : 0), gaya.teksSamar, 1.0F);
 	}
 
-	/** The tokens in the bag, with whether this sect takes them. */
+	/** The tokens in the bag, with whether this sect takes them (a scrolled list: arrow keys reach every one). */
 	private void token(Lukis l, int x0, int y0, int x1, int y1) {
 		PanelTempat.kartu(l.g, gaya, x0, y0, x1, y1, 0.0F, false);
 		l.teks(t("lamaran.token.judul"), x0 + 4, y0 + 3, x1 - x0 - 8, gaya.gelap() ? TempatWarna.EMAS_TERANG : gaya.aksen, 1.0F);
@@ -179,20 +192,20 @@ public final class LayarLamaran extends LayarGabungDasar {
 			l.bungkus(t("lamaran.token.kosong"), x0 + 4, y, x1 - x0 - 8, gaya.teksSamar, 1.0F, y1 - y - 2);
 			return;
 		}
-		for (Lembar e : token) {
-			if (y + 18 > y1) {
-				break;
-			}
+		tokenGulir.gambar(l, "token", x0 + 1, y, x1 - 1, y1 - 1, token.size(), 20, (lk, i, rx0, ry0, rx1, ry1, sorot, pilih) -> {
+			Lembar e = token.get(i);
 			ItemStack stack = e.barang();
 			if (!stack.isEmpty()) {
-				l.g.item(stack, x0 + 3, y);
+				lk.g.item(stack, rx0 + 2, ry0);
 			}
 			boolean sah = e.b(Lamaran.SAH);
-			l.teks(e.teks(LembarKunci.NAMA), x0 + 22, y + 1, x1 - x0 - 36, gaya.teks, 1.0F);
-			IkonTempat.gambar(l.g, sah ? IkonTempat.CENTANG : IkonTempat.SILANG, x1 - 12, y + 1, 9, 0xFFFFFFFF);
+			lk.teks(e.teks(LembarKunci.NAMA), rx0 + 21, ry0 + 1, rx1 - rx0 - 35, gaya.teks, 1.0F);
+			IkonTempat.gambar(lk.g, sah ? IkonTempat.CENTANG : IkonTempat.SILANG, rx1 - 12, ry0 + 1, 9, 0xFFFFFFFF);
 			Component bawah = sah ? t("lamaran.token.sah") : e.teks(LembarKunci.ALASAN);
-			l.teks(bawah, x0 + 22, y + 10, x1 - x0 - 26, sah ? TempatWarna.OK : TempatWarna.BAHAYA, 1.0F);
-			y += 20;
-		}
+			lk.teks(bawah, rx0 + 21, ry0 + 10, rx1 - rx0 - 25, sah ? TempatWarna.OK : TempatWarna.BAHAYA, 1.0F);
+			if (lk.di(rx0, ry0, rx1, ry1) && !stack.isEmpty()) {
+				lk.tip(stack.getHoverName());
+			}
+		}, null, null);
 	}
 }

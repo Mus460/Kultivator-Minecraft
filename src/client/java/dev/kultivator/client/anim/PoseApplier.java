@@ -204,7 +204,7 @@ public final class PoseApplier {
 		}
 		float lift = pose.body(LIFT);
 		if (lift != 0.0F && Float.isFinite(lift)) {
-			poseStack.translate(0.0F, Mth.clamp(lift, -0.8F, 1.2F), 0.0F);
+			poseStack.translate(0.0F, Mth.clamp(lift, -0.8F, dev.kultivator.client.sosok.gerak.GerakApplier.LIFT_MAKS), 0.0F);
 		}
 	}
 

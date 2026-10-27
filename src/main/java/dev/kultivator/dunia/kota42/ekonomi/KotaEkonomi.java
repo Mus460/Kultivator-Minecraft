@@ -17,11 +17,13 @@ import dev.kultivator.dunia.kota42.api.KotaGerakId;
 import dev.kultivator.dunia.kota42.api.WargaApi;
 import dev.kultivator.dunia.kota42.warga.Warga;
 import dev.kultivator.dunia.tempat.TempatInfo;
+import dev.kultivator.dunia.tempat.ekonomi.Barang;
 import dev.kultivator.dunia.tempat.ekonomi.KasKota;
 import dev.kultivator.dunia.tempat.ekonomi.LapakSekte;
 import dev.kultivator.dunia.tempat.hidup.Kegiatan;
 import dev.kultivator.dunia.tempat.hidup.Pemanggil;
 import dev.kultivator.dunia.tempat.hidup.TempatHuni;
+import dev.kultivator.dunia.tempat.tema.bersama.Dagang;
 import dev.kultivator.sosok.GerakId;
 import dev.kultivator.sosok.PropId;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -30,6 +32,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -94,7 +97,7 @@ public final class KotaEkonomi {
 		KotaHidupCommands.daftar("lapak", KotaEkonomi::cmdLapak);
 		KotaHidupCommands.daftar("pulang", () -> Commands.literal("pulang").executes(KotaEkonomi::pulang));
 		KotaUji.daftar("ekonomi", KotaEkonomi::uji);
-		KotaUji.chips("kota_hidup ekonomi stok <kategori> <n>", "kota_hidup ekonomi lumbung");
+		KotaUji.chips("kota_hidup ekonomi stok <kategori> <n>", "kota_hidup ekonomi lumbung", "kota_hidup ekonomi keran", "kota_hidup ekonomi simulasi 3 7");
 	}
 
 	/**
@@ -314,6 +317,12 @@ public final class KotaEkonomi {
 				.then(Commands.literal("buka").executes(ctx -> toko(ctx, (pl, toko) -> TokoPemain.buka(pl, toko, true))))
 				.then(Commands.literal("tutup").executes(ctx -> toko(ctx, (pl, toko) -> TokoPemain.buka(pl, toko, false))))
 				.then(Commands.literal("laci").executes(ctx -> toko(ctx, (pl, toko) -> TokoPemain.ambilLaci(pl, toko))))
+				.then(Commands.literal("perabot")
+						.then(Commands.literal("rak").executes(ctx -> toko42(ctx, "rak")))
+						.then(Commands.literal("kasir").executes(ctx -> toko42(ctx, "kasir")))
+						.then(Commands.literal("papan").executes(ctx -> toko42(ctx, "papan"))))
+				.then(Commands.literal("bank").executes(ctx -> toko(ctx, (pl, toko) ->
+						TokoPemain.keBank(pl, toko, !TokoPemain.keBank(pl.level().getServer(), toko)))))
 				.then(Commands.literal("nama").then(Commands.argument("teks", StringArgumentType.greedyString())
 						.executes(ctx -> toko(ctx, (pl, toko) -> TokoPemain.nama(pl, toko, StringArgumentType.getString(ctx, "teks"))))))
 				.then(Commands.literal("pegawai").then(Commands.argument("warga", IntegerArgumentType.integer(1))
@@ -323,6 +332,12 @@ public final class KotaEkonomi {
 				.then(Commands.literal("harga")
 						.then(Commands.literal("pasar").executes(ctx -> rakDitatap(ctx, -1L)))
 						.then(Commands.argument("nb", LongArgumentType.longArg(1L)).executes(ctx -> rakDitatap(ctx, LongArgumentType.getLong(ctx, "nb")))));
+	}
+
+	/** {@code toko perabot <jenis>}: buys a shop block from a Tukang next to the player. */
+	private static int toko42(CommandContext<CommandSourceStack> ctx, String jenis) throws CommandSyntaxException {
+		TokoPemain.beliPerabot(ctx.getSource().getPlayerOrException(), jenis);
+		return 1;
 	}
 
 	@FunctionalInterface
@@ -472,6 +487,7 @@ public final class KotaEkonomi {
 				.then(harga)
 				.then(stok)
 				.then(Commands.literal("lumbung").executes(KotaEkonomi::ujiLumbung))
+				.then(Commands.literal("keran").executes(KotaEkonomi::ujiKeran))
 				.then(Commands.literal("simulasi").then(Commands.argument("pita", IntegerArgumentType.integer(0, SASARAN.length - 1))
 						.then(Commands.argument("hari", IntegerArgumentType.integer(1, 120)).executes(KotaEkonomi::ujiSimulasi))));
 	}
@@ -564,29 +580,74 @@ public final class KotaEkonomi {
 		return 1;
 	}
 
+	/** {@code ekonomi keran}: this week's faucet totals of the player against the 42.6.0 caps (what the {@code kota_milikku} block shows). */
+	private static int ujiKeran(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+		ServerPlayer player = ctx.getSource().getPlayerOrException();
+		MinecraftServer server = player.level().getServer();
+		int b = Barang.pita(player);
+		long tokoBatas = 0L;
+		for (TokoPemain.Toko toko : TokoPemain.milik(server, player.getUUID())) {
+			CompoundTag d = TokoPemain.data(server, toko);
+			tokoBatas += d == null ? 0L : TokoPemain.batasHarian(d) * 7L;
+		}
+		String[] sumber = {Investasi.K_TOKO, Investasi.K_INVESTASI, Investasi.K_KONTRAK, Investasi.K_GAJI, Investasi.K_UPETI, Investasi.K_BUNGA};
+		// the contract premium shares Dagang's weekly trade-profit ledger
+		long[] nb = {Investasi.keranMinggu(server, player.getUUID(), sumber[0]), Investasi.keranMinggu(server, player.getUUID(), sumber[1]),
+				Math.max(0L, Dagang.labaMinggu(player)), Investasi.keranMinggu(server, player.getUUID(), sumber[3]),
+				Investasi.keranMinggu(server, player.getUUID(), sumber[4]), Investasi.keranMinggu(server, player.getUUID(), sumber[5])};
+		long[] batas = {tokoBatas, Investasi.BATAS_TOTAL * (b + 1L), Dagang.batas(player), Jabatan.gajiMaks(Jabatan.WALI_KOTA, b) * Jabatan.TEMPAT_TINGGI_MAKS,
+				30L * (b + 1L) * 3L * 3L, 10L * (b + 1L)};
+		CommandSourceStack src = ctx.getSource();
+		src.sendSuccess(() -> Component.translatable("kultivator.kota42.harga.uji.keran_judul", b).withStyle(ChatFormatting.GOLD), false);
+		for (int i = 0; i < sumber.length; i++) {
+			int idx = i;
+			src.sendSuccess(() -> Component.translatable("kultivator.kota42.harga.uji.keran_baris", sumber[idx], nb[idx], batas[idx])
+					.withStyle(nb[idx] > batas[idx] ? ChatFormatting.RED : ChatFormatting.GRAY), false);
+		}
+		return 1;
+	}
+
 	/**
 	 * {@code ekonomi simulasi <pita> <hari>} (42.6.0): the mean daily NB a player of band {@code pita} draws from the 42
-	 * faucets when he uses all of them (the shop sells at 60 % of its rumah-toko cap and keeps a 25 % margin over what the
-	 * goods cost him; the weekly caps of 42.6.0 spread over the days; offices and tribute only from the bands that reach
-	 * them), minus the 42C sinks (rent of a rumah toko, shop tax, two helpers). Time model: a player who works all 42
-	 * faucets spends about half his day on the 38 sources, so {@code 0.5 x target middle + 42 net} must fall inside the
-	 * 38.M.1 target -25 % / +25 %.
+	 * faucets when he works all of them, minus the 42C sinks. A faucet counts only as far as the band can reach it:
+	 * <ul>
+	 * <li>shop: {@code tokoBatas x (b+1)} a day, 60 % sold, 25 % margin over what the goods cost; a stall (rent 6 x (b+1) a
+	 * week) before Golden Core, a rumah toko (x1.5, rent {@code sewaPersen} of 1800) from it;</li>
+	 * <li>investments: the 42.6.0 weekly cap, or 4.5 % a week of ten days' savings when that is less;</li>
+	 * <li>offices: rank 3 / 4 / 5 from Foundation / Golden Core / Nascent Soul, two places, each the smaller of the rank cap
+	 * {@code 20 x (b+1) x rank} and the rank's share (2 / 3 / 5 %) of a 1000 NB town week;</li>
+	 * <li>tribute: from Foundation (a hall), two pacts of class 2, 80 % collected; loans: 60 % of the cap; requests: half of
+	 * the three a day at {@code 3 x (b+1)}.</li>
+	 * </ul>
+	 * Time model: a player who works all of these spends about half his day on the 38 sources, so
+	 * {@code 0.5 x target middle + 42 net} must fall inside the 38.M.1 target -25 % / +25 %.
 	 */
 	private static int ujiSimulasi(CommandContext<CommandSourceStack> ctx) {
 		int b = IntegerArgumentType.getInteger(ctx, "pita");
 		int hari = IntegerArgumentType.getInteger(ctx, "hari");
 		KotaConfig.Ekonomi cfg = KotaConfig.ekonomi();
-		long[] keran = {
-				Math.round(cfg.tokoBatas * (b + 1) * 1.5D * 0.6D * 0.25D * hari),   // rumah toko: 60 % of its cap, 25 % margin
-				Math.round(60.0D * (b + 1) / 7.0D * hari),                     // investments, total cap a week
-				Math.round(20.0D * (b + 1) * 3 * 2 / 7.0D * Math.min(1.0D, b / 3.0D) * hari),   // office wages, rank 3 in 2 places
-				Math.round(30.0D * (b + 1) * 2 * 3 / 7.0D * Math.min(1.0D, b / 4.0D) * hari),   // protection tribute, 3 towns
-				Math.round(10.0D * (b + 1) / 7.0D * hari),                     // loan interest
-				Math.round(3.0D * 4 * (b + 1) * hari)};                        // residents' requests
+		long bawah = SASARAN[b][0];
+		long atas = SASARAN[b][1];
+		double tengah = (bawah + atas) / 2.0D;
+		boolean rumahToko = b >= 3;
+		int pangkat = b < 2 ? 0 : Math.min(5, b + 1);
+		double tokoBatas = cfg.tokoBatas * (b + 1) * (rumahToko ? 1.5D : 1.0D);
+		double gajiTempat = pangkat == 0 ? 0.0D : Math.min(Jabatan.gajiMaks(pangkat, b), 1000.0D * Jabatan.persenGaji(pangkat) / 100.0D * cfg.gajiSkala);
+		double[] harian = {
+				tokoBatas * 0.6D * 0.25D,                                                                   // shop margin
+				Math.min(Investasi.BATAS_TOTAL * (b + 1) / 7.0D, tengah * 10.0D * 0.045D / 7.0D),            // investments
+				gajiTempat * 2.0D / 7.0D,                                                                   // office wages, two places
+				b < 2 ? 0.0D : 30.0D * (b + 1) * 2.0D * 2.0D / 7.0D * 0.8D,                                 // protection tribute
+				10.0D * (b + 1) / 7.0D * 0.6D,                                                              // loan interest
+				3.0D * 3.0D * (b + 1) * 0.5D};                                                              // residents' requests
+		long[] keran = new long[harian.length];
+		for (int i = 0; i < keran.length; i++) {
+			keran[i] = Math.round(harian[i] * hari);
+		}
 		String[] nama = {"toko", "investasi", "gaji", "upeti", "bunga", "permintaan"};
-		long sewaRumah = Math.round(1800.0D * 1.0D * cfg.sewaPersen / 100.0D / 7.0D * hari);
-		long pajakToko = Math.round(cfg.tokoBatas * (b + 1) * 1.5D * 0.6D * hari * LapakSekte.PAJAK);
-		long pembantu = Math.round(12.0D / 7.0D * hari) * 2;
+		long sewa = Math.round((rumahToko ? 1800.0D * cfg.sewaPersen / 100.0D / 7.0D : 6.0D * (b + 1) / 7.0D) * hari);
+		long pajakToko = Math.round(tokoBatas * 0.6D * hari * LapakSekte.PAJAK);
+		long pembantu = rumahToko ? Math.round(12.0D / 7.0D * hari) * 2 : 0L;
 		long masuk = 0L;
 		CommandSourceStack src = ctx.getSource();
 		src.sendSuccess(() -> Component.translatable("kultivator.kota42.harga.uji.sim_judul", b, hari).withStyle(ChatFormatting.GOLD), false);
@@ -596,11 +657,9 @@ public final class KotaEkonomi {
 			src.sendSuccess(() -> Component.translatable("kultivator.kota42.harga.uji.sim_baris", nama[idx], keran[idx], keran[idx] / Math.max(1, hari))
 					.withStyle(ChatFormatting.GRAY), false);
 		}
-		long keluar = sewaRumah + pajakToko + pembantu;
+		long keluar = sewa + pajakToko + pembantu;
 		long bersihHari = (masuk - keluar) / Math.max(1, hari);
-		long bawah = SASARAN[b][0];
-		long atas = SASARAN[b][1];
-		long total = (bawah + atas) / 4L + bersihHari;
+		long total = Math.round(tengah / 2.0D) + bersihHari;
 		boolean ok = total >= bawah * 3L / 4L && total <= atas * 5L / 4L;
 		long masukF = masuk;
 		src.sendSuccess(() -> Component.translatable("kultivator.kota42.harga.uji.sim_hasil", masukF, keluar, bersihHari, total, bawah, atas,

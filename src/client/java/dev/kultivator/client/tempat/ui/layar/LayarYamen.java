@@ -1,6 +1,5 @@
 package dev.kultivator.client.tempat.ui.layar;
 
-import dev.kultivator.client.dunia.kota42.ui.layar.SketsaKota;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.CincinWaktu;
 import dev.kultivator.client.screen.ui.DaftarGulir;
@@ -19,7 +18,6 @@ import dev.kultivator.client.tempat.ui.kit.IkonTempat;
 import dev.kultivator.client.tempat.ui.kit.Lembar;
 import dev.kultivator.client.tempat.ui.kit.PanelTempat;
 import dev.kultivator.client.tempat.ui.kit.TempatWarna;
-import dev.kultivator.dunia.kota42.ui.KotaLembar;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import dev.kultivator.dunia.tempat.ui.LembarKunci.Yamen;
 import dev.kultivator.sekte.gabung.api.Corak;
@@ -49,41 +47,23 @@ import org.jetbrains.annotations.Nullable;
  * Shifu membela" (bond &ge; 50). An A2 trial (a fellow member killed) offers only to accept the expulsion or to flee as a
  * deserter (heavy confirm). A running confinement shows its countdown ring and "Tebus" (PK per 10 seconds).</li>
  * </ul>
- * Both are drawn with the single kit at text 1.0. DESIGN 42.11.9 adds two modes, opened with the 42 screen ids so the
- * server sheet keys stay {@link KotaLembar}'s; they are half-built 42-G2 work drawn by the old sheet engine with the 42
- * painters ({@link SketsaKota}) until 42U rebuilds them on the single kit (43.16.6, {@link #mesinLama}):
- * <ul>
- * <li>{@code jabatan} — the player's town office: tabs Jabatan (rank seal, wage against the cap, duties of the week,
- * attendance, rights, the next rank and its requirements, "Ajukan"), Pajak (rate within the rank's limits, last weeks'
- * income and spending as bars, festival budget of a Wali Kota), Perkara (open and decided cases, opens one) and Kavling
- * (the town's growth lots, opens one).</li>
- * <li>{@code perkara} — one hearing: tabs Sidang (the two parties face to face with their claims, the witnesses with
- * "Panggil" and their testimony bubbles), Bukti (item / note / gossip cards with "Telusuri" and the traced spreader
- * chain) and Putusan (three verdicts with their estimated consequence, each asking the confirm seal; the bribe envelope
- * in danger colours; the result).</li>
- * </ul>
+ * Both are drawn with the single kit at text 1.0. The DESIGN 42.11.9 office and hearing sheets ({@code jabatan},
+ * {@code perkara}) are pages of their own on the single kit, {@code client/dunia/kota42/ui/layar/LayarJabatan} and
+ * {@code LayarPerkara} (D-42U).
  */
 public final class LayarYamen extends LayarInti {
 
-	// perkara view tabs (client-side views of one sheet)
-	private static final String T_SIDANG = "sidang";
-	private static final String T_BUKTI = "bukti";
-	private static final String T_PUTUSAN = "putusan";
 	/** The record thresholds of 41.6.11 ({@code Aturan.TEGURAN..USIR}). */
 	private static final int[] AMBANG = {10, 20, 35, 50, 60};
 
 	private final DaftarGulir sitaan = new DaftarGulir();
 	private final DaftarGulir catatan = new DaftarGulir();
-	/** The lists of the 42 modes (old sheet engine). */
-	private final dev.kultivator.client.tempat.ui.kit.DaftarGulir daftar = new dev.kultivator.client.tempat.ui.kit.DaftarGulir();
-	private int tarif = -1;
-	private long festival = -1L;
 
 	public LayarYamen(int npcId, CompoundTag lembar) {
 		this(Yamen.LAYAR, npcId, lembar);
 	}
 
-	/** The court for the 38 {@code yamen} id, the 41 {@code gabung_hukum} hearing or a 42 id ({@code jabatan}, {@code perkara}). */
+	/** The court for the 38 {@code yamen} id or the 41 {@code gabung_hukum} hearing. */
 	public LayarYamen(String layar, int npcId, CompoundTag lembar) {
 		super(layar, npcId, lembar, judulMode(layar), LembarKunci.GAYA_BATU);
 	}
@@ -95,8 +75,6 @@ public final class LayarYamen extends LayarInti {
 
 	private static Component judulMode(String layar) {
 		return switch (layar) {
-			case KotaLembar.Jabatan.LAYAR -> SketsaKota.t("jabatan.judul");
-			case KotaLembar.Perkara.LAYAR -> SketsaKota.t("perkara.judul");
 			case Hukum.LAYAR -> LayarGabung2.u("hukum.judul");
 			default -> k("layar.yamen");
 		};
@@ -107,24 +85,8 @@ public final class LayarYamen extends LayarInti {
 	}
 
 	@Override
-	protected boolean mesinLama() {
-		return KotaLembar.Jabatan.LAYAR.equals(layar) || KotaLembar.Perkara.LAYAR.equals(layar);
-	}
-
-	@Override
 	protected List<Tab> daftarTab() {
-		return switch (layar) {
-			case KotaLembar.Jabatan.LAYAR -> List.of(
-					new Tab(KotaLembar.Jabatan.TAB_JABATAN, SketsaKota.t("jabatan.tab.jabatan"), LembarKunci.Ikon.CAP_MERAH),
-					new Tab(KotaLembar.Jabatan.TAB_PAJAK, SketsaKota.t("jabatan.tab.pajak"), LembarKunci.Ikon.TIMBANGAN),
-					new Tab(KotaLembar.Jabatan.TAB_PERKARA, SketsaKota.t("jabatan.tab.perkara"), LembarKunci.Ikon.YAMEN),
-					new Tab(KotaLembar.Jabatan.TAB_KAVLING, SketsaKota.t("jabatan.tab.kavling"), Glyphs.Atlas.TONGGAK));
-			case KotaLembar.Perkara.LAYAR -> List.of(
-					new Tab(T_SIDANG, SketsaKota.t("perkara.tab.sidang"), LembarKunci.Ikon.YAMEN),
-					new Tab(T_BUKTI, SketsaKota.t("perkara.tab.bukti"), Glyphs.Atlas.GULUNGAN),
-					new Tab(T_PUTUSAN, SketsaKota.t("perkara.tab.putusan"), LembarKunci.Ikon.CAP_MERAH));
-			default -> List.of();
-		};
+		return List.of();
 	}
 
 	/** A Balai Hukum hearing is the player's own anchor session (41): it may act (the server still checks every op). */
@@ -139,30 +101,15 @@ public final class LayarYamen extends LayarInti {
 	}
 
 	@Override
-	protected void tabBerubah() {
-		daftar.mulaiUlang(Util.getMillis());
-	}
-
-	@Override
 	protected void setelahLembar(boolean buka) {
-		if (hukum()) {
-			if (buka) {
-				catatan.mulaiUlang(Util.getMillis());
-			}
-			return;
-		}
-		if (buka || tarif < 0) {
-			tarif = lembar.sub(KotaLembar.Jabatan.PAJAK).i(KotaLembar.Jabatan.TARIF, -1);
-			festival = lembar.sub(KotaLembar.Jabatan.PAJAK).l(KotaLembar.Jabatan.FESTIVAL, -1L);
+		if (hukum() && buka) {
+			catatan.mulaiUlang(Util.getMillis());
 		}
 	}
 
 	@Override
 	protected @Nullable Component petunjuk() {
-		if (hukum()) {
-			return lembar.ada(Hukum.SOAL) ? LayarGabung2.u("hukum.petunjuk_soal") : null;
-		}
-		return KotaLembar.Perkara.LAYAR.equals(layar) ? SketsaKota.t("perkara.petunjuk") : null;
+		return hukum() && lembar.ada(Hukum.SOAL) ? LayarGabung2.u("hukum.petunjuk_soal") : null;
 	}
 
 	@Override
@@ -172,27 +119,6 @@ public final class LayarYamen extends LayarInti {
 		} else {
 			yamen(l, x0, y0, x1, y1);
 		}
-	}
-
-	/** The 42 modes (old sheet engine, {@link #mesinLama}). */
-	@Override
-	protected void isi(dev.kultivator.client.tempat.ui.kit.Lukis l, int x0, int y0, int x1, int y1) {
-		if (KotaLembar.Jabatan.LAYAR.equals(layar)) {
-			jabatan(l, x0, y0, x1, y1);
-		} else {
-			perkara(l, x0, y0, x1, y1);
-		}
-	}
-
-	/**
-	 * A dangerous write button of the 42 modes: the press opens the Gulungan's confirm seal (G13: medium, hold 1.5 s; was a
-	 * second press within 3 s) and the op is sent once confirmed.
-	 */
-	private void tombolYakin(dev.kultivator.client.tempat.ui.kit.Lukis l, String kunci, int x, int y, int w, int h, Component label, boolean aktif,
-			@Nullable Component alasan, String op) {
-		boolean baca = !tulisBoleh();
-		tombol.gambar(l, kunci, x, y, w, h, label, aktif && !baca, baca ? alasanBaca() : alasan,
-				() -> konfirmasi(SegelKonfirmasi.Tingkat.SEDANG, SketsaKota.t("yakin.pesan", label), () -> kirim(op)));
 	}
 
 	// =================================================================== 38 yamen
@@ -541,440 +467,5 @@ public final class LayarYamen extends LayarInti {
 				lembar.ada(Hukum.SOAL) ? LayarGabung2.u("hukum.jawab_dulu") : LayarGabung2.u("hukum.bela_habis"), Hukum.OP_BELA);
 		tombolOp(l, "shifu", x0 + (bw + 4) * 2, by, bw, TOMBOL_H, LayarGabung2.u("hukum.minta_shifu"), lembar.b(Hukum.SHIFU),
 				LayarGabung2.u("hukum.shifu_tidak", lembar.i(GabungLembar.IKATAN, 0)), Hukum.OP_MINTA_SHIFU);
-	}
-
-	// =================================================================== 42 jabatan
-
-	private void jabatan(dev.kultivator.client.tempat.ui.kit.Lukis l, int x0, int y0, int x1, int y1) {
-		int y = SketsaKota.kota(l, lembar, x0, y0, x1, gaya);
-		switch (tab) {
-			case KotaLembar.Jabatan.TAB_PAJAK -> pajak(l, x0, y, x1, y1);
-			case KotaLembar.Jabatan.TAB_PERKARA -> daftarPerkara(l, x0, y, x1, y1);
-			case KotaLembar.Jabatan.TAB_KAVLING -> daftarKavling(l, x0, y, x1, y1);
-			default -> kartuJabatan(l, x0, y, x1, y1);
-		}
-	}
-
-	private void kartuJabatan(dev.kultivator.client.tempat.ui.kit.Lukis l, int x0, int y0, int x1, int y1) {
-		Lembar j = lembar.sub(KotaLembar.Jabatan.JABATAN);
-		int pangkat = j.i(KotaLembar.Jabatan.PANGKAT, 0);
-		Kotak[] k = bagi(x0, y0, x1, y1);
-		Kotak kiri = k[0];
-		PanelTempat.kartu(l.g, gaya, kiri.x0(), kiri.y0(), kiri.x1(), kiri.y1(), 0.0F, false);
-		// rank seal: a square cinnabar seal with the rank number
-		int ss = 30;
-		int sx = kiri.x0() + 4;
-		int sy = kiri.y0() + 4;
-		int segel = pangkat > 0 ? Palette.SEAL : Palette.LOCKED;
-		IkonTempat.stempel(l.g, IkonTempat.Stempel.PERSEGI, sx, sy, ss, ss, Palette.argb(0xE8, segel & 0xFFFFFF));
-		Brush.centered(l.g, font, Component.literal(pangkat > 0 ? Integer.toString(pangkat) : "—"), sx + ss / 2.0F, sy + ss / 2.0F - 6, 0xFFFFF4E0, 1.5F, true);
-		int tx = sx + ss + 6;
-		l.teks(Brush.bold(j.teks(LembarKunci.GELAR)), tx, sy + 2, kiri.x1() - tx - 4, gaya.teks, 1.0F);
-		long gaji = j.l(KotaLembar.Jabatan.GAJI, 0L);
-		long gajiMaks = j.l(KotaLembar.Jabatan.GAJI_MAKS, 0L);
-		l.keterangan(SketsaKota.t("jabatan.gaji", Brush.angka(gaji), Brush.angka(gajiMaks)), tx, sy + 13, kiri.x1() - tx - 4, gaya.teksLemah);
-		SketsaKota.batang(l, tx, sy + 22, kiri.x1() - tx - 8, 3, gajiMaks <= 0 ? 0.0F : gaji / (float) gajiMaks, Palette.GOLD, -1.0F);
-		int y = sy + ss + 6;
-		if (pangkat > 0) {
-			long hadir = j.l(KotaLembar.Jabatan.HADIR, -1L);
-			l.keterangan(hadir < 0 ? SketsaKota.t("jabatan.hadir_belum") : SketsaKota.t("jabatan.hadir", hadir), kiri.x0() + 6, y, kiri.w() - 12, gaya.teksLemah);
-			y += 10;
-		}
-		Component warn = j.teksAtau(KotaLembar.Jabatan.PERINGATAN);
-		if (warn != null) {
-			IkonTempat.gambar(l.g, LembarKunci.Ikon.LONCENG, kiri.x0() + 5, y - 1, 9, 0xFFFFFFFF);
-			l.keterangan(warn, kiri.x0() + 16, y, kiri.w() - 22, TempatWarna.BAHAYA);
-			y += 10;
-		}
-		y += subjudul(l, SketsaKota.t("jabatan.tugas"), kiri.x0() + 4, y, kiri.x1() - 4);
-		int tombolY = kiri.y1() - 18;
-		for (Lembar t : j.daftar(KotaLembar.Jabatan.TUGAS)) {
-			if (y + 10 > tombolY) {
-				break;
-			}
-			int maks = t.i(LembarKunci.MAKS, 0);
-			boolean selesai = t.b(KotaLembar.Jabatan.SELESAI);
-			int bw = maks > 0 ? 34 : 0;
-			IkonTempat.gambar(l.g, maks > 0 && selesai ? IkonTempat.CENTANG : IkonTempat.TONGGAK, kiri.x0() + 5, y, 8, 0xFFFFFFFF);
-			l.teks(t.teks(LembarKunci.TEKS), kiri.x0() + 15, y, kiri.w() - 22 - bw, selesai ? gaya.teksSamar : gaya.teks, 0.75F);
-			if (maks > 0) {
-				int kemajuan = t.i(LembarKunci.KEMAJUAN, 0);
-				SketsaKota.batang(l, kiri.x1() - 6 - bw, y + 2, bw - 12, 3, kemajuan / (float) maks, selesai ? TempatWarna.OK : TempatWarna.PERINGATAN, -1.0F);
-				l.kanan(Component.literal(kemajuan + "/" + maks), kiri.x1() - 5, y, gaya.teksLemah, 0.7F);
-			}
-			y += 10;
-		}
-		// duty buttons
-		int bw = (kiri.w() - 12) / 2;
-		boolean periksa = j.b("boleh_periksa");
-		if (pangkat >= KotaLembar.Jabatan.PENGAWAS_PASAR) {
-			tombolOp(l, "periksa", kiri.x0() + 4, tombolY, bw, 14, SketsaKota.t("jabatan.periksa"), periksa, SketsaKota.t("jabatan.periksa_habis"), "periksa");
-		}
-		if (pangkat >= KotaLembar.Jabatan.WALI_KOTA) {
-			int pj = j.i("penjaga", 0);
-			int pjm = j.i("penjaga_maks", 6);
-			tombolOp(l, "penjaga", kiri.x0() + 8 + bw, tombolY, bw, 14, SketsaKota.t("jabatan.penjaga", pj, pjm), pj < pjm, SketsaKota.t("jabatan.penjaga_penuh"),
-					"penjaga");
-		}
-		// right: rights and the next rank
-		Kotak kanan = k[1];
-		int ry = kanan.y0();
-		ry += subjudul(l, SketsaKota.t("jabatan.hak"), kanan.x0(), ry, kanan.x1());
-		List<Lembar> hak = j.daftar(KotaLembar.Jabatan.HAK);
-		Lembar berikut = j.sub(KotaLembar.Jabatan.BERIKUT);
-		int batasHak = berikut.kosongSemua() ? kanan.y1() : kanan.y1() - 70;
-		for (Lembar h : hak) {
-			if (ry + 9 > batasHak) {
-				break;
-			}
-			boolean ok = h.b(LembarKunci.OK);
-			Brush.text(l.g, font, Component.literal(Integer.toString(h.i(KotaLembar.Jabatan.PANGKAT, 0))), kanan.x0(), ry, ok ? Palette.SEAL : gaya.teksSamar,
-					0.7F, false);
-			l.teks(h.teks(LembarKunci.TEKS), kanan.x0() + 8, ry, kanan.w() - 8, ok ? gaya.teks : TempatWarna.terkunci(gaya.teksSamar), 0.75F);
-			ry += 9;
-		}
-		if (berikut.kosongSemua()) {
-			l.keterangan(SketsaKota.t("jabatan.puncak"), kanan.x0(), Math.min(ry + 4, kanan.y1() - 10), kanan.w(), TempatWarna.EMAS);
-			return;
-		}
-		int by = kanan.y1() - 68;
-		PanelTempat.sumur(l.g, gaya, kanan.x0(), by, kanan.x1(), kanan.y1());
-		l.teks(SketsaKota.t("jabatan.berikut", berikut.teks(LembarKunci.GELAR)), kanan.x0() + 4, by + 3, kanan.w() - 8, gaya.teksSumur(), 0.8F);
-		int sy2 = by + 14;
-		for (Lembar s : berikut.daftar(LembarKunci.SYARAT)) {
-			int h = SketsaKota.syarat(l, s, kanan.x0() + 4, sy2, kanan.x1() - 4, kanan.y1() - 18);
-			if (h == 0) {
-				break;
-			}
-			sy2 += h;
-		}
-		boolean bisa = berikut.b(LembarKunci.BISA);
-		tombolOp(l, "ajukan", kanan.x0() + 4, kanan.y1() - 17, kanan.w() - 8, 14, SketsaKota.t("jabatan.ajukan"), bisa, berikut.teksAtau(LembarKunci.ALASAN),
-				KotaLembar.Jabatan.OP_AJUKAN);
-		Lembar c = lembar.sub(LembarKunci.CATATAN);
-		if (pangkat >= KotaLembar.Jabatan.HAKIM_PEMBANTU && !c.kosongSemua() && l.di(sx, sy, sx + ss, sy + ss)) {
-			l.tip(SketsaKota.t("jabatan.catatan", c.i(KotaLembar.Jabatan.DIPUTUS, 0), c.i(KotaLembar.Jabatan.SUAP, 0), c.i(KotaLembar.Jabatan.AUDIT, 0)));
-		}
-	}
-
-	private void pajak(dev.kultivator.client.tempat.ui.kit.Lukis l, int x0, int y0, int x1, int y1) {
-		Lembar p = lembar.sub(KotaLembar.Jabatan.PAJAK);
-		int min = p.i(KotaLembar.Jabatan.MIN, 5);
-		int maks = p.i(LembarKunci.MAKS, 20);
-		int sekarang = p.i(KotaLembar.Jabatan.TARIF, 8);
-		if (tarif < 0) {
-			tarif = sekarang;
-		}
-		tarif = Math.max(min, Math.min(maks, tarif));
-		boolean bisa = p.b(LembarKunci.BISA);
-		Kotak[] k = bagi(x0, y0, x1, y1);
-		Kotak kiri = k[0];
-		PanelTempat.kartu(l.g, gaya, kiri.x0(), kiri.y0(), kiri.x1(), kiri.y1(), 0.0F, false);
-		int y = kiri.y0() + 4;
-		y += subjudul(l, SketsaKota.t("pajak.tarif"), kiri.x0() + 4, y, kiri.x1() - 4);
-		float cx = (kiri.x0() + kiri.x1()) / 2.0F;
-		// the rate on a 5-20 scale with the allowed band shaded
-		int sx0 = kiri.x0() + 10;
-		int sx1 = kiri.x1() - 10;
-		int sy = y + 22;
-		l.g.fill(sx0, sy, sx1, sy + 4, Palette.argb(0x50, 0x000000));
-		int bx0 = sx0 + Math.round((sx1 - sx0) * (min - 5) / 15.0F);
-		int bx1 = sx0 + Math.round((sx1 - sx0) * (maks - 5) / 15.0F);
-		l.g.fill(bx0, sy, Math.max(bx0 + 1, bx1), sy + 4, Palette.argb(0xA0, 0x5FA88C));
-		int mx = sx0 + Math.round((sx1 - sx0) * (10 - 5) / 15.0F);
-		l.g.fill(mx, sy - 3, mx + 1, sy + 7, TempatWarna.PERINGATAN);
-		int nx = sx0 + Math.round((sx1 - sx0) * (sekarang - 5) / 15.0F);
-		Brush.disc(l.g, nx + 0.5F, sy + 2, 2.5F, gaya.teksSamar);
-		int px = sx0 + Math.round((sx1 - sx0) * (tarif - 5) / 15.0F);
-		Brush.disc(l.g, px + 0.5F, sy + 2, 4.0F, Palette.SEAL);
-		Brush.centered(l.g, font, Component.literal(tarif + " %"), cx, y + 2, tarif > 10 ? TempatWarna.BAHAYA : gaya.teks, 1.4F, false);
-		y = sy + 10;
-		l.bungkus(p.teks(KotaLembar.Jabatan.EFEK), kiri.x0() + 6, y, kiri.w() - 12, gaya.teksLemah, 0.75F, 20);
-		int by = kiri.y1() - 18;
-		Component alasan = p.teksAtau(LembarKunci.ALASAN);
-		tombol.gambar(l, "tarif#kurang", kiri.x0() + 4, by, 16, 14, Component.literal("−"), bisa && tarif > min, alasan, () -> tarif--);
-		tombol.gambar(l, "tarif#tambah", kiri.x0() + 22, by, 16, 14, Component.literal("+"), bisa && tarif < maks, alasan, () -> tarif++);
-		tombolOp(l, "tarif", kiri.x0() + 42, by, kiri.w() - 46, 14, SketsaKota.t("pajak.tetapkan", tarif), bisa && tarif != sekarang,
-				alasan != null ? alasan : SketsaKota.t("pajak.sama"), LembarKunci.op(KotaLembar.Jabatan.OP_PAJAK, tarif));
-		// festival budget of a Wali Kota
-		if (p.ada(KotaLembar.Jabatan.FESTIVAL)) {
-			long fmaks = p.l(LembarKunci.HARGA, 400L);
-			if (festival < 0L) {
-				festival = p.l(KotaLembar.Jabatan.FESTIVAL, 0L);
-			}
-			int fy = by - 30;
-			l.keterangan(SketsaKota.t("pajak.festival", Brush.angka(festival), Brush.angka(fmaks)), kiri.x0() + 6, fy, kiri.w() - 12, gaya.teksLemah);
-			tombol.gambar(l, "fest#kurang", kiri.x0() + 4, fy + 10, 16, 13, Component.literal("−"), festival > 0, null, () -> festival = Math.max(0L, festival - 20L));
-			tombol.gambar(l, "fest#tambah", kiri.x0() + 22, fy + 10, 16, 13, Component.literal("+"), festival < fmaks, null,
-					() -> festival = Math.min(fmaks, festival + 20L));
-			tombolOp(l, "fest", kiri.x0() + 42, fy + 10, kiri.w() - 46, 13, SketsaKota.t("pajak.festival_simpan"),
-					festival != p.l(KotaLembar.Jabatan.FESTIVAL, 0L), SketsaKota.t("pajak.sama"), LembarKunci.op(KotaLembar.Jabatan.OP_FESTIVAL, festival));
-		}
-		// income and spending of the last weeks
-		Kotak kanan = k[1];
-		int half = (kanan.y0() + kanan.y1()) / 2;
-		riwayat(l, SketsaKota.t("pajak.masuk"), p.daftar(KotaLembar.Jabatan.MASUK), kanan.x0(), kanan.y0(), kanan.x1(), half - 2, TempatWarna.OK);
-		riwayat(l, SketsaKota.t("pajak.keluar"), p.daftar(KotaLembar.Jabatan.KELUAR), kanan.x0(), half + 2, kanan.x1(), kanan.y1(), TempatWarna.BAHAYA);
-	}
-
-	private void riwayat(dev.kultivator.client.tempat.ui.kit.Lukis l, Component judul, List<Lembar> rows, int x0, int y0, int x1, int y1, int warna) {
-		int y = y0 + subjudul(l, judul, x0, y0, x1);
-		if (rows.isEmpty()) {
-			l.keterangan(SketsaKota.t("pajak.riwayat_kosong"), x0, y + 2, x1 - x0, gaya.teksSamar);
-			return;
-		}
-		long maks = 1L;
-		for (Lembar r : rows) {
-			maks = Math.max(maks, r.l(LembarKunci.HARGA, 0L));
-		}
-		// newest left, one bar per week
-		int n = rows.size();
-		int gap = 3;
-		int bw = Math.max(4, (x1 - x0 - (n - 1) * gap) / Math.max(1, n));
-		int base = y1 - 10;
-		for (int i = 0; i < n; i++) {
-			long v = rows.get(i).l(LembarKunci.HARGA, 0L);
-			int h = Math.round((base - y - 2) * v / (float) maks);
-			int bx = x0 + i * (bw + gap);
-			l.g.fillGradient(bx, base - h, bx + bw, base, warna, Palette.darken(warna, 0.35F));
-			if (l.di(bx, base - h - 2, bx + bw, base)) {
-				l.tip(List.of(rows.get(i).teks(LembarKunci.TEKS), Component.literal(Brush.angka(v) + " NB")));
-			}
-		}
-		l.keterangan(SketsaKota.t("pajak.minggu_ini", Brush.angka(rows.get(0).l(LembarKunci.HARGA, 0L))), x0, base + 1, x1 - x0, gaya.teksLemah);
-	}
-
-	private void daftarPerkara(dev.kultivator.client.tempat.ui.kit.Lukis l, int x0, int y0, int x1, int y1) {
-		List<Lembar> rows = lembar.daftar(KotaLembar.Jabatan.PERKARA);
-		Lembar c = lembar.sub(LembarKunci.CATATAN);
-		l.keterangan(SketsaKota.t("jabatan.catatan", c.i(KotaLembar.Jabatan.DIPUTUS, 0), c.i(KotaLembar.Jabatan.SUAP, 0), c.i(KotaLembar.Jabatan.AUDIT, 0)),
-				x0, y0, x1 - x0, gaya.teksSamar);
-		int y = y0 + 11;
-		if (rows.isEmpty()) {
-			kosong(l, SketsaKota.t("jabatan.perkara_kosong"), x0, y, x1, y1);
-			return;
-		}
-		daftar.gambar(l, "perkara", x0, y, x1, y1, rows.size(), 26, (lk, i, rx0, ry0, rx1, ry1, sorot, pilih) -> {
-			Lembar e = rows.get(i);
-			boolean selesai = e.b(KotaLembar.Jabatan.SELESAI);
-			PanelTempat.kartu(lk.g, gaya, rx0, ry0, rx1, ry1, sorot ? 1.0F : 0.0F, pilih);
-			IkonTempat.gambar(lk.g, selesai ? LembarKunci.Ikon.CAP_MERAH : LembarKunci.Ikon.TIMBANGAN, rx0 + 3, ry0 + 4, 16, 0xFFFFFFFF);
-			lk.teks(Brush.bold(e.teks(LembarKunci.NAMA)), rx0 + 23, ry0 + 3, rx1 - rx0 - 90, selesai ? gaya.teksLemah : gaya.teks, 0.85F);
-			Component bawah = selesai ? SketsaKota.t("perkara.diputus", e.teks(KotaLembar.Jabatan.PUTUSAN))
-					: SketsaKota.t("perkara.baris", e.i(KotaLembar.Jabatan.SAKSI, 0), e.i(KotaLembar.Jabatan.BUKTI, 0));
-			lk.keterangan(bawah, rx0 + 23, ry0 + 14, rx1 - rx0 - 90, gaya.teksLemah);
-			if (!selesai) {
-				int sisa = e.i(LembarKunci.SISA_HARI, 0);
-				lk.kanan(SketsaKota.t("perkara.sisa", sisa), rx1 - 5, ry0 + 4, sisa <= 1 ? TempatWarna.BAHAYA : gaya.teksLemah, 0.75F);
-			}
-			lk.kanan(SketsaKota.t(selesai ? "perkara.lihat" : "perkara.sidang"), rx1 - 5, ry0 + 15, TempatWarna.EMAS, 0.7F);
-		}, () -> {
-			int i = daftar.pilihan();
-			if (i >= 0 && i < rows.size()) {
-				kirim(LembarKunci.op(KotaLembar.Jabatan.OP_PERKARA, rows.get(i).id()));
-			}
-		}, null);
-	}
-
-	private void daftarKavling(dev.kultivator.client.tempat.ui.kit.Lukis l, int x0, int y0, int x1, int y1) {
-		List<Lembar> rows = lembar.daftar(KotaLembar.Jabatan.TAB_KAVLING);
-		if (rows.isEmpty()) {
-			kosong(l, SketsaKota.t("kavling.kosong"), x0, y0, x1, y1);
-			return;
-		}
-		daftar.gambar(l, "kavling", x0, y0, x1, y1, rows.size(), 24, (lk, i, rx0, ry0, rx1, ry1, sorot, pilih) -> {
-			Lembar e = rows.get(i);
-			PanelTempat.kartu(lk.g, gaya, rx0, ry0, rx1, ry1, sorot ? 1.0F : 0.0F, pilih);
-			String keadaan = e.s(LembarKunci.KEADAAN);
-			IkonTempat.gambar(lk.g, IkonTempat.TONGGAK, rx0 + 3, ry0 + 4, 14, 0xFFFFFFFF);
-			lk.teks(Brush.bold(e.teks(LembarKunci.NAMA)), rx0 + 21, ry0 + 3, (rx1 - rx0) / 2 - 24, gaya.teks, 0.85F);
-			lk.keterangan(e.teks(KotaLembar.Kavling.RENCANA), rx0 + 21, ry0 + 13, (rx1 - rx0) / 2 - 24, gaya.teksLemah);
-			int tahap = e.i("tahap", 0);
-			int total = Math.max(1, e.i(LembarKunci.TAHAP_TOTAL, 5));
-			int bx = rx0 + (rx1 - rx0) / 2 + 4;
-			for (int s = 0; s < total; s++) {
-				int c = s < tahap ? 0xFF5FA88C : Palette.argb(0x50, 0x000000);
-				lk.g.fill(bx + s * 9, ry0 + 6, bx + s * 9 + 7, ry0 + 11, c);
-			}
-			lk.keterangan(SketsaKota.t("kavling.keadaan." + keadaan), bx, ry0 + 13, rx1 - bx - 4, KotaLembar.Kavling.KV_TIDAK_LAYAK.equals(keadaan)
-					? TempatWarna.BAHAYA : gaya.teksSamar);
-		}, () -> {
-			int i = daftar.pilihan();
-			if (i >= 0 && i < rows.size()) {
-				kirim(LembarKunci.op(KotaLembar.Jabatan.OP_KAVLING, Integer.toString(rows.get(i).i(LembarKunci.ID, 0))));
-			}
-		}, null);
-	}
-
-	// =================================================================== 42 perkara
-
-	private void perkara(dev.kultivator.client.tempat.ui.kit.Lukis l, int x0, int y0, int x1, int y1) {
-		Lembar c = lembar.sub(KotaLembar.Perkara.PERKARA);
-		if (c.kosongSemua()) {
-			kosong(l, SketsaKota.t("perkara.kosong"), x0, y0, x1, y1);
-			return;
-		}
-		// case line + days left
-		int sisa = c.i(LembarKunci.SISA_HARI, 0);
-		Component kanan = SketsaKota.t("perkara.sisa", sisa);
-		int kw = Math.round(font.width(kanan) * 0.75F) + 4;
-		l.teks(Brush.bold(c.teks(LembarKunci.NAMA)), x0, y0, x1 - x0 - kw, gaya.teks, 0.9F);
-		l.kanan(kanan, x1, y0 + 1, sisa <= 1 ? TempatWarna.BAHAYA : gaya.teksLemah, 0.75F);
-		l.keterangan(c.teks(LembarKunci.TEKS), x0, y0 + 10, x1 - x0, gaya.teksLemah);
-		int y = y0 + 21;
-		// other open cases: small chips to switch
-		List<Lembar> lain = lembar.daftar("terbuka");
-		if (lain.size() > 1) {
-			int cx = x0;
-			for (Lembar o : lain) {
-				Component n = Component.literal("#" + o.id());
-				int w = Math.round(font.width(n) * 0.75F) + 8;
-				if (cx + w > x1) {
-					break;
-				}
-				boolean dipilih = o.b(KotaLembar.PILIH);
-				tombol.gambar(l, "kasus" + o.id(), cx, y, w, 10, n, !dipilih, null, () -> kirim(LembarKunci.op(LembarKunci.OP_TAB, KotaLembar.Perkara.LAYAR,
-						o.id())), false, dipilih);
-				cx += w + 3;
-			}
-			y += 13;
-		}
-		switch (tab) {
-			case T_BUKTI -> bukti(l, x0, y, x1, y1);
-			case T_PUTUSAN -> putusan(l, x0, y, x1, y1);
-			default -> sidang(l, x0, y, x1, y1);
-		}
-	}
-
-	private void sidang(dev.kultivator.client.tempat.ui.kit.Lukis l, int x0, int y0, int x1, int y1) {
-		List<Lembar> pihak = lembar.daftar(KotaLembar.Perkara.PIHAK);
-		int tinggiPihak = Math.min(58, (y1 - y0) / 2);
-		int mid = (x0 + x1) / 2;
-		for (int i = 0; i < pihak.size() && i < 2; i++) {
-			Lembar p = pihak.get(i);
-			boolean kiri = i == 0;
-			int bx0 = kiri ? x0 : mid + 3;
-			int bx1 = kiri ? mid - 3 : x1;
-			PanelTempat.kartu(l.g, gaya, bx0, y0, bx1, y0 + tinggiPihak, 0.0F, false);
-			int ps = Math.min(32, tinggiPihak - 6);
-			int px = kiri ? bx0 + 3 : bx1 - 3 - ps;
-			dev.kultivator.client.tempat.ui.kit.Potret.gambar(l, px, y0 + 3, ps, p.i(LembarKunci.POTRET, -1), LembarKunci.Ikon.TIDAK_ADA, false, 0.0F);
-			int tx0 = kiri ? px + ps + 4 : bx0 + 4;
-			int tx1 = kiri ? bx1 - 4 : px - 4;
-			l.keterangan(SketsaKota.t("perkara.pihak." + p.s(KotaLembar.Perkara.PERAN_PIHAK)), tx0, y0 + 3, tx1 - tx0, gaya.teksSamar);
-			l.teks(Brush.bold(p.teks(LembarKunci.NAMA)), tx0, y0 + 11, tx1 - tx0, gaya.teks, 0.85F);
-			l.keterangan(SketsaKota.umurKerja(p), tx0, y0 + 21, tx1 - tx0, gaya.teksLemah);
-			if (p.ada(KotaLembar.WATAK)) {
-				l.keterangan(SketsaKota.t("watak." + p.s(KotaLembar.WATAK)), tx0, y0 + 29, tx1 - tx0, TempatWarna.PERINGATAN);
-			}
-			// claim bubble under the portrait
-			int qy = y0 + Math.max(ps + 5, 38);
-			l.bungkus(SketsaKota.t("perkara.klaim", p.teks(KotaLembar.Perkara.KLAIM)), bx0 + 4, qy, bx1 - bx0 - 8, gaya.teks, 0.7F, y0 + tinggiPihak - qy - 2);
-		}
-		// "vs" seal between them
-		IkonTempat.stempel(l.g, IkonTempat.Stempel.BULAT, mid - 8, y0 + tinggiPihak / 2 - 8, 16, 16, Palette.argb(0xD0, 0x7A1A1A));
-		Brush.centered(l.g, font, Component.literal("⚖"), mid, y0 + tinggiPihak / 2 - 4, 0xFFFFF0E0, 0.9F, false);
-		int y = y0 + tinggiPihak + 4;
-		y += subjudul(l, SketsaKota.t("perkara.saksi"), x0, y, x1);
-		List<Lembar> saksi = lembar.daftar(KotaLembar.Perkara.SAKSI);
-		if (saksi.isEmpty()) {
-			l.keterangan(SketsaKota.t("perkara.saksi_kosong"), x0, y + 2, x1 - x0, gaya.teksSamar);
-			return;
-		}
-		daftar.gambar(l, "saksi", x0, y, x1, y1, saksi.size(), 26, (lk, i, rx0, ry0, rx1, ry1, sorot, pilih) -> {
-			Lembar s = saksi.get(i);
-			boolean dipanggil = s.b(KotaLembar.Perkara.DIPANGGIL);
-			int bw = 56;
-			int tx = SketsaKota.warga(lk, s, rx0, ry0, Math.min(rx1, rx0 + 150), ry1, sorot, pilih, gaya);
-			if (dipanggil) {
-				// the testimony as a speech bubble beside the card
-				int bx0 = Math.min(rx1, rx0 + 154);
-				lk.g.fill(bx0, ry0 + 2, rx1, ry1 - 2, Palette.argb(0xD8, 0xF4ECD4));
-				lk.g.fill(bx0 - 3, ry0 + 9, bx0, ry0 + 12, Palette.argb(0xD8, 0xF4ECD4));
-				lk.bungkus(s.teks(KotaLembar.Perkara.KESAKSIAN), bx0 + 3, ry0 + 4, rx1 - bx0 - 6, Palette.INK, 0.7F, ry1 - ry0 - 6);
-			} else {
-				tombolOp(lk, "panggil" + i, rx1 - bw - 2, ry0 + 5, bw, 14, SketsaKota.t("perkara.panggil"), true, null,
-						LembarKunci.op(KotaLembar.Perkara.OP_PANGGIL, s.i(KotaLembar.WARGA, -1)));
-			}
-		}, null, null);
-	}
-
-	private void bukti(dev.kultivator.client.tempat.ui.kit.Lukis l, int x0, int y0, int x1, int y1) {
-		List<Lembar> rows = lembar.daftar(KotaLembar.Perkara.BUKTI);
-		if (rows.isEmpty()) {
-			kosong(l, SketsaKota.t("perkara.bukti_kosong"), x0, y0, x1, y1);
-			return;
-		}
-		daftar.gambar(l, "bukti", x0, y0, x1, y1, rows.size(), 40, (lk, i, rx0, ry0, rx1, ry1, sorot, pilih) -> {
-			Lembar b = rows.get(i);
-			PanelTempat.kartu(lk.g, gaya, rx0, ry0, rx1, ry1, sorot ? 1.0F : 0.0F, pilih);
-			String jenis = b.s(LembarKunci.JENIS);
-			boolean telusur = b.b(KotaLembar.Perkara.DITELUSURI);
-			if (KotaLembar.Perkara.BK_BARANG.equals(jenis) && !b.barang().isEmpty()) {
-				lk.g.item(b.barang(), rx0 + 4, ry0 + 4);
-			} else {
-				IkonTempat.gambar(lk.g, KotaLembar.Perkara.BK_GOSIP.equals(jenis) ? IkonTempat.RANTAI : IkonTempat.GULUNGAN, rx0 + 4, ry0 + 4, 16, 0xFFFFFFFF);
-			}
-			int tx = rx0 + 24;
-			int bw = 58;
-			lk.teks(Brush.bold(b.teks(LembarKunci.NAMA)), tx, ry0 + 3, rx1 - tx - bw - 6, gaya.teks, 0.85F);
-			lk.bungkus(b.teks(LembarKunci.TEKS), tx, ry0 + 13, rx1 - tx - bw - 6, telusur ? gaya.teks : gaya.teksSamar, 0.7F, 14);
-			List<Lembar> rantai = b.daftar(KotaLembar.Perkara.RANTAI);
-			if (!rantai.isEmpty()) {
-				// the spreader chain, oldest last: A ← B ← C
-				Component chain = Component.empty();
-				for (int r = 0; r < rantai.size(); r++) {
-					chain = chain.copy().append(r == 0 ? Component.empty() : Component.literal(" ← ")).append(rantai.get(r).teks(LembarKunci.NAMA));
-				}
-				lk.keterangan(SketsaKota.t("perkara.rantai", chain), tx, ry1 - 10, rx1 - tx - bw - 6, TempatWarna.PERINGATAN);
-			}
-			if (telusur) {
-				IkonTempat.gambar(lk.g, IkonTempat.CENTANG, rx1 - 14, ry0 + 5, 10, 0xFFFFFFFF);
-			} else {
-				tombolOp(lk, "telusuri" + i, rx1 - bw - 3, ry0 + 5, bw, 14, SketsaKota.t("perkara.telusuri"), true, null,
-						LembarKunci.op(KotaLembar.Perkara.OP_TELUSURI, b.id()));
-			}
-		}, null, null);
-	}
-
-	private void putusan(dev.kultivator.client.tempat.ui.kit.Lukis l, int x0, int y0, int x1, int y1) {
-		int y = y0;
-		Lembar amplop = lembar.sub(KotaLembar.Perkara.AMPLOP);
-		if (!amplop.kosongSemua()) {
-			// a red envelope on the table, danger colours
-			int h = 30;
-			l.g.fill(x0, y, x1, y + h, Palette.argb(0xC0, 0x5A0E0E));
-			l.g.fill(x0, y, x1, y + 1, TempatWarna.BAHAYA);
-			l.g.fill(x0 + 4, y + 5, x0 + 26, y + 25, 0xFFB3202A);
-			l.g.fill(x0 + 4, y + 5, x0 + 26, y + 9, 0xFFD4A637);
-			l.teks(SketsaKota.t("perkara.amplop", amplop.teks(KotaLembar.DARI), Brush.angka(amplop.l(LembarKunci.HARGA, 0L))), x0 + 30, y + 4,
-					x1 - x0 - 150, 0xFFFFE4D0, 0.8F);
-			l.keterangan(SketsaKota.t("perkara.amplop_risiko"), x0 + 30, y + 16, x1 - x0 - 150, 0xFFE0A090);
-			tombolYakin(l, "amplop_terima", x1 - 118, y + 8, 58, 14, SketsaKota.t("perkara.amplop_terima"), true, null, KotaLembar.Perkara.OP_AMPLOP_TERIMA);
-			tombolOp(l, "amplop_tolak", x1 - 58, y + 8, 54, 14, SketsaKota.t("perkara.amplop_tolak"), true, null, KotaLembar.Perkara.OP_AMPLOP_TOLAK);
-			y += h + 4;
-		}
-		Lembar hasil = lembar.sub(KotaLembar.Perkara.HASIL);
-		if (!hasil.kosongSemua()) {
-			PanelTempat.sumur(l.g, gaya, x0, y, x1, y + 34);
-			IkonTempat.stempel(l.g, IkonTempat.Stempel.PERSEGI, x0 + 4, y + 4, 26, 26, Palette.argb(0xE0, Palette.SEAL & 0xFFFFFF));
-			l.bungkus(hasil.teks(LembarKunci.TEKS), x0 + 34, y + 4, x1 - x0 - 38, gaya.teksSumur(), 0.8F, 28);
-			y += 38;
-		}
-		y += subjudul(l, SketsaKota.t("perkara.putusan"), x0, y, x1);
-		List<Lembar> rows = lembar.daftar(KotaLembar.Perkara.PUTUSAN);
-		for (Lembar v : rows) {
-			if (y + 30 > y1) {
-				break;
-			}
-			int no = v.i(LembarKunci.NO, 0);
-			PanelTempat.kartu(l.g, gaya, x0, y, x1, y + 28, 0.0F, false);
-			Brush.text(l.g, font, Component.literal(Integer.toString(no)), x0 + 5, y + 4, Palette.SEAL, 1.3F, false);
-			l.teks(v.teks(LembarKunci.TEKS), x0 + 18, y + 3, x1 - x0 - 92, gaya.teks, 0.85F);
-			l.keterangan(SketsaKota.t("perkara.akibat", v.teks(KotaLembar.Perkara.AKIBAT)), x0 + 18, y + 15, x1 - x0 - 92, gaya.teksLemah);
-			tombolYakin(l, "putus" + no, x1 - 72, y + 7, 68, 14, SketsaKota.t("perkara.putuskan"), v.b(LembarKunci.BISA), v.teksAtau(LembarKunci.ALASAN),
-					LembarKunci.op(KotaLembar.Perkara.OP_PUTUSKAN, no));
-			y += 31;
-		}
 	}
 }

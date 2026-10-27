@@ -217,7 +217,8 @@ public final class KotaRagam {
 			present.add(p.id());
 			Kegiatan k = huni.kegiatan(p, waktu, now);
 			boolean umum = Kapasitas.umum(k.tujuan());
-			Penyeimbang.catatData(h, p.id(), umum, umum ? -1 : Penyeimbang.zonaTetap(huni, peta, p, k));
+			Penyeimbang.catatData(h, p.id(), umum, umum ? -1 : Penyeimbang.zonaTetap(huni, peta, p, k), Penyeimbang.dalam(k));
+			Penyeimbang.catatMinat(h, p.id(), umum, k.tujuan());
 			MetrikRagam.sampelWarga(s, huni.situsId, hari, p, k);
 		}
 		for (Integer id : List.copyOf(h.bebas)) {

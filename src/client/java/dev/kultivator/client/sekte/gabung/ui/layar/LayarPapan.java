@@ -71,6 +71,7 @@ public final class LayarPapan extends LayarGabungDasar {
 		aktif.mulaiUlang(now);
 		tugas.mulaiUlang(now);
 		tampilKunci = "";
+		halaman = 0;
 	}
 
 	@Override
@@ -139,11 +140,14 @@ public final class LayarPapan extends LayarGabungDasar {
 			kosong(l, u("papan.kosong." + tab), x0, y0, x1, y1);
 			return;
 		}
-		Kotak[] k = bagi(x0, y0, x1, y1);
-		daftar.gambar(l, "misi", k[0].x0(), k[0].y0(), k[0].x1(), k[0].y1(), list.size(), 22, (lk, i, rx0, ry0, rx1, ry1, sorot, pilih) ->
+		y0 = bilahHalaman(l, x0, y0, x1, u("papan.hal.misi"), u("papan.hal.slip"));
+		Kotak[] k = bagiHalaman(x0, y0, x1, y1);
+		if (k[0] != null) daftar.gambar(l, "misi", k[0].x0(), k[0].y0(), k[0].x1(), k[0].y1(), list.size(), 22, (lk, i, rx0, ry0, rx1, ry1, sorot, pilih) ->
 				baris(lk, list.get(i), rx0, ry0, rx1, ry1, sorot, pilih), this::terimaPilihan, null);
 		int sel = daftar.pilihan();
-		slip(l, k[1], sel >= 0 && sel < list.size() ? list.get(sel) : null);
+		if (k[1] != null) {
+			slip(l, k[1], sel >= 0 && sel < list.size() ? list.get(sel) : null);
+		}
 	}
 
 	private void cap(Lukis l, Lembar e, int x, int y, int size) {
@@ -209,15 +213,18 @@ public final class LayarPapan extends LayarGabungDasar {
 		float tinggi = l.bungkus(e.teks(LembarKunci.TEKS).copy().withStyle(ChatFormatting.ITALIC), x0, y, x1 - x0, gaya.teks, 1.0F,
 				Math.max(9, by - y - bawahTinggi));
 		y += Math.round(tinggi) + 4;
-		int rx = x0;
-		l.teks(u("papan.imbalan"), rx, y, 60, gaya.teksSamar);
-		rx += font.width(u("papan.imbalan")) + 4;
-		rx += pk(l, e.i(LembarKunci.PK, 0), -1L, rx, y, false, 1.0F) + 6;
-		if (e.ada(LembarKunci.SKOR)) {
-			l.teks(u("papan.skor_perang", Brush.bertanda(e.i(LembarKunci.SKOR, 0))), rx, y, x1 - rx, TempatWarna.EMAS_GELAP);
+		if (y + 10 < by) {
+			// never over the buttons of a short slip
+			int rx = x0;
+			l.teks(u("papan.imbalan"), rx, y, 60, gaya.teksSamar);
+			rx += font.width(u("papan.imbalan")) + 4;
+			rx += pk(l, e.i(LembarKunci.PK, 0), -1L, rx, y, false, 1.0F) + 6;
+			if (e.ada(LembarKunci.SKOR)) {
+				l.teks(u("papan.skor_perang", Brush.bertanda(e.i(LembarKunci.SKOR, 0))), rx, y, x1 - rx, TempatWarna.EMAS_GELAP);
+			}
+			y += 12;
 		}
-		y += 12;
-		if (e.ada(Papan.ANGGOTA_MAKS)) {
+		if (e.ada(Papan.ANGGOTA_MAKS) && y + 10 < by) {
 			l.teks(u("papan.regu", anggota.size(), e.i(Papan.ANGGOTA_MAKS, 4)), x0, y, x1 - x0, gaya.teksLemah);
 			y += 10;
 			for (int i = 0; i < anggota.size() && i < 4 && y + 9 < by; i++) {

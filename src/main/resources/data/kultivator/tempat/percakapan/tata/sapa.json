@@ -26,7 +26,8 @@
         {
           "kunci": "sapa.subuh.1",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -35,7 +36,9 @@
         },
         {
           "kunci": "sapa.subuh.2",
-          "slot": [],
+          "slot": [
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "gunung"
@@ -44,7 +47,8 @@
         {
           "kunci": "sapa.subuh.3",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 2,
           "varian": [
@@ -63,6 +67,10 @@
         "$sebutan": {
           "tipe": "sebutan_pendengar",
           "dari": "pendengar"
+        },
+        "$ekor": {
+          "aturan": "ekor.sapa",
+          "opsional": 0.35
         }
       },
       "gestur": "lambai"
@@ -80,7 +88,8 @@
         {
           "kunci": "sapa.pagi.0",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 3,
           "varian": [
@@ -105,14 +114,16 @@
         {
           "kunci": "sapa.pagi.2",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1
         },
         {
           "kunci": "sapa.pagi.3",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1
         },
@@ -136,6 +147,10 @@
         "$sebutan": {
           "tipe": "sebutan_pendengar",
           "dari": "pendengar"
+        },
+        "$ekor": {
+          "aturan": "ekor.sapa",
+          "opsional": 0.35
         }
       },
       "gestur": "lambai"
@@ -153,7 +168,8 @@
         {
           "kunci": "sapa.siang.0",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 3,
           "varian": [
@@ -165,7 +181,8 @@
         {
           "kunci": "sapa.siang.1",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -196,7 +213,9 @@
         },
         {
           "kunci": "sapa.siang.4",
-          "slot": [],
+          "slot": [
+            "$ekor"
+          ],
           "bobot": 2,
           "varian": [
             "air",
@@ -208,6 +227,10 @@
         "$sebutan": {
           "tipe": "sebutan_pendengar",
           "dari": "pendengar"
+        },
+        "$ekor": {
+          "aturan": "ekor.sapa",
+          "opsional": 0.35
         }
       },
       "gestur": "lambai"
@@ -225,7 +248,8 @@
         {
           "kunci": "sapa.sore.0",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 3,
           "varian": [
@@ -246,7 +270,9 @@
         },
         {
           "kunci": "sapa.sore.2",
-          "slot": [],
+          "slot": [
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "oasis"
@@ -266,7 +292,8 @@
         {
           "kunci": "sapa.sore.4",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 2,
           "varian": [
@@ -276,7 +303,8 @@
         {
           "kunci": "sapa.sore.5",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -288,6 +316,10 @@
         "$sebutan": {
           "tipe": "sebutan_pendengar",
           "dari": "pendengar"
+        },
+        "$ekor": {
+          "aturan": "ekor.sapa",
+          "opsional": 0.35
         }
       },
       "gestur": "lambai"
@@ -305,7 +337,8 @@
         {
           "kunci": "sapa.malam.0",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 3,
           "varian": [
@@ -317,7 +350,8 @@
         {
           "kunci": "sapa.malam.1",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -327,7 +361,9 @@
         },
         {
           "kunci": "sapa.malam.2",
-          "slot": [],
+          "slot": [
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "air"
@@ -346,7 +382,9 @@
         },
         {
           "kunci": "sapa.malam.4",
-          "slot": [],
+          "slot": [
+            "$ekor"
+          ],
           "bobot": 2,
           "varian": [
             "kasar",
@@ -358,6 +396,10 @@
         "$sebutan": {
           "tipe": "sebutan_pendengar",
           "dari": "pendengar"
+        },
+        "$ekor": {
+          "aturan": "ekor.sapa",
+          "opsional": 0.35
         }
       },
       "gestur": "lambai"
@@ -375,7 +417,8 @@
         {
           "kunci": "sapa.larut.0",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -387,7 +430,8 @@
         {
           "kunci": "sapa.larut.1",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -398,7 +442,8 @@
         {
           "kunci": "sapa.larut.2",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -408,7 +453,8 @@
         {
           "kunci": "sapa.larut.3",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 2,
           "varian": [
@@ -421,6 +467,10 @@
         "$sebutan": {
           "tipe": "sebutan_pendengar",
           "dari": "pendengar"
+        },
+        "$ekor": {
+          "aturan": "ekor.sapa",
+          "opsional": 0.35
         }
       },
       "gestur": "lambai"
@@ -449,7 +499,8 @@
         {
           "kunci": "sapa.hujan.1",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -459,7 +510,8 @@
         {
           "kunci": "sapa.hujan.2",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -479,7 +531,9 @@
         },
         {
           "kunci": "sapa.hujan.4",
-          "slot": [],
+          "slot": [
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "kuno"
@@ -490,6 +544,10 @@
         "$sebutan": {
           "tipe": "sebutan_pendengar",
           "dari": "pendengar"
+        },
+        "$ekor": {
+          "aturan": "ekor.sapa",
+          "opsional": 0.35
         }
       },
       "gestur": "lambai"
@@ -725,7 +783,8 @@
         {
           "kunci": "sapa.gembira.0",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 2,
           "varian": [
@@ -736,7 +795,8 @@
         {
           "kunci": "sapa.gembira.1",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -745,7 +805,9 @@
         },
         {
           "kunci": "sapa.gembira.2",
-          "slot": [],
+          "slot": [
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "kampung"
@@ -754,7 +816,8 @@
         {
           "kunci": "sapa.gembira.3",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -764,7 +827,8 @@
         {
           "kunci": "sapa.gembira.4",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -776,6 +840,10 @@
         "$sebutan": {
           "tipe": "sebutan_pendengar",
           "dari": "pendengar"
+        },
+        "$ekor": {
+          "aturan": "ekor.sapa",
+          "opsional": 0.35
         }
       },
       "gestur": "tertawa"
@@ -1212,7 +1280,8 @@
         {
           "kunci": "sapa.kenal.0",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 2,
           "varian": [
@@ -1234,7 +1303,8 @@
         {
           "kunci": "sapa.kenal.2",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -1254,7 +1324,8 @@
         {
           "kunci": "sapa.kenal.4",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -1266,6 +1337,10 @@
         "$sebutan": {
           "tipe": "sebutan_pendengar",
           "dari": "pendengar"
+        },
+        "$ekor": {
+          "aturan": "ekor.sapa",
+          "opsional": 0.35
         }
       },
       "gestur": "lambai"
@@ -1283,7 +1358,8 @@
         {
           "kunci": "sapa.akrab.0",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 2,
           "varian": [
@@ -1304,7 +1380,8 @@
         {
           "kunci": "sapa.akrab.2",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -1314,7 +1391,8 @@
         {
           "kunci": "sapa.akrab.3",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -1325,7 +1403,8 @@
         {
           "kunci": "sapa.akrab.4",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -1337,6 +1416,10 @@
         "$sebutan": {
           "tipe": "sebutan_pendengar",
           "dari": "pendengar"
+        },
+        "$ekor": {
+          "aturan": "ekor.sapa",
+          "opsional": 0.35
         }
       },
       "gestur": "tepuk_bahu"
@@ -1354,7 +1437,8 @@
         {
           "kunci": "sapa.sahabat.0",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 2,
           "varian": [
@@ -1365,7 +1449,8 @@
         {
           "kunci": "sapa.sahabat.1",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -1375,7 +1460,8 @@
         {
           "kunci": "sapa.sahabat.2",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -1385,7 +1471,8 @@
         {
           "kunci": "sapa.sahabat.3",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -1395,7 +1482,8 @@
         {
           "kunci": "sapa.sahabat.4",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -1408,6 +1496,10 @@
         "$sebutan": {
           "tipe": "sebutan_pendengar",
           "dari": "pendengar"
+        },
+        "$ekor": {
+          "aturan": "ekor.sapa",
+          "opsional": 0.35
         }
       },
       "gestur": "peluk"
@@ -1491,7 +1583,8 @@
         {
           "kunci": "sapa.tahu_nama.0",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -1502,7 +1595,8 @@
         {
           "kunci": "sapa.tahu_nama.1",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -1529,6 +1623,10 @@
         "$tempat": {
           "tipe": "tempat",
           "dari": "konteks.tempat"
+        },
+        "$ekor": {
+          "aturan": "ekor.sapa",
+          "opsional": 0.35
         }
       },
       "gestur": "lambai"
@@ -1546,7 +1644,8 @@
         {
           "kunci": "sapa.pedagang.0",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 3,
           "varian": [
@@ -1559,7 +1658,8 @@
         {
           "kunci": "sapa.pedagang.1",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -1569,7 +1669,8 @@
         {
           "kunci": "sapa.pedagang.2",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -1579,7 +1680,8 @@
         {
           "kunci": "sapa.pedagang.3",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 2,
           "varian": [
@@ -1589,7 +1691,8 @@
         {
           "kunci": "sapa.pedagang.4",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -1598,7 +1701,9 @@
         },
         {
           "kunci": "sapa.pedagang.5",
-          "slot": [],
+          "slot": [
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "kasar"
@@ -1609,6 +1714,10 @@
         "$sebutan": {
           "tipe": "sebutan_pendengar",
           "dari": "pendengar"
+        },
+        "$ekor": {
+          "aturan": "ekor.sapa",
+          "opsional": 0.35
         }
       },
       "gestur": "seru_dagang"
@@ -1629,7 +1738,8 @@
         {
           "kunci": "sapa.pedagang.hujan.0",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -1639,7 +1749,8 @@
         {
           "kunci": "sapa.pedagang.hujan.1",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -1649,7 +1760,8 @@
         {
           "kunci": "sapa.pedagang.hujan.2",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1
         }
@@ -1658,6 +1770,10 @@
         "$sebutan": {
           "tipe": "sebutan_pendengar",
           "dari": "pendengar"
+        },
+        "$ekor": {
+          "aturan": "ekor.sapa",
+          "opsional": 0.35
         }
       },
       "gestur": "seru_dagang"
@@ -1675,7 +1791,8 @@
         {
           "kunci": "sapa.pekerja.0",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 2,
           "varian": [
@@ -1686,7 +1803,8 @@
         {
           "kunci": "sapa.pekerja.1",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -1697,7 +1815,8 @@
           "kunci": "sapa.pekerja.2",
           "slot": [
             "$sebutan",
-            "$kerja"
+            "$kerja",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -1707,7 +1826,8 @@
         {
           "kunci": "sapa.pekerja.3",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -1716,7 +1836,9 @@
         },
         {
           "kunci": "sapa.pekerja.4",
-          "slot": [],
+          "slot": [
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "kasar"
@@ -1731,6 +1853,10 @@
         "$kerja": {
           "tipe": "pekerjaan",
           "dari": "pembicara"
+        },
+        "$ekor": {
+          "aturan": "ekor.sapa",
+          "opsional": 0.35
         }
       },
       "gestur": "seka_keringat"
@@ -1756,7 +1882,8 @@
         {
           "kunci": "sapa.pekerja.pagi.0",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -1765,7 +1892,9 @@
         },
         {
           "kunci": "sapa.pekerja.pagi.1",
-          "slot": [],
+          "slot": [
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "kasar"
@@ -1774,7 +1903,8 @@
         {
           "kunci": "sapa.pekerja.pagi.2",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -1786,6 +1916,10 @@
         "$sebutan": {
           "tipe": "sebutan_pendengar",
           "dari": "pendengar"
+        },
+        "$ekor": {
+          "aturan": "ekor.sapa",
+          "opsional": 0.35
         }
       },
       "gestur": "lambai"
@@ -1803,7 +1937,8 @@
         {
           "kunci": "sapa.penjaga.0",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 2,
           "varian": [
@@ -1814,7 +1949,8 @@
         {
           "kunci": "sapa.penjaga.1",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -1824,7 +1960,8 @@
         {
           "kunci": "sapa.penjaga.2",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -1834,7 +1971,8 @@
         {
           "kunci": "sapa.penjaga.3",
           "slot": [
-            "$tempat"
+            "$tempat",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -1844,7 +1982,8 @@
         {
           "kunci": "sapa.penjaga.4",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -1860,6 +1999,10 @@
         "$tempat": {
           "tipe": "tempat",
           "dari": "konteks.tempat"
+        },
+        "$ekor": {
+          "aturan": "ekor.sapa",
+          "opsional": 0.35
         }
       },
       "gestur": "sikap_tombak"
@@ -1956,7 +2099,8 @@
         {
           "kunci": "sapa.tetua.1",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -1966,7 +2110,8 @@
         {
           "kunci": "sapa.tetua.2",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -1975,7 +2120,9 @@
         },
         {
           "kunci": "sapa.tetua.3",
-          "slot": [],
+          "slot": [
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "kampung"
@@ -1984,7 +2131,8 @@
         {
           "kunci": "sapa.tetua.4",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -1996,6 +2144,10 @@
         "$sebutan": {
           "tipe": "sebutan_pendengar",
           "dari": "pendengar"
+        },
+        "$ekor": {
+          "aturan": "ekor.sapa",
+          "opsional": 0.35
         }
       },
       "gestur": "sikap_tua",
@@ -2013,7 +2165,9 @@
       "bingkai": [
         {
           "kunci": "sapa.kultivator.0",
-          "slot": [],
+          "slot": [
+            "$ekor"
+          ],
           "bobot": 2,
           "varian": [
             "kuno",
@@ -2023,7 +2177,8 @@
         {
           "kunci": "sapa.kultivator.1",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -2034,7 +2189,8 @@
         {
           "kunci": "sapa.kultivator.2",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -2056,6 +2212,10 @@
         "$sebutan": {
           "tipe": "sebutan_pendengar",
           "dari": "pendengar"
+        },
+        "$ekor": {
+          "aturan": "ekor.sapa",
+          "opsional": 0.35
         }
       },
       "gestur": "hormat"
@@ -2127,7 +2287,8 @@
         {
           "kunci": "sapa.cendekia.1",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -2137,7 +2298,8 @@
         {
           "kunci": "sapa.cendekia.2",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -2147,7 +2309,8 @@
         {
           "kunci": "sapa.cendekia.3",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1
         }
@@ -2156,6 +2319,10 @@
         "$sebutan": {
           "tipe": "sebutan_pendengar",
           "dari": "pendengar"
+        },
+        "$ekor": {
+          "aturan": "ekor.sapa",
+          "opsional": 0.35
         }
       },
       "gestur": "hormat"
@@ -2172,7 +2339,9 @@
       "bingkai": [
         {
           "kunci": "sapa.rahib.0",
-          "slot": [],
+          "slot": [
+            "$ekor"
+          ],
           "bobot": 2,
           "varian": [
             "kuno"
@@ -2181,7 +2350,8 @@
         {
           "kunci": "sapa.rahib.1",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -2191,7 +2361,8 @@
         {
           "kunci": "sapa.rahib.2",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -2201,7 +2372,8 @@
         {
           "kunci": "sapa.rahib.3",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1
         }
@@ -2210,6 +2382,10 @@
         "$sebutan": {
           "tipe": "sebutan_pendengar",
           "dari": "pendengar"
+        },
+        "$ekor": {
+          "aturan": "ekor.sapa",
+          "opsional": 0.35
         }
       },
       "gestur": "sikap_doa"
@@ -2236,7 +2412,9 @@
         },
         {
           "kunci": "sapa.pejabat.1",
-          "slot": [],
+          "slot": [
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "kasar",
@@ -2246,7 +2424,8 @@
         {
           "kunci": "sapa.pejabat.2",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -2256,7 +2435,8 @@
         {
           "kunci": "sapa.pejabat.3",
           "slot": [
-            "$sebutan"
+            "$sebutan",
+            "$ekor"
           ],
           "bobot": 1
         }
@@ -2265,6 +2445,10 @@
         "$sebutan": {
           "tipe": "sebutan_pendengar",
           "dari": "pendengar"
+        },
+        "$ekor": {
+          "aturan": "ekor.sapa",
+          "opsional": 0.35
         }
       },
       "gestur": "sikap_tangan_belakang"

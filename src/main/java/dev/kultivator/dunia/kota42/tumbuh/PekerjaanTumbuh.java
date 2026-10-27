@@ -157,7 +157,8 @@ public final class PekerjaanTumbuh {
 			return;
 		}
 		List<String> needs = kebutuhan(server, level, situs);
-		if (needs.isEmpty() || Kemakmuran.nilai(server, situs) < KotaConfig.tumbuh().ambang || BangunKembali.aktif(server, situs)) {
+		if (needs.isEmpty() || Kemakmuran.nilai(server, situs) < KotaConfig.tumbuh().ambang || BangunKembali.aktif(server, situs)
+				|| Blokade.aktif(server, situs)) {
 			return;
 		}
 		pilihBaru(server, situs, plots, needs);

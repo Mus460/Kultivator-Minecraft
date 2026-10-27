@@ -1,0 +1,63 @@
+{
+  "nama": "kultivator.kota42.perkara.t.air_irigasi.nama",
+  "teks": "kultivator.kota42.perkara.t.air_irigasi.teks",
+  "penggugat": {
+    "klaim": "kultivator.kota42.perkara.t.air_irigasi.klaim_a",
+    "peran": [
+      "petani"
+    ]
+  },
+  "tergugat": {
+    "klaim": "kultivator.kota42.perkara.t.air_irigasi.klaim_b",
+    "peran": [
+      "petani"
+    ]
+  },
+  "benar": "acak",
+  "saksi": 2,
+  "kesaksian": {
+    "penggugat": [
+      "kultivator.kota42.perkara.t.air_irigasi.saksi_a1",
+      "kultivator.kota42.perkara.t.air_irigasi.saksi_a2"
+    ],
+    "tergugat": [
+      "kultivator.kota42.perkara.t.air_irigasi.saksi_b1",
+      "kultivator.kota42.perkara.t.air_irigasi.saksi_b2"
+    ]
+  },
+  "dusta": "kultivator.kota42.perkara.t.air_irigasi.dusta",
+  "bukti": [
+    {
+      "jenis": "catatan",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.air_irigasi.bukti1_a",
+        "tergugat": "kultivator.kota42.perkara.t.air_irigasi.bukti1_b"
+      }
+    },
+    {
+      "jenis": "gosip",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.air_irigasi.bukti2_a",
+        "tergugat": "kultivator.kota42.perkara.t.air_irigasi.bukti2_b"
+      }
+    }
+  ],
+  "putusan": [
+    {
+      "untuk": "penggugat",
+      "teks": "kultivator.kota42.perkara.t.air_irigasi.putusan1",
+      "akibat": "kultivator.kota42.perkara.t.air_irigasi.putusan1_akibat"
+    },
+    {
+      "untuk": "tergugat",
+      "teks": "kultivator.kota42.perkara.t.air_irigasi.putusan2",
+      "akibat": "kultivator.kota42.perkara.t.air_irigasi.putusan2_akibat"
+    },
+    {
+      "untuk": "damai",
+      "teks": "kultivator.kota42.perkara.t.air_irigasi.putusan3",
+      "akibat": "kultivator.kota42.perkara.t.air_irigasi.putusan3_akibat"
+    }
+  ],
+  "suap": 0.3
+}

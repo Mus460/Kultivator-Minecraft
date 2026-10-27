@@ -193,6 +193,8 @@ public final class KafilahJalan {
 				caravan.putBoolean("tiba", true);
 				caravan.putLong("tiba_pada", now);
 				changed = true;
+				// 42.6.3: an arrived caravan restocks the three scarcest goods of the town it reached
+				dev.kultivator.dunia.kota42.ekonomi.StokKota.kafilahTiba(current, caravan.getLongOr("tujuan", 0L));
 				if (guard != null) {
 					Msg.chat(guard, Component.translatable("kultivator.tempat_ekonomi.kafilah.tiba", KotaNames.town(caravan.getLongOr("tujuan", 0L)))
 							.withStyle(ChatFormatting.GREEN));

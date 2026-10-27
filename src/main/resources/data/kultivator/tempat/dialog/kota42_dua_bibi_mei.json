@@ -1,0 +1,33 @@
+{
+  "pembicara": [
+    "tokoh:bibi_mei"
+  ],
+  "prioritas": 55,
+  "syarat": [
+    "quest kota42_dua_keluarga aktif",
+    "bendera kota42.dua.surat",
+    "!bendera kota42.dua.dengar_mei"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "357",
+      "prop": "177",
+      "akibat": [
+        "bendera kota42.dua.dengar_mei"
+      ],
+      "pilihan": [
+        {
+          "ke": "syarat"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "syarat",
+      "gestur": "tunjuk",
+      "suara": "kota42.comblang"
+    }
+  ]
+}

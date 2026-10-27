@@ -42,7 +42,7 @@
   "kultivator.gabung.corak.labirin_batu.aturan": "An unseen maze rises. Step on the three formation eyes in the order of the trigram riddle, then walk out. A wrong eye costs 10 seconds.",
   "kultivator.gabung.corak.labirin_batu.inspired": "Inspired by Zhuge Liang's Stone Sentinel Maze (八阵图) that misled Lu Xun.",
   "kultivator.gabung.corak.lima_pilar.nama": "Five Qi Pillars",
-  "kultivator.gabung.corak.lima_pilar.aturan": "Visit the five pillars along the Five Phases cycle. Hold right-click on a pillar to raise the Qi needle, release to let it sink; keep it inside the band for 15 seconds.",
+  "kultivator.gabung.corak.lima_pilar.aturan": "Visit the five pillars along the Five Phases cycle. Hold right-click on a pillar to raise the Qi needle, release to let it sink; keep it inside the band for 15 seconds. The needle follows with a brief lag: let go before it reaches the band, do not wait.",
   "kultivator.gabung.corak.lima_pilar.inspired": "Inspired by the generating cycle of the Five Phases (五行相生).",
   "kultivator.gabung.corak.satu_tungku.nama": "One Furnace",
   "kultivator.gabung.corak.satu_tungku.aturan": "Refine any pill at the sect's furnace with the trial box's ingredients within 600 seconds. The pill's quality decides your mark; unused ingredients go back.",
@@ -51,7 +51,7 @@
   "kultivator.gabung.corak.pikul_gunung.aturan": "Carry the stone from the foot of the stair to its top. In hand it is heavy; in the pack heavier still. Dropping it costs 10 seconds; losing it fails.",
   "kultivator.gabung.corak.pikul_gunung.inspired": "Inspired by the Monkey King pinned under Five Finger Mountain.",
   "kultivator.gabung.corak.kolam_darah.nama": "Blood Pool",
-  "kultivator.gabung.corak.kolam_darah.aturan": "Stand in the blood pool while it drinks your life, and survive three waves of demonic cultivators. Crouch still for 1 second to offer blood for Strength II.",
+  "kultivator.gabung.corak.kolam_darah.aturan": "Stand in the blood pool while it drinks your life (it stops at 30 %% health; the pool does not kill) and survive three waves of demonic cultivators. Crouch still for 1 second to offer blood for Strength II.",
   "kultivator.gabung.corak.kolam_darah.inspired": "Inspired by the blood prohibited grounds of demonic-path xianxia novels.",
   "kultivator.gabung.corak.tiga_cawan.nama": "Three Cups",
   "kultivator.gabung.corak.tiga_cawan.aturan": "Drink from the three poisoned cups one by one. Smell the scent, then pick the right antidote from the five herbs (read each herb's note) within 20 seconds.",
@@ -147,5 +147,12 @@
   "kultivator.gabung.corak.ujian_senyap.gagal": "Seen three times. The shadows do not take one so easily seen.",
   "kultivator.gabung.corak.ujian_senyap.seru.0": "Who goes there?!",
   "kultivator.gabung.corak.ujian_senyap.seru.1": "Intruder! Over there!",
-  "kultivator.gabung.corak.ujian_senyap.seru.2": "Caught you!"
+  "kultivator.gabung.corak.ujian_senyap.seru.2": "Caught you!",
+  "kultivator.gabung.corak.sisa_waktu": "Time left: %s seconds.",
+  "kultivator.gabung.corak.akhir.duel_kalah": "Duel over",
+  "kultivator.gabung.corak.seratus_tebasan.tawaran_duel": "You stand at the Foundation realm: if you wish, right-click the Instructing Disciple before the first cut to challenge them to a friendly sword duel instead of the dummies. A win is full marks.",
+  "kultivator.gabung.corak.seratus_tebasan.duel_ranah": "The friendly duel is only for candidates of the Foundation realm or higher. Cut the dummies.",
+  "kultivator.gabung.corak.seratus_tebasan.duel_terlambat": "You have already begun on the dummies; the duel can no longer be chosen.",
+  "kultivator.gabung.corak.seratus_tebasan.duel_gagal": "The duel cannot begin (%s). Cut the dummies.",
+  "kultivator.gabung.corak.seratus_tebasan.duel_mulai": "The Instructing Disciple draws their sword. A friendly sword duel begins; it stops when either of you is down to a tenth of their breath."
 }

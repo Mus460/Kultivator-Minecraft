@@ -10,18 +10,20 @@ lanjut: kerja kota
 gestur: tatap_langit
 $penguat: aturan=frag.penguat opsional=0.3
 $senang: aturan=seru.senang opsional=0.5
-- [2] Langit bersih sekali hari ini. Pertanda baik, kata orang. || Such a clear sky today. A good omen, they say.
-  ~ kuno: Langit jernih tanpa awan. Pertanda baik bagi jalan siapa pun. || A cloudless clear sky. A good omen for anyone's road.
-  ~ kasar: Langit bersih. Bagus. Itu saja. || Clear sky. Good. That's all.
-- Cuaca begini enak untuk menjemur apa saja. Kasur, ikan, bahkan diri sendiri. {$penguat} || Weather like this is good for drying anything. Mattresses, fish, even yourself. {$penguat}
-- Matahari bersahabat hari ini. Semoga awet sampai panen. || The sun is friendly today. May it last till harvest.
-  ~ kampung: Mataharinya ramah, Nak. Moga-moga awet sampai panen. || The sun's kind, child. Hope it holds till harvest.
-- Kalau cerah begini, pedagang dari luar kota pasti banyak yang datang. || On clear days like this, plenty of outside traders come.
-  ~ pelabuhan: Cerah begini kapal dagang berdatangan, Bung. Dermaga bakal sesak. || Clear like this the merchantmen come in, mate. The dock will be packed.
-- Cerah begini, hatiku ikut terang. {$senang} || A clear day like this brightens my heart too. {$senang}
-  ~ kasar: Cerah. Bagus. Jangan buang waktu bicara cuaca. || Clear. Good. Don't waste time on the weather.
-- Lihat itu, burung layang-layang terbang tinggi. Tidak akan hujan. || Look, the swallows fly high. It won't rain.
-  ~ oasis: Lihat, Saudara, elang terbang tinggi. Badai pasir tidak akan datang. || Look, friend, the hawks fly high. No sandstorm today.
+$awal: aturan=awal.basa opsional=0.4
+$ekor: aturan=ekor.basa opsional=0.4
+- [2] {$awal}Langit bersih sekali hari ini. Pertanda baik, kata orang.{$ekor} || {$awal}Such a clear sky today. A good omen, they say.{$ekor}
+  ~ kuno: {$awal}Langit jernih tanpa awan. Pertanda baik bagi jalan siapa pun.{$ekor} || {$awal}A cloudless clear sky. A good omen for anyone's road.{$ekor}
+  ~ kasar: {$awal}Langit bersih. Bagus. Itu saja.{$ekor} || {$awal}Clear sky. Good. That's all.{$ekor}
+- {$awal}Cuaca begini enak untuk menjemur apa saja. Kasur, ikan, bahkan diri sendiri. {$penguat} || {$awal}Weather like this is good for drying anything. Mattresses, fish, even yourself. {$penguat}
+- {$awal}Matahari bersahabat hari ini. Semoga awet sampai panen.{$ekor} || {$awal}The sun is friendly today. May it last till harvest.{$ekor}
+  ~ kampung: {$awal}Mataharinya ramah, Nak. Moga-moga awet sampai panen.{$ekor} || {$awal}The sun's kind, child. Hope it holds till harvest.{$ekor}
+- {$awal}Kalau cerah begini, pedagang dari luar kota pasti banyak yang datang.{$ekor} || {$awal}On clear days like this, plenty of outside traders come.{$ekor}
+  ~ pelabuhan: {$awal}Cerah begini kapal dagang berdatangan, Bung. Dermaga bakal sesak.{$ekor} || {$awal}Clear like this the merchantmen come in, mate. The dock will be packed.{$ekor}
+- {$awal}Cerah begini, hatiku ikut terang. {$senang} || {$awal}A clear day like this brightens my heart too. {$senang}
+  ~ kasar: {$awal}Cerah. Bagus. Jangan buang waktu bicara cuaca. || {$awal}Clear. Good. Don't waste time on the weather.
+- {$awal}Lihat itu, burung layang-layang terbang tinggi. Tidak akan hujan.{$ekor} || {$awal}Look, the swallows fly high. It won't rain.{$ekor}
+  ~ oasis: {$awal}Lihat, Saudara, elang terbang tinggi. Badai pasir tidak akan datang.{$ekor} || {$awal}Look, friend, the hawks fly high. No sandstorm today.{$ekor}
 
 == basa.cuaca.hujan
 niat: BASA_BASI
@@ -32,19 +34,21 @@ gestur: hangat_tangan
 $keluh: aturan=seru.keluh opsional=0.5
 $ajakan: aturan=frag.ajakan opsional=0.35
 $sebutan: tipe=sebutan_pendengar dari=pendengar
-- [2] Hujan sejak subuh. Jalanan jadi bubur. {$keluh} || Raining since dawn. The streets have turned to porridge. {$keluh}
-  ~ kasar: Hujan terus. Sial. || Raining nonstop. Damn.
-  ~ kampung: Hujan dari subuh, Nak. Pematang licin semua. || Raining since dawn, child. Every bund is slippery.
-- Petani senang, tukang jemur menangis. Begitulah hujan. || Farmers rejoice, washerfolk weep. That's rain for you.
-  ~ kuno: Hujan yang sama menyenangkan petani dan menyusahkan tukang jemur. Begitulah langit. || The same rain gladdens the farmer and grieves the washer. So is heaven.
-- Atap rumahku bocor lagi. Ember sudah tiga di lantai. || My roof leaks again. Three buckets on the floor already.
-  ~ pelabuhan: Atap gudangku bocor lagi, Bung. Karung garam jadi air asin. || My warehouse roof leaks again, mate. The salt sacks turned to brine.
-- Hujan begini enaknya makan mi panas di kedai. {$ajakan} || Rain like this calls for hot noodles at the eatery. {$ajakan}
-- Kata orang tua, hujan di hari pasar artinya rezeki datang terlambat. || The old folk say rain on market day means fortune arrives late.
-  ~ kasar: Hujan di hari pasar. Rugi. || Rain on market day. Loss.
-  ~ air: Hujan di kanal itu musik, ya. Perahu-perahu jadi berirama. || Rain on the canal is music, isn't it. The boats rock in rhythm.
-- Bau tanah basah ini mengingatkanku pada masa kecil. || The smell of wet earth reminds me of childhood.
-  ~ kuno: Aroma tanah basah membangkitkan kenangan masa kecil, {$sebutan}. || The scent of wet earth awakens childhood memories, {$sebutan}.
+$awal: aturan=awal.basa opsional=0.4
+$ekor: aturan=ekor.basa opsional=0.4
+- [2] {$awal}Hujan sejak subuh. Jalanan jadi bubur. {$keluh} || {$awal}Raining since dawn. The streets have turned to porridge. {$keluh}
+  ~ kasar: {$awal}Hujan terus. Sial. || {$awal}Raining nonstop. Damn.
+  ~ kampung: {$awal}Hujan dari subuh, Nak. Pematang licin semua. || {$awal}Raining since dawn, child. Every bund is slippery.
+- {$awal}Petani senang, tukang jemur menangis. Begitulah hujan.{$ekor} || {$awal}Farmers rejoice, washerfolk weep. That's rain for you.{$ekor}
+  ~ kuno: {$awal}Hujan yang sama menyenangkan petani dan menyusahkan tukang jemur. Begitulah langit.{$ekor} || {$awal}The same rain gladdens the farmer and grieves the washer. So is heaven.{$ekor}
+- {$awal}Atap rumahku bocor lagi. Ember sudah tiga di lantai.{$ekor} || {$awal}My roof leaks again. Three buckets on the floor already.{$ekor}
+  ~ pelabuhan: {$awal}Atap gudangku bocor lagi, Bung. Karung garam jadi air asin.{$ekor} || {$awal}My warehouse roof leaks again, mate. The salt sacks turned to brine.{$ekor}
+- {$awal}Hujan begini enaknya makan mi panas di kedai. {$ajakan} || {$awal}Rain like this calls for hot noodles at the eatery. {$ajakan}
+- {$awal}Kata orang tua, hujan di hari pasar artinya rezeki datang terlambat.{$ekor} || {$awal}The old folk say rain on market day means fortune arrives late.{$ekor}
+  ~ kasar: {$awal}Hujan di hari pasar. Rugi.{$ekor} || {$awal}Rain on market day. Loss.{$ekor}
+  ~ air: {$awal}Hujan di kanal itu musik, ya. Perahu-perahu jadi berirama.{$ekor} || {$awal}Rain on the canal is music, isn't it. The boats rock in rhythm.{$ekor}
+- {$awal}Bau tanah basah ini mengingatkanku pada masa kecil.{$ekor} || {$awal}The smell of wet earth reminds me of childhood.{$ekor}
+  ~ kuno: {$awal}Aroma tanah basah membangkitkan kenangan masa kecil, {$sebutan}.{$ekor} || {$awal}The scent of wet earth awakens childhood memories, {$sebutan}.{$ekor}
 
 == basa.cuaca.badai
 niat: BASA_BASI
@@ -52,14 +56,16 @@ topik: cuaca
 syarat: cuaca=badai
 lanjut: bahaya
 gestur: lihat_sekeliling
-- Petir tadi menyambar dekat menara. Telingaku masih berdenging. || That bolt struck near the tower. My ears are still ringing.
-  ~ kasar: Petir tadi hampir kena menara. Hebat. || That bolt nearly hit the tower. Impressive.
-- Badai begini kapal-kapal tidak berani berlayar. Harga ikan pasti naik. || In storms like this no ship dares sail. Fish prices will rise.
-  ~ pelabuhan: Badai begini, Bung, kapal diikat dua kali. Besok harga ikan melonjak. || Storms like this, mate, boats get double-tied. Tomorrow fish prices leap.
-- Anak-anakku bersembunyi di bawah meja. Aku pura-pura berani. || My children are hiding under the table. I'm pretending to be brave.
-  ~ p: Anak-anakku sembunyi di bawah meja. Aku pura-pura tenang sambil memeluk mereka. || My children hide under the table. I pretend to be calm while hugging them.
-- Kata almanak, badai di musim ini tanda naga sedang berganti sisik. || The almanac says storms this season mean a dragon is shedding scales.
-  ~ kuno: Kitab lama berkata, badai musim ini adalah naga yang sedang berganti sisik. || The old books say this season's storms are a dragon shedding its scales.
+$awal: aturan=awal.basa opsional=0.4
+$ekor: aturan=ekor.basa opsional=0.4
+- {$awal}Petir tadi menyambar dekat menara. Telingaku masih berdenging.{$ekor} || {$awal}That bolt struck near the tower. My ears are still ringing.{$ekor}
+  ~ kasar: {$awal}Petir tadi hampir kena menara. Hebat.{$ekor} || {$awal}That bolt nearly hit the tower. Impressive.{$ekor}
+- {$awal}Badai begini kapal-kapal tidak berani berlayar. Harga ikan pasti naik.{$ekor} || {$awal}In storms like this no ship dares sail. Fish prices will rise.{$ekor}
+  ~ pelabuhan: {$awal}Badai begini, Bung, kapal diikat dua kali. Besok harga ikan melonjak.{$ekor} || {$awal}Storms like this, mate, boats get double-tied. Tomorrow fish prices leap.{$ekor}
+- {$awal}Anak-anakku bersembunyi di bawah meja. Aku pura-pura berani.{$ekor} || {$awal}My children are hiding under the table. I'm pretending to be brave.{$ekor}
+  ~ p: {$awal}Anak-anakku sembunyi di bawah meja. Aku pura-pura tenang sambil memeluk mereka.{$ekor} || {$awal}My children hide under the table. I pretend to be calm while hugging them.{$ekor}
+- {$awal}Kata almanak, badai di musim ini tanda naga sedang berganti sisik.{$ekor} || {$awal}The almanac says storms this season mean a dragon is shedding scales.{$ekor}
+  ~ kuno: {$awal}Kitab lama berkata, badai musim ini adalah naga yang sedang berganti sisik.{$ekor} || {$awal}The old books say this season's storms are a dragon shedding its scales.{$ekor}
 
 == basa.cuaca.salju
 niat: BASA_BASI
@@ -68,14 +74,16 @@ syarat: cuaca=salju
 lanjut: harga keluarga
 gestur: hangat_tangan
 $keluh: aturan=seru.keluh opsional=0.5
-- Kayu bakar sekarang semahal daging. {$keluh} || Firewood costs as much as meat now. {$keluh}
-  ~ kampung: Kayu bakar mahal, Nak. Sekarang bakar sekam saja. || Firewood's dear, child. Burning husks now.
-- Anak-anak membuat boneka salju di alun-alun. Hidungnya dari wortel curian dapurku. || The children built a snowman in the square. Its nose is a carrot stolen from my kitchen.
-  ~ kasar: Anak-anak bikin boneka salju. Pakai wortelku. Bocah-bocah itu. || Kids made a snowman. With my carrot. Brats.
-- Salju pertama selalu cantik. Salju kesepuluh hanya merepotkan. || The first snow is always pretty. The tenth is only a nuisance.
-  ~ kuno: Salju pertama adalah puisi; salju kesepuluh hanyalah pekerjaan. || The first snow is poetry; the tenth is only work.
-- Sumur membeku tadi pagi. Kami harus memecah esnya dengan kapak. || The well froze this morning. We had to break the ice with an axe.
-  ~ gunung: Kolam biara membeku. Para biksu muda memecah esnya sambil bernyanyi. || The monastery pond froze. The young monks break the ice while singing.
+$awal: aturan=awal.basa opsional=0.4
+$ekor: aturan=ekor.basa opsional=0.4
+- {$awal}Kayu bakar sekarang semahal daging. {$keluh} || {$awal}Firewood costs as much as meat now. {$keluh}
+  ~ kampung: {$awal}Kayu bakar mahal, Nak. Sekarang bakar sekam saja. || {$awal}Firewood's dear, child. Burning husks now.
+- {$awal}Anak-anak membuat boneka salju di alun-alun. Hidungnya dari wortel curian dapurku.{$ekor} || {$awal}The children built a snowman in the square. Its nose is a carrot stolen from my kitchen.{$ekor}
+  ~ kasar: {$awal}Anak-anak bikin boneka salju. Pakai wortelku. Bocah-bocah itu.{$ekor} || {$awal}Kids made a snowman. With my carrot. Brats.{$ekor}
+- {$awal}Salju pertama selalu cantik. Salju kesepuluh hanya merepotkan.{$ekor} || {$awal}The first snow is always pretty. The tenth is only a nuisance.{$ekor}
+  ~ kuno: {$awal}Salju pertama adalah puisi; salju kesepuluh hanyalah pekerjaan.{$ekor} || {$awal}The first snow is poetry; the tenth is only work.{$ekor}
+- {$awal}Sumur membeku tadi pagi. Kami harus memecah esnya dengan kapak.{$ekor} || {$awal}The well froze this morning. We had to break the ice with an axe.{$ekor}
+  ~ gunung: {$awal}Kolam biara membeku. Para biksu muda memecah esnya sambil bernyanyi.{$ekor} || {$awal}The monastery pond froze. The young monks break the ice while singing.{$ekor}
 
 == basa.cuaca.kabut
 niat: BASA_BASI
@@ -83,14 +91,16 @@ topik: cuaca
 syarat: cuaca=kabut_qi
 lanjut: dunia sekte
 gestur: tatap_langit
-- Kabut Qi begini, para kultivator di bukit pasti sedang bersemedi semua. || In Qi mist like this, every cultivator on the hill must be meditating.
-  ~ kuno: Kabut Qi turun; para penempuh Dao di bukit tentu sedang menyerapnya. || The Qi mist descends; the Dao walkers on the hill must be absorbing it.
-- Tanaman obat tumbuh cepat sekali kalau kabut Qi turun. Petani herba senang. || Herbs grow so fast when the Qi mist falls. The herb farmers are glad.
-  ~ gunung: Herba di tebing tumbuh dua kali lipat saat kabut Qi. Pemetik herba sibuk sekali. || Cliff herbs grow twice as fast in Qi mist. The herb pickers are so busy.
-- Nenekku bilang, kabut Qi bisa membuat orang biasa bermimpi masa lalu. || My grandmother said Qi mist makes ordinary folk dream of past lives.
-  ~ kampung: Simbahku bilang, kalau kabut Qi turun, orang bisa mimpi jadi raja. || My granny says when the Qi mist falls, folk dream of being kings.
-- Kemarin dalam kabut aku hampir menabrak tiang lentera. Malu sekali. || In yesterday's mist I nearly walked into a lamp post. So embarrassing.
-  ~ kasar: Kemarin aku menabrak tiang lentera di kabut. Jangan tertawa. || Yesterday I walked into a lamp post in the mist. Don't laugh.
+$awal: aturan=awal.basa opsional=0.4
+$ekor: aturan=ekor.basa opsional=0.4
+- {$awal}Kabut Qi begini, para kultivator di bukit pasti sedang bersemedi semua.{$ekor} || {$awal}In Qi mist like this, every cultivator on the hill must be meditating.{$ekor}
+  ~ kuno: {$awal}Kabut Qi turun; para penempuh Dao di bukit tentu sedang menyerapnya.{$ekor} || {$awal}The Qi mist descends; the Dao walkers on the hill must be absorbing it.{$ekor}
+- {$awal}Tanaman obat tumbuh cepat sekali kalau kabut Qi turun. Petani herba senang.{$ekor} || {$awal}Herbs grow so fast when the Qi mist falls. The herb farmers are glad.{$ekor}
+  ~ gunung: {$awal}Herba di tebing tumbuh dua kali lipat saat kabut Qi. Pemetik herba sibuk sekali.{$ekor} || {$awal}Cliff herbs grow twice as fast in Qi mist. The herb pickers are so busy.{$ekor}
+- {$awal}Nenekku bilang, kabut Qi bisa membuat orang biasa bermimpi masa lalu.{$ekor} || {$awal}My grandmother said Qi mist makes ordinary folk dream of past lives.{$ekor}
+  ~ kampung: {$awal}Simbahku bilang, kalau kabut Qi turun, orang bisa mimpi jadi raja.{$ekor} || {$awal}My granny says when the Qi mist falls, folk dream of being kings.{$ekor}
+- {$awal}Kemarin dalam kabut aku hampir menabrak tiang lentera. Malu sekali.{$ekor} || {$awal}In yesterday's mist I nearly walked into a lamp post. So embarrassing.{$ekor}
+  ~ kasar: {$awal}Kemarin aku menabrak tiang lentera di kabut. Jangan tertawa.{$ekor} || {$awal}Yesterday I walked into a lamp post in the mist. Don't laugh.{$ekor}
 
 == basa.musim.semi
 niat: BASA_BASI
@@ -98,16 +108,18 @@ topik: musim
 syarat: musim=semi
 lanjut: acara keluarga
 gestur: bicara_tangan
-- [2] Bunga persik sudah mekar di tepi sungai. Musim yang bagus untuk melamar, kata orang. || The peach blossoms are out by the river. A good season for proposals, they say.
-  ~ kampung: Kembang persik sudah mekar, Nak. Musim orang melamar. || The peach blossoms are out, child. Proposal season.
-  ~ kuno: Bunga persik bermekaran di tepi sungai. Musim yang baik untuk mengikat janji. || Peach blossoms bloom by the river. A fine season to bind vows.
-- Musim semi, semua orang jadi rajin. Sawah, kebun, bahkan kucing di atap. || In spring everyone turns diligent. Paddies, gardens, even the cats on the roofs.
-  ~ kasar: Musim semi. Semua sibuk. Kucing juga. Berisik. || Spring. Everyone busy. Cats too. Noisy.
-- Anak-anak sudah main layangan lagi. Langit penuh naga kertas. || The children fly kites again. The sky is full of paper dragons.
-  ~ air: Layang-layang memantul di air kanal, Kakak... seperti naga berenang... || Kites reflected in the canal, dear... like dragons swimming...
-- Semi begini, udara wangi. Aku jadi ingin menulis puisi, padahal tidak bisa. || Spring like this, the air smells sweet. Makes me want to write poems, though I can't.
-- Burung walet kembali ke atap kami tahun ini. Pertanda rumah tangga rukun. || The swallows came back to our eaves this year. A sign of a harmonious household.
-  ~ kuno: Burung walet kembali ke atap kami. Leluhur berkata itu tanda rumah yang rukun. || The swallows returned to our eaves. The elders say it marks a harmonious home.
+$awal: aturan=awal.basa opsional=0.4
+$ekor: aturan=ekor.basa opsional=0.4
+- [2] {$awal}Bunga persik sudah mekar di tepi sungai. Musim yang bagus untuk melamar, kata orang.{$ekor} || {$awal}The peach blossoms are out by the river. A good season for proposals, they say.{$ekor}
+  ~ kampung: {$awal}Kembang persik sudah mekar, Nak. Musim orang melamar.{$ekor} || {$awal}The peach blossoms are out, child. Proposal season.{$ekor}
+  ~ kuno: {$awal}Bunga persik bermekaran di tepi sungai. Musim yang baik untuk mengikat janji.{$ekor} || {$awal}Peach blossoms bloom by the river. A fine season to bind vows.{$ekor}
+- {$awal}Musim semi, semua orang jadi rajin. Sawah, kebun, bahkan kucing di atap.{$ekor} || {$awal}In spring everyone turns diligent. Paddies, gardens, even the cats on the roofs.{$ekor}
+  ~ kasar: {$awal}Musim semi. Semua sibuk. Kucing juga. Berisik.{$ekor} || {$awal}Spring. Everyone busy. Cats too. Noisy.{$ekor}
+- {$awal}Anak-anak sudah main layangan lagi. Langit penuh naga kertas.{$ekor} || {$awal}The children fly kites again. The sky is full of paper dragons.{$ekor}
+  ~ air: {$awal}Layang-layang memantul di air kanal, Kakak... seperti naga berenang...{$ekor} || {$awal}Kites reflected in the canal, dear... like dragons swimming...{$ekor}
+- {$awal}Semi begini, udara wangi. Aku jadi ingin menulis puisi, padahal tidak bisa.{$ekor} || {$awal}Spring like this, the air smells sweet. Makes me want to write poems, though I can't.{$ekor}
+- {$awal}Burung walet kembali ke atap kami tahun ini. Pertanda rumah tangga rukun.{$ekor} || {$awal}The swallows came back to our eaves this year. A sign of a harmonious household.{$ekor}
+  ~ kuno: {$awal}Burung walet kembali ke atap kami. Leluhur berkata itu tanda rumah yang rukun.{$ekor} || {$awal}The swallows returned to our eaves. The elders say it marks a harmonious home.{$ekor}
 
 == basa.musim.panas
 niat: BASA_BASI
@@ -115,18 +127,20 @@ topik: musim
 syarat: musim=panas
 lanjut: kerja harga
 gestur: seka_keringat
-- [2] Panas sekali musim ini. Jangkrik pun malas berbunyi. || So hot this season. Even the crickets are too lazy to sing.
-  ~ kasar: Panas. Gerah. Malas. || Hot. Sticky. Lazy.
-  ~ oasis: Panas ini belum seberapa, Saudara. Di gurun telur matang di atas batu. || This heat is nothing, friend. In the desert eggs cook on stones.
-- Semangka dari ladang timur manis-manis tahun ini. Sudah coba? || The watermelons from the east fields are sweet this year. Tried them?
-  ~ kampung: Semangka ladang timur manis, Nak. Mau kupotongkan? || The east field melons are sweet, child. Shall I cut you one?
-- Malam-malam aku tidur di serambi. Di dalam seperti tungku. || At night I sleep on the veranda. Indoors is like an oven.
-  ~ pelabuhan: Malam-malam aku tidur di geladak, Bung. Kabin seperti tungku. || Nights I sleep on deck, mate. The cabin's like an oven.
-- Musim panas, sungai surut. Tukang perahu banyak menganggur. || Summer, the river shrinks. Many boatmen sit idle.
-  ~ air: Kanal surut, Kakak... perahu-perahu kandas di lumpur... || The canals are low, dear... the boats are stuck in mud...
-  ~ oasis: Panas begini, Saudara, air lebih mahal dari kata-kata. || In heat like this, friend, water is dearer than words.
-- Kata tabib, minum teh krisan supaya panas dalam tidak naik. || The physician says drink chrysanthemum tea so inner heat won't rise.
-  ~ kuno: Teh krisan meredakan panas dalam, demikian kata tabib tua. || Chrysanthemum tea calms inner heat, so says the old physician.
+$awal: aturan=awal.basa opsional=0.4
+$ekor: aturan=ekor.basa opsional=0.4
+- [2] {$awal}Panas sekali musim ini. Jangkrik pun malas berbunyi.{$ekor} || {$awal}So hot this season. Even the crickets are too lazy to sing.{$ekor}
+  ~ kasar: {$awal}Panas. Gerah. Malas.{$ekor} || {$awal}Hot. Sticky. Lazy.{$ekor}
+  ~ oasis: {$awal}Panas ini belum seberapa, Saudara. Di gurun telur matang di atas batu.{$ekor} || {$awal}This heat is nothing, friend. In the desert eggs cook on stones.{$ekor}
+- {$awal}Semangka dari ladang timur manis-manis tahun ini. Sudah coba? || {$awal}The watermelons from the east fields are sweet this year. Tried them?
+  ~ kampung: {$awal}Semangka ladang timur manis, Nak. Mau kupotongkan? || {$awal}The east field melons are sweet, child. Shall I cut you one?
+- {$awal}Malam-malam aku tidur di serambi. Di dalam seperti tungku.{$ekor} || {$awal}At night I sleep on the veranda. Indoors is like an oven.{$ekor}
+  ~ pelabuhan: {$awal}Malam-malam aku tidur di geladak, Bung. Kabin seperti tungku.{$ekor} || {$awal}Nights I sleep on deck, mate. The cabin's like an oven.{$ekor}
+- {$awal}Musim panas, sungai surut. Tukang perahu banyak menganggur.{$ekor} || {$awal}Summer, the river shrinks. Many boatmen sit idle.{$ekor}
+  ~ air: {$awal}Kanal surut, Kakak... perahu-perahu kandas di lumpur...{$ekor} || {$awal}The canals are low, dear... the boats are stuck in mud...{$ekor}
+  ~ oasis: {$awal}Panas begini, Saudara, air lebih mahal dari kata-kata.{$ekor} || {$awal}In heat like this, friend, water is dearer than words.{$ekor}
+- {$awal}Kata tabib, minum teh krisan supaya panas dalam tidak naik.{$ekor} || {$awal}The physician says drink chrysanthemum tea so inner heat won't rise.{$ekor}
+  ~ kuno: {$awal}Teh krisan meredakan panas dalam, demikian kata tabib tua.{$ekor} || {$awal}Chrysanthemum tea calms inner heat, so says the old physician.{$ekor}
 
 == basa.musim.gugur
 niat: BASA_BASI
@@ -134,17 +148,19 @@ topik: musim
 syarat: musim=gugur
 lanjut: acara harga
 gestur: tatap_langit
-- [2] Daun-daun mulai merah. Sebentar lagi festival bulan. || The leaves are turning red. The moon festival is near.
-  ~ kuno: Daun-daun memerah. Festival bulan sebentar lagi; semoga keluarga berkumpul. || The leaves redden. The moon festival is near; may families gather.
-  ~ kasar: Daun merah. Festival. Ramai lagi. || Red leaves. Festival. Crowds again.
-- Musim gugur musim panen. Semua orang sibuk, semua orang lelah, semua orang makan enak. || Autumn is harvest. Everyone busy, everyone tired, everyone eating well.
-  ~ kampung: Musim panen, Nak! Capek, tapi nasi baru wangi sekali. || Harvest time, child! Tiring, but the new rice smells wonderful.
-- Angin gugur membawa bau padi. Aku suka sekali. || The autumn wind carries the smell of rice. I love it.
-  ~ gunung: Angin gugur membawa bau dupa dari biara. Damai sekali. || The autumn wind carries incense from the monastery. So peaceful.
-- Kue bulan tahun ini isinya kacang merah atau biji teratai? Aku pilih teratai. || This year's mooncakes: red bean or lotus seed? I'll take lotus.
-  ~ p: Tahun ini aku membuat kue bulan sendiri. Isi teratai, tentu saja. || This year I'm making mooncakes myself. Lotus filling, of course.
-- Gugur begini aku selalu teringat orang-orang yang sudah pergi. || Autumn always makes me think of those who have passed.
-  ~ kuno: Musim gugur selalu mengingatkan pada mereka yang telah kembali ke langit. || Autumn always recalls those who have returned to heaven.
+$awal: aturan=awal.basa opsional=0.4
+$ekor: aturan=ekor.basa opsional=0.4
+- [2] {$awal}Daun-daun mulai merah. Sebentar lagi festival bulan.{$ekor} || {$awal}The leaves are turning red. The moon festival is near.{$ekor}
+  ~ kuno: {$awal}Daun-daun memerah. Festival bulan sebentar lagi; semoga keluarga berkumpul.{$ekor} || {$awal}The leaves redden. The moon festival is near; may families gather.{$ekor}
+  ~ kasar: {$awal}Daun merah. Festival. Ramai lagi.{$ekor} || {$awal}Red leaves. Festival. Crowds again.{$ekor}
+- {$awal}Musim gugur musim panen. Semua orang sibuk, semua orang lelah, semua orang makan enak.{$ekor} || {$awal}Autumn is harvest. Everyone busy, everyone tired, everyone eating well.{$ekor}
+  ~ kampung: {$awal}Musim panen, Nak! Capek, tapi nasi baru wangi sekali.{$ekor} || {$awal}Harvest time, child! Tiring, but the new rice smells wonderful.{$ekor}
+- {$awal}Angin gugur membawa bau padi. Aku suka sekali.{$ekor} || {$awal}The autumn wind carries the smell of rice. I love it.{$ekor}
+  ~ gunung: {$awal}Angin gugur membawa bau dupa dari biara. Damai sekali.{$ekor} || {$awal}The autumn wind carries incense from the monastery. So peaceful.{$ekor}
+- {$awal}Kue bulan tahun ini isinya kacang merah atau biji teratai? Aku pilih teratai.{$ekor} || {$awal}This year's mooncakes: red bean or lotus seed? I'll take lotus.{$ekor}
+  ~ p: {$awal}Tahun ini aku membuat kue bulan sendiri. Isi teratai, tentu saja.{$ekor} || {$awal}This year I'm making mooncakes myself. Lotus filling, of course.{$ekor}
+- {$awal}Gugur begini aku selalu teringat orang-orang yang sudah pergi.{$ekor} || {$awal}Autumn always makes me think of those who have passed.{$ekor}
+  ~ kuno: {$awal}Musim gugur selalu mengingatkan pada mereka yang telah kembali ke langit.{$ekor} || {$awal}Autumn always recalls those who have returned to heaven.{$ekor}
 
 == basa.musim.dingin
 niat: BASA_BASI
@@ -153,17 +169,19 @@ syarat: musim=dingin
 lanjut: keluarga harga
 gestur: hangat_tangan
 $keluh: aturan=seru.keluh opsional=0.5
-- [2] Musim dingin panjang tahun ini. Semoga lumbung cukup. || A long winter this year. May the granary hold.
-  ~ kasar: Dingin panjang. Lumbung tipis. Bagus sekali. || Long cold. Thin granary. Wonderful.
-  ~ kampung: Musim dingin panjang, Nak. Semoga lumbung desa cukup. || A long winter, child. May the village granary last.
-- Tahun Baru tinggal sebentar lagi. Aku belum beli kertas merah. || New Year is almost here. I haven't bought red paper yet.
-  ~ p: Tahun Baru sebentar lagi, belum menjahit baju anak-anak! Aduh. || New Year's nearly here and I haven't sewn the children's clothes! Oh dear.
-- Pagi-pagi napas jadi asap. Anak-anak pura-pura jadi naga. || Mornings your breath turns to smoke. The children pretend to be dragons.
-  ~ kuno: Napas menjadi kabut di pagi hari. Anak-anak berlagak seperti naga muda. || Breath becomes mist in the morning. The children play at young dragons.
-- Dingin begini, sup tulang di rumah makan paling dicari. || In cold like this, bone soup at the eatery sells best.
-  ~ oasis: Malam gurun dingin sekali, Saudara. Sup kambing paling dicari. || Desert nights are freezing, friend. Mutton soup sells best.
-- Tanganku pecah-pecah kena air dingin. {$keluh} || My hands are cracked from cold water. {$keluh}
-  ~ kasar: Tanganku pecah-pecah. Dingin sialan. || Hands all cracked. Damn cold.
+$awal: aturan=awal.basa opsional=0.4
+$ekor: aturan=ekor.basa opsional=0.4
+- [2] {$awal}Musim dingin panjang tahun ini. Semoga lumbung cukup.{$ekor} || {$awal}A long winter this year. May the granary hold.{$ekor}
+  ~ kasar: {$awal}Dingin panjang. Lumbung tipis. Bagus sekali.{$ekor} || {$awal}Long cold. Thin granary. Wonderful.{$ekor}
+  ~ kampung: {$awal}Musim dingin panjang, Nak. Semoga lumbung desa cukup.{$ekor} || {$awal}A long winter, child. May the village granary last.{$ekor}
+- {$awal}Tahun Baru tinggal sebentar lagi. Aku belum beli kertas merah.{$ekor} || {$awal}New Year is almost here. I haven't bought red paper yet.{$ekor}
+  ~ p: {$awal}Tahun Baru sebentar lagi, belum menjahit baju anak-anak! Aduh.{$ekor} || {$awal}New Year's nearly here and I haven't sewn the children's clothes! Oh dear.{$ekor}
+- {$awal}Pagi-pagi napas jadi asap. Anak-anak pura-pura jadi naga.{$ekor} || {$awal}Mornings your breath turns to smoke. The children pretend to be dragons.{$ekor}
+  ~ kuno: {$awal}Napas menjadi kabut di pagi hari. Anak-anak berlagak seperti naga muda.{$ekor} || {$awal}Breath becomes mist in the morning. The children play at young dragons.{$ekor}
+- {$awal}Dingin begini, sup tulang di rumah makan paling dicari.{$ekor} || {$awal}In cold like this, bone soup at the eatery sells best.{$ekor}
+  ~ oasis: {$awal}Malam gurun dingin sekali, Saudara. Sup kambing paling dicari.{$ekor} || {$awal}Desert nights are freezing, friend. Mutton soup sells best.{$ekor}
+- {$awal}Tanganku pecah-pecah kena air dingin. {$keluh} || {$awal}My hands are cracked from cold water. {$keluh}
+  ~ kasar: {$awal}Tanganku pecah-pecah. Dingin sialan. || {$awal}Hands all cracked. Damn cold.
 
 == basa.jam.pagi
 niat: BERI_KABAR
@@ -173,17 +191,19 @@ lanjut: kerja harga
 gestur: bicara_tangan
 $sebutan: tipe=sebutan_pendengar dari=pendengar
 $ajakan: aturan=frag.ajakan opsional=0.35
-- Pasar pagi tadi ramai sekali. Ada yang jual ikan sebesar anak kecil. || The morning market was packed. Someone was selling a fish the size of a child.
-  ~ pelabuhan: Pasar ikan pagi tadi ramai, Bung! Ada tuna sebesar anak kecil! || The fish market was packed this morning, mate! A tuna the size of a child!
-  ~ kuno: Pasar pagi ramai sekali, {$sebutan}. Seseorang menjual ikan sebesar anak kecil. || The morning market was teeming, {$sebutan}. Someone sold a fish the size of a child.
-- Aku bangun kesiangan. Ayam jago tetangga sakit tenggorokan, katanya. || I overslept. The neighbour's rooster has a sore throat, apparently.
-  ~ kasar: Kesiangan. Ayam tetangga tidak berkokok. Salahkan ayam. || Overslept. The neighbour's rooster didn't crow. Blame the rooster.
-- Pagi begini paling enak bubur dan cakwe. {$ajakan} || Mornings like this call for porridge and fried dough. {$ajakan}
-  ~ kampung: Pagi-pagi enaknya bubur sama gorengan, Nak. {$ajakan} || Mornings call for porridge and fritters, child. {$ajakan}
-- Para kakek sudah tai chi di alun-alun sejak subuh. Gerakannya lambat sekali, tapi mereka tidak pernah sakit. || The old men have done tai chi in the square since dawn. Slow as anything, but they never fall ill.
-  ~ gunung: Para biksu tua berlatih di halaman sejak subuh. Gerakan mereka lambat seperti awan. || The old monks practise in the yard since dawn. Their moves are slow as clouds.
-- Hari ini hari pasar. Gerobak-gerobak sudah antre di gerbang. || Today's market day. The carts are already queued at the gate.
-  ~ oasis: Hari pasar, Saudara! Unta-unta sudah antre di gerbang oasis. || Market day, friend! The camels are queued at the oasis gate.
+$awal: aturan=awal.kabar opsional=0.35
+$ekor: aturan=ekor.kabar opsional=0.4
+- Pasar pagi tadi ramai sekali. Ada yang jual ikan sebesar anak kecil.{$ekor} || The morning market was packed. Someone was selling a fish the size of a child.{$ekor}
+  ~ pelabuhan: Pasar ikan pagi tadi ramai, Bung! Ada tuna sebesar anak kecil!{$ekor} || The fish market was packed this morning, mate! A tuna the size of a child!{$ekor}
+  ~ kuno: Pasar pagi ramai sekali, {$sebutan}. Seseorang menjual ikan sebesar anak kecil.{$ekor} || The morning market was teeming, {$sebutan}. Someone sold a fish the size of a child.{$ekor}
+- {$awal}Aku bangun kesiangan. Ayam jago tetangga sakit tenggorokan, katanya.{$ekor} || {$awal}I overslept. The neighbour's rooster has a sore throat, apparently.{$ekor}
+  ~ kasar: {$awal}Kesiangan. Ayam tetangga tidak berkokok. Salahkan ayam.{$ekor} || {$awal}Overslept. The neighbour's rooster didn't crow. Blame the rooster.{$ekor}
+- {$awal}Pagi begini paling enak bubur dan cakwe. {$ajakan} || {$awal}Mornings like this call for porridge and fried dough. {$ajakan}
+  ~ kampung: {$awal}Pagi-pagi enaknya bubur sama gorengan, Nak. {$ajakan} || {$awal}Mornings call for porridge and fritters, child. {$ajakan}
+- {$awal}Para kakek sudah tai chi di alun-alun sejak subuh. Gerakannya lambat sekali, tapi mereka tidak pernah sakit.{$ekor} || {$awal}The old men have done tai chi in the square since dawn. Slow as anything, but they never fall ill.{$ekor}
+  ~ gunung: {$awal}Para biksu tua berlatih di halaman sejak subuh. Gerakan mereka lambat seperti awan.{$ekor} || {$awal}The old monks practise in the yard since dawn. Their moves are slow as clouds.{$ekor}
+- {$awal}Hari ini hari pasar. Gerobak-gerobak sudah antre di gerbang.{$ekor} || {$awal}Today's market day. The carts are already queued at the gate.{$ekor}
+  ~ oasis: {$awal}Hari pasar, Saudara! Unta-unta sudah antre di gerbang oasis.{$ekor} || {$awal}Market day, friend! The camels are queued at the oasis gate.{$ekor}
 
 == basa.jam.siang
 niat: BERI_KABAR
@@ -191,14 +211,16 @@ topik: kota
 syarat: jam=siang
 lanjut: kerja
 gestur: seka_keringat
-- Siang begini kedai teh penuh orang yang pura-pura sibuk. || At this hour the teahouse is full of people pretending to be busy.
-  ~ kasar: Kedai teh penuh pemalas. Seperti biasa. || Teahouse full of idlers. As usual.
-- Perutku sudah bunyi sejak tadi. Pedagang bakpao lewat belum, ya? || My stomach's been growling a while. Has the bun seller passed yet?
-  ~ kampung: Perutku keroncongan, Nak. Tukang bakso lewat belum, ya? || My belly's rumbling, child. Has the meatball seller passed yet?
-- Separuh hari sudah lewat. Separuh lagi masih panjang. || Half the day's gone. The other half is still long.
-  ~ kuno: Separuh hari telah berlalu. Separuh lagi masih menanti. || Half the day has passed. The other half still waits.
-- Siang bolong begini, bahkan hantu malas keluar, kata orang. || High noon like this, even ghosts can't be bothered, they say.
-  ~ kampung: Siang bolong begini, kata simbah, setan pun tidur. || Broad noon like this, granny says, even devils nap.
+$awal: aturan=awal.kabar opsional=0.35
+$ekor: aturan=ekor.kabar opsional=0.4
+- {$awal}Siang begini kedai teh penuh orang yang pura-pura sibuk.{$ekor} || {$awal}At this hour the teahouse is full of people pretending to be busy.{$ekor}
+  ~ kasar: {$awal}Kedai teh penuh pemalas. Seperti biasa.{$ekor} || {$awal}Teahouse full of idlers. As usual.{$ekor}
+- {$awal}Perutku sudah bunyi sejak tadi. Pedagang bakpao lewat belum, ya? || {$awal}My stomach's been growling a while. Has the bun seller passed yet?
+  ~ kampung: {$awal}Perutku keroncongan, Nak. Tukang bakso lewat belum, ya? || {$awal}My belly's rumbling, child. Has the meatball seller passed yet?
+- {$awal}Separuh hari sudah lewat. Separuh lagi masih panjang.{$ekor} || {$awal}Half the day's gone. The other half is still long.{$ekor}
+  ~ kuno: {$awal}Separuh hari telah berlalu. Separuh lagi masih menanti.{$ekor} || {$awal}Half the day has passed. The other half still waits.{$ekor}
+- {$awal}Siang bolong begini, bahkan hantu malas keluar, kata orang.{$ekor} || {$awal}High noon like this, even ghosts can't be bothered, they say.{$ekor}
+  ~ kampung: {$awal}Siang bolong begini, kata simbah, setan pun tidur.{$ekor} || {$awal}Broad noon like this, granny says, even devils nap.{$ekor}
 
 == basa.jam.sore
 niat: BERI_KABAR
@@ -206,14 +228,16 @@ topik: kota
 syarat: jam=sore
 lanjut: keluarga acara
 gestur: bicara_tangan
-- Sore-sore begini anak-anak main di gang. Ramainya seperti pasar burung. || Evenings the children play in the alleys. Noisy as a bird market.
-  ~ kasar: Anak-anak berisik di gang. Setiap sore. || Kids making a racket in the lane. Every evening.
-- Sebentar lagi lentera dinyalakan. Aku suka saat kota berubah jingga. || Soon the lanterns will be lit. I love when the town turns amber.
-  ~ air: Sebentar lagi lentera kanal dinyalakan, Kakak... kota jadi jingga... indah... || Soon the canal lanterns will be lit, dear... the town turns amber... lovely...
-- Para pekerja pulang. Bau masakan dari setiap dapur. Ini waktu terbaik di kota. || The workers head home. Cooking smells from every kitchen. The best hour in town.
-  ~ kuno: Para pekerja pulang dan asap dapur naik. Inilah saat kota bernapas lega. || The workers go home and kitchen smoke rises. This is when the town breathes easy.
-- Kalau sore cerah, para kakek main catur di bawah pohon sampai gelap. || On clear evenings the old men play chess under the tree till dark.
-  ~ kampung: Kalau sore cerah, simbah-simbah main catur sampai gelap. || On clear evenings the old folk play chess till dark.
+$awal: aturan=awal.kabar opsional=0.35
+$ekor: aturan=ekor.kabar opsional=0.4
+- {$awal}Sore-sore begini anak-anak main di gang. Ramainya seperti pasar burung.{$ekor} || {$awal}Evenings the children play in the alleys. Noisy as a bird market.{$ekor}
+  ~ kasar: {$awal}Anak-anak berisik di gang. Setiap sore.{$ekor} || {$awal}Kids making a racket in the lane. Every evening.{$ekor}
+- {$awal}Sebentar lagi lentera dinyalakan. Aku suka saat kota berubah jingga.{$ekor} || {$awal}Soon the lanterns will be lit. I love when the town turns amber.{$ekor}
+  ~ air: {$awal}Sebentar lagi lentera kanal dinyalakan, Kakak... kota jadi jingga... indah...{$ekor} || {$awal}Soon the canal lanterns will be lit, dear... the town turns amber... lovely...{$ekor}
+- {$awal}Para pekerja pulang. Bau masakan dari setiap dapur. Ini waktu terbaik di kota.{$ekor} || {$awal}The workers head home. Cooking smells from every kitchen. The best hour in town.{$ekor}
+  ~ kuno: {$awal}Para pekerja pulang dan asap dapur naik. Inilah saat kota bernapas lega.{$ekor} || {$awal}The workers go home and kitchen smoke rises. This is when the town breathes easy.{$ekor}
+- {$awal}Kalau sore cerah, para kakek main catur di bawah pohon sampai gelap.{$ekor} || {$awal}On clear evenings the old men play chess under the tree till dark.{$ekor}
+  ~ kampung: {$awal}Kalau sore cerah, simbah-simbah main catur sampai gelap.{$ekor} || {$awal}On clear evenings the old folk play chess till dark.{$ekor}
 
 == basa.jam.malam
 niat: BERI_KABAR
@@ -221,15 +245,17 @@ topik: kota
 syarat: jam=malam,larut
 lanjut: bahaya pasar_hantu
 gestur: lihat_sekeliling
-- Malam ini sunyi. Terlalu sunyi, kalau kau tanya aku. || Quiet tonight. Too quiet, if you ask me.
-  ~ kasar: Sepi. Tidak suka. || Quiet. Don't like it.
-  ~ iblis: Malam ini sunyi. Di kota ini, sunyi berarti seseorang sedang mengasah pisau. || Quiet tonight. In this city, quiet means someone is sharpening a knife.
-- Penjaga malam baru saja memukul kentongan. Sudah jam dua. || The night watchman just struck his clapper. Second watch already.
-  ~ kampung: Kentongan sudah dipukul dua kali, Nak. Sudah larut. || The slit drum's struck twice, child. It's late.
-- Bulan setengah malam ini. Bagus untuk mencuri, kata pencopet. Hehe, bercanda. || Half moon tonight. Good for stealing, the pickpockets say. Hehe, joking.
-  ~ kasar: Setengah bulan. Pencopet suka. Jaga dompetmu. || Half moon. Pickpockets love it. Mind your purse.
-- Kedai arak masih ramai. Dengar? Ada yang bernyanyi sumbang. || The tavern is still lively. Hear that? Someone singing off-key.
-  ~ pelabuhan: Kedai pelaut masih ramai, Bung. Dengar? Lagu laut sumbang. || The sailors' tavern is still lively, mate. Hear that? An off-key sea shanty.
+$awal: aturan=awal.kabar opsional=0.35
+$ekor: aturan=ekor.kabar opsional=0.4
+- {$awal}Malam ini sunyi. Terlalu sunyi, kalau kau tanya aku.{$ekor} || {$awal}Quiet tonight. Too quiet, if you ask me.{$ekor}
+  ~ kasar: {$awal}Sepi. Tidak suka.{$ekor} || {$awal}Quiet. Don't like it.{$ekor}
+  ~ iblis: {$awal}Malam ini sunyi. Di kota ini, sunyi berarti seseorang sedang mengasah pisau.{$ekor} || {$awal}Quiet tonight. In this city, quiet means someone is sharpening a knife.{$ekor}
+- {$awal}Penjaga malam baru saja memukul kentongan. Sudah jam dua.{$ekor} || {$awal}The night watchman just struck his clapper. Second watch already.{$ekor}
+  ~ kampung: {$awal}Kentongan sudah dipukul dua kali, Nak. Sudah larut.{$ekor} || {$awal}The slit drum's struck twice, child. It's late.{$ekor}
+- {$awal}Bulan setengah malam ini. Bagus untuk mencuri, kata pencopet. Hehe, bercanda.{$ekor} || {$awal}Half moon tonight. Good for stealing, the pickpockets say. Hehe, joking.{$ekor}
+  ~ kasar: {$awal}Setengah bulan. Pencopet suka. Jaga dompetmu.{$ekor} || {$awal}Half moon. Pickpockets love it. Mind your purse.{$ekor}
+- {$awal}Kedai arak masih ramai. Dengar? Ada yang bernyanyi sumbang.{$ekor} || {$awal}The tavern is still lively. Hear that? Someone singing off-key.{$ekor}
+  ~ pelabuhan: {$awal}Kedai pelaut masih ramai, Bung. Dengar? Lagu laut sumbang.{$ekor} || {$awal}The sailors' tavern is still lively, mate. Hear that? An off-key sea shanty.{$ekor}
 
 == basa.kota.umum
 niat: CERITA

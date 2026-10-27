@@ -360,6 +360,16 @@ public final class RutinitasPagi {
 							PropId.PIKULAN, GerakId.JALAN_PIKUL, false);
 				}
 			}
+			// the town wakes before the market: an eighth stretches at the door, an eighth of the women fetch the water jar from the well
+			if (!hujan && h < 6.5D && WargaApi.umur(w) >= 16 && w.peranNpc().kelompok != NpcRole.Kelompok.PENJAGA) {
+				long u = Math.floorMod(w.id * 7L + s.hari() * 3L, 8L);
+				if (h < 5.75D && u < 2L) {
+					return Kegiatan.di("pagi_regang", Kegiatan.RUMAH, KotaGerakId.PEREGANGAN_PAGI, 0);
+				}
+				if (h >= 5.75D && u == 2L && !w.pria() && !huni.titik("sumur").isEmpty()) {
+					return Kegiatan.di("pagi_air", "sumur", KotaGerakId.PIKUL_TEMPAYAN, KotaGerakId.PROP_TEMPAYAN_AIR);
+				}
+			}
 			if (!hariSekolah(huni.situsId, s.hari())) {
 				return null;
 			}
@@ -454,6 +464,9 @@ public final class RutinitasPagi {
 
 	// ================================================================== tick
 
+	/** place -> world day its 05:00 bell already startled the pigeons. */
+	private static final java.util.Map<Long, Long> LONCENG = new java.util.HashMap<>();
+
 	private static void tick(MinecraftServer server) {
 		if (server.getTickCount() % 20L != 13L) {
 			return;
@@ -471,6 +484,12 @@ public final class RutinitasPagi {
 				}
 				live.add(huni.situsId);
 				Pagi pg = pagi(huni, day);
+				// the 05:00 bell startles the landed pigeon flocks once a day
+				Long dering = LONCENG.get(huni.situsId);
+				if (jam < 5.2D && (dering == null || dering != day)) {
+					LONCENG.put(huni.situsId, day);
+					dev.kultivator.dunia.kota42.hewan.HewanKota.merpatiTerbang(level, huni.situsId);
+				}
 				if (jam < 6.5D) {
 					taiChi(level, huni, pg, now);
 				}

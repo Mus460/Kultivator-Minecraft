@@ -89,7 +89,7 @@ public final class SettingsRows {
 	 * skips a switched-off side scroll so the next one gets the turn. The guide tracker keeps its own coin ("Panduan").
 	 */
 	public static final List<String> HUD_SAKLAR = List.of("kabar", "qi", "codex", "aura", "tribulasi", "duel", "ujian", "lei_tai", "tangga",
-			"gerbang", "kapal", "langit", "naga", "dimensi", "tema", "elite", "formasi", "bangun");
+			"gerbang", "kapal", "langit", "naga", "dimensi", "tema", "elite", "formasi", "bangun", "kota_kejar", "kota_irama");
 	/** The street music volume in percent (100/75/50/25/0, Suara group), read with {@link #kota42Melodi}. */
 	public static final String KOTA42_MELODI = "kota42.melodi";
 	private static final int[] MELODI_LANGKAH = {100, 75, 50, 25, 0};

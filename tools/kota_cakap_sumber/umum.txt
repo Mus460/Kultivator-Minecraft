@@ -8,30 +8,34 @@ niat: BASA_BASI
 topik: cuaca
 syarat: cuaca=gerhana,meteor
 gestur: tatap_langit
-- [3] Langit aneh sekali hari ini. Ibuku sudah membakar dupa tiga batang. || The sky is so strange today. My mother has burned three incense sticks.
-  ~ kasar: Langit gila. Jangan tanya aku kenapa. || Mad sky. Don't ask me why.
-  ~ kuno: Langit menunjukkan pertanda. Para tetua sekte pasti sedang menghitung bintang. || Heaven shows an omen. The sect elders must be counting the stars.
-  ~ kampung: Langit kayak gitu, Nak, kata simbah tanda ada raja baru lahir. || A sky like that, child, granny says, means a new king is born.
-  ~ pelabuhan: Langit begini, Bung, para nakhoda tidak mau berlayar. Takut dewa laut marah. || A sky like this, mate, the captains won't sail. Afraid the sea god's angry.
-- [2] Kau lihat bintang jatuh semalam? Aku sempat membuat tiga permohonan! || Did you see the falling stars last night? I made three wishes!
-  ~ p: Bintang jatuh semalam! Aku memohon jodoh yang baik untuk anakku. || Falling stars last night! I wished for a good match for my child.
-- Anak-anak takut sekali waktu matahari menghilang. Aku juga, sebenarnya. || The children were terrified when the sun vanished. So was I, honestly.
-  ~ gunung: Para biksu memukul lonceng terus waktu matahari tertutup. Amitaba. || The monks rang the bell nonstop while the sun was covered. Amitabha.
+$awal: aturan=awal.basa opsional=0.4
+$ekor: aturan=ekor.basa opsional=0.4
+- [3] {$awal}Langit aneh sekali hari ini. Ibuku sudah membakar dupa tiga batang.{$ekor} || {$awal}The sky is so strange today. My mother has burned three incense sticks.{$ekor}
+  ~ kasar: {$awal}Langit gila. Jangan tanya aku kenapa.{$ekor} || {$awal}Mad sky. Don't ask me why.{$ekor}
+  ~ kuno: {$awal}Langit menunjukkan pertanda. Para tetua sekte pasti sedang menghitung bintang.{$ekor} || {$awal}Heaven shows an omen. The sect elders must be counting the stars.{$ekor}
+  ~ kampung: {$awal}Langit kayak gitu, Nak, kata simbah tanda ada raja baru lahir.{$ekor} || {$awal}A sky like that, child, granny says, means a new king is born.{$ekor}
+  ~ pelabuhan: {$awal}Langit begini, Bung, para nakhoda tidak mau berlayar. Takut dewa laut marah.{$ekor} || {$awal}A sky like this, mate, the captains won't sail. Afraid the sea god's angry.{$ekor}
+- [2] Kau lihat bintang jatuh semalam? Aku sempat membuat tiga permohonan!{$ekor} || Did you see the falling stars last night? I made three wishes!{$ekor}
+  ~ p: Bintang jatuh semalam! Aku memohon jodoh yang baik untuk anakku.{$ekor} || Falling stars last night! I wished for a good match for my child.{$ekor}
+- {$awal}Anak-anak takut sekali waktu matahari menghilang. Aku juga, sebenarnya.{$ekor} || {$awal}The children were terrified when the sun vanished. So was I, honestly.{$ekor}
+  ~ gunung: {$awal}Para biksu memukul lonceng terus waktu matahari tertutup. Amitaba.{$ekor} || {$awal}The monks rang the bell nonstop while the sun was covered. Amitabha.{$ekor}
 
 == kerja.kabar
 niat: BERI_KABAR
 topik: kerja
 gestur: bicara_tangan
 $sebutan: tipe=sebutan_pendengar dari=pendengar
-- [3] Hari ini pekerjaanku selesai lebih cepat. Langka sekali, jadi aku mau menikmatinya. || My work finished early today. So rare, I mean to enjoy it.
-  ~ kasar: Kerja selesai. Upah belum. Seperti biasa. || Work done. Pay not. As usual.
-  ~ kuno: Pekerjaan hari ini telah tuntas, {$sebutan}. Hamba bersyukur. || Today's labour is complete, {$sebutan}. This one is grateful.
-  ~ kampung: Kerjaan beres, Nak. Nanti sore bisa leyeh-leyeh di serambi. || Work's done, child. This afternoon I can lounge on the porch.
-- [2] Majikanku menaikkan upahku sedikit. Sedikit sekali, tapi tetap naik! || My master raised my pay a little. Very little, but still a raise!
-  ~ pelabuhan: Kapten bilang aku boleh pegang kemudi minggu depan, Bung! || The captain says I can take the helm next week, mate!
-  ~ p: Pesanan jahitanku bertambah. Semoga mataku masih kuat. || My sewing orders are growing. I hope my eyes hold out.
-- Kami mendapat pesanan besar dari kafilah. Sebulan ke depan pasti sibuk. || We got a big order from a caravan. Busy month ahead for sure.
-- Ada pekerja baru di tempatku. Masih kikuk, tapi rajin. || There's a new hand where I work. Still clumsy, but hardworking.
+$awal: aturan=awal.kabar opsional=0.35
+$ekor: aturan=ekor.kabar opsional=0.4
+- [3] {$awal}Hari ini pekerjaanku selesai lebih cepat. Langka sekali, jadi aku mau menikmatinya.{$ekor} || {$awal}My work finished early today. So rare, I mean to enjoy it.{$ekor}
+  ~ kasar: {$awal}Kerja selesai. Upah belum. Seperti biasa.{$ekor} || {$awal}Work done. Pay not. As usual.{$ekor}
+  ~ kuno: {$awal}Pekerjaan hari ini telah tuntas, {$sebutan}. Hamba bersyukur.{$ekor} || {$awal}Today's labour is complete, {$sebutan}. This one is grateful.{$ekor}
+  ~ kampung: {$awal}Kerjaan beres, Nak. Nanti sore bisa leyeh-leyeh di serambi.{$ekor} || {$awal}Work's done, child. This afternoon I can lounge on the porch.{$ekor}
+- [2] {$awal}Majikanku menaikkan upahku sedikit. Sedikit sekali, tapi tetap naik!{$ekor} || {$awal}My master raised my pay a little. Very little, but still a raise!{$ekor}
+  ~ pelabuhan: {$awal}Kapten bilang aku boleh pegang kemudi minggu depan, Bung!{$ekor} || {$awal}The captain says I can take the helm next week, mate!{$ekor}
+  ~ p: {$awal}Pesanan jahitanku bertambah. Semoga mataku masih kuat.{$ekor} || {$awal}My sewing orders are growing. I hope my eyes hold out.{$ekor}
+- {$awal}Kami mendapat pesanan besar dari kafilah. Sebulan ke depan pasti sibuk.{$ekor} || {$awal}We got a big order from a caravan. Busy month ahead for sure.{$ekor}
+- {$awal}Ada pekerja baru di tempatku. Masih kikuk, tapi rajin.{$ekor} || {$awal}There's a new hand where I work. Still clumsy, but hardworking.{$ekor}
 
 == kerja.pamer
 niat: PAMER
@@ -53,40 +57,46 @@ niat: BERI_KABAR
 topik: musim
 gestur: tatap_langit
 $musim: tipe=musim dari=konteks.musim
-- [3] Musim {$musim} tahun ini datang lebih cepat. Lihat saja pepohonan. || {$musim} came early this year. Just look at the trees.
-  ~ kasar: Musim {$musim}. Sama seperti tahun lalu. Membosankan. || {$musim}. Same as last year. Dull.
-  ~ kuno: Musim {$musim} telah tiba; langit dan bumi berganti rupa. || {$musim} has arrived; heaven and earth change their face.
-  ~ kampung: Musim {$musim}, Nak. Waktunya ganti tanaman di kebun. || {$musim}, child. Time to change what's in the garden.
-- [2] Kata almanak, musim {$musim} ini akan panjang. Siapkan persediaan. || The almanac says this {$musim} will be long. Lay in supplies.
-  ~ pelabuhan: Musim {$musim}, Bung. Angin berubah arah, ikan juga. || {$musim}, mate. The wind changes direction, and so do the fish.
-  ~ oasis: Di gurun, musim {$musim} hanya berarti panasnya beda sedikit, Saudara. || In the desert {$musim} only means slightly different heat, friend.
-- Setiap musim {$musim} aku membuat manisan buah. Mau coba nanti? || Every {$musim} I make candied fruit. Want to try some later?
+$awal: aturan=awal.kabar opsional=0.35
+$ekor: aturan=ekor.kabar opsional=0.4
+- [3] Musim {$musim} tahun ini datang lebih cepat. Lihat saja pepohonan.{$ekor} || {$musim} came early this year. Just look at the trees.{$ekor}
+  ~ kasar: Musim {$musim}. Sama seperti tahun lalu. Membosankan.{$ekor} || {$musim}. Same as last year. Dull.{$ekor}
+  ~ kuno: Musim {$musim} telah tiba; langit dan bumi berganti rupa.{$ekor} || {$musim} has arrived; heaven and earth change their face.{$ekor}
+  ~ kampung: Musim {$musim}, Nak. Waktunya ganti tanaman di kebun.{$ekor} || {$musim}, child. Time to change what's in the garden.{$ekor}
+- [2] {$awal}Kata almanak, musim {$musim} ini akan panjang. Siapkan persediaan.{$ekor} || {$awal}The almanac says this {$musim} will be long. Lay in supplies.{$ekor}
+  ~ pelabuhan: Musim {$musim}, Bung. Angin berubah arah, ikan juga.{$ekor} || {$musim}, mate. The wind changes direction, and so do the fish.{$ekor}
+  ~ oasis: {$awal}Di gurun, musim {$musim} hanya berarti panasnya beda sedikit, Saudara.{$ekor} || {$awal}In the desert {$musim} only means slightly different heat, friend.{$ekor}
+- {$awal}Setiap musim {$musim} aku membuat manisan buah. Mau coba nanti? || {$awal}Every {$musim} I make candied fruit. Want to try some later?
 
 == keluarga.umum
 niat: BERI_KABAR
 topik: keluarga
 gestur: bicara_tangan
 $arah: tipe=arah dari=konteks.arah
-- [3] Orang tuaku masih sehat di kampung. Setiap musim aku mengirim uang. || My parents are still well back home. Every season I send money.
-  ~ kasar: Keluarga? Ada. Merepotkan. Tapi ada. || Family? Got some. Troublesome. But there.
-  ~ kuno: Leluhur keluarga hamba berasal dari {$arah}. Abu mereka masih di sana. || My family's forebears came from the {$arah}. Their ashes are still there.
-  ~ kampung: Adikku baru nikah bulan lalu, Nak. Sekarang tinggal aku yang belum. Hehe. || My little sister wed last month, child. Now only I'm left. Heh.
-- [2] Kakakku merantau ke ibu kota. Suratnya datang setiap bulan purnama. || My elder brother went to the capital. His letters come every full moon.
-  ~ pelabuhan: Ayahku nelayan, kakekku nelayan. Aku? Tentu saja nelayan, Bung. || My father was a fisher, my grandfather too. Me? A fisher, of course, mate.
-- Rumah kami kecil, tapi selalu ramai. Tujuh orang di bawah satu atap. || Our house is small but always lively. Seven under one roof.
-- Ibuku masih memasak untuk semua orang walau sudah tua. Tidak bisa dilarang. || My mother still cooks for everyone though she's old. Can't stop her.
+$awal: aturan=awal.kabar opsional=0.35
+$ekor: aturan=ekor.kabar opsional=0.4
+- [3] {$awal}Orang tuaku masih sehat di kampung. Setiap musim aku mengirim uang.{$ekor} || {$awal}My parents are still well back home. Every season I send money.{$ekor}
+  ~ kasar: {$awal}Keluarga? Ada. Merepotkan. Tapi ada.{$ekor} || {$awal}Family? Got some. Troublesome. But there.{$ekor}
+  ~ kuno: {$awal}Leluhur keluarga hamba berasal dari {$arah}. Abu mereka masih di sana.{$ekor} || {$awal}My family's forebears came from the {$arah}. Their ashes are still there.{$ekor}
+  ~ kampung: {$awal}Adikku baru nikah bulan lalu, Nak. Sekarang tinggal aku yang belum. Hehe.{$ekor} || {$awal}My little sister wed last month, child. Now only I'm left. Heh.{$ekor}
+- [2] {$awal}Kakakku merantau ke ibu kota. Suratnya datang setiap bulan purnama.{$ekor} || {$awal}My elder brother went to the capital. His letters come every full moon.{$ekor}
+  ~ pelabuhan: {$awal}Ayahku nelayan, kakekku nelayan. Aku? Tentu saja nelayan, Bung.{$ekor} || {$awal}My father was a fisher, my grandfather too. Me? A fisher, of course, mate.{$ekor}
+- {$awal}Rumah kami kecil, tapi selalu ramai. Tujuh orang di bawah satu atap.{$ekor} || {$awal}Our house is small but always lively. Seven under one roof.{$ekor}
+- {$awal}Ibuku masih memasak untuk semua orang walau sudah tua. Tidak bisa dilarang.{$ekor} || {$awal}My mother still cooks for everyone though she's old. Can't stop her.{$ekor}
 
 == tetangga.umum
 niat: BERI_KABAR
 topik: tetangga
 gestur: tunjuk
-- [3] Tetangga sebelahku baru memasang lentera baru. Merah, besar, terang sekali. || My next-door neighbour just hung a new lantern. Red, big, very bright.
-  ~ kasar: Tetanggaku berisik. Setiap malam. || My neighbours are noisy. Every night.
-  ~ kuno: Tetangga yang baik lebih berharga dari kerabat yang jauh, kata leluhur. || A good neighbour is worth more than distant kin, say the ancestors.
-  ~ kampung: Tetangga sebelah baru beli kambing, Nak. Sekarang tiap pagi kebangun gara-gara mengembik. || The neighbour bought a goat, child. Now I wake every morning to bleating.
-- [2] Keluarga baru pindah ke ujung gang. Anaknya tiga, semuanya ribut. || A new family moved to the end of the lane. Three kids, all noisy.
-  ~ p: Ibu sebelah membagikan kue lapis kemarin. Baik sekali orangnya. || The lady next door handed out layer cake yesterday. So kind.
-- Kucing tetangga tidur di atap rumahku setiap siang. Sudah kuanggap kucingku sendiri. || The neighbour's cat sleeps on my roof every afternoon. I count it as mine now.
+$awal: aturan=awal.kabar opsional=0.35
+$ekor: aturan=ekor.kabar opsional=0.4
+- [3] {$awal}Tetangga sebelahku baru memasang lentera baru. Merah, besar, terang sekali.{$ekor} || {$awal}My next-door neighbour just hung a new lantern. Red, big, very bright.{$ekor}
+  ~ kasar: {$awal}Tetanggaku berisik. Setiap malam.{$ekor} || {$awal}My neighbours are noisy. Every night.{$ekor}
+  ~ kuno: {$awal}Tetangga yang baik lebih berharga dari kerabat yang jauh, kata leluhur.{$ekor} || {$awal}A good neighbour is worth more than distant kin, say the ancestors.{$ekor}
+  ~ kampung: {$awal}Tetangga sebelah baru beli kambing, Nak. Sekarang tiap pagi kebangun gara-gara mengembik.{$ekor} || {$awal}The neighbour bought a goat, child. Now I wake every morning to bleating.{$ekor}
+- [2] {$awal}Keluarga baru pindah ke ujung gang. Anaknya tiga, semuanya ribut.{$ekor} || {$awal}A new family moved to the end of the lane. Three kids, all noisy.{$ekor}
+  ~ p: {$awal}Ibu sebelah membagikan kue lapis kemarin. Baik sekali orangnya.{$ekor} || {$awal}The lady next door handed out layer cake yesterday. So kind.{$ekor}
+- {$awal}Kucing tetangga tidur di atap rumahku setiap siang. Sudah kuanggap kucingku sendiri.{$ekor} || {$awal}The neighbour's cat sleeps on my roof every afternoon. I count it as mine now.{$ekor}
 
 == kebiasaan.umum
 niat: CERITA

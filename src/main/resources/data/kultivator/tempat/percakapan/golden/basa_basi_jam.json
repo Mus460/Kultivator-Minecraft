@@ -73,6 +73,14 @@
         "k": "kultivator.cakap.makanan.basa.0.pelabuhan",
         "a": [
           {
+            "k": "kultivator.cakap.awal.basa.15",
+            "a": []
+          },
+          {
+            "k": "kultivator.cakap.ekor.basa.2",
+            "a": []
+          },
+          {
             "k": "kultivator.cakap.lex.kakak.pelabuhan",
             "a": []
           }
@@ -82,8 +90,8 @@
       "gestur": "makan",
       "seru": null,
       "tik": null,
-      "id_id": "Ikan bakar baru diangkat, Bung! Bau asapnya sampai ke kapal!",
-      "en_us": "Grilled fish just off the fire, mate! You can smell it from the ships!"
+      "id_id": "Kebetulan sekali bertemu. Ikan bakar baru diangkat, Bung! Bau asapnya sampai ke kapal! Itu saja yang ada di kepalaku.",
+      "en_us": "What luck, meeting like this. Grilled fish just off the fire, mate! You can smell it from the ships! That's all that's in my head."
     },
     {
       "ubah": {
@@ -108,7 +116,14 @@
       },
       "harap": {
         "k": "kultivator.cakap.basa.musim.semi.1",
-        "a": []
+        "a": [
+          {
+            "t": ""
+          },
+          {
+            "t": ""
+          }
+        ]
       },
       "aturan": "basa.musim.semi",
       "gestur": "bicara_tangan",
@@ -140,14 +155,22 @@
       },
       "harap": {
         "k": "kultivator.cakap.basa.musim.semi.4",
-        "a": []
+        "a": [
+          {
+            "k": "kultivator.cakap.awal.basa.4",
+            "a": []
+          },
+          {
+            "t": ""
+          }
+        ]
       },
       "aturan": "basa.musim.semi",
       "gestur": "bicara_tangan",
       "seru": null,
       "tik": null,
-      "id_id": "Burung walet kembali ke atap kami tahun ini. Pertanda rumah tangga rukun.",
-      "en_us": "The swallows came back to our eaves this year. A sign of a harmonious household."
+      "id_id": "Kau juga merasa begitu? Burung walet kembali ke atap kami tahun ini. Pertanda rumah tangga rukun.",
+      "en_us": "Do you feel the same? The swallows came back to our eaves this year. A sign of a harmonious household."
     },
     {
       "ubah": {
@@ -172,14 +195,22 @@
       },
       "harap": {
         "k": "kultivator.cakap.basa.cuaca.cerah.3.pelabuhan",
-        "a": []
+        "a": [
+          {
+            "k": "kultivator.cakap.awal.basa.1",
+            "a": []
+          },
+          {
+            "t": ""
+          }
+        ]
       },
       "aturan": "basa.cuaca.cerah",
       "gestur": "tatap_langit",
       "seru": null,
       "tik": null,
-      "id_id": "Cerah begini kapal dagang berdatangan, Bung. Dermaga bakal sesak.",
-      "en_us": "Clear like this the merchantmen come in, mate. The dock will be packed."
+      "id_id": "Nah. Cerah begini kapal dagang berdatangan, Bung. Dermaga bakal sesak.",
+      "en_us": "Well. Clear like this the merchantmen come in, mate. The dock will be packed."
     }
   ]
 }

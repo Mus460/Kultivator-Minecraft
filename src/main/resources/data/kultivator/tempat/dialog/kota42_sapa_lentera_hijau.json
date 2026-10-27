@@ -1,0 +1,43 @@
+{
+  "pembicara": [
+    "tokoh:lentera_hijau"
+  ],
+  "prioritas": 5,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "366",
+      "suara": "kota42.lentera_hijau",
+      "pilihan": [
+        {
+          "ke": "siapa"
+        },
+        {
+          "ke": "aturan"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "siapa",
+      "gestur": "366",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "aturan",
+      "gestur": "bisik",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

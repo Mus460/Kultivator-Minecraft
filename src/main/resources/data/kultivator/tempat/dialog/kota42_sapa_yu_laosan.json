@@ -1,0 +1,42 @@
+{
+  "pembicara": [
+    "tokoh:yu_laosan"
+  ],
+  "prioritas": 5,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "angkat_bawa",
+      "pilihan": [
+        {
+          "ke": "dadu"
+        },
+        {
+          "ke": "anak"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "dadu",
+      "gestur": "363",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "anak",
+      "gestur": "memandang",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

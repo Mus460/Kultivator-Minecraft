@@ -580,7 +580,8 @@ public final class KalenderKota {
 		int musim = musim(day);
 		int raya = KotaConfig.acara().musim ? MusimKota.hariRaya(day) : 0;
 		UUID pelindung = PaktaLindung.pelindung(situs);
-		int lambang = pelindung == null ? -1 : pelindung.hashCode() & 0x7FFFFFFF;
+		// the packed emblem of the protecting sect (the same value the branch sign keeps), -1 without a protector
+		int lambang = pelindung == null ? -1 : dev.kultivator.sekte.seragam.LambangData.get(pelindung).lambang() & 0x7FFFFFFF;
 		int lentera;
 		if ((bits & BIT_MAKAM) != 0) {
 			lentera = LENTERA_DUKA;
@@ -724,6 +725,37 @@ public final class KalenderKota {
 			t.putLong("hari_" + kunci, day);
 			Cultivators.dirty(player);
 			return true;
+		}
+
+		/** How many times {@code kunci} was counted today by {@link #tambahHari} (0 on a new day). */
+		public static int hariHitung(ServerPlayer player, String kunci) {
+			CompoundTag t = tag(player);
+			return t.getLongOr("cd_" + kunci, Long.MIN_VALUE) == hari(player.level().getServer()) ? t.getIntOr("c_" + kunci, 0) : 0;
+		}
+
+		/** Counts {@code n} more of {@code kunci} today (the daily limit of dice throws...); returns the new count. */
+		public static int tambahHari(ServerPlayer player, String kunci, int n) {
+			CompoundTag t = tag(player);
+			long day = hari(player.level().getServer());
+			int now = (t.getLongOr("cd_" + kunci, Long.MIN_VALUE) == day ? t.getIntOr("c_" + kunci, 0) : 0) + n;
+			t.putLong("cd_" + kunci, day);
+			t.putInt("c_" + kunci, now);
+			Cultivators.dirty(player);
+			return now;
+		}
+
+		/** True when {@code kunci} was marked today by {@link #sekaliSehari} (read only). */
+		public static boolean hariIni(ServerPlayer player, String kunci) {
+			return tag(player).getLongOr("hari_" + kunci, Long.MIN_VALUE) == hari(player.level().getServer());
+		}
+
+		/** A counter per player and {@code kunci} (0, 1, 2 ...: the n-th lore page, the next song...); returns the old value. */
+		public static int urutan(ServerPlayer player, String kunci) {
+			CompoundTag t = tag(player);
+			int n = t.getIntOr("n_" + kunci, 0);
+			t.putInt("n_" + kunci, n + 1);
+			Cultivators.dirty(player);
+			return n;
 		}
 
 		/** Marks troupe bit {@code bit} as watched; returns the full mask. */

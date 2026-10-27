@@ -106,6 +106,20 @@
       "teks": "kultivator.gabung.kabar.gabung_hari_ujian"
     },
     {
+      "id": "gabung_tunas_naga",
+      "pemicu": "gabung_tunas_naga",
+      "bobot": 8,
+      "umur_hari": 8,
+      "teks": "kultivator.gabung.kabar.gabung_tunas_naga"
+    },
+    {
+      "id": "gabung_kawan_lama",
+      "pemicu": "gabung_kawan_lama",
+      "bobot": 8,
+      "umur_hari": 8,
+      "teks": "kultivator.gabung.kabar.gabung_kawan_lama"
+    },
+    {
       "id": "gabung_kelas_naik_menengah",
       "pemicu": "gabung_kelas_naik_menengah",
       "bobot": 10,

@@ -2920,6 +2920,57 @@ def kedai_arak():
     save(p, "kedai_arak")
 
 
+def rumah_makan():
+    """The town's noodle house (42.9.1 rumah_makan, the mian board): a plaster shop 15 x 14 under a gable roof; inside the
+    kit's open kitchen line, serving counter and dining rows; outside a street stall under a lean-to (smoker, steaming
+    pot, bowls on the counter) and a drying rack of hanging noodle strands, the noodle banner on a corner pole."""
+    sx, sy, sz = 15, 16, 14
+    p = piece(sx, sy, sz, seed=53132)
+    p.foundation(0, 0, sx - 1, sz - 1, depth=1, role="kerb")
+    p.air(0, 1, 0, sx - 1, sy - 1, sz - 1)
+    p.floor(1, 1, 1, sx - 2, 11, role="paving", alt="paving_alt", alt_chance=0.3)
+    for x in range(sx):
+        for z in (0, 12, 13):
+            p.put(x, 1, z, "paving" if p.rng.random() < 0.75 else "paving_alt")
+    p.walls(1, 2, 1, sx - 2, 5, 11, role="plaster", pillar="red", windows=3, window_role="window", door=("south", 3))
+    p.fill(2, 6, 2, sx - 3, 6, 10, "wood")
+    beam_band(p, 1, 1, sx - 2, 11, 6)
+    brackets(p, 1, 1, sx - 2, 11, 6, every=3)
+    gable(p, 1, 7, 1, sx - 2, 11, along="x", overhang=1)
+    khk.interior("rumah_makan", p, 2, 1, 2, sx - 4, 9, 4, "south", pintu=7, titik_maks=20)
+    khk.cerobong_dapur(p, 1, 1, sx - 2, sz - 2, 1, maks=1)
+    # the street stall (west of the door): posts, a lean-to of slabs on the wall, counter with stove, pot and bowls
+    for x in (2, 5):
+        for y in (2, 3, 4):
+            p.put(x, y, 13, "wood_fence")
+    for x in range(2, 6):
+        for z in (12, 13):
+            p.slab(x, 5, z, "wood_slab", "bottom")
+    p.put(2, 2, 12, "minecraft:barrel", {"facing": "up", "open": "false"})
+    p.put(3, 2, 12, "minecraft:smoker", {"facing": "south", "lit": "false"})
+    p.put(4, 2, 12, "minecraft:water_cauldron", {"level": "3"})
+    p.put(5, 2, 12, "minecraft:barrel", {"facing": "up", "open": "false"})
+    p.put(5, 3, 12, "minecraft:spruce_pressure_plate" if CUR["v"] != "sabana" else "minecraft:acacia_pressure_plate", {"powered": "false"})
+    khk.titik42(p, "pajangan:mangkuk", 5, 4, 12, "south")
+    lit(p, 3, 5, 13, chain=1, role="lamp")
+    # the drying rack east of the door: noodle strands (thin white panes) hanging from the crossbar
+    for x in (9, 13):
+        for y in (2, 3, 4):
+            p.put(x, y, 13, "wood_fence")
+    for x in range(9, 14):
+        p.put(x, 4, 13, "wood_fence")
+    for x in (10, 12):
+        for y in (2, 3):
+            p.put(x, y, 13, "minecraft:white_stained_glass_pane")
+    p.put(11, 2, 13, "minecraft:barrel", {"facing": "up", "open": "false"})
+    coba(p, lambda k, x, z: khk.panji(k, x, 1, z, "south", "panji", "mian", tiang=5), [(14, 12), (14, 13), (0, 13)], lantai=1)
+    emper(p, (1, sx - 2), 12, salt=53132, maks=3, jarak=4, y_min=1)
+    lit(p, 7, 7, 12, chain=1, role="lamp")
+    finish_lights(p, 7, 2, 5)
+    front_door(p, sx, sz, 7, y=1)
+    save(p, "rumah_makan")
+
+
 def gudang():
     """A town warehouse 13 x 14 (42.9.1 gudang, 42.6.5): the kit's barrels, crates, sacks and the big steelyard inside
     (gudang, lumbung, pajangan:dacing), a hoist beam over the double door, a loaded hand cart and sacks in the yard."""
@@ -3154,7 +3205,7 @@ def sz_of(p):
 HIDUP42 = {"gerbang": _h_gerbang, "gerbang_2": _h_gerbang, "jalan_utama_a": _h_jalan_utama, "jalan_utama_b": _h_jalan_utama,
            "alun": _h_alun, "kantor_sekte": _h_kantor, "kantor_sekte_2": _h_kantor, "penginapan": _h_penginapan,
            "penginapan_2": _h_penginapan, "balai_lelang": _h_unik, "kedai_teh": _h_unik, "kedai_teh_2": _h_unik,
-           "toko_peti": _h_unik, "paviliun_pil": _h_unik, "paviliun_pusaka": _h_unik, "paviliun_pil_2": _h_unik,
+           "toko_peti": _h_unik, "rumah_makan": _h_unik, "paviliun_pil": _h_unik, "paviliun_pusaka": _h_unik, "paviliun_pil_2": _h_unik,
            "paviliun_pusaka_2": _h_unik, "jembatan": _h_jembatan, "jembatan_2": _h_jembatan, "tembok_ujung_1": _h_tembok,
            "tembok_ujung_2": _h_tembok, "tembok_ujung_3": _h_tembok}
 HIDUP42_AWAL = (("jalan_lurus", _h_jalan), ("hias_", _h_hias))
@@ -3219,7 +3270,7 @@ def write_town_pools():
                                                           "kandang")]
                  # DESIGN 42.9.4 / 42.9.6: growth lots (about 6 per town), the wine house and the warehouse
                  + [(S("kavling_kecil", utuh), 2), (S("kavling_kecil_2", utuh), 1), (S("kavling_besar", utuh), 2),
-                    (S("kavling_besar_2", utuh), 1), (S("kedai_arak"), 1), (S("gudang"), 1)]
+                    (S("kavling_besar_2", utuh), 1), (S("kedai_arak"), 1), (S("rumah_makan"), 1), (S("gudang"), 1)]
                  + [({"element_type": "minecraft:empty_pool_element"}, 1)],
     }
     fallback = {"jalan": ref("tembok_ujung"), "jalan_ujung": ref("tembok_ujung")}
@@ -3377,6 +3428,7 @@ def build_town():
     kavling_kota("kavling_besar", "rumah_toko", 53122)
     kavling_kota("kavling_besar_2", "bengkel", 53123)
     kedai_arak()
+    rumah_makan()
     gudang()
     hias_kandang()
     tembok_ujung_makam("tembok_ujung_makam", 53125, 0, 0)

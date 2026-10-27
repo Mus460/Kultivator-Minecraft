@@ -51,16 +51,8 @@
     {
       "ubah": {},
       "harap": {
-        "k": "kultivator.cakap.dagang.tawar_pembeli.0",
+        "k": "kultivator.cakap.dagang.tawar_pembeli.1.pelabuhan",
         "a": [
-          {
-            "k": "kultivator.kota.nb",
-            "a": [
-              {
-                "t": "18"
-              }
-            ]
-          },
           {
             "k": "kultivator.kota.nb",
             "a": [
@@ -75,8 +67,8 @@
       "gestur": "tawar",
       "seru": null,
       "tik": null,
-      "id_id": "%s NB? Mahal sekali! %s NB saja, ya?",
-      "en_us": "%s SV? Too dear! Just %s SV, all right?"
+      "id_id": "Di dermaga sebelah %s NB, Bung. Jangan kira aku baru turun kapal.",
+      "en_us": "At the next dock it's %s SV, mate. Don't think I just stepped off a boat."
     },
     {
       "ubah": {
@@ -134,15 +126,24 @@
         "niat": "TAWAR"
       },
       "harap": {
-        "k": "kultivator.cakap.dagang.tawar.obrol.1.pelabuhan",
-        "a": []
+        "k": "kultivator.cakap.tawar.sopan.2",
+        "a": [
+          {
+            "k": "kultivator.kota.nb",
+            "a": [
+              {
+                "t": "12"
+              }
+            ]
+          }
+        ]
       },
-      "aturan": "dagang.tawar.obrol",
+      "aturan": "tawar.sopan",
       "gestur": "tawar",
       "seru": null,
       "tik": null,
-      "id_id": "Di dermaga sebelah lebih murah, Bung. Jangan kira aku orang baru.",
-      "en_us": "Cheaper at the next dock, mate. Don't take me for a newcomer."
+      "id_id": "Saya akan membeli bila Anda berkenan menurunkan harga ke %s NB.",
+      "en_us": "I shall buy if you would kindly lower the price to %s SV."
     },
     {
       "ubah": {

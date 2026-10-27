@@ -9,6 +9,10 @@ import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -92,6 +96,15 @@ public class PapanCabangBlock extends BaseEntityBlock {
 	protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
 		super.affectNeighborsAfterRemoval(state, level, pos, movedByPiston);
 		CabangKota.papanHilang(level, pos);
+	}
+
+	/** 42U-2: a right click opens the branch sheet at the sign (writes allowed within reach of the board). */
+	@Override
+	protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+		if (player instanceof ServerPlayer sp) {
+			dev.kultivator.dunia.kota42.ui.LembarKotaDasar.bukaDi(sp, dev.kultivator.dunia.kota42.ui.KotaLembar.Cabang.LAYAR, pos);
+		}
+		return InteractionResult.SUCCESS;
 	}
 
 	@Override

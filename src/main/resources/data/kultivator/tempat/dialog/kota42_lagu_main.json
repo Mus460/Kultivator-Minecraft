@@ -1,0 +1,31 @@
+{
+  "pembicara": [
+    "tokoh:ah_qin"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest kota42_lagu_jembatan tahap mainkan"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "355",
+      "prop": "174",
+      "pilihan": [
+        {
+          "akibat": [
+            "bendera kota42.lagu.main"
+          ],
+          "ke": "main"
+        }
+      ]
+    },
+    {
+      "id": "main",
+      "gestur": "355",
+      "prop": "174",
+      "suara": "kota42.ah_qin"
+    }
+  ]
+}

@@ -50,6 +50,10 @@
           {
             "k": "kultivator.cakap.lex.kakak.ibukota",
             "a": []
+          },
+          {
+            "k": "kultivator.cakap.ekor.sapa.3",
+            "a": []
           }
         ]
       },
@@ -57,8 +61,8 @@
       "gestur": "lambai",
       "seru": null,
       "tik": null,
-      "id_id": "Sore, Kakanda.",
-      "en_us": "Evening, Elder Brother."
+      "id_id": "Sore, Kakanda. Jangan membuat masalah, ya.",
+      "en_us": "Evening, Elder Brother. Don't make trouble, will you."
     },
     {
       "ubah": {
@@ -90,6 +94,9 @@
           {
             "k": "kultivator.cakap.lex.kakak.ibukota",
             "a": []
+          },
+          {
+            "t": ""
           }
         ]
       },

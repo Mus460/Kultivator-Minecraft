@@ -1,0 +1,31 @@
+{
+  "pembicara": [
+    "tokoh:li_laoban"
+  ],
+  "prioritas": 55,
+  "syarat": [
+    "quest kota42_dua_keluarga aktif",
+    "bendera kota42.dua.surat",
+    "!bendera kota42.dua.dengar_li"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "marah_tunjuk",
+      "akibat": [
+        "bendera kota42.dua.dengar_li"
+      ],
+      "pilihan": [
+        {
+          "ke": "surat"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "surat",
+      "gestur": "451"
+    }
+  ]
+}

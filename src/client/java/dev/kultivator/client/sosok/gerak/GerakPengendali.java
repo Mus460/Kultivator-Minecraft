@@ -389,6 +389,9 @@ public final class GerakPengendali {
 			d.klip = atas == k.sekali.k ? k.sekali.klip : atas == k.aktKlip.k ? k.aktKlip.klip : atas == k.loop.k ? k.loop.klip
 					: atas == k.sikap.k ? k.sikap.klip : 0;
 			d.varian = atas == k.sekali.k ? k.sekali.varian : atas == k.aktKlip.k ? k.aktKlip.varian : atas == k.loop.k ? k.loop.varian : 0;
+			// clip time in ticks (the renderers' whole-body moves, e.g. the acrobat's somersault, read it)
+			d.tKlip = Math.max(0.0F, age - (atas == k.sekali.k ? k.sekali.mulai : atas == k.aktKlip.k ? k.aktKlip.mulai
+					: atas == k.loop.k ? k.loop.mulai : atas == k.sikap.k ? k.sikap.mulai : age));
 		}
 		if ("abadi".equals(kunci) || "d.dewa_penglai".equals(kunci)) {
 			d.melayang = 0.02F;
@@ -517,7 +520,7 @@ public final class GerakPengendali {
 		boolean beladiri = beladiri(e, st, gaya, kunci);
 		c |= beladiri ? Klip.SY_BELA_DIRI : Klip.SY_SIPIL;
 		boolean tetua = e instanceof DiscipleEntity ? st.sectRank >= 4
-				: kunci != null && (kunci.startsWith("tetua") || kunci.equals("ketua_sekte") || kunci.equals("patriark_klan"));
+				: kunci != null && (kunci.startsWith("tetua") || kunci.startsWith("ketua_sekte") || kunci.equals("patriark_klan"));
 		if (tetua) {
 			c |= Klip.SY_TETUA;
 		}

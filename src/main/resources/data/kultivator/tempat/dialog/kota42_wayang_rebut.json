@@ -1,0 +1,22 @@
+{
+  "pembicara": [
+    "tokoh:lentera_hijau"
+  ],
+  "prioritas": 55,
+  "syarat": [
+    "quest kota42_malam_wayang tahap tebus",
+    "bendera kota42.wayang.rebut",
+    "!punya kultivator:wayang_kulit_kera_sakti"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "419",
+      "akibat": [
+        "beri kultivator:wayang_kulit_kera_sakti",
+        "kota42.kesan tokoh:lentera_hijau -20"
+      ]
+    }
+  ]
+}

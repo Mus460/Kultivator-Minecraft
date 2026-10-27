@@ -1,7 +1,6 @@
 package dev.kultivator.client.sekte.gabung.ui.layar;
 
 import dev.kultivator.client.screen.ui.Brush;
-import dev.kultivator.client.screen.ui.Eased;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.SegelKonfirmasi;
 import dev.kultivator.client.sekte.gabung.ui.IkonGabung;
@@ -45,13 +44,8 @@ public final class LayarKartu extends LayarGabungDasar {
 	private static final int ROW_H = 24;
 
 	private final DaftarGulir catatan = new DaftarGulir();
-	private final Eased gulirTampil = new Eased(14.0F);
-	private float gulir;
-	private int isiTinggi;
-	private int kx0;
-	private int ky0;
-	private int kx1;
-	private int ky1;
+	private final DaftarGulir syaratKeluar = new DaftarGulir();
+	private final GulirKolom kolom = new GulirKolom();
 	/** Heading to scroll to once laid out ("shifu" / "murid"), or "". */
 	private String lompat = "";
 	private int shifuY;
@@ -91,8 +85,8 @@ public final class LayarKartu extends LayarGabungDasar {
 	@Override
 	protected void tabBerubah() {
 		catatan.mulaiUlang(Util.getMillis());
-		gulir = 0.0F;
-		gulirTampil.set(0.0F);
+		syaratKeluar.mulaiUlang(Util.getMillis());
+		kolom.ulang();
 	}
 
 	@Override
@@ -108,20 +102,13 @@ public final class LayarKartu extends LayarGabungDasar {
 	// ================================================================== Kartu: card, Shifu, Murid in one scroll
 
 	private void tumpuk(Lukis l, int x0, int y0, int x1, int y1) {
-		kx0 = x0;
-		ky0 = y0;
-		kx1 = x1;
-		ky1 = y1;
-		if (!lompat.isEmpty() && isiTinggi > 0) {
-			gulir = Kartu.TAB_SHIFU.equals(lompat) ? shifuY : muridY;
+		if (!lompat.isEmpty() && kolom.isi() > 0) {
+			kolom.ke(Kartu.TAB_SHIFU.equals(lompat) ? shifuY : muridY);
 			lompat = "";
 		}
-		float maks = Math.max(0.0F, isiTinggi - (y1 - y0));
-		gulir = Math.max(0.0F, Math.min(maks, gulir));
-		float offset = gulirTampil.to(gulir, l.detik);
+		gulirAktif = kolom;
+		int top = kolom.mulai(l, x0, y0, x1, y1);
 		int bx1 = x1 - 4;
-		l.klip(x0, y0, x1, y1);
-		int top = Math.round(y0 - offset);
 		int cy = top;
 		kartu(l, x0, cy, bx1, cy + KARTU_H);
 		cy += KARTU_H + 6;
@@ -132,26 +119,7 @@ public final class LayarKartu extends LayarGabungDasar {
 		muridY = cy - top;
 		cy += subjudul(l, t("tab.murid"), x0, cy, bx1);
 		cy = murid(l, x0, cy + 2, bx1);
-		l.lepasKlip();
-		isiTinggi = cy - top + 4;
-		if (maks > 0.0F) {
-			float bead = y0 + 3.0F + (y1 - y0 - 6.0F) * Math.min(1.0F, offset / maks);
-			l.g.fill(x1 - 2, y0, x1 - 1, y1, Palette.CORD);
-			Brush.disc(l.g, x1 - 1.5F, bead, 2.2F, Palette.JADE);
-		}
-	}
-
-	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-		if (super.mouseScrolled(mouseX, mouseY, scrollX, scrollY)) {
-			return true;
-		}
-		// shortcut: box compared in screen coordinates (exact unless "uji ui skala" is on), upgrade when the base exposes vx/vy
-		if (Kartu.TAB_KARTU.equals(tab) && mouseX >= kx0 && mouseX < kx1 && mouseY >= ky0 && mouseY < ky1 && isiTinggi > ky1 - ky0) {
-			gulir -= (float) scrollY * 18.0F;
-			return true;
-		}
-		return false;
+		kolom.selesai(l, cy);
 	}
 
 	private void kartu(Lukis l, int x0, int y0, int x1, int y1) {
@@ -445,12 +413,11 @@ public final class LayarKartu extends LayarGabungDasar {
 		int y = y0 + 25;
 		int by = y1 - 16;
 		int peringatanY = by - 34;
-		for (Lembar s : k.daftar(LembarKunci.SYARAT)) {
-			int h = barisSyarat(l, s, x0, y, x1, peringatanY - 12);
-			if (h == 0) {
-				break;
-			}
-			y += h;
+		List<Lembar> syarat = k.daftar(LembarKunci.SYARAT);
+		if (syarat.isEmpty()) {
+			l.teks(t("kartu.keluar.tanpa_syarat"), x0, y, x1 - x0, gaya.teksSamar);
+		} else {
+			daftarSyarat(l, syaratKeluar, "syarat", syarat, x0, y, x1, peringatanY - 12);
 		}
 		boolean bisa = k.b(LembarKunci.BISA);
 		if (k.b(Kartu.RESTU)) {

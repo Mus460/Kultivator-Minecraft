@@ -97,6 +97,14 @@
           {
             "k": "kultivator.cakap.lex.kemarin.ibukota",
             "a": []
+          },
+          {
+            "k": "kultivator.cakap.ekor.kabar.0",
+            "a": []
+          },
+          {
+            "k": "kultivator.cakap.awal.kabar.7",
+            "a": []
           }
         ]
       },
@@ -104,8 +112,8 @@
       "gestur": "bicara_tangan",
       "seru": null,
       "tik": null,
-      "id_id": "kudengar Han menolong Tuan Gao baru kemarin. Orang baik masih ada rupanya.",
-      "en_us": "I heard Han helped Tuan Gao only yesterday. So good people still exist."
+      "id_id": "kudengar Han menolong Tuan Gao baru kemarin. Orang baik masih ada rupanya. Begitu kabar yang sampai ke telingaku.",
+      "en_us": "I heard Han helped Tuan Gao only yesterday. So good people still exist. That's the news that reached my ears."
     },
     {
       "ubah": {
@@ -165,6 +173,10 @@
           },
           {
             "t": "Tuan Gao"
+          },
+          {
+            "k": "kultivator.cakap.ekor.kabar.10",
+            "a": []
           }
         ]
       },
@@ -172,8 +184,8 @@
       "gestur": "tunjuk",
       "seru": null,
       "tik": null,
-      "id_id": "Kau lihat duel empat hari lalu? Han mengalahkan Tuan Gao dalam tiga jurus!",
-      "en_us": "Did you see the duel four days ago? Han beat Tuan Gao in three moves!"
+      "id_id": "Kau lihat duel empat hari lalu? Han mengalahkan Tuan Gao dalam tiga jurus! Demikian yang sempat kudengar, semoga bermanfaat.",
+      "en_us": "Did you see the duel four days ago? Han beat Tuan Gao in three moves! That is all I managed to hear; may it be of use."
     },
     {
       "ubah": {
@@ -220,7 +232,15 @@
         "k": "kultivator.cakap.kabar.menawar_keras.1",
         "a": [
           {
+            "k": "kultivator.cakap.awal.kabar.6",
+            "a": []
+          },
+          {
             "t": "Han"
+          },
+          {
+            "k": "kultivator.cakap.ekor.kabar.8",
+            "a": []
           }
         ]
       },
@@ -228,8 +248,8 @@
       "gestur": "geleng",
       "seru": null,
       "tik": null,
-      "id_id": "Kalau Han mampir ke lapakmu, naikkan harganya dulu. Dia menawar habis-habisan.",
-      "en_us": "If Han stops at your stall, raise the price first. They haggle to the last coin."
+      "id_id": "Mohon maaf mengganggu, ada kabar yang patut didengar. Kalau Han mampir ke lapakmu, naikkan harganya dulu. Dia menawar habis-habisan. Siapa tahu berguna bagimu.",
+      "en_us": "Pardon the interruption; there is news worth hearing. If Han stops at your stall, raise the price first. They haggle to the last coin. Who knows, it may serve you."
     },
     {
       "ubah": {
@@ -283,6 +303,10 @@
           },
           {
             "t": "Tuan Gao"
+          },
+          {
+            "k": "kultivator.cakap.ekor.kabar.2",
+            "a": []
           }
         ]
       },
@@ -290,8 +314,8 @@
       "gestur": "geleng",
       "seru": null,
       "tik": null,
-      "id_id": " Han harus belajar dari ingkarnya pada Tuan Gao.",
-      "en_us": " Han should learn from failing Tuan Gao."
+      "id_id": " Han harus belajar dari ingkarnya pada Tuan Gao. Kau sendiri sudah dengar?",
+      "en_us": " Han should learn from failing Tuan Gao. Have you heard it yourself?"
     }
   ]
 }

@@ -1,0 +1,470 @@
+{
+  "ganti": false,
+  "rasa": {
+    "pangsit": {
+      "id": [
+        "minecraft:bread",
+        "minecraft:baked_potato",
+        "minecraft:mushroom_stew",
+        "minecraft:rabbit_stew",
+        "minecraft:beetroot_soup",
+        "minecraft:cooked_cod",
+        "minecraft:cooked_salmon",
+        "minecraft:pumpkin_pie"
+      ],
+      "item": [
+        "bakpao",
+        "pangsit",
+        "dumpling",
+        "mi_",
+        "nasi",
+        "bubur",
+        "sup_",
+        "sup",
+        "mantou"
+      ]
+    },
+    "kertas": {
+      "id": [
+        "minecraft:paper",
+        "minecraft:ink_sac",
+        "minecraft:glow_ink_sac",
+        "minecraft:feather",
+        "minecraft:string",
+        "minecraft:map",
+        "minecraft:filled_map"
+      ],
+      "item": [
+        "kuas",
+        "tinta",
+        "kertas",
+        "layang"
+      ]
+    },
+    "buah": {
+      "id": [
+        "minecraft:apple",
+        "minecraft:melon_slice",
+        "minecraft:sweet_berries",
+        "minecraft:glow_berries",
+        "minecraft:carrot",
+        "minecraft:chorus_fruit",
+        "minecraft:dried_kelp"
+      ],
+      "item": [
+        "persik",
+        "buah",
+        "jeruk"
+      ]
+    }
+  },
+  "aturan": [
+    {
+      "kebiasaan": "kakek_catur",
+      "suka": [
+        "teh",
+        "buah"
+      ],
+      "benci": []
+    },
+    {
+      "kebiasaan": "pemain_erhu",
+      "suka": [
+        "teh",
+        "kertas"
+      ],
+      "benci": []
+    },
+    {
+      "kebiasaan": "penggemar_opera",
+      "suka": [
+        "kain",
+        "arak"
+      ],
+      "benci": []
+    },
+    {
+      "kebiasaan": "adu_jangkrik",
+      "suka": [
+        "buah",
+        "biji"
+      ],
+      "benci": []
+    },
+    {
+      "kebiasaan": "layang_layang",
+      "suka": [
+        "kertas"
+      ],
+      "benci": []
+    },
+    {
+      "kebiasaan": "pencerita_anak",
+      "suka": [
+        "teh",
+        "manis"
+      ],
+      "benci": []
+    },
+    {
+      "kebiasaan": "tai_chi",
+      "suka": [
+        "teh",
+        "buah"
+      ],
+      "benci": [
+        "arak"
+      ]
+    },
+    {
+      "kebiasaan": "penabung",
+      "suka": [
+        "biji",
+        "pangsit"
+      ],
+      "benci": [
+        "mewah"
+      ]
+    },
+    {
+      "kebiasaan": "pemalas",
+      "suka": [
+        "manis",
+        "daging"
+      ],
+      "benci": [
+        "senjata"
+      ]
+    },
+    {
+      "kebiasaan": "gosip_sumur",
+      "suka": [
+        "teh",
+        "manis"
+      ],
+      "benci": []
+    },
+    {
+      "kebiasaan": "penjudi",
+      "suka": [
+        "mewah",
+        "arak"
+      ],
+      "benci": []
+    },
+    {
+      "kebiasaan": "pemarah",
+      "suka": [
+        "arak",
+        "daging"
+      ],
+      "benci": [
+        "teh"
+      ]
+    },
+    {
+      "kebiasaan": "pekerja_keras",
+      "suka": [
+        "pangsit",
+        "daging"
+      ],
+      "benci": []
+    },
+    {
+      "kebiasaan": "penyapu_jalan",
+      "suka": [
+        "teh",
+        "pangsit"
+      ],
+      "benci": []
+    },
+    {
+      "kebiasaan": "dermawan",
+      "suka": [
+        "pangsit"
+      ],
+      "benci": [
+        "mewah"
+      ]
+    },
+    {
+      "kebiasaan": "pengintip",
+      "suka": [
+        "arak",
+        "manis"
+      ],
+      "benci": []
+    },
+    {
+      "kebiasaan": "tidur_siang",
+      "suka": [
+        "teh",
+        "pangsit"
+      ],
+      "benci": []
+    },
+    {
+      "peran": "hakim",
+      "suka": [
+        "kitab",
+        "teh"
+      ],
+      "benci": [
+        "mewah"
+      ]
+    },
+    {
+      "peran": "pustakawan",
+      "suka": [
+        "kitab",
+        "kertas"
+      ],
+      "benci": []
+    },
+    {
+      "peran": "guru_sekolah",
+      "suka": [
+        "kertas",
+        "kitab",
+        "buah"
+      ],
+      "benci": []
+    },
+    {
+      "peran": "pemusik",
+      "suka": [
+        "teh",
+        "kain"
+      ],
+      "benci": []
+    },
+    {
+      "peran": "pengamen",
+      "suka": [
+        "pangsit",
+        "teh"
+      ],
+      "benci": []
+    },
+    {
+      "peran": "pendongeng",
+      "suka": [
+        "teh",
+        "manis",
+        "kitab"
+      ],
+      "benci": []
+    },
+    {
+      "peran": "akrobat",
+      "suka": [
+        "pangsit",
+        "daging",
+        "buah"
+      ],
+      "benci": [
+        "arak"
+      ]
+    },
+    {
+      "peran": "mak_comblang",
+      "suka": [
+        "kain",
+        "manis",
+        "teh"
+      ],
+      "benci": []
+    },
+    {
+      "peran": "penjual_obat",
+      "suka": [
+        "mewah",
+        "arak"
+      ],
+      "benci": []
+    },
+    {
+      "peran": "pengurus_duka",
+      "suka": [
+        "teh",
+        "pangsit"
+      ],
+      "benci": [
+        "bunga"
+      ]
+    },
+    {
+      "peran": "pialang",
+      "suka": [
+        "mewah"
+      ],
+      "benci": [
+        "biji"
+      ]
+    },
+    {
+      "peran": "bankir",
+      "suka": [
+        "mewah",
+        "teh"
+      ],
+      "benci": []
+    },
+    {
+      "peran": "penjaga_malam",
+      "suka": [
+        "teh",
+        "pangsit"
+      ],
+      "benci": [
+        "arak"
+      ]
+    },
+    {
+      "peran": "penjaga",
+      "suka": [
+        "daging",
+        "pangsit"
+      ],
+      "benci": []
+    },
+    {
+      "peran": "penjaga_gudang",
+      "suka": [
+        "pangsit",
+        "teh"
+      ],
+      "benci": []
+    },
+    {
+      "peran": "petani",
+      "suka": [
+        "biji",
+        "pangsit"
+      ],
+      "benci": []
+    },
+    {
+      "peran": "nelayan",
+      "suka": [
+        "arak",
+        "pangsit"
+      ],
+      "benci": []
+    },
+    {
+      "peran": "penjual_ikan",
+      "suka": [
+        "arak",
+        "teh"
+      ],
+      "benci": []
+    },
+    {
+      "peran": "pencopet",
+      "suka": [
+        "pangsit",
+        "manis"
+      ],
+      "benci": [
+        "senjata"
+      ]
+    },
+    {
+      "peran": "pengemis",
+      "suka": [
+        "pangsit",
+        "daging"
+      ],
+      "benci": []
+    },
+    {
+      "peran": "tukang",
+      "suka": [
+        "arak",
+        "pangsit"
+      ],
+      "benci": []
+    },
+    {
+      "peran": "pemilik_teh",
+      "suka": [
+        "teh",
+        "kitab"
+      ],
+      "benci": []
+    },
+    {
+      "watak": "ramah",
+      "suka": [
+        "manis",
+        "pangsit"
+      ],
+      "benci": []
+    },
+    {
+      "watak": "curiga",
+      "suka": [],
+      "benci": [
+        "mewah"
+      ]
+    },
+    {
+      "watak": "licik",
+      "suka": [
+        "mewah",
+        "arak"
+      ],
+      "benci": []
+    },
+    {
+      "watak": "jujur",
+      "suka": [
+        "pangsit",
+        "teh"
+      ],
+      "benci": [
+        "mewah"
+      ]
+    },
+    {
+      "watak": "penakut",
+      "suka": [
+        "buah"
+      ],
+      "benci": []
+    },
+    {
+      "tahap": "remaja",
+      "suka": [
+        "manis",
+        "pangsit",
+        "kertas"
+      ],
+      "benci": []
+    },
+    {
+      "tahap": "anak",
+      "suka": [
+        "buah"
+      ],
+      "benci": []
+    },
+    {
+      "tahap": "tua",
+      "suka": [
+        "buah"
+      ],
+      "benci": [
+        "senjata"
+      ]
+    },
+    {
+      "sakit": true,
+      "suka": [
+        "pangsit"
+      ],
+      "benci": []
+    }
+  ]
+}

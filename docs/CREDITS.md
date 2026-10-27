@@ -23,6 +23,27 @@ processed (echo, choir, demon voice) by `tools/gen_voices.py`.
 Ketentuan tiap karakter: https://github.com/VOICEVOX/voicevox_vvm (TERMS). Kultivator adalah proyek pribadi non-komersial.
 Character terms: see the VOICEVOX VVM TERMS. Kultivator is a personal, non-commercial project.
 
+### Gabung Sekte dan Kota yang Hidup / Joining a Sect and Living Towns (DESIGN 41, 42)
+
+133 baris suara bernama (28 klip di `sounds/voice/world/gabung/`, 105 klip di `sounds/voice/world/kota42/`) dibuat dengan VOICEVOX
+oleh `tools/gen_voices.py` (daftar `KV41_42`, kalimat sumber di `docs/progres/m2-voices.md`). Tidak ada suara baru: hanya karakter
+yang sudah tercantum di atas, yaitu VOICEVOX:青山龍星 (Langit), VOICEVOX:ちび式じい (tetua sekte, hakim, pendongeng, penjaga malam),
+VOICEVOX:麒ヶ島宗麟 (ketua lama, wali kota), VOICEVOX:剣崎雌雄 (penjaga Pasar Hantu), VOICEVOX:白上虎太郎, VOICEVOX:玄野武宏,
+VOICEVOX:雀松朱司, VOICEVOX:四国めたん, VOICEVOX:春日部つむぎ dan VOICEVOX:小夜/SAYO (warga, murid, pedagang, tukang).
+133 named voice lines (28 clips in `sounds/voice/world/gabung/`, 105 in `sounds/voice/world/kota42/`) were made with VOICEVOX by
+`tools/gen_voices.py` (list `KV41_42`, source lines in `docs/progres/m2-voices.md`) using only the characters already credited
+above (青山龍星, ちび式じい, 麒ヶ島宗麟, 剣崎雌雄, 白上虎太郎, 玄野武宏, 雀松朱司, 四国めたん, 春日部つむぎ, 小夜/SAYO).
+
+### Alat musik dan suara pesta kota / Town instruments and festival sounds (DESIGN 42)
+
+Erhu, suona, pipa, dizi, gong, kentongan, genderang kecil, balok kayu, petasan, peluit merpati dan dua loop latar
+(`ambient/kota/malam_meriah`, `ambient/kota/upacara`) disintesis sendiri sepenuhnya dari rumus oleh
+`tools/gen_kota_hidup_suara.py` (tanpa sampel rekaman dan tanpa VOICEVOX; kedua loop latar juga mencampur loop kota yang sudah ada).
+Erhu, suona, pipa, dizi, gongs, kentongan, small drum, wood blocks, firecrackers, the pigeon whistle and the two ambience loops
+(`ambient/kota/malam_meriah`, `ambient/kota/upacara`) are synthesised from maths alone by `tools/gen_kota_hidup_suara.py` (no
+recorded samples, no VOICEVOX; the two loops also mix the existing town loops). Every other texture, model and animation of
+designs 41 and 42 is our own, made by the generators in `tools/`.
+
 ## Suara tanpa kata / Non-verbal vocal clips
 
 - "Voice Clip Pack - Male Adventurer RPG" oleh/by Brandon Song (wolfwoot) — CC0 —

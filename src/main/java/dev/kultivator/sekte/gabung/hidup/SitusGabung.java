@@ -96,7 +96,10 @@ public final class SitusGabung {
 		Pelajaran.init();
 		SpiritSites.addSiteProvider(SitusGabung::situs);
 		ServerTickEvents.END_SERVER_TICK.register(SitusGabung::tick);
-		ServerLifecycleEvents.SERVER_STOPPED.register(s -> KolamRoh.reset());
+		ServerLifecycleEvents.SERVER_STOPPED.register(s -> {
+			KolamRoh.reset();
+			Kediaman.reset();
+		});
 		GabungApi.daftarUji("turnamen", TurnamenMurid::ujiNode);
 		GabungApi.daftarUji("pelajaran", Pelajaran::ujiNode);
 		GabungApi.daftarUji("sewa", SitusGabung::ujiSewa);
@@ -116,6 +119,8 @@ public final class SitusGabung {
 		}
 		TurnamenMurid.tick(server);
 		Pelajaran.tick(server);
+		Kediaman.sambut(server);
+		KolamRoh.suasana(server);
 		if (tickCount % Kediaman.SEAT_JEDA == 0L) {
 			Kediaman.tick(server);
 		}

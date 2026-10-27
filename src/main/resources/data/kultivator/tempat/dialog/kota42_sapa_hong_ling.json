@@ -1,0 +1,56 @@
+{
+  "pembicara": [
+    "tokoh:hong_ling"
+  ],
+  "prioritas": 5,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "380",
+      "suara": "kota42.akrobat_buka",
+      "pilihan": [
+        {
+          "ke": "rombongan"
+        },
+        {
+          "ke": "tali"
+        },
+        {
+          "ke": "barongsai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "rombongan",
+      "gestur": "380",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "tali",
+      "gestur": "tertawa",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "barongsai",
+      "gestur": "378",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

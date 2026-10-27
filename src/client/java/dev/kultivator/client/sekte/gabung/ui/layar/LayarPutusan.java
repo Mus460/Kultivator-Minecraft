@@ -104,7 +104,8 @@ public final class LayarPutusan extends LayarGabungDasar {
 				UiSound.denied();
 			}
 		}
-		int yy = kepalaSekte(l, lembar, x0, y0, x1);
+		// a short box (GUI scale 4) gives the strip's 19 px to the card
+		int yy = y1 - y0 < PENDEK ? y0 : kepalaSekte(l, lembar, x0, y0, x1);
 		// the score scale over the card
 		int skor = Math.max(0, Math.min(100, lembar.i(LembarKunci.SKOR, 0)));
 		Component skorT = Brush.bold(u("putusan.skor", skor));

@@ -86,6 +86,7 @@ public final class LayarPaviliun extends LayarGabungDasar {
 		jumlah.set(1);
 		muncul = now;
 		tampilKunci = "";
+		halaman = 0;
 	}
 
 	@Override
@@ -168,12 +169,15 @@ public final class LayarPaviliun extends LayarGabungDasar {
 			kosong(l, cari != null && !cari.kosong() ? u("paviliun.tidak_ketemu") : u("paviliun.tab_kosong." + tab), x0, y0, x1, y1);
 			return;
 		}
-		Kotak[] k = bagi(x0, y0, x1, y1);
+		y0 = bilahHalaman(l, x0, y0, x1, u("paviliun.hal.barang"), u("paviliun.hal.rincian"));
+		Kotak[] k = bagiHalaman(x0, y0, x1, y1);
 		long now = muncul;
-		daftar.gambar(l, "barang", k[0].x0(), k[0].y0(), k[0].x1(), k[0].y1(), list.size(), 24, (lk, i, rx0, ry0, rx1, ry1, sorot, pilih) ->
+		if (k[0] != null) daftar.gambar(l, "barang", k[0].x0(), k[0].y0(), k[0].x1(), k[0].y1(), list.size(), 24, (lk, i, rx0, ry0, rx1, ry1, sorot, pilih) ->
 				baris(lk, list.get(i), rx0, ry0, rx1, ry1, sorot, pilih, now), this::tukar, i -> jumlah.set(1));
 		int sel = daftar.pilihan();
-		detail(l, k[1], sel >= 0 && sel < list.size() ? list.get(sel) : null);
+		if (k[1] != null) {
+			detail(l, k[1], sel >= 0 && sel < list.size() ? list.get(sel) : null);
+		}
 	}
 
 	private void baris(Lukis l, Lembar e, int x0, int y0, int x1, int y1, boolean sorot, boolean pilih, long muncul) {
@@ -267,8 +271,10 @@ public final class LayarPaviliun extends LayarGabungDasar {
 		if (e.b(Paviliun.WARISAN)) {
 			jenis.append(" · ").append(u("paviliun.warisan_tanda"));
 		}
-		l.teks(jenis, x0, y, x1 - x0, lemah);
-		y += 11;
+		if (y + 10 < by - 16) {
+			l.teks(jenis, x0, y, x1 - x0, lemah);
+			y += 11;
+		}
 		// price breakdown
 		int harga = e.i(LembarKunci.HARGA, 0);
 		int dasar = e.i(Paviliun.HARGA_DASAR, harga);

@@ -50,7 +50,8 @@ import java.util.UUID;
  * <p>
  * <b>Ujian Hati</b> in the main hall ({@code kompleks/aula}): the admissions elder ({@code TokohSekte.penerimaan}; his body
  * through {@code TokohAnchors.tubuh}, else a staff {@code TETUA_SEKTE} body for the day) asks three questions drawn from
- * the twelve of the sect's alignment, on the 38 {@code dialog} screen: the opening dialog
+ * the twelve of the sect's alignment (one of the three is swapped for one of the two about the sect's own art,
+ * {@code gabung_wawancara_c_<corak>_1..2}), on the 38 {@code dialog} screen: the opening dialog
  * {@code gabung_wawancara_<aliran>} and the question dialogs {@code gabung_wawancara_<aliran>_01..12}. Every answer
  * runs effect {@code gabung.jawab <kesan> [sifat]} (impression -10..+15, a candidate trait {@code teguh}, {@code licik},
  * {@code welas}, {@code haus_kuasa} ...); the condition {@code gabung.soal <id>} keeps each question to its turn, so
@@ -70,6 +71,8 @@ public final class UjianHati {
 	public static final int KOLAM = 12;
 	public static final int DITANYA = 3;
 	public static final int KOLAM_PELAYAN = 4;
+	/** Questions per corak ({@code gabung_wawancara_c_<corak>_<1..2>}); one replaces a question of the alignment's pool. */
+	public static final int KOLAM_CORAK = 2;
 	/** An unanswered interview runs out after this long (each missing answer counts -5). */
 	public static final int BATAS_TICK = 240 * 20;
 	/** The guest duel passes after lasting this long. */
@@ -106,6 +109,8 @@ public final class UjianHati {
 			for (int i = 0; i < DITANYA; i++) {
 				pick[i] = pool.remove(rnd.nextInt(pool.size()));
 			}
+			// one of the three is about the sect's own art (41.5.4 interview, corak flavour): numbers above KOLAM
+			pick[rnd.nextInt(DITANYA)] = KOLAM + 1 + rnd.nextInt(KOLAM_CORAK);
 			s.data.putIntArray(SOAL, pick);
 		}
 		s.data.putInt(KE, 0);
@@ -149,6 +154,9 @@ public final class UjianHati {
 		int q = n >= 0 && n < soal.length ? soal[n] : 1;
 		if (s.data.getBooleanOr(PELAYAN, false)) {
 			return "gabung_wawancara_pelayan_" + q;
+		}
+		if (q > KOLAM) {
+			return "gabung_wawancara_c_" + s.corak.id() + "_" + Math.min(KOLAM_CORAK, q - KOLAM);
 		}
 		return "gabung_wawancara_" + aliran(s) + "_" + (q < 10 ? "0" : "") + q;
 	}

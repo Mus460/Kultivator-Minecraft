@@ -136,8 +136,11 @@ public final class SiklusHidup {
 				}
 			}
 			// matchmaking: single 22-35 without a lover
-			if (w.lajang() && kekasih == Warga.TANPA && umur >= 22 && umur <= 35 && random.nextDouble() < 0.15D * (comblang ? 1.5D : 1.0D)) {
+			if (w.lajang() && kekasih == Warga.TANPA && umur >= 22 && umur <= 35 && random.nextDouble() < 0.08D * (comblang ? 1.5D : 1.0D)) {
 				Warga jodoh = cariJodoh(data, s, w, 18, 45, hari, random);
+				if (jodoh == null && s.warga.size() < KECIL && random.nextDouble() < 0.5D) {
+					jodoh = menantuLuar(data, s, w, umur, hari, random);
+				}
 				if (jodoh != null) {
 					Hubungan.ikat(w, jodoh, JenisHubungan.KEKASIH, 72, hari);
 					tunangkan(w, jodoh, hari, random);
@@ -152,6 +155,7 @@ public final class SiklusHidup {
 				if (sesak(s, w.rumahTangga)) {
 					p *= 0.5D;
 				}
+				p *= faktorRuang(s);
 				if (Kemakmuran.nilai(s.id) >= 60) {
 					p *= 1.2D;
 				}
@@ -168,7 +172,8 @@ public final class SiklusHidup {
 			if (!w.pria() && w.pasangan != Warga.TANPA && w.anak.length == 0 && umur < 50 && random.nextDouble() < 0.05D) {
 				Warga husband = data.byId(w.pasangan);
 				Warga yatim = husband == null ? null : cariYatim(data, s, w.rumahTangga);
-				if (yatim != null) {
+				// a mother is at least 17 years older than her child
+				if (yatim != null && umur - umurPada(yatim, hari) >= 17) {
 					angkat(data, husband, w, yatim);
 				}
 			}
@@ -208,6 +213,47 @@ public final class SiklusHidup {
 		if (umur >= 65 && bekerja(w) && !(w.abadi && cfg.tokohAbadi)) {
 			pensiun(server, data, s.id, w);
 		}
+	}
+
+	/**
+	 * Room in the place for more people: the people against the beds of its houses (or the first raising when larger). A
+	 * crowded place has fewer births (1 up to 0.95 of the room, 0.25 at 1.2), an emptied one more (up to 1.75), so a town
+	 * settles around its houses over the generations instead of swelling or dying out.
+	 */
+	static double faktorRuang(WargaData.Situs s) {
+		CompoundTag kap = s.stat.getCompoundOrEmpty(WargaGen.KAPASITAS);
+		int kasur = 0;
+		for (String key : kap.keySet()) {
+			kasur += Math.max(2, kap.getIntOr(key, 2));
+		}
+		double ruang = Math.max(kasur, s.stat.getIntOr("awal", 0));
+		if (ruang <= 0.0D) {
+			return 1.0D;
+		}
+		double r = s.warga.size() / ruang;
+		if (r < 0.7D) {
+			return 1.0D + (0.7D - r) * 2.5D;
+		}
+		return r <= 0.95D ? 1.0D : Math.max(0.15D, 1.0D - (r - 0.95D) * 3.0D);
+	}
+
+	/** A place below this many residents finds spouses beyond its walls when it has none to offer. */
+	private static final int KECIL = 80;
+
+	/**
+	 * A small place has no one left for a single to marry: a man or a woman of the other sex and about the same age comes in
+	 * from outside to marry into the house (the household of {@code w}; work follows from 42A-2 {@code Pekerjaan}), so a
+	 * village of a dozen does not die out in three generations.
+	 */
+	private static Warga menantuLuar(WargaData data, WargaData.Situs s, Warga w, int umur, long hari, RandomSource random) {
+		int lawan = w.pria() ? Warga.WANITA : Warga.PRIA;
+		int min = Math.max(18, umur - 4);
+		Warga baru = WargaGen.pendatang(data, NpcRole.WARGA, lawan, min, Math.min(45, Math.max(min, umur + 4)), hari, random);
+		baru.rumahTangga = w.rumahTangga;
+		baru.rumah = w.rumah;
+		Kebiasaan.undiAwal(baru, umurPada(baru, hari), random);
+		data.tambah(s.id, baru);
+		return baru;
 	}
 
 	// ================================================================== events
@@ -388,6 +434,11 @@ public final class SiklusHidup {
 		}
 		pindahRumah(yatim, ibu.rumahTangga);
 		yatim.rumah = ibu.rumah;
+		// the family tree follows: the new parents, their family name and the next generation line
+		yatim.ayah = ayah.id;
+		yatim.ibu = ibu.id;
+		yatim.marga = ayah.marga;
+		yatim.generasi = ayah.generasi + 1;
 		ayah.tambahAnak(yatim.id);
 		ibu.tambahAnak(yatim.id);
 		data.ubah();

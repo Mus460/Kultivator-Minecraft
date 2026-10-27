@@ -20,6 +20,7 @@ import dev.kultivator.dunia.tempat.ekonomi.EkonomiApi;
 import dev.kultivator.dunia.tempat.ekonomi.KafilahSekte;
 import dev.kultivator.dunia.tempat.ekonomi.KasKota;
 import dev.kultivator.dunia.tempat.ekonomi.LapakSekte;
+import dev.kultivator.dunia.tempat.ekonomi.RumahUang;
 import dev.kultivator.dunia.tempat.hidup.HidupApi;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import dev.kultivator.sect.hall.Halls;
@@ -258,6 +259,15 @@ public final class TokoPemain {
 		tutup(server, situs, "r" + rumah);
 	}
 
+	/** A house was sealed (rent ran out, sold, tax unpaid): its shop stops selling until the owner opens it again. */
+	static void rumahDisegel(MinecraftServer server, long situs, int rumah) {
+		CompoundTag t = tag(server, situs, "r" + rumah);
+		if (t != null && t.getBooleanOr("buka", true)) {
+			t.putBoolean("buka", false);
+			KotaEkonomiData.get(server).ubah();
+		}
+	}
+
 	private static void tutup(MinecraftServer server, long situs, String id) {
 		CompoundTag all = semuaTag(server, situs);
 		if (!all.contains(id)) {
@@ -323,10 +333,90 @@ public final class TokoPemain {
 		Msg.chat(player, Component.translatable("kultivator.kota42.toko.laci", NilaiBatu.text(laci)).withStyle(ChatFormatting.GOLD));
 	}
 
+	/** The Tukang's list prices of the three shop blocks in NB (42.6.2): rack, cashier counter, name board. */
+	public static final long PERABOT_RAK = 20L;
+	public static final long PERABOT_KASIR = 30L;
+	public static final long PERABOT_PAPAN = 15L;
+
+	/**
+	 * {@code perabot:rak|kasir|papan}: a Tukang within 8 blocks sells one shop block at its list price times the town's
+	 * building-material price ({@code HargaKota.faktor(BAHAN)}); the money goes to the town purse (a sink). The same blocks
+	 * can be crafted (data recipes), so this is the paid shortcut.
+	 */
+	public static void beliPerabot(ServerPlayer player, String jenis) {
+		net.minecraft.world.item.Item item;
+		long dasar;
+		switch (jenis) {
+			case "rak" -> {
+				item = KotaEkonomiBlocks.RAK_DAGANG_ITEM;
+				dasar = PERABOT_RAK;
+			}
+			case "kasir" -> {
+				item = KotaEkonomiBlocks.MEJA_KASIR_ITEM;
+				dasar = PERABOT_KASIR;
+			}
+			case "papan" -> {
+				item = KotaEkonomiBlocks.PAPAN_NAMA_TOKO_ITEM;
+				dasar = PERABOT_PAPAN;
+			}
+			default -> {
+				return;
+			}
+		}
+		MinecraftServer server = player.level().getServer();
+		KultivatorNpc tukang = null;
+		for (KultivatorNpc npc : player.level().getEntitiesOfClass(KultivatorNpc.class, player.getBoundingBox().inflate(8.0D), KultivatorNpc::isAlive)) {
+			if (npc.role() == NpcRole.TUKANG) {
+				tukang = npc;
+				break;
+			}
+		}
+		if (tukang == null) {
+			gagal(player, "tanpa_tukang");
+			return;
+		}
+		long situs = HargaKota.situs(player, tukang);
+		long harga = Barang.harga(dasar, HargaKota.faktor(server, situs, Kategori.BAHAN));
+		if (!EkonomiApi.bayar(player, harga, "toko_perabot")) {
+			gagal(player, "uang", NilaiBatu.text(harga));
+			return;
+		}
+		if (situs != 0L) {
+			KasKota.tambah(server, situs, harga);
+		}
+		ItemStack barang = new ItemStack(item);
+		Barang.beri(player, barang);
+		Msg.chat(player, Component.translatable("kultivator.kota42.toko.perabot", barang.getHoverName(), NilaiBatu.text(harga)).withStyle(ChatFormatting.GOLD));
+	}
+
+	/** Whether the shop's takings go straight into the owner's Rumah Uang deposit (screen field {@code ke_bank}). */
+	public static boolean keBank(MinecraftServer server, Toko toko) {
+		CompoundTag t = tagDi(server.overworld(), toko.pos());
+		return t != null && t.getBooleanOr("kb", false);
+	}
+
+	/**
+	 * {@code ke_bank:0|1}: from now on sales are paid into the Rumah Uang deposit (no fee, even while the owner is away);
+	 * what already waits in the till stays there. The deposit is the same at every Rumah Uang (38.M.2.2).
+	 */
+	public static void keBank(ServerPlayer player, Toko toko, boolean ya) {
+		CompoundTag t = milikTag(player, toko);
+		if (t == null) {
+			return;
+		}
+		t.putBoolean("kb", ya);
+		KotaEkonomiData.get(player.level().getServer()).ubah();
+		Msg.chat(player, Component.translatable(ya ? "kultivator.kota42.toko.ke_bank_ya" : "kultivator.kota42.toko.ke_bank_tidak").withStyle(ChatFormatting.GOLD));
+	}
+
 	/** {@code buka:0|1}. */
 	public static void buka(ServerPlayer player, Toko toko, boolean buka) {
 		CompoundTag t = milikTag(player, toko);
 		if (t != null) {
+			if (buka && RumahKota.rumahDi(player.level(), toko.pos()) instanceof RumahKota.Rumah rumah && RumahKota.ST_SEGEL.equals(rumah.jenis())) {
+				gagal(player, "segel");
+				return;
+			}
 			t.putBoolean("buka", buka);
 			KotaEkonomiData.get(player.level().getServer()).ubah();
 			Msg.chat(player, Component.translatable(buka ? "kultivator.kota42.toko.buka" : "kultivator.kota42.toko.tutup").withStyle(ChatFormatting.GOLD));
@@ -773,8 +863,17 @@ public final class TokoPemain {
 		long situs = t.getLongOr("s", 0L);
 		long tax = Math.max(1L, Math.round(gross * PAJAK));
 		long net = gross - tax;
+		UUID owner = pemilikDari(t);
 		t.putLong("tp", t.getLongOr("tp", 0L) + gross);
-		t.putLong("laci", t.getLongOr("laci", 0L) + net);
+		if (owner != null && t.getBooleanOr("kb", false)) {
+			RumahUang.masukkan(server, owner, net, "kultivator.kota42.bank.riwayat.toko", t.getStringOr("nm", ""));
+		} else {
+			t.putLong("laci", t.getLongOr("laci", 0L) + net);
+		}
+		if (warga && owner != null) {
+			// resident buyers pay out of thin air: that is the 42.6.0 faucet "penjualan toko" (a player buying is only a transfer)
+			Investasi.catatKeran(server, owner, Investasi.K_TOKO, net);
+		}
 		t.putLong("dnb", t.getLongOr("dnb", 0L) + net);
 		t.putLong("dtx", t.getLongOr("dtx", 0L) + tax);
 		t.putInt("djl", t.getIntOr("djl", 0) + qty);
@@ -853,16 +952,21 @@ public final class TokoPemain {
 		reputasi(server, level, t, box);
 		RandomSource random = RandomSource.create(situs ^ hari * 0x5DEECE66DL ^ t.getStringOr("id", "").hashCode());
 		List<RakDagangBlockEntity> racks = rak(level, t);
-		boolean penjaga = t.contains("pgm");
+		boolean penjaga = t.contains("pgm") || owner != null && dev.kultivator.dunia.kota42.hewan.HewanKota.dijaga(server, situs, owner);
 		if (!penjaga && random.nextInt(350) == 0) {
 			hilang(racks, random, t, true);
 		}
 		if ("licik".equals(watak(t)) && random.nextInt(140) == 0) {
 			hilang(racks, random, t, false);
 		}
-		if (pegawaiAda(t) && Math.floorMod(hari, 7L) == 0L) {
+		// due by day, not by weekday: a shop whose chunk slept through the weekday still pays its clerk
+		if (pegawaiAda(t) && hari >= t.getLongOr("pgs", 0L)) {
 			t.putInt("ahli", Math.min(100, t.getIntOr("ahli", 0) + 4));
 			bayarPegawai(server, t, hari);
+		}
+		if (owner != null) {
+			// the sales cap follows the owner's realm (an absent owner keeps the band last seen)
+			t.putInt("b", server.getPlayerList().getPlayer(owner) instanceof ServerPlayer op ? Isian.pita(op) : Math.max(t.getIntOr("b", 0), Investasi.pitaTersimpan(server, owner)));
 		}
 		if (Math.floorMod(hari, 7L) == 0L) {
 			t.putInt("cur", 0);
@@ -962,7 +1066,8 @@ public final class TokoPemain {
 			if (laci >= gaji) {
 				t.putLong("laci", laci - gaji);
 				paid = true;
-			} else if (online != null && EkonomiApi.bayar(online, gaji, "toko_pegawai")) {
+			} else if (online != null && EkonomiApi.bayar(online, gaji, "toko_pegawai")
+					|| owner != null && Investasi.bayarLuring(server, owner, gaji, "kultivator.kota42.bank.riwayat.gaji", t.getStringOr("nm", ""))) {
 				paid = true;
 			}
 		}
@@ -1041,6 +1146,10 @@ public final class TokoPemain {
 		Msg.chat(player, Component.translatable("kultivator.kota42.toko.ringkas.isi", t.getIntOr("rep", REP_AWAL), NilaiBatu.text(t.getLongOr("laci", 0L)),
 				NilaiBatu.text(t.getLongOr("tp", 0L)), NilaiBatu.text(batasHarian(t)), pegawai, rak(player.level(), t).size(), RAK_MAKS)
 				.withStyle(ChatFormatting.GRAY));
+		if (t.getBooleanOr("kb", false)) {
+			Msg.chat(player, Component.translatable("kultivator.kota42.toko.ringkas.bank", NilaiBatu.text(RumahUang.saldo(server, player.getUUID())))
+					.withStyle(ChatFormatting.GRAY));
+		}
 	}
 
 	// ================================================================== helpers

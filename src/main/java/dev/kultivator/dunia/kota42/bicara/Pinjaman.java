@@ -219,6 +219,7 @@ public final class Pinjaman {
 		long room = Math.max(0L, cap - wk.getLongOr("nb", 0L));
 		long paidInterest = KasKota.ambil(server, situs, Math.min(bunga, room));
 		wk.putLong("nb", wk.getLongOr("nb", 0L) + paidInterest);
+		dev.kultivator.dunia.kota42.ekonomi.Investasi.catatKeran(server, player.getUUID(), dev.kultivator.dunia.kota42.ekonomi.Investasi.K_BUNGA, paidInterest);
 		part.put("b_" + player.getUUID(), wk);
 		NilaiBatu.give(player, pokok + paidInterest);
 		Ingatan.ubahUtang(WargaData.get(server), w, player.getUUID(), (int) -pokok);

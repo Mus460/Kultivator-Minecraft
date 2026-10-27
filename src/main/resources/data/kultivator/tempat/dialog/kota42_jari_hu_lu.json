@@ -1,0 +1,48 @@
+{
+  "pembicara": [
+    "tokoh:hu_lu"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest kota42_seribu_jari tahap sandi",
+    "!bendera kota42.jari.sandi"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "bisik",
+      "pilihan": [
+        {
+          "syarat": [
+            "nb_pita 2"
+          ],
+          "akibat": [
+            "bayar_pita 2",
+            "bendera kota42.jari.sandi"
+          ],
+          "ke": "sandi",
+          "tampil": true,
+          "alasan": "kultivator.cerita.kota42_jari_hu_lu.mulai.1.alasan"
+        },
+        {
+          "syarat": [
+            "nama_baik 30"
+          ],
+          "akibat": [
+            "bendera kota42.jari.sandi"
+          ],
+          "ke": "sandi",
+          "tampil": true,
+          "alasan": "kultivator.cerita.kota42_jari_hu_lu.mulai.2.alasan"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "sandi",
+      "gestur": "bisik",
+      "suara": "kota42.sandi_malam"
+    }
+  ]
+}

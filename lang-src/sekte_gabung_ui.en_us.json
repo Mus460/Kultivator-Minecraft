@@ -184,8 +184,8 @@
   "kultivator.gabung.ui.punya.pk": "%s PK",
   "kultivator.gabung.ui.syarat.ujian.luar": "Pass the Retest (the style test again, threshold 0.5)",
   "kultivator.gabung.ui.saran.ujian.luar": "ask the Admissions Elder for the Retest",
-  "kultivator.gabung.ui.syarat.ujian.dalam": "Pass the Inner Disciple Trial (a duel or floor 5 of the Void)",
-  "kultivator.gabung.ui.saran.ujian.dalam": "challenge an Inner Disciple on the lei tai or reach floor 5",
+  "kultivator.gabung.ui.syarat.ujian.dalam": "Pass the Inner Disciple Trial (a Sword Duel on the arena)",
+  "kultivator.gabung.ui.saran.ujian.dalam": "ask for promotion in your own hall; the examiner waits on the arena",
   "kultivator.gabung.ui.syarat.ujian.inti": "Top 3 of the Disciple Tournament or one rank-A mission",
   "kultivator.gabung.ui.saran.ujian.inti": "win the Disciple Tournament or finish an A mission",
   "kultivator.gabung.ui.syarat.ujian.pewaris": "Win the Heir Election",
@@ -352,5 +352,11 @@
   "kultivator.gabung.ui.hud.hati": "Question %s/3 · Impression %s",
   "kultivator.gabung.ui.hud.wawancara": "Answer the elder's one question",
   "kultivator.gabung.ui.hud.wawancara.selesai": "Question answered",
-  "kultivator.gabung.ui.hud.tamu": "Round %s · won %s"
+  "kultivator.gabung.ui.hud.tamu": "Round %s · won %s",
+  "kultivator.gabung.ui.kartu.keluar.tanpa_syarat": "No conditions are recorded for leaving.",
+  "kultivator.gabung.ui.lamaran.hal.syarat": "Requirements",
+  "kultivator.gabung.ui.lamaran.hal.token": "Tokens in bag",
+  "kultivator.gabung.ui.direktori.papan_kosong": "Nobody has earned PK this month yet.",
+  "kultivator.gabung.ui.skala.hidup": "GUI scale test %1$s: the next sect screens are laid out as GUI scale %1$s would. Type /kultivasi gabung skala 0 to turn it off.",
+  "kultivator.gabung.ui.skala.mati": "GUI scale test turned off."
 }

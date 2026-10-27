@@ -1,0 +1,32 @@
+{
+  "pembicara": [
+    "tokoh:dalang_su"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest kota42_malam_wayang tahap perdana",
+    "jam 19 23"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "413",
+      "prop": "216",
+      "pilihan": [
+        {
+          "akibat": [
+            "klip k:pukul_gong k:gong_tangan",
+            "peristiwa tanda kota42.irama_wayang"
+          ],
+          "ke": "tepat"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "tepat",
+      "gestur": "tepuk_tangan"
+    }
+  ]
+}

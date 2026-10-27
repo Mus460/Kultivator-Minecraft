@@ -1,0 +1,44 @@
+{
+  "pembicara": [
+    "tokoh:tang_xiaomi"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest kota42_sup_hangat tahap cucu"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "450",
+      "prop": "212",
+      "pilihan": [
+        {
+          "akibat": [
+            "bendera kota42.sup.rahasia"
+          ],
+          "ke": "ingat"
+        },
+        {
+          "ke": "garam"
+        }
+      ]
+    },
+    {
+      "id": "garam",
+      "gestur": "451",
+      "pilihan": [
+        {
+          "akibat": [
+            "bendera kota42.sup.rahasia"
+          ],
+          "ke": "ingat"
+        }
+      ]
+    },
+    {
+      "id": "ingat",
+      "gestur": "menangis"
+    }
+  ]
+}

@@ -127,7 +127,14 @@
         "k": "kultivator.cakap.kabar.harga_turun.1",
         "a": [
           {
+            "k": "kultivator.cakap.awal.kabar.6",
+            "a": []
+          },
+          {
             "t": "garam"
+          },
+          {
+            "t": ""
           }
         ]
       },
@@ -135,8 +142,8 @@
       "gestur": "tertawa",
       "seru": null,
       "tik": null,
-      "id_id": "Kafilah besar datang membawa garam. Harganya jatuh, pedagang lama menangis.",
-      "en_us": "A big caravan came with garam. Prices crashed; the old merchants weep."
+      "id_id": "Mohon maaf mengganggu, ada kabar yang patut didengar. Kafilah besar datang membawa garam. Harganya jatuh, pedagang lama menangis.",
+      "en_us": "Pardon the interruption; there is news worth hearing. A big caravan came with garam. Prices crashed; the old merchants weep."
     },
     {
       "ubah": {
@@ -183,6 +190,9 @@
                 "a": []
               }
             ]
+          },
+          {
+            "t": ""
           },
           {
             "t": ""

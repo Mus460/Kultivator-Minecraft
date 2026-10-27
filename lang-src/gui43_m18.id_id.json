@@ -34,5 +34,7 @@
   "kultivator.gui43.m18.hud.tema": "HUD tempat bertema",
   "kultivator.gui43.m18.hud.elite": "Papan nama musuh elite",
   "kultivator.gui43.m18.hud.formasi": "Alarm formasi",
-  "kultivator.gui43.m18.hud.bangun": "HUD bangun sekte"
+  "kultivator.gui43.m18.hud.bangun": "HUD bangun sekte",
+  "kultivator.gui43.m18.hud.kota_kejar": "HUD kejar pencopet",
+  "kultivator.gui43.m18.hud.kota_irama": "HUD irama kota (ronda, wayang)"
 }

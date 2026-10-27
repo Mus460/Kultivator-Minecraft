@@ -1,0 +1,64 @@
+{
+  "nama": "kultivator.kota42.perkara.t.kerbau_masuk_sawah.nama",
+  "teks": "kultivator.kota42.perkara.t.kerbau_masuk_sawah.teks",
+  "penggugat": {
+    "klaim": "kultivator.kota42.perkara.t.kerbau_masuk_sawah.klaim_a",
+    "peran": [
+      "petani"
+    ]
+  },
+  "tergugat": {
+    "klaim": "kultivator.kota42.perkara.t.kerbau_masuk_sawah.klaim_b",
+    "peran": [
+      "petani"
+    ]
+  },
+  "benar": "acak",
+  "saksi": 2,
+  "kesaksian": {
+    "penggugat": [
+      "kultivator.kota42.perkara.t.kerbau_masuk_sawah.saksi_a1",
+      "kultivator.kota42.perkara.t.kerbau_masuk_sawah.saksi_a2"
+    ],
+    "tergugat": [
+      "kultivator.kota42.perkara.t.kerbau_masuk_sawah.saksi_b1",
+      "kultivator.kota42.perkara.t.kerbau_masuk_sawah.saksi_b2"
+    ]
+  },
+  "dusta": "kultivator.kota42.perkara.t.kerbau_masuk_sawah.dusta",
+  "bukti": [
+    {
+      "jenis": "barang",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.kerbau_masuk_sawah.bukti1_a",
+        "tergugat": "kultivator.kota42.perkara.t.kerbau_masuk_sawah.bukti1_b"
+      },
+      "barang": "minecraft:lead"
+    },
+    {
+      "jenis": "gosip",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.kerbau_masuk_sawah.bukti2_a",
+        "tergugat": "kultivator.kota42.perkara.t.kerbau_masuk_sawah.bukti2_b"
+      }
+    }
+  ],
+  "putusan": [
+    {
+      "untuk": "penggugat",
+      "teks": "kultivator.kota42.perkara.t.kerbau_masuk_sawah.putusan1",
+      "akibat": "kultivator.kota42.perkara.t.kerbau_masuk_sawah.putusan1_akibat"
+    },
+    {
+      "untuk": "tergugat",
+      "teks": "kultivator.kota42.perkara.t.kerbau_masuk_sawah.putusan2",
+      "akibat": "kultivator.kota42.perkara.t.kerbau_masuk_sawah.putusan2_akibat"
+    },
+    {
+      "untuk": "damai",
+      "teks": "kultivator.kota42.perkara.t.kerbau_masuk_sawah.putusan3",
+      "akibat": "kultivator.kota42.perkara.t.kerbau_masuk_sawah.putusan3_akibat"
+    }
+  ],
+  "suap": 0.3
+}

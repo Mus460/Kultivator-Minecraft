@@ -33,7 +33,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 
 /**
@@ -45,7 +47,10 @@ import java.util.function.Supplier;
  * of the corak's Dao plus two other Dao (grades up to the class's best, MEROSOT: HUANG), the pills up to the class's best
  * pill (41.4.5), town weapons and forged artifacts of grade up to {@code class - 1}, materials flavoured by the corak
  * (herbs for ALKIMIA/RACUN, beast cores for BINATANG, ores for TUBUH/PEDANG), the one Teknik Warisan, and the realm keys
- * left over from the month's quota ({@link KuotaAlam}). Sold counts per week live in
+ * left over from the month's quota ({@link KuotaAlam}). The corak colours the whole shelf (D-41C): the pill room of an
+ * ALKIMIA sect stocks twice as much and one high-quality Golden Core pill, BUDDHA opens the soul pill and TUBUH the marrow
+ * pill one class earlier; weapons and artifact forms lean to the style's own shapes ({@link #FORMA_CORAK}); the material
+ * tab adds two items only that style keeps ({@link #EKSTRA}). Sold counts per week live in
  * {@code DataSekteGabung.bagian("paviliun")}; a member's purchases are shared stock (multiplayer competes).
  */
 public final class StokPaviliun {
@@ -79,6 +84,44 @@ public final class StokPaviliun {
 	private static final Object[][] LOGAM = {
 			{"iron", Items.IRON_INGOT, 4, 32}, {"gold", Items.GOLD_INGOT, 10, 16}, {"amethyst", Items.AMETHYST_SHARD, 6, 16},
 			{"diamond", Items.DIAMOND, 40, 4}};
+
+	/**
+	 * The shapes each style forges and stocks: town weapon forms ({@code SenjataKota.Bentuk} ids) and artifact forms
+	 * ({@code ArtifactItem.FORMS}); three of the four weapons and two of the three artifacts are drawn from these.
+	 */
+	private record Forma(List<String> senjata, List<String> pusaka) {
+	}
+
+	static final Map<Corak, Forma> FORMA_CORAK = new EnumMap<>(Corak.class);
+
+	static {
+		FORMA_CORAK.put(Corak.PEDANG, new Forma(List.of("jian", "dao", "kebut"), List.of("pedang")));
+		FORMA_CORAK.put(Corak.BUDDHA, new Forma(List.of("kebut", "gada"), List.of("lonceng")));
+		FORMA_CORAK.put(Corak.BINATANG, new Forma(List.of("qiang", "kapak"), List.of("lonceng", "payung")));
+		FORMA_CORAK.put(Corak.FORMASI, new Forma(List.of("kipas_besi", "kebut"), List.of("payung")));
+		FORMA_CORAK.put(Corak.UNSUR, new Forma(List.of("kipas_besi", "jian"), List.of("payung")));
+		FORMA_CORAK.put(Corak.ALKIMIA, new Forma(List.of("kipas_besi", "dao"), List.of("wajan")));
+		FORMA_CORAK.put(Corak.TUBUH, new Forma(List.of("gada", "kapak", "qiang"), List.of("pedang", "lonceng")));
+		FORMA_CORAK.put(Corak.DARAH, new Forma(List.of("kapak", "dao"), List.of("pedang", "wajan")));
+		FORMA_CORAK.put(Corak.RACUN, new Forma(List.of("kipas_besi", "dao"), List.of("wajan", "payung")));
+		FORMA_CORAK.put(Corak.BAYANGAN, new Forma(List.of("dao", "jian"), List.of("payung", "pedang")));
+	}
+
+	/** Materials only one style keeps: name, item, base NB (the shop price), weekly stock, lowest class. Two per style. */
+	private static final Map<Corak, Object[][]> EKSTRA = new EnumMap<>(Corak.class);
+
+	static {
+		EKSTRA.put(Corak.PEDANG, new Object[][] {{"batu_asah", Items.GRINDSTONE, 8, 4, 1}, {"kuarsa", Items.QUARTZ, 4, 12, 2}});
+		EKSTRA.put(Corak.BUDDHA, new Object[][] {{"madu", Items.HONEY_BOTTLE, 6, 8, 1}, {"kristal_ametis", Items.AMETHYST_SHARD, 6, 8, 2}});
+		EKSTRA.put(Corak.BINATANG, new Object[][] {{"kulit", Items.LEATHER, 2, 24, 1}, {"pelana", Items.SADDLE, 30, 1, 2}});
+		EKSTRA.put(Corak.FORMASI, new Object[][] {{"lazuardi", Items.LAPIS_LAZULI, 2, 24, 1}, {"kompas", Items.COMPASS, 12, 2, 2}});
+		EKSTRA.put(Corak.UNSUR, new Object[][] {{"tembaga", Items.COPPER_INGOT, 3, 24, 1}, {"batang_petir", Items.LIGHTNING_ROD, 12, 2, 2}});
+		EKSTRA.put(Corak.ALKIMIA, new Object[][] {{"serbuk_api", Items.BLAZE_POWDER, 8, 8, 1}, {"debu_cahaya", Items.GLOWSTONE_DUST, 4, 12, 1}});
+		EKSTRA.put(Corak.TUBUH, new Object[][] {{"batu_bara", Items.COAL, 1, 48, 1}, {"batu_asah", Items.GRINDSTONE, 8, 3, 2}});
+		EKSTRA.put(Corak.DARAH, new Object[][] {{"batang_api", Items.BLAZE_ROD, 10, 4, 2}, {"bunga_neraka", Items.NETHER_WART, 4, 12, 1}});
+		EKSTRA.put(Corak.RACUN, new Object[][] {{"mata_laba", Items.SPIDER_EYE, 3, 16, 1}, {"mata_laba_busuk", Items.FERMENTED_SPIDER_EYE, 8, 4, 2}});
+		EKSTRA.put(Corak.BAYANGAN, new Object[][] {{"mutiara_ender", Items.ENDER_PEARL, 10, 4, 2}, {"tinta", Items.INK_SAC, 2, 24, 1}});
+	}
 
 	static final String BAGIAN = "paviliun";
 
@@ -123,10 +166,18 @@ public final class StokPaviliun {
 					PaviliunJasa.KALI_WARISAN * warisan.grade().pavilionPrice(), 1, warisan.grade().tier(), warisan.dao(), min, 1, true, -1));
 		}
 		for (Pil p : PIL) {
-			out.add(new Barang("p." + p.id, GabungLembar.Paviliun.TAB_PIL, () -> pil(p), p.pk, p.stok, p.mutu.ordinal(), null, p.pangkatMin,
-					p.kelasMin, false, -1));
+			int stok = p.stok < 0 || corak != Corak.ALKIMIA ? p.stok : p.stok * 2;
+			out.add(new Barang("p." + p.id, GabungLembar.Paviliun.TAB_PIL, () -> pil(p), p.pk, stok, p.mutu.ordinal(), null, p.pangkatMin,
+					kelasPil(p, corak), false, -1));
 		}
-		pusaka(server, kelas, random, out);
+		if (corak == Corak.ALKIMIA) {
+			// the furnace sect's own batch: one Golden Core pill of high quality (a third dearer, two a week)
+			Pil emas = PIL.get(3);
+			out.add(new Barang("p." + emas.id + ".tinggi", GabungLembar.Paviliun.TAB_PIL,
+					() -> AlchemyComponents.withQuality(Harga.item(emas.id), PillQuality.HIGH), emas.pk * 4 / 3, 2, PillQuality.HIGH.ordinal(), null,
+					emas.pangkatMin, emas.kelasMin, false, -1));
+		}
+		pusaka(server, kelas, corak, random, out);
 		bahan(kelas, corak, random, out);
 		int[] sisa = KuotaAlam.sisa(server, sekte);
 		for (int col = 0; col < sisa.length; col++) {
@@ -137,6 +188,12 @@ public final class StokPaviliun {
 			}
 		}
 		return out;
+	}
+
+	/** The lowest class that stocks pill {@code p} in a sect of {@code corak}: BUDDHA the soul pill, TUBUH the marrow pill, one class earlier. */
+	private static int kelasPil(Pil p, Corak corak) {
+		boolean awal = corak == Corak.BUDDHA && "soul_nurturing_pill".equals(p.id) || corak == Corak.TUBUH && "marrow_cleansing_pill".equals(p.id);
+		return awal ? Math.max(1, p.kelasMin - 1) : p.kelasMin;
 	}
 
 	private static ItemStack pil(Pil p) {
@@ -256,12 +313,14 @@ public final class StokPaviliun {
 
 	// ------------------------------------------------------------------ weapons and artifacts
 
-	private static void pusaka(MinecraftServer server, KelasSekte kelas, RandomSource random, List<Barang> out) {
+	private static void pusaka(MinecraftServer server, KelasSekte kelas, Corak corak, RandomSource random, List<Barang> out) {
 		int maks = Math.max(0, kelas.nomor() - 1);
 		SenjataKota.Bentuk[] shapes = SenjataKota.Bentuk.values();
 		SenjataKota.Mutu[] grades = SenjataKota.Mutu.values();
+		Forma forma = FORMA_CORAK.get(corak);
 		for (int i = 0; i < 4; i++) {
-			SenjataKota.Bentuk bentuk = shapes[random.nextInt(shapes.length)];
+			// three of the four are the style's own shapes
+			SenjataKota.Bentuk bentuk = bentukDari(shapes, forma != null && i < 3 ? forma.senjata() : null, random);
 			SenjataKota.Mutu mutu = grades[Math.min(maks, Math.min(grades.length - 1, random.nextInt(maks + 1)))];
 			String id = "s." + bentuk.id + "." + mutu.id;
 			if (out.stream().anyMatch(b -> b.id().equals(id))) {
@@ -272,7 +331,9 @@ public final class StokPaviliun {
 					Pangkat.LUAR, 1, false, -1));
 		}
 		for (int i = 0; i < 3; i++) {
-			String form = ArtifactItem.FORMS.get(random.nextInt(ArtifactItem.FORMS.size()));
+			// two of the three artifacts are the style's own forms
+			List<String> forms = forma != null && i < 2 ? forma.pusaka() : ArtifactItem.FORMS;
+			String form = forms.get(random.nextInt(forms.size()));
 			int grade = random.nextInt(Math.min(3, maks) + 1);
 			long seed = random.nextLong();
 			int pk = (int) Math.max(1L, Math.round(Harga.ARTIFACT[grade] / Harga.NB_PER_PK));
@@ -280,6 +341,19 @@ public final class StokPaviliun {
 					() -> Forging.buatStok(server.overworld(), form, grade, RandomSource.create(seed), null), pk, 1, grade, null, Pangkat.LUAR, 1, false,
 					-1));
 		}
+	}
+
+	/** A weapon shape: one of {@code pilihan} (ids) when given, else any. */
+	private static SenjataKota.Bentuk bentukDari(SenjataKota.Bentuk[] shapes, @Nullable List<String> pilihan, RandomSource random) {
+		if (pilihan != null) {
+			String want = pilihan.get(random.nextInt(pilihan.size()));
+			for (SenjataKota.Bentuk b : shapes) {
+				if (b.id.equals(want)) {
+					return b;
+				}
+			}
+		}
+		return shapes[random.nextInt(shapes.length)];
 	}
 
 	// ------------------------------------------------------------------ materials
@@ -315,6 +389,14 @@ public final class StokPaviliun {
 			int stock = (int) row[3] * (logam ? 2 : 1);
 			out.add(new Barang("m." + row[0], GabungLembar.Paviliun.TAB_BAHAN, () -> new ItemStack(item), Math.max(1, nb / 2), stock, -1, null,
 					Pangkat.LUAR, 1, false, -1));
+		}
+		Object[][] ekstra = EKSTRA.get(corak);
+		if (ekstra != null) {
+			for (Object[] row : ekstra) {
+				Item item = (Item) row[1];
+				out.add(new Barang("x." + row[0], GabungLembar.Paviliun.TAB_BAHAN, () -> new ItemStack(item), Math.max(1, (int) row[2] / 2), (int) row[3],
+						-1, null, Pangkat.LUAR, (int) row[4], false, -1));
+			}
 		}
 	}
 

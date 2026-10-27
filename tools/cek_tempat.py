@@ -521,6 +521,47 @@ def gz_size(path):
     return os.path.getsize(path)
 
 
+def check_hidup42(templates):
+    """DESIGN 42 (D-42W): every kavling point names a growth plan of rencana.json of its own class and size, every plan has its
+    five stage templates, every `dijual` house has its `bangunan` box, and no template still carries a 42-only work tool
+    (the mod reads the 38 type, kota_hidup_kit.ALIAS_ALAT). Returns the number of kavling points seen."""
+    path = os.path.join(DATA, "structure", "kota_tumbuh", "rencana.json")
+    plans = (read_json(path) or {}).get("rencana", {}) if os.path.exists(path) else {}
+    for key, plan in sorted(plans.items()):
+        for st in plan.get("tahap", []):
+            if st.get("template") not in templates:
+                err("%s: plan %s names a missing stage template %s" % (rel(path), key, st.get("template")))
+    n = 0
+    todo = dict(templates)
+    for d, _, files in os.walk(os.path.join(DATA, "structure", "kota")):      # kota 34 is not a 38 folder
+        for f in files:
+            if f.endswith(".nbt"):
+                q = os.path.join(d, f)
+                todo[template_id_of(q)] = (q, nbt.read_file(q)[1])
+    for tid, (p, root) in sorted(todo.items()):
+        pts = root.get("kultivator_titik", [])
+        boxes = {(q.get("data") or {}).get("nama") for q in pts if q.get("jenis") == "bangunan"}
+        for q in pts:
+            j, dt = q.get("jenis", ""), q.get("data") or {}
+            if j in kota_hidup_kit.ALIAS_ALAT:
+                err("%s: titik %s is read by nothing (stored as %s)" % (rel(p), j, kota_hidup_kit.ALIAS_ALAT[j]))
+            if j == "dijual" and dt.get("rumah") not in boxes:
+                err("%s: dijual house %r has no bangunan box of that name" % (rel(p), dt.get("rumah")))
+            if j != "kavling":
+                continue
+            n += 1
+            plan = plans.get(str(dt.get("gaya")) + "/" + str(dt.get("rencana")))
+            if plan is None:
+                err("%s: kavling %s/%s has no plan in rencana.json" % (rel(p), dt.get("gaya"), dt.get("rencana")))
+                continue
+            w, _h, d = plan["ukuran"]
+            if (int(dt.get("dx", -1)) + 1, int(dt.get("dz", -1)) + 1) != (w, d) or dt.get("kelas") != plan.get("kelas"):
+                err("%s: kavling %s/%s box %sx%s class %s differs from the plan %sx%s %s" % (
+                    rel(p), dt.get("gaya"), dt.get("rencana"), int(dt.get("dx", -1)) + 1, int(dt.get("dz", -1)) + 1,
+                    dt.get("kelas"), w, d, plan.get("kelas")))
+    return n
+
+
 def check_budgets(templates):
     per = {}
     per_tema = {}
@@ -580,13 +621,14 @@ def main(argv):
     check_tema(sets, structures)
     check_tags(sets, structures)
     check_titik41(structures, pools, templates)
+    n_kav = check_hidup42(templates)
     per = check_budgets(templates)
     for w in sorted(set(warnings)):
         print("warning:", w)
     for e in errors:
         print("ERROR:", e)
-    print("cek_tempat: %d template(s), %d tata_letak structure(s), %d set(s) scanned; gzip %s; %d error(s)"
-          % (len(templates), n_tl, len(sets), {k: v for k, v in sorted(per.items())}, len(errors)))
+    print("cek_tempat: %d template(s), %d tata_letak structure(s), %d set(s) scanned, %d kavling; gzip %s; %d error(s)"
+          % (len(templates), n_tl, len(sets), n_kav, {k: v for k, v in sorted(per.items())}, len(errors)))
     if errors and not soft:
         sys.exit(1)
 

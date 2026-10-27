@@ -14,7 +14,9 @@ import dev.kultivator.client.sosok.SosokRender;
 import dev.kultivator.disciple.DiscipleEntity;
 import dev.kultivator.dunia.kota.KultivatorNpc;
 import dev.kultivator.dunia.kota.NpcRole;
+import dev.kultivator.dunia.kota42.api.KotaGerakId;
 import dev.kultivator.sosok.RupaKunci;
+import dev.kultivator.sosok.SosokApi;
 import net.fabricmc.fabric.api.client.rendering.v1.FabricRenderState;
 import net.fabricmc.fabric.api.client.rendering.v1.RenderStateDataKey;
 import net.minecraft.client.model.HumanoidModel;
@@ -153,6 +155,11 @@ public class NpcRenderer extends LivingEntityRenderer<KultivatorNpc, DiscipleRen
 		PoseRenderData.extract(entity, state, partialTicks);
 		SosokRender.selesai(entity, state, partialTicks);
 		SosokRender.labelLod(entity, state, partialTicks);
+		// inside the lion costume the mesh draws the two dancers' legs itself: the bodies under it stay unseen
+		int gerakIni = SosokApi.gerakSekarang(entity);
+		if (gerakIni == KotaGerakId.BARONGSAI_KEPALA || gerakIni == KotaGerakId.BARONGSAI_EKOR) {
+			state.isInvisible = true;
+		}
 		Component line = entity.line();
 		// always written: a render state may be reused from the last frame
 		boolean speaking = !line.getString().isEmpty() && state.distanceToCameraSq <= BUBBLE_DISTANCE_SQ && !state.isInvisible;

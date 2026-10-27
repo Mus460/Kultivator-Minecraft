@@ -370,7 +370,7 @@ public final class KegiatanKelompok {
 			}
 		}
 		for (List<Penduduk> isi : rumah.values()) {
-			if (isi.size() < 2 || r.nextDouble() >= 0.2D) {
+			if (isi.size() < 2 || r.nextDouble() >= KotaConfig.warga().kelompokPeluang) {
 				continue;
 			}
 			int m = mulai(Jenis.KELUARGA_SORE, r);

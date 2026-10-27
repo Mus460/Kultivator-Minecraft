@@ -16,7 +16,8 @@
             "$barang",
             "$waktu_lalu",
             "$sebab_harga",
-            "$keluh"
+            "$keluh",
+            "$awal"
           ],
           "bobot": 3,
           "varian": [
@@ -57,7 +58,9 @@
         {
           "kunci": "kabar.harga_naik.3",
           "slot": [
-            "$barang"
+            "$awal",
+            "$barang",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -116,6 +119,14 @@
         "$ragu": {
           "aturan": "seru.ragu",
           "opsional": 0.5
+        },
+        "$awal": {
+          "aturan": "awal.kabar",
+          "opsional": 0.35
+        },
+        "$ekor": {
+          "aturan": "ekor.kabar",
+          "opsional": 0.4
         }
       },
       "lanjut": [
@@ -151,7 +162,9 @@
         {
           "kunci": "kabar.harga_turun.1",
           "slot": [
-            "$barang"
+            "$awal",
+            "$barang",
+            "$ekor"
           ],
           "bobot": 2,
           "varian": [
@@ -162,14 +175,18 @@
         {
           "kunci": "kabar.harga_turun.2",
           "slot": [
-            "$barang"
+            "$awal",
+            "$barang",
+            "$ekor"
           ],
           "bobot": 1
         },
         {
           "kunci": "kabar.harga_turun.3",
           "slot": [
-            "$barang"
+            "$awal",
+            "$barang",
+            "$ekor"
           ],
           "bobot": 1
         }
@@ -193,6 +210,14 @@
         "$senang": {
           "aturan": "seru.senang",
           "opsional": 0.5
+        },
+        "$awal": {
+          "aturan": "awal.kabar",
+          "opsional": 0.35
+        },
+        "$ekor": {
+          "aturan": "ekor.kabar",
+          "opsional": 0.4
         }
       },
       "lanjut": [
@@ -212,6 +237,7 @@
         {
           "kunci": "kabar.acara.0",
           "slot": [
+            "$awal",
             "$subjek",
             "$waktu_depan",
             "$ajakan"
@@ -226,8 +252,10 @@
         {
           "kunci": "kabar.acara.1",
           "slot": [
+            "$awal",
             "$subjek",
-            "$waktu_depan"
+            "$waktu_depan",
+            "$ekor"
           ],
           "bobot": 2,
           "varian": [
@@ -238,14 +266,18 @@
         {
           "kunci": "kabar.acara.2",
           "slot": [
-            "$waktu_depan"
+            "$awal",
+            "$waktu_depan",
+            "$ekor"
           ],
           "bobot": 1
         },
         {
           "kunci": "kabar.acara.3",
           "slot": [
-            "$waktu_depan"
+            "$awal",
+            "$waktu_depan",
+            "$ekor"
           ],
           "bobot": 1
         }
@@ -262,6 +294,14 @@
         "$ajakan": {
           "aturan": "frag.ajakan",
           "opsional": 0.35
+        },
+        "$awal": {
+          "aturan": "awal.kabar",
+          "opsional": 0.35
+        },
+        "$ekor": {
+          "aturan": "ekor.kabar",
+          "opsional": 0.4
         }
       },
       "lanjut": [
@@ -364,8 +404,10 @@
         {
           "kunci": "kabar.kafilah.0",
           "slot": [
+            "$awal",
             "$subjek",
-            "$waktu_lalu"
+            "$waktu_lalu",
+            "$ekor"
           ],
           "bobot": 3,
           "varian": [
@@ -388,12 +430,18 @@
         },
         {
           "kunci": "kabar.kafilah.2",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1
         },
         {
           "kunci": "kabar.kafilah.3",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1
         }
       ],
@@ -409,6 +457,14 @@
         "$senang": {
           "aturan": "seru.senang",
           "opsional": 0.5
+        },
+        "$awal": {
+          "aturan": "awal.kabar",
+          "opsional": 0.35
+        },
+        "$ekor": {
+          "aturan": "ekor.kabar",
+          "opsional": 0.4
         }
       },
       "lanjut": [
@@ -428,8 +484,10 @@
         {
           "kunci": "kabar.kavling.0",
           "slot": [
+            "$awal",
             "$subjek",
-            "$waktu_lalu"
+            "$waktu_lalu",
+            "$ekor"
           ],
           "bobot": 2,
           "varian": [
@@ -441,7 +499,8 @@
         {
           "kunci": "kabar.kavling.1",
           "slot": [
-            "$subjek"
+            "$subjek",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -451,13 +510,17 @@
         {
           "kunci": "kabar.kavling.2",
           "slot": [
-            "$subjek"
+            "$subjek",
+            "$ekor"
           ],
           "bobot": 1
         },
         {
           "kunci": "kabar.kavling.3",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1
         }
       ],
@@ -469,6 +532,14 @@
         "$waktu_lalu": {
           "tipe": "waktu_lalu",
           "dari": "fakta.hariKejadian"
+        },
+        "$awal": {
+          "aturan": "awal.kabar",
+          "opsional": 0.35
+        },
+        "$ekor": {
+          "aturan": "ekor.kabar",
+          "opsional": 0.4
         }
       },
       "lanjut": [
@@ -488,7 +559,8 @@
           "kunci": "kabar.pelindung.0",
           "slot": [
             "$subjek",
-            "$sekte_fakta"
+            "$sekte_fakta",
+            "$ekor"
           ],
           "bobot": 3,
           "varian": [
@@ -499,6 +571,7 @@
         {
           "kunci": "kabar.pelindung.1",
           "slot": [
+            "$awal",
             "$sekte_fakta",
             "$senang",
             "$subjek"
@@ -512,6 +585,7 @@
         {
           "kunci": "kabar.pelindung.2",
           "slot": [
+            "$awal",
             "$sekte_fakta",
             "$ragu"
           ],
@@ -520,7 +594,9 @@
         {
           "kunci": "kabar.pelindung.3",
           "slot": [
-            "$sekte_fakta"
+            "$awal",
+            "$sekte_fakta",
+            "$ekor"
           ],
           "bobot": 1
         }
@@ -541,6 +617,14 @@
         "$ragu": {
           "aturan": "seru.ragu",
           "opsional": 0.5
+        },
+        "$awal": {
+          "aturan": "awal.kabar",
+          "opsional": 0.35
+        },
+        "$ekor": {
+          "aturan": "ekor.kabar",
+          "opsional": 0.4
         }
       },
       "lanjut": [
@@ -561,7 +645,8 @@
           "kunci": "kabar.pasar_hantu.0",
           "slot": [
             "$tempat_fakta",
-            "$waktu_depan"
+            "$waktu_depan",
+            "$ekor"
           ],
           "bobot": 3,
           "varian": [
@@ -572,8 +657,10 @@
         {
           "kunci": "kabar.pasar_hantu.1",
           "slot": [
+            "$awal",
             "$tempat_fakta",
-            "$waktu_depan"
+            "$waktu_depan",
+            "$ekor"
           ],
           "bobot": 2,
           "varian": [
@@ -583,12 +670,16 @@
         },
         {
           "kunci": "kabar.pasar_hantu.2",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1
         },
         {
           "kunci": "kabar.pasar_hantu.3",
           "slot": [
+            "$awal",
             "$tempat_fakta",
             "$penutup_kecil"
           ],
@@ -606,6 +697,14 @@
         },
         "$penutup_kecil": {
           "aturan": "frag.penutup_kecil",
+          "opsional": 0.4
+        },
+        "$awal": {
+          "aturan": "awal.kabar",
+          "opsional": 0.35
+        },
+        "$ekor": {
+          "aturan": "ekor.kabar",
           "opsional": 0.4
         }
       },
@@ -626,9 +725,11 @@
         {
           "kunci": "kabar.copet.0",
           "slot": [
+            "$awal",
             "$subjek",
             "$waktu_lalu",
-            "$objek"
+            "$objek",
+            "$ekor"
           ],
           "bobot": 3,
           "varian": [
@@ -640,6 +741,7 @@
         {
           "kunci": "kabar.copet.1",
           "slot": [
+            "$awal",
             "$objek",
             "$kaget",
             "$subjek"
@@ -653,13 +755,18 @@
         {
           "kunci": "kabar.copet.2",
           "slot": [
-            "$angka"
+            "$awal",
+            "$angka",
+            "$ekor"
           ],
           "bobot": 1
         },
         {
           "kunci": "kabar.copet.3",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1
         }
       ],
@@ -683,6 +790,14 @@
         "$angka": {
           "tipe": "angka",
           "dari": "fakta.nilai"
+        },
+        "$awal": {
+          "aturan": "awal.kabar",
+          "opsional": 0.35
+        },
+        "$ekor": {
+          "aturan": "ekor.kabar",
+          "opsional": 0.4
         }
       },
       "lanjut": [
@@ -704,7 +819,8 @@
           "slot": [
             "$subjek",
             "$arah",
-            "$jarak"
+            "$jarak",
+            "$ekor"
           ],
           "bobot": 2,
           "varian": [
@@ -717,7 +833,9 @@
           "slot": [
             "$katanya",
             "$subjek",
-            "$arah"
+            "$arah",
+            "$ekor",
+            "$awal"
           ],
           "bobot": 1,
           "varian": [
@@ -728,7 +846,9 @@
         {
           "kunci": "kabar.tempat_ada.2",
           "slot": [
-            "$subjek"
+            "$awal",
+            "$subjek",
+            "$ekor"
           ],
           "bobot": 1
         }
@@ -748,6 +868,14 @@
         },
         "$katanya": {
           "aturan": "frag.katanya"
+        },
+        "$awal": {
+          "aturan": "awal.kabar",
+          "opsional": 0.35
+        },
+        "$ekor": {
+          "aturan": "ekor.kabar",
+          "opsional": 0.4
         }
       },
       "lanjut": [
@@ -767,8 +895,10 @@
         {
           "kunci": "kabar.harta.0",
           "slot": [
+            "$awal",
             "$subjek",
-            "$waktu_lalu"
+            "$waktu_lalu",
+            "$ekor"
           ],
           "bobot": 3,
           "varian": [
@@ -779,6 +909,7 @@
         {
           "kunci": "kabar.harta.1",
           "slot": [
+            "$awal",
             "$arah",
             "$waktu_lalu",
             "$subjek",
@@ -793,15 +924,19 @@
         {
           "kunci": "kabar.harta.2",
           "slot": [
-            "$subjek"
+            "$awal",
+            "$subjek",
+            "$ekor"
           ],
           "bobot": 1
         },
         {
           "kunci": "kabar.harta.3",
           "slot": [
+            "$awal",
             "$sebutan",
-            "$subjek"
+            "$subjek",
+            "$ekor"
           ],
           "bobot": 1
         }
@@ -826,6 +961,14 @@
         "$sebutan": {
           "tipe": "sebutan_pendengar",
           "dari": "pendengar"
+        },
+        "$awal": {
+          "aturan": "awal.kabar",
+          "opsional": 0.35
+        },
+        "$ekor": {
+          "aturan": "ekor.kabar",
+          "opsional": 0.4
         }
       },
       "lanjut": [

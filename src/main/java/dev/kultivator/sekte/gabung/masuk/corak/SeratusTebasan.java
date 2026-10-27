@@ -1,6 +1,11 @@
 package dev.kultivator.sekte.gabung.masuk.corak;
 
+import dev.kultivator.data.Cultivators;
+import dev.kultivator.data.Realm;
+import dev.kultivator.duel.DuelIds;
 import dev.kultivator.duel.clash.WeaponClass;
+import dev.kultivator.duel.session.DuelChallenges;
+import dev.kultivator.duel.session.DuelRuleSet;
 import dev.kultivator.dunia.kota.KultivatorNpc;
 import dev.kultivator.dunia.kota.NpcRole;
 import dev.kultivator.dunia.tempat.hidup.HidupApi;
@@ -13,7 +18,11 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,8 +38,10 @@ import java.util.Random;
  * {@code S2 = kena / 100}. A wrong weapon or a dark dummy breaks the combo (shown on the HUD, not scored). An outer
  * disciple of the sect drills beside the ring (clip {@code tebasan_ujian}, wooden sword) as the example.
  * <p>
- * Shortcut: the design's optional friendly duel for Foundation+ (Duel Pedang vs an outer disciple) is not offered here;
- * every candidate takes the dummies. Upgrade when 41B wants the choice in its test-day dialog.
+ * The duel option (41.5.4): a candidate of Foundation or higher may instead right-click the outer disciple before the
+ * first hit lands to ask for a friendly Duel Pedang. The dummies then stand dark. A win is {@code S2} 1.0; a loss that
+ * still took 40 % of the disciple's health is 0.6; a lesser loss or a draw 0.3. The limit is 195 s so that the last of the
+ * hundred lights can still be answered at the slowest beat.
  */
 public final class SeratusTebasan extends UjianDasar {
 
@@ -39,6 +50,9 @@ public final class SeratusTebasan extends UjianDasar {
 	public static final double JARI = 4.0D;
 	private static final int JEDA_AWAL = 40;
 	private static final int JEDA_AKHIR = 28;
+	/** 100 lights at 40..28 ticks come to about 173 s; the limit leaves room for the last one. */
+	private static final int BATAS = 195 * 20;
+	private static final float LAWAN_HILANG = 0.40F;
 
 	private final List<BonekaUjianEntity> boneka = new ArrayList<>();
 	private int nyala;
@@ -48,6 +62,10 @@ public final class SeratusTebasan extends UjianDasar {
 	private int berikut = 60;
 	private int terakhir = -1;
 	private int salahPesan;
+	private @Nullable KultivatorNpc guru;
+	/** 0 the dummies, 1 the duel runs, 2 the duel ended (the score is set). */
+	private int duel;
+	private int duelPesan;
 
 	public SeratusTebasan(ServerPlayer pemain, String sekte, int kelas, Vec3 pusat, long benih) {
 		super(pemain, sekte, Corak.PEDANG, kelas, pusat, benih);
@@ -75,17 +93,81 @@ public final class SeratusTebasan extends UjianDasar {
 			boneka.add(b);
 		}
 		Vec3 sisi = dariPusat(JARI + 2.5D, 0.0D);
-		KultivatorNpc guru = tubuh(NpcRole.MURID_SEKTE_LUAR, sisi, yaw(sisi, pusat), realmLawan(), t("pengajar"), null);
+		guru = tubuh(NpcRole.MURID_SEKTE_LUAR, sisi, yaw(sisi, pusat), realmLawan(), t("pengajar"), null);
 		if (guru != null) {
 			guru.memory().putBoolean("hold", true);
 			HidupApi.klip(guru, GabungGerakId.TEBASAN_UJIAN, GabungGerakId.PROP_PEDANG_KAYU, 0);
 		}
 		chat(t(ChatFormatting.GOLD, "seratus_tebasan.mulai", NYALA_TOTAL));
+		if (guru != null && bolehDuel()) {
+			chat(t(ChatFormatting.AQUA, "seratus_tebasan.tawaran_duel"));
+		}
 		return null;
 	}
 
 	@Override
+	public int batasTick() {
+		return BATAS;
+	}
+
+	/** Foundation or higher, before the first hit. */
+	private boolean bolehDuel() {
+		return duel == 0 && kena == 0 && Cultivators.get(pemain).realm().ordinal() >= Realm.FOUNDATION.ordinal();
+	}
+
+	@Override
+	public InteractionResult pakaiEntitas(Entity entity, InteractionHand hand) {
+		if (guru == null || entity != guru || hand != InteractionHand.MAIN_HAND || duel != 0) {
+			return InteractionResult.PASS;
+		}
+		if (!bolehDuel()) {
+			if (duelPesan <= 0) {
+				bar(t(ChatFormatting.YELLOW, Cultivators.get(pemain).realm().ordinal() < Realm.FOUNDATION.ordinal()
+						? "seratus_tebasan.duel_ranah" : "seratus_tebasan.duel_terlambat"));
+				duelPesan = 60;
+			}
+			return InteractionResult.SUCCESS;
+		}
+		guru.memory().putBoolean("hold", false);
+		Component sebab = DuelChallenges.startDirect(pemain, pemain, guru, DuelIds.PAIR_NPC, DuelRuleSet.defaults());
+		if (sebab != null) {
+			guru.memory().putBoolean("hold", true);
+			chat(t(ChatFormatting.RED, "seratus_tebasan.duel_gagal", sebab));
+			return InteractionResult.SUCCESS;
+		}
+		duel = 1;
+		for (BonekaUjianEntity b : boneka) {
+			b.padamkan();
+		}
+		chat(t(ChatFormatting.GOLD, "seratus_tebasan.duel_mulai"));
+		return InteractionResult.SUCCESS;
+	}
+
+	/** The duel of the option ended (told by {@code UjianCorak}'s duel listener; cheap, the end is taken in the tick). */
+	public void duelSelesai(@Nullable LivingEntity pemenang, @Nullable LivingEntity kalah) {
+		if (duel != 1 || selesai()) {
+			return;
+		}
+		duel = 2;
+		boolean menang = pemenang != null && pemenang.getUUID().equals(uuid());
+		LivingEntity lawan = guru;
+		boolean separuh = lawan != null && lawan.getHealth() <= lawan.getMaxHealth() * (1.0F - LAWAN_HILANG);
+		double nilai = menang ? 1.0D : separuh ? 0.6D : 0.3D;
+		skor = nilai;
+		akhiri(nilai, menang ? "tuntas" : "duel_kalah", false);
+	}
+
+	@Override
 	public void tik() {
+		if (duelPesan > 0) {
+			duelPesan--;
+		}
+		if (duel != 0) {
+			if (guru == null || guru.isRemoved()) {
+				akhiri(skor, "rusak", true);
+			}
+			return;
+		}
 		for (BonekaUjianEntity b : boneka) {
 			if (b.isRemoved()) {
 				akhiri(skor, "rusak", true);
@@ -157,7 +239,7 @@ public final class SeratusTebasan extends UjianDasar {
 
 	@Override
 	public void waktuHabis() {
-		akhiri(kena / (double) NYALA_TOTAL, "waktu", false);
+		akhiri(duel != 0 ? skor : kena / (double) NYALA_TOTAL, "waktu", false);
 	}
 
 	@Override

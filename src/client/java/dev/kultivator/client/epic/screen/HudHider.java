@@ -26,7 +26,7 @@ public final class HudHider {
 			{"tribulation_hud", "tribulasi"}, {"duel_hud", "duel"}, {"gabung_ujian", "ujian"}, {"sekte_turnamen_lingkar", "lei_tai"},
 			{"sekte_tangga_gulungan", "tangga"}, {"kota_besar_hud", "gerbang"}, {"kapal_hud", "kapal"}, {"langit_hud", "langit"},
 			{"naga_hud", "naga"}, {"dimensi_jiwa", "dimensi"}, {"tema_fx_hud", "tema"}, {"elite_plate", "elite"}, {"formasi_alarm", "formasi"},
-			{"sect_build_hud", "bangun"}};
+			{"sect_build_hud", "bangun"}, {"kota_kejar", "kota_kejar"}, {"kota_irama", "kota_irama"}};
 
 	/** Wraps the vanilla elements (from {@code CLIENT_STARTED}). */
 	public static void register() {

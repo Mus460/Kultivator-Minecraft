@@ -1,0 +1,40 @@
+{
+  "pembicara": [
+    "tokoh:yan_feihu"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest kota42_hati_feihu tahap putus"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "bicara_tangan",
+      "pilihan": [
+        {
+          "akibat": [
+            "bendera kota42.feihu.tinggal",
+            "quest_maju kota42_hati_feihu"
+          ],
+          "ke": "tinggal"
+        },
+        {
+          "akibat": [
+            "bendera kota42.feihu.pergi",
+            "quest_maju kota42_hati_feihu"
+          ],
+          "ke": "pergi"
+        }
+      ]
+    },
+    {
+      "id": "tinggal",
+      "gestur": "377"
+    },
+    {
+      "id": "pergi",
+      "gestur": "376"
+    }
+  ]
+}

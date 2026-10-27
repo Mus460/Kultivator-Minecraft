@@ -1,0 +1,47 @@
+{
+  "pemberi": "tokoh:gong_shu",
+  "tempat": "kota42",
+  "alur": true,
+  "tahap": [
+    {
+      "id": "kurang",
+      "tujuan": [
+        "bicara tokoh:ma_fu"
+      ]
+    },
+    {
+      "id": "kawal",
+      "tujuan": [
+        "kalahkan peran:pembunuh_bayaran x3"
+      ],
+      "akibat_masuk": [
+        "panggil_peran pembunuh_bayaran musuh 3"
+      ]
+    },
+    {
+      "id": "kirim",
+      "tujuan": [
+        "bicara tokoh:ma_fu"
+      ]
+    },
+    {
+      "id": "genteng",
+      "tujuan": [
+        "antar minecraft:brick tokoh:gong_shu x64"
+      ]
+    },
+    {
+      "id": "resmi",
+      "tujuan": [
+        "kavling_tahap 1",
+        "bendera kota42.tumbuh.potong_pita"
+      ],
+      "akibat": [
+        "kota42.nama_jalan pemain",
+        "nama_baik 10",
+        "kota42.kesan tokoh:gong_shu 30",
+        "kabar kota42_tumbuh_resmi pemain"
+      ]
+    }
+  ]
+}

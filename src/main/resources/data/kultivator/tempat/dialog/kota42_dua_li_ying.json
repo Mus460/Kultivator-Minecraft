@@ -1,0 +1,41 @@
+{
+  "pembicara": [
+    "tokoh:li_ying"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest kota42_dua_keluarga tahap surat",
+    "!bendera kota42.dua.surat"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "363",
+      "pilihan": [
+        {
+          "ke": "surat"
+        },
+        {
+          "ke": "ayah"
+        }
+      ]
+    },
+    {
+      "id": "ayah",
+      "gestur": "menangis",
+      "pilihan": [
+        {
+          "ke": "surat"
+        }
+      ]
+    },
+    {
+      "id": "surat",
+      "gestur": "419",
+      "akibat": [
+        "bendera kota42.dua.surat"
+      ]
+    }
+  ]
+}

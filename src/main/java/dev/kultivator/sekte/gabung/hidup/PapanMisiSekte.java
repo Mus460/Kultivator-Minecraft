@@ -529,8 +529,47 @@ public final class PapanMisiSekte {
 			case KEBUN -> {
 				return kebun(player, m, tick);
 			}
+			case RONDA -> {
+				return ronda(player, m, d, tick);
+			}
 		}
 		return false;
+	}
+
+	/**
+	 * One step of a RONDA mission: the current waypoint (target x/z) is reached within {@code RADIUS_TIBA} blocks, the
+	 * target moves to the next stored waypoint; a column of light marks the waypoint while the player is within 64 blocks.
+	 */
+	private static boolean ronda(ServerPlayer player, CompoundTag m, double d, long tick) {
+		ServerLevel level = player.level();
+		int jumlah = m.getIntOr(JenisMisiGabung.JUMLAH, 1);
+		int x = m.getIntOr(JenisMisiGabung.X, 0);
+		int z = m.getIntOr(JenisMisiGabung.Z, 0);
+		if (d > JenisMisiGabung.RADIUS_TIBA) {
+			BlockPos top = new BlockPos(x, 64, z);
+			if (d <= 64.0D && tick % 20L == 0L && level.isLoaded(top)) {
+				int y = level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
+				for (int i = 0; i < 6; i++) {
+					level.sendParticles(ParticleTypes.END_ROD, x + 0.5D, y + 0.5D + i * 0.8D, z + 0.5D, 1, 0.05D, 0.05D, 0.05D, 0.0D);
+				}
+			}
+			return false;
+		}
+		int maju = m.getIntOr(JenisMisiGabung.KEMAJUAN, 0) + 1;
+		m.putInt(JenisMisiGabung.KEMAJUAN, maju);
+		level.sendParticles(ParticleTypes.HAPPY_VILLAGER, player.getX(), player.getY() + 1.0D, player.getZ(), 12, 0.6D, 0.6D, 0.6D, 0.02D);
+		level.playSound(null, player.blockPosition(), SoundEvents.BELL_BLOCK, SoundSource.PLAYERS, 0.6F, 1.0F + 0.1F * maju);
+		if (maju >= jumlah) {
+			keLapor(player, m);
+			return true;
+		}
+		int[] titik = m.getIntArray(JenisMisiGabung.TITIK).orElse(new int[0]);
+		if (maju * 2 + 1 < titik.length) {
+			m.putInt(JenisMisiGabung.X, titik[maju * 2]);
+			m.putInt(JenisMisiGabung.Z, titik[maju * 2 + 1]);
+		}
+		Msg.chat(player, Component.translatable("kultivator.gabung.misi.ronda_tanda", maju, jumlah).withStyle(ChatFormatting.AQUA));
+		return true;
 	}
 
 	/** One harvest of a KEBUN mission: crouch {@code KEBUN_DETIK} s within 2.5 blocks of a {@code kerja:cangkul} plot. */

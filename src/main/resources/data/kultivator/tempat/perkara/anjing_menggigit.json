@@ -1,0 +1,66 @@
+{
+  "nama": "kultivator.kota42.perkara.t.anjing_menggigit.nama",
+  "teks": "kultivator.kota42.perkara.t.anjing_menggigit.teks",
+  "penggugat": {
+    "klaim": "kultivator.kota42.perkara.t.anjing_menggigit.klaim_a",
+    "peran": [
+      "warga",
+      "tukang"
+    ]
+  },
+  "tergugat": {
+    "klaim": "kultivator.kota42.perkara.t.anjing_menggigit.klaim_b",
+    "peran": [
+      "warga",
+      "petani"
+    ]
+  },
+  "benar": "acak",
+  "saksi": 2,
+  "kesaksian": {
+    "penggugat": [
+      "kultivator.kota42.perkara.t.anjing_menggigit.saksi_a1",
+      "kultivator.kota42.perkara.t.anjing_menggigit.saksi_a2"
+    ],
+    "tergugat": [
+      "kultivator.kota42.perkara.t.anjing_menggigit.saksi_b1",
+      "kultivator.kota42.perkara.t.anjing_menggigit.saksi_b2"
+    ]
+  },
+  "dusta": "kultivator.kota42.perkara.t.anjing_menggigit.dusta",
+  "bukti": [
+    {
+      "jenis": "barang",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.anjing_menggigit.bukti1_a",
+        "tergugat": "kultivator.kota42.perkara.t.anjing_menggigit.bukti1_b"
+      },
+      "barang": "minecraft:bone"
+    },
+    {
+      "jenis": "gosip",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.anjing_menggigit.bukti2_a",
+        "tergugat": "kultivator.kota42.perkara.t.anjing_menggigit.bukti2_b"
+      }
+    }
+  ],
+  "putusan": [
+    {
+      "untuk": "penggugat",
+      "teks": "kultivator.kota42.perkara.t.anjing_menggigit.putusan1",
+      "akibat": "kultivator.kota42.perkara.t.anjing_menggigit.putusan1_akibat"
+    },
+    {
+      "untuk": "tergugat",
+      "teks": "kultivator.kota42.perkara.t.anjing_menggigit.putusan2",
+      "akibat": "kultivator.kota42.perkara.t.anjing_menggigit.putusan2_akibat"
+    },
+    {
+      "untuk": "damai",
+      "teks": "kultivator.kota42.perkara.t.anjing_menggigit.putusan3",
+      "akibat": "kultivator.kota42.perkara.t.anjing_menggigit.putusan3_akibat"
+    }
+  ],
+  "suap": 0.1
+}

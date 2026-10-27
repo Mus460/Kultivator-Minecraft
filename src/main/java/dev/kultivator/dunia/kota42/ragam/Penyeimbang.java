@@ -78,6 +78,10 @@ public final class Penyeimbang {
 	record Pilihan(String kunci, TempatHuni.Tujuan tujuan, int zona, long sampai, long titik) {
 	}
 
+	/** Weight factor of a zone clearly under its target / at or over it (on top of the free-share weight, 42.4A.2). */
+	static final double UNDER_TARGET = 2.5D;
+	static final double OVER_TARGET = 0.4D;
+
 	/** The occupancy state of one place (live) or of one simulation run. */
 	public static final class Hunian {
 		public final long situs;
@@ -88,11 +92,17 @@ public final class Penyeimbang {
 		final Map<Integer, Integer> zonaTetap = new HashMap<>();
 		/** Residents whose current goal is a general one (the free residents of the hour). */
 		final Set<Integer> bebas = new HashSet<>();
+		/** What each free resident wants right now (its general goal without the number): the demand the targets follow. */
+		final Map<Integer, String> minat = new HashMap<>();
+		/** Residents indoors (asleep, shut in a room): counted in {@link #occ} but they have no body to see. */
+		final Set<Integer> dalam = new HashSet<>();
 		/** Residents to move away from {@link #pindahDari} at their next activity change. */
 		final Map<Integer, Integer> pindahDari = new HashMap<>();
 		/** Reservations of a simulation (pos -> resident). */
 		final Map<Long, Integer> pesanSim = new HashMap<>();
 		int[] occ = new int[0];
+		/** {@link #occ} without the residents indoors: the people who can be seen (body spread is judged against it). */
+		int[] luar = new int[0];
 		int[] tetap = new int[0];
 		Kapasitas.Sasaran sasaran = Kapasitas.Sasaran.KOSONG;
 		int jam = -1;
@@ -112,6 +122,11 @@ public final class Penyeimbang {
 		/** Data occupancy of zone {@code z}. */
 		public int occ(int z) {
 			return z >= 0 && z < occ.length ? occ[z] : 0;
+		}
+
+		/** Occupancy of zone {@code z} without the residents indoors. */
+		public int luar(int z) {
+			return z >= 0 && z < luar.length ? luar[z] : 0;
 		}
 
 		public Kapasitas.Sasaran sasaran() {
@@ -245,6 +260,7 @@ public final class Penyeimbang {
 			boolean kunciUntuk, long now, long sampai) {
 		String to = k.tujuan();
 		String key = k.kunci() + "|" + to + "|" + jam / 2;
+		catatMinat(h, p.id(), true, to);
 		Pilihan old = h.pilihan.get(p.id());
 		if (old != null && old.kunci().equals(key) && old.sampai() > now
 				&& (!kunciUntuk || h.simulasi || !huni.terkunci(old.tujuan().pos(), p.id()))) {
@@ -317,6 +333,9 @@ public final class Penyeimbang {
 			if (o < s.lantai()[z]) {
 				x *= 2.0D;
 			}
+			// pull toward the zone's own target: a zone under it draws, a zone at or over it draws less (small towns, where a zone
+			// holds one or two people and the flat free-share weight alone scatters the counts)
+			x *= o + 1.0D <= s.target()[z] ? UNDER_TARGET : o >= s.target()[z] ? OVER_TARGET : 1.0D;
 			if (dipakai >= muat) {
 				x *= 0.3D;
 			}
@@ -389,6 +408,7 @@ public final class Penyeimbang {
 		}
 		h.zonaTetap.remove(id);
 		h.bebas.add(id);
+		h.dalam.remove(id);
 	}
 
 	/** How many people one titik holds (a stall front: the buyers; a street node: one walker). */
@@ -655,11 +675,36 @@ public final class Penyeimbang {
 			jenis[z] = peta.zona(z).jenis();
 		}
 		KotaConfig.Warga cfg = KotaConfig.warga();
+		int[] luar = occ.clone();
+		for (int id : h.dalam) {
+			Integer z = h.pilihan.containsKey(id) ? null : h.zonaTetap.get(id);
+			if (z != null && z >= 0 && z < n && luar[z] > 0) {
+				luar[z]--;
+			}
+		}
 		h.occ = occ;
+		h.luar = luar;
 		h.tetap = tetap;
 		h.jam = jam;
+		Map<String, Integer> wish = new HashMap<>();
+		for (Map.Entry<Integer, String> e : h.minat.entrySet()) {
+			if (h.bebas.contains(e.getKey())) {
+				wish.merge(e.getValue(), 1, Integer::sum);
+			}
+		}
+		double[] minat = new double[n];
+		for (Map.Entry<String, Integer> e : wish.entrySet()) {
+			int[] where = peta.sebaran(e.getKey());
+			long all = 0L;
+			for (int v : where) {
+				all += v;
+			}
+			for (int z = 0; z < n && all > 0L; z++) {
+				minat[z] += e.getValue() * where[z] / (double) all;
+			}
+		}
 		h.sasaran = Kapasitas.hitung(kap, jenis, tetap, Math.max(bebas, h.pilihan.size()), jam, h.acara, h.acaraZona, cfg.kapZona, cfg.lantaiZona,
-				h.hari);
+				h.hari, minat);
 		h.pindahDari.clear();
 		for (int z = 0; z < n; z++) {
 			int over = occ[z] - h.sasaran.topi()[z];
@@ -684,6 +729,16 @@ public final class Penyeimbang {
 	 * it is not the balancer's. {@code zona} -1 = unknown (staying put, away).
 	 */
 	static void catatData(Hunian h, int id, boolean umum, int zona) {
+		catatData(h, id, umum, zona, false);
+	}
+
+	/** As above; {@code dalam} = the resident is indoors (asleep, shut in a room) and so has no body to be seen. */
+	static void catatData(Hunian h, int id, boolean umum, int zona, boolean dalam) {
+		if (dalam && !umum) {
+			h.dalam.add(id);
+		} else {
+			h.dalam.remove(id);
+		}
 		if (umum) {
 			h.bebas.add(id);
 			h.zonaTetap.remove(id);
@@ -706,7 +761,24 @@ public final class Penyeimbang {
 		h.pilihan.remove(id);
 		h.zonaTetap.remove(id);
 		h.bebas.remove(id);
+		h.dalam.remove(id);
+		h.minat.remove(id);
 		h.pindahDari.remove(id);
+	}
+
+	/** Notes what resident {@code id} wants (a general goal) or forgets it (a goal that is not the balancer's). */
+	static void catatMinat(Hunian h, int id, boolean umum, String tujuan) {
+		if (umum) {
+			int colon = tujuan.indexOf(':');
+			h.minat.put(id, colon > 0 && tujuan.startsWith("@") ? tujuan.substring(0, colon) : tujuan);
+		} else {
+			h.minat.remove(id);
+		}
+	}
+
+	/** True when the resident's activity keeps it indoors (no body to see). */
+	static boolean dalam(Kegiatan k) {
+		return k.dalam() || Kegiatan.KASUR.equals(k.tujuan());
 	}
 
 	/**

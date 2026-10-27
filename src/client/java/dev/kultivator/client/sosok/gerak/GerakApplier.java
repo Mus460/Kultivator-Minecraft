@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import dev.kultivator.client.render.MeditationPose;
 import dev.kultivator.client.sosok.SosokDetail;
+import dev.kultivator.dunia.kota42.api.KotaGerakId;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
@@ -26,6 +27,8 @@ public final class GerakApplier {
 	private static final float SHOULDER_Y = 2.0F;
 	private static final float HIP_Y = 12.0F;
 	private static final float MODEL_SCALE = 0.9375F;
+	/** Highest whole-body lift (blocks) a clip may ask for: the top of the acrobats' pyramid (clip 376) sits 3 blocks up. */
+	public static final float LIFT_MAKS = 3.2F;
 
 	/** From the PlayerModel mixin, after {@code PoseApplier.apply}. */
 	public static void apply(PlayerModel model, AvatarRenderState state) {
@@ -297,7 +300,7 @@ public final class GerakApplier {
 				&& pose.pose() != dev.kultivator.technique.spec.dsl.Pose.FLAME_CUP)) {
 			float lift = pose.body(Klip.LIFT);
 			if (Float.isFinite(lift)) {
-				naik += Mth.clamp(lift, -0.8F, 1.2F);
+				naik += Mth.clamp(lift, -0.8F, LIFT_MAKS);
 			}
 		}
 		GerakData d = GerakData.dari(state);
@@ -323,13 +326,24 @@ public final class GerakApplier {
 	 */
 	public static void putarTidur(AvatarRenderState state, PoseStack poseStack) {
 		GerakData d = GerakData.dari(state);
+		if (d != null && d.klip == KotaGerakId.AKROBAT_SIMPAI && d.tKlip > 12.0F && d.tKlip < 24.0F) {
+			// the hoop jump's somersault (clip ticks 12-24): one full turn about the hips, forward
+			float u = (d.tKlip - 12.0F) / 12.0F;
+			float halus = u * u * (3.0F - 2.0F * u);
+			poseStack.translate(0.0F, 0.9F, 0.0F);
+			poseStack.rotateDegrees(Axis.XP, 360.0F * halus);
+			poseStack.translate(0.0F, -0.9F, 0.0F);
+		}
 		if (d == null || d.tidurBobot <= 0.0F) {
 			return;
 		}
 		float w = d.tidurBobot;
 		poseStack.translate(0.0F, 0.18F * w, 0.0F);
 		poseStack.rotateDegrees(Axis.XP, 90.0F * w);
-		if (d.klip == dev.kultivator.sosok.GerakId.TIDUR && d.varian == dev.kultivator.sosok.GerakId.V_TIDUR_MIRING) {
+		boolean miring = d.klip == dev.kultivator.sosok.GerakId.TIDUR && d.varian == dev.kultivator.sosok.GerakId.V_TIDUR_MIRING;
+		// the bench sleeper lies on his side, arm hanging (the floor variant stays on the back)
+		miring |= d.klip == KotaGerakId.TIDUR_BANGKU && d.varian != KotaGerakId.V_TIDUR_LANTAI;
+		if (miring) {
 			poseStack.rotateDegrees(Axis.YP, 90.0F * w);
 		}
 	}

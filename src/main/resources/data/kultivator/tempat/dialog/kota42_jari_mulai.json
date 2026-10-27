@@ -1,0 +1,38 @@
+{
+  "pembicara": [
+    "tokoh:bibi_wang"
+  ],
+  "prioritas": 40,
+  "syarat": [
+    "quest kota42_seribu_jari baru",
+    "hari 4",
+    "acak 50"
+  ],
+  "sekali": true,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "kaget",
+      "suara": "kota42.copet_teriak",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai kota42_seribu_jari"
+          ],
+          "ke": "kejar"
+        },
+        {
+          "akibat": [
+            "quest_mulai kota42_seribu_jari"
+          ],
+          "ke": "kejar"
+        }
+      ]
+    },
+    {
+      "id": "kejar",
+      "gestur": "tunjuk"
+    }
+  ]
+}

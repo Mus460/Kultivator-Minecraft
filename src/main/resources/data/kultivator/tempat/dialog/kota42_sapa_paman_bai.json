@@ -1,0 +1,44 @@
+{
+  "pembicara": [
+    "tokoh:paman_bai"
+  ],
+  "prioritas": 5,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_doa",
+      "suara": "kota42.makam_pimpin",
+      "pilihan": [
+        {
+          "ke": "duka"
+        },
+        {
+          "ke": "nama"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "duka",
+      "gestur": "sujud_dupa",
+      "prop": "dupa",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "nama",
+      "gestur": "425",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

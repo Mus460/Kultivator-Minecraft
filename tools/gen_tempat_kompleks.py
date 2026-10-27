@@ -1487,6 +1487,15 @@ def gua_kediaman(k, nx, nz, i):
     K.chest(k, nx + 4, LY + 1, nz, None, "west")
     K.shelf(k, nx + 4, LY + 2, nz, "west")
     k.put(nx + 4, LY + 1, nz + 2, "minecraft:white_candle", {"candles": "2", "lit": "true", "waterlogged": "false"})
+    # D-41W: a lived-in cave - an inlaid rug under the middle, a tea table with a second cushion, a banner on the back wall,
+    # a potted bamboo opposite the fern and a lantern under the keystone
+    K.rug(k, nx + 1, nz + 1, nx + 3, nz + 3, LY + 1)
+    K.low_table(k, nx + 1, LY + 1, nz + 3)
+    k.put(nx + 1, LY + 2, nz + 3, "minecraft:decorated_pot")
+    bantal(k, nx + 1, LY + 1, nz + 4, "north")
+    K.wall_banner(k, nx + 2, LY + 3, nz, "south")
+    K.pot(k, nx + 4, LY + 1, nz + 4, "minecraft:potted_bamboo")
+    K.lit(k, nx + 2, LY + 4, fz, chain=0)
     titik41(k, nx + 2.5, LY + 1, nz + 2.5, "kediaman_%d" % i, yaw=0.0)
 
 

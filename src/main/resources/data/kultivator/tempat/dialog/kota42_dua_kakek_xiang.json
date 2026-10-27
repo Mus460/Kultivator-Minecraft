@@ -1,0 +1,27 @@
+{
+  "pembicara": [
+    "tokoh:kakek_xiang"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest kota42_dua_keluarga tahap telusur"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "catur",
+      "prop": "papan_catur",
+      "pilihan": [
+        {
+          "ke": "kwitansi"
+        }
+      ]
+    },
+    {
+      "id": "kwitansi",
+      "gestur": "tunjuk",
+      "suara": "kota42.catur_skak"
+    }
+  ]
+}

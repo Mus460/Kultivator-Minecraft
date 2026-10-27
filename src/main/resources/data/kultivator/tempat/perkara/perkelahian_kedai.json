@@ -1,0 +1,67 @@
+{
+  "nama": "kultivator.kota42.perkara.t.perkelahian_kedai.nama",
+  "teks": "kultivator.kota42.perkara.t.perkelahian_kedai.teks",
+  "penggugat": {
+    "klaim": "kultivator.kota42.perkara.t.perkelahian_kedai.klaim_a",
+    "peran": [
+      "pemilik_teh",
+      "pelayan"
+    ]
+  },
+  "tergugat": {
+    "klaim": "kultivator.kota42.perkara.t.perkelahian_kedai.klaim_b",
+    "peran": [
+      "kuli",
+      "nelayan",
+      "tukang"
+    ]
+  },
+  "benar": "acak",
+  "saksi": 2,
+  "kesaksian": {
+    "penggugat": [
+      "kultivator.kota42.perkara.t.perkelahian_kedai.saksi_a1",
+      "kultivator.kota42.perkara.t.perkelahian_kedai.saksi_a2"
+    ],
+    "tergugat": [
+      "kultivator.kota42.perkara.t.perkelahian_kedai.saksi_b1",
+      "kultivator.kota42.perkara.t.perkelahian_kedai.saksi_b2"
+    ]
+  },
+  "dusta": "kultivator.kota42.perkara.t.perkelahian_kedai.dusta",
+  "bukti": [
+    {
+      "jenis": "barang",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.perkelahian_kedai.bukti1_a",
+        "tergugat": "kultivator.kota42.perkara.t.perkelahian_kedai.bukti1_b"
+      },
+      "barang": "minecraft:oak_planks"
+    },
+    {
+      "jenis": "gosip",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.perkelahian_kedai.bukti2_a",
+        "tergugat": "kultivator.kota42.perkara.t.perkelahian_kedai.bukti2_b"
+      }
+    }
+  ],
+  "putusan": [
+    {
+      "untuk": "penggugat",
+      "teks": "kultivator.kota42.perkara.t.perkelahian_kedai.putusan1",
+      "akibat": "kultivator.kota42.perkara.t.perkelahian_kedai.putusan1_akibat"
+    },
+    {
+      "untuk": "tergugat",
+      "teks": "kultivator.kota42.perkara.t.perkelahian_kedai.putusan2",
+      "akibat": "kultivator.kota42.perkara.t.perkelahian_kedai.putusan2_akibat"
+    },
+    {
+      "untuk": "damai",
+      "teks": "kultivator.kota42.perkara.t.perkelahian_kedai.putusan3",
+      "akibat": "kultivator.kota42.perkara.t.perkelahian_kedai.putusan3_akibat"
+    }
+  ],
+  "suap": 0.3
+}

@@ -1,0 +1,48 @@
+{
+  "pembicara": [
+    "tokoh:yu_laosan"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest kota42_akar_langit aktif",
+    "!quest kota42_akar_langit tahap daun",
+    "!bendera kota42.akar.pilih"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "berdebat",
+      "akibat": [
+        "bendera kota42.akar.dengar_ayah"
+      ],
+      "pilihan": [
+        {
+          "syarat": [
+            "nb_pita 10",
+            "quest kota42_akar_langit tahap cara"
+          ],
+          "akibat": [
+            "bayar_pita 10",
+            "kota42.kebiasaan tokoh:yu_laosan penjudi hapus",
+            "quest_maju kota42_akar_langit"
+          ],
+          "ke": "lunas",
+          "tampil": true,
+          "alasan": "kultivator.cerita.kota42_akar_ayah.mulai.1.alasan"
+        },
+        {
+          "ke": "malu"
+        }
+      ]
+    },
+    {
+      "id": "lunas",
+      "gestur": "berlutut"
+    },
+    {
+      "id": "malu",
+      "gestur": "451"
+    }
+  ]
+}

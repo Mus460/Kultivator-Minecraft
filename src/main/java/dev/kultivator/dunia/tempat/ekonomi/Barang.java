@@ -111,6 +111,8 @@ public final class Barang {
 		if (gilda && Lencana.bintang(player) >= Lencana.DISKON_BINTANG) {
 			d += Lencana.DISKON;
 		}
+		// 42.6.6: a town office (Juru Tulis 3 %, Pengawas Pasar and above 5 %) discounts the shops of its own place
+		d += dev.kultivator.dunia.kota42.ekonomi.Jabatan.diskon(player, town);
 		return Math.min(DISKON_MAKS, d);
 	}
 

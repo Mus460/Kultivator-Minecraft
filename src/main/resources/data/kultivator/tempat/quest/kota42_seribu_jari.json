@@ -1,0 +1,91 @@
+{
+  "pemberi": "tokoh:bibi_wang",
+  "tempat": "kota42",
+  "alur": true,
+  "tahap": [
+    {
+      "id": "korban",
+      "tujuan": [
+        "kejar_copet *"
+      ]
+    },
+    {
+      "id": "telusur",
+      "tujuan": [
+        "tanda kota42.telusur.kota42_seribu_jari"
+      ],
+      "akibat_masuk": [
+        "kota42.gosip kota42_seribu_jari"
+      ]
+    },
+    {
+      "id": "sandi",
+      "tujuan": [
+        "bendera kota42.jari.sandi",
+        "bicara tokoh:lentera_hijau"
+      ]
+    },
+    {
+      "id": "sarang",
+      "cabang": [
+        {
+          "syarat": [
+            "bendera kota42.jari.serah"
+          ],
+          "ke": "serah"
+        },
+        {
+          "syarat": [
+            "bendera kota42.jari.informan"
+          ],
+          "ke": "informan"
+        },
+        {
+          "syarat": [
+            "bendera kota42.jari.insaf"
+          ],
+          "ke": "insaf"
+        }
+      ]
+    },
+    {
+      "id": "serah",
+      "tujuan": [
+        "bicara tokoh:bao_qing"
+      ],
+      "akibat": [
+        "nama_baik 4",
+        "kota42.calon peran:anak kantor",
+        "beri kultivator:topeng_pasar_hantu",
+        "kabar kota42_jari_serah pemain"
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "informan",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "bendera kota42.informan_seribu_jari",
+        "beri kultivator:topeng_pasar_hantu",
+        "kabar kota42_jari_informan"
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "insaf",
+      "tujuan": [
+        "bendera kota42.jari.modal"
+      ],
+      "akibat": [
+        "kota42.saham tokoh:shi_xiaoqian 30",
+        "kota42.kesan tokoh:shi_xiaoqian 40",
+        "beri kultivator:topeng_pasar_hantu",
+        "nama_baik 2",
+        "kabar kota42_jari_insaf pemain"
+      ],
+      "ke": "selesai"
+    }
+  ]
+}

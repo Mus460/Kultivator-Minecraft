@@ -69,14 +69,22 @@
       },
       "harap": {
         "k": "kultivator.cakap.basa.cuaca.hujan.4",
-        "a": []
+        "a": [
+          {
+            "t": ""
+          },
+          {
+            "k": "kultivator.cakap.ekor.basa.0",
+            "a": []
+          }
+        ]
       },
       "aturan": "basa.cuaca.hujan",
       "gestur": "hangat_tangan",
       "seru": null,
       "tik": null,
-      "id_id": "Kata orang tua, hujan di hari pasar artinya rezeki datang terlambat.",
-      "en_us": "The old folk say rain on market day means fortune arrives late."
+      "id_id": "Kata orang tua, hujan di hari pasar artinya rezeki datang terlambat. Begitulah pikirku.",
+      "en_us": "The old folk say rain on market day means fortune arrives late. That's what I think."
     },
     {
       "ubah": {
@@ -102,7 +110,14 @@
       },
       "harap": {
         "k": "kultivator.cakap.basa.musim.semi.1",
-        "a": []
+        "a": [
+          {
+            "t": ""
+          },
+          {
+            "t": ""
+          }
+        ]
       },
       "aturan": "basa.musim.semi",
       "gestur": "bicara_tangan",
@@ -135,14 +150,22 @@
       },
       "harap": {
         "k": "kultivator.cakap.basa.musim.semi.4",
-        "a": []
+        "a": [
+          {
+            "t": ""
+          },
+          {
+            "k": "kultivator.cakap.ekor.basa.14",
+            "a": []
+          }
+        ]
       },
       "aturan": "basa.musim.semi",
       "gestur": "bicara_tangan",
       "seru": null,
       "tik": null,
-      "id_id": "Burung walet kembali ke atap kami tahun ini. Pertanda rumah tangga rukun.",
-      "en_us": "The swallows came back to our eaves this year. A sign of a harmonious household."
+      "id_id": "Burung walet kembali ke atap kami tahun ini. Pertanda rumah tangga rukun. Obrolan kecil begini menyegarkan.",
+      "en_us": "The swallows came back to our eaves this year. A sign of a harmonious household. Small talk like this is refreshing."
     },
     {
       "ubah": {
@@ -168,7 +191,14 @@
       },
       "harap": {
         "k": "kultivator.cakap.basa.musim.semi.3",
-        "a": []
+        "a": [
+          {
+            "t": ""
+          },
+          {
+            "t": ""
+          }
+        ]
       },
       "aturan": "basa.musim.semi",
       "gestur": "bicara_tangan",

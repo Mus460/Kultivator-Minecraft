@@ -100,6 +100,10 @@
           {
             "k": "kultivator.cakap.lex.kakak.kampung",
             "a": []
+          },
+          {
+            "k": "kultivator.cakap.ekor.sapa.6",
+            "a": []
           }
         ]
       },
@@ -107,8 +111,8 @@
       "gestur": "lambai",
       "seru": null,
       "tik": null,
-      "id_id": "Pagi, Kang. Kalau mau sesuatu dibuat, pagi begini aku masih segar.",
-      "en_us": "Morning, Big Brother. If you want something made, I'm still fresh this early."
+      "id_id": "Pagi, Kang. Kalau mau sesuatu dibuat, pagi begini aku masih segar. Senang melihatmu lagi.",
+      "en_us": "Morning, Big Brother. If you want something made, I'm still fresh this early. Good to see you again."
     },
     {
       "ubah": {
@@ -137,6 +141,9 @@
           {
             "k": "kultivator.cakap.lex.kakak.kampung",
             "a": []
+          },
+          {
+            "t": ""
           }
         ]
       },
@@ -180,6 +187,9 @@
           {
             "k": "kultivator.cakap.lex.kakak.kampung.p",
             "a": []
+          },
+          {
+            "t": ""
           }
         ]
       },

@@ -28,6 +28,8 @@ public final class KotaTumbuhData extends KotaBagianData {
 	public static final String MAKMUR = "makmur";
 	/** Sub-module key {@code "bangun"}. */
 	public static final String BANGUN = "bangun";
+	/** Sub-module key {@code "blokade"}: blockade days and the war refugees' houses of a place. */
+	public static final String BLOKADE = "blokade";
 
 	public KotaTumbuhData() {
 	}

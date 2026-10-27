@@ -213,5 +213,9 @@
   "kultivator.kota42.cakap.uji.gosip.buat": "Gossip %1$s born: #%2$s",
   "kultivator.kota42.cakap.uji.gosip.jejak": "Gossip #%1$s as %2$s heard it: %3$s links",
   "kultivator.kota42.cakap.uji.gosip.jejak_warga": "  <- %1$s",
-  "kultivator.kota42.cakap.uji.gosip.jejak_pemain": "  <- player #%1$s"
+  "kultivator.kota42.cakap.uji.gosip.jejak_pemain": "  <- player #%1$s",
+  "kultivator.kota42.cakap.uji.golden.hasil": "Golden test: %1$s of %2$s files pass",
+  "kultivator.kota42.cakap.uji.golden.beda": "  %1$s",
+  "kultivator.kota42.cakap.uji.golden.tulis": "Wrote %1$s new expectation files to %2$s",
+  "kultivator.kota42.cakap.uji.golden.kosong": "No golden files loaded (conversation data empty?)"
 }

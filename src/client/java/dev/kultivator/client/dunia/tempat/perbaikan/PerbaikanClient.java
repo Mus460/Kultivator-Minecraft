@@ -5,6 +5,9 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
+import net.minecraft.core.BlockPos;
+
+import java.util.Collection;
 
 /**
  * Client init of 38PR repair (DESIGN 38.R.3): the scaffolding drawn around repair jobs ({@link Perancah}), client
@@ -26,6 +29,15 @@ public final class PerbaikanClient {
 		ClientTickEvents.END_CLIENT_TICK.register(Perancah::tick);
 		LevelRenderEvents.COLLECT_SUBMITS.register(Perancah::render);
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> Perancah.clear());
+	}
+
+	/** A plot of Kota yang Hidup under construction: the box to put the scaffold round and the building progress 0..1. */
+	public record Lahan(long id, BlockPos min, BlockPos max, float progres) {
+	}
+
+	/** The plot scaffolds near this player (the full set each call; see {@code KotaHidupClient}); client thread only. */
+	public static void perancahKavling(Collection<Lahan> lahan) {
+		Perancah.kavling(lahan);
 	}
 
 	private PerbaikanClient() {

@@ -1,0 +1,53 @@
+{
+  "pembicara": [
+    "tokoh:nenek_tang"
+  ],
+  "prioritas": 5,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "masak",
+      "prop": "sendok_sayur",
+      "suara": "kota42.sup_nenek",
+      "pilihan": [
+        {
+          "syarat": [
+            "quest kota42_sup_hangat baru"
+          ],
+          "akibat": [
+            "quest_mulai kota42_sup_hangat"
+          ]
+        },
+        {
+          "ke": "sup"
+        },
+        {
+          "ke": "cucu"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "sup",
+      "gestur": "masak",
+      "prop": "sendok_sayur",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "cucu",
+      "gestur": "tepuk_bahu",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

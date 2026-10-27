@@ -1,0 +1,66 @@
+{
+  "nama": "kultivator.kota42.perkara.t.pohon_tumbang.nama",
+  "teks": "kultivator.kota42.perkara.t.pohon_tumbang.teks",
+  "penggugat": {
+    "klaim": "kultivator.kota42.perkara.t.pohon_tumbang.klaim_a",
+    "peran": [
+      "warga",
+      "petani"
+    ]
+  },
+  "tergugat": {
+    "klaim": "kultivator.kota42.perkara.t.pohon_tumbang.klaim_b",
+    "peran": [
+      "warga",
+      "tukang"
+    ]
+  },
+  "benar": "acak",
+  "saksi": 2,
+  "kesaksian": {
+    "penggugat": [
+      "kultivator.kota42.perkara.t.pohon_tumbang.saksi_a1",
+      "kultivator.kota42.perkara.t.pohon_tumbang.saksi_a2"
+    ],
+    "tergugat": [
+      "kultivator.kota42.perkara.t.pohon_tumbang.saksi_b1",
+      "kultivator.kota42.perkara.t.pohon_tumbang.saksi_b2"
+    ]
+  },
+  "dusta": "kultivator.kota42.perkara.t.pohon_tumbang.dusta",
+  "bukti": [
+    {
+      "jenis": "barang",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.pohon_tumbang.bukti1_a",
+        "tergugat": "kultivator.kota42.perkara.t.pohon_tumbang.bukti1_b"
+      },
+      "barang": "minecraft:oak_log"
+    },
+    {
+      "jenis": "catatan",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.pohon_tumbang.bukti2_a",
+        "tergugat": "kultivator.kota42.perkara.t.pohon_tumbang.bukti2_b"
+      }
+    }
+  ],
+  "putusan": [
+    {
+      "untuk": "penggugat",
+      "teks": "kultivator.kota42.perkara.t.pohon_tumbang.putusan1",
+      "akibat": "kultivator.kota42.perkara.t.pohon_tumbang.putusan1_akibat"
+    },
+    {
+      "untuk": "tergugat",
+      "teks": "kultivator.kota42.perkara.t.pohon_tumbang.putusan2",
+      "akibat": "kultivator.kota42.perkara.t.pohon_tumbang.putusan2_akibat"
+    },
+    {
+      "untuk": "damai",
+      "teks": "kultivator.kota42.perkara.t.pohon_tumbang.putusan3",
+      "akibat": "kultivator.kota42.perkara.t.pohon_tumbang.putusan3_akibat"
+    }
+  ],
+  "suap": 0.2
+}

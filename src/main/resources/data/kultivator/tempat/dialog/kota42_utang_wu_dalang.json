@@ -1,0 +1,31 @@
+{
+  "pembicara": [
+    "tokoh:wu_dalang"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest kota42_utang_tiga_generasi tahap surat",
+    "!punya kultivator:surat_utang",
+    "!bendera kota42.utang.dihitung"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "416",
+      "prop": "218",
+      "akibat": [
+        "beri kultivator:surat_utang"
+      ],
+      "pilihan": [
+        {
+          "ke": "yamen"
+        }
+      ]
+    },
+    {
+      "id": "yamen",
+      "gestur": "hormat"
+    }
+  ]
+}

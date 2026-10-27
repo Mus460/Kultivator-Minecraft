@@ -1,0 +1,19 @@
+{
+  "pembicara": [
+    "tokoh:bibi_wang"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest kota42_malam_wayang tahap telusur"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "takut_sembunyi",
+      "akibat": [
+        "peristiwa tanda kota42.telusur.kota42_wayang_hilang"
+      ]
+    }
+  ]
+}

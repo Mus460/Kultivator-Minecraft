@@ -1,0 +1,17 @@
+{
+  "pembicara": [
+    "tokoh:bao_qing"
+  ],
+  "prioritas": 60,
+  "syarat": [
+    "quest kota42_seribu_jari tahap serah"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "418",
+      "suara": "kota42.putusan"
+    }
+  ]
+}

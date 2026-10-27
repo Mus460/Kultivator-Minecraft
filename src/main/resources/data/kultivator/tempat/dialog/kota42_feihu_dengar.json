@@ -1,0 +1,17 @@
+{
+  "pembicara": [
+    "tokoh:yan_feihu"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest kota42_hati_feihu tahap comblang",
+    "!bendera kota42.feihu.comblang"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "451"
+    }
+  ]
+}

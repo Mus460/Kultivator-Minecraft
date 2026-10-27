@@ -1,0 +1,39 @@
+{
+  "pemberi": "peran:tetua_sekte",
+  "tempat": "gabung_sekte",
+  "tahap": [
+    {
+      "id": "sudut",
+      "tujuan": [
+        "tanda gabung_tugas_sapu x2"
+      ],
+      "akibat": [
+        "gabung.sikap luar 3"
+      ]
+    },
+    {
+      "id": "pohon",
+      "tujuan": [
+        "tanda gabung_tugas_sapu"
+      ],
+      "akibat": [
+        "gabung.pk 14",
+        "gabung.ikatan 2",
+        "efek minecraft:haste 1800 0"
+      ],
+      "batas_hari": 6,
+      "gagal_ke": "layu",
+      "ke": "selesai"
+    },
+    {
+      "id": "layu",
+      "tujuan": [
+        "tanda gabung_tugas"
+      ],
+      "akibat": [
+        "gabung.pk 4"
+      ],
+      "ke": "selesai"
+    }
+  ]
+}

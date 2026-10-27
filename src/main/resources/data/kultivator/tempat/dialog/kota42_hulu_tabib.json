@@ -1,0 +1,26 @@
+{
+  "pembicara": [
+    "peran:tabib"
+  ],
+  "prioritas": 35,
+  "syarat": [
+    "quest kota42_tabib_keliling baru",
+    "hari 8",
+    "acak 40"
+  ],
+  "sekali": true,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "periksa_nadi",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai kota42_tabib_keliling"
+          ]
+        }
+      ]
+    }
+  ]
+}

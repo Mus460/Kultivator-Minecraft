@@ -113,14 +113,16 @@ syarat: kelompok=pedagang label_emosi=gembira,puas,lega
 gestur: hitung_koin
 $barang: tipe=barang dari=konteks.barang
 $senang: aturan=seru.senang opsional=0.5
-- [3] Dagangan hari ini laris! {$barang} habis sebelum tengah hari. {$senang} || Trade's brisk today! The {$barang} sold out before noon. {$senang}
-  ~ kasar: Laris. Akhirnya bisa bayar sewa. || Selling well. Can finally pay the rent.
-  ~ kuno: Rezeki hari ini melimpah. Langit memperhatikan orang yang tekun. || Fortune overflows today. Heaven watches the diligent.
-  ~ pelabuhan: Seluruh muatan habis, Bung! Malam ini aku traktir! || Whole cargo's gone, mate! Drinks on me tonight!
-- [2] Pelanggan baru datang terus sejak festival. Aku sampai minta anakku membantu. || New customers keep coming since the festival. I've had to get my child to help.
-  ~ p: Pelanggan baru datang terus. Aku sampai lupa menyisir rambut. Hihi. || New customers keep coming. I even forgot to comb my hair. Hehe.
-- Kalau terus begini, aku bisa membuka lapak kedua. || If this keeps up, I could open a second stall.
-- Untung tahun ini lebih baik dari tahun lalu. Leluhur pasti memberkati. || Profit's better than last year. The ancestors must be blessing us.
+$awal: aturan=awal.kabar opsional=0.35
+$ekor: aturan=ekor.kabar opsional=0.4
+- [3] {$awal}Dagangan hari ini laris! {$barang} habis sebelum tengah hari. {$senang} || {$awal}Trade's brisk today! The {$barang} sold out before noon. {$senang}
+  ~ kasar: {$awal}Laris. Akhirnya bisa bayar sewa. || {$awal}Selling well. Can finally pay the rent.
+  ~ kuno: {$awal}Rezeki hari ini melimpah. Langit memperhatikan orang yang tekun. || {$awal}Fortune overflows today. Heaven watches the diligent.
+  ~ pelabuhan: {$awal}Seluruh muatan habis, Bung! Malam ini aku traktir! || {$awal}Whole cargo's gone, mate! Drinks on me tonight!
+- [2] {$awal}Pelanggan baru datang terus sejak festival. Aku sampai minta anakku membantu.{$ekor} || {$awal}New customers keep coming since the festival. I've had to get my child to help.{$ekor}
+  ~ p: {$awal}Pelanggan baru datang terus. Aku sampai lupa menyisir rambut. Hihi.{$ekor} || {$awal}New customers keep coming. I even forgot to comb my hair. Hehe.{$ekor}
+- {$awal}Kalau terus begini, aku bisa membuka lapak kedua.{$ekor} || {$awal}If this keeps up, I could open a second stall.{$ekor}
+- {$awal}Untung tahun ini lebih baik dari tahun lalu. Leluhur pasti memberkati.{$ekor} || {$awal}Profit's better than last year. The ancestors must be blessing us.{$ekor}
 
 == dagang.cerita.sepi
 niat: KELUH
@@ -130,16 +132,18 @@ gestur: geleng
 seru: aduh
 $keluh: aturan=seru.keluh opsional=0.5
 $barang: tipe=barang dari=konteks.barang
-- [3] Sepi sekali hari ini. Baru dua pembeli sejak pagi. {$keluh} || So quiet today. Only two buyers since morning. {$keluh}
-  ~ kasar: Sepi. Lalat pun malas mampir. || Dead. Even the flies won't stop by.
+$awal: aturan=awal.keluh opsional=0.45
+$ekor: aturan=ekor.keluh opsional=0.4
+- [3] {$awal}Sepi sekali hari ini. Baru dua pembeli sejak pagi. {$keluh} || {$awal}So quiet today. Only two buyers since morning. {$keluh}
+  ~ kasar: {$awal}Sepi. Lalat pun malas mampir. || {$awal}Dead. Even the flies won't stop by.
   ~ kuno: Pasar sedang lesu. Bahkan batu roh pun tidur di kantong orang. || The market is sluggish. Even spirit stones sleep in people's purses.
-  ~ pelabuhan: Kapal tidak datang, pembeli tidak datang, Bung. Aku cuma memandangi laut. || No ships, no buyers, mate. I just stare at the sea.
-  ~ kampung: Sepi, Nak. Orang kampung lagi pada ke sawah semua. || Quiet, child. The village is all out in the paddies.
-- [2] {$barang} tidak laku. Mungkin aku salah memilih dagangan musim ini. || The {$barang} won't sell. Maybe I chose wrong this season.
-  ~ oasis: Kafilah lewat tanpa berhenti, Saudara. {$barang}-ku menunggu di bawah terik. || Caravans pass without stopping, friend. My {$barang} waits under the blazing sun.
-- Pajak lapak naik, pembeli turun. Bagaimana orang kecil bisa hidup? || Stall tax up, buyers down. How are small folk to live?
-- Kalau begini terus, aku harus pinjam ke rentenir. Jangan sampai. || If this goes on, I'll have to borrow from the lender. Heaven forbid.
-  ~ iblis: Sepi. Di kota ini sepi berarti ada yang lebih besar memakan pasar. || Quiet. In this city quiet means something bigger is eating the market.
+  ~ pelabuhan: {$awal}Kapal tidak datang, pembeli tidak datang, Bung. Aku cuma memandangi laut. || {$awal}No ships, no buyers, mate. I just stare at the sea.
+  ~ kampung: {$awal}Sepi, Nak. Orang kampung lagi pada ke sawah semua. || {$awal}Quiet, child. The village is all out in the paddies.
+- [2] {$barang} tidak laku. Mungkin aku salah memilih dagangan musim ini.{$ekor} || The {$barang} won't sell. Maybe I chose wrong this season.{$ekor}
+  ~ oasis: {$awal}Kafilah lewat tanpa berhenti, Saudara. {$barang}-ku menunggu di bawah terik.{$ekor} || {$awal}Caravans pass without stopping, friend. My {$barang} waits under the blazing sun.{$ekor}
+- {$awal}Pajak lapak naik, pembeli turun. Bagaimana orang kecil bisa hidup? || {$awal}Stall tax up, buyers down. How are small folk to live?
+- {$awal}Kalau begini terus, aku harus pinjam ke rentenir. Jangan sampai.{$ekor} || {$awal}If this goes on, I'll have to borrow from the lender. Heaven forbid.{$ekor}
+  ~ iblis: {$awal}Sepi. Di kota ini sepi berarti ada yang lebih besar memakan pasar.{$ekor} || {$awal}Quiet. In this city quiet means something bigger is eating the market.{$ekor}
 
 == dagang.tanya_harga
 niat: TANYA

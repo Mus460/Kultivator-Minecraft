@@ -1,0 +1,442 @@
+{
+  "templat": [
+    {
+      "id": "kota42_dua_damai",
+      "pemicu": "kota42_dua_damai",
+      "bobot": 10,
+      "umur_hari": 14,
+      "peran_penyebar": [
+        "pemilik_teh",
+        "penjual_ikan"
+      ]
+    },
+    {
+      "id": "kota42_dua_lari",
+      "pemicu": "kota42_dua_lari",
+      "bobot": 10,
+      "umur_hari": 10,
+      "peran_penyebar": [
+        "mak_comblang",
+        "pemilik_teh"
+      ]
+    },
+    {
+      "id": "kota42_dua_pisah",
+      "pemicu": "kota42_dua_pisah",
+      "bobot": 10,
+      "umur_hari": 10,
+      "peran_penyebar": [
+        "pelayan",
+        "pemilik_teh"
+      ]
+    },
+    {
+      "id": "kota42_zhuazhou_damai",
+      "pemicu": "kota42_zhuazhou_damai",
+      "bobot": 10,
+      "umur_hari": 12,
+      "peran_penyebar": [
+        "mak_comblang",
+        "tetua_desa"
+      ]
+    },
+    {
+      "id": "kota42_ronda_baru",
+      "pemicu": "kota42_ronda_baru",
+      "bobot": 10,
+      "umur_hari": 10,
+      "peran_penyebar": [
+        "penjaga_malam",
+        "penjaga"
+      ]
+    },
+    {
+      "id": "kota42_utang_lunas",
+      "pemicu": "kota42_utang_lunas",
+      "bobot": 10,
+      "umur_hari": 8,
+      "peran_penyebar": [
+        "pialang",
+        "bankir"
+      ]
+    },
+    {
+      "id": "kota42_utang_sidang",
+      "pemicu": "kota42_utang_sidang",
+      "bobot": 10,
+      "umur_hari": 10,
+      "peran_penyebar": [
+        "pialang",
+        "hakim"
+      ]
+    },
+    {
+      "id": "kota42_utang_modal",
+      "pemicu": "kota42_utang_modal",
+      "bobot": 10,
+      "umur_hari": 8,
+      "peran_penyebar": [
+        "pelayan",
+        "koki"
+      ]
+    },
+    {
+      "id": "kota42_jari_serah",
+      "pemicu": "kota42_jari_serah",
+      "bobot": 10,
+      "umur_hari": 10,
+      "peran_penyebar": [
+        "penjaga",
+        "pemilik_teh"
+      ]
+    },
+    {
+      "id": "kota42_jari_informan",
+      "pemicu": "kota42_jari_informan",
+      "bobot": 10,
+      "umur_hari": 8,
+      "peran_penyebar": [
+        "pengemis",
+        "pencopet"
+      ]
+    },
+    {
+      "id": "kota42_jari_insaf",
+      "pemicu": "kota42_jari_insaf",
+      "bobot": 10,
+      "umur_hari": 10,
+      "peran_penyebar": [
+        "pedagang_keliling",
+        "pengemis"
+      ]
+    },
+    {
+      "id": "kota42_akar_pemain",
+      "pemicu": "kota42_akar_pemain",
+      "bobot": 10,
+      "umur_hari": 12,
+      "peran_penyebar": [
+        "penjual_ikan",
+        "pemilik_teh"
+      ]
+    },
+    {
+      "id": "kota42_akar_gao",
+      "pemicu": "kota42_akar_gao",
+      "bobot": 10,
+      "umur_hari": 12,
+      "peran_penyebar": [
+        "penjual_ikan",
+        "pengemis"
+      ]
+    },
+    {
+      "id": "kota42_akar_tinggal",
+      "pemicu": "kota42_akar_tinggal",
+      "bobot": 10,
+      "umur_hari": 12,
+      "peran_penyebar": [
+        "penjual_ikan",
+        "tabib"
+      ]
+    },
+    {
+      "id": "kota42_tumbuh_resmi",
+      "pemicu": "kota42_tumbuh_resmi",
+      "bobot": 10,
+      "umur_hari": 12,
+      "peran_penyebar": [
+        "tukang",
+        "kuli"
+      ]
+    },
+    {
+      "id": "kota42_sup_bagi",
+      "pemicu": "kota42_sup_bagi",
+      "bobot": 10,
+      "umur_hari": 9,
+      "peran_penyebar": [
+        "koki",
+        "rahib"
+      ]
+    },
+    {
+      "id": "kota42_sup_cucu",
+      "pemicu": "kota42_sup_cucu",
+      "bobot": 10,
+      "umur_hari": 10,
+      "peran_penyebar": [
+        "koki",
+        "pelayan"
+      ]
+    },
+    {
+      "id": "kota42_pelindung_panji",
+      "pemicu": "kota42_pelindung_panji",
+      "bobot": 10,
+      "umur_hari": 12,
+      "peran_penyebar": [
+        "penjaga",
+        "petani"
+      ]
+    },
+    {
+      "id": "kota42_wayang_perdana",
+      "pemicu": "kota42_wayang_perdana",
+      "bobot": 10,
+      "umur_hari": 10,
+      "peran_penyebar": [
+        "pelayan",
+        "pemusik"
+      ]
+    },
+    {
+      "id": "kota42_pejabat_sita",
+      "pemicu": "kota42_pejabat_sita",
+      "bobot": 10,
+      "umur_hari": 10,
+      "peran_penyebar": [
+        "pedagang_keliling",
+        "hakim"
+      ]
+    },
+    {
+      "id": "kota42_pejabat_suap",
+      "pemicu": "kota42_pejabat_suap",
+      "bobot": 10,
+      "umur_hari": 8,
+      "peran_penyebar": [
+        "pialang",
+        "pemilik_teh"
+      ]
+    },
+    {
+      "id": "kota42_lagu_jembatan",
+      "pemicu": "kota42_lagu_jembatan",
+      "bobot": 10,
+      "umur_hari": 10,
+      "peran_penyebar": [
+        "pengamen",
+        "pemusik"
+      ]
+    },
+    {
+      "id": "kota42_hulu_bongkar",
+      "pemicu": "kota42_hulu_bongkar",
+      "bobot": 10,
+      "umur_hari": 8,
+      "peran_penyebar": [
+        "pedagang_keliling",
+        "pemilik_teh"
+      ]
+    },
+    {
+      "id": "kota42_hulu_mitra",
+      "pemicu": "kota42_hulu_mitra",
+      "bobot": 10,
+      "umur_hari": 8,
+      "peran_penyebar": [
+        "tabib",
+        "pedagang_keliling"
+      ]
+    },
+    {
+      "id": "kota42_feihu_tinggal",
+      "pemicu": "kota42_feihu_tinggal",
+      "bobot": 10,
+      "umur_hari": 8,
+      "peran_penyebar": [
+        "akrobat",
+        "penjual_ikan"
+      ]
+    },
+    {
+      "id": "kota42_feihu_pergi",
+      "pemicu": "kota42_feihu_pergi",
+      "bobot": 10,
+      "umur_hari": 8,
+      "peran_penyebar": [
+        "akrobat",
+        "penjual_ikan"
+      ]
+    },
+    {
+      "id": "kota42_umum_sumur",
+      "pemicu": "umum",
+      "bobot": 10,
+      "umur_hari": 3,
+      "peran_penyebar": [
+        "warga"
+      ],
+      "isian": [
+        "kota"
+      ]
+    },
+    {
+      "id": "kota42_umum_catur",
+      "pemicu": "umum",
+      "bobot": 10,
+      "umur_hari": 3,
+      "peran_penyebar": [
+        "warga"
+      ],
+      "isian": [
+        "kota"
+      ]
+    },
+    {
+      "id": "kota42_umum_pasar",
+      "pemicu": "umum",
+      "bobot": 10,
+      "umur_hari": 3,
+      "peran_penyebar": [
+        "petani",
+        "pedagang_keliling"
+      ],
+      "isian": [
+        "kota"
+      ]
+    },
+    {
+      "id": "kota42_umum_dongeng",
+      "pemicu": "umum",
+      "bobot": 10,
+      "umur_hari": 3,
+      "peran_penyebar": [
+        "pemilik_teh",
+        "pelayan"
+      ],
+      "isian": [
+        "kota"
+      ]
+    },
+    {
+      "id": "kota42_umum_ronda",
+      "pemicu": "umum",
+      "bobot": 10,
+      "umur_hari": 3,
+      "peran_penyebar": [
+        "penjaga_malam",
+        "penjaga"
+      ],
+      "isian": [
+        "kota"
+      ]
+    },
+    {
+      "id": "kota42_umum_nikah",
+      "pemicu": "umum",
+      "bobot": 10,
+      "umur_hari": 3,
+      "peran_penyebar": [
+        "mak_comblang",
+        "warga"
+      ],
+      "isian": [
+        "kota"
+      ]
+    },
+    {
+      "id": "kota42_umum_bayi",
+      "pemicu": "umum",
+      "bobot": 10,
+      "umur_hari": 3,
+      "peran_penyebar": [
+        "warga",
+        "penjual_ikan"
+      ],
+      "isian": [
+        "kota"
+      ]
+    },
+    {
+      "id": "kota42_umum_arak",
+      "pemicu": "umum",
+      "bobot": 10,
+      "umur_hari": 3,
+      "peran_penyebar": [
+        "pelayan",
+        "pemilik_teh"
+      ],
+      "isian": [
+        "kota"
+      ]
+    },
+    {
+      "id": "kota42_umum_kucing",
+      "pemicu": "umum",
+      "bobot": 10,
+      "umur_hari": 3,
+      "peran_penyebar": [
+        "penjual_ikan"
+      ],
+      "isian": [
+        "kota"
+      ]
+    },
+    {
+      "id": "kota42_umum_layang",
+      "pemicu": "umum",
+      "bobot": 10,
+      "umur_hari": 3,
+      "peran_penyebar": [
+        "tabib",
+        "warga"
+      ],
+      "isian": [
+        "kota"
+      ]
+    },
+    {
+      "id": "kota42_umum_copet",
+      "pemicu": "umum",
+      "bobot": 10,
+      "umur_hari": 3,
+      "peran_penyebar": [
+        "penjaga",
+        "pedagang_keliling"
+      ],
+      "isian": [
+        "kota"
+      ]
+    },
+    {
+      "id": "kota42_umum_sekte",
+      "pemicu": "umum",
+      "bobot": 10,
+      "umur_hari": 3,
+      "peran_penyebar": [
+        "petani",
+        "penjaga"
+      ],
+      "isian": [
+        "kota"
+      ]
+    },
+    {
+      "id": "kota42_umum_musim",
+      "pemicu": "umum",
+      "bobot": 10,
+      "umur_hari": 3,
+      "peran_penyebar": [
+        "tetua_desa",
+        "petani"
+      ],
+      "isian": [
+        "kota"
+      ]
+    },
+    {
+      "id": "kota42_umum_tahun",
+      "pemicu": "umum",
+      "bobot": 10,
+      "umur_hari": 3,
+      "peran_penyebar": [
+        "pedagang_keliling"
+      ],
+      "isian": [
+        "kota"
+      ]
+    }
+  ]
+}

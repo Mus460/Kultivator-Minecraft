@@ -89,11 +89,34 @@ public final class RumahUang {
 		return true;
 	}
 
+	/** 42C: pays {@code nb} into a player's deposit while he may be away (shop sales set to "ke_bank"); no fee. */
+	public static void masukkan(MinecraftServer server, UUID player, long nb, String kunci, Object arg) {
+		if (nb <= 0L) {
+			return;
+		}
+		setSaldo(server, player, saldo(server, player) + nb);
+		riwayat(server, player, nb, kunci, arg);
+	}
+
+	/** 42C: takes {@code nb} from a player's deposit for an automatic payment (tax, wages); false (nothing taken) when it is smaller. */
+	public static boolean potong(MinecraftServer server, UUID player, long nb, String kunci, Object arg) {
+		long have = saldo(server, player);
+		if (nb <= 0L || have < nb) {
+			return nb <= 0L;
+		}
+		setSaldo(server, player, have - nb);
+		riwayat(server, player, -nb, kunci, arg);
+		return true;
+	}
+
 	/** Adds a history line (signed NB, newest first, {@link #RIWAYAT_MAKS} kept). */
 	static void riwayat(ServerPlayer player, long nb, String kunci, Object arg) {
-		MinecraftServer server = player.level().getServer();
+		riwayat(player.level().getServer(), player.getUUID(), nb, kunci, arg);
+	}
+
+	private static void riwayat(MinecraftServer server, UUID id, long nb, String kunci, Object arg) {
 		EkonomiData data = EkonomiData.get(server);
-		ListTag list = data.daftar(player.getUUID(), RIWAYAT);
+		ListTag list = data.daftar(id, RIWAYAT);
 		CompoundTag row = new CompoundTag();
 		row.putLong(LembarKunci.HARI, Barang.hari(server));
 		row.putLong(LembarKunci.NB, nb);

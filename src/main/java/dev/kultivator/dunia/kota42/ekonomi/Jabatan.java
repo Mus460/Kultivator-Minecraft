@@ -170,7 +170,7 @@ public final class Jabatan {
 
 	/** The discount an office gives at the place's shops (rank 1: 3 %, rank 2+: 5 %), for 42C's sellers. */
 	public static double diskon(ServerPlayer player, long situs) {
-		int rank = aktif() ? pangkat(player.getUUID(), situs) : TANPA;
+		int rank = situs != 0L && aktif() ? pangkat(player.getUUID(), situs) : TANPA;
 		return rank >= PENGAWAS_PASAR ? 0.05D : rank == JURU_TULIS ? 0.03D : 0.0D;
 	}
 
@@ -524,6 +524,11 @@ public final class Jabatan {
 	}
 
 	// ================================================================== wages, attendance
+
+	/** The share of the place's weekly intake (%) a holder of rank {@code pangkat} (0-5) is paid. */
+	public static int persenGaji(int pangkat) {
+		return GAJI_PERSEN[Math.max(0, Math.min(GAJI_PERSEN.length - 1, pangkat))];
+	}
 
 	/** The most rank {@code pangkat} may earn here per week for this band. */
 	public static long gajiMaks(int pangkat, int band) {

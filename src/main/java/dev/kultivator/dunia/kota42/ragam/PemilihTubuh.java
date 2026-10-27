@@ -47,16 +47,7 @@ public final class PemilihTubuh {
 			if (peta == null || h == null || peta.jumlah() == 0) {
 				return null;
 			}
-			List<Pemanggil.Calon> keepers = new ArrayList<>();
-			List<Pemanggil.Calon> rest = new ArrayList<>();
-			for (Pemanggil.Calon c : calon) {
-				(c.p().peran().stationary ? keepers : rest).add(c);
-			}
-			keepers.sort(Comparator.comparingDouble(Pemanggil.Calon::jarak));
-			List<Pemanggil.Calon> out = new ArrayList<>(calon.size());
-			out.addAll(keepers);
-			out.addAll(sebar(peta, h, rest, anggaran, c -> peta.zonaDi(c.tujuan().pos()), Pemanggil.Calon::jarak));
-			return out;
+			return urut(peta, h, calon, anggaran, c -> c.p().peran().stationary, c -> peta.zonaDi(c.tujuan().pos()), Pemanggil.Calon::jarak);
 		}
 
 		@Override
@@ -77,6 +68,29 @@ public final class PemilihTubuh {
 			return out.size() > maks ? List.copyOf(out.subList(0, maks)) : out;
 		}
 	};
+
+	/**
+	 * The order of all candidates: keepers (staff and stationary roles) first, nearest first, as the audit rule wants; when the
+	 * keepers alone outnumber the body budget (the capital: most residents are staff) they are shared between the visible
+	 * zones like everyone else, so the bodies do not all pile up where the staff happens to be thickest.
+	 */
+	static <T> List<T> urut(PetaZona peta, Penyeimbang.Hunian h, List<T> items, int anggaran, java.util.function.Predicate<T> penjaga,
+			ToIntFunction<T> zonaDari, ToDoubleFunction<T> jarakDari) {
+		List<T> keepers = new ArrayList<>();
+		List<T> rest = new ArrayList<>();
+		for (T item : items) {
+			(penjaga.test(item) ? keepers : rest).add(item);
+		}
+		List<T> out = new ArrayList<>(items.size());
+		if (keepers.size() > anggaran) {
+			out.addAll(sebar(peta, h, keepers, anggaran, zonaDari, jarakDari));
+		} else {
+			keepers.sort(Comparator.comparingDouble(jarakDari));
+			out.addAll(keepers);
+		}
+		out.addAll(sebar(peta, h, rest, anggaran, zonaDari, jarakDari));
+		return out;
+	}
 
 	/** The block of a far-crowd entry (half-block offsets from the place anchor). */
 	static BlockPos posisi(BlockPos anchor, PendudukSnapshot.Entri e) {
@@ -110,10 +124,14 @@ public final class PemilihTubuh {
 				continue;
 			}
 			list.sort(Comparator.comparingDouble(jarakDari));
-			bobot[z] = Math.max(list.size(), z < n ? h.occ(z) : 0);
+			bobot[z] = Math.max(list.size(), z < n ? h.luar(z) : 0);
 			dekat[z] = jarakDari.applyAsDouble(list.getFirst()) <= DEKAT_MINIMAL;
 		}
-		int[] kuota = kuota(bobot, dekat, anggaran);
+		int[] maks = new int[n + 1];
+		for (int z = 0; z <= n; z++) {
+			maks[z] = perZona.get(z).size();
+		}
+		int[] kuota = kuota(bobot, dekat, anggaran, maks);
 		int[] diberi = new int[n + 1];
 		List<T> out = new ArrayList<>(items.size());
 		int total = 0;
@@ -155,6 +173,44 @@ public final class PemilihTubuh {
 	 * (while the budget lasts, the heaviest zones first), never more than a zone's items would need is left to the caller.
 	 */
 	static int[] kuota(double[] bobot, boolean[] dekat, int anggaran) {
+		return kuota(bobot, dekat, anggaran, null);
+	}
+
+	/**
+	 * As above, but no zone is given more than {@code maks} (the bodies it could actually have): the share a small zone cannot
+	 * use goes to the other zones by their weights, not to whoever stands nearest.
+	 */
+	static int[] kuota(double[] bobot, boolean[] dekat, int anggaran, int @Nullable [] maks) {
+		double[] w = bobot.clone();
+		int[] out = kuota1(w, dekat, anggaran);
+		if (maks == null) {
+			return out;
+		}
+		for (int round = 0; round < bobot.length; round++) {
+			int free = 0;
+			boolean cut = false;
+			for (int i = 0; i < out.length; i++) {
+				if (out[i] > maks[i]) {
+					free += out[i] - maks[i];
+					out[i] = maks[i];
+					w[i] = 0.0D;
+					cut = true;
+				} else if (maks[i] <= out[i]) {
+					w[i] = 0.0D;
+				}
+			}
+			if (!cut || free <= 0) {
+				break;
+			}
+			int[] more = Kapasitas.sisaTerbesar(w, free, 0);
+			for (int i = 0; i < out.length; i++) {
+				out[i] += more[i];
+			}
+		}
+		return out;
+	}
+
+	private static int[] kuota1(double[] bobot, boolean[] dekat, int anggaran) {
 		int n = bobot.length;
 		int[] out = new int[n];
 		if (anggaran <= 0) {

@@ -4,6 +4,7 @@ import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.SegelKonfirmasi;
 import dev.kultivator.client.sekte.gabung.ui.IkonGabung;
+import dev.kultivator.client.tempat.ui.kit.DaftarGulir;
 import dev.kultivator.client.tempat.ui.kit.IkonTempat;
 import dev.kultivator.client.tempat.ui.kit.LayarTempatDasar;
 import dev.kultivator.client.tempat.ui.kit.Lembar;
@@ -15,10 +16,13 @@ import dev.kultivator.sekte.gabung.api.Corak;
 import dev.kultivator.sekte.gabung.api.KelasSekte;
 import dev.kultivator.sekte.gabung.api.Pangkat;
 import dev.kultivator.sekte.gabung.ui.GabungLembar;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 /**
  * The base of every 41 screen (DESIGN 41.10, kit 38.U read-only): the sect header strip (emblem in its ink colour,
@@ -33,6 +37,15 @@ public abstract class LayarGabungDasar extends LayarTempatDasar {
 
 	/** Lang prefix of the 41U texts. */
 	public static final String K = "kultivator.gabung.ui.";
+	/** Below this content height (GUI scale 4 on a small window) the sect strip is dropped to give the page its room. */
+	protected static final int PENDEK = 135;
+
+	/** Height of the content box this frame (set before {@link #isiGabung}). */
+	protected int tinggiIsi;
+	/** The scrolled column the sheet drew this frame (wheel and keys go to it), or null. */
+	protected @Nullable GulirKolom gulirAktif;
+	/** The page shown in the narrow layout of a split sheet ({@link #bilahHalaman}); reset by the sheet's tab change. */
+	protected int halaman;
 
 	protected LayarGabungDasar(String layar, int npcId, CompoundTag lembar, Component judul, TempatWarna.Gaya gayaBawaan) {
 		super(layar, npcId, lembar, judul, gayaBawaan);
@@ -49,6 +62,8 @@ public abstract class LayarGabungDasar extends LayarTempatDasar {
 
 	@Override
 	protected final void isi(Lukis l, int x0, int y0, int x1, int y1) {
+		tinggiIsi = y1 - y0;
+		gulirAktif = null;
 		if (lembar.i(GabungLembar.ALIRAN, -1) == 2 && lembar.ada(GabungLembar.SEKTE_ID)) {
 			// the demonic sects' stone panel washed in dark red (41.10)
 			l.g.fill(x0 - 2, y0 - 2, x1 + 2, y1 + 2, Palette.argb(0x30, TempatWarna.IBLIS & 0xFFFFFF));
@@ -59,6 +74,18 @@ public abstract class LayarGabungDasar extends LayarTempatDasar {
 	/** The screen's content (after the alignment wash). */
 	protected abstract void isiGabung(Lukis l, int x0, int y0, int x1, int y1);
 
+	/** The wheel goes to the scrolled column of the frame when no list took it. */
+	@Override
+	public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+		return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY) || gulirAktif != null && gulirAktif.roda(mouseX, mouseY, scrollY);
+	}
+
+	/** Arrow / page keys scroll the column of the frame (keyboard only) once no list owns them. */
+	@Override
+	protected boolean tombolLain(KeyEvent event) {
+		return gulirAktif != null && gulirAktif.tombol(event);
+	}
+
 	// ================================================================== sect header
 
 	/**
@@ -66,7 +93,7 @@ public abstract class LayarGabungDasar extends LayarTempatDasar {
 	 * a thin rule in the sect's ink colour. Returns the y under it.
 	 */
 	protected int kepalaSekte(Lukis l, int x0, int y0, int x1) {
-		if (!lembar.ada(GabungLembar.SEKTE_ID)) {
+		if (!lembar.ada(GabungLembar.SEKTE_ID) || tinggiIsi < PENDEK) {
 			return y0;
 		}
 		int y = y0 + 1;
@@ -141,6 +168,41 @@ public abstract class LayarGabungDasar extends LayarTempatDasar {
 			return 19;
 		}
 		return 11;
+	}
+
+	/**
+	 * The requirement lines as a scrolled list (19 px rows: the line plus its caption), so none is cut off in a short box
+	 * and the arrow keys reach every one (D-41U). Draws the list's own focus ring.
+	 */
+	protected void daftarSyarat(Lukis l, DaftarGulir gulir, String kunci, List<Lembar> syarat, int x0, int y0, int x1, int y1) {
+		if (y1 - y0 < 10) {
+			return;
+		}
+		gulir.gambar(l, kunci, x0, y0, x1, y1, syarat.size(), 19, (lk, i, rx0, ry0, rx1, ry1, sorot, pilih) ->
+				barisSyarat(lk, syarat.get(i), rx0 + 2, ry0 + 1, rx1 - 2, ry1), null, null);
+	}
+
+	/**
+	 * Narrow layout only: the two panes of a split sheet become two pages behind a row of two chips. Returns the y under
+	 * the row ({@code y0} itself in the other layouts, which show both panes).
+	 */
+	protected int bilahHalaman(Lukis l, int x0, int y0, int x1, Component a, Component b) {
+		if (tata != Tata.SEMPIT) {
+			return y0;
+		}
+		int w = (x1 - x0 - 3) / 2;
+		tombol.gambar(l, "hal0", x0, y0, w, 13, a, true, null, () -> halaman = 0, false, halaman == 0);
+		tombol.gambar(l, "hal1", x0 + w + 3, y0, w, 13, b, true, null, () -> halaman = 1, false, halaman == 1);
+		return y0 + 16;
+	}
+
+	/** {@link #bagi} in the wide layouts; in the narrow one only the chosen page, as the whole box (the other is null). */
+	protected Kotak[] bagiHalaman(int x0, int y0, int x1, int y1) {
+		if (tata != Tata.SEMPIT) {
+			return bagi(x0, y0, x1, y1);
+		}
+		Kotak penuh = new Kotak(x0, y0, x1, y1);
+		return halaman == 0 ? new Kotak[] {penuh, null} : new Kotak[] {null, penuh};
 	}
 
 	/** A small bar 0..1 with an optional marker at {@code tanda} (-1 none). */

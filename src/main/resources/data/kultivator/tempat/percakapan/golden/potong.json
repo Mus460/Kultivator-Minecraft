@@ -144,15 +144,20 @@
         "niat": "KEMBALI"
       },
       "harap": {
-        "k": "kultivator.cakap.kembali.3",
-        "a": []
+        "k": "kultivator.cakap.kembali.1.ibukota",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.tuan.ibukota",
+            "a": []
+          }
+        ]
       },
       "aturan": "kembali",
       "gestur": "bicara_tangan",
       "seru": null,
       "tik": null,
-      "id_id": "Hah, akhirnya tenang lagi. Lanjut, ya.",
-      "en_us": "Hah, calm again at last. Let's go on."
+      "id_id": "Mohon maaf atas jeda tadi, Tuanku. Mari kita teruskan.",
+      "en_us": "My apologies for the pause, My Lord. Let us go on."
     },
     {
       "ubah": {

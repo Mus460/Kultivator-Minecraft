@@ -109,6 +109,11 @@ public final class TurnamenMurid {
 	public static final double JARAK = 64.0D;
 	/** Pause between two bouts and the longest a bout may run before data decides (ticks). */
 	public static final int JEDA_TICK = 100;
+	/** The pause after the final: the champion's bow and the school's cheer (ticks). */
+	public static final int JEDA_UPACARA = 220;
+	/** Disciples of the compound cheer within this range of the lei tai (at most {@link #SORAK_MAKS}). */
+	public static final double JARAK_SORAK = 26.0D;
+	public static final int SORAK_MAKS = 12;
 	public static final int BATAS_TICK = (DETIK_BABAK + 60) * 20;
 	/** Health share the sect healer restores a player fighter to after each bout. */
 	public static final float RAWAT = 0.70F;
@@ -181,6 +186,8 @@ public final class TurnamenMurid {
 		@Nullable KultivatorNpc tubuhB;
 		@Nullable LivingEntity sisiA;
 		@Nullable LivingEntity sisiB;
+		/** The roster champion's body, kept on the lei tai for the closing ceremony (null for a player or a data final). */
+		@Nullable KultivatorNpc juara;
 		int hasil = -1;
 
 		Laga(String sekte, BlockPos arena, long situs) {
@@ -505,9 +512,19 @@ public final class TurnamenMurid {
 			if (pemenang < 0) {
 				pemenang = putusanSisa(level, laga);
 			}
-			hapusTubuh(laga);
+			boolean final_ = laga.pertandingan == laga.menang.length - 1;
+			if (final_) {
+				upacaraJuara(level, laga, pemenang);
+			} else {
+				hapusTubuh(laga);
+				sorakMurid(level, laga, 50);
+			}
 			laga.bertarung = false;
 			catatHasil(server, level, laga, pemenang, false);
+			if (final_) {
+				// the closing ceremony: the winner stands on the lei tai while the school cheers
+				laga.sampai = now + JEDA_UPACARA;
+			}
 			return;
 		}
 		if (now < laga.sampai) {
@@ -871,6 +888,7 @@ public final class TurnamenMurid {
 				: Component.translatable("kultivator.gabung.turnamen.juara", namaSlot(champion), Kediaman.nama(laga.sekte)).withStyle(ChatFormatting.GOLD);
 		if (kabar != null) {
 			siar(level, laga, kabar);
+			siar(level, laga, ringkasan(laga, juara));
 			for (UUID uuid : data.anggotaSekte(laga.sekte)) {
 				ServerPlayer p = server.getPlayerList().getPlayer(uuid);
 				if (p != null && !dekat(p, laga.arena)) {
@@ -891,6 +909,26 @@ public final class TurnamenMurid {
 			HidupApi.bubarkan(level, laga.situs);
 		}
 		level.playSound(null, laga.arena, SoundEvents.BELL_RESONATE, SoundSource.AMBIENT, 1.4F, 1.1F);
+	}
+
+	/** The final standing as one line: champion, finalist, the two semi-finalists who lost. */
+	private static Component ringkasan(Laga laga, int juara) {
+		int[] fin = pasangan(laga, 6);
+		int fi = fin[0] == juara ? fin[1] : fin[0];
+		Slot finalis = fi < 0 ? null : laga.slot[fi];
+		return Component.translatable("kultivator.gabung.turnamen.ringkasan", namaSlot(laga.slot[juara]), namaSlot(finalis), namaSlot(kalahDi(laga, 4)),
+				namaSlot(kalahDi(laga, 5))).withColor(0xE8D9A8);
+	}
+
+	/** The loser of match {@code m}, or null (a bye or an unplayed match). */
+	private static @Nullable Slot kalahDi(Laga laga, int m) {
+		int w = laga.menang[m];
+		if (w < 0) {
+			return null;
+		}
+		int[] pair = pasangan(laga, m);
+		int idx = w == pair[0] ? pair[1] : pair[0];
+		return idx < 0 ? null : laga.slot[idx];
 	}
 
 	/** Finishes every open match by data (no player near, a cut tournament, a failure). */
@@ -1018,8 +1056,49 @@ public final class TurnamenMurid {
 		return p != null && dekat(p, arena) && p.isAlive() ? p : null;
 	}
 
+	/**
+	 * The final is over: the loser's body goes, the winner's body (a roster disciple) stays on the lei tai, bows to the
+	 * elders (clip {@code salam_sekte}) and the school cheers; {@link #selesai} removes it after {@link #JEDA_UPACARA}.
+	 */
+	private static void upacaraJuara(ServerLevel level, Laga laga, int pemenang) {
+		int[] pair = pasangan(laga, laga.pertandingan);
+		// only a bout the duel itself ended (hasil >= 0) leaves a body free of its session
+		KultivatorNpc menang = laga.hasil < 0 ? null : pemenang == pair[0] ? laga.tubuhA : pemenang == pair[1] ? laga.tubuhB : null;
+		if (menang != null && menang == laga.tubuhA) {
+			laga.tubuhA = null;
+		} else if (menang != null) {
+			laga.tubuhB = null;
+		}
+		hapusTubuh(laga);
+		if (menang != null && menang.isAlive() && !menang.isRemoved()) {
+			laga.juara = menang;
+			DuelistRegistry.override(menang, null);
+			menang.getNavigation().stop();
+			menang.setHealth(menang.getMaxHealth());
+			HidupApi.klip(menang, GabungGerakId.SALAM_SEKTE, 0, 80);
+			level.playSound(null, menang.blockPosition(), SoundEvents.PLAYER_LEVELUP, SoundSource.AMBIENT, 0.8F, 1.2F);
+		}
+		sorakMurid(level, laga, 100);
+	}
+
+	/** The disciples of the compound near the lei tai cheer with the school's own cheer clip (never the fighters). */
+	private static void sorakMurid(ServerLevel level, Laga laga, int tick) {
+		int n = 0;
+		for (KultivatorNpc npc : level.getEntitiesOfClass(KultivatorNpc.class, new net.minecraft.world.phys.AABB(laga.arena).inflate(JARAK_SORAK))) {
+			if (n >= SORAK_MAKS) {
+				break;
+			}
+			if (npc == laga.tubuhA || npc == laga.tubuhB || npc == laga.juara || !npc.isAlive()
+					|| npc.role() != NpcRole.MURID_SEKTE_LUAR && npc.role() != NpcRole.MURID_SEKTE_DALAM) {
+				continue;
+			}
+			HidupApi.klip(npc, GabungGerakId.SORAK_MURID, 0, tick);
+			n++;
+		}
+	}
+
 	private static void hapusTubuh(Laga laga) {
-		for (KultivatorNpc npc : new KultivatorNpc[]{laga.tubuhA, laga.tubuhB}) {
+		for (KultivatorNpc npc : new KultivatorNpc[]{laga.tubuhA, laga.tubuhB, laga.juara}) {
 			if (npc != null && !npc.isRemoved()) {
 				// a session still holding the body sees its side vanish and ends itself
 				DuelistRegistry.override(npc, null);
@@ -1028,6 +1107,7 @@ public final class TurnamenMurid {
 		}
 		laga.tubuhA = null;
 		laga.tubuhB = null;
+		laga.juara = null;
 		laga.sisiA = null;
 		laga.sisiB = null;
 	}

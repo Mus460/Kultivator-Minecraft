@@ -1,0 +1,67 @@
+{
+  "nama": "kultivator.kota42.perkara.t.kebakaran_lalai.nama",
+  "teks": "kultivator.kota42.perkara.t.kebakaran_lalai.teks",
+  "penggugat": {
+    "klaim": "kultivator.kota42.perkara.t.kebakaran_lalai.klaim_a",
+    "peran": [
+      "pemilik_teh",
+      "koki",
+      "tukang"
+    ]
+  },
+  "tergugat": {
+    "klaim": "kultivator.kota42.perkara.t.kebakaran_lalai.klaim_b",
+    "peran": [
+      "pelayan",
+      "kuli"
+    ]
+  },
+  "benar": "acak",
+  "saksi": 2,
+  "kesaksian": {
+    "penggugat": [
+      "kultivator.kota42.perkara.t.kebakaran_lalai.saksi_a1",
+      "kultivator.kota42.perkara.t.kebakaran_lalai.saksi_a2"
+    ],
+    "tergugat": [
+      "kultivator.kota42.perkara.t.kebakaran_lalai.saksi_b1",
+      "kultivator.kota42.perkara.t.kebakaran_lalai.saksi_b2"
+    ]
+  },
+  "dusta": "kultivator.kota42.perkara.t.kebakaran_lalai.dusta",
+  "bukti": [
+    {
+      "jenis": "barang",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.kebakaran_lalai.bukti1_a",
+        "tergugat": "kultivator.kota42.perkara.t.kebakaran_lalai.bukti1_b"
+      },
+      "barang": "minecraft:charcoal"
+    },
+    {
+      "jenis": "catatan",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.kebakaran_lalai.bukti2_a",
+        "tergugat": "kultivator.kota42.perkara.t.kebakaran_lalai.bukti2_b"
+      }
+    }
+  ],
+  "putusan": [
+    {
+      "untuk": "penggugat",
+      "teks": "kultivator.kota42.perkara.t.kebakaran_lalai.putusan1",
+      "akibat": "kultivator.kota42.perkara.t.kebakaran_lalai.putusan1_akibat"
+    },
+    {
+      "untuk": "tergugat",
+      "teks": "kultivator.kota42.perkara.t.kebakaran_lalai.putusan2",
+      "akibat": "kultivator.kota42.perkara.t.kebakaran_lalai.putusan2_akibat"
+    },
+    {
+      "untuk": "damai",
+      "teks": "kultivator.kota42.perkara.t.kebakaran_lalai.putusan3",
+      "akibat": "kultivator.kota42.perkara.t.kebakaran_lalai.putusan3_akibat"
+    }
+  ],
+  "suap": 0.3
+}

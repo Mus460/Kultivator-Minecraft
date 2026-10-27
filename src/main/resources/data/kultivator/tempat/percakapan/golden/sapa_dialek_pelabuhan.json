@@ -68,6 +68,9 @@
           {
             "k": "kultivator.cakap.lex.kakak.pelabuhan",
             "a": []
+          },
+          {
+            "t": ""
           }
         ]
       },
@@ -101,14 +104,19 @@
       },
       "harap": {
         "k": "kultivator.cakap.sapa.pekerja.pagi.1",
-        "a": []
+        "a": [
+          {
+            "k": "kultivator.cakap.ekor.sapa.3",
+            "a": []
+          }
+        ]
       },
       "aturan": "sapa.pekerja.pagi",
       "gestur": "lambai",
       "seru": null,
       "tik": null,
-      "id_id": "Pagi! Tungku sudah panas sejak subuh.",
-      "en_us": "Morning! The forge has been hot since dawn."
+      "id_id": "Pagi! Tungku sudah panas sejak subuh. Jangan membuat masalah, ya.",
+      "en_us": "Morning! The forge has been hot since dawn. Don't make trouble, will you."
     },
     {
       "ubah": {
@@ -137,6 +145,9 @@
           {
             "k": "kultivator.cakap.lex.kakak.pelabuhan",
             "a": []
+          },
+          {
+            "t": ""
           }
         ]
       },

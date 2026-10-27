@@ -437,7 +437,7 @@ public final class RumahKota {
 		t.putLong("ss", sampai);
 		t.putLong("hb", 0L);
 		t.remove("sg");
-		KasKota.tambah(server, situs, biaya);
+		KasKota.pajak(server, situs, biaya, "sewa");
 		BukuKas.catat(server, player.getUUID(), LembarKunci.BukuKas.SUMBER_SEWA, 0, -biaya, "kultivator.kota42.rumah.buku.sewa", namaTempat(server, situs), w);
 		berubah(server, situs, id, player.getUUID());
 		beriKertas(player, situs, id);
@@ -468,7 +468,7 @@ public final class RumahKota {
 		t.putLong("ss", dari + 7L * w);
 		t.putString("st", ST_SEWA);
 		t.remove("sg");
-		KasKota.tambah(server, situs, biaya);
+		KasKota.pajak(server, situs, biaya, "sewa");
 		BukuKas.catat(server, player.getUUID(), LembarKunci.BukuKas.SUMBER_SEWA, 0, -biaya, "kultivator.kota42.rumah.buku.sewa", namaTempat(server, situs), w);
 		berubah(server, situs, id, player.getUUID());
 		return kirim(player, new Hasil(true, Component.translatable("kultivator.kota42.rumah.perpanjang", w, dari + 7L * w)));
@@ -811,10 +811,14 @@ public final class RumahKota {
 		if (pajak <= 0L) {
 			return;
 		}
-		if (online != null && EkonomiApi.bayar(online, pajak, "rumah_pajak")) {
+		// an owner who is away pays from his drawer or Rumah Uang deposit (offline weeks never count as unpaid while there is money)
+		if (online != null && EkonomiApi.bayar(online, pajak, "rumah_pajak")
+				|| Investasi.bayarLuring(server, info.pemilik(), pajak, "kultivator.kota42.bank.riwayat.pajak", nama(server, info).getString())) {
 			KasKota.pajak(server, info.situs(), pajak, "properti");
 			BukuKas.catat(server, info.pemilik(), LembarKunci.BukuKas.SUMBER_SEWA, 0, -pajak, "kultivator.kota42.rumah.buku.pajak", namaTempat(server, info.situs()));
-			Msg.chat(online, Component.translatable("kultivator.kota42.rumah.pajak_dibayar", nama(server, info), NilaiBatu.text(pajak)).withStyle(ChatFormatting.GRAY));
+			if (online != null) {
+				Msg.chat(online, Component.translatable("kultivator.kota42.rumah.pajak_dibayar", nama(server, info), NilaiBatu.text(pajak)).withStyle(ChatFormatting.GRAY));
+			}
 			return;
 		}
 		int tunggak = t.getIntOr("tg", 0) + 1;
@@ -837,7 +841,10 @@ public final class RumahKota {
 		Info info = baca(situs, t);
 		Warga w = WargaApi.byId(pb);
 		long gaji = gajiPembantu(server, info);
-		if (w == null || !w.hidup() || ST_SEGEL.equals(info.status()) || online == null || !EkonomiApi.bayar(online, gaji, "rumah_pembantu")) {
+		boolean lunas = w != null && w.hidup() && !ST_SEGEL.equals(info.status()) && info.pemilik() != null
+				&& (online != null && EkonomiApi.bayar(online, gaji, "rumah_pembantu")
+				|| Investasi.bayarLuring(server, info.pemilik(), gaji, "kultivator.kota42.bank.riwayat.gaji", nama(server, info).getString()));
+		if (!lunas) {
 			lepasPembantu(server, situs, t);
 			if (online != null) {
 				Msg.chat(online, Component.translatable("kultivator.kota42.rumah.pembantu_pergi").withStyle(ChatFormatting.GRAY));
@@ -871,6 +878,7 @@ public final class RumahKota {
 			t.putLong("hb", 0L);
 		}
 		lepasPembantu(server, situs, t);
+		TokoPemain.rumahDisegel(server, situs, id);
 		berubah(server, situs, id, pemilikDari(t));
 	}
 
@@ -999,6 +1007,13 @@ public final class RumahKota {
 					continue;
 				}
 				TUBUH.put(key, body);
+			}
+			if (info.kotak().isInside(owner.blockPosition()) && server.getTickCount() % 600 == 7) {
+				// the help feeds the owner's tamed pets inside the house (42.6.1): a hurt one mends a little every 30 s
+				for (net.minecraft.world.entity.TamableAnimal pet : level.getEntitiesOfClass(net.minecraft.world.entity.TamableAnimal.class,
+						net.minecraft.world.phys.AABB.of(info.kotak()), p -> p.isTame() && p.isOwnedBy(owner) && p.getHealth() < p.getMaxHealth())) {
+					pet.heal(4.0F);
+				}
 			}
 			if (info.kotak().isInside(owner.blockPosition()) && !tehAktif(owner)) {
 				CompoundTag teh = KotaEkonomiData.get(server).bagian(KotaEkonomiData.RUMAH).getCompoundOrEmpty("teh");

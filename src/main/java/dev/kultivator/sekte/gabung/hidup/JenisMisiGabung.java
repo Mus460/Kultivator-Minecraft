@@ -45,7 +45,8 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * The mission kinds of the sect board (DESIGN 41.6.3). The eleven guild kinds of 38 ({@code buru}, {@code kemah},
+ * The mission kinds of the sect board (DESIGN 41.6.3, with four more of D-41C: {@code gabung_ronda}, {@code gabung_ziarah},
+ * {@code gabung_sutra}, {@code gabung_segel}). The eleven guild kinds of 38 ({@code buru}, {@code kemah},
  * {@code herba}, {@code kawal}, {@code binatang}, {@code sarang}, {@code begal}, {@code kafilah}, {@code gua},
  * {@code kurir}, {@code tawanan}) are offered with PK pay (never NB) and the sect's flavour, plus the eight kinds of 41
  * ({@code gabung_*}). Every kind points at a real place or a real foe: the existing rogue camps ({@code Camps}), elite
@@ -80,7 +81,12 @@ public final class JenisMisiGabung {
 		/** Bring {@code jumlah} items of the kind to the board (herbs by age, pills or artifacts by grade). */
 		SERAH,
 		/** Harvest the compound's herb plots ({@code kerja:cangkul}) {@code jumlah} times, a quarter day apart. */
-		KEBUN
+		KEBUN,
+		/**
+		 * Visit {@code jumlah} waypoints in order (12 blocks each, stored in {@link #TITIK}; the target {@code x/z} is always
+		 * the next one, so the compass and the board follow the walk).
+		 */
+		RONDA
 	}
 
 	/**
@@ -138,6 +144,8 @@ public final class JenisMisiGabung {
 	public static final String BATAS = "batas";
 	public static final String PK = "pk";
 	public static final String PESERTA = "peserta";
+	/** The waypoints of a {@link Tujuan#RONDA} mission: {@code [x0, z0, x1, z1, ...]}. */
+	public static final String TITIK = "titik";
 	public static final String DIAMBIL = "diambil";
 	public static final String TAHAP_JALAN = "jalan";
 	public static final String TAHAP_LAPOR = "lapor";
@@ -187,6 +195,11 @@ public final class JenisMisiGabung {
 		tambah("gabung_kelompok", JenisMisi.B, JenisMisi.S, "gua/sarang_binatang", 6, Tujuan.BUNUH_BINATANG, -1, 1, null, null, true, 1,
 				0);
 		tambah("gabung_langit", JenisMisi.A, JenisMisi.S, null, 5, Tujuan.DIAM, -1, KelasSekte.AGUNG.nomor(), null, null, false, 120, 0);
+		// D-41C: four more kinds that use only real places (a ring of boundary marks, real caves and villages)
+		tambah("gabung_ronda", JenisMisi.E, JenisMisi.C, null, 12, Tujuan.RONDA, -1, 1, Corak.PEDANG, Corak.BAYANGAN, false, 3, 1);
+		tambah("gabung_ziarah", JenisMisi.D, JenisMisi.B, null, 7, Tujuan.RONDA, -1, 1, Corak.BUDDHA, Corak.FORMASI, false, 3, 1);
+		tambah("gabung_sutra", JenisMisi.E, JenisMisi.C, "kampung/", 8, Tujuan.DIAM, -1, 1, Corak.BUDDHA, Corak.RACUN, false, 60, 20);
+		tambah("gabung_segel", JenisMisi.C, JenisMisi.A, "gua/", 6, Tujuan.DIAM, -1, 1, Corak.FORMASI, Corak.UNSUR, false, 90, 30);
 	}
 
 	private static void tambah(String id, int min, int maks, @Nullable String situs, int bobot, Tujuan tujuan, int aliran, int kelasMin,
@@ -308,6 +321,11 @@ public final class JenisMisiGabung {
 		}
 		int high = wajibE ? JenisMisi.E : Math.min(chosen.misi().pangkatMaks(), maks);
 		int mutu = chosen.misi().pangkatMin() + random.nextInt(Math.max(1, high - chosen.misi().pangkatMin() + 1));
+		return susun(server, sekte, hari, slot, chosen, mutu, random);
+	}
+
+	/** One mission of kind {@code chosen} at rank {@code mutu} (slot {@code slot} of the board of {@code hari}); null without a target. */
+	public static @Nullable CompoundTag susun(MinecraftServer server, String sekte, long hari, int slot, Jenis chosen, int mutu, RandomSource random) {
 		CompoundTag m = new CompoundTag();
 		m.putString(ID, sekte + "." + hari + "." + slot);
 		m.putString(JENIS, chosen.id());
@@ -348,6 +366,31 @@ public final class JenisMisiGabung {
 				} else {
 					target = situs(level, pusat, "kota", 2400);
 				}
+			}
+			case "gabung_ronda" -> {
+				// a ring of boundary marks round the gate, evenly spaced, 70-135 blocks out (further for higher ranks)
+				int n = jenis.jumlah(mutu);
+				double radius = 70.0D + mutu * 20.0D + random.nextInt(40);
+				double start = random.nextDouble() * Math.PI * 2.0D;
+				int[] titik = new int[n * 2];
+				for (int i = 0; i < n; i++) {
+					double angle = start + i * Math.PI * 2.0D / n;
+					titik[i * 2] = Mth.floor(pusat.getX() + Math.cos(angle) * radius);
+					titik[i * 2 + 1] = Mth.floor(pusat.getZ() + Math.sin(angle) * radius);
+				}
+				m.putIntArray(TITIK, titik);
+				target = new BlockPos(titik[0], 64, titik[1]);
+			}
+			case "gabung_ziarah" -> {
+				List<BlockPos> jalan = ziarah(level, pusat, jenis.jumlah(mutu), mutu, random);
+				int[] titik = new int[jalan.size() * 2];
+				for (int i = 0; i < jalan.size(); i++) {
+					titik[i * 2] = jalan.get(i).getX();
+					titik[i * 2 + 1] = jalan.get(i).getZ();
+				}
+				m.putIntArray(TITIK, titik);
+				m.putInt(JUMLAH, jalan.size());
+				target = jalan.getFirst();
 			}
 			case "gabung_mata_mata" -> {
 				String musuh = sekteLain(server, sekte, pusat, false);
@@ -395,6 +438,36 @@ public final class JenisMisiGabung {
 		double angle = random.nextDouble() * Math.PI * 2.0D;
 		double distance = 150.0D + mutu * 70.0D + random.nextDouble() * 160.0D;
 		return new BlockPos(Mth.floor(pusat.getX() + Math.cos(angle) * distance), 64, Mth.floor(pusat.getZ() + Math.sin(angle) * distance));
+	}
+
+	/**
+	 * The route of a pilgrimage: the real caves and villages round the gate, nearest first and then always the nearest
+	 * unvisited one; missing places are made up with wild points (the same rule as every other kind without a site).
+	 */
+	private static List<BlockPos> ziarah(ServerLevel level, BlockPos pusat, int n, int mutu, RandomSource random) {
+		List<BlockPos> pool = new ArrayList<>();
+		for (String kind : new String[] {"gua/", "kampung/"}) {
+			for (DuniaSites.Site site : DuniaSites.near(level, pusat, 1500, kind)) {
+				pool.add(site.pos());
+			}
+		}
+		List<BlockPos> route = new ArrayList<>();
+		BlockPos from = pusat;
+		while (route.size() < n && !pool.isEmpty()) {
+			BlockPos best = pool.getFirst();
+			for (BlockPos p : pool) {
+				if (p.distSqr(from) < best.distSqr(from)) {
+					best = p;
+				}
+			}
+			pool.remove(best);
+			route.add(best);
+			from = best;
+		}
+		while (route.size() < Math.max(2, n)) {
+			route.add(titikAcak(pusat, mutu, random));
+		}
+		return route;
 	}
 
 	private static @Nullable BlockPos situs(ServerLevel level, BlockPos near, String kind, int radius) {
@@ -576,8 +649,15 @@ public final class JenisMisiGabung {
 		};
 		String tujuan = misi.getStringOr(SEKTE_TUJUAN, "");
 		Component target = tujuan.isEmpty() ? Component.translatable("kultivator.gabung.misi.tempat_jauh") : namaSekte(tujuan);
-		return Component.translatable(KUNCI + misi.getStringOr(JENIS, "") + ".teks." + suffix + "." + Mth.clamp(misi.getIntOr(VARIAN, 0), 0, 1),
+		MutableComponent body = Component.translatable(KUNCI + misi.getStringOr(JENIS, "") + ".teks." + suffix + "." + Mth.clamp(misi.getIntOr(VARIAN, 0), 0, 1),
 				target, misi.getIntOr(JUMLAH, 1), misi.getIntOr(MUTU_BARANG, 0));
+		// D-41C: every briefing ends with a line in the voice of the sect's style (three per style, by mission id)
+		Corak corak = sekte.isEmpty() ? null : GabungApi.corak(sekte);
+		if (corak != null) {
+			int line = Math.floorMod(misi.getStringOr(ID, "").hashCode(), 3);
+			body.append(Component.literal(" ")).append(Component.translatable(KUNCI + "rasa." + corak.id() + "." + line).withStyle(net.minecraft.ChatFormatting.ITALIC));
+		}
+		return body;
 	}
 
 	/** The goal line with progress ("Kalahkan 3/7 siluman di sekitar tanda"). */

@@ -373,10 +373,10 @@
   "kultivator.gabung.naik.tamu": "Tetua Tamu tidak naik pangkat; kehormatannya adalah kebebasannya.",
   "kultivator.gabung.naik.lulus_ujian": "Ujian kenaikan ke %s lulus. Ajukan kenaikanmu di aula.",
   "kultivator.gabung.naik.ujian.luar": "Uji Ulang (ulang ujian corak, ambang 0,5)",
-  "kultivator.gabung.naik.ujian.dalam": "Ujian Murid Dalam (duel melawan Murid Dalam atau Alam Dewa Hampa lantai 5)",
+  "kultivator.gabung.naik.ujian.dalam": "Ujian Murid Dalam (Duel Pedang melawan Murid Dalam di lei tai)",
   "kultivator.gabung.naik.ujian.inti": "Tiga besar Turnamen Murid atau satu misi peringkat A",
   "kultivator.gabung.naik.ujian.pewaris": "Menang Pemilihan Pewaris",
-  "kultivator.gabung.naik.ujian.tetua": "Ujian Tetua sesuai corak sekte",
+  "kultivator.gabung.naik.ujian.tetua": "Ujian Tetua (corak sekte diuji ulang, ambang 0,85)",
   "kultivator.gabung.naik.ujian.wakil": "Dukungan setengah tetua atau lebih",
   "kultivator.gabung.syarat.naik.anggota": "Anggota sah sebuah sekte",
   "kultivator.gabung.syarat.naik.ranah": "Ranah minimal %s (kini %s)",
@@ -415,5 +415,10 @@
   "kultivator.gabung.aturan.dialog.sumpah.iblis": "\"Bagus. Sekarang kau milik gunung ini. Yang mengkhianatinya tidak pernah tidur nyenyak lagi.\"",
   "kultivator.gabung.syarat.diusir_kelas": "Pernah diusir dari sekte se-aliran dalam 30 hari: dinilai sebagai %s",
   "kultivator.gabung.naik.uji_ulang_mulai": "Uji Ulang dimulai: tunjukkan lagi corak sektemu. Ambang lulus 50%.",
-  "kultivator.gabung.naik.uji_ulang_gagal": "Uji Ulang belum lulus (%s%%, perlu 50%%). Coba lagi kapan saja."
+  "kultivator.gabung.naik.uji_ulang_gagal": "Uji Ulang belum lulus (%s%%, perlu 50%%). Coba lagi kapan saja.",
+  "kultivator.gabung.naik.penguji_dalam": "Penguji Murid Dalam",
+  "kultivator.gabung.naik.ujian_dalam.mulai": "Ujian Murid Dalam: %s menunggumu di lei tai. Duel Pedang %s detik, berhenti pada 10%% nyawa. Menang, bertahan sampai waktu habis, atau membuat lawan tinggal separuh nyawa berarti lulus.",
+  "kultivator.gabung.naik.ujian_dalam.gagal": "Kau kalah dari penguji. Berlatihlah di lei tai, lalu ajukan kenaikan lagi kapan saja.",
+  "kultivator.gabung.naik.ujian_tetua.mulai": "Ujian Tetua dimulai: corak sektemu diuji ulang, tetapi tetua menuntut %s%%.",
+  "kultivator.gabung.naik.ujian_tetua.gagal": "Ujian Tetua belum lulus (%s%%, perlu %s%%). Ajukan lagi kapan saja."
 }

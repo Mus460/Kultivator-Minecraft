@@ -68,6 +68,8 @@ final class HelpPage extends Page {
 			"tema_kapal", "tema_galangan", "tema_mural", "tema_sutra", "tema_teh", "tema_bait", "tema_herba", "tema_ziarah", "tema_lift",
 			"tema_pasar_gelap", "tema_kitab_terlarang", "tema_kontrak", "tema_taruhan", "tema_tawanan", "tema_dokumen", "tema_racik",
 			"tema_irama", "tema_tawar", "tema_dagang",
+			// DESIGN 42.11 (Kota yang Hidup): the five town topics (texts in kota_hidup_ui)
+			"warga", "ekonomi_kota", "kehidupan_kota", "sekte_kota", "kota_tumbuh",
 			"glosarium"};
 	/** Sheet keys whose page shares one topic with a sibling sheet (same class or same function). */
 	private static final Map<String, String> ALIAS = Map.of("dermaga", "teleport", "penginapan", "layanan_kota", "rumah_makan",

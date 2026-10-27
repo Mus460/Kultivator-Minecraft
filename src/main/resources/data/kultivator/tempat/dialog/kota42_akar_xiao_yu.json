@@ -1,0 +1,27 @@
+{
+  "pembicara": [
+    "tokoh:xiao_yu"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest kota42_akar_langit tahap tawar",
+    "!bendera kota42.akar.dengar_ayah"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "367",
+      "suara": "kota42.xiao_yu",
+      "pilihan": [
+        {
+          "ke": "siapa"
+        }
+      ]
+    },
+    {
+      "id": "siapa",
+      "gestur": "menangis"
+    }
+  ]
+}

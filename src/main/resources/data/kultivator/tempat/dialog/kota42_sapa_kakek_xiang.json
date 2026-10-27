@@ -1,0 +1,44 @@
+{
+  "pembicara": [
+    "tokoh:kakek_xiang"
+  ],
+  "prioritas": 5,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "catur",
+      "prop": "papan_catur",
+      "pilihan": [
+        {
+          "ke": "catur"
+        },
+        {
+          "ke": "kota"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "catur",
+      "gestur": "catur",
+      "prop": "papan_catur",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kota",
+      "gestur": "memandang",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

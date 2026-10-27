@@ -1,0 +1,60 @@
+{
+  "pemberi": "tokoh:lao_geng",
+  "tempat": "kota42",
+  "alur": true,
+  "tahap": [
+    {
+      "id": "ronda",
+      "tujuan": [
+        "ronda_geng tokoh:lao_geng x3"
+      ]
+    },
+    {
+      "id": "ajari",
+      "tujuan": [
+        "tanda kota42.irama_ronda",
+        "bicara tokoh:xiao_bang"
+      ]
+    },
+    {
+      "id": "pensiun",
+      "tujuan": [
+        "bendera kota42.geng.pamit"
+      ]
+    },
+    {
+      "id": "makam",
+      "tujuan": [
+        "hadir_upacara makam tokoh:lao_geng"
+      ],
+      "akibat_masuk": [
+        "kota42.pensiun tokoh:lao_geng"
+      ],
+      "batas_hari": 25,
+      "gagal_ke": "ziarah"
+    },
+    {
+      "id": "pewaris",
+      "tujuan": [
+        "ronda_geng tokoh:xiao_bang"
+      ],
+      "akibat_masuk": [
+        "kota42.warisi tokoh:xiao_bang tokoh:lao_geng"
+      ],
+      "akibat": [
+        "beri kultivator:kentongan_tua",
+        "nama_baik 5",
+        "kota42.kesan tokoh:xiao_bang 30",
+        "kabar kota42_ronda_baru pemain"
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "ziarah",
+      "tujuan": [
+        "bicara tokoh:xiao_bang"
+      ],
+      "ke": "pewaris"
+    }
+  ]
+}

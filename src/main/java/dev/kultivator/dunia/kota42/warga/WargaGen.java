@@ -414,7 +414,8 @@ public final class WargaGen {
 		return switch (role.kelompok) {
 			case ANAK -> 3 + random.nextInt(10);
 			case TETUA -> role == NpcRole.KEPALA_DESA || role == NpcRole.MAK_COMBLANG ? 45 + random.nextInt(26) : 60 + random.nextInt(21);
-			default -> 18 + random.nextInt(43);
+			// working adults lean young (mean ~36): a town of 18-60 evenly spread would turn into one wave of elders
+			default -> 18 + (int) (42.0D * Math.pow(random.nextDouble(), 1.3D));
 		};
 	}
 
@@ -482,9 +483,14 @@ public final class WargaGen {
 	 * {@code Migrasi}/{@code Pekerjaan}) gives it a slot and adds it to the data.
 	 */
 	public static Warga pendatang(WargaData data, NpcRole peran, int umurMin, int umurMaks, long hari, RandomSource random) {
+		return pendatang(data, peran, -1, umurMin, umurMaks, hari, random);
+	}
+
+	/** As above, of sex {@code kelamin} ({@link Warga#PRIA}/{@link Warga#WANITA}; -1 = by {@code rasioPerempuan}, a role may force its own). */
+	public static Warga pendatang(WargaData data, NpcRole peran, int kelamin, int umurMin, int umurMaks, long hari, RandomSource random) {
 		Warga w = new Warga(data.idBaru());
 		KotaConfig.Warga cfg = KotaConfig.warga();
-		w.kelamin = kelaminUntuk(peran, random.nextDouble() < cfg.rasioPerempuan ? Warga.WANITA : Warga.PRIA, random);
+		w.kelamin = kelaminUntuk(peran, kelamin >= 0 ? (byte) kelamin : random.nextDouble() < cfg.rasioPerempuan ? Warga.WANITA : Warga.PRIA, random);
 		int umur = umurMin + random.nextInt(Math.max(1, umurMaks - umurMin + 1));
 		w.lahir = hari * 10L - (umur * 10L * cfg.hariPerTahun + random.nextInt(10 * cfg.hariPerTahun));
 		w.marga = NamaWarga.margaAcak(random);

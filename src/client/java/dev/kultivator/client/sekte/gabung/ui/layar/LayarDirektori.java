@@ -404,7 +404,8 @@ public final class LayarDirektori extends LayarGabungDasar {
 				: tren < 0 ? Component.literal("▼").withColor(Palette.SEAL & 0xFFFFFF) : Component.literal("–");
 		Component teks = Component.translatable(M + "kekuatan", Brush.angka(rank.i(Direktori.KEKUATAN, 0)), rank.i(Direktori.PERINGKAT, 0)).append(" ")
 				.append(panah);
-		l.teks(teks, x0, y, x1 - x0, l.gaya.teksLemah);
+		IkonGabung.gambar(l.g, IkonGabung.PERINGKAT, x0, y, 9);
+		l.teks(teks, x0 + 11, y, x1 - x0 - 11, l.gaya.teksLemah);
 		if (l.di(x0, y, x1, y + 10)) {
 			l.tip(t("direktori.tren." + (tren > 0 ? "naik" : tren < 0 ? "turun" : "tetap")));
 		}
@@ -516,12 +517,15 @@ public final class LayarDirektori extends LayarGabungDasar {
 	 */
 	private int papanJasa(Lukis l, Lembar s, int x0, int y, int x1) {
 		List<Lembar> rows = s.daftar(Direktori.PAPAN_JASA);
-		if (rows.isEmpty()) {
-			return y;
-		}
 		y += l.kepala(t("direktori.papan_jasa"), x0, y, x1);
-		l.samar(t("direktori.pk_total", Brush.angka(s.l(GabungLembar.PK_TOTAL, 0L))), x0, y, x1 - x0);
+		IkonGabung.gambar(l.g, IkonGabung.PAPAN_JASA, x0, y - 1, 10);
+		l.samar(t("direktori.pk_total", Brush.angka(s.l(GabungLembar.PK_TOTAL, 0L))), x0 + 12, y, x1 - x0 - 12);
 		y += 12;
+		if (rows.isEmpty()) {
+			// a new month, nobody has earned PK yet
+			l.samar(t("direktori.papan_kosong"), x0, y, x1 - x0);
+			return y + 14;
+		}
 		for (int i = 0; i < rows.size(); i++) {
 			Lembar r = rows.get(i);
 			boolean anda = r.b(LembarKunci.ANDA);

@@ -1,0 +1,44 @@
+{
+  "pembicara": [
+    "tokoh:yu_xiuniang"
+  ],
+  "prioritas": 5,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "365",
+      "prop": "180",
+      "pilihan": [
+        {
+          "ke": "gula"
+        },
+        {
+          "ke": "putri"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "gula",
+      "gestur": "365",
+      "prop": "180",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "putri",
+      "gestur": "bicara_tangan",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

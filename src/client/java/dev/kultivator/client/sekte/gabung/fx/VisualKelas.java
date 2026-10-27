@@ -108,8 +108,8 @@ public final class VisualKelas {
 
 	/**
 	 * The compound anchors of sect {@code sekte} ({@code kompleks/aula}, {@code kompleks/puncak}; null = unknown): the dome
-	 * then stands over the main hall and the crown over the summit hall instead of over the gate. For a payload of the
-	 * server (none sends it yet; see {@code docs/progres/m2-41V-P.md}).
+	 * then stands over the main hall and the crown over the summit hall instead of over the gate. Fed by the
+	 * {@code gabung_titik} payload of {@code GabungTitik} (received in {@link GabungFxClient#init}).
 	 */
 	public static void titik(String sekte, @Nullable BlockPos aula, @Nullable BlockPos puncak) {
 		if (sekte == null) {

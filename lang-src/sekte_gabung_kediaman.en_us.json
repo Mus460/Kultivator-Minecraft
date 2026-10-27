@@ -188,5 +188,12 @@
   "kultivator.gabung.pelajaran.dao.space.2": "Teleport formations are built from stone and calculation. The Dao of space is built from conviction.",
   "kultivator.gabung.pelajaran.dao.space.3": "Never tear space in anger. A ragged tear will not close again.",
   "kultivator.gabung.pelajaran.dao.space.4": "Your step is one, but your goal is ten li away. Learn to fold what lies between.",
-  "kultivator.gabung.pelajaran.dao.space.5": "The sky above and the earth below are only two sides of the same cloth."
+  "kultivator.gabung.pelajaran.dao.space.5": "The sky above and the earth below are only two sides of the same cloth.",
+  "kultivator.gabung.turnamen.ringkasan": "Final standing: champion %s, finalist %s, semi-finalists %s and %s.",
+  "kultivator.gabung.kediaman.sambut": "%1$s · meditation %2$s · rent paid to day %3$s",
+  "kultivator.gabung.kediaman.sambut.gua_kecil": "Your small cave greets you with cold stone and the smell of moss. A place this narrow packs the mind tight as well.",
+  "kultivator.gabung.kediaman.sambut.gua_urat": "The Qi vein in the cave wall pulses slowly, like a sleeping heart. Your breath follows its rhythm without being asked.",
+  "kultivator.gabung.kediaman.sambut.puncak": "The summit wind sweeps your robe and the whole school lies spread below. From here your worries look as small as those roofs.",
+  "kultivator.gabung.kediaman.sambut.paviliun_awan": "Clouds flow beneath the pavilion floor. Every breath of wind brings a scrap of tales from far-off sects.",
+  "kultivator.gabung.kediaman.sambut_jimat": "Your Return Talisman is not yet bound to this place. Type /kultivasi gabung kediaman jimat if you want to return here."
 }

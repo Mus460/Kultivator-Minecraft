@@ -211,6 +211,10 @@ public final class Promosi {
 		if (!ok && tujuan == Pangkat.LUAR && hanyaUjian(syarat) && Pemeriksa.diWilayahSendiri(player)) {
 			return ujiUlang(player, k.sekte);
 		}
+		// D-41AD: the Murid Dalam duel and the Ujian Tetua start the same way (the trial is the only missing line)
+		if (!ok && UjianPangkat.punya(tujuan) && hanyaUjian(syarat) && Pemeriksa.diWilayahSendiri(player)) {
+			return UjianPangkat.mulai(player, k.sekte, tujuan);
+		}
 		if (!ok || !Pemeriksa.diWilayahSendiri(player)) {
 			kartu(player, tujuan, syarat, ok);
 			return false;

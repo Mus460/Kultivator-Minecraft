@@ -15,7 +15,9 @@
         {
           "kunci": "keluarga.pasangan.0",
           "slot": [
-            "$pasangan"
+            "$awal",
+            "$pasangan",
+            "$ekor"
           ],
           "bobot": 3,
           "varian": [
@@ -28,7 +30,9 @@
         {
           "kunci": "keluarga.pasangan.1",
           "slot": [
-            "$pasangan"
+            "$awal",
+            "$pasangan",
+            "$ekor"
           ],
           "bobot": 2,
           "varian": [
@@ -40,7 +44,9 @@
         {
           "kunci": "keluarga.pasangan.2",
           "slot": [
-            "$pasangan"
+            "$awal",
+            "$pasangan",
+            "$ekor"
           ],
           "bobot": 1,
           "varian": [
@@ -49,12 +55,18 @@
         },
         {
           "kunci": "keluarga.pasangan.3",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1
         },
         {
           "kunci": "keluarga.pasangan.4",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1
         }
       ],
@@ -62,6 +74,14 @@
         "$pasangan": {
           "tipe": "nama_warga",
           "dari": "konteks.pasangan"
+        },
+        "$awal": {
+          "aturan": "awal.kabar",
+          "opsional": 0.35
+        },
+        "$ekor": {
+          "aturan": "ekor.kabar",
+          "opsional": 0.4
         }
       },
       "lanjut": [
@@ -84,7 +104,9 @@
         {
           "kunci": "keluarga.anak.0",
           "slot": [
-            "$anak"
+            "$awal",
+            "$anak",
+            "$ekor"
           ],
           "bobot": 3,
           "varian": [
@@ -96,7 +118,9 @@
         {
           "kunci": "keluarga.anak.1",
           "slot": [
-            "$anak"
+            "$awal",
+            "$anak",
+            "$ekor"
           ],
           "bobot": 2,
           "varian": [
@@ -107,14 +131,18 @@
         {
           "kunci": "keluarga.anak.2",
           "slot": [
-            "$anak"
+            "$awal",
+            "$anak",
+            "$ekor"
           ],
           "bobot": 1
         },
         {
           "kunci": "keluarga.anak.3",
           "slot": [
+            "$awal",
             "$anak",
+            "$ekor",
             "$sebutan"
           ],
           "bobot": 1,
@@ -125,7 +153,9 @@
         {
           "kunci": "keluarga.anak.4",
           "slot": [
-            "$anak"
+            "$awal",
+            "$anak",
+            "$ekor"
           ],
           "bobot": 1
         }
@@ -138,6 +168,14 @@
         "$sebutan": {
           "tipe": "sebutan_pendengar",
           "dari": "pendengar"
+        },
+        "$awal": {
+          "aturan": "awal.kabar",
+          "opsional": 0.35
+        },
+        "$ekor": {
+          "aturan": "ekor.kabar",
+          "opsional": 0.4
         }
       },
       "lanjut": [
@@ -279,7 +317,9 @@
         {
           "kunci": "keluarga.kekasih.0",
           "slot": [
-            "$kekasih"
+            "$awal",
+            "$kekasih",
+            "$ekor"
           ],
           "bobot": 3,
           "varian": [
@@ -291,7 +331,9 @@
         {
           "kunci": "keluarga.kekasih.1",
           "slot": [
-            "$kekasih"
+            "$awal",
+            "$kekasih",
+            "$ekor"
           ],
           "bobot": 2,
           "varian": [
@@ -302,14 +344,18 @@
         {
           "kunci": "keluarga.kekasih.2",
           "slot": [
-            "$kekasih"
+            "$awal",
+            "$kekasih",
+            "$ekor"
           ],
           "bobot": 1
         },
         {
           "kunci": "keluarga.kekasih.3",
           "slot": [
-            "$kekasih"
+            "$awal",
+            "$kekasih",
+            "$ekor"
           ],
           "bobot": 1
         }
@@ -318,6 +364,14 @@
         "$kekasih": {
           "tipe": "nama_warga",
           "dari": "konteks.kekasih"
+        },
+        "$awal": {
+          "aturan": "awal.kabar",
+          "opsional": 0.35
+        },
+        "$ekor": {
+          "aturan": "ekor.kabar",
+          "opsional": 0.4
         }
       },
       "lanjut": [
@@ -338,7 +392,9 @@
         {
           "kunci": "keluarga.sahabat.0",
           "slot": [
-            "$sahabat"
+            "$awal",
+            "$sahabat",
+            "$ekor"
           ],
           "bobot": 3,
           "varian": [
@@ -350,7 +406,9 @@
         {
           "kunci": "keluarga.sahabat.1",
           "slot": [
-            "$sahabat"
+            "$awal",
+            "$sahabat",
+            "$ekor"
           ],
           "bobot": 2,
           "varian": [
@@ -360,14 +418,18 @@
         {
           "kunci": "keluarga.sahabat.2",
           "slot": [
-            "$sahabat"
+            "$awal",
+            "$sahabat",
+            "$ekor"
           ],
           "bobot": 1
         },
         {
           "kunci": "keluarga.sahabat.3",
           "slot": [
-            "$sahabat"
+            "$awal",
+            "$sahabat",
+            "$ekor"
           ],
           "bobot": 1
         }
@@ -376,6 +438,14 @@
         "$sahabat": {
           "tipe": "nama_warga",
           "dari": "konteks.sahabat"
+        },
+        "$awal": {
+          "aturan": "awal.kabar",
+          "opsional": 0.35
+        },
+        "$ekor": {
+          "aturan": "ekor.kabar",
+          "opsional": 0.4
         }
       },
       "lanjut": [
@@ -397,7 +467,9 @@
         {
           "kunci": "keluarga.musuh.0",
           "slot": [
-            "$musuh"
+            "$awal",
+            "$musuh",
+            "$ekor"
           ],
           "bobot": 3,
           "varian": [
@@ -409,7 +481,9 @@
         {
           "kunci": "keluarga.musuh.1",
           "slot": [
-            "$musuh"
+            "$awal",
+            "$musuh",
+            "$ekor"
           ],
           "bobot": 2,
           "varian": [
@@ -419,13 +493,16 @@
         {
           "kunci": "keluarga.musuh.2",
           "slot": [
-            "$musuh"
+            "$awal",
+            "$musuh",
+            "$ekor"
           ],
           "bobot": 1
         },
         {
           "kunci": "keluarga.musuh.3",
           "slot": [
+            "$awal",
             "$musuh",
             "$keluh"
           ],
@@ -440,6 +517,14 @@
         "$keluh": {
           "aturan": "seru.keluh",
           "opsional": 0.5
+        },
+        "$awal": {
+          "aturan": "awal.kabar",
+          "opsional": 0.35
+        },
+        "$ekor": {
+          "aturan": "ekor.kabar",
+          "opsional": 0.4
         }
       },
       "lanjut": [
@@ -460,7 +545,9 @@
         {
           "kunci": "keluarga.guru.0",
           "slot": [
-            "$guru"
+            "$awal",
+            "$guru",
+            "$ekor"
           ],
           "bobot": 3,
           "varian": [
@@ -471,7 +558,9 @@
         {
           "kunci": "keluarga.guru.1",
           "slot": [
-            "$murid"
+            "$awal",
+            "$murid",
+            "$ekor"
           ],
           "bobot": 2,
           "varian": [
@@ -482,14 +571,18 @@
         {
           "kunci": "keluarga.guru.2",
           "slot": [
-            "$guru"
+            "$awal",
+            "$guru",
+            "$ekor"
           ],
           "bobot": 1
         },
         {
           "kunci": "keluarga.guru.3",
           "slot": [
-            "$murid"
+            "$awal",
+            "$murid",
+            "$ekor"
           ],
           "bobot": 1
         }
@@ -502,6 +595,14 @@
         "$murid": {
           "tipe": "nama_warga",
           "dari": "konteks.murid"
+        },
+        "$awal": {
+          "aturan": "awal.kabar",
+          "opsional": 0.35
+        },
+        "$ekor": {
+          "aturan": "ekor.kabar",
+          "opsional": 0.4
         }
       },
       "lanjut": [

@@ -188,5 +188,12 @@
   "kultivator.gabung.pelajaran.dao.space.2": "Formasi pemindah dibangun dari batu dan perhitungan. Dao ruang dibangun dari keyakinan.",
   "kultivator.gabung.pelajaran.dao.space.3": "Jangan robek ruang dengan amarah. Robekan yang tidak rapi tidak akan menutup lagi.",
   "kultivator.gabung.pelajaran.dao.space.4": "Langkahmu satu, tapi tujuanmu sepuluh li. Belajarlah melipat yang di tengah.",
-  "kultivator.gabung.pelajaran.dao.space.5": "Langit di atas dan tanah di bawah hanyalah dua sisi kain yang sama."
+  "kultivator.gabung.pelajaran.dao.space.5": "Langit di atas dan tanah di bawah hanyalah dua sisi kain yang sama.",
+  "kultivator.gabung.turnamen.ringkasan": "Bagan akhir: juara %s, finalis %s, semifinalis %s dan %s.",
+  "kultivator.gabung.kediaman.sambut": "%1$s · meditasi %2$s · sewa sampai hari %3$s",
+  "kultivator.gabung.kediaman.sambut.gua_kecil": "Gua kecilmu menyambut dengan dingin batu dan bau lumut. Tempat sesempit ini membuat pikiran ikut memadat.",
+  "kultivator.gabung.kediaman.sambut.gua_urat": "Urat Qi di dinding gua berdenyut pelan, seperti jantung yang tertidur. Napasmu mengikuti iramanya tanpa kau minta.",
+  "kultivator.gabung.kediaman.sambut.puncak": "Angin puncak menyapu jubahmu dan seluruh perguruan terhampar di bawah. Dari sini, kekhawatiran tampak sekecil atap-atap itu.",
+  "kultivator.gabung.kediaman.sambut.paviliun_awan": "Awan mengalir di bawah lantai paviliun. Tiap embusan membawa sepotong cerita dari sekte-sekte yang jauh.",
+  "kultivator.gabung.kediaman.sambut_jimat": "Jimat Pulangmu belum terikat ke tempat ini. Ketik /kultivasi gabung kediaman jimat bila kau ingin pulang ke sini."
 }

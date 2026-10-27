@@ -2,9 +2,11 @@ package dev.kultivator.sekte.gabung.masuk;
 
 import dev.kultivator.data.CultivationData;
 import dev.kultivator.data.Cultivators;
+import dev.kultivator.data.Realm;
 import dev.kultivator.data.RootGrade;
 import dev.kultivator.dunia.kota.KultivatorNpc;
 import dev.kultivator.dunia.tempat.cerita.CeritaApi;
+import dev.kultivator.dunia.tempat.kotabesar.KotaBesarData;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import dev.kultivator.dunia.tempat.ui.TempatLayar;
 import dev.kultivator.sect.hall.Halls;
@@ -147,6 +149,12 @@ public final class Putusan {
 		if (Halls.level(player.getUUID()) >= 5 && p.ordinal() < Pangkat.DALAM.ordinal()) {
 			p = Pangkat.byOrdinal(p.ordinal() + 1);
 			terms.add(new Rincian(Masuk.t("putusan.r.aula"), 0));
+		}
+		// 41.5.2: the Undangan door lifts a Foundation+ champion of the Grand Tournament straight to Dalam
+		if (s.pintu == Pintu.UNDANGAN && p.ordinal() < Pangkat.DALAM.ordinal() && cd.realm().ordinal() >= Realm.FOUNDATION.ordinal()
+				&& KotaBesarData.get(player.level().getServer()).punyaGelar(player.getUUID(), "juara_turnamen")) {
+			p = Pangkat.DALAM;
+			terms.add(new Rincian(Masuk.t("putusan.r.juara"), 0));
 		}
 		Pangkat cap = s.pintu.pangkatMaks();
 		if (s.pintu != Pintu.UNDANGAN && p.ordinal() > cap.ordinal() && !(Halls.level(player.getUUID()) >= 5)) {

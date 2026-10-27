@@ -1,0 +1,49 @@
+{
+  "pemberi": "tokoh:tetua_he",
+  "tempat": "kota42_kota34",
+  "alur": true,
+  "tahap": [
+    {
+      "id": "keluh",
+      "tujuan": [
+        "bicara tokoh:tetua_he"
+      ]
+    },
+    {
+      "id": "kemah",
+      "tujuan": [
+        "pergi pos/kemah_begal",
+        "kalahkan peran:pembunuh_bayaran x4"
+      ],
+      "arah": "pos/kemah_begal"
+    },
+    {
+      "id": "tantang",
+      "tujuan": [
+        "duel peran:murid_sekte_dalam"
+      ],
+      "akibat_masuk": [
+        "panggil_peran murid_sekte_dalam musuh 1"
+      ]
+    },
+    {
+      "id": "serbu",
+      "tujuan": [
+        "tanda kota42.bela_menang"
+      ],
+      "batas_hari": 12,
+      "gagal_ke": "panji"
+    },
+    {
+      "id": "panji",
+      "tujuan": [
+        "bendera kota42.pelindung.panji"
+      ],
+      "akibat": [
+        "kota42.pakta",
+        "nama_baik 6",
+        "kabar kota42_pelindung_panji pemain"
+      ]
+    }
+  ]
+}

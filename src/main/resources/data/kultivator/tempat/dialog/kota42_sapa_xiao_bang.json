@@ -1,0 +1,43 @@
+{
+  "pembicara": [
+    "tokoh:xiao_bang"
+  ],
+  "prioritas": 5,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "kaget",
+      "pilihan": [
+        {
+          "ke": "takut"
+        },
+        {
+          "ke": "guru"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "takut",
+      "gestur": "takut_sembunyi",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "guru",
+      "gestur": "383",
+      "prop": "191",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

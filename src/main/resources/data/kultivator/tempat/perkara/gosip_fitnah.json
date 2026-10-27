@@ -1,0 +1,67 @@
+{
+  "nama": "kultivator.kota42.perkara.t.gosip_fitnah.nama",
+  "teks": "kultivator.kota42.perkara.t.gosip_fitnah.teks",
+  "penggugat": {
+    "klaim": "kultivator.kota42.perkara.t.gosip_fitnah.klaim_a",
+    "peran": [
+      "pedagang_keliling",
+      "koki",
+      "pemilik_teh"
+    ]
+  },
+  "tergugat": {
+    "klaim": "kultivator.kota42.perkara.t.gosip_fitnah.klaim_b",
+    "peran": [
+      "warga",
+      "penjual_ikan"
+    ]
+  },
+  "benar": "acak",
+  "saksi": 2,
+  "kesaksian": {
+    "penggugat": [
+      "kultivator.kota42.perkara.t.gosip_fitnah.saksi_a1",
+      "kultivator.kota42.perkara.t.gosip_fitnah.saksi_a2"
+    ],
+    "tergugat": [
+      "kultivator.kota42.perkara.t.gosip_fitnah.saksi_b1",
+      "kultivator.kota42.perkara.t.gosip_fitnah.saksi_b2"
+    ]
+  },
+  "dusta": "kultivator.kota42.perkara.t.gosip_fitnah.dusta",
+  "bukti": [
+    {
+      "jenis": "gosip",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.gosip_fitnah.bukti1_a",
+        "tergugat": "kultivator.kota42.perkara.t.gosip_fitnah.bukti1_b"
+      }
+    },
+    {
+      "jenis": "barang",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.gosip_fitnah.bukti2_a",
+        "tergugat": "kultivator.kota42.perkara.t.gosip_fitnah.bukti2_b"
+      },
+      "barang": "minecraft:wheat"
+    }
+  ],
+  "putusan": [
+    {
+      "untuk": "penggugat",
+      "teks": "kultivator.kota42.perkara.t.gosip_fitnah.putusan1",
+      "akibat": "kultivator.kota42.perkara.t.gosip_fitnah.putusan1_akibat"
+    },
+    {
+      "untuk": "tergugat",
+      "teks": "kultivator.kota42.perkara.t.gosip_fitnah.putusan2",
+      "akibat": "kultivator.kota42.perkara.t.gosip_fitnah.putusan2_akibat"
+    },
+    {
+      "untuk": "damai",
+      "teks": "kultivator.kota42.perkara.t.gosip_fitnah.putusan3",
+      "akibat": "kultivator.kota42.perkara.t.gosip_fitnah.putusan3_akibat"
+    }
+  ],
+  "suap": 0.2
+}

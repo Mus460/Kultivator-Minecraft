@@ -1,0 +1,28 @@
+{
+  "pembicara": [
+    "tokoh:qiu_panitera"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest kota42_catatan_kota tahap lapor"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "menulis",
+      "prop": "221",
+      "suara": "kota42.pejabat_sapa",
+      "pilihan": [
+        {
+          "ke": "cap"
+        }
+      ]
+    },
+    {
+      "id": "cap",
+      "gestur": "418",
+      "prop": "220"
+    }
+  ]
+}

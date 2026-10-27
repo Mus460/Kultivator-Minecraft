@@ -44,6 +44,12 @@ public final class LayarKediaman extends LayarGabungDasar {
 
 	private final DaftarGulir pilih = new DaftarGulir();
 	private final DaftarGulir kolam = new DaftarGulir();
+	/** The stacked plaque + chest of a narrow page (GUI scale 4) scroll as one column. */
+	private final GulirKolom kolomGua = new GulirKolom();
+
+	/** Height of the dwelling plaque (the lines down to the amulet button) and of the stacked chest. */
+	private static final int PLAKAT_H = 78;
+	private static final int PETI_H = 94;
 
 	public LayarKediaman(int npcId, CompoundTag lembar) {
 		super(Kediaman.LAYAR, npcId, lembar, u("kediaman.judul"), TempatWarna.Gaya.GIOK);
@@ -66,6 +72,7 @@ public final class LayarKediaman extends LayarGabungDasar {
 		long now = Util.getMillis();
 		pilih.mulaiUlang(now);
 		kolam.mulaiUlang(now);
+		kolomGua.ulang();
 	}
 
 	@Override
@@ -90,18 +97,30 @@ public final class LayarKediaman extends LayarGabungDasar {
 			return;
 		}
 		int by = y1 - 16;
-		// Side by side down to 240 px (the Harta paper at GUI scale 4 is ~289 wide): stacked, the plaque had no room.
+		// Side by side down to 240 px (the Harta paper at GUI scale 4 is ~289 wide); narrower, the plaque and the chest
+		// stack in one scrolled column (arrow keys / wheel) instead of two clipped halves.
 		boolean tumpuk = x1 - x0 < 240;
-		int split = tumpuk ? y0 + (by - y0) / 2 : -1;
+		int py0 = y0;
 		int px1 = tumpuk ? x1 : x0 + (x1 - x0) * 11 / 20;
-		int py1 = tumpuk ? split - 3 : by - 4;
+		int py1 = by - 4;
+		int cx0 = px1 + 6;
+		int cy0 = y0;
+		int cy1 = by - 4;
+		if (tumpuk) {
+			gulirAktif = kolomGua;
+			py0 = kolomGua.mulai(l, x0, y0, x1, by - 3);
+			py1 = py0 + PLAKAT_H;
+			cx0 = x0;
+			cy0 = py1 + 5;
+			cy1 = cy0 + PETI_H;
+		}
 		// the dwelling plaque (its lines never spill onto the chest)
-		IkonGabung.kartu(l.g, x0, y0, px1, py1);
-		l.klip(x0, y0, px1, py1);
+		IkonGabung.kartu(l.g, x0, py0, px1, py1);
+		l.klip(x0, py0, px1, py1);
 		int ink = 0xFF16302A;
 		int lemah = 0xFF3E5E52;
 		int x = x0 + 9;
-		int y = y0 + 8;
+		int y = py0 + 8;
 		IkonGabung.gambar(l.g, IkonGabung.MEDITASI, x, y, 20);
 		l.teks(Brush.bold(h.teks(LembarKunci.NAMA)), x + 24, y + 1, px1 - x - 34, ink, 1.0F);
 		l.teks(u("kediaman.jenis." + h.s(LembarKunci.JENIS)), x + 24, y + 11, px1 - x - 34, lemah, 1.0F);
@@ -123,9 +142,10 @@ public final class LayarKediaman extends LayarGabungDasar {
 		}
 		l.lepasKlip();
 		// the deposit chest
-		int cx0 = tumpuk ? x0 : px1 + 6;
-		int cy0 = tumpuk ? split + 3 : y0;
-		peti(l, h, cx0, cy0, x1, by - 4);
+		peti(l, h, cx0, cy0, x1, cy1);
+		if (tumpuk) {
+			kolomGua.selesai(l, cy1);
+		}
 		// buttons
 		int sewa = h.i(Kediaman.SEWA, 0);
 		int bw = (x1 - x0 - 8) / 3;

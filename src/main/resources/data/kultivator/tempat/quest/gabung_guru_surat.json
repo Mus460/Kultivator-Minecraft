@@ -18,10 +18,32 @@
       ],
       "akibat_masuk": [
         "gabung.cerita guru_surat sahabat"
-      ]
+      ],
+      "ke": "tulis"
     },
     {
-      "id": "balasan",
+      "id": "tulis",
+      "tujuan": [
+        "gabung pilih:guru_surat"
+      ],
+      "akibat_masuk": [
+        "gabung.cerita guru_surat tulis",
+        "gabung.pilihan guru_surat tulis sabar intip"
+      ],
+      "cabang": [
+        {
+          "syarat": [
+            "bendera gabung.guru_surat.intip"
+          ],
+          "ke": "balasan_intip"
+        }
+      ],
+      "ke": "balasan_sabar",
+      "batas_hari": 2,
+      "gagal_ke": "balasan_sabar"
+    },
+    {
+      "id": "balasan_sabar",
       "tujuan": [
         "gabung temu:shifu"
       ],
@@ -29,9 +51,28 @@
         "gabung.cerita guru_surat balasan"
       ],
       "akibat": [
-        "gabung.cerita guru_surat selesai shifu",
-        "gabung.ikatan 15",
-        "gabung.sikap shifu 10",
+        "gabung.cerita guru_surat selesai_sabar shifu",
+        "gabung.ikatan 20",
+        "gabung.sikap shifu 12",
+        "gabung.kabar gabung_kawan_lama",
+        "gabung.pk 40"
+      ],
+      "ke": "selesai",
+      "arah": "sekte/kompleks"
+    },
+    {
+      "id": "balasan_intip",
+      "tujuan": [
+        "gabung temu:shifu"
+      ],
+      "akibat_masuk": [
+        "gabung.cerita guru_surat balasan"
+      ],
+      "akibat": [
+        "gabung.cerita guru_surat selesai_intip shifu",
+        "gabung.ikatan 8",
+        "gabung.sikap shifu -5",
+        "gabung.pelanggaran 1",
         "gabung.pk 40"
       ],
       "ke": "selesai",

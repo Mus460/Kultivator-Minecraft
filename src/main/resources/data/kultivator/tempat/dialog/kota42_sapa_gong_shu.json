@@ -1,0 +1,49 @@
+{
+  "pembicara": [
+    "tokoh:gong_shu"
+  ],
+  "prioritas": 5,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "420",
+      "prop": "224",
+      "pilihan": [
+        {
+          "akibat": [
+            "buka_layanan kavling"
+          ]
+        },
+        {
+          "ke": "balok"
+        },
+        {
+          "ke": "kota"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "balok",
+      "gestur": "421",
+      "prop": "225",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kota",
+      "gestur": "tunjuk",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

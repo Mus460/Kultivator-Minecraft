@@ -1,0 +1,83 @@
+{
+  "pembicara": [
+    "tokoh:li_zuixian"
+  ],
+  "prioritas": 10,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "412",
+      "prop": "171",
+      "suara": "kota42.mabuk",
+      "pilihan": [
+        {
+          "syarat": [
+            "quest kota42_tujuh_malam baru"
+          ],
+          "akibat": [
+            "quest_mulai kota42_tujuh_malam"
+          ],
+          "ke": "giok"
+        },
+        {
+          "syarat": [
+            "quest kota42_tujuh_malam tahap minum",
+            "jam 19 24",
+            "punya kultivator:hidangan/arak_bunga_persik"
+          ],
+          "akibat": [
+            "ambil kultivator:hidangan/arak_bunga_persik",
+            "peristiwa tanda kota42.minum_li_zuixian",
+            "klip k:bersulang k:cawan_arak"
+          ],
+          "ke": "minum",
+          "tampil": true,
+          "alasan": "kultivator.cerita.kota42_zuixian_sapa.mulai.2.alasan"
+        },
+        {
+          "ke": "ujian"
+        },
+        {
+          "ke": "berhenti"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "giok",
+      "gestur": "369",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "minum",
+      "gestur": "410",
+      "suara": "kota42.huaquan"
+    },
+    {
+      "id": "ujian",
+      "gestur": "tertawa",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "berhenti",
+      "gestur": "berdebat",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

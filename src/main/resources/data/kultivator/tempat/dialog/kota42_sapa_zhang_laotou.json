@@ -1,0 +1,43 @@
+{
+  "pembicara": [
+    "tokoh:zhang_laotou"
+  ],
+  "prioritas": 5,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "seru_dagang",
+      "pilihan": [
+        {
+          "ke": "tahu"
+        },
+        {
+          "ke": "li"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "tahu",
+      "gestur": "tumbuk_herba",
+      "prop": "alu",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "li",
+      "gestur": "marah_tunjuk",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

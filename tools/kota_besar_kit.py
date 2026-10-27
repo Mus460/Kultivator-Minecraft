@@ -18,6 +18,7 @@ import random
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import nbt  # noqa: E402
 import structgen  # noqa: E402
 import tempat_lib as tl  # noqa: E402
 from structgen import Piece  # noqa: E402
@@ -79,6 +80,7 @@ class Kanvas(Piece):
             return None
         if hadap not in FACE:
             raise ValueError("bad hadap %r" % hadap)
+        jenis, data = nbt.alias_titik(jenis, data)
         e = {"jenis": jenis, "pos": [int(x), int(y), int(z)], "hadap": hadap}
         if data:
             e["data"] = {str(k): str(v) for k, v in data.items()}

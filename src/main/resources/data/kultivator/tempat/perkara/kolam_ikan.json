@@ -1,0 +1,66 @@
+{
+  "nama": "kultivator.kota42.perkara.t.kolam_ikan.nama",
+  "teks": "kultivator.kota42.perkara.t.kolam_ikan.teks",
+  "penggugat": {
+    "klaim": "kultivator.kota42.perkara.t.kolam_ikan.klaim_a",
+    "peran": [
+      "petani",
+      "nelayan"
+    ]
+  },
+  "tergugat": {
+    "klaim": "kultivator.kota42.perkara.t.kolam_ikan.klaim_b",
+    "peran": [
+      "nelayan",
+      "warga"
+    ]
+  },
+  "benar": "acak",
+  "saksi": 2,
+  "kesaksian": {
+    "penggugat": [
+      "kultivator.kota42.perkara.t.kolam_ikan.saksi_a1",
+      "kultivator.kota42.perkara.t.kolam_ikan.saksi_a2"
+    ],
+    "tergugat": [
+      "kultivator.kota42.perkara.t.kolam_ikan.saksi_b1",
+      "kultivator.kota42.perkara.t.kolam_ikan.saksi_b2"
+    ]
+  },
+  "dusta": "kultivator.kota42.perkara.t.kolam_ikan.dusta",
+  "bukti": [
+    {
+      "jenis": "barang",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.kolam_ikan.bukti1_a",
+        "tergugat": "kultivator.kota42.perkara.t.kolam_ikan.bukti1_b"
+      },
+      "barang": "minecraft:cod"
+    },
+    {
+      "jenis": "gosip",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.kolam_ikan.bukti2_a",
+        "tergugat": "kultivator.kota42.perkara.t.kolam_ikan.bukti2_b"
+      }
+    }
+  ],
+  "putusan": [
+    {
+      "untuk": "penggugat",
+      "teks": "kultivator.kota42.perkara.t.kolam_ikan.putusan1",
+      "akibat": "kultivator.kota42.perkara.t.kolam_ikan.putusan1_akibat"
+    },
+    {
+      "untuk": "tergugat",
+      "teks": "kultivator.kota42.perkara.t.kolam_ikan.putusan2",
+      "akibat": "kultivator.kota42.perkara.t.kolam_ikan.putusan2_akibat"
+    },
+    {
+      "untuk": "damai",
+      "teks": "kultivator.kota42.perkara.t.kolam_ikan.putusan3",
+      "akibat": "kultivator.kota42.perkara.t.kolam_ikan.putusan3_akibat"
+    }
+  ],
+  "suap": 0.2
+}

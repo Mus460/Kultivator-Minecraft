@@ -11,7 +11,6 @@ import dev.kultivator.dunia.kota42.KotaHidup;
 import dev.kultivator.dunia.tempat.TempatInfo;
 import dev.kultivator.dunia.tempat.ekonomi.Barang;
 import dev.kultivator.dunia.tempat.ekonomi.KasKota;
-import dev.kultivator.dunia.tempat.tema.TemaConfig;
 import dev.kultivator.dunia.tempat.tema.bersama.Dagang;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
@@ -55,7 +54,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * Nama Baik +1 per 32 items and counts as a town task.
  * <p>
  * State in {@code KotaEkonomiData.bagian("kontrak")["pemain"][uuid]}: {@code nd} Nama Dagang, {@code ok} deliveries made,
- * {@code km}/{@code kp} premium booked this week, {@code n} next id, {@code L} contracts ({@code i} id, {@code b} item,
+ * {@code n} next id, {@code L} contracts ({@code i} id, {@code b} item,
  * {@code j} units, {@code a}/{@code t} source/destination, {@code ti} days, {@code k} runs done, {@code kk} runs, {@code h}
  * price x100, {@code dn} fine %, {@code tg} tier, {@code nx} next run day, {@code kv} caravan on the road, {@code st} 0
  * active / 1 done / 2 cancelled, {@code ws} week the offer came from, {@code wo} offer id).
@@ -352,10 +351,11 @@ public final class KontrakDagang {
 		long gross = Math.round(units * k.harga());
 		long fee = Math.round(gross * ONGKOS);
 		long premium = Math.max(0L, gross - Math.round(units * base));
-		long room = Math.max(0L, batasMinggu(server, player) - premiMinggu(server, player));
+		long room = batasMinggu(server, player);
 		long paidPremium = Math.min(premium, room);
 		long pay = Math.max(0L, gross - premium + paidPremium - fee);
-		catatPremi(server, player, paidPremium);
+		// the premium joins Dagang's own weekly ledger: one cap for all trade profit (42.6.5)
+		Dagang.catatLaba(server, player, paidPremium);
 		Investasi.keLaci(server, player, pay, "");
 		Investasi.catatKeran(server, player, Investasi.K_KONTRAK, paidPremium);
 		if (units >= k.jumlah()) {
@@ -380,28 +380,11 @@ public final class KontrakDagang {
 		KotaEkonomiData.get(server).ubah();
 	}
 
-	/** The weekly cap of the trade premium (the 38.T trade cap for the player's band, less his market trade profit). */
+	/** What is left of the player's weekly trade-profit cap (38 {@link Dagang}: shop trade and contract premiums share it). */
 	private static long batasMinggu(MinecraftServer server, UUID player) {
 		ServerPlayer online = server.getPlayerList().getPlayer(player);
-		if (online != null) {
-			return Math.max(0L, Dagang.batas(online) - Math.max(0L, Dagang.labaMinggu(online)));
-		}
-		return (long) TemaConfig.inti().batasLabaMingguan * (Investasi.pitaTersimpan(server, player) + 1L);
-	}
-
-	private static long premiMinggu(MinecraftServer server, UUID player) {
-		CompoundTag b = buku(server, player);
-		return b.getLongOr("km", -1L) == Math.floorDiv(KotaHidup.hari(server), 7L) ? b.getLongOr("kp", 0L) : 0L;
-	}
-
-	private static void catatPremi(MinecraftServer server, UUID player, long nb) {
-		CompoundTag b = buku(server, player);
-		long week = Math.floorDiv(KotaHidup.hari(server), 7L);
-		if (b.getLongOr("km", -1L) != week) {
-			b.putLong("km", week);
-			b.putLong("kp", 0L);
-		}
-		b.putLong("kp", b.getLongOr("kp", 0L) + nb);
+		long cap = online != null ? Dagang.batas(online) : Dagang.batas(Investasi.pitaTersimpan(server, player));
+		return Math.max(0L, cap - Math.max(0L, Dagang.labaMinggu(server, player)));
 	}
 
 	/** Weekly upkeep (nothing yet: weeks reset lazily). */

@@ -1,0 +1,42 @@
+{
+  "pembicara": [
+    "tokoh:wu_dalang"
+  ],
+  "prioritas": 5,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "palu_landasan",
+      "pilihan": [
+        {
+          "ke": "mi"
+        },
+        {
+          "ke": "warung"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "mi",
+      "gestur": "palu_landasan",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "warung",
+      "gestur": "450",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

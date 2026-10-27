@@ -8,8 +8,6 @@ import dev.kultivator.disciple.DiscipleHooks;
 import dev.kultivator.disciple.Disciples;
 import dev.kultivator.disciple.DuelRules;
 import dev.kultivator.epic.EpicIds;
-import dev.kultivator.network.Actions;
-import dev.kultivator.network.Payloads;
 import dev.kultivator.sect.hall.Candidates;
 import dev.kultivator.sect.hall.HallData;
 import dev.kultivator.sect.hall.Halls;
@@ -297,7 +295,7 @@ public final class Tetua {
 		mine.putLong(TetuaData.AUTO_DAY, today);
 		TetuaData.dirty();
 		int before = core.getListOrEmpty("candidates").size();
-		Halls.handleAction(master, new Payloads.Action(Actions.HALL, Halls.OP_ACCEPT, Integer.toString(best)));
+		Halls.accept(master, best);
 		if (Halls.section(owner, HallData.CORE).getListOrEmpty("candidates").size() < before) {
 			Component who = bestName == null ? Component.translatable("kultivator.sekte.tetua.someone") : bestName;
 			SekteLog.log(server, owner, SekteIds.E, Component.translatable("kultivator.sekte.tetua.log.auto_accept", elder.getName(), who));

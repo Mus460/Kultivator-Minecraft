@@ -1,0 +1,45 @@
+{
+  "pembicara": [
+    "tokoh:dalang_su"
+  ],
+  "prioritas": 30,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "413",
+      "prop": "216",
+      "pilihan": [
+        {
+          "syarat": [
+            "quest kota42_malam_wayang baru"
+          ],
+          "akibat": [
+            "quest_mulai kota42_malam_wayang"
+          ],
+          "ke": "cari"
+        },
+        {
+          "ke": "cara"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "cari",
+      "gestur": "tunjuk"
+    },
+    {
+      "id": "cara",
+      "gestur": "413",
+      "prop": "216",
+      "suara": "kota42.wayang_buka",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

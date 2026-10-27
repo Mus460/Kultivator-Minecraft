@@ -1,0 +1,48 @@
+{
+  "pembicara": [
+    "tokoh:gong_shu"
+  ],
+  "prioritas": 20,
+  "syarat": [
+    "hari 10",
+    "nama_baik 20"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "420",
+      "prop": "224",
+      "suara": "kota42.mandor",
+      "pilihan": [
+        {
+          "syarat": [
+            "quest kota42_banjir_musim_semi baru"
+          ],
+          "akibat": [
+            "quest_mulai kota42_banjir_musim_semi"
+          ],
+          "ke": "bagi"
+        },
+        {
+          "ke": "kenapa"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "bagi",
+      "gestur": "tunjuk"
+    },
+    {
+      "id": "kenapa",
+      "gestur": "bicara_tangan",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

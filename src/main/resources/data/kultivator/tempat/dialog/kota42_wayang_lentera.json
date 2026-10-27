@@ -1,0 +1,49 @@
+{
+  "pembicara": [
+    "tokoh:lentera_hijau"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest kota42_malam_wayang tahap tebus",
+    "!bendera kota42.wayang.rebut"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "366",
+      "prop": "216",
+      "suara": "kota42.lentera_hijau",
+      "pilihan": [
+        {
+          "syarat": [
+            "nb_pita 6"
+          ],
+          "akibat": [
+            "bayar_pita 6",
+            "beri kultivator:wayang_kulit_kera_sakti"
+          ],
+          "ke": "tebus",
+          "tampil": true,
+          "alasan": "kultivator.cerita.kota42_wayang_lentera.mulai.1.alasan"
+        },
+        {
+          "akibat": [
+            "panggil_peran pencopet musuh 3",
+            "bendera kota42.wayang.rebut"
+          ],
+          "ke": "rebut"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "tebus",
+      "gestur": "hormat"
+    },
+    {
+      "id": "rebut",
+      "gestur": "366"
+    }
+  ]
+}

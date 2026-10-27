@@ -78,6 +78,10 @@
           {
             "k": "kultivator.cakap.lex.kakak.kampung",
             "a": []
+          },
+          {
+            "k": "kultivator.cakap.ekor.sapa.6",
+            "a": []
           }
         ]
       },
@@ -85,14 +89,18 @@
       "gestur": "lambai",
       "seru": null,
       "tik": null,
-      "id_id": "Pagi yang cerah, Kang. Semoga harimu lancar.",
-      "en_us": "A bright morning, Big Brother. May your day go smoothly."
+      "id_id": "Pagi yang cerah, Kang. Semoga harimu lancar. Senang melihatmu lagi.",
+      "en_us": "A bright morning, Big Brother. May your day go smoothly. Good to see you again."
     },
     {
       "ubah": {},
       "harap": {
         "k": "kultivator.cakap.sapa.pekerja.pagi.1",
-        "a": []
+        "a": [
+          {
+            "t": ""
+          }
+        ]
       },
       "aturan": "sapa.pekerja.pagi",
       "gestur": "lambai",
@@ -109,6 +117,10 @@
           {
             "k": "kultivator.cakap.lex.kakak.kampung",
             "a": []
+          },
+          {
+            "k": "kultivator.cakap.ekor.sapa.4",
+            "a": []
           }
         ]
       },
@@ -116,8 +128,8 @@
       "gestur": "seka_keringat",
       "seru": null,
       "tik": null,
-      "id_id": "Oh, Kang. Maaf, tanganku kotor. Salam!",
-      "en_us": "Oh, Big Brother. Sorry, my hands are dirty. Greetings!"
+      "id_id": "Oh, Kang. Maaf, tanganku kotor. Salam! Hati-hati di jalan.",
+      "en_us": "Oh, Big Brother. Sorry, my hands are dirty. Greetings! Mind the road."
     },
     {
       "ubah": {},
@@ -127,6 +139,9 @@
           {
             "k": "kultivator.cakap.lex.kakak.kampung",
             "a": []
+          },
+          {
+            "t": ""
           }
         ]
       },
@@ -145,6 +160,9 @@
           {
             "k": "kultivator.cakap.lex.kakak.kampung",
             "a": []
+          },
+          {
+            "t": ""
           }
         ]
       },

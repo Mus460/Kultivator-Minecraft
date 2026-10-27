@@ -42,7 +42,7 @@
   "kultivator.gabung.corak.labirin_batu.aturan": "Labirin tak kasatmata bangkit. Langkahi tiga mata formasi sesuai urutan teka-teki trigram, lalu keluar. Mata yang salah: +10 detik.",
   "kultivator.gabung.corak.labirin_batu.inspired": "Terinspirasi dari Formasi Delapan Pintu Zhuge Liang (八阵图) yang menyesatkan Lu Xun.",
   "kultivator.gabung.corak.lima_pilar.nama": "Lima Pilar Qi",
-  "kultivator.gabung.corak.lima_pilar.aturan": "Datangi lima pilar menurut daur Lima Unsur. Tahan klik kanan pada pilar untuk menaikkan jarum Qi, lepas untuk menurunkannya; jaga jarum di dalam pita selama 15 detik.",
+  "kultivator.gabung.corak.lima_pilar.aturan": "Datangi lima pilar menurut daur Lima Unsur. Tahan klik kanan pada pilar untuk menaikkan jarum Qi, lepas untuk menurunkannya; jaga jarum di dalam pita selama 15 detik. Jarum menyusul dengan jeda sekejap: lepas sebelum ia sampai ke pita, jangan menunggu.",
   "kultivator.gabung.corak.lima_pilar.inspired": "Terinspirasi dari daur saling melahirkan Lima Unsur (五行相生).",
   "kultivator.gabung.corak.satu_tungku.nama": "Satu Tungku",
   "kultivator.gabung.corak.satu_tungku.aturan": "Buat pil apa pun di tungku sekte dengan bahan dari kotak ujian dalam 600 detik. Mutu pil menentukan nilaimu; bahan sisa dikembalikan.",
@@ -51,7 +51,7 @@
   "kultivator.gabung.corak.pikul_gunung.aturan": "Bawa batu pikul dari kaki tangga ke puncaknya. Di tangan ia berat; di kantong lebih berat lagi. Jatuh = +10 detik; hilang = gagal.",
   "kultivator.gabung.corak.pikul_gunung.inspired": "Terinspirasi dari Sun Wukong yang tertindih Gunung Lima Jari.",
   "kultivator.gabung.corak.kolam_darah.nama": "Kolam Darah",
-  "kultivator.gabung.corak.kolam_darah.aturan": "Berdirilah di kolam darah selagi ia meminum nyawamu, dan bertahanlah dari tiga gelombang kultivator iblis. Jongkok diam 1 detik = korbankan darah untuk Kekuatan II.",
+  "kultivator.gabung.corak.kolam_darah.aturan": "Berdirilah di kolam darah selagi ia meminum nyawamu (berhenti di 30 %% nyawa; kolam tak membunuh) dan bertahanlah dari tiga gelombang kultivator iblis. Jongkok diam 1 detik = korbankan darah untuk Kekuatan II.",
   "kultivator.gabung.corak.kolam_darah.inspired": "Terinspirasi dari tanah terlarang darah dalam novel xianxia aliran iblis.",
   "kultivator.gabung.corak.tiga_cawan.nama": "Tiga Cawan",
   "kultivator.gabung.corak.tiga_cawan.aturan": "Minum dari tiga cawan beracun satu per satu. Cium aromanya, lalu pilih penawar yang tepat dari lima herba (baca catatan tiap herba) dalam 20 detik.",
@@ -147,5 +147,12 @@
   "kultivator.gabung.corak.ujian_senyap.gagal": "Tiga kali terlihat. Bayangan tidak menerima yang mudah dilihat.",
   "kultivator.gabung.corak.ujian_senyap.seru.0": "Siapa di sana?!",
   "kultivator.gabung.corak.ujian_senyap.seru.1": "Penyusup! Di sana!",
-  "kultivator.gabung.corak.ujian_senyap.seru.2": "Tertangkap kau!"
+  "kultivator.gabung.corak.ujian_senyap.seru.2": "Tertangkap kau!",
+  "kultivator.gabung.corak.sisa_waktu": "Sisa waktu: %s detik.",
+  "kultivator.gabung.corak.akhir.duel_kalah": "Duel usai",
+  "kultivator.gabung.corak.seratus_tebasan.tawaran_duel": "Kau sudah di Ranah Fondasi: bila mau, klik kanan Murid Pengajar sebelum tebasan pertama untuk menantangnya berduel pedang ramah ganti boneka. Menang = nilai penuh.",
+  "kultivator.gabung.corak.seratus_tebasan.duel_ranah": "Duel ramah hanya untuk calon Ranah Fondasi ke atas. Tebas bonekanya.",
+  "kultivator.gabung.corak.seratus_tebasan.duel_terlambat": "Kau sudah mulai menebas boneka; duel tak bisa dipilih lagi.",
+  "kultivator.gabung.corak.seratus_tebasan.duel_gagal": "Duel tak bisa dimulai (%s). Tebas bonekanya.",
+  "kultivator.gabung.corak.seratus_tebasan.duel_mulai": "Murid Pengajar mencabut pedangnya. Duel pedang ramah dimulai; ia berhenti bila salah satu tinggal sepersepuluh napas."
 }

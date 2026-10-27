@@ -1,9 +1,15 @@
 package dev.kultivator.client.dunia.tempat.hidup;
 
+import dev.kultivator.Kultivator;
 import dev.kultivator.client.EffectQuality;
+import dev.kultivator.client.dunia.kota42.KotaHidupClient;
+import dev.kultivator.client.dunia.kota42.fx.SuasanaFx;
+import dev.kultivator.client.screen.SettingsRows;
 import dev.kultivator.client.voice.VoiceSettings;
 import dev.kultivator.dunia.kota.KultivatorNpc;
 import dev.kultivator.dunia.kota.NpcRole;
+import dev.kultivator.dunia.kota42.KotaPayloads;
+import dev.kultivator.dunia.kota42.acara.KalenderKota;
 import dev.kultivator.sound.SuaraKota;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -30,12 +36,19 @@ import java.util.Arrays;
  * Night (the capital's curfew, villages asleep), rain and a roof over the head turn it down, the tavern least of all; a
  * scan runs once a second (every two at Minimal quality) and each bed slews its volume, so places fade in and out. Volume:
  * "Riuh kota" ({@link VoiceSettings#riuh()}) times the vanilla "Ambient/Environment" slider.
+ * <p>
+ * Two beds of Kota yang Hidup (DESIGN 42.12.6, 42V-F) join the five: {@link Suasana#MALAM_MERIAH}, the night district (the tavern
+ * and street crowd under pipa, erhu and dizi, replacing most of the plain tavern and street beds while it plays), heard in a place
+ * whose atmosphere carries the night-district bit or a festival evening; and {@link Suasana#UPACARA}, a distant suona with gong and
+ * drum, heard from 20 to 130 blocks of a running wedding or funeral procession (near it the musicians themselves play, positioned,
+ * through {@code fx/MelodiJalan}). They are client-local sound events ({@code ambient.kota.malam_meriah}, {@code .upacara}, in
+ * {@code sounds.json}) and scale with "Riuh kota" and the street-music setting.
  */
 public final class RiuhKota {
 
 	/** The kinds of place, in {@link SuaraKota#RIUH} order. */
 	enum Suasana {
-		PASAR, KEDAI, PELABUHAN, JALAN, KUIL
+		PASAR, KEDAI, PELABUHAN, JALAN, KUIL, MALAM_MERIAH, UPACARA
 	}
 
 	/** Loudest bed (the loops are mastered quiet already; this leaves room for the town's own sounds). */
@@ -43,6 +56,10 @@ public final class RiuhKota {
 	/** Near bodies count fully inside this radius and fade to nothing at {@link #DEKAT}. */
 	private static final double DEKAT = 32.0D;
 	private static final double JAUH = 112.0D;
+
+	/** The two beds of 42V-F: local events only (the server never plays them), found by the sound manager in {@code sounds.json}. */
+	private static final SoundEvent MALAM_MERIAH = SoundEvent.createVariableRangeEvent(Kultivator.id("ambient.kota.malam_meriah"));
+	private static final SoundEvent UPACARA = SoundEvent.createVariableRangeEvent(Kultivator.id("ambient.kota.upacara"));
 
 	private static final @Nullable Lingkup[] BED = new Lingkup[Suasana.values().length];
 	private static final float[] SKOR = new float[Suasana.values().length];
@@ -72,8 +89,8 @@ public final class RiuhKota {
 			Lingkup bed = BED[i];
 			if (bed != null && !bed.isStopped()) {
 				bed.target = TARGET[i];
-			} else if (TARGET[i] > 0.01F) {
-				Lingkup fresh = new Lingkup(SuaraKota.RIUH.get(i));
+			} else if (TARGET[i] > 0.01F && minecraft.getSoundManager().getSoundEvent(acara(i).location()) != null) {
+				Lingkup fresh = new Lingkup(acara(i));
 				fresh.target = TARGET[i];
 				try {
 					minecraft.getSoundManager().play(fresh);
@@ -125,6 +142,7 @@ public final class RiuhKota {
 		SKOR[Suasana.JALAN.ordinal()] += kursi * 0.08F;
 		if (orang < 1.0F) {
 			Arrays.fill(TARGET, 0.0F);
+			tambahan(level, setelan);
 			return;
 		}
 		// open water around an inhabited spot: a harbour, a river town's quay
@@ -155,6 +173,46 @@ public final class RiuhKota {
 			}
 			TARGET[i] = Math.min(MAKS, v * ramai * setelan * MAKS);
 		}
+		tambahan(level, setelan);
+	}
+
+	/** The sound event of bed {@code i} (the first five are the server-registered crowd loops). */
+	private static SoundEvent acara(int i) {
+		return i < SuaraKota.RIUH.size() ? SuaraKota.RIUH.get(i) : i == Suasana.MALAM_MERIAH.ordinal() ? MALAM_MERIAH : UPACARA;
+	}
+
+	/**
+	 * The two beds of Kota yang Hidup. The night district's strength is 1 in a place whose atmosphere says so (or on a festival
+	 * evening) while the player is within 60 blocks of the place's edge, fading out over the next 30 blocks; while it plays the
+	 * tavern and street beds give way to it. The procession bed rises from 20 blocks to 50 blocks from a running wedding or funeral
+	 * and falls off between 80 and 130.
+	 */
+	private static void tambahan(ClientLevel level, float setelan) {
+		float musik = SettingsRows.kota42Melodi() / 100.0F;
+		float meriah = 0.0F;
+		long jam = Math.floorMod(level.getOverworldClockTime(), 24000L);
+		boolean malam = jam >= 11500L && jam < 22000L;
+		if (malam && setelan > 0.0F) {
+			for (KotaPayloads.Suasana s : KotaHidupClient.semuaSuasana()) {
+				boolean pesta = (s.acara() & KalenderKota.BIT_DISTRIK_MALAM) != 0 || s.hariRaya() != 0 && (s.acara() & KalenderKota.BIT_HARI_RAYA) != 0;
+				if (!pesta || (s.acara() & KalenderKota.BIT_MAKAM) != 0) {
+					continue;
+				}
+				double tepi = SuasanaFx.jarakKeTepi(s.situs());
+				meriah = Math.max(meriah, (float) Mth.clamp(1.0D - (tepi - 60.0D) / 30.0D, 0.0D, 1.0D));
+			}
+		}
+		float upacara = 0.0F;
+		if (setelan > 0.0F) {
+			double d = SuasanaFx.jarakUpacara();
+			upacara = (float) (Mth.clamp((d - 20.0D) / 30.0D, 0.0D, 1.0D) * Mth.clamp((130.0D - d) / 50.0D, 0.0D, 1.0D));
+		}
+		TARGET[Suasana.MALAM_MERIAH.ordinal()] = Math.min(MAKS, meriah * setelan * (0.5F + 0.5F * musik) * MAKS);
+		TARGET[Suasana.UPACARA.ordinal()] = Math.min(MAKS, upacara * setelan * musik * MAKS);
+		// the night district carries its own tavern and street: the plain beds step back while it plays
+		float mundur = 1.0F - 0.75F * meriah;
+		TARGET[Suasana.KEDAI.ordinal()] *= mundur;
+		TARGET[Suasana.JALAN.ordinal()] *= mundur;
 	}
 
 	/** Adds one townsperson of {@code role} to the kind scores. */

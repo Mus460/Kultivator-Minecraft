@@ -57,15 +57,23 @@
     {
       "ubah": {},
       "harap": {
-        "k": "kultivator.cakap.keluh.kejahatan.2",
-        "a": []
+        "k": "kultivator.cakap.keluh.uang.0.kampung",
+        "a": [
+          {
+            "t": ""
+          },
+          {
+            "k": "kultivator.cakap.seru.keluh.6",
+            "a": []
+          }
+        ]
       },
-      "aturan": "keluh.kejahatan",
-      "gestur": "geleng",
-      "seru": null,
+      "aturan": "keluh.uang",
+      "gestur": "hitung_koin",
+      "seru": "kota42.seru.aduh_p",
       "tik": null,
-      "id_id": "Penjaga datang setelah malingnya pergi. Selalu begitu.",
-      "en_us": "The guards arrive after the thief has gone. Always."
+      "id_id": "Duit habis, Nak. Utang di warung sudah sepanjang lenganku.",
+      "en_us": "Money's gone, child. My tab at the stall is as long as my arm."
     },
     {
       "ubah": {
@@ -93,19 +101,23 @@
         "niat": "KELUH"
       },
       "harap": {
-        "k": "kultivator.cakap.curhat.keluh.3",
+        "k": "kultivator.cakap.keluh.lagi.cuaca.4.p",
         "a": [
           {
-            "t": "Ah Ling"
+            "k": "kultivator.cakap.awal.keluh.1",
+            "a": []
+          },
+          {
+            "t": ""
           }
         ]
       },
-      "aturan": "curhat.keluh",
-      "gestur": "menangis",
+      "aturan": "keluh.lagi.cuaca",
+      "gestur": "geleng",
       "seru": "kota42.seru.aduh_p",
       "tik": null,
-      "id_id": "Pelanggan sepi, sewa lapak naik. Mungkin aku harus pulang kampung saja.",
-      "en_us": "Customers are few, the stall rent's up. Maybe I should just go back home."
+      "id_id": "Kau tahu tidak? Jemuranku tidak pernah kering sempurna. Baju suamiku bau apek semua.",
+      "en_us": "You know what? My washing never dries properly. My husband's clothes all smell musty."
     }
   ]
 }

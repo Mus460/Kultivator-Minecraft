@@ -1,0 +1,31 @@
+{
+  "pembicara": [
+    "tokoh:tetua_he"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest kota42_pelindung_baru tahap panji"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "hormat_dalam",
+      "pilihan": [
+        {
+          "akibat": [
+            "bendera kota42.pelindung.panji",
+            "suara kota42.panji_naik"
+          ],
+          "ke": "naik"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "naik",
+      "gestur": "tepuk_tangan",
+      "suara": "kota42.pelindung_sapa"
+    }
+  ]
+}

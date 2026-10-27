@@ -20,7 +20,8 @@ import java.util.List;
 
 /**
  * DARAH "Kolam Darah" (DESIGN 41.5.4; the blood sects' pool, as Han Li saw the Blood Prohibited Ground): stand in the
- * blood pool ({@code kompleks/ujian_darah}, radius 3) while it drinks one health every 2 s, and survive three waves of
+ * blood pool ({@code kompleks/ujian_darah}, radius 3) while it drinks one health every 2 s (down to 30 % of the maximum,
+ * never to death), and survive three waves of
  * demonic rogue cultivators ({@link RogueCultivators#VARIANT_DEMONIC}, tiers by the sect's class, realm foes). Out of the
  * pool more than 3 s fails the test. The offering: crouch still for 1 s to cut the palm, losing 20 % health for Strength II
  * for 15 s (once per 15 s; never below 1 health). Dying (the death guard) fails as usual.
@@ -35,6 +36,8 @@ public final class KolamDarah extends UjianDasar {
 	private static final int LUAR_MAKS = 60;
 	private static final int KORBAN_TICK = 20;
 	private static final int KUAT_TICK = 15 * 20;
+	/** The drain never takes the candidate below this share of the maximum health. */
+	private static final float LANTAI = 0.30F;
 	/** Rogue tiers per wave by class 1-5. */
 	private static final int[][][] TIER = {
 			{{1, 1}, {1, 1}, {1, 2}},
@@ -86,7 +89,8 @@ public final class KolamDarah extends UjianDasar {
 			}
 		} else {
 			luar = 0;
-			if (umur % KURAS_TICK == 0 && pemain.getHealth() > 1.0F) {
+			// the pool drinks but does not kill: it stops at 30 % health (the waves are the test, not the drain)
+			if (umur % KURAS_TICK == 0 && pemain.getHealth() > Math.max(1.0F, pemain.getMaxHealth() * LANTAI)) {
 				pemain.hurtServer(level, level.damageSources().magic(), 1.0F);
 				if (umur % (KURAS_TICK * 3) == 0) {
 					bunyi(pemain.position(), SoundEvents.WARDEN_HEARTBEAT, 0.7F, 1.0F);

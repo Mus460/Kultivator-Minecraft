@@ -1,0 +1,22 @@
+{
+  "pembicara": [
+    "tokoh:bibi_mei"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest kota42_hati_feihu tahap comblang",
+    "!bendera kota42.feihu.comblang"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "357",
+      "prop": "177",
+      "suara": "kota42.comblang",
+      "akibat": [
+        "bendera kota42.feihu.comblang"
+      ]
+    }
+  ]
+}

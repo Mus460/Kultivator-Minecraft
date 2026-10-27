@@ -1,0 +1,36 @@
+{
+  "pembicara": [
+    "tokoh:qiu_panitera"
+  ],
+  "prioritas": 5,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "menulis",
+      "prop": "kuas",
+      "pilihan": [
+        {
+          "akibat": [
+            "buka_layanan jabatan"
+          ]
+        },
+        {
+          "ke": "pajak"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "pajak",
+      "gestur": "menulis",
+      "prop": "kuas",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "nama": "kultivator.kota42.perkara.t.lapak_pasar.nama",
+  "teks": "kultivator.kota42.perkara.t.lapak_pasar.teks",
+  "penggugat": {
+    "klaim": "kultivator.kota42.perkara.t.lapak_pasar.klaim_a",
+    "peran": [
+      "pedagang_keliling",
+      "penjual_ikan"
+    ]
+  },
+  "tergugat": {
+    "klaim": "kultivator.kota42.perkara.t.lapak_pasar.klaim_b",
+    "peran": [
+      "pedagang_keliling",
+      "petani"
+    ]
+  },
+  "benar": "acak",
+  "saksi": 2,
+  "kesaksian": {
+    "penggugat": [
+      "kultivator.kota42.perkara.t.lapak_pasar.saksi_a1",
+      "kultivator.kota42.perkara.t.lapak_pasar.saksi_a2"
+    ],
+    "tergugat": [
+      "kultivator.kota42.perkara.t.lapak_pasar.saksi_b1",
+      "kultivator.kota42.perkara.t.lapak_pasar.saksi_b2"
+    ]
+  },
+  "dusta": "kultivator.kota42.perkara.t.lapak_pasar.dusta",
+  "bukti": [
+    {
+      "jenis": "catatan",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.lapak_pasar.bukti1_a",
+        "tergugat": "kultivator.kota42.perkara.t.lapak_pasar.bukti1_b"
+      }
+    },
+    {
+      "jenis": "barang",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.lapak_pasar.bukti2_a",
+        "tergugat": "kultivator.kota42.perkara.t.lapak_pasar.bukti2_b"
+      },
+      "barang": "minecraft:paper"
+    }
+  ],
+  "putusan": [
+    {
+      "untuk": "penggugat",
+      "teks": "kultivator.kota42.perkara.t.lapak_pasar.putusan1",
+      "akibat": "kultivator.kota42.perkara.t.lapak_pasar.putusan1_akibat"
+    },
+    {
+      "untuk": "tergugat",
+      "teks": "kultivator.kota42.perkara.t.lapak_pasar.putusan2",
+      "akibat": "kultivator.kota42.perkara.t.lapak_pasar.putusan2_akibat"
+    },
+    {
+      "untuk": "damai",
+      "teks": "kultivator.kota42.perkara.t.lapak_pasar.putusan3",
+      "akibat": "kultivator.kota42.perkara.t.lapak_pasar.putusan3_akibat"
+    }
+  ],
+  "suap": 0.3
+}

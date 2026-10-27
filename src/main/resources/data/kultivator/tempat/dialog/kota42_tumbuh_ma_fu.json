@@ -1,0 +1,26 @@
+{
+  "pembicara": [
+    "tokoh:ma_fu"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest kota42_kota_tumbuh tahap kawal"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "hitung_sempoa",
+      "prop": "sempoa",
+      "pilihan": [
+        {
+          "ke": "kawal"
+        }
+      ]
+    },
+    {
+      "id": "kawal",
+      "gestur": "tunjuk"
+    }
+  ]
+}

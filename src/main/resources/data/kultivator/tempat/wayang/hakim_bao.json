@@ -1,0 +1,80 @@
+{
+  "id": "hakim_bao",
+  "indeks": 3,
+  "judul": "kultivator.kota42.wayang.hakim_bao.judul",
+  "sumber": "kultivator.kota42.wayang.hakim_bao.sumber",
+  "durasi_tick": 1200,
+  "babak_tick": 300,
+  "pembuka": "kultivator.kota42.wayang.hakim_bao.pembuka",
+  "tokoh": [
+    {
+      "sel": 0,
+      "nama": "kultivator.kota42.wayang.hakim_bao.tokoh.0"
+    },
+    {
+      "sel": 1,
+      "nama": "kultivator.kota42.wayang.hakim_bao.tokoh.1"
+    },
+    {
+      "sel": 2,
+      "nama": "kultivator.kota42.wayang.hakim_bao.tokoh.2"
+    },
+    {
+      "sel": 3,
+      "nama": "kultivator.kota42.wayang.hakim_bao.tokoh.3"
+    },
+    {
+      "sel": 4,
+      "nama": "kultivator.kota42.wayang.hakim_bao.tokoh.4"
+    },
+    {
+      "sel": 5,
+      "nama": "kultivator.kota42.wayang.hakim_bao.tokoh.5"
+    }
+  ],
+  "babak": [
+    {
+      "mulai_tick": 0,
+      "a": 3,
+      "b": 0,
+      "mode": "cakap",
+      "narasi": "kultivator.kota42.wayang.hakim_bao.babak.0.narasi",
+      "kata_a": "kultivator.kota42.wayang.hakim_bao.babak.0.a",
+      "kata_b": "kultivator.kota42.wayang.hakim_bao.babak.0.b",
+      "bunyi": "erhu"
+    },
+    {
+      "mulai_tick": 300,
+      "a": 1,
+      "b": 2,
+      "mode": "kejar",
+      "narasi": "kultivator.kota42.wayang.hakim_bao.babak.1.narasi",
+      "kata_a": "kultivator.kota42.wayang.hakim_bao.babak.1.a",
+      "kata_b": "kultivator.kota42.wayang.hakim_bao.babak.1.b",
+      "bunyi": "genderang"
+    },
+    {
+      "mulai_tick": 600,
+      "a": 0,
+      "b": 2,
+      "mode": "cakap",
+      "narasi": "kultivator.kota42.wayang.hakim_bao.babak.2.narasi",
+      "kata_a": "kultivator.kota42.wayang.hakim_bao.babak.2.a",
+      "kata_b": "kultivator.kota42.wayang.hakim_bao.babak.2.b",
+      "bunyi": "erhu"
+    },
+    {
+      "mulai_tick": 900,
+      "a": 0,
+      "b": 4,
+      "mode": "sapa",
+      "narasi": "kultivator.kota42.wayang.hakim_bao.babak.3.narasi",
+      "kata_a": "kultivator.kota42.wayang.hakim_bao.babak.3.a",
+      "kata_b": "kultivator.kota42.wayang.hakim_bao.babak.3.b",
+      "bunyi": "genderang"
+    }
+  ],
+  "penutup": "kultivator.kota42.wayang.hakim_bao.penutup",
+  "lore": "kultivator.kota42.wayang.hakim_bao.lore",
+  "tiket_nb": 2
+}

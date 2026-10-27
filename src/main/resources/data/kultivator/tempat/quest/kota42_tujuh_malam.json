@@ -1,0 +1,23 @@
+{
+  "pemberi": "tokoh:li_zuixian",
+  "tempat": "kota42",
+  "alur": true,
+  "tahap": [
+    {
+      "id": "minum",
+      "tujuan": [
+        "tanda kota42.minum_li_zuixian x7"
+      ]
+    },
+    {
+      "id": "giok",
+      "tujuan": [
+        "bendera kota42.zuixian.giok"
+      ],
+      "akibat": [
+        "beri kultivator:jade_slip",
+        "kota42.kesan tokoh:li_zuixian 40"
+      ]
+    }
+  ]
+}

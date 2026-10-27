@@ -1,5 +1,6 @@
 package dev.kultivator.dunia.kota42.cakap;
 
+import com.google.gson.JsonObject;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -32,8 +33,8 @@ import java.util.SplittableRandom;
  * Test commands of 42K (DESIGN 42.5A.12, 42.14.3): {@code /kultivasi uji kota_hidup cakap ...} and {@code ... gosip ...}.
  * The townsperson is the stored warga behind the nearest civilian body within 8 blocks (the second nearest for
  * {@code obrol}); the place is the tester's ({@code KotaHidupCommands.tempatPemain}). Output keys
- * {@code kultivator.kota42.cakap.uji.*} (fragment {@code kota_hidup_cakap_mesin}). The golden-file sub
- * ({@code cakap golden [tulis]}) belongs to 42K-T's realiser and registers under the same literal.
+ * {@code kultivator.kota42.cakap.uji.*} (fragment {@code kota_hidup_cakap_mesin}). {@code cakap golden [tulis]} runs the
+ * realisation golden files of 42K-T ({@link Realisasi#ujiGolden}).
  */
 public final class CakapUji {
 
@@ -55,7 +56,9 @@ public final class CakapUji {
 						.then(Commands.argument("niat", StringArgumentType.word()).executes(ctx -> kombinasi(ctx, StringArgumentType.getString(ctx, "niat")))))
 				.then(Commands.literal("obrol").executes(ctx -> obrol(ctx, null))
 						.then(Commands.argument("jenis", StringArgumentType.word()).executes(ctx -> obrol(ctx, StringArgumentType.getString(ctx, "jenis")))))
-				.then(Commands.literal("jejak").executes(CakapUji::jejak));
+				.then(Commands.literal("jejak").executes(CakapUji::jejak))
+				.then(Commands.literal("golden").executes(ctx -> golden(ctx, false))
+						.then(Commands.literal("tulis").executes(ctx -> golden(ctx, true))));
 	}
 
 	private static LiteralArgumentBuilder<CommandSourceStack> gosip() {
@@ -348,6 +351,64 @@ public final class CakapUji {
 					: Component.translatable(K + "gosip.jejak_pemain", -1 - teller));
 		}
 		return 1;
+	}
+
+	// ================================================================== golden files
+
+	/**
+	 * {@code cakap golden [tulis]}: every realisation golden file ({@code "jenis": "realisasi"} under
+	 * {@code percakapan/golden}) against the live grammar, seeds and language tables; a difference prints the step, the key and
+	 * both values. {@code tulis} never touches the jar: it writes the freshly computed expectations to
+	 * {@code <server dir>/kultivator_golden/<id>.json} for the author to copy into the data folder.
+	 */
+	private static int golden(CommandContext<CommandSourceStack> ctx, boolean tulis) {
+		CommandSourceStack src = ctx.getSource();
+		Map<String, String> id = Ujaran.bahasa("id_id");
+		Map<String, String> en = Ujaran.bahasa("en_us");
+		TataBahasa.Tabel tabel = TataBahasa.tabel();
+		int total = 0;
+		int lulus = 0;
+		int ditulis = 0;
+		List<String> beda = new ArrayList<>();
+		java.nio.file.Path keluar = src.getServer().getServerDirectory().resolve("kultivator_golden");
+		for (Map.Entry<String, JsonObject> e : CakapReload.mentahAwalan("golden/").entrySet()) {
+			JsonObject g = e.getValue();
+			if (!"realisasi".equals(TataBahasa.teks(g, "jenis", ""))) {
+				continue;
+			}
+			total++;
+			JsonObject kerja = g.deepCopy();
+			List<String> d = Realisasi.ujiGolden(kerja, tabel, id, en, tulis);
+			if (tulis) {
+				try {
+					java.nio.file.Files.createDirectories(keluar);
+					String name = e.getKey().substring(e.getKey().lastIndexOf('/') + 1) + ".json";
+					java.nio.file.Files.writeString(keluar.resolve(name), new com.google.gson.GsonBuilder().setPrettyPrinting()
+							.disableHtmlEscaping().create().toJson(kerja) + "\n", java.nio.charset.StandardCharsets.UTF_8);
+					ditulis++;
+				} catch (java.io.IOException exception) {
+					beda.add(e.getKey() + ": " + exception.getMessage());
+				}
+			}
+			if (d.isEmpty()) {
+				lulus++;
+			} else {
+				beda.addAll(d);
+			}
+		}
+		if (total == 0) {
+			src.sendFailure(Component.translatable(K + "golden.kosong"));
+			return 0;
+		}
+		if (tulis) {
+			baris(src, Component.translatable(K + "golden.tulis", ditulis, keluar.toString()).withStyle(ChatFormatting.GOLD));
+			return ditulis;
+		}
+		baris(src, Component.translatable(K + "golden.hasil", lulus, total).withStyle(lulus == total ? ChatFormatting.GREEN : ChatFormatting.RED));
+		for (int i = 0; i < beda.size() && i < 12; i++) {
+			baris(src, Component.translatable(K + "golden.beda", beda.get(i)));
+		}
+		return lulus;
 	}
 
 	private CakapUji() {

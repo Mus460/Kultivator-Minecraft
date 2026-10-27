@@ -1,0 +1,43 @@
+{
+  "pembicara": [
+    "tokoh:tang_xiaomi"
+  ],
+  "prioritas": 5,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "450",
+      "prop": "212",
+      "pilihan": [
+        {
+          "ke": "nenek"
+        },
+        {
+          "ke": "mimpi"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "nenek",
+      "gestur": "menangis",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "mimpi",
+      "gestur": "bicara_tangan",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

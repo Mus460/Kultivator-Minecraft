@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 /**
  * The op test subs of 42S (DESIGN 42.4A.8) under {@code /kultivasi uji kota_hidup}:
@@ -375,6 +376,9 @@ public final class RagamUji {
 		int kosongN;
 		double bagian;
 		int bagianN;
+		double rasio;
+		int rasioN;
+		double badan;
 	}
 
 	private static int simulasi(CommandContext<CommandSourceStack> ctx, int hariN) throws CommandSyntaxException {
@@ -386,15 +390,22 @@ public final class RagamUji {
 		long started = System.nanoTime();
 		TempatHuni huni = t.huni();
 		PetaZona peta = t.peta();
+		MetrikRagam.Laporan l = simulasi(huni, peta, t.level().getGameTime(), t.level().getServer().overworld().getOverworldClockTime(), hariN,
+				c -> src.sendSuccess(() -> c, false));
+		long ms = (System.nanoTime() - started) / 1_000_000L;
+		cetak(src, Component.translatable("kultivator.kota42.ragam.sim.judul", huni.jenis, hariN, huni.penduduk().size(), peta.jumlah(), ms), l);
+		src.sendSuccess(() -> Component.translatable("kultivator.kota42.ragam.sim.catatan").withStyle(ChatFormatting.GRAY), false);
+		return l.lulus() ? 1 : 0;
+	}
+
+	/** The simulation itself (also run outside the game by the offline check): no bodies, one step per {@link KotaRagam#LINTAS}. */
+	static MetrikRagam.Laporan simulasi(TempatHuni huni, PetaZona peta, long now0, long waktu0, int hariN, Consumer<Component> keluar) {
 		Penyeimbang.Hunian h = Penyeimbang.simulasi(huni.situsId);
-		long now0 = t.level().getGameTime();
-		long waktu0 = t.level().getServer().overworld().getOverworldClockTime();
 		long base = (Math.floorDiv(waktu0, 24000L) + 1L) * 24000L;
 		int langkah = (int) (24000L / KotaRagam.LINTAS);
 		List<Penduduk> residents = huni.penduduk();
 		Map<Integer, int[]> today = new HashMap<>();
 		Map<Integer, int[]> yesterday = new HashMap<>();
-		Map<Integer, String> lastKey = new HashMap<>();
 		Jam[] perJam = new Jam[24];
 		for (int i = 0; i < 24; i++) {
 			perJam[i] = new Jam();
@@ -412,7 +423,15 @@ public final class RagamUji {
 		double min = dev.kultivator.dunia.kota42.KotaConfig.warga().jarakMin;
 		for (int d = 0; d < hariN; d++) {
 			MetrikRagam.Jumlah dayTotal = new MetrikRagam.Jumlah();
+			// turns are counted from the day's plans (a turn lasts a few minutes, shorter than one step of this simulation)
 			int dayBelokan = 0;
+			for (Penduduk p : residents) {
+				for (RencanaHarian.Langkah l : RencanaHarian.rencana(huni, p, Math.floorDiv(base, 24000L) + d).langkah()) {
+					if (l.jenis().equals("belokan")) {
+						dayBelokan++;
+					}
+				}
+			}
 			for (int s = 0; s < langkah; s++) {
 				long waktu = base + d * 24000L + s * KotaRagam.LINTAS;
 				long now = now0 + (waktu - waktu0);
@@ -438,7 +457,7 @@ public final class RagamUji {
 						}
 					} else {
 						zona = Penyeimbang.zonaTetap(huni, peta, p, k);
-						Penyeimbang.catatData(h, p.id(), false, zona);
+						Penyeimbang.catatData(h, p.id(), false, zona, Penyeimbang.dalam(k));
 					}
 					int sig = MetrikRagam.tanda(k);
 					int[] day = today.computeIfAbsent(p.id(), x -> new int[]{0});
@@ -447,18 +466,15 @@ public final class RagamUji {
 							day = java.util.Arrays.copyOf(day, day.length + 1);
 							day[day.length - 1] = sig;
 						}
-						if (k.kunci().startsWith("belok") && !k.kunci().equals(lastKey.get(p.id()))) {
-							dayBelokan++;
-						}
 					}
 					day[0]++;
 					today.put(p.id(), day);
-					lastKey.put(p.id(), k.kunci());
 					if (!k.dalam() && zona >= 0) {
 						BlockPos where = at != null ? at : peta.zona(zona).pusat();
 						double dist = Math.sqrt(where.distSqr(centre));
 						if (dist <= 128.0D) {
-							calon.add(new int[]{p.id(), zona, (int) dist, p.peran().stationary ? 1 : 0, titik ? 1 : 0, where.getX(), where.getY(), where.getZ()});
+							calon.add(new int[]{p.id(), zona, (int) dist, p.peran().stationary ? 1 : 0, titik ? 1 : 0, where.getX(), where.getY(), where.getZ(),
+									at != null ? 1 : 0});
 						}
 					}
 				}
@@ -477,13 +493,7 @@ public final class RagamUji {
 					bucket.kosongN++;
 				}
 				// bodies as the picker would make them for a player standing at the place centre
-				List<int[]> keepers = new ArrayList<>();
-				List<int[]> rest = new ArrayList<>();
-				for (int[] c : calon) {
-					(c[3] == 1 ? keepers : rest).add(c);
-				}
-				List<int[]> order = new ArrayList<>(keepers);
-				order.addAll(PemilihTubuh.sebar(peta, h, rest, anggaran, c -> c[1], c -> c[2]));
+				List<int[]> order = PemilihTubuh.urut(peta, h, calon, anggaran, c -> c[3] == 1, c -> c[1], c -> c[2]);
 				List<int[]> made = order.subList(0, Math.min(order.size(), anggaran));
 				int[] perZona = new int[peta.jumlah()];
 				List<Integer> visible = new ArrayList<>();
@@ -491,12 +501,15 @@ public final class RagamUji {
 					perZona[c[1]]++;
 				}
 				for (int z = 0; z < peta.jumlah(); z++) {
-					if ((h.occ(z) > 0 || perZona[z] > 0) && Math.sqrt(peta.zona(z).pusat().distSqr(centre)) <= 128.0D) {
+					if ((h.luar(z) > 0 || perZona[z] > 0) && Math.sqrt(peta.zona(z).pusat().distSqr(centre)) <= 128.0D) {
 						visible.add(z);
 					}
 				}
-				MetrikRagam.Tubuh tm = MetrikRagam.tubuhDari(visible, perZona, h.occ, -1);
+				MetrikRagam.Tubuh tm = MetrikRagam.tubuhDari(visible, perZona, h.luar, -1);
+				bucket.badan += made.size();
 				if (tm != null) {
+					bucket.rasio += tm.rasio();
+					bucket.rasioN++;
 					tN++;
 					tR += tm.rasio();
 					if (tm.empatZona()) {
@@ -508,8 +521,14 @@ public final class RagamUji {
 				}
 				for (int i = 0; i < made.size(); i++) {
 					int[] a = made.get(i);
+					if (a[8] == 0) {
+						continue; // no chosen spot (zone centre stands in for it): nothing to measure
+					}
 					for (int j = i + 1; j < made.size(); j++) {
 						int[] b = made.get(j);
+						if (b[8] == 0) {
+							continue;
+						}
 						pairs++;
 						double dx = a[5] - b[5];
 						double dz = a[7] - b[7];
@@ -529,9 +548,9 @@ public final class RagamUji {
 			int dayN = d;
 			double belokanHari = residents.isEmpty() ? 0.0D : dayBelokan / (double) residents.size();
 			MetrikRagam.Jumlah dj = dayTotal;
-			src.sendSuccess(() -> Component.translatable("kultivator.kota42.ragam.sim.hari", dayN + 1, angka(dj.bebasN > 0 ? dj.bebasS / dj.bebasN : -1),
+			keluar.accept(Component.translatable("kultivator.kota42.ragam.sim.hari", dayN + 1, angka(dj.bebasN > 0 ? dj.bebasS / dj.bebasN : -1),
 					dj.bebasN > 0 ? dj.bebasMin : 0, angka(dj.stafN > 0 ? dj.stafS / dj.stafN : -1), angka(dj.bebasN > 0 ? dj.ulangS / dj.bebasN : -1),
-					angka(dj.jacN > 0 ? dj.jacS / dj.jacN : -1), angka(belokanHari)), false);
+					angka(dj.jacN > 0 ? dj.jacS / dj.jacN : -1), angka(belokanHari)));
 			yesterday = today;
 			today = new HashMap<>();
 		}
@@ -543,11 +562,12 @@ public final class RagamUji {
 			if (b.n == 0) {
 				continue;
 			}
-			String line = String.format(Locale.ROOT, "%02d;%d;%.1f;%s;%s;%s", hour, b.n, b.bebas / b.n, angka(b.giniN > 0 ? b.gini / b.giniN : -1),
-					angka(b.kosongN > 0 ? b.kosong / b.kosongN : -1), angka(b.bagianN > 0 ? b.bagian / b.bagianN : -1));
+			String line = String.format(Locale.ROOT, "%02d;%d;%.1f;%s;%s;%s;%s;%.0f", hour, b.n, b.bebas / b.n, angka(b.giniN > 0 ? b.gini / b.giniN : -1),
+					angka(b.kosongN > 0 ? b.kosong / b.kosongN : -1), angka(b.bagianN > 0 ? b.bagian / b.bagianN : -1),
+					angka(b.rasioN > 0 ? b.rasio / b.rasioN : -1), b.badan / b.n);
 			log.append(line).append('\n');
 			String[] f = line.split(";");
-			src.sendSuccess(() -> Component.translatable("kultivator.kota42.ragam.sim.jam", f[0], f[2], f[3], f[4], f[5]), false);
+			keluar.accept(Component.translatable("kultivator.kota42.ragam.sim.jam", f[0], f[2], f[3], f[4], f[5]));
 		}
 		double giniAll = 0.0D;
 		int giniN = 0;
@@ -577,10 +597,7 @@ public final class RagamUji {
 			log.append(b.id()).append('=').append(angka(b.nilai())).append(" (").append(b.sasaran()).append(") ").append(b.lulus() ? "ok" : "GAGAL").append('\n');
 		}
 		Kultivator.LOGGER.info(log.toString());
-		long ms = (System.nanoTime() - started) / 1_000_000L;
-		cetak(src, Component.translatable("kultivator.kota42.ragam.sim.judul", huni.jenis, hariN, residents.size(), peta.jumlah(), ms), l);
-		src.sendSuccess(() -> Component.translatable("kultivator.kota42.ragam.sim.catatan").withStyle(ChatFormatting.GRAY), false);
-		return l.lulus() ? 1 : 0;
+		return l;
 	}
 
 	private RagamUji() {

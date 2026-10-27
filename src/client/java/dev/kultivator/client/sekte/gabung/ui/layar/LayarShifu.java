@@ -95,7 +95,7 @@ public final class LayarShifu extends LayarGabungDasar {
 		int x1 = x + w - 2;
 		int y0 = y + 2;
 		int y1 = y + h - 2;
-		int yy = LayarPutusan.kepalaSekte(l, lembar, x0, y0, x1);
+		int yy = y1 - y0 < PENDEK ? y0 : LayarPutusan.kepalaSekte(l, lembar, x0, y0, x1);
 		boolean kasihan = lembar.b(Shifu.KASIHAN);
 		yy += Math.round(l.bungkus(kasihan ? u("shifu.kasihan") : u("shifu.ket"), x0, yy, x1 - x0, kasihan ? Palette.PERINGATAN : l.gaya.teksLemah, 18))
 				+ 3;

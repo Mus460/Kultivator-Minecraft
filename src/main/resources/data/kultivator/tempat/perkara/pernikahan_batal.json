@@ -1,0 +1,66 @@
+{
+  "nama": "kultivator.kota42.perkara.t.pernikahan_batal.nama",
+  "teks": "kultivator.kota42.perkara.t.pernikahan_batal.teks",
+  "penggugat": {
+    "klaim": "kultivator.kota42.perkara.t.pernikahan_batal.klaim_a",
+    "peran": [
+      "warga",
+      "koki",
+      "pemilik_teh"
+    ]
+  },
+  "tergugat": {
+    "klaim": "kultivator.kota42.perkara.t.pernikahan_batal.klaim_b",
+    "peran": [
+      "warga",
+      "petani"
+    ]
+  },
+  "benar": "acak",
+  "saksi": 2,
+  "kesaksian": {
+    "penggugat": [
+      "kultivator.kota42.perkara.t.pernikahan_batal.saksi_a1",
+      "kultivator.kota42.perkara.t.pernikahan_batal.saksi_a2"
+    ],
+    "tergugat": [
+      "kultivator.kota42.perkara.t.pernikahan_batal.saksi_b1",
+      "kultivator.kota42.perkara.t.pernikahan_batal.saksi_b2"
+    ]
+  },
+  "dusta": "kultivator.kota42.perkara.t.pernikahan_batal.dusta",
+  "bukti": [
+    {
+      "jenis": "catatan",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.pernikahan_batal.bukti1_a",
+        "tergugat": "kultivator.kota42.perkara.t.pernikahan_batal.bukti1_b"
+      }
+    },
+    {
+      "jenis": "gosip",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.pernikahan_batal.bukti2_a",
+        "tergugat": "kultivator.kota42.perkara.t.pernikahan_batal.bukti2_b"
+      }
+    }
+  ],
+  "putusan": [
+    {
+      "untuk": "penggugat",
+      "teks": "kultivator.kota42.perkara.t.pernikahan_batal.putusan1",
+      "akibat": "kultivator.kota42.perkara.t.pernikahan_batal.putusan1_akibat"
+    },
+    {
+      "untuk": "tergugat",
+      "teks": "kultivator.kota42.perkara.t.pernikahan_batal.putusan2",
+      "akibat": "kultivator.kota42.perkara.t.pernikahan_batal.putusan2_akibat"
+    },
+    {
+      "untuk": "damai",
+      "teks": "kultivator.kota42.perkara.t.pernikahan_batal.putusan3",
+      "akibat": "kultivator.kota42.perkara.t.pernikahan_batal.putusan3_akibat"
+    }
+  ],
+  "suap": 0.3
+}

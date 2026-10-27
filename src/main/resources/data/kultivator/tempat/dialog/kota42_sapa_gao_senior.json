@@ -1,0 +1,42 @@
+{
+  "pembicara": [
+    "tokoh:gao_senior"
+  ],
+  "prioritas": 5,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_angkuh",
+      "pilihan": [
+        {
+          "ke": "sekte"
+        },
+        {
+          "ke": "cari"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "sekte",
+      "gestur": "sikap_angkuh",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "cari",
+      "gestur": "memandang",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

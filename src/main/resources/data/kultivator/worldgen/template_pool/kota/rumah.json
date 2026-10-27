@@ -282,6 +282,15 @@
     {
       "element": {
         "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/rumah_makan",
+        "processors": "kultivator:kota/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
         "location": "kultivator:kota/gudang",
         "processors": "kultivator:kota/lapuk",
         "projection": "rigid"

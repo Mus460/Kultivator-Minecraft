@@ -4,6 +4,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import dev.kultivator.Kultivator;
 import dev.kultivator.alchemy.AlchemyFurnace;
+import dev.kultivator.duel.api.DuelEndListeners;
 import dev.kultivator.sekte.gabung.GabungPayloads;
 import dev.kultivator.sekte.gabung.api.Corak;
 import dev.kultivator.sekte.gabung.api.GabungApi;
@@ -34,6 +35,8 @@ import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -238,6 +241,14 @@ public final class UjianCorak {
 				s.ujian.pilSelesai(level, pos, result, quality, success);
 			}
 		});
+		// the friendly duel of Seratus Tebasan (41.5.4): the listener only passes the result on, the runner ends the test
+		DuelEndListeners.add((session, winner, loser) -> {
+			ServerPlayer p = winner instanceof ServerPlayer w ? w : loser instanceof ServerPlayer l ? l : null;
+			Sesi s = p == null ? null : sesi(p);
+			if (s != null && s.ujian instanceof SeratusTebasan tebasan) {
+				tebasan.duelSelesai(winner, loser);
+			}
+		});
 		GabungApi.daftarUji("corak", UjianCorak::perintah);
 		for (Corak c : Corak.values()) {
 			dev.kultivator.sekte.gabung.GabungUji.chips("gabung corak " + c.id());
@@ -413,6 +424,7 @@ public final class UjianCorak {
 		}
 		u.majukan();
 		u.tik();
+		peringatanWaktu(p, u);
 		if (!u.selesai() && u.umur() >= u.batasTick()) {
 			u.waktuHabis();
 		}
@@ -422,6 +434,22 @@ public final class UjianCorak {
 		}
 		if (u.umur() % u.jedaHud() == 0) {
 			kirimHud(p, u);
+		}
+	}
+
+	/** 60, 30 and 10 seconds left: a line on the action bar and a tick of the bell (only when the limit is longer). */
+	private static void peringatanWaktu(ServerPlayer p, UjianDasar u) {
+		if (u.selesai()) {
+			return;
+		}
+		int sisa = u.batasTick() - u.umur();
+		for (int detik : new int[] {60, 30, 10}) {
+			if (sisa == detik * 20 && u.batasTick() > (detik + 20) * 20) {
+				Msg.actionBar(p, Component.translatable("kultivator.gabung.corak.sisa_waktu", detik)
+						.withStyle(detik <= 10 ? ChatFormatting.RED : ChatFormatting.YELLOW));
+				p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.NOTE_BLOCK_BELL.value(), SoundSource.PLAYERS, 0.5F,
+						detik <= 10 ? 1.6F : 1.2F);
+			}
 		}
 	}
 
@@ -452,6 +480,8 @@ public final class UjianCorak {
 			Component judul = Component.translatable("kultivator.gabung.corak.akhir." + alasan.toLowerCase(Locale.ROOT));
 			Msg.chat(p, Component.translatable("kultivator.gabung.corak.hasil", judul, persen)
 					.withStyle(hasil.gagal() ? ChatFormatting.RED : persen >= 70 ? ChatFormatting.GREEN : ChatFormatting.YELLOW));
+			p.level().playSound(null, p.getX(), p.getY(), p.getZ(), hasil.gagal() || persen < 35 ? SoundEvents.ANVIL_LAND : SoundEvents.PLAYER_LEVELUP,
+					SoundSource.PLAYERS, hasil.gagal() ? 0.4F : 0.6F, hasil.gagal() ? 0.7F : persen >= 70 ? 1.2F : 0.9F);
 			if (s.dariPerintah) {
 				GabungApi.lepasSibuk(p, SIBUK);
 			}

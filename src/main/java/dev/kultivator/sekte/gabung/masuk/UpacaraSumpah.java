@@ -39,6 +39,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -72,7 +74,11 @@ import java.util.UUID;
  */
 public final class UpacaraSumpah {
 
-	/** Ticks of the parts (the reading takes three lines of 3 s). */
+	/**
+	 * Ticks of the parts (the reading takes three lines of 3 s). Clip lengths on the client: kneel 60, incense 60 (it holds
+	 * its kneeling pose, so it is not interrupted by a second kneel), prostrations 60, badge 50 (hold). The incense starts at
+	 * 40 (the kneel has settled) and the first line follows when the clip has ended (40 + 60 = 100).
+	 */
 	static final int T_DUPA = 40;
 	static final int T_ATURAN_1 = 100;
 	static final int T_ATURAN_2 = 160;
@@ -250,8 +256,6 @@ public final class UpacaraSumpah {
 						Masuk.ucap(pemimpin, "gabung.sumpah_aturan_" + n, "elder.welcome", Masuk.t("ucap.sumpah_aturan_" + n));
 					}
 					Msg.chat(p, Masuk.t("sumpah.aturan", n, Masuk.t("ucap.sumpah_aturan_" + n)).withStyle(ChatFormatting.YELLOW));
-				} else if (t == T_DUPA + 30) {
-					GabungPayloads.kirimKlip(p, GabungGerakId.SUMPAH_BERLUTUT, 0);
 				} else if (t >= T_TANYA) {
 					u.fase = 1;
 					u.faseMulai = now;
@@ -308,6 +312,7 @@ public final class UpacaraSumpah {
 			GabungApi.tambahPk(p, u.bonus, u.istimewa ? "gabung.istimewa" : "gabung.putusan");
 		}
 		Advancements.grant(p, "sekte/gabung_sumpah");
+		p.level().playSound(null, u.altar, SoundEvents.BELL_RESONATE, SoundSource.PLAYERS, 1.2F, 0.9F);
 		if (pemimpin != null) {
 			Masuk.ucap(pemimpin, "gabung.diterima", "elder.welcome", Masuk.t("ucap.diterima"));
 		}

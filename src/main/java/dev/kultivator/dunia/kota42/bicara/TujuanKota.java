@@ -2,6 +2,7 @@ package dev.kultivator.dunia.kota42.bicara;
 
 import dev.kultivator.dunia.kota.KultivatorNpc;
 import dev.kultivator.dunia.kota42.KotaBus;
+import dev.kultivator.dunia.kota42.acara.KotaAcaraData;
 import dev.kultivator.dunia.kota42.api.JenisUpacara;
 import dev.kultivator.dunia.kota42.api.WargaApi;
 import dev.kultivator.dunia.kota42.warga.Ingatan;
@@ -16,13 +17,17 @@ import dev.kultivator.dunia.tempat.cerita.TempatDialog;
 import dev.kultivator.dunia.tempat.hidup.Pemanggil;
 import dev.kultivator.dunia.tempat.hidup.TempatHuni;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * The quest goal kinds of Kota yang Hidup (DESIGN 42.10 "tujuan baru 42B") for the 38 quest engine
@@ -60,11 +65,15 @@ public final class TujuanKota {
 		}
 		initialised = true;
 		for (String jenis : JENIS) {
-			QuestTracker.daftarTujuan(jenis, (args, j, id) -> j.equals(jenis) && cocok(args, id));
+			QuestTracker.daftarTujuan(jenis, (args, j, id) -> j.equals(jenis) && cocok(jenis, args, id));
 		}
 		KotaBus.UPACARA.register((server, situs, jenis, id, fase) -> {
-			if (fase == 1) {
-				diTempat(server, situs, "hadir_upacara", "jenis:" + jenis.name().toLowerCase(Locale.ROOT) + ";situs:" + situs);
+			if (fase >= 1) { // every step counts: a guest who arrives at the banquet was there too
+				StringBuilder token = new StringBuilder("jenis:").append(jenis.name().toLowerCase(Locale.ROOT)).append(";situs:").append(situs);
+				for (String tokoh : pesertaTokoh(server, situs, jenis, id)) {
+					token.append(";tokoh:").append(tokoh);
+				}
+				diTempat(server, situs, "hadir_upacara", token.toString());
 			}
 		});
 		KotaBus.KAVLING.register((server, situs, kavling, tahap) -> diTempat(server, situs, "kavling_tahap", "tahap:" + tahap + ";situs:" + situs));
@@ -76,6 +85,7 @@ public final class TujuanKota {
 			Warga w = wargaBicara(player);
 			return w != null && WargaApi.ingatan(w, player.getUUID()).nama;
 		});
+		Syarat.daftar("kota_wafat", (player, args) -> !args.isEmpty() && TokohKota.wafat(player.level().getServer(), args.get(0)));
 		Syarat.daftar("kota_tolong", (player, args) -> !args.isEmpty() && CeritaApi.bendera(player, "kota42.tolong." + args.get(0)));
 		Akibat.daftar("kota_kesan", (player, args) -> {
 			Warga w = wargaBicara(player);
@@ -100,17 +110,52 @@ public final class TujuanKota {
 		});
 	}
 
-	private static boolean cocok(List<String> args, String id) {
-		if (args.isEmpty() || "*".equals(args.get(0))) {
-			return true;
-		}
-		String want = args.get(0);
-		for (String token : id.split(";")) {
-			if (token.equals(want)) {
-				return true;
+	/** Goal words without {@code key:} read as this key ({@code hadir_upacara nikah}, {@code kavling_tahap 1}). */
+	private static final Map<String, String> SINGKAT = Map.of("hadir_upacara", "jenis", "kavling_tahap", "tahap", "perkara", "templat",
+			"tolong", "jenis", "ronda_geng", "malam", "gosip_telusur", "templat");
+
+	/** Every word of the goal must be {@code *} or one of the event's tokens ({@code hadir_upacara makam tokoh:lao_geng}). */
+	private static boolean cocok(String jenis, List<String> args, String id) {
+		String awalan = SINGKAT.get(jenis);
+		String[] tokens = id.split(";");
+		for (String want : args) {
+			if ("*".equals(want)) {
+				continue;
+			}
+			if (awalan != null && want.indexOf(':') < 0) {
+				want = awalan + ":" + want;
+			}
+			boolean ada = false;
+			for (String token : tokens) {
+				if (token.equals(want)) {
+					ada = true;
+					break;
+				}
+			}
+			if (!ada) {
+				return false;
 			}
 		}
-		return false;
+		return true;
+	}
+
+	/** Story characters taking part in ceremony {@code id}: both spouses, baby and parents, but only the dead at a funeral. */
+	private static List<String> pesertaTokoh(MinecraftServer server, long situs, JenisUpacara jenis, int id) {
+		List<String> out = new ArrayList<>();
+		WargaData data = WargaData.get(server);
+		// the ceremony records live in 42D's section "upacara" of KotaAcaraData (list "u": i = id, w = resident ids)
+		for (Tag t : KotaAcaraData.get(server).situs("upacara", situs).getListOrEmpty("u")) {
+			if (t instanceof CompoundTag r && r.getIntOr("i", -1) == id) {
+				int[] ids = r.getIntArray("w").orElse(new int[0]);
+				for (int k = 0; k < ids.length && (k == 0 || jenis != JenisUpacara.MAKAM); k++) {
+					Warga w = data.byId(ids[k]);
+					if (w != null && !w.tokoh.isEmpty() && !out.contains(w.tokoh)) {
+						out.add(w.tokoh);
+					}
+				}
+			}
+		}
+		return out;
 	}
 
 	private static int angka(String s) {
@@ -204,11 +249,21 @@ public final class TujuanKota {
 		}
 	}
 
-	/** 42D ({@code Ronda}): the player walked night watch round number {@code malam} (1-based) in place {@code situs}. */
+	/**
+	 * 42D ({@code Ronda}): the player walked night watch round number {@code malam} (1-based) in place {@code situs}. The
+	 * watchmen Lao Geng and Xiao Bang walk the watch of the place they live in, so their tokens join the event id.
+	 */
 	public static void ronda(ServerPlayer player, long situs, int malam) {
-		if (player != null) {
-			QuestTracker.peristiwa(player, "ronda_geng", "situs:" + situs + ";malam:" + malam);
+		if (player == null) {
+			return;
 		}
+		StringBuilder id = new StringBuilder("situs:").append(situs).append(";malam:").append(malam);
+		for (String tokoh : new String[] {"lao_geng", "xiao_bang"}) {
+			if (TokohKota.situs(player.level().getServer(), tokoh) == situs) {
+				id.append(";tokoh:").append(tokoh);
+			}
+		}
+		QuestTracker.peristiwa(player, "ronda_geng", id.toString());
 	}
 
 	/** {@code jenis} as a goal token ({@code nikah}...). */

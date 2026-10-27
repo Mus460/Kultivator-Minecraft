@@ -1,0 +1,176 @@
+# rinci: D-42K detail pass (conversation corpus breadth, DESIGN 42.5A.8). Source format: gen_kota_hidup_cakap.py.
+# Glue fragments that decorate the base frames of BERI_KABAR, KELUH, SAPA and BASA_BASI (an opener ends with a sentence stop
+# and a glued space "\_", a tail starts with a glued space), so one frame yields many sentences. The slots are added to the
+# frames by the drafting aid (scratchpad d42k/decor.py); the rules below are the fragments themselves.
+@kelompok rinci
+
+== awal.kabar
+- [2 biasa,kasar] Eh, dengar ini.\_ || Hey, listen to this.\_
+  ~ kasar: Hei. Dengar.\_ || Hey. Listen.\_
+- [2 biasa,kasar] Kau sudah dengar belum?\_ || Have you heard yet?\_
+  ~ kampung: Sudah dengar belum?\_ || Have you heard yet?\_
+- [biasa,kasar] Begini.\_ || Here's the thing.\_
+- [biasa,kasar] Oh ya, hampir lupa.\_ || Oh yes, nearly forgot.\_
+- [biasa] Baru tadi aku dengar.\_ || I only just heard.\_
+- [biasa] Ssst, mendekat sedikit.\_ || Shh, come a little closer.\_
+  ~ air: Kakak... mendekat sedikit... ada kabar...\_ || Dear... come a little closer... there's news...\_
+- [sopan,kuno] Mohon maaf mengganggu, ada kabar yang patut didengar.\_ || Pardon the interruption; there is news worth hearing.\_
+  ~ kuno: Perkenankan hamba menyampaikan sesuatu.\_ || Permit this one to relay something.\_
+- [sopan] Kebetulan kita bertemu, ada yang ingin kusampaikan.\_ || Fortunate we met; there is something I wish to tell you.\_
+- [biasa,kasar] Kebetulan kita bertemu.\_ || Lucky we met.\_
+- [biasa] Pasar lagi ramai membicarakan sesuatu.\_ || The market is buzzing about something.\_
+  ~ ibukota: Balai distrik lagi ramai membicarakan sesuatu.\_ || The district hall is buzzing about something.\_
+- [biasa] Kabar terbaru, nih.\_ || Fresh news, this.\_
+- [pelabuhan] Kabar dari dermaga, Bung.\_ || News off the docks, mate.\_
+- [oasis] Kabar dibawa kafilah, Saudara.\_ || News the caravans carried, friend.\_
+- [gunung] Amitaba. Ada kabar yang sampai ke gunung ini.\_ || Amitabha. News has reached this mountain.\_
+- [iblis] Informasi. Gratis kali ini.\_ || Information. Free, this once.\_
+- [kampung] Wah, ada kabar dari balai desa.\_ || Well, there's word from the village hall.\_
+
+== ekor.kabar
+- [2] \_Begitu kabar yang sampai ke telingaku. || \_That's the news that reached my ears.
+  ~ kuno: \_Demikianlah kabar yang sampai kepada hamba. || \_Such is the news that reached this one.
+- [2 biasa,kasar] \_Entah benar entah tidak, aku cuma menyampaikan. || \_True or not, I'm only passing it on.
+- [biasa,sopan] \_Kau sendiri sudah dengar? || \_Have you heard it yourself?
+- [biasa] \_Jangan bilang-bilang dulu, ya. || \_Don't spread it yet, will you.
+  ~ kasar: \_Bocorkan, dan kau berurusan denganku. || \_Leak it, and you answer to me.
+- [biasa,kasar] \_Itu kata orang, bukan kataku. || \_That's what folk say, not me.
+- [biasa] \_Sumur pun sudah ramai membicarakannya. || \_The well is already buzzing with it.
+  ~ pelabuhan: \_Dermaga pun sudah ramai membicarakannya. || \_The docks are already buzzing with it.
+- [biasa,kasar] \_Nah, sekarang kau tahu. || \_Well, now you know.
+- [biasa] \_Kupikir kau perlu tahu. || \_I thought you should know.
+- [biasa,sopan] \_Siapa tahu berguna bagimu. || \_Who knows, it may serve you.
+- [biasa] \_Kabar begini cepat basi, makanya kusampaikan sekarang. || \_News like this goes stale fast, so I'm telling you now.
+- [sopan] \_Demikian yang sempat kudengar, semoga bermanfaat. || \_That is all I managed to hear; may it be of use.
+- [sopan,kuno] \_Kiranya itu cukup untuk dipertimbangkan. || \_Perhaps that is enough to weigh.
+- [kasar] \_Percaya atau tidak, terserah. || \_Believe it or not, up to you.
+- [kasar] \_Jangan tanya dari mana. || \_Don't ask where from.
+- [biasa] \_Besok mungkin sudah ada kabar lain. || \_Tomorrow there may be other news.
+- [pelabuhan] \_Kabar laut cepat sampai ke darat, Bung. || \_News from the sea reaches land quickly, mate.
+- [oasis] \_Kabar bertiup bersama angin gurun, Saudara. || \_News blows with the desert wind, friend.
+- [gunung] \_Amitaba. Semoga kabar ini tidak mengeruhkan hati. || \_Amitabha. May this news not cloud the heart.
+- [iblis] \_Informasi ada harganya. Yang ini kuberikan cuma-cuma. || \_Information has a price. This piece I give free.
+- [kampung] \_Wis, begitu kabarnya. || \_Well, that's the word.
+- [air] \_Katanya begitu, Kakak... aku hanya ikut mendengar... || \_That's what they say, dear... I only overheard...
+
+== awal.keluh
+- [2 biasa,kasar] Hhh.\_ || Hhh.\_
+- [2 biasa,sopan] Kau tahu tidak?\_ || You know what?\_
+- [biasa,kasar] Dengar, ya.\_ || Listen.\_
+- [biasa] Sejujurnya?\_ || Honestly?\_
+- [biasa] Capek, deh.\_ || I'm worn out.\_
+  ~ kasar: Sudah muak.\_ || Sick of it.\_
+- [biasa] Mau dengar keluhanku?\_ || Want to hear my grumbles?\_
+- [biasa,kasar] Hari ini saja sudah begini.\_ || Just today alone is like this.\_
+- [sopan] Maaf kalau terdengar mengeluh.\_ || Forgive me if this sounds like complaining.\_
+- [sopan,kuno] Bolehkah hamba berkeluh sejenak?\_ || May this one grumble a moment?\_
+- [kuno] Ah, derita fana.\_ || Ah, the sorrows of mortal life.\_
+- [biasa] Duduk sini, kuceritakan.\_ || Sit here, I'll tell you.\_
+- [biasa,kasar] Jangan tertawa, ya.\_ || Don't laugh.\_
+- [pelabuhan] Bung, dengar dulu.\_ || Mate, hear me out.\_
+- [oasis] Saudara, sebelum matahari terbenam, dengarkan.\_ || Friend, before the sun sets, hear this.\_
+- [gunung] Amitaba. Hati ini penat.\_ || Amitabha. This heart is weary.\_
+- [kampung] Kamu tahu nggak?\_ || You know what?\_
+- [iblis] Jangan kaget. Di sini semua mengeluh.\_ || Don't be shocked. Everyone here grumbles.\_
+- [air] Kakak... boleh aku mengeluh sedikit...\_ || Dear... may I grumble a little...\_
+- [biasa] Tahu tidak, aku hampir menyerah.\_ || You know, I nearly gave up.\_
+- [biasa,kasar] Ya ampun, hari yang panjang.\_ || Goodness, what a long day.\_
+- [biasa,sopan] Boleh aku bercerita sedikit?\_ || May I tell you a little something?\_
+- [kasar] Sial, dengar ini.\_ || Damn, hear this.\_
+- [biasa] Seharian aku memikirkan ini.\_ || I've been brooding on this all day.\_
+- [sopan] Maaf, hati ini sedang berat.\_ || Forgive me, my heart is heavy today.\_
+- [biasa,kasar] Kalau bukan kau, aku diam saja.\_ || If it weren't you, I'd keep quiet.\_
+
+== ekor.keluh
+- [2] \_Entah sampai kapan begini. || \_Who knows how long it'll stay like this.
+- [2 biasa,kasar] \_Tapi siapa yang mau peduli. || \_But who's going to care.
+- [biasa] \_Ya sudah, kuceritakan saja padamu. || \_Well, I'll just tell you.
+- [biasa,sopan] \_Maaf jadi curhat. || \_Sorry for turning this into a vent.
+- [biasa] \_Kau pernah begitu juga? || \_Ever been through the same?
+- [biasa,kasar] \_Hidup memang begini. || \_Life's just like this.
+- [biasa] \_Besok mungkin lebih baik. Mungkin. || \_Tomorrow may be better. May be.
+- [biasa] \_Setidaknya masih ada teh hangat. || \_At least there's still warm tea.
+  ~ pelabuhan: \_Setidaknya masih ada arak di kedai, Bung. || \_At least there's still wine at the tavern, mate.
+- [kasar] \_Sudah, jangan dibahas lagi. || \_Enough, let's drop it.
+- [kasar] \_Dunia ini tidak adil. || \_This world isn't fair.
+- [sopan,kuno] \_Biarlah waktu yang menjawab. || \_Let time answer.
+- [kuno] \_Hamba hanya bisa bersabar. || \_This one can only be patient.
+- [biasa] \_Doakan saja yang terbaik. || \_Just wish for the best.
+- [oasis] \_Pasir pun akhirnya berhenti bergerak, Saudara. || \_Even sand eventually stops moving, friend.
+- [gunung] \_Amitaba. Semua akan berlalu. || \_Amitabha. All will pass.
+- [kampung] \_Wis, sabar saja. || \_Well, just be patient.
+- [iblis] \_Bukan berarti aku menyerah. Hanya capek. || \_Doesn't mean I give up. Just tired.
+- [air] \_Maaf, Kakak... aku jadi sedih sendiri... || \_Sorry, dear... I've made myself sad...
+- [biasa] \_Mungkin aku saja yang terlalu memikirkan. || \_Maybe it's only me overthinking.
+- [biasa,sopan] \_Terima kasih sudah mau mendengar. || \_Thank you for listening.
+- [biasa,kasar] \_Tapi ya, begitulah kita. || \_But well, that's how we are.
+- [biasa] \_Rasanya lega sudah menceritakan. || \_It feels a relief to have told it.
+- [kasar] \_Sudah, diam sana. || \_Right, enough, shush.
+- [sopan,kuno] \_Semoga musim berikutnya lebih ramah. || \_May the next season be kinder.
+- [biasa] \_Kalau ada jalan keluar, beritahu aku. || \_If you see a way out, tell me.
+
+== ekor.sapa
+- [2 biasa,sopan] \_Semoga harimu lancar. || \_May your day go smoothly.
+- [2 biasa] \_Mampir kalau sempat. || \_Drop by if you have time.
+- [biasa,sopan] \_Jaga dirimu baik-baik. || \_Take good care of yourself.
+- [biasa,kasar] \_Jangan membuat masalah, ya. || \_Don't make trouble, will you.
+- [biasa] \_Hati-hati di jalan. || \_Mind the road.
+- [biasa] \_Ada yang bisa kubantu? || \_Anything I can help with?
+- [biasa,sopan] \_Senang melihatmu lagi. || \_Good to see you again.
+- [biasa,kasar] \_Jalan terus, jangan menghalangi. || \_Keep walking, don't block the way.
+- [sopan] \_Semoga langit melindungimu. || \_May heaven keep you.
+- [sopan,kuno] \_Salam untuk keluargamu. || \_Greetings to your family.
+  ~ kuno: \_Hamba mendoakan keselamatanmu. || \_This one prays for your safety.
+- [kuno] \_Semoga jalanmu lapang. || \_May your path be wide.
+- [pelabuhan] \_Angin baik, Bung. || \_Fair winds, mate.
+- [oasis] \_Semoga mata air selalu dekat, Saudara. || \_May a spring always be near, friend.
+- [gunung] \_Amitaba. Semoga tenang. || \_Amitabha. Be at peace.
+- [kampung] \_Hati-hati ya, jalannya licin. || \_Careful now, the path is slippery.
+- [iblis] \_Berhati-hatilah. Di sini dinding punya telinga. || \_Be careful. Here the walls have ears.
+- [air] \_Selamat berjalan, Kakak... || \_Safe walking, dear...
+- [ibukota] \_Semoga urusanmu di kota ini lancar. || \_May your business in this city go well.
+
+== awal.basa
+- [2 biasa,kasar] Ngomong-ngomong.\_ || By the way.\_
+- [2 biasa] Nah.\_ || Well.\_
+- [biasa,kasar] Hm, bicara soal itu.\_ || Hm, speaking of which.\_
+- [biasa] Sambil menunggu, ya.\_ || While we wait, then.\_
+- [biasa] Kau juga merasa begitu?\_ || Do you feel the same?\_
+- [biasa,sopan] Kalau boleh berbasa-basi.\_ || If I may make small talk.\_
+- [sopan,kuno] Perkenankan hamba bertanya-tanya sejenak.\_ || Permit this one to chat a moment.\_
+- [biasa] Duduk sebentar, enak diobrolkan.\_ || Sit a while; it's nice to chat.\_
+- [biasa] Eh, kau tahu?\_ || Hey, did you know?\_
+- [kasar] Ah, daripada diam.\_ || Ah, better than silence.\_
+- [pelabuhan] Bung, sambil menunggu angin.\_ || Mate, while we wait for wind.\_
+- [oasis] Saudara, selagi menunggu teduh.\_ || Friend, while we wait for shade.\_
+- [kampung] Sambil duduk-duduk.\_ || While we sit about.\_
+- [gunung] Amitaba. Sambil menikmati hening.\_ || Amitabha. While enjoying the quiet.\_
+- [air] Kakak... sambil menunggu perahu...\_ || Dear... while waiting for the boat...\_
+- [biasa] Kebetulan sekali bertemu.\_ || What luck, meeting like this.\_
+- [biasa,kasar] Hm, ada waktu sebentar?\_ || Hm, got a moment?\_
+- [biasa] Sudah lama tidak mengobrol begini.\_ || It's been a while since we chatted like this.\_
+- [biasa,sopan] Kalau tidak mengganggu.\_ || If it's no bother.\_
+- [kasar] Daripada bengong.\_ || Better than staring into space.\_
+- [biasa] Teh dulu, baru bicara.\_ || Tea first, then talk.\_
+
+== ekor.basa
+- [2 biasa] \_Begitulah pikirku. || \_That's what I think.
+- [2 biasa,sopan] \_Kau sendiri bagaimana? || \_And yourself?
+- [biasa,kasar] \_Itu saja yang ada di kepalaku. || \_That's all that's in my head.
+- [biasa] \_Kadang hal kecil begini yang membuat betah. || \_Sometimes it's little things like this that make a place home.
+- [biasa,sopan] \_Semoga kita bertemu lagi. || \_May we meet again.
+- [biasa] \_Ceritakan kapan-kapan tentang tempatmu. || \_Tell me some time about where you're from.
+- [kasar] \_Sudah, jangan dipikirkan. || \_Enough, don't think on it.
+- [sopan,kuno] \_Demikian sekadar basa-basi dari hamba. || \_Such is this one's idle chatter.
+- [pelabuhan] \_Obrolan dermaga memang begini, Bung. || \_Dockside talk is just like this, mate.
+- [oasis] \_Obrolan di tepi mata air tak pernah habis, Saudara. || \_Talk by the spring never runs out, friend.
+- [gunung] \_Amitaba. Hening pun obrolan. || \_Amitabha. Even silence is a conversation.
+- [kampung] \_Ya begitulah orang kampung. || \_Well, that's village folk for you.
+- [air] \_Maaf, Kakak... aku terlalu banyak bicara... || \_Sorry, dear... I talk too much...
+- [iblis] \_Basa-basi di sini juga ada harganya. || \_Even small talk has a price here.
+- [biasa] \_Obrolan kecil begini menyegarkan. || \_Small talk like this is refreshing.
+- [biasa,sopan] \_Semoga hari ini baik padamu. || \_May today be good to you.
+- [biasa,kasar] \_Ya sudah, itu saja. || \_Well then, that's all.
+- [biasa] \_Lain kali kita lanjutkan. || \_We'll carry on another time.
+- [kasar] \_Cukup, aku mau diam. || \_Enough, I want quiet.
+- [sopan] \_Terima kasih telah menemani berbincang. || \_Thank you for keeping me company in talk.

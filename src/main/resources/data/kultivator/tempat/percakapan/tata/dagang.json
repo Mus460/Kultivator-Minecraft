@@ -369,6 +369,7 @@
         {
           "kunci": "dagang.cerita.laris.0",
           "slot": [
+            "$awal",
             "$barang",
             "$senang"
           ],
@@ -381,7 +382,10 @@
         },
         {
           "kunci": "dagang.cerita.laris.1",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 2,
           "varian": [
             "p"
@@ -389,12 +393,18 @@
         },
         {
           "kunci": "dagang.cerita.laris.2",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1
         },
         {
           "kunci": "dagang.cerita.laris.3",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1
         }
       ],
@@ -406,6 +416,14 @@
         "$senang": {
           "aturan": "seru.senang",
           "opsional": 0.5
+        },
+        "$awal": {
+          "aturan": "awal.kabar",
+          "opsional": 0.35
+        },
+        "$ekor": {
+          "aturan": "ekor.kabar",
+          "opsional": 0.4
         }
       },
       "gestur": "hitung_koin"
@@ -423,6 +441,7 @@
         {
           "kunci": "dagang.cerita.sepi.0",
           "slot": [
+            "$awal",
             "$keluh"
           ],
           "bobot": 3,
@@ -436,7 +455,9 @@
         {
           "kunci": "dagang.cerita.sepi.1",
           "slot": [
-            "$barang"
+            "$barang",
+            "$ekor",
+            "$awal"
           ],
           "bobot": 2,
           "varian": [
@@ -445,12 +466,17 @@
         },
         {
           "kunci": "dagang.cerita.sepi.2",
-          "slot": [],
+          "slot": [
+            "$awal"
+          ],
           "bobot": 1
         },
         {
           "kunci": "dagang.cerita.sepi.3",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "iblis"
@@ -465,6 +491,14 @@
         "$barang": {
           "tipe": "barang",
           "dari": "konteks.barang"
+        },
+        "$awal": {
+          "aturan": "awal.keluh",
+          "opsional": 0.45
+        },
+        "$ekor": {
+          "aturan": "ekor.keluh",
+          "opsional": 0.4
         }
       },
       "gestur": "geleng",

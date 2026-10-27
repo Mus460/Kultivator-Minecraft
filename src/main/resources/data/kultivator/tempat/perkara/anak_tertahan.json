@@ -1,0 +1,65 @@
+{
+  "nama": "kultivator.kota42.perkara.t.anak_tertahan.nama",
+  "teks": "kultivator.kota42.perkara.t.anak_tertahan.teks",
+  "penggugat": {
+    "klaim": "kultivator.kota42.perkara.t.anak_tertahan.klaim_a",
+    "peran": [
+      "warga",
+      "petani"
+    ]
+  },
+  "tergugat": {
+    "klaim": "kultivator.kota42.perkara.t.anak_tertahan.klaim_b",
+    "peran": [
+      "pedagang_keliling",
+      "tukang"
+    ]
+  },
+  "benar": "acak",
+  "saksi": 2,
+  "kesaksian": {
+    "penggugat": [
+      "kultivator.kota42.perkara.t.anak_tertahan.saksi_a1",
+      "kultivator.kota42.perkara.t.anak_tertahan.saksi_a2"
+    ],
+    "tergugat": [
+      "kultivator.kota42.perkara.t.anak_tertahan.saksi_b1",
+      "kultivator.kota42.perkara.t.anak_tertahan.saksi_b2"
+    ]
+  },
+  "dusta": "kultivator.kota42.perkara.t.anak_tertahan.dusta",
+  "bukti": [
+    {
+      "jenis": "catatan",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.anak_tertahan.bukti1_a",
+        "tergugat": "kultivator.kota42.perkara.t.anak_tertahan.bukti1_b"
+      }
+    },
+    {
+      "jenis": "gosip",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.anak_tertahan.bukti2_a",
+        "tergugat": "kultivator.kota42.perkara.t.anak_tertahan.bukti2_b"
+      }
+    }
+  ],
+  "putusan": [
+    {
+      "untuk": "penggugat",
+      "teks": "kultivator.kota42.perkara.t.anak_tertahan.putusan1",
+      "akibat": "kultivator.kota42.perkara.t.anak_tertahan.putusan1_akibat"
+    },
+    {
+      "untuk": "tergugat",
+      "teks": "kultivator.kota42.perkara.t.anak_tertahan.putusan2",
+      "akibat": "kultivator.kota42.perkara.t.anak_tertahan.putusan2_akibat"
+    },
+    {
+      "untuk": "damai",
+      "teks": "kultivator.kota42.perkara.t.anak_tertahan.putusan3",
+      "akibat": "kultivator.kota42.perkara.t.anak_tertahan.putusan3_akibat"
+    }
+  ],
+  "suap": 0.15
+}

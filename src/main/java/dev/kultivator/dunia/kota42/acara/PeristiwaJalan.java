@@ -1,11 +1,14 @@
 package dev.kultivator.dunia.kota42.acara;
 
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.kultivator.dunia.kota.Kota;
 import dev.kultivator.dunia.kota.KotaData;
 import dev.kultivator.dunia.kota.KultivatorNpc;
 import dev.kultivator.dunia.kota.NpcRole;
 import dev.kultivator.dunia.kota42.KotaConfig;
 import dev.kultivator.dunia.kota42.KotaHidup;
+import dev.kultivator.dunia.kota42.KotaUji;
 import dev.kultivator.dunia.kota42.api.JenisHubungan;
 import dev.kultivator.dunia.kota42.api.KotaGerakId;
 import dev.kultivator.dunia.kota42.api.PenimpaJadwalKota;
@@ -19,6 +22,7 @@ import dev.kultivator.dunia.kota42.hewan.HewanKota;
 import dev.kultivator.dunia.kota42.warga.Suasana;
 import dev.kultivator.dunia.kota42.warga.Warga;
 import dev.kultivator.dunia.kota42.warga.WargaData;
+import dev.kultivator.dunia.tempat.TempatInfo;
 import dev.kultivator.dunia.tempat.Titik;
 import dev.kultivator.dunia.tempat.ekonomi.GerobakEntity;
 import dev.kultivator.dunia.tempat.hidup.HidupApi;
@@ -38,6 +42,8 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -223,7 +229,38 @@ public final class PeristiwaJalan {
 		GerobakEntity.setPenangan((cart, player) -> player.level() instanceof ServerLevel level && klikEntitas(level, player, cart));
 		HewanKota.addPenangkapAyam(PeristiwaJalan::ayamTertangkap);
 		Suasana.addPengaruhTempat(PeristiwaJalan::pengaruhTempat);
+		KotaUji.daftar("acara", PeristiwaJalan::uji);
+		KotaUji.chips("kota_hidup acara copet_warga", "kota_hidup acara peristiwa <jenis>", "kota_hidup acara sebulan",
+				"kota_hidup acara <upacara> data", "kota_hidup acara upacara");
 		Upacara.init();
+	}
+
+	// ================================================================== test commands
+
+	/**
+	 * {@code uji kota_hidup acara copet|copet_warga|tawuran|gerobak|api|ayam|anak_tersesat} and the same under
+	 * {@code acara peristiwa <jenis>}: starts the event in the tester's place now (merged with 42D's {@code acara} node).
+	 */
+	static LiteralArgumentBuilder<CommandSourceStack> uji() {
+		LiteralArgumentBuilder<CommandSourceStack> root = Commands.literal("acara");
+		LiteralArgumentBuilder<CommandSourceStack> grup = Commands.literal("peristiwa");
+		for (String jenis : List.of(COPET, COPET_WARGA, PERKELAHIAN, TAWURAN, GEROBAK, API, AYAM, ANAK)) {
+			root.then(Commands.literal(jenis).executes(ctx -> ujiPicu(ctx.getSource(), jenis)));
+			grup.then(Commands.literal(jenis).executes(ctx -> ujiPicu(ctx.getSource(), jenis)));
+		}
+		return root.then(grup);
+	}
+
+	private static int ujiPicu(CommandSourceStack source, String jenis) throws CommandSyntaxException {
+		ServerPlayer player = source.getPlayerOrException();
+		TempatInfo info = dev.kultivator.dunia.kota42.KotaHidupCommands.tempatPemain(player);
+		if (info == null) {
+			source.sendFailure(Component.translatable("kultivator.kota42.acara.uji.tanpa_tempat"));
+			return 0;
+		}
+		boolean ok = picu(source.getLevel(), info.situsId(), jenis);
+		source.sendSuccess(() -> Component.translatable(L + (ok ? "uji.picu" : "uji.gagal"), jenis).withStyle(ok ? ChatFormatting.GREEN : ChatFormatting.RED), false);
+		return ok ? 1 : 0;
 	}
 
 	/** True while street events run ({@code kotaAcara.aktif}, {@code peristiwa}, residents on). */
@@ -384,7 +421,7 @@ public final class PeristiwaJalan {
 		// the pickpocket on a player: its own chance, once a day per town
 		if (KotaConfig.acara().copet && t.getLongOr("d_" + COPET, -1L) != hari && jam >= 7 && jam < 21 && !berjalan(huni.situsId, COPET)
 				&& dev.kultivator.util.Sibuk.why(player) == null && player.getDeltaMovement().horizontalDistanceSqr() < 0.02D
-				&& keramaian(level, player.blockPosition(), huni.situsId) >= 4 && r.nextDouble() < PELUANG_COPET) {
+				&& keramaian(level, player.blockPosition(), huni.situsId) >= 4 && r.nextDouble() < PELUANG_COPET * DistrikMalam.faktorCopet(level.getServer(), huni.situsId)) {
 			mulai(level, huni, COPET, player, now);
 			return;
 		}
@@ -409,7 +446,7 @@ public final class PeristiwaJalan {
 			bobot.put(API, malam ? 4 : 2);
 		}
 		if (jam >= 11 || jam < 1) {
-			bobot.put(PERKELAHIAN, malam ? 4 : 2);
+			bobot.put(PERKELAHIAN, (int) Math.round((malam ? 4 : 2) * (malam ? DistrikMalam.faktorPerkelahian(KotaHidup.server(), huni.situsId) : 1.0D)));
 		}
 		if (jam >= 7 && jam < 19 && !kampung) {
 			bobot.put(COPET_WARGA, 2);
@@ -1055,6 +1092,13 @@ public final class PeristiwaJalan {
 				if ((now - mulai) % 40L == 0L) {
 					ApiKecilEntity e = api.getFirst();
 					level.playSound(null, e.blockPosition(), SoundEvents.FIRE_AMBIENT, SoundSource.BLOCKS, 1.0F, 0.9F + level.getRandom().nextFloat() * 0.2F);
+					// the one at the head of the chain, next to the flames, flings his bucket at them (the others keep passing)
+					KultivatorNpc depan = rantai.isEmpty() ? null : tubuh(huni, rantai.getLast());
+					if (depan != null && depan.position().distanceToSqr(Vec3.atCenterOf(rantaiPos.getLast())) < 9.0D) {
+						HidupApi.tatap(depan, e);
+						HidupApi.klip(depan, KotaGerakId.SIRAM_API, KotaGerakId.PROP_EMBER_API, 24);
+						level.sendParticles(ParticleTypes.SPLASH, e.getX(), e.getY() + 0.9D, e.getZ(), 10, 0.35D, 0.3D, 0.35D, 0.12D);
+					}
 					if (malam && (now - mulai) % 80L == 0L) {
 						// the night watch beats the alarm fast (the gong of 42D's ronda when one is near)
 						level.playSound(null, e.blockPosition(), SoundEvents.BELL_BLOCK, SoundSource.NEUTRAL, 0.8F, 1.7F);
@@ -1286,6 +1330,12 @@ public final class PeristiwaJalan {
 				beri(player, new ItemStack(Items.EGG, 2));
 				if (petani != null) {
 					WargaApi.ubahKesan(petani, player, 5, "ayam", null);
+					KultivatorNpc petaniTubuh = tubuh(huni, petani);
+					if (petaniTubuh != null) {
+						// the farmer takes the hens home in the bamboo basket
+						HidupApi.tatap(petaniTubuh, player);
+						HidupApi.klip(petaniTubuh, KotaGerakId.DORONG_SANGKAR_AYAM, 0, 160);
+					}
 					seru(tubuh(huni, petani), "kota42.terima_kasih", "ayam.terima_kasih");
 				}
 				Msg.chat(player, Component.translatable(L + "ayam.hadiah").withStyle(ChatFormatting.GOLD));

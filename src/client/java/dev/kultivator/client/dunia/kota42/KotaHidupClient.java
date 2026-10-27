@@ -5,6 +5,7 @@ import dev.kultivator.client.dunia.kota42.gerak.KotaPoses;
 import dev.kultivator.client.dunia.kota42.ragam.PetaPanasDebug;
 import dev.kultivator.client.dunia.kota42.render.KotaRenderClient;
 import dev.kultivator.client.dunia.kota42.ui.KotaUiClient;
+import dev.kultivator.client.dunia.tempat.perbaikan.PerbaikanClient;
 import dev.kultivator.dunia.kota42.KotaPayloads;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -74,8 +75,10 @@ public final class KotaHidupClient {
 				UPACARA.put(payload.id(), payload);
 			}
 		});
-		ClientPlayNetworking.registerGlobalReceiver(KotaPayloads.Kavling.TYPE, (payload, context) ->
-				KAVLING.put(payload.situs() * 31L + payload.kavling(), payload));
+		ClientPlayNetworking.registerGlobalReceiver(KotaPayloads.Kavling.TYPE, (payload, context) -> {
+			KAVLING.put(payload.situs() * 31L + payload.kavling(), payload);
+			perancahKavling();
+		});
 		ClientPlayNetworking.registerGlobalReceiver(KotaPayloads.Kejar.TYPE, (payload, context) -> {
 			kejar = payload.copet() < 0 || payload.sisa() <= 0 ? null : payload;
 			kejarMs = System.currentTimeMillis();
@@ -97,6 +100,22 @@ public final class KotaHidupClient {
 		UjaranClient.init();
 		// 42S debug heat map:
 		PetaPanasDebug.init();
+	}
+
+	/** Stages 2-4 of a plot (frame, walls, roof) stand in a scaffold that rises with the stage (42.9.4). */
+	private static void perancahKavling() {
+		java.util.List<PerbaikanClient.Lahan> lahan = new java.util.ArrayList<>();
+		for (KotaPayloads.Kavling kv : KAVLING.values()) {
+			if (kv.tahap() < 2 || kv.tahap() > 4 || kv.kotak().length < 6) {
+				continue;
+			}
+			net.minecraft.core.BlockPos a = net.minecraft.core.BlockPos.of(kv.asal());
+			short[] k = kv.kotak();
+			int tinggi = Math.min(k[4], 4 + 4 * kv.tahap());
+			lahan.add(new PerbaikanClient.Lahan(kv.situs() * 31L + kv.kavling(), a.offset(k[0], k[1], k[2]),
+					a.offset(k[3], tinggi, k[5]), (kv.tahap() - 1) / 4.0F));
+		}
+		PerbaikanClient.perancahKavling(lahan);
 	}
 
 	// ================================================================== caches

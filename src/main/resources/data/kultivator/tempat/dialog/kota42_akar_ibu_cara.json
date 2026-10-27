@@ -1,0 +1,31 @@
+{
+  "pembicara": [
+    "tokoh:yu_xiuniang"
+  ],
+  "prioritas": 55,
+  "syarat": [
+    "quest kota42_akar_langit tahap cara"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "365",
+      "prop": "180",
+      "pilihan": [
+        {
+          "akibat": [
+            "kota42.kesan tokoh:yu_xiuniang 15",
+            "quest_maju kota42_akar_langit"
+          ],
+          "ke": "bujuk"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "bujuk",
+      "gestur": "hormat"
+    }
+  ]
+}

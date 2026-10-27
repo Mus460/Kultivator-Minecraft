@@ -47,12 +47,17 @@ public final class PetaZona {
 	public record Unit(int indeks, int zona, Bentuk bentuk, String nama, BoundingBox kotak, int kapasitas, List<Titik> titik) {
 	}
 
-	/** One zone: a district's share of one zone kind. */
-	public record Zona(int indeks, String distrik, String jenis, BoundingBox kotak, BlockPos pusat, int kapasitas, int[] unit) {
+	/** One zone: a district's share of one zone kind (a large share is cut into strips, {@code sektor} 1, 2, ...; 0 = whole). */
+	public record Zona(int indeks, String distrik, String jenis, BoundingBox kotak, BlockPos pusat, int kapasitas, int[] unit, int sektor) {
 		public String id() {
-			return distrik + "/" + jenis;
+			return distrik + "/" + jenis + (sektor > 0 ? "#" + sektor : "");
 		}
 	}
+
+	/** A district's share of one kind above this capacity is cut into strips of about this size, so a market or a plaza spreads. */
+	static final int SEKTOR_K = 36;
+	/** The most strips of one share. */
+	static final int SEKTOR_MAKS = 4;
 
 	private static final Map<Long, PetaZona> CACHE = new HashMap<>();
 
@@ -64,6 +69,8 @@ public final class PetaZona {
 	private final Map<Long, Integer> unitTitik;
 	private final Map<Long, Integer> sel;
 	private final Map<Long, List<Integer>> selBangunan;
+	/** {@link #sebaran} by goal. */
+	private final Map<String, int[]> sebaranCache = new HashMap<>();
 	/** Seats of the taverns, tea houses and eating houses (near a tea kettle, or a stove with four seats round it). */
 	public final List<Titik> kursiKedai;
 	/** Market stalls ({@code lapak}, {@code kerja:kios}). */
@@ -108,6 +115,42 @@ public final class PetaZona {
 
 	public List<Zona> semua() {
 		return zona;
+	}
+
+	/** Places per zone that a general goal ({@code kursi}, {@code @kedai}, {@code @depan_lapak}, {@code @jalan}, ...) can use. */
+	public int[] sebaran(String goal) {
+		int[] out = sebaranCache.get(goal);
+		if (out == null) {
+			out = new int[zona.size()];
+			if (goal.equals("@kedai")) {
+				for (Titik t : kursiKedai) {
+					tambah(out, t);
+				}
+			} else if (goal.equals("@depan_lapak")) {
+				for (Titik t : lapak) {
+					tambah(out, t);
+				}
+			} else {
+				String jenis = goal.equals("@jalan") ? "jalan" : goal;
+				String kembar = Penyeimbang.kembar(jenis);
+				for (Unit u : unit) {
+					for (Titik t : u.titik()) {
+						if (t.jenis().equals(jenis) || t.jenis().equals(kembar)) {
+							out[u.zona()]++;
+						}
+					}
+				}
+			}
+			sebaranCache.put(goal, out);
+		}
+		return out;
+	}
+
+	private void tambah(int[] out, Titik t) {
+		int z = zonaDi(t.pos());
+		if (z >= 0 && z < out.length) {
+			out[z]++;
+		}
 	}
 
 	public int jumlah() {
@@ -209,6 +252,11 @@ public final class PetaZona {
 	}
 
 	static PetaZona bangun(ServerLevel level, TempatHuni huni) {
+		return bangun(huni, distrik(level, huni));
+	}
+
+	/** The map of {@code huni} for the given districts (the offline simulation passes its own; empty = the compass split). */
+	static PetaZona bangun(TempatHuni huni, List<Distrik> distrik) {
 		Map<String, Integer> jenisTitik = huni.ringkasTitik();
 		List<Titik> semua = new ArrayList<>();
 		for (String type : jenisTitik.keySet()) {
@@ -271,8 +319,6 @@ public final class PetaZona {
 			String kind = e.getKey().substring(e.getKey().lastIndexOf(',') + 1);
 			semuaBakal.add(new Bakal(Bentuk.LAPANGAN, "lapangan_" + e.getKey(), kind, kotak(e.getValue()), e.getValue()));
 		}
-		// districts
-		List<Distrik> distrik = distrik(level, huni);
 		BlockPos tengah = huni.kotak.getCenter();
 		double setengah = Math.max(huni.kotak.getXSpan(), huni.kotak.getZSpan()) / 2.0D;
 		Map<String, List<Integer>> perZona = new LinkedHashMap<>();
@@ -284,6 +330,7 @@ public final class PetaZona {
 			distrikBakal.add(d);
 			perZona.computeIfAbsent(d + "/" + b.jenis(), k -> new ArrayList<>()).add(i);
 		}
+		perZona = potong(perZona, semuaBakal);
 		List<Zona> zona = new ArrayList<>();
 		List<Unit> unit = new ArrayList<>();
 		Map<Long, Integer> unitTitik = new HashMap<>();
@@ -326,10 +373,15 @@ public final class PetaZona {
 				}
 			}
 			String[] dj = e.getKey().split("/", 2);
+			int hash = dj[1].indexOf('#');
+			int sektor = hash < 0 ? 0 : Integer.parseInt(dj[1].substring(hash + 1));
+			if (hash >= 0) {
+				dj[1] = dj[1].substring(0, hash);
+			}
 			BoundingBox z0 = box == null ? huni.kotak : box;
 			BlockPos c = z0.getCenter();
 			int y = yN > 0 ? (int) (ySum / yN) : c.getY();
-			zona.add(new Zona(zi, dj[0], dj[1], z0, new BlockPos(c.getX(), y, c.getZ()), Math.max(1, kap), units));
+			zona.add(new Zona(zi, dj[0], dj[1], z0, new BlockPos(c.getX(), y, c.getZ()), Math.max(1, kap), units, sektor));
 		}
 		// buildings were added in size order inside each zone; keep the smallest first per grid cell
 		for (List<Integer> list : selBangunan.values()) {
@@ -351,6 +403,57 @@ public final class PetaZona {
 		stalls.addAll(huni.titik("kerja:kios"));
 		return new PetaZona(huni.situsId, huni.jumlahTitik(), List.copyOf(zona), List.copyOf(unit), unitTitik, sel, selBangunan,
 				kursiKedai(huni), List.copyOf(stalls));
+	}
+
+	/**
+	 * Cuts every share of a kind whose capacity passes {@link #SEKTOR_K} into strips along its longer side, each about
+	 * {@code SEKTOR_K} large (at most {@link #SEKTOR_MAKS}); the first strip keeps the plain key, the others get {@code #n}.
+	 */
+	private static Map<String, List<Integer>> potong(Map<String, List<Integer>> perZona, List<Bakal> bakal) {
+		Map<String, List<Integer>> out = new LinkedHashMap<>();
+		for (Map.Entry<String, List<Integer>> e : perZona.entrySet()) {
+			List<Integer> list = e.getValue();
+			int total = 0;
+			int minX = Integer.MAX_VALUE;
+			int maxX = Integer.MIN_VALUE;
+			int minZ = Integer.MAX_VALUE;
+			int maxZ = Integer.MIN_VALUE;
+			for (int i : list) {
+				total += kapasitas(bakal.get(i));
+				BlockPos c = bakal.get(i).kotak().getCenter();
+				minX = Math.min(minX, c.getX());
+				maxX = Math.max(maxX, c.getX());
+				minZ = Math.min(minZ, c.getZ());
+				maxZ = Math.max(maxZ, c.getZ());
+			}
+			int n = Math.min(SEKTOR_MAKS, (total + SEKTOR_K - 1) / SEKTOR_K);
+			if (n < 2 || list.size() < 2 * n) {
+				out.put(e.getKey(), list);
+				continue;
+			}
+			boolean alongX = maxX - minX >= maxZ - minZ;
+			List<Integer> sorted = new ArrayList<>(list);
+			sorted.sort(Comparator.comparingInt((Integer i) -> alongX ? bakal.get(i).kotak().getCenter().getX() : bakal.get(i).kotak().getCenter().getZ())
+					.thenComparingInt(i -> i));
+			List<List<Integer>> strips = new ArrayList<>();
+			for (int s = 0; s < n; s++) {
+				strips.add(new ArrayList<>());
+			}
+			int run = 0;
+			for (int i : sorted) {
+				int s = Math.min(n - 1, (int) ((long) run * n / Math.max(1, total)));
+				strips.get(s).add(i);
+				run += kapasitas(bakal.get(i));
+			}
+			int sektor = 0;
+			for (List<Integer> strip : strips) {
+				if (!strip.isEmpty()) {
+					out.put(sektor == 0 ? e.getKey() : e.getKey() + "#" + sektor, strip);
+					sektor++;
+				}
+			}
+		}
+		return out;
 	}
 
 	private static long volume(BoundingBox b) {

@@ -1,0 +1,43 @@
+{
+  "pembicara": [
+    "tokoh:gao_senior"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest kota42_akar_langit aktif",
+    "!quest kota42_akar_langit tahap daun",
+    "!quest kota42_akar_langit tahap tanding",
+    "!bendera kota42.akar.pilih"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_angkuh",
+      "akibat": [
+        "bendera kota42.akar.dengar_gao"
+      ],
+      "pilihan": [
+        {
+          "syarat": [
+            "quest kota42_akar_langit tahap cara"
+          ],
+          "akibat": [
+            "bendera kota42.akar.tanding",
+            "quest_maju kota42_akar_langit",
+            "mulai_duel"
+          ],
+          "tampil": true,
+          "alasan": "kultivator.cerita.kota42_akar_gao.mulai.1.alasan"
+        },
+        {
+          "ke": "putus"
+        }
+      ]
+    },
+    {
+      "id": "putus",
+      "gestur": "sikap_angkuh"
+    }
+  ]
+}

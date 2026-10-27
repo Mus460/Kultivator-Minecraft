@@ -11,6 +11,7 @@ import dev.kultivator.dunia.kota42.warga.Warga;
 import dev.kultivator.dunia.tempat.TempatInfo;
 import dev.kultivator.dunia.tempat.ekonomi.Barang;
 import dev.kultivator.dunia.tempat.ekonomi.EkonomiApi;
+import dev.kultivator.dunia.tempat.ekonomi.RumahUang;
 import dev.kultivator.dunia.kota.NilaiBatu;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
@@ -136,6 +137,21 @@ public final class Investasi {
 		b.putLong("laci", b.getLongOr("laci", 0L) - take);
 		KotaEkonomiData.get(server).ubah();
 		return take;
+	}
+
+	/**
+	 * Pays a standing bill (property tax, wages) of a player who is away: the drawer first, then the Rumah Uang deposit.
+	 * All or nothing; {@code kunci} is the deposit history line ({@code kultivator.kota42.bank.riwayat.*}, one %s).
+	 */
+	public static boolean bayarLuring(MinecraftServer server, UUID player, long nb, String kunci, Object arg) {
+		if (nb <= 0L) {
+			return true;
+		}
+		if (laci(server, player) >= nb) {
+			dariLaci(server, player, nb);
+			return true;
+		}
+		return RumahUang.potong(server, player, nb, kunci, arg);
 	}
 
 	/** Pays the drawer out as spirit stones; returns what was paid. */

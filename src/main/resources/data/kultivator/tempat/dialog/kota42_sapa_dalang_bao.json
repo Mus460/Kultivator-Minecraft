@@ -1,0 +1,32 @@
+{
+  "pembicara": [
+    "tokoh:bao_qing"
+  ],
+  "prioritas": -1,
+  "syarat": [
+    "quest kota42_pejabat_jujur aktif"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_tangan_belakang",
+      "pilihan": [
+        {
+          "ke": "perkara_kota"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "perkara_kota",
+      "gestur": "418",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

@@ -7,6 +7,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.kultivator.dunia.kota42.KotaConfig;
+import dev.kultivator.dunia.kota42.KotaHidup;
 import dev.kultivator.dunia.kota42.KotaHidupCommands;
 import dev.kultivator.dunia.kota42.ekonomi.KotaEkonomi;
 import dev.kultivator.dunia.tempat.PotonganInfo;
@@ -34,7 +35,7 @@ import java.util.function.Function;
  * The commands of 42F (DESIGN 42.14.2-42.14.3).
  * <ul>
  *   <li>{@code uji kota_hidup tumbuh [info]}, {@code kavling [daftar|tp <n>|pilih <n> <rencana>|mulai <n>]},
- *       {@code tahap [lanjut|semua]}, {@code bahan isi}, {@code makmur <n>}, {@code rusak_proyek};</li>
+ *       {@code tahap [lanjut|semua]}, {@code bahan isi}, {@code makmur <n>}, {@code rusak_proyek}, {@code blokade [hari]};</li>
  *   <li>{@code uji kota_hidup kompat periksa [radius]}: structures of other namespaces touching the plots and lots of the
  *       places near the tester, and the plots marked {@code TIDAK_LAYAK} with their reason (42.12.1A);</li>
  *   <li>{@code /kultivasi kotaku kavling [<n> [sumbang <nb>|rencana <id>]]}, {@code kavling jual|beri <bahan> <n>},
@@ -65,7 +66,9 @@ final class KotaTumbuhPerintah {
 						.then(Commands.literal("semua").executes(ctx -> tahap(ctx, true))))
 				.then(Commands.literal("bahan").then(Commands.literal("isi").executes(KotaTumbuhPerintah::bahanIsi)))
 				.then(Commands.literal("makmur").then(Commands.argument("n", IntegerArgumentType.integer(-1, 100)).executes(KotaTumbuhPerintah::makmur)))
-				.then(Commands.literal("rusak_proyek").executes(KotaTumbuhPerintah::rusakProyek));
+				.then(Commands.literal("rusak_proyek").executes(KotaTumbuhPerintah::rusakProyek))
+				.then(Commands.literal("blokade").executes(ctx -> blokade(ctx, 2))
+						.then(Commands.argument("hari", IntegerArgumentType.integer(0, 14)).executes(ctx -> blokade(ctx, IntegerArgumentType.getInteger(ctx, "hari")))));
 	}
 
 	private record Tempat(ServerPlayer player, ServerLevel level, MinecraftServer server, long situs) {
@@ -277,6 +280,22 @@ final class KotaTumbuhPerintah {
 		}
 		BangunKembali.mulai(t.server(), t.level(), t.situs(), open);
 		ctx.getSource().sendSuccess(() -> Component.translatable(K + "bangun.mulai", open), false);
+		return 1;
+	}
+
+	/** {@code blokade [hari]}: blockades the place for that many days (0 lifts it) and reports refugees and migrant builders. */
+	private static int blokade(CommandContext<CommandSourceStack> ctx, int hari) throws CommandSyntaxException {
+		Tempat t = tempat(ctx);
+		if (t == null) {
+			return 0;
+		}
+		if (hari == 0) {
+			Blokade.akhiri(t.server(), t.situs());
+		} else {
+			Blokade.mulai(t.server(), t.situs(), KotaHidup.hari(t.server()) + hari);
+		}
+		ctx.getSource().sendSuccess(() -> Component.translatable(K + "uji.blokade", Blokade.aktif(t.server(), t.situs()) ? 1 : 0,
+				Blokade.rumah(t.server(), t.situs()).size(), TukangPendatang.jumlah(t.situs()), String.format(java.util.Locale.ROOT, "%.2f", Pembangun.faktorMurid(t.server(), t.situs()))), false);
 		return 1;
 	}
 

@@ -335,5 +335,20 @@
   "kultivator.gabung.ui2.putusan.bonus": "Bonus",
   "kultivator.gabung.ui2.putusan.sumpah": "To the Oath Ceremony",
   "kultivator.gabung.ui2.putusan.pelayan": "Enter by the Servant Door",
-  "kultivator.gabung.ui2.putusan.tutup": "Close"
+  "kultivator.gabung.ui2.putusan.tutup": "Close",
+  "kultivator.gabung.ui2.politik.hal.tetua": "Elders",
+  "kultivator.gabung.ui2.politik.hal.tindakan": "Actions",
+  "kultivator.gabung.ui2.politik.hal.suksesi": "Succession",
+  "kultivator.gabung.ui2.politik.hal.pewaris": "Heir",
+  "kultivator.gabung.ui2.politik.hal.misi": "War missions",
+  "kultivator.gabung.ui2.politik.hal.peta": "Map",
+  "kultivator.gabung.ui2.politik.hal.sumbangan": "Donations",
+  "kultivator.gabung.ui2.politik.hal.grafik": "Graph",
+  "kultivator.gabung.ui2.politik.hal.daftar": "Branches",
+  "kultivator.gabung.ui2.politik.hal.restu": "Blessing",
+  "kultivator.gabung.ui2.politik.suksesi.bab": "Chapter %1$s of %2$s: %3$s",
+  "kultivator.gabung.ui2.paviliun.hal.barang": "Goods",
+  "kultivator.gabung.ui2.paviliun.hal.rincian": "Details",
+  "kultivator.gabung.ui2.papan.hal.misi": "Missions",
+  "kultivator.gabung.ui2.papan.hal.slip": "Details"
 }

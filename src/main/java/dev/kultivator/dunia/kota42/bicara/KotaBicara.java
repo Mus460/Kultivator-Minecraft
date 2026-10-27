@@ -151,6 +151,14 @@ public final class KotaBicara {
 		return KotaConfig.bicara().aktif && WargaApi.aktif();
 	}
 
+	/**
+	 * The name a player gave a street of place {@code situs} (effect {@code kota42.nama_jalan}), or null. For the street-name
+	 * post at the titik {@code nama_jalan} (42V-F {@code TitikSiar}), which shows it instead of the generator's default.
+	 */
+	public static @org.jetbrains.annotations.Nullable String namaJalan(MinecraftServer server, long situs) {
+		return server == null ? null : AkibatKota.namaJalanDi(server, situs);
+	}
+
 	static Muatan muatan() {
 		return muatan;
 	}

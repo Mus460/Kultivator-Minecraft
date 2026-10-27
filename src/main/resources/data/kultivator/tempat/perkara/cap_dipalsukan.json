@@ -1,0 +1,67 @@
+{
+  "nama": "kultivator.kota42.perkara.t.cap_dipalsukan.nama",
+  "teks": "kultivator.kota42.perkara.t.cap_dipalsukan.teks",
+  "penggugat": {
+    "klaim": "kultivator.kota42.perkara.t.cap_dipalsukan.klaim_a",
+    "peran": [
+      "pedagang_keliling",
+      "pandai_pusaka",
+      "tukang"
+    ]
+  },
+  "tergugat": {
+    "klaim": "kultivator.kota42.perkara.t.cap_dipalsukan.klaim_b",
+    "peran": [
+      "pedagang_keliling",
+      "pialang"
+    ]
+  },
+  "benar": "acak",
+  "saksi": 2,
+  "kesaksian": {
+    "penggugat": [
+      "kultivator.kota42.perkara.t.cap_dipalsukan.saksi_a1",
+      "kultivator.kota42.perkara.t.cap_dipalsukan.saksi_a2"
+    ],
+    "tergugat": [
+      "kultivator.kota42.perkara.t.cap_dipalsukan.saksi_b1",
+      "kultivator.kota42.perkara.t.cap_dipalsukan.saksi_b2"
+    ]
+  },
+  "dusta": "kultivator.kota42.perkara.t.cap_dipalsukan.dusta",
+  "bukti": [
+    {
+      "jenis": "barang",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.cap_dipalsukan.bukti1_a",
+        "tergugat": "kultivator.kota42.perkara.t.cap_dipalsukan.bukti1_b"
+      },
+      "barang": "minecraft:white_wool"
+    },
+    {
+      "jenis": "catatan",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.cap_dipalsukan.bukti2_a",
+        "tergugat": "kultivator.kota42.perkara.t.cap_dipalsukan.bukti2_b"
+      }
+    }
+  ],
+  "putusan": [
+    {
+      "untuk": "penggugat",
+      "teks": "kultivator.kota42.perkara.t.cap_dipalsukan.putusan1",
+      "akibat": "kultivator.kota42.perkara.t.cap_dipalsukan.putusan1_akibat"
+    },
+    {
+      "untuk": "tergugat",
+      "teks": "kultivator.kota42.perkara.t.cap_dipalsukan.putusan2",
+      "akibat": "kultivator.kota42.perkara.t.cap_dipalsukan.putusan2_akibat"
+    },
+    {
+      "untuk": "damai",
+      "teks": "kultivator.kota42.perkara.t.cap_dipalsukan.putusan3",
+      "akibat": "kultivator.kota42.perkara.t.cap_dipalsukan.putusan3_akibat"
+    }
+  ],
+  "suap": 0.45
+}

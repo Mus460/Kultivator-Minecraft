@@ -980,6 +980,9 @@ public final class TugasHarian {
 		}
 		Msg.chat(player, (s.tugas.harian ? Component.translatable("kultivator.gabung.tugas.selesai", s.tugas.nama(), pk, k.tugasJumlah, PER_HARI)
 				: Component.translatable("kultivator.gabung.tugas.selesai_lain", s.tugas.nama(), pk)).withStyle(ChatFormatting.GOLD));
+		// D-41C: one line of how the chore looked from outside (two per chore, by world day)
+		Msg.chat(player, Component.translatable("kultivator.gabung.tugas." + s.tugas.id + ".puji." + Math.floorMod(hari + k.tugasTotal, 2L))
+				.withStyle(ChatFormatting.ITALIC, ChatFormatting.GRAY));
 		if (khas) {
 			Msg.chat(player, Component.translatable("kultivator.gabung.tugas.khas", GabungApi.corak(s.sekte).nama()).withStyle(ChatFormatting.DARK_AQUA));
 		}
@@ -1000,6 +1003,9 @@ public final class TugasHarian {
 	static @Nullable String questTugas(Tugas t) {
 		return switch (t) {
 			case PIKUL_AIR -> "gabung_tugas_air";
+			case SAPU -> "gabung_tugas_sapu";
+			case KEBUN -> "gabung_tugas_kebun";
+			case GERBANG -> "gabung_tugas_gerbang";
 			case TUNGKU -> "gabung_tugas_tungku";
 			case KITAB -> "gabung_tugas_kitab";
 			case KANDANG -> "gabung_tugas_kandang";

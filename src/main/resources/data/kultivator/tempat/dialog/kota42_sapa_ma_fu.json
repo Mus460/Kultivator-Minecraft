@@ -1,0 +1,56 @@
+{
+  "pembicara": [
+    "tokoh:ma_fu"
+  ],
+  "prioritas": 5,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "seru_dagang",
+      "pilihan": [
+        {
+          "ke": "langka"
+        },
+        {
+          "ke": "begal"
+        },
+        {
+          "ke": "utang"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "langka",
+      "gestur": "tawar",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "begal",
+      "gestur": "hitung_sempoa",
+      "prop": "sempoa",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "utang",
+      "gestur": "tertawa",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

@@ -506,6 +506,11 @@ public final class KantorRekrut {
 		if (Berbakat.perluRestu(w)) {
 			if (w.sikapKeluarga == Berbakat.MENOLAK) {
 				boolean quest = CeritaApi.mulaiQuest(player, "kota42_restu_ayah", situs);
+				if (quest) {
+					KotaSekteData sd = KotaSekteData.get(server);
+					sd.bagian(KotaSekteData.RESTU).putInt(player.getUUID().toString(), w.id);
+					sd.ubah();
+				}
 				Warga ayah = w.ayah == Warga.TANPA ? null : data.byId(w.ayah);
 				Component nama = ayah != null ? WargaApi.nama(ayah) : Component.translatable("kultivator.kota42.sekte.kantor.keluarga");
 				return KotaSekte.Hasil.gagal(quest ? "kantor.restu_quest" : "kantor.restu_tolak", nama, WargaApi.nama(w)).kirim(player);

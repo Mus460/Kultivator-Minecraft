@@ -1,7 +1,7 @@
-# Checklist uji Fase 41 — Gabung Sekte (draf F41-1)
+# Checklist uji Fase 41 — Gabung Sekte (final F-END)
 
-Ditulis F41-1 setelah gelombang 41-G1 (build B1 hijau). Sumber: DESIGN 41.16 (`docs/rancangan/41-gabung-sekte.md`).
-Belum ada yang diuji di game; F-END merapikan setelah gelombang detail D-41-42. Perintah uji di bawah
+Ditulis F41-1, dirapikan F-END setelah gelombang detail D-41-42 (build B3 hijau). Sumber: DESIGN 41.16 (`docs/rancangan/41-gabung-sekte.md`).
+Belum ada yang diuji di game; semua centang di bawah menunggu penguji. Perintah uji di bawah
 `/kultivasi uji gabung ...` (op 2); perintah pemain di bawah `/kultivasi gabung ...`. **Selalu dunia baru.** Config bawaan:
 `gabungSekte.aktif` true, `sebaran` seimbang, `tubuhMaks` 24. Panduan: bab 22. Bantuan: topik "Gabung Sekte", "Kelas Sekte",
 "Corak Sekte".
@@ -14,11 +14,24 @@ runtime selain lewat WorldBreaker/BuildPlacer, tidak ada tokoh yang mati, tidak 
 - [x] TplCheck `kompleks_sekte` (50) dan `sekte` (3) bersih; cek_tempat 0 galat; jumlah structure set tetap 105
 - [x] 29 advancement diberikan dari kode; semua sub `uji gabung` terdaftar
 
-## Celah yang diketahui di B1 (untuk gelombang detail)
-- Ujian Murid Dalam dan Ujian Tetua belum ada pelaksananya: kenaikan ke Dalam/Tetua tertahan di baris "ujian". Uji Ulang
-  (Luar) dan syarat Inti (turnamen 3 besar / misi A) sudah tersambung.
-- Dialog aturan `gabung_aturan_<aliran>` belum dibuka dari mana pun (sumpah membacakan 3 aturan lewat chat).
-- Penanda peta `gabung/sekteku` belum diterbitkan (perlu penanda per pemain).
+## Sudah terbukti di luar game (F-END)
+- [x] Build B3 hijau (compileJava, compileClientJava, jar); mergeLang tanpa kunci ganda
+- [x] Generator ulang tanpa perubahan berkas: gen_gabung_cerita, gen_tempat_kompleks (50 templat), gen_kompat_bioma (53 tag)
+- [x] 28 klip suara `gabung.*` dibuat (VOICEVOX) dan terdaftar di `sounds.json`; `VoiceEvents.GABUNG_SIAP = true`
+- [x] cek_tempat 0 galat (105 set), cek_sosok 0/0, cek_kompat_mod 0; harness run_38, run_all, run_fin, run_kompat hijau
+
+## Celah yang diketahui (untuk penguji dan gelombang berikut)
+- Ujian Murid Dalam hanya berupa duel (alternatif lantai 5 Alam Dewa Hampa tidak dibangun); Ujian Tetua lewat kursi.
+- Klip pemain untuk sapu, kebun, menyalin kitab, memberi makan, latihan pagi, jaga malam dan kuliah belum ada (`GabungGerakId.KLIP_PEMAIN`
+  membatasi 13 klip; klip 320-349 butuh pose di `GabungPoses`); hanya pikul air dan kipas tungku menganimasikan pemain.
+- Lambang sekte yang diserap, decal cabang, kamera dan musik suksesi (klien `LambangCache`) belum ada.
+- Suksesi dan perang kalah belum memanggil `TokohSekte.gantiKetua`/`lukai`; tokoh tetua tidak berubah.
+- `gabung.jubah_mangkuk.restu` dan `CeritaGabung.rahasiaBocor` belum dibaca 41D; pemburu belum membaca `pemburuSampai`.
+- Kuota Alam (`gabung_kuota`) masih dari aturan 30 hari; Gua Urat belum punya gangguan Qi liar.
+- Dua kunci suara `gabung.hukum_*` ada tetapi pencurian kebun dan Paviliun >= 300 PK belum terdeteksi.
+- Perintah `naik` terdaftar dua kali (Promosi dan GabungLayar); yang kedua menang untuk tanpa-argumen, `naik tetua` tetap hidup.
+- Dialog aturan `gabung_aturan_<aliran>` dan penanda peta `gabung/sekteku` belum dibuka/diterbitkan.
+- LimaPilar TARIK/TURUN angkanya dihitung, mungkin perlu penyetelan setelah uji main.
 
 ## Uji terima
 - [ ] 1. Dunia baru, `uji gabung daftar`: 8 sekte dengan kelas `seimbang` (satu t8, satu t7); `uji gabung sebaran` membuktikan dua
@@ -76,5 +89,5 @@ runtime selain lewat WorldBreaker/BuildPlacer, tidak ada tokoh yang mati, tidak 
 - [ ] Veto pendirian, Cabang, Tetua Tamu, veto perang, suksesi, serap/lebur, murid titipan
 - [ ] Multipemain: kursi, Papan Jasa, kelompok, PvP lei tai, suara politik, sinkron jubah
 - [ ] Worldgen: lot `paviliun_jasa`, titik baru di kompleks dan gerbang, TplCheck/cek_tempat bersih, harness hijau
-- [ ] Klip 300-319, prop 150-156, rupa per corak, 26 suara, bab panduan 22, 29 advancement
+- [ ] Klip 300-319, prop 150-156, rupa per corak, 28 suara, bab panduan 22, 29 advancement
 - [ ] Sibuk di semua peristiwa; tidak ada blok runtime; tidak ada LightningBolt/cuaca/waktu

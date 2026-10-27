@@ -1,0 +1,50 @@
+{
+  "pembicara": [
+    "tokoh:qiu_panitera"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest kota42_utang_tiga_generasi tahap pilih"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "hitung_sempoa",
+      "prop": "sempoa",
+      "akibat": [
+        "bendera kota42.utang.dihitung",
+        "beri kultivator:surat_utang"
+      ],
+      "pilihan": [
+        {
+          "ke": "pilihan"
+        }
+      ]
+    },
+    {
+      "id": "pilihan",
+      "gestur": "bicara_tangan",
+      "pilihan": [
+        {
+          "akibat": [
+            "bendera kota42.utang.lunas",
+            "quest_maju kota42_utang_tiga_generasi"
+          ]
+        },
+        {
+          "akibat": [
+            "bendera kota42.utang.sidang",
+            "quest_maju kota42_utang_tiga_generasi"
+          ]
+        },
+        {
+          "akibat": [
+            "bendera kota42.utang.modal",
+            "quest_maju kota42_utang_tiga_generasi"
+          ]
+        }
+      ]
+    }
+  ]
+}

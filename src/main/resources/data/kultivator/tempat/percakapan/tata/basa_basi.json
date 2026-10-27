@@ -14,7 +14,10 @@
       "bingkai": [
         {
           "kunci": "basa.cuaca.cerah.0",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 2,
           "varian": [
             "kuno",
@@ -24,13 +27,17 @@
         {
           "kunci": "basa.cuaca.cerah.1",
           "slot": [
+            "$awal",
             "$penguat"
           ],
           "bobot": 1
         },
         {
           "kunci": "basa.cuaca.cerah.2",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "kampung"
@@ -38,7 +45,10 @@
         },
         {
           "kunci": "basa.cuaca.cerah.3",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "pelabuhan"
@@ -47,6 +57,7 @@
         {
           "kunci": "basa.cuaca.cerah.4",
           "slot": [
+            "$awal",
             "$senang"
           ],
           "bobot": 1,
@@ -56,7 +67,10 @@
         },
         {
           "kunci": "basa.cuaca.cerah.5",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "oasis"
@@ -71,6 +85,14 @@
         "$senang": {
           "aturan": "seru.senang",
           "opsional": 0.5
+        },
+        "$awal": {
+          "aturan": "awal.basa",
+          "opsional": 0.4
+        },
+        "$ekor": {
+          "aturan": "ekor.basa",
+          "opsional": 0.4
         }
       },
       "lanjut": [
@@ -92,6 +114,7 @@
         {
           "kunci": "basa.cuaca.hujan.0",
           "slot": [
+            "$awal",
             "$keluh"
           ],
           "bobot": 2,
@@ -102,7 +125,10 @@
         },
         {
           "kunci": "basa.cuaca.hujan.1",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "kuno"
@@ -110,7 +136,10 @@
         },
         {
           "kunci": "basa.cuaca.hujan.2",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "pelabuhan"
@@ -119,13 +148,17 @@
         {
           "kunci": "basa.cuaca.hujan.3",
           "slot": [
+            "$awal",
             "$ajakan"
           ],
           "bobot": 1
         },
         {
           "kunci": "basa.cuaca.hujan.4",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "kasar",
@@ -135,6 +168,8 @@
         {
           "kunci": "basa.cuaca.hujan.5",
           "slot": [
+            "$awal",
+            "$ekor",
             "$sebutan"
           ],
           "bobot": 1,
@@ -155,6 +190,14 @@
         "$sebutan": {
           "tipe": "sebutan_pendengar",
           "dari": "pendengar"
+        },
+        "$awal": {
+          "aturan": "awal.basa",
+          "opsional": 0.4
+        },
+        "$ekor": {
+          "aturan": "ekor.basa",
+          "opsional": 0.4
         }
       },
       "lanjut": [
@@ -175,7 +218,10 @@
       "bingkai": [
         {
           "kunci": "basa.cuaca.badai.0",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "kasar"
@@ -183,7 +229,10 @@
         },
         {
           "kunci": "basa.cuaca.badai.1",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "pelabuhan"
@@ -191,7 +240,10 @@
         },
         {
           "kunci": "basa.cuaca.badai.2",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "p"
@@ -199,14 +251,26 @@
         },
         {
           "kunci": "basa.cuaca.badai.3",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "kuno"
           ]
         }
       ],
-      "slot": {},
+      "slot": {
+        "$awal": {
+          "aturan": "awal.basa",
+          "opsional": 0.4
+        },
+        "$ekor": {
+          "aturan": "ekor.basa",
+          "opsional": 0.4
+        }
+      },
       "lanjut": [
         "bahaya"
       ],
@@ -225,6 +289,7 @@
         {
           "kunci": "basa.cuaca.salju.0",
           "slot": [
+            "$awal",
             "$keluh"
           ],
           "bobot": 1,
@@ -234,7 +299,10 @@
         },
         {
           "kunci": "basa.cuaca.salju.1",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "kasar"
@@ -242,7 +310,10 @@
         },
         {
           "kunci": "basa.cuaca.salju.2",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "kuno"
@@ -250,7 +321,10 @@
         },
         {
           "kunci": "basa.cuaca.salju.3",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "gunung"
@@ -261,6 +335,14 @@
         "$keluh": {
           "aturan": "seru.keluh",
           "opsional": 0.5
+        },
+        "$awal": {
+          "aturan": "awal.basa",
+          "opsional": 0.4
+        },
+        "$ekor": {
+          "aturan": "ekor.basa",
+          "opsional": 0.4
         }
       },
       "lanjut": [
@@ -281,7 +363,10 @@
       "bingkai": [
         {
           "kunci": "basa.cuaca.kabut.0",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "kuno"
@@ -289,7 +374,10 @@
         },
         {
           "kunci": "basa.cuaca.kabut.1",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "gunung"
@@ -297,7 +385,10 @@
         },
         {
           "kunci": "basa.cuaca.kabut.2",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "kampung"
@@ -305,14 +396,26 @@
         },
         {
           "kunci": "basa.cuaca.kabut.3",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "kasar"
           ]
         }
       ],
-      "slot": {},
+      "slot": {
+        "$awal": {
+          "aturan": "awal.basa",
+          "opsional": 0.4
+        },
+        "$ekor": {
+          "aturan": "ekor.basa",
+          "opsional": 0.4
+        }
+      },
       "lanjut": [
         "dunia",
         "sekte"
@@ -331,7 +434,10 @@
       "bingkai": [
         {
           "kunci": "basa.musim.semi.0",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 2,
           "varian": [
             "kampung",
@@ -340,7 +446,10 @@
         },
         {
           "kunci": "basa.musim.semi.1",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "kasar"
@@ -348,7 +457,10 @@
         },
         {
           "kunci": "basa.musim.semi.2",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "air"
@@ -356,19 +468,34 @@
         },
         {
           "kunci": "basa.musim.semi.3",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1
         },
         {
           "kunci": "basa.musim.semi.4",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "kuno"
           ]
         }
       ],
-      "slot": {},
+      "slot": {
+        "$awal": {
+          "aturan": "awal.basa",
+          "opsional": 0.4
+        },
+        "$ekor": {
+          "aturan": "ekor.basa",
+          "opsional": 0.4
+        }
+      },
       "lanjut": [
         "acara",
         "keluarga"
@@ -387,7 +514,10 @@
       "bingkai": [
         {
           "kunci": "basa.musim.panas.0",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 2,
           "varian": [
             "kasar",
@@ -396,7 +526,9 @@
         },
         {
           "kunci": "basa.musim.panas.1",
-          "slot": [],
+          "slot": [
+            "$awal"
+          ],
           "bobot": 1,
           "varian": [
             "kampung"
@@ -404,7 +536,10 @@
         },
         {
           "kunci": "basa.musim.panas.2",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "pelabuhan"
@@ -412,7 +547,10 @@
         },
         {
           "kunci": "basa.musim.panas.3",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "air",
@@ -421,14 +559,26 @@
         },
         {
           "kunci": "basa.musim.panas.4",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "kuno"
           ]
         }
       ],
-      "slot": {},
+      "slot": {
+        "$awal": {
+          "aturan": "awal.basa",
+          "opsional": 0.4
+        },
+        "$ekor": {
+          "aturan": "ekor.basa",
+          "opsional": 0.4
+        }
+      },
       "lanjut": [
         "kerja",
         "harga"
@@ -447,7 +597,10 @@
       "bingkai": [
         {
           "kunci": "basa.musim.gugur.0",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 2,
           "varian": [
             "kuno",
@@ -456,7 +609,10 @@
         },
         {
           "kunci": "basa.musim.gugur.1",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "kampung"
@@ -464,7 +620,10 @@
         },
         {
           "kunci": "basa.musim.gugur.2",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "gunung"
@@ -472,7 +631,10 @@
         },
         {
           "kunci": "basa.musim.gugur.3",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "p"
@@ -480,14 +642,26 @@
         },
         {
           "kunci": "basa.musim.gugur.4",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "kuno"
           ]
         }
       ],
-      "slot": {},
+      "slot": {
+        "$awal": {
+          "aturan": "awal.basa",
+          "opsional": 0.4
+        },
+        "$ekor": {
+          "aturan": "ekor.basa",
+          "opsional": 0.4
+        }
+      },
       "lanjut": [
         "acara",
         "harga"
@@ -506,7 +680,10 @@
       "bingkai": [
         {
           "kunci": "basa.musim.dingin.0",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 2,
           "varian": [
             "kasar",
@@ -515,7 +692,10 @@
         },
         {
           "kunci": "basa.musim.dingin.1",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "p"
@@ -523,7 +703,10 @@
         },
         {
           "kunci": "basa.musim.dingin.2",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "kuno"
@@ -531,7 +714,10 @@
         },
         {
           "kunci": "basa.musim.dingin.3",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "oasis"
@@ -540,6 +726,7 @@
         {
           "kunci": "basa.musim.dingin.4",
           "slot": [
+            "$awal",
             "$keluh"
           ],
           "bobot": 1,
@@ -552,6 +739,14 @@
         "$keluh": {
           "aturan": "seru.keluh",
           "opsional": 0.5
+        },
+        "$awal": {
+          "aturan": "awal.basa",
+          "opsional": 0.4
+        },
+        "$ekor": {
+          "aturan": "ekor.basa",
+          "opsional": 0.4
         }
       },
       "lanjut": [
@@ -574,6 +769,7 @@
         {
           "kunci": "basa.jam.pagi.0",
           "slot": [
+            "$ekor",
             "$sebutan"
           ],
           "bobot": 1,
@@ -584,7 +780,10 @@
         },
         {
           "kunci": "basa.jam.pagi.1",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "kasar"
@@ -593,6 +792,7 @@
         {
           "kunci": "basa.jam.pagi.2",
           "slot": [
+            "$awal",
             "$ajakan"
           ],
           "bobot": 1,
@@ -602,7 +802,10 @@
         },
         {
           "kunci": "basa.jam.pagi.3",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "gunung"
@@ -610,7 +813,10 @@
         },
         {
           "kunci": "basa.jam.pagi.4",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "oasis"
@@ -625,6 +831,14 @@
         "$ajakan": {
           "aturan": "frag.ajakan",
           "opsional": 0.35
+        },
+        "$awal": {
+          "aturan": "awal.kabar",
+          "opsional": 0.35
+        },
+        "$ekor": {
+          "aturan": "ekor.kabar",
+          "opsional": 0.4
         }
       },
       "lanjut": [
@@ -645,7 +859,10 @@
       "bingkai": [
         {
           "kunci": "basa.jam.siang.0",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "kasar"
@@ -653,7 +870,9 @@
         },
         {
           "kunci": "basa.jam.siang.1",
-          "slot": [],
+          "slot": [
+            "$awal"
+          ],
           "bobot": 1,
           "varian": [
             "kampung"
@@ -661,7 +880,10 @@
         },
         {
           "kunci": "basa.jam.siang.2",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "kuno"
@@ -669,14 +891,26 @@
         },
         {
           "kunci": "basa.jam.siang.3",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "kampung"
           ]
         }
       ],
-      "slot": {},
+      "slot": {
+        "$awal": {
+          "aturan": "awal.kabar",
+          "opsional": 0.35
+        },
+        "$ekor": {
+          "aturan": "ekor.kabar",
+          "opsional": 0.4
+        }
+      },
       "lanjut": [
         "kerja"
       ],
@@ -694,7 +928,10 @@
       "bingkai": [
         {
           "kunci": "basa.jam.sore.0",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "kasar"
@@ -702,7 +939,10 @@
         },
         {
           "kunci": "basa.jam.sore.1",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "air"
@@ -710,7 +950,10 @@
         },
         {
           "kunci": "basa.jam.sore.2",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "kuno"
@@ -718,14 +961,26 @@
         },
         {
           "kunci": "basa.jam.sore.3",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "kampung"
           ]
         }
       ],
-      "slot": {},
+      "slot": {
+        "$awal": {
+          "aturan": "awal.kabar",
+          "opsional": 0.35
+        },
+        "$ekor": {
+          "aturan": "ekor.kabar",
+          "opsional": 0.4
+        }
+      },
       "lanjut": [
         "keluarga",
         "acara"
@@ -745,7 +1000,10 @@
       "bingkai": [
         {
           "kunci": "basa.jam.malam.0",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "kasar",
@@ -754,7 +1012,10 @@
         },
         {
           "kunci": "basa.jam.malam.1",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "kampung"
@@ -762,7 +1023,10 @@
         },
         {
           "kunci": "basa.jam.malam.2",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "kasar"
@@ -770,14 +1034,26 @@
         },
         {
           "kunci": "basa.jam.malam.3",
-          "slot": [],
+          "slot": [
+            "$awal",
+            "$ekor"
+          ],
           "bobot": 1,
           "varian": [
             "pelabuhan"
           ]
         }
       ],
-      "slot": {},
+      "slot": {
+        "$awal": {
+          "aturan": "awal.kabar",
+          "opsional": 0.35
+        },
+        "$ekor": {
+          "aturan": "ekor.kabar",
+          "opsional": 0.4
+        }
+      },
       "lanjut": [
         "bahaya",
         "pasar_hantu"

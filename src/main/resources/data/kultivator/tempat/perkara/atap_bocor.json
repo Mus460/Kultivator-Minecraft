@@ -1,0 +1,66 @@
+{
+  "nama": "kultivator.kota42.perkara.t.atap_bocor.nama",
+  "teks": "kultivator.kota42.perkara.t.atap_bocor.teks",
+  "penggugat": {
+    "klaim": "kultivator.kota42.perkara.t.atap_bocor.klaim_a",
+    "peran": [
+      "warga",
+      "koki"
+    ]
+  },
+  "tergugat": {
+    "klaim": "kultivator.kota42.perkara.t.atap_bocor.klaim_b",
+    "peran": [
+      "warga",
+      "tukang"
+    ]
+  },
+  "benar": "acak",
+  "saksi": 2,
+  "kesaksian": {
+    "penggugat": [
+      "kultivator.kota42.perkara.t.atap_bocor.saksi_a1",
+      "kultivator.kota42.perkara.t.atap_bocor.saksi_a2"
+    ],
+    "tergugat": [
+      "kultivator.kota42.perkara.t.atap_bocor.saksi_b1",
+      "kultivator.kota42.perkara.t.atap_bocor.saksi_b2"
+    ]
+  },
+  "dusta": "kultivator.kota42.perkara.t.atap_bocor.dusta",
+  "bukti": [
+    {
+      "jenis": "barang",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.atap_bocor.bukti1_a",
+        "tergugat": "kultivator.kota42.perkara.t.atap_bocor.bukti1_b"
+      },
+      "barang": "minecraft:bricks"
+    },
+    {
+      "jenis": "catatan",
+      "teks": {
+        "penggugat": "kultivator.kota42.perkara.t.atap_bocor.bukti2_a",
+        "tergugat": "kultivator.kota42.perkara.t.atap_bocor.bukti2_b"
+      }
+    }
+  ],
+  "putusan": [
+    {
+      "untuk": "penggugat",
+      "teks": "kultivator.kota42.perkara.t.atap_bocor.putusan1",
+      "akibat": "kultivator.kota42.perkara.t.atap_bocor.putusan1_akibat"
+    },
+    {
+      "untuk": "tergugat",
+      "teks": "kultivator.kota42.perkara.t.atap_bocor.putusan2",
+      "akibat": "kultivator.kota42.perkara.t.atap_bocor.putusan2_akibat"
+    },
+    {
+      "untuk": "damai",
+      "teks": "kultivator.kota42.perkara.t.atap_bocor.putusan3",
+      "akibat": "kultivator.kota42.perkara.t.atap_bocor.putusan3_akibat"
+    }
+  ],
+  "suap": 0.2
+}

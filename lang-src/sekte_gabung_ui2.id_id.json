@@ -335,5 +335,20 @@
   "kultivator.gabung.ui2.putusan.bonus": "Bonus",
   "kultivator.gabung.ui2.putusan.sumpah": "Menuju Upacara Sumpah",
   "kultivator.gabung.ui2.putusan.pelayan": "Masuk lewat Pintu Pelayan",
-  "kultivator.gabung.ui2.putusan.tutup": "Tutup"
+  "kultivator.gabung.ui2.putusan.tutup": "Tutup",
+  "kultivator.gabung.ui2.politik.hal.tetua": "Tetua",
+  "kultivator.gabung.ui2.politik.hal.tindakan": "Tindakan",
+  "kultivator.gabung.ui2.politik.hal.suksesi": "Suksesi",
+  "kultivator.gabung.ui2.politik.hal.pewaris": "Pewaris",
+  "kultivator.gabung.ui2.politik.hal.misi": "Misi perang",
+  "kultivator.gabung.ui2.politik.hal.peta": "Peta",
+  "kultivator.gabung.ui2.politik.hal.sumbangan": "Sumbangan",
+  "kultivator.gabung.ui2.politik.hal.grafik": "Grafik",
+  "kultivator.gabung.ui2.politik.hal.daftar": "Cabang",
+  "kultivator.gabung.ui2.politik.hal.restu": "Restu",
+  "kultivator.gabung.ui2.politik.suksesi.bab": "Bab %1$s dari %2$s: %3$s",
+  "kultivator.gabung.ui2.paviliun.hal.barang": "Barang",
+  "kultivator.gabung.ui2.paviliun.hal.rincian": "Rincian",
+  "kultivator.gabung.ui2.papan.hal.misi": "Misi",
+  "kultivator.gabung.ui2.papan.hal.slip": "Rincian"
 }

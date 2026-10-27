@@ -26,6 +26,15 @@
       }
     ]
   },
+  "ambient.kota.malam_meriah": {
+    "subtitle": "subtitles.kultivator.ambient.kota.malam_meriah",
+    "sounds": [
+      {
+        "name": "kultivator:ambient/kota/malam_meriah",
+        "stream": true
+      }
+    ]
+  },
   "ambient.kota.pasar": {
     "subtitle": "subtitles.kultivator.ambient.kota.pasar",
     "sounds": [
@@ -40,6 +49,15 @@
     "sounds": [
       {
         "name": "kultivator:ambient/kota/pelabuhan",
+        "stream": true
+      }
+    ]
+  },
+  "ambient.kota.upacara": {
+    "subtitle": "subtitles.kultivator.ambient.kota.upacara",
+    "sounds": [
+      {
+        "name": "kultivator:ambient/kota/upacara",
         "stream": true
       }
     ]
@@ -442,6 +460,491 @@
       },
       {
         "name": "kultivator:film/zap_2"
+      }
+    ]
+  },
+  "kota42.balok_kayu": {
+    "subtitle": "subtitles.kultivator.kota42.balok_kayu",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/balok_kayu_0"
+      },
+      {
+        "name": "kultivator:kota42/balok_kayu_1"
+      }
+    ]
+  },
+  "kota42.dizi.0": {
+    "subtitle": "subtitles.kultivator.kota42.dizi",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/dizi_0"
+      }
+    ]
+  },
+  "kota42.dizi.1": {
+    "subtitle": "subtitles.kultivator.kota42.dizi",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/dizi_1"
+      }
+    ]
+  },
+  "kota42.dizi.10": {
+    "subtitle": "subtitles.kultivator.kota42.dizi",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/dizi_10"
+      }
+    ]
+  },
+  "kota42.dizi.11": {
+    "subtitle": "subtitles.kultivator.kota42.dizi",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/dizi_11"
+      }
+    ]
+  },
+  "kota42.dizi.2": {
+    "subtitle": "subtitles.kultivator.kota42.dizi",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/dizi_2"
+      }
+    ]
+  },
+  "kota42.dizi.3": {
+    "subtitle": "subtitles.kultivator.kota42.dizi",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/dizi_3"
+      }
+    ]
+  },
+  "kota42.dizi.4": {
+    "subtitle": "subtitles.kultivator.kota42.dizi",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/dizi_4"
+      }
+    ]
+  },
+  "kota42.dizi.5": {
+    "subtitle": "subtitles.kultivator.kota42.dizi",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/dizi_5"
+      }
+    ]
+  },
+  "kota42.dizi.6": {
+    "subtitle": "subtitles.kultivator.kota42.dizi",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/dizi_6"
+      }
+    ]
+  },
+  "kota42.dizi.7": {
+    "subtitle": "subtitles.kultivator.kota42.dizi",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/dizi_7"
+      }
+    ]
+  },
+  "kota42.dizi.8": {
+    "subtitle": "subtitles.kultivator.kota42.dizi",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/dizi_8"
+      }
+    ]
+  },
+  "kota42.dizi.9": {
+    "subtitle": "subtitles.kultivator.kota42.dizi",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/dizi_9"
+      }
+    ]
+  },
+  "kota42.erhu.0": {
+    "subtitle": "subtitles.kultivator.kota42.erhu",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/erhu_0"
+      }
+    ]
+  },
+  "kota42.erhu.1": {
+    "subtitle": "subtitles.kultivator.kota42.erhu",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/erhu_1"
+      }
+    ]
+  },
+  "kota42.erhu.10": {
+    "subtitle": "subtitles.kultivator.kota42.erhu",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/erhu_10"
+      }
+    ]
+  },
+  "kota42.erhu.11": {
+    "subtitle": "subtitles.kultivator.kota42.erhu",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/erhu_11"
+      }
+    ]
+  },
+  "kota42.erhu.2": {
+    "subtitle": "subtitles.kultivator.kota42.erhu",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/erhu_2"
+      }
+    ]
+  },
+  "kota42.erhu.3": {
+    "subtitle": "subtitles.kultivator.kota42.erhu",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/erhu_3"
+      }
+    ]
+  },
+  "kota42.erhu.4": {
+    "subtitle": "subtitles.kultivator.kota42.erhu",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/erhu_4"
+      }
+    ]
+  },
+  "kota42.erhu.5": {
+    "subtitle": "subtitles.kultivator.kota42.erhu",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/erhu_5"
+      }
+    ]
+  },
+  "kota42.erhu.6": {
+    "subtitle": "subtitles.kultivator.kota42.erhu",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/erhu_6"
+      }
+    ]
+  },
+  "kota42.erhu.7": {
+    "subtitle": "subtitles.kultivator.kota42.erhu",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/erhu_7"
+      }
+    ]
+  },
+  "kota42.erhu.8": {
+    "subtitle": "subtitles.kultivator.kota42.erhu",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/erhu_8"
+      }
+    ]
+  },
+  "kota42.erhu.9": {
+    "subtitle": "subtitles.kultivator.kota42.erhu",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/erhu_9"
+      }
+    ]
+  },
+  "kota42.genderang_kecil": {
+    "subtitle": "subtitles.kultivator.kota42.genderang_kecil",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/genderang_kecil_0"
+      },
+      {
+        "name": "kultivator:kota42/genderang_kecil_1"
+      }
+    ]
+  },
+  "kota42.gong.0": {
+    "subtitle": "subtitles.kultivator.kota42.gong",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/gong_0"
+      }
+    ]
+  },
+  "kota42.gong.1": {
+    "subtitle": "subtitles.kultivator.kota42.gong",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/gong_1"
+      }
+    ]
+  },
+  "kota42.gong.2": {
+    "subtitle": "subtitles.kultivator.kota42.gong",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/gong_2"
+      }
+    ]
+  },
+  "kota42.kentongan.0": {
+    "subtitle": "subtitles.kultivator.kota42.kentongan",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/kentongan_0"
+      }
+    ]
+  },
+  "kota42.kentongan.1": {
+    "subtitle": "subtitles.kultivator.kota42.kentongan",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/kentongan_1"
+      }
+    ]
+  },
+  "kota42.kentongan.2": {
+    "subtitle": "subtitles.kultivator.kota42.kentongan",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/kentongan_2"
+      }
+    ]
+  },
+  "kota42.merpati_peluit": {
+    "subtitle": "subtitles.kultivator.kota42.merpati_peluit",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/merpati_peluit"
+      }
+    ]
+  },
+  "kota42.petasan": {
+    "subtitle": "subtitles.kultivator.kota42.petasan",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/petasan_0"
+      },
+      {
+        "name": "kultivator:kota42/petasan_1"
+      },
+      {
+        "name": "kultivator:kota42/petasan_2"
+      },
+      {
+        "name": "kultivator:kota42/petasan_3"
+      },
+      {
+        "name": "kultivator:kota42/petasan_4"
+      },
+      {
+        "name": "kultivator:kota42/petasan_5"
+      }
+    ]
+  },
+  "kota42.pipa.0": {
+    "subtitle": "subtitles.kultivator.kota42.pipa",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/pipa_0"
+      }
+    ]
+  },
+  "kota42.pipa.1": {
+    "subtitle": "subtitles.kultivator.kota42.pipa",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/pipa_1"
+      }
+    ]
+  },
+  "kota42.pipa.10": {
+    "subtitle": "subtitles.kultivator.kota42.pipa",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/pipa_10"
+      }
+    ]
+  },
+  "kota42.pipa.11": {
+    "subtitle": "subtitles.kultivator.kota42.pipa",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/pipa_11"
+      }
+    ]
+  },
+  "kota42.pipa.2": {
+    "subtitle": "subtitles.kultivator.kota42.pipa",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/pipa_2"
+      }
+    ]
+  },
+  "kota42.pipa.3": {
+    "subtitle": "subtitles.kultivator.kota42.pipa",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/pipa_3"
+      }
+    ]
+  },
+  "kota42.pipa.4": {
+    "subtitle": "subtitles.kultivator.kota42.pipa",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/pipa_4"
+      }
+    ]
+  },
+  "kota42.pipa.5": {
+    "subtitle": "subtitles.kultivator.kota42.pipa",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/pipa_5"
+      }
+    ]
+  },
+  "kota42.pipa.6": {
+    "subtitle": "subtitles.kultivator.kota42.pipa",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/pipa_6"
+      }
+    ]
+  },
+  "kota42.pipa.7": {
+    "subtitle": "subtitles.kultivator.kota42.pipa",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/pipa_7"
+      }
+    ]
+  },
+  "kota42.pipa.8": {
+    "subtitle": "subtitles.kultivator.kota42.pipa",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/pipa_8"
+      }
+    ]
+  },
+  "kota42.pipa.9": {
+    "subtitle": "subtitles.kultivator.kota42.pipa",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/pipa_9"
+      }
+    ]
+  },
+  "kota42.suona.0": {
+    "subtitle": "subtitles.kultivator.kota42.suona",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/suona_0"
+      }
+    ]
+  },
+  "kota42.suona.1": {
+    "subtitle": "subtitles.kultivator.kota42.suona",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/suona_1"
+      }
+    ]
+  },
+  "kota42.suona.10": {
+    "subtitle": "subtitles.kultivator.kota42.suona",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/suona_10"
+      }
+    ]
+  },
+  "kota42.suona.11": {
+    "subtitle": "subtitles.kultivator.kota42.suona",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/suona_11"
+      }
+    ]
+  },
+  "kota42.suona.2": {
+    "subtitle": "subtitles.kultivator.kota42.suona",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/suona_2"
+      }
+    ]
+  },
+  "kota42.suona.3": {
+    "subtitle": "subtitles.kultivator.kota42.suona",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/suona_3"
+      }
+    ]
+  },
+  "kota42.suona.4": {
+    "subtitle": "subtitles.kultivator.kota42.suona",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/suona_4"
+      }
+    ]
+  },
+  "kota42.suona.5": {
+    "subtitle": "subtitles.kultivator.kota42.suona",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/suona_5"
+      }
+    ]
+  },
+  "kota42.suona.6": {
+    "subtitle": "subtitles.kultivator.kota42.suona",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/suona_6"
+      }
+    ]
+  },
+  "kota42.suona.7": {
+    "subtitle": "subtitles.kultivator.kota42.suona",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/suona_7"
+      }
+    ]
+  },
+  "kota42.suona.8": {
+    "subtitle": "subtitles.kultivator.kota42.suona",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/suona_8"
+      }
+    ]
+  },
+  "kota42.suona.9": {
+    "subtitle": "subtitles.kultivator.kota42.suona",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/suona_9"
       }
     ]
   },
@@ -5223,6 +5726,258 @@
       }
     ]
   },
+  "voice.gabung.diterima": {
+    "subtitle": "subtitles.kultivator.voice.gabung.diterima",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/gabung/diterima",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gabung.gerbang_panggil": {
+    "subtitle": "subtitles.kultivator.voice.gabung.gerbang_panggil",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/gabung/gerbang_panggil",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gabung.hukum_kurung": {
+    "subtitle": "subtitles.kultivator.voice.gabung.hukum_kurung",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/gabung/hukum_kurung",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gabung.hukum_tegur": {
+    "subtitle": "subtitles.kultivator.voice.gabung.hukum_tegur",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/gabung/hukum_tegur",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gabung.istimewa": {
+    "subtitle": "subtitles.kultivator.voice.gabung.istimewa",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/gabung/istimewa",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gabung.ketua_baru": {
+    "subtitle": "subtitles.kultivator.voice.gabung.ketua_baru",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/gabung/ketua_baru",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gabung.ketua_serah": {
+    "subtitle": "subtitles.kultivator.voice.gabung.ketua_serah",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/gabung/ketua_serah",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gabung.naik_kelas": {
+    "subtitle": "subtitles.kultivator.voice.gabung.naik_kelas",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/gabung/naik_kelas",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gabung.pamit": {
+    "subtitle": "subtitles.kultivator.voice.gabung.pamit",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/gabung/pamit",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gabung.panggilan_perang": {
+    "subtitle": "subtitles.kultivator.voice.gabung.panggilan_perang",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/gabung/panggilan_perang",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gabung.pelajaran_mulai": {
+    "subtitle": "subtitles.kultivator.voice.gabung.pelajaran_mulai",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/gabung/pelajaran_mulai",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gabung.pemburu": {
+    "subtitle": "subtitles.kultivator.voice.gabung.pemburu",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/gabung/pemburu",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gabung.saingan_ejek": {
+    "subtitle": "subtitles.kultivator.voice.gabung.saingan_ejek",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/gabung/saingan_ejek",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gabung.sapa_adik": {
+    "subtitle": "subtitles.kultivator.voice.gabung.sapa_adik",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/gabung/sapa_adik",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gabung.sapa_kakak": {
+    "subtitle": "subtitles.kultivator.voice.gabung.sapa_kakak",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/gabung/sapa_kakak",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gabung.shifu_lampaui": {
+    "subtitle": "subtitles.kultivator.voice.gabung.shifu_lampaui",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/gabung/shifu_lampaui",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gabung.shifu_lindungi": {
+    "subtitle": "subtitles.kultivator.voice.gabung.shifu_lindungi",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/gabung/shifu_lindungi",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gabung.shifu_pilih": {
+    "subtitle": "subtitles.kultivator.voice.gabung.shifu_pilih",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/gabung/shifu_pilih",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gabung.sumpah_aturan_1": {
+    "subtitle": "subtitles.kultivator.voice.gabung.sumpah_aturan_1",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/gabung/sumpah_aturan_1",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gabung.sumpah_aturan_2": {
+    "subtitle": "subtitles.kultivator.voice.gabung.sumpah_aturan_2",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/gabung/sumpah_aturan_2",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gabung.sumpah_aturan_3": {
+    "subtitle": "subtitles.kultivator.voice.gabung.sumpah_aturan_3",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/gabung/sumpah_aturan_3",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gabung.tamu_sambut": {
+    "subtitle": "subtitles.kultivator.voice.gabung.tamu_sambut",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/gabung/tamu_sambut",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gabung.tangga_tekanan": {
+    "subtitle": "subtitles.kultivator.voice.gabung.tangga_tekanan",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/gabung/tangga_tekanan",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gabung.turnamen_juara": {
+    "subtitle": "subtitles.kultivator.voice.gabung.turnamen_juara",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/gabung/turnamen_juara",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gabung.ujian_gagal": {
+    "subtitle": "subtitles.kultivator.voice.gabung.ujian_gagal",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/gabung/ujian_gagal",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gabung.ujian_lulus": {
+    "subtitle": "subtitles.kultivator.voice.gabung.ujian_lulus",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/gabung/ujian_lulus",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gabung.ujian_mulai": {
+    "subtitle": "subtitles.kultivator.voice.gabung.ujian_mulai",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/gabung/ujian_mulai",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gabung.usir": {
+    "subtitle": "subtitles.kultivator.voice.gabung.usir",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/gabung/usir",
+        "stream": false
+      }
+    ]
+  },
   "voice.grunt.female.attack": {
     "subtitle": "subtitles.kultivator.voice.grunt.female.attack",
     "sounds": [
@@ -6359,6 +7114,951 @@
     "sounds": [
       {
         "name": "kultivator:voice/world/kota/wanderer_dao",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.ah_qin": {
+    "subtitle": "subtitles.kultivator.voice.kota42.ah_qin",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/ah_qin",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.akrobat_buka": {
+    "subtitle": "subtitles.kultivator.voice.kota42.akrobat_buka",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/akrobat_buka",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.anak_kagum": {
+    "subtitle": "subtitles.kultivator.voice.kota42.anak_kagum",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/anak_kagum",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.api_padam": {
+    "subtitle": "subtitles.kultivator.voice.kota42.api_padam",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/api_padam",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.bangun_kembali": {
+    "subtitle": "subtitles.kultivator.voice.kota42.bangun_kembali",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/bangun_kembali",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.bayi_lahir": {
+    "subtitle": "subtitles.kultivator.voice.kota42.bayi_lahir",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/bayi_lahir",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.bela_menang": {
+    "subtitle": "subtitles.kultivator.voice.kota42.bela_menang",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/bela_menang",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.bela_panggil": {
+    "subtitle": "subtitles.kultivator.voice.kota42.bela_panggil",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/bela_panggil",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.bersulang": {
+    "subtitle": "subtitles.kultivator.voice.kota42.bersulang",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/bersulang",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.catur_kalah": {
+    "subtitle": "subtitles.kultivator.voice.kota42.catur_kalah",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/catur_kalah",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.catur_skak": {
+    "subtitle": "subtitles.kultivator.voice.kota42.catur_skak",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/catur_skak",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.comblang": {
+    "subtitle": "subtitles.kultivator.voice.kota42.comblang",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/comblang",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.copet_tabrak": {
+    "subtitle": "subtitles.kultivator.voice.kota42.copet_tabrak",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/copet_tabrak",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.copet_teriak": {
+    "subtitle": "subtitles.kultivator.voice.kota42.copet_teriak",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/copet_teriak",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.copet_tertangkap": {
+    "subtitle": "subtitles.kultivator.voice.kota42.copet_tertangkap",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/copet_tertangkap",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.cucu_cerita": {
+    "subtitle": "subtitles.kultivator.voice.kota42.cucu_cerita",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/cucu_cerita",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.dadu_besar": {
+    "subtitle": "subtitles.kultivator.voice.kota42.dadu_besar",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/dadu_besar",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.dadu_kecil": {
+    "subtitle": "subtitles.kultivator.voice.kota42.dadu_kecil",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/dadu_kecil",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.diselamatkan": {
+    "subtitle": "subtitles.kultivator.voice.kota42.diselamatkan",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/diselamatkan",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.duka": {
+    "subtitle": "subtitles.kultivator.voice.kota42.duka",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/duka",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.gerobak": {
+    "subtitle": "subtitles.kultivator.voice.kota42.gerobak",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/gerobak",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.gosip_bisik": {
+    "subtitle": "subtitles.kultivator.voice.kota42.gosip_bisik",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/gosip_bisik",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.gosip_tawa": {
+    "subtitle": "subtitles.kultivator.voice.kota42.gosip_tawa",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/gosip_tawa",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.guru_panggil": {
+    "subtitle": "subtitles.kultivator.voice.kota42.guru_panggil",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/guru_panggil",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.harga_naik": {
+    "subtitle": "subtitles.kultivator.voice.kota42.harga_naik",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/harga_naik",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.huaquan": {
+    "subtitle": "subtitles.kultivator.voice.kota42.huaquan",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/huaquan",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.kavling_selesai": {
+    "subtitle": "subtitles.kultivator.voice.kota42.kavling_selesai",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/kavling_selesai",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.kebakaran": {
+    "subtitle": "subtitles.kultivator.voice.kota42.kebakaran",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/kebakaran",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.laba": {
+    "subtitle": "subtitles.kultivator.voice.kota42.laba",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/laba",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.lao_geng_pamit": {
+    "subtitle": "subtitles.kultivator.voice.kota42.lao_geng_pamit",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/lao_geng_pamit",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.lao_shuo_buka": {
+    "subtitle": "subtitles.kultivator.voice.kota42.lao_shuo_buka",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/lao_shuo_buka",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.lao_shuo_tutup": {
+    "subtitle": "subtitles.kultivator.voice.kota42.lao_shuo_tutup",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/lao_shuo_tutup",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.lentera_hijau": {
+    "subtitle": "subtitles.kultivator.voice.kota42.lentera_hijau",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/lentera_hijau",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.lerai": {
+    "subtitle": "subtitles.kultivator.voice.kota42.lerai",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/lerai",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.mabuk": {
+    "subtitle": "subtitles.kultivator.voice.kota42.mabuk",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/mabuk",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.makam_pimpin": {
+    "subtitle": "subtitles.kultivator.voice.kota42.makam_pimpin",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/makam_pimpin",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.makam_ratap": {
+    "subtitle": "subtitles.kultivator.voice.kota42.makam_ratap",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/makam_ratap",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.makam_sujud": {
+    "subtitle": "subtitles.kultivator.voice.kota42.makam_sujud",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/makam_sujud",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.mandor": {
+    "subtitle": "subtitles.kultivator.voice.kota42.mandor",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/mandor",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.marah": {
+    "subtitle": "subtitles.kultivator.voice.kota42.marah",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/marah",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.nikah_jemput": {
+    "subtitle": "subtitles.kultivator.voice.kota42.nikah_jemput",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/nikah_jemput",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.nikah_selamat": {
+    "subtitle": "subtitles.kultivator.voice.kota42.nikah_selamat",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/nikah_selamat",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.nikah_sembah": {
+    "subtitle": "subtitles.kultivator.voice.kota42.nikah_sembah",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/nikah_sembah",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.nikah_undang": {
+    "subtitle": "subtitles.kultivator.voice.kota42.nikah_undang",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/nikah_undang",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.pajak_keluh": {
+    "subtitle": "subtitles.kultivator.voice.kota42.pajak_keluh",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/pajak_keluh",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.panji_naik": {
+    "subtitle": "subtitles.kultivator.voice.kota42.panji_naik",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/panji_naik",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.pedagang_seru": {
+    "subtitle": "subtitles.kultivator.voice.kota42.pedagang_seru",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/pedagang_seru",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.pejabat_sapa": {
+    "subtitle": "subtitles.kultivator.voice.kota42.pejabat_sapa",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/pejabat_sapa",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.pelindung_sapa": {
+    "subtitle": "subtitles.kultivator.voice.kota42.pelindung_sapa",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/pelindung_sapa",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.penjual_obat": {
+    "subtitle": "subtitles.kultivator.voice.kota42.penjual_obat",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/penjual_obat",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.pindah": {
+    "subtitle": "subtitles.kultivator.voice.kota42.pindah",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/pindah",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.putusan": {
+    "subtitle": "subtitles.kultivator.voice.kota42.putusan",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/putusan",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.razia": {
+    "subtitle": "subtitles.kultivator.voice.kota42.razia",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/razia",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.rekrut_pamit": {
+    "subtitle": "subtitles.kultivator.voice.kota42.rekrut_pamit",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/rekrut_pamit",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.rekrut_terima": {
+    "subtitle": "subtitles.kultivator.voice.kota42.rekrut_terima",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/rekrut_terima",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.restu_tolak": {
+    "subtitle": "subtitles.kultivator.voice.kota42.restu_tolak",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/restu_tolak",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.ronda_geng1": {
+    "subtitle": "subtitles.kultivator.voice.kota42.ronda_geng1",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/ronda_geng1",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.ronda_geng2": {
+    "subtitle": "subtitles.kultivator.voice.kota42.ronda_geng2",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/ronda_geng2",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.ronda_geng3": {
+    "subtitle": "subtitles.kultivator.voice.kota42.ronda_geng3",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/ronda_geng3",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.ronda_geng4": {
+    "subtitle": "subtitles.kultivator.voice.kota42.ronda_geng4",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/ronda_geng4",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.ronda_geng5": {
+    "subtitle": "subtitles.kultivator.voice.kota42.ronda_geng5",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/ronda_geng5",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.sandi_malam": {
+    "subtitle": "subtitles.kultivator.voice.kota42.sandi_malam",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/sandi_malam",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.sapa_akrab": {
+    "subtitle": "subtitles.kultivator.voice.kota42.sapa_akrab",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/sapa_akrab",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.sapa_asing": {
+    "subtitle": "subtitles.kultivator.voice.kota42.sapa_asing",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/sapa_asing",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.sapa_kenal": {
+    "subtitle": "subtitles.kultivator.voice.kota42.sapa_kenal",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/sapa_kenal",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.sapa_pagi": {
+    "subtitle": "subtitles.kultivator.voice.kota42.sapa_pagi",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/sapa_pagi",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.sebulan_selamat": {
+    "subtitle": "subtitles.kultivator.voice.kota42.sebulan_selamat",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/sebulan_selamat",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.sekolah_hafal": {
+    "subtitle": "subtitles.kultivator.voice.kota42.sekolah_hafal",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/sekolah_hafal",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.seru.aduh_l": {
+    "subtitle": "subtitles.kultivator.voice.kota42.seru.aduh_l",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/seru/aduh_l",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.seru.aduh_p": {
+    "subtitle": "subtitles.kultivator.voice.kota42.seru.aduh_p",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/seru/aduh_p",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.seru.bisik_p": {
+    "subtitle": "subtitles.kultivator.voice.kota42.seru.bisik_p",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/seru/bisik_p",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.seru.cih": {
+    "subtitle": "subtitles.kultivator.voice.kota42.seru.cih",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/seru/cih",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.seru.eh_l": {
+    "subtitle": "subtitles.kultivator.voice.kota42.seru.eh_l",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/seru/eh_l",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.seru.eh_p": {
+    "subtitle": "subtitles.kultivator.voice.kota42.seru.eh_p",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/seru/eh_p",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.seru.hmm_l": {
+    "subtitle": "subtitles.kultivator.voice.kota42.seru.hmm_l",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/seru/hmm_l",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.seru.hmm_p": {
+    "subtitle": "subtitles.kultivator.voice.kota42.seru.hmm_p",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/seru/hmm_p",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.seru.maaf_l": {
+    "subtitle": "subtitles.kultivator.voice.kota42.seru.maaf_l",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/seru/maaf_l",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.seru.maaf_p": {
+    "subtitle": "subtitles.kultivator.voice.kota42.seru.maaf_p",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/seru/maaf_p",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.seru.mabuk": {
+    "subtitle": "subtitles.kultivator.voice.kota42.seru.mabuk",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/seru/mabuk",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.seru.oh_l": {
+    "subtitle": "subtitles.kultivator.voice.kota42.seru.oh_l",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/seru/oh_l",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.seru.oh_p": {
+    "subtitle": "subtitles.kultivator.voice.kota42.seru.oh_p",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/seru/oh_p",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.seru.setuju_l": {
+    "subtitle": "subtitles.kultivator.voice.kota42.seru.setuju_l",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/seru/setuju_l",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.seru.takut_p": {
+    "subtitle": "subtitles.kultivator.voice.kota42.seru.takut_p",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/seru/takut_p",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.seru.tawa_l": {
+    "subtitle": "subtitles.kultivator.voice.kota42.seru.tawa_l",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/seru/tawa_l",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.seru.tawa_p": {
+    "subtitle": "subtitles.kultivator.voice.kota42.seru.tawa_p",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/seru/tawa_p",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.seru.terima_kasih_l": {
+    "subtitle": "subtitles.kultivator.voice.kota42.seru.terima_kasih_l",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/seru/terima_kasih_l",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.seru.terima_kasih_p": {
+    "subtitle": "subtitles.kultivator.voice.kota42.seru.terima_kasih_p",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/seru/terima_kasih_p",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.seru.tetua_hmm": {
+    "subtitle": "subtitles.kultivator.voice.kota42.seru.tetua_hmm",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/seru/tetua_hmm",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.seru.tetua_marah": {
+    "subtitle": "subtitles.kultivator.voice.kota42.seru.tetua_marah",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/seru/tetua_marah",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.seru.wah_anak": {
+    "subtitle": "subtitles.kultivator.voice.kota42.seru.wah_anak",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/seru/wah_anak",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.seru.ya_l": {
+    "subtitle": "subtitles.kultivator.voice.kota42.seru.ya_l",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/seru/ya_l",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.seru.ya_p": {
+    "subtitle": "subtitles.kultivator.voice.kota42.seru.ya_p",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/seru/ya_p",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.suap": {
+    "subtitle": "subtitles.kultivator.voice.kota42.suap",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/suap",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.sup_nenek": {
+    "subtitle": "subtitles.kultivator.voice.kota42.sup_nenek",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/sup_nenek",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.tahun_baru": {
+    "subtitle": "subtitles.kultivator.voice.kota42.tahun_baru",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/tahun_baru",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.taichi": {
+    "subtitle": "subtitles.kultivator.voice.kota42.taichi",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/taichi",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.takut_serangan": {
+    "subtitle": "subtitles.kultivator.voice.kota42.takut_serangan",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/takut_serangan",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.tanya_jalan": {
+    "subtitle": "subtitles.kultivator.voice.kota42.tanya_jalan",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/tanya_jalan",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.terima_kasih": {
+    "subtitle": "subtitles.kultivator.voice.kota42.terima_kasih",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/terima_kasih",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.tidak_tahu": {
+    "subtitle": "subtitles.kultivator.voice.kota42.tidak_tahu",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/tidak_tahu",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.wayang_buka": {
+    "subtitle": "subtitles.kultivator.voice.kota42.wayang_buka",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/wayang_buka",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.xiao_bang": {
+    "subtitle": "subtitles.kultivator.voice.kota42.xiao_bang",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/xiao_bang",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.xiao_yu": {
+    "subtitle": "subtitles.kultivator.voice.kota42.xiao_yu",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/xiao_yu",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.zhuazhou_kuas": {
+    "subtitle": "subtitles.kultivator.voice.kota42.zhuazhou_kuas",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/zhuazhou_kuas",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota42.zhuazhou_pedang": {
+    "subtitle": "subtitles.kultivator.voice.kota42.zhuazhou_pedang",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota42/zhuazhou_pedang",
         "stream": false
       }
     ]

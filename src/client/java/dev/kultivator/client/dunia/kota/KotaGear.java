@@ -397,6 +397,10 @@ public final class KotaGear {
 	 * {@code akrobat.egrang}, {@code penari}, {@code topeng_kertas}, {@code penjaga_malam}, {@code pencopet}; NONE otherwise.
 	 */
 	static int kindRupa(KultivatorNpc npc) {
+		// the stilt-walking clip carries its own stilts, whatever look key the troupe's server code left on the body
+		if (dev.kultivator.sosok.SosokApi.gerakSekarang(npc) == dev.kultivator.dunia.kota42.api.KotaGerakId.EGRANG_JALAN) {
+			return EGRANG;
+		}
 		String rupa = npc.syncedRupa();
 		if (rupa.isEmpty()) {
 			return NONE;

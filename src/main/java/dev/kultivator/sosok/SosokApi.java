@@ -212,7 +212,21 @@ public final class SosokApi {
 		if (p == null || klien(npc)) {
 			return;
 		}
-		p.setRupaData(RupaKunci.parse(kunciRupa).format());
+		RupaKunci kunci = RupaKunci.parse(kunciRupa);
+		for (java.util.function.UnaryOperator<RupaKunci> penyaring : PENYARING_RUPA) {
+			kunci = penyaring.apply(kunci);
+		}
+		p.setRupaData(kunci.format());
+	}
+
+	private static final java.util.List<java.util.function.UnaryOperator<RupaKunci>> PENYARING_RUPA = new java.util.concurrent.CopyOnWriteArrayList<>();
+
+	/**
+	 * Registers a rewriter every {@link #setRupa} key passes through (DESIGN 41.11.5: 41 turns {@code tetua_sekte|sekte=npc:s3}
+	 * into the sect's style row {@code tetua_sekte.pedang|sekte=npc:s3}). It must return the key itself when it does not apply.
+	 */
+	public static void tambahPenyaringRupa(java.util.function.UnaryOperator<RupaKunci> penyaring) {
+		PENYARING_RUPA.add(penyaring);
 	}
 
 	/** The body's look key ({@link RupaKunci#KOSONG} when none). */

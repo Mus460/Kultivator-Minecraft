@@ -1,0 +1,43 @@
+{
+  "pembicara": [
+    "tokoh:li_laoban"
+  ],
+  "prioritas": 5,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "seru_dagang",
+      "pilihan": [
+        {
+          "ke": "kakek"
+        },
+        {
+          "ke": "putri"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kakek",
+      "gestur": "minum_teh",
+      "prop": "cangkir",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "putri",
+      "gestur": "bicara_tangan",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

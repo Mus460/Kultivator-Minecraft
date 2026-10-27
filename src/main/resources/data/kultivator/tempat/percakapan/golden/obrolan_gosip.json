@@ -125,6 +125,10 @@
         "k": "kultivator.cakap.kabar.berkelahi.0",
         "a": [
           {
+            "k": "kultivator.cakap.awal.kabar.4",
+            "a": []
+          },
+          {
             "t": "Paman Li"
           },
           {
@@ -133,6 +137,9 @@
           {
             "k": "kultivator.cakap.lex.kemarin_lusa.kampung",
             "a": []
+          },
+          {
+            "t": ""
           }
         ]
       },
@@ -140,8 +147,8 @@
       "gestur": "berdebat",
       "seru": null,
       "tik": null,
-      "id_id": "Paman Li dan Tukang Ma baku hantam di depan kedai wingi uni! Meja pecah dua.",
-      "en_us": "Paman Li and Tukang Ma came to blows outside the eatery day before yesterday! A table split in two."
+      "id_id": "Baru tadi aku dengar. Paman Li dan Tukang Ma baku hantam di depan kedai wingi uni! Meja pecah dua.",
+      "en_us": "I only just heard. Paman Li and Tukang Ma came to blows outside the eatery day before yesterday! A table split in two."
     },
     {
       "ubah": {

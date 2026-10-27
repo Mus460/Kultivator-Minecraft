@@ -1,0 +1,11 @@
+{
+  "nama": "kultivator.kota42.tolong.rentenir.nama",
+  "teks": [
+    "kultivator.kota42.tolong.rentenir.teks.0",
+    "kultivator.kota42.tolong.rentenir.teks.1",
+    "kultivator.kota42.tolong.rentenir.teks.2"
+  ],
+  "imbalan": "kultivator.kota42.tolong.rentenir.imbalan",
+  "batas_hari": 5,
+  "peluang": 1.0
+}

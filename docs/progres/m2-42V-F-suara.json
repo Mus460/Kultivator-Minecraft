@@ -1,0 +1,505 @@
+{
+  "ambient.kota.malam_meriah": {
+    "subtitle": "subtitles.kultivator.ambient.kota.malam_meriah",
+    "sounds": [
+      {
+        "name": "kultivator:ambient/kota/malam_meriah",
+        "stream": true
+      }
+    ]
+  },
+  "ambient.kota.upacara": {
+    "subtitle": "subtitles.kultivator.ambient.kota.upacara",
+    "sounds": [
+      {
+        "name": "kultivator:ambient/kota/upacara",
+        "stream": true
+      }
+    ]
+  },
+  "kota42.balok_kayu": {
+    "subtitle": "subtitles.kultivator.kota42.balok_kayu",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/balok_kayu_0"
+      },
+      {
+        "name": "kultivator:kota42/balok_kayu_1"
+      }
+    ]
+  },
+  "kota42.dizi.0": {
+    "subtitle": "subtitles.kultivator.kota42.dizi",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/dizi_0"
+      }
+    ]
+  },
+  "kota42.dizi.1": {
+    "subtitle": "subtitles.kultivator.kota42.dizi",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/dizi_1"
+      }
+    ]
+  },
+  "kota42.dizi.10": {
+    "subtitle": "subtitles.kultivator.kota42.dizi",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/dizi_10"
+      }
+    ]
+  },
+  "kota42.dizi.11": {
+    "subtitle": "subtitles.kultivator.kota42.dizi",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/dizi_11"
+      }
+    ]
+  },
+  "kota42.dizi.2": {
+    "subtitle": "subtitles.kultivator.kota42.dizi",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/dizi_2"
+      }
+    ]
+  },
+  "kota42.dizi.3": {
+    "subtitle": "subtitles.kultivator.kota42.dizi",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/dizi_3"
+      }
+    ]
+  },
+  "kota42.dizi.4": {
+    "subtitle": "subtitles.kultivator.kota42.dizi",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/dizi_4"
+      }
+    ]
+  },
+  "kota42.dizi.5": {
+    "subtitle": "subtitles.kultivator.kota42.dizi",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/dizi_5"
+      }
+    ]
+  },
+  "kota42.dizi.6": {
+    "subtitle": "subtitles.kultivator.kota42.dizi",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/dizi_6"
+      }
+    ]
+  },
+  "kota42.dizi.7": {
+    "subtitle": "subtitles.kultivator.kota42.dizi",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/dizi_7"
+      }
+    ]
+  },
+  "kota42.dizi.8": {
+    "subtitle": "subtitles.kultivator.kota42.dizi",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/dizi_8"
+      }
+    ]
+  },
+  "kota42.dizi.9": {
+    "subtitle": "subtitles.kultivator.kota42.dizi",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/dizi_9"
+      }
+    ]
+  },
+  "kota42.erhu.0": {
+    "subtitle": "subtitles.kultivator.kota42.erhu",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/erhu_0"
+      }
+    ]
+  },
+  "kota42.erhu.1": {
+    "subtitle": "subtitles.kultivator.kota42.erhu",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/erhu_1"
+      }
+    ]
+  },
+  "kota42.erhu.10": {
+    "subtitle": "subtitles.kultivator.kota42.erhu",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/erhu_10"
+      }
+    ]
+  },
+  "kota42.erhu.11": {
+    "subtitle": "subtitles.kultivator.kota42.erhu",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/erhu_11"
+      }
+    ]
+  },
+  "kota42.erhu.2": {
+    "subtitle": "subtitles.kultivator.kota42.erhu",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/erhu_2"
+      }
+    ]
+  },
+  "kota42.erhu.3": {
+    "subtitle": "subtitles.kultivator.kota42.erhu",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/erhu_3"
+      }
+    ]
+  },
+  "kota42.erhu.4": {
+    "subtitle": "subtitles.kultivator.kota42.erhu",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/erhu_4"
+      }
+    ]
+  },
+  "kota42.erhu.5": {
+    "subtitle": "subtitles.kultivator.kota42.erhu",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/erhu_5"
+      }
+    ]
+  },
+  "kota42.erhu.6": {
+    "subtitle": "subtitles.kultivator.kota42.erhu",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/erhu_6"
+      }
+    ]
+  },
+  "kota42.erhu.7": {
+    "subtitle": "subtitles.kultivator.kota42.erhu",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/erhu_7"
+      }
+    ]
+  },
+  "kota42.erhu.8": {
+    "subtitle": "subtitles.kultivator.kota42.erhu",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/erhu_8"
+      }
+    ]
+  },
+  "kota42.erhu.9": {
+    "subtitle": "subtitles.kultivator.kota42.erhu",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/erhu_9"
+      }
+    ]
+  },
+  "kota42.genderang_kecil": {
+    "subtitle": "subtitles.kultivator.kota42.genderang_kecil",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/genderang_kecil_0"
+      },
+      {
+        "name": "kultivator:kota42/genderang_kecil_1"
+      }
+    ]
+  },
+  "kota42.gong.0": {
+    "subtitle": "subtitles.kultivator.kota42.gong",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/gong_0"
+      }
+    ]
+  },
+  "kota42.gong.1": {
+    "subtitle": "subtitles.kultivator.kota42.gong",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/gong_1"
+      }
+    ]
+  },
+  "kota42.gong.2": {
+    "subtitle": "subtitles.kultivator.kota42.gong",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/gong_2"
+      }
+    ]
+  },
+  "kota42.kentongan.0": {
+    "subtitle": "subtitles.kultivator.kota42.kentongan",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/kentongan_0"
+      }
+    ]
+  },
+  "kota42.kentongan.1": {
+    "subtitle": "subtitles.kultivator.kota42.kentongan",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/kentongan_1"
+      }
+    ]
+  },
+  "kota42.kentongan.2": {
+    "subtitle": "subtitles.kultivator.kota42.kentongan",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/kentongan_2"
+      }
+    ]
+  },
+  "kota42.merpati_peluit": {
+    "subtitle": "subtitles.kultivator.kota42.merpati_peluit",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/merpati_peluit"
+      }
+    ]
+  },
+  "kota42.petasan": {
+    "subtitle": "subtitles.kultivator.kota42.petasan",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/petasan_0"
+      },
+      {
+        "name": "kultivator:kota42/petasan_1"
+      },
+      {
+        "name": "kultivator:kota42/petasan_2"
+      },
+      {
+        "name": "kultivator:kota42/petasan_3"
+      },
+      {
+        "name": "kultivator:kota42/petasan_4"
+      },
+      {
+        "name": "kultivator:kota42/petasan_5"
+      }
+    ]
+  },
+  "kota42.pipa.0": {
+    "subtitle": "subtitles.kultivator.kota42.pipa",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/pipa_0"
+      }
+    ]
+  },
+  "kota42.pipa.1": {
+    "subtitle": "subtitles.kultivator.kota42.pipa",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/pipa_1"
+      }
+    ]
+  },
+  "kota42.pipa.10": {
+    "subtitle": "subtitles.kultivator.kota42.pipa",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/pipa_10"
+      }
+    ]
+  },
+  "kota42.pipa.11": {
+    "subtitle": "subtitles.kultivator.kota42.pipa",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/pipa_11"
+      }
+    ]
+  },
+  "kota42.pipa.2": {
+    "subtitle": "subtitles.kultivator.kota42.pipa",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/pipa_2"
+      }
+    ]
+  },
+  "kota42.pipa.3": {
+    "subtitle": "subtitles.kultivator.kota42.pipa",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/pipa_3"
+      }
+    ]
+  },
+  "kota42.pipa.4": {
+    "subtitle": "subtitles.kultivator.kota42.pipa",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/pipa_4"
+      }
+    ]
+  },
+  "kota42.pipa.5": {
+    "subtitle": "subtitles.kultivator.kota42.pipa",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/pipa_5"
+      }
+    ]
+  },
+  "kota42.pipa.6": {
+    "subtitle": "subtitles.kultivator.kota42.pipa",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/pipa_6"
+      }
+    ]
+  },
+  "kota42.pipa.7": {
+    "subtitle": "subtitles.kultivator.kota42.pipa",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/pipa_7"
+      }
+    ]
+  },
+  "kota42.pipa.8": {
+    "subtitle": "subtitles.kultivator.kota42.pipa",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/pipa_8"
+      }
+    ]
+  },
+  "kota42.pipa.9": {
+    "subtitle": "subtitles.kultivator.kota42.pipa",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/pipa_9"
+      }
+    ]
+  },
+  "kota42.suona.0": {
+    "subtitle": "subtitles.kultivator.kota42.suona",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/suona_0"
+      }
+    ]
+  },
+  "kota42.suona.1": {
+    "subtitle": "subtitles.kultivator.kota42.suona",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/suona_1"
+      }
+    ]
+  },
+  "kota42.suona.10": {
+    "subtitle": "subtitles.kultivator.kota42.suona",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/suona_10"
+      }
+    ]
+  },
+  "kota42.suona.11": {
+    "subtitle": "subtitles.kultivator.kota42.suona",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/suona_11"
+      }
+    ]
+  },
+  "kota42.suona.2": {
+    "subtitle": "subtitles.kultivator.kota42.suona",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/suona_2"
+      }
+    ]
+  },
+  "kota42.suona.3": {
+    "subtitle": "subtitles.kultivator.kota42.suona",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/suona_3"
+      }
+    ]
+  },
+  "kota42.suona.4": {
+    "subtitle": "subtitles.kultivator.kota42.suona",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/suona_4"
+      }
+    ]
+  },
+  "kota42.suona.5": {
+    "subtitle": "subtitles.kultivator.kota42.suona",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/suona_5"
+      }
+    ]
+  },
+  "kota42.suona.6": {
+    "subtitle": "subtitles.kultivator.kota42.suona",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/suona_6"
+      }
+    ]
+  },
+  "kota42.suona.7": {
+    "subtitle": "subtitles.kultivator.kota42.suona",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/suona_7"
+      }
+    ]
+  },
+  "kota42.suona.8": {
+    "subtitle": "subtitles.kultivator.kota42.suona",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/suona_8"
+      }
+    ]
+  },
+  "kota42.suona.9": {
+    "subtitle": "subtitles.kultivator.kota42.suona",
+    "sounds": [
+      {
+        "name": "kultivator:kota42/suona_9"
+      }
+    ]
+  }
+}

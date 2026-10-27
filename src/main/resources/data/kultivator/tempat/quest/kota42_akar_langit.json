@@ -1,0 +1,100 @@
+{
+  "pemberi": "tokoh:guru_zhou",
+  "tempat": "kota42",
+  "alur": true,
+  "tahap": [
+    {
+      "id": "daun",
+      "tujuan": [
+        "bicara tokoh:xiao_yu"
+      ]
+    },
+    {
+      "id": "tawar",
+      "tujuan": [
+        "bendera kota42.akar.dengar_ayah",
+        "bendera kota42.akar.dengar_gao"
+      ]
+    },
+    {
+      "id": "cara",
+      "cabang": [
+        {
+          "syarat": [
+            "bendera kota42.akar.tanding"
+          ],
+          "ke": "tanding"
+        }
+      ],
+      "ke": "kenangan"
+    },
+    {
+      "id": "tanding",
+      "tujuan": [
+        "duel tokoh:gao_senior"
+      ],
+      "batas_hari": 3,
+      "gagal_ke": "kenangan"
+    },
+    {
+      "id": "kenangan",
+      "cabang": [
+        {
+          "syarat": [
+            "bendera kota42.akar.pemain"
+          ],
+          "ke": "pemain"
+        },
+        {
+          "syarat": [
+            "bendera kota42.akar.gao"
+          ],
+          "ke": "gao"
+        },
+        {
+          "syarat": [
+            "bendera kota42.akar.tinggal"
+          ],
+          "ke": "tinggal"
+        }
+      ]
+    },
+    {
+      "id": "pemain",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "kota42.calon tokoh:xiao_yu pemain",
+        "kota42.kesan tokoh:yu_xiuniang 30",
+        "kabar kota42_akar_pemain pemain"
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "gao",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "kota42.calon tokoh:xiao_yu gao",
+        "kota42.kesan tokoh:yu_laosan 20",
+        "kabar kota42_akar_gao"
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "tinggal",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "kota42.calon tokoh:xiao_yu tinggal",
+        "kota42.kesan tokoh:yu_xiuniang 40",
+        "kota42.kesan tokoh:guru_zhou 20",
+        "kabar kota42_akar_tinggal"
+      ],
+      "ke": "selesai"
+    }
+  ]
+}

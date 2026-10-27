@@ -1,0 +1,20 @@
+{
+  "pembicara": [
+    "tokoh:lao_shuo"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest kota42_lagu_jembatan tahap bait_satu"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "371",
+      "prop": "kipas_lipat",
+      "akibat": [
+        "bendera kota42.lagu.satu"
+      ]
+    }
+  ]
+}

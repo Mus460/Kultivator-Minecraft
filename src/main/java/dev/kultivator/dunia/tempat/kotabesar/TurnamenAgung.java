@@ -663,6 +663,7 @@ final class TurnamenAgung implements KotaBesarKalender.Acara {
 			Barang.beri(winner, piala(winner, KotaBesarKota.nama(server, k), Kota.day(server)));
 			KotaData.get(server).addReputation(town, winner.getUUID(), 5);
 			KotaBesarData.get(server).beriGelar(winner.getUUID(), "juara_turnamen");
+			dev.kultivator.sekte.gabung.masuk.TokenNaik.beriUndangan(winner, List.of("terdekat")); // 41B: champions get an Undangan
 			Msg.title(winner, Component.translatable("kultivator.kota_besar.turnamen.juara").withStyle(ChatFormatting.GOLD),
 					Component.translatable("kultivator.kota_besar.turnamen.juara.sub", KotaBesarKota.nama(server, k)), 10, 80, 20);
 		}

@@ -90,10 +90,18 @@
         "k": "kultivator.cakap.kabar.nikah.3",
         "a": [
           {
+            "k": "kultivator.cakap.awal.kabar.1.kampung",
+            "a": []
+          },
+          {
             "t": "Bibi Zhang"
           },
           {
             "t": "Paman Li"
+          },
+          {
+            "k": "kultivator.cakap.ekor.kabar.0",
+            "a": []
           }
         ]
       },
@@ -101,8 +109,8 @@
       "gestur": "tertawa",
       "seru": null,
       "tik": null,
-      "id_id": "Ibu Bibi Zhang menangis bahagia sepanjang upacara. Katanya Paman Li menantu idaman.",
-      "en_us": "Bibi Zhang's mother wept with joy all ceremony. Says Paman Li is the perfect in-law."
+      "id_id": "Sudah dengar belum? Ibu Bibi Zhang menangis bahagia sepanjang upacara. Katanya Paman Li menantu idaman. Begitu kabar yang sampai ke telingaku.",
+      "en_us": "Have you heard yet? Bibi Zhang's mother wept with joy all ceremony. Says Paman Li is the perfect in-law. That's the news that reached my ears."
     },
     {
       "ubah": {
@@ -141,14 +149,23 @@
       },
       "harap": {
         "k": "kultivator.cakap.keluarga.umum.1",
-        "a": []
+        "a": [
+          {
+            "k": "kultivator.cakap.awal.kabar.5",
+            "a": []
+          },
+          {
+            "k": "kultivator.cakap.ekor.kabar.3",
+            "a": []
+          }
+        ]
       },
       "aturan": "keluarga.umum",
       "gestur": "bicara_tangan",
       "seru": null,
       "tik": null,
-      "id_id": "Kakakku merantau ke ibu kota. Suratnya datang setiap bulan purnama.",
-      "en_us": "My elder brother went to the capital. His letters come every full moon."
+      "id_id": "Ssst, mendekat sedikit. Kakakku merantau ke ibu kota. Suratnya datang setiap bulan purnama. Jangan bilang-bilang dulu, ya.",
+      "en_us": "Shh, come a little closer. My elder brother went to the capital. His letters come every full moon. Don't spread it yet, will you."
     },
     {
       "ubah": {
@@ -188,6 +205,9 @@
       "harap": {
         "k": "kultivator.cakap.kabar.sakit.0.kampung",
         "a": [
+          {
+            "t": ""
+          },
           {
             "t": "Paman Li"
           },

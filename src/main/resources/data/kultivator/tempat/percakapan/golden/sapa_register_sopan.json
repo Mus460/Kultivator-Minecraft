@@ -43,7 +43,7 @@
     {
       "ubah": {},
       "harap": {
-        "k": "kultivator.cakap.sapa.kenal.1.kampung",
+        "k": "kultivator.cakap.sapa.pagi.5",
         "a": [
           {
             "k": "kultivator.cakap.lex.tuan.kampung",
@@ -51,12 +51,12 @@
           }
         ]
       },
-      "aturan": "sapa.kenal",
+      "aturan": "sapa.pagi",
       "gestur": "lambai",
       "seru": null,
       "tik": null,
-      "id_id": "Lho, Pak! Sehat, Nak?",
-      "en_us": "Well, Mister! Keeping well, child?"
+      "id_id": "Pagi, Pak. Mau ke mana sepagi ini?",
+      "en_us": "Morning, Mister. Where are you off to so early?"
     },
     {
       "ubah": {
@@ -68,22 +68,31 @@
         }
       },
       "harap": {
-        "k": "kultivator.cakap.sapa.pekerja.4",
-        "a": []
+        "k": "kultivator.cakap.sapa.pekerja.1.kampung",
+        "a": [
+          {
+            "k": "kultivator.cakap.lex.nona.kampung",
+            "a": []
+          },
+          {
+            "k": "kultivator.cakap.ekor.sapa.9",
+            "a": []
+          }
+        ]
       },
       "aturan": "sapa.pekerja",
       "gestur": "seka_keringat",
       "seru": null,
       "tik": null,
-      "id_id": "Salam! Jangan berdiri di situ, nanti kena serbuk kayu.",
-      "en_us": "Greetings! Don't stand there; you'll get sawdust on you."
+      "id_id": "Salam, Nak. Kerjaan banyak, tapi sebentar boleh. Salam untuk keluargamu.",
+      "en_us": "Greetings, child. Lots of work, but a moment's fine. Greetings to your family."
     },
     {
       "ubah": {
         "tahu_nama": true
       },
       "harap": {
-        "k": "kultivator.cakap.sapa.pagi.2",
+        "k": "kultivator.cakap.sapa.pagi.0",
         "a": [
           {
             "k": "kultivator.cakap.lex.sebutan_nama",
@@ -96,6 +105,9 @@
                 "t": "Han"
               }
             ]
+          },
+          {
+            "t": ""
           }
         ]
       },
@@ -103,8 +115,8 @@
       "gestur": "lambai",
       "seru": null,
       "tik": null,
-      "id_id": "Pagi yang cerah, Pak Han. Semoga harimu lancar.",
-      "en_us": "A bright morning, Mister Han. May your day go smoothly."
+      "id_id": "Selamat pagi, Pak Han!",
+      "en_us": "Good morning, Mister Han!"
     }
   ]
 }

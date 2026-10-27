@@ -666,7 +666,9 @@
         {
           "kunci": "curhat.keluh.0",
           "slot": [
-            "$lawan"
+            "$awal",
+            "$lawan",
+            "$ekor"
           ],
           "bobot": 3,
           "varian": [
@@ -678,7 +680,9 @@
         {
           "kunci": "curhat.keluh.1",
           "slot": [
-            "$lawan"
+            "$awal",
+            "$lawan",
+            "$ekor"
           ],
           "bobot": 2,
           "varian": [
@@ -689,8 +693,10 @@
         {
           "kunci": "curhat.keluh.2",
           "slot": [
+            "$awal",
             "$almarhum",
-            "$lawan"
+            "$lawan",
+            "$ekor"
           ],
           "bobot": 2,
           "varian": [
@@ -700,6 +706,8 @@
         {
           "kunci": "curhat.keluh.3",
           "slot": [
+            "$awal",
+            "$ekor",
             "$lawan"
           ],
           "bobot": 1,
@@ -710,7 +718,9 @@
         {
           "kunci": "curhat.keluh.4",
           "slot": [
-            "$lawan"
+            "$awal",
+            "$lawan",
+            "$ekor"
           ],
           "bobot": 1
         }
@@ -723,6 +733,14 @@
         "$almarhum": {
           "tipe": "nama_warga",
           "dari": "konteks.almarhum"
+        },
+        "$awal": {
+          "aturan": "awal.keluh",
+          "opsional": 0.45
+        },
+        "$ekor": {
+          "aturan": "ekor.keluh",
+          "opsional": 0.4
         }
       },
       "gestur": "menangis",

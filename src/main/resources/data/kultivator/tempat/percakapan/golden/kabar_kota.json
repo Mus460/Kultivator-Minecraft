@@ -77,7 +77,14 @@
       },
       "harap": {
         "k": "kultivator.cakap.kabar.kafilah.3",
-        "a": []
+        "a": [
+          {
+            "t": ""
+          },
+          {
+            "t": ""
+          }
+        ]
       },
       "aturan": "kabar.kafilah",
       "gestur": "tunjuk",
@@ -125,6 +132,10 @@
           {
             "k": "kultivator.cakap.lex.besok.oasis",
             "a": []
+          },
+          {
+            "k": "kultivator.cakap.ekor.kabar.2",
+            "a": []
           }
         ]
       },
@@ -132,8 +143,8 @@
       "gestur": "bisik",
       "seru": null,
       "tik": null,
-      "id_id": "Sst... Pasar Hantu buka di gang belakang kuil esok, bila matahari mengizinkan. Bawa lentera putih, jangan bicara keras.",
-      "en_us": "Shh... the Ghost Market opens at gang belakang kuil tomorrow, sun willing. Bring a white lantern and keep your voice down."
+      "id_id": "Sst... Pasar Hantu buka di gang belakang kuil esok, bila matahari mengizinkan. Bawa lentera putih, jangan bicara keras. Kau sendiri sudah dengar?",
+      "en_us": "Shh... the Ghost Market opens at gang belakang kuil tomorrow, sun willing. Bring a white lantern and keep your voice down. Have you heard it yourself?"
     },
     {
       "ubah": {
@@ -208,6 +219,9 @@
         "k": "kultivator.cakap.kabar.acara.3",
         "a": [
           {
+            "t": ""
+          },
+          {
             "k": "kultivator.cakap.lex.hari_lagi",
             "a": [
               {
@@ -215,6 +229,10 @@
                 "a": []
               }
             ]
+          },
+          {
+            "k": "kultivator.cakap.ekor.kabar.5",
+            "a": []
           }
         ]
       },
@@ -222,8 +240,8 @@
       "gestur": "bicara_tangan",
       "seru": null,
       "tik": null,
-      "id_id": "Semua penjual makanan bersiap. Acara tiga hari lagi berarti dagangan habis.",
-      "en_us": "Every food seller is getting ready. in three days means a sell-out."
+      "id_id": "Semua penjual makanan bersiap. Acara tiga hari lagi berarti dagangan habis. Sumur pun sudah ramai membicarakannya.",
+      "en_us": "Every food seller is getting ready. in three days means a sell-out. The well is already buzzing with it."
     }
   ]
 }
