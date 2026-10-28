@@ -1,9 +1,9 @@
 package dev.kultivator.client.dunia.tempat.kotabesar;
 
 import dev.kultivator.Kultivator;
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.dunia.tempat.kotabesar.KotaBesarPayload;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
@@ -27,7 +27,7 @@ public final class KotaBesarClient {
 		ClientPlayNetworking.registerGlobalReceiver(KotaBesarPayload.TYPE, (payload, context) -> KotaBesarFx.terima(payload));
 		HudElementRegistry.attachElementAfter(VanillaHudElements.MISC_OVERLAYS, Kultivator.id("kota_besar_hud"), new KotaBesarHud());
 		ClientTickEvents.END_CLIENT_TICK.register(KotaBesarFx::tick);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> KotaBesarFx.bersihkan()));
+		ClientDisconnect.register((handler, client) -> client.execute(() -> KotaBesarFx.bersihkan()));
 	}
 
 	private KotaBesarClient() {

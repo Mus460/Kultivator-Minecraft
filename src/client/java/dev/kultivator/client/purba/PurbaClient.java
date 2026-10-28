@@ -1,7 +1,7 @@
 package dev.kultivator.client.purba;
 
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.purba.PurbaEntities;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.nbt.CompoundTag;
 
@@ -17,7 +17,7 @@ public final class PurbaClient {
 
 	/** Called once from {@code KultivatorClient}. */
 	public static void init() {
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
+		ClientDisconnect.register((handler, client) -> client.execute(() -> {
 			data = new CompoundTag();
 			PurbaFx.clear();
 		}));

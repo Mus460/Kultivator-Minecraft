@@ -110,6 +110,11 @@ public final class SosokJembatan {
 		}
 	}
 
+	/** True when the atlas of a look is in the cache now (no composing). */
+	static boolean atlasAda(@Nullable Object rupa) {
+		return !kulitRusak && rupa instanceof SosokRupa r && KulitCache.ada(r);
+	}
+
 	/** One of the 24 ready fallback atlases {@code textures/sosok/cadangan/<kelamin>_<usia>_<kelas>.png}. */
 	static @Nullable Identifier cadangan(int kelamin, int usia, String kelas) {
 		try {

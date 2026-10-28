@@ -10,11 +10,13 @@ import dev.kultivator.disciple.DuelRules;
 import dev.kultivator.fx.Fx;
 import dev.kultivator.fx.FxType;
 import dev.kultivator.registry.ModItems;
+import dev.kultivator.sect.event.Storehouse;
 import dev.kultivator.sect.hall.Halls;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
 import dev.kultivator.util.NoGrief;
 import dev.kultivator.util.Targeting;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -31,6 +33,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.InteractionHand;
@@ -104,6 +107,13 @@ public final class SoulSeal {
 	}
 
 	static void register() {
+		// Stopping (players still online, not yet saved): a running ritual hands its jade back instead of losing it with the map.
+		ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
+			for (Ritual ritual : List.copyOf(RITUALS.values())) {
+				refundJade(server, ritual);
+			}
+			RITUALS.clear();
+		});
 		DiscipleHooks.addStats((entity, sink) -> {
 			if (sealed(entity.data())) {
 				sink.add(Attributes.MAX_HEALTH, HEALTH_ID, HEALTH_BONUS, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
@@ -208,12 +218,29 @@ public final class SoulSeal {
 	private static void giveJadeBack(ServerPlayer master) {
 		ItemStack back = new ItemStack(ITEM);
 		if (!master.hasInfiniteMaterials() && !master.getInventory().add(back) && !back.isEmpty()) {
-			// Never through a portal (an End portal would build its platform) and never on a plate.
-			ItemEntity item = new ItemEntity(master.level(), master.getX(), master.getY() + 0.5D, master.getZ(), back);
-			item.setDefaultPickUpDelay();
-			item.addTag(NoGrief.TAG);
-			item.setPortalCooldown();
-			master.level().addFreshEntity(item);
+			dropJade(master, back);
+		}
+	}
+
+	/** Never through a portal (an End portal would build its platform) and never on a plate. */
+	private static void dropJade(Entity at, ItemStack back) {
+		ItemEntity item = new ItemEntity(at.level(), at.getX(), at.getY() + 0.5D, at.getZ(), back);
+		item.setDefaultPickUpDelay();
+		item.addTag(NoGrief.TAG);
+		item.setPortalCooldown();
+		at.level().addFreshEntity(item);
+	}
+
+	/** A ritual that ends without a seal: the jade goes to the master, or into the Lumbung when the master is offline. */
+	private static void refundJade(MinecraftServer server, Ritual ritual) {
+		ServerPlayer master = server.getPlayerList().getPlayer(ritual.master());
+		if (master != null) {
+			giveJadeBack(master);
+			return;
+		}
+		ItemStack rest = Storehouse.insert(ritual.master(), new ItemStack(ITEM));
+		if (!rest.isEmpty()) {
+			dropJade(ritual.entity(), rest);
 		}
 	}
 
@@ -226,8 +253,8 @@ public final class SoulSeal {
 			RITUALS.remove(soul);
 			if (master != null) {
 				Msg.chat(master, Component.translatable(DisciplePaths.PREFIX + "seal.broken", DisciplePaths.name(entity)).withColor(DisciplePaths.REFUSE));
-				giveJadeBack(master);
 			}
+			refundJade(server, ritual);
 			return;
 		}
 		int ticks = ++ritual.ticks()[0];

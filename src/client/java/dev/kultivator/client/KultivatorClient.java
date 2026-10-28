@@ -10,7 +10,6 @@ import dev.kultivator.client.screen.CultivationScreen;
 import dev.kultivator.network.Payloads;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
@@ -20,6 +19,7 @@ public class KultivatorClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		EffectQuality.load();
+		ClientDisconnect.init();
 		Keys.init();
 		// UI/UX Terpadu (DESIGN 33.7 module N): the hub's back behaviour, the Akses Cepat wheel (V) and the one-time key move.
 		dev.kultivator.client.hub.HubNav.init();
@@ -116,7 +116,7 @@ public class KultivatorClient implements ClientModInitializer {
 
 		HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, Kultivator.id("qi_hud"), new QiHud());
 		ClientTickEvents.END_CLIENT_TICK.register(FxDispatcher::tick);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
+		ClientDisconnect.register((handler, client) -> client.execute(() -> {
 			ClientCultivation.clear();
 		}));
 	}

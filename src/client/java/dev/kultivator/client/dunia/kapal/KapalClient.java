@@ -1,6 +1,7 @@
 package dev.kultivator.client.dunia.kapal;
 
 import dev.kultivator.Kultivator;
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.EffectQuality;
 import dev.kultivator.client.dunia.DuniaScenes;
 import dev.kultivator.client.epic.EpicSettings;
@@ -15,7 +16,6 @@ import dev.kultivator.dunia.kapal.KapalNet;
 import dev.kultivator.dunia.kapal.KapalRohEntity;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
@@ -55,7 +55,7 @@ public final class KapalClient {
 		ClientEntityEvents.ENTITY_LOAD.register((entity, level) -> KapalFx.loaded(entity));
 		ClientEntityEvents.ENTITY_UNLOAD.register((entity, level) -> KapalFx.unloaded(entity));
 		ClientTickEvents.END_CLIENT_TICK.register(KapalClient::tick);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
+		ClientDisconnect.register((handler, client) -> client.execute(() -> {
 			KapalFx.clear();
 			KapalModel.clear();
 			fadeStart = 0L;

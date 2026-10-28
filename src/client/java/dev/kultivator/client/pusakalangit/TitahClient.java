@@ -3,6 +3,7 @@ package dev.kultivator.client.pusakalangit;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.Keys;
 import dev.kultivator.client.dampak.DampakClient;
 import dev.kultivator.client.dampak.cinema.TargetMark;
@@ -25,7 +26,6 @@ import dev.kultivator.technique.spec.dsl.Dampak;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommands;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -150,7 +150,7 @@ public final class TitahClient {
 		ClientTickEvents.END_CLIENT_TICK.register(minecraft -> ticks++);
 		// Keabadian › Titah (DESIGN 43.5, M16)
 		HubPages.daftar(HubNav.KEABADIAN, Urutan.ID_TITAH, Urutan.TITAH, TitahScreen::new);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> clear()));
+		ClientDisconnect.register((handler, client) -> client.execute(() -> clear()));
 		try {
 			dev.kultivator.client.pusakalangit.world.TitahWorld.init();
 		} catch (RuntimeException | LinkageError exception) {

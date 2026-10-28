@@ -1,6 +1,7 @@
 package dev.kultivator.client.kehancuran;
 
 import dev.kultivator.Kultivator;
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.Keys;
 import dev.kultivator.client.codex.Codex;
 import dev.kultivator.client.hub.HubNav;
@@ -12,7 +13,6 @@ import dev.kultivator.kehancuran.Kehancuran;
 import dev.kultivator.network.Actions;
 import dev.kultivator.network.Payloads;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.minecraft.client.Minecraft;
@@ -70,7 +70,7 @@ public final class KehancuranClient {
 	private static Component stashedName = Component.empty();
 
 	public static void init() {
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> clear()));
+		ClientDisconnect.register((handler, client) -> client.execute(() -> clear()));
 		ClientTickEvents.END_CLIENT_TICK.register(KehancuranFx::tick);
 		HudElementRegistry.attachElementAfter(VanillaHudElements.MISC_OVERLAYS, Kultivator.id("kehancuran_sky"), new RedSkyHud());
 		Codex.daftarHalaman();

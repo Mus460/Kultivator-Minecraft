@@ -1,5 +1,6 @@
 package dev.kultivator.client.dunia.kota42;
 
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.dunia.kota42.cakap.UjaranClient;
 import dev.kultivator.client.dunia.kota42.gerak.KotaPoses;
 import dev.kultivator.client.dunia.kota42.ragam.PetaPanasDebug;
@@ -7,7 +8,6 @@ import dev.kultivator.client.dunia.kota42.render.KotaRenderClient;
 import dev.kultivator.client.dunia.kota42.ui.KotaUiClient;
 import dev.kultivator.client.dunia.tempat.perbaikan.PerbaikanClient;
 import dev.kultivator.dunia.kota42.KotaPayloads;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import org.jetbrains.annotations.Nullable;
 
@@ -87,7 +87,7 @@ public final class KotaHidupClient {
 		ClientPlayNetworking.registerGlobalReceiver(KotaPayloads.Ujaran.TYPE, (payload, context) ->
 				UJARAN.put(payload.pembicara(), new UjaranMasuk(payload, System.currentTimeMillis())));
 		ClientPlayNetworking.registerGlobalReceiver(KotaPayloads.PetaPanas.TYPE, (payload, context) -> petaPanas = payload);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> hapus());
+		ClientDisconnect.register((handler, client) -> hapus());
 		// 42U Layar (screens, hub cards, HUDs):
 		KotaUiClient.init();
 		// 42V-F atmosphere and fx (lanterns, smoke, banners, firecrackers, soot, shadow theatre, street music):

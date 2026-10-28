@@ -892,7 +892,7 @@ public final class TempatHuni {
 			jarak.put(p.id(), Math.sqrt(at.distSqr(scene)) + bonus);
 		}
 		calon.sort(Comparator.comparingDouble(p -> jarak.getOrDefault(p.id(), Double.MAX_VALUE)));
-		for (int i = 0; i < calon.size() && i < HidupApi.TONTON_MAKS; i++) {
+		for (int i = 0; i < calon.size() && i < HidupApi.tontonUkuran(situsId); i++) {
 			tonton.put(calon.get(i).id(), i);
 		}
 	}

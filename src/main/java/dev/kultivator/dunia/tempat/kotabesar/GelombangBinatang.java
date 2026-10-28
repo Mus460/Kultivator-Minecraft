@@ -22,6 +22,7 @@ import dev.kultivator.technique.spec.TechniquePower;
 import dev.kultivator.util.Msg;
 import dev.kultivator.util.Sibuk;
 import dev.kultivator.voice.Voice;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -159,6 +160,24 @@ public final class GelombangBinatang {
 			}
 		});
 		ServerLivingEntityEvents.AFTER_DEATH.register(GelombangBinatang::mati);
+		// raiders are persistent: those a stopped server saved (or a finished raid left in an unloaded chunk) never come back
+		ServerEntityEvents.ALLOW_LOAD.register((entity, level, reason, flag) -> reason != EntitySpawnReason.LOAD
+				|| !entity.entityTags().contains(TAG) || masihDilacak(entity.getUUID()));
+	}
+
+	/** True while an active raid still tracks {@code id} (a chunk that reloads mid-fight keeps its raiders). */
+	private static boolean masihDilacak(UUID id) {
+		for (Serbuan s : AKTIF.values()) {
+			if (s.monster.contains(id)) {
+				return true;
+			}
+		}
+		for (SerbuanTempat s : TEMPAT.values()) {
+			if (s.monster.contains(id)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	static void lupakan() {
@@ -366,7 +385,6 @@ public final class GelombangBinatang {
 		}
 		int batch = Math.min(4, room);
 		for (int i = 0; i < batch && s.lahir < s.kuota; i++) {
-			s.lahir++;
 			double side = (r.nextDouble() - 0.5D) * 40.0D;
 			double depth = 26.0D + r.nextDouble() * 14.0D;
 			Vec3 lat = new Vec3(-s.luar.z, 0.0D, s.luar.x);
@@ -375,7 +393,7 @@ public final class GelombangBinatang {
 			if (spot == null) {
 				continue;
 			}
-			boolean elite = s.lahir <= s.gelombang;
+			boolean elite = s.lahir < s.gelombang;
 			EntityType<? extends Mob> type = pilihJenis(r);
 			Mob mob = type.create(level, EntitySpawnReason.EVENT);
 			if (mob == null) {
@@ -394,6 +412,7 @@ public final class GelombangBinatang {
 			}
 			if (level.addFreshEntity(mob)) {
 				s.monster.add(mob.getUUID());
+				s.lahir++; // counted only once it stands in the world (an unloaded spot spawns nothing)
 			}
 		}
 	}
@@ -407,9 +426,11 @@ public final class GelombangBinatang {
 	}
 
 	private static void bersihkanMati(ServerLevel level, Serbuan s) {
+		// a raider in an unloaded chunk is not dead: with no defender around the count stands still
+		boolean jaga = !pembela(level, s).isEmpty();
 		s.monster.removeIf(id -> {
 			Entity e = level.getEntity(id);
-			return e == null || !e.isAlive();
+			return e == null ? jaga : !e.isAlive();
 		});
 	}
 
@@ -788,9 +809,10 @@ public final class GelombangBinatang {
 			if (s.gelombang == 0 || s.gelombang < GELOMBANG && now >= s.berikut && s.lahir >= s.kuota) {
 				gelombangTempat(level, s, now);
 			}
+			boolean jaga = !pembelaTempat(level, s).isEmpty();
 			s.monster.removeIf(id -> {
 				Entity e = level.getEntity(id);
-				return e == null || !e.isAlive();
+				return e == null ? jaga : !e.isAlive();
 			});
 			spawnTempat(level, s);
 			gerakkanTempat(level, s);
@@ -838,13 +860,12 @@ public final class GelombangBinatang {
 		int batch = Math.min(4, room);
 		Vec3 lat = new Vec3(-s.luar.z, 0.0D, s.luar.x);
 		for (int i = 0; i < batch && s.lahir < s.kuota; i++) {
-			s.lahir++;
 			Vec3 at = Vec3.atCenterOf(s.depan).add(s.luar.scale(22.0D + r.nextDouble() * 12.0D)).add(lat.scale((r.nextDouble() - 0.5D) * 40.0D));
 			BlockPos spot = TempatApi.groundSpot(level, Mth.floor(at.x), Mth.floor(at.z), s.depan.getY());
 			if (spot == null) {
 				continue;
 			}
-			boolean elite = s.lahir <= s.gelombang;
+			boolean elite = s.lahir < s.gelombang;
 			Mob mob;
 			if (JENIS_BINATANG.equals(s.jenis)) {
 				int roll = r.nextInt(100);
@@ -879,6 +900,7 @@ public final class GelombangBinatang {
 				mob.addTag(TAG);
 			}
 			s.monster.add(mob.getUUID());
+			s.lahir++;
 		}
 	}
 

@@ -16,6 +16,8 @@ import dev.kultivator.epic.EpicIds;
 import dev.kultivator.fx.Fx;
 import dev.kultivator.fx.FxType;
 import dev.kultivator.sect.event.SectEventItems;
+import dev.kultivator.sect.event.Storehouse;
+import dev.kultivator.sect.hall.Halls;
 import dev.kultivator.sect.hall.SectRanks;
 import dev.kultivator.technique.source.LearnRules;
 import dev.kultivator.data.TechniqueSpec;
@@ -360,8 +362,11 @@ final class PrimordialEvents {
 			ended = true;
 			if (!active && refund != null && !refund.isEmpty()) {
 				ServerPlayer player = level.getServer().getPlayerList().getPlayer(owner);
-				if (player != null) {
+				if (player != null && player.isAlive()) {
 					Purba.give(player, refund);
+				} else {
+					// offline or dead (a dead inventory is already emptied): the Lumbung, else an owner-locked drop at the arena
+					Purba.drop(level, center, Halls.hallOf(owner) != null ? Storehouse.insert(owner, refund) : refund, owner);
 				}
 				refund = null;
 			}
@@ -915,6 +920,14 @@ final class PrimordialEvents {
 				Kultivator.LOGGER.error("Primordial rewards failed", exception);
 				fight.cleanup();
 			}
+		}
+	}
+
+	/** LEAVE (that owner) or SERVER_STOPPING (null): an omen still running gives the scroll back while its owner is still here. */
+	static void abandonOmen(@Nullable UUID owner) {
+		Fight fight = current;
+		if (fight != null && !fight.active && (owner == null || fight.owner.equals(owner))) {
+			fight.depart(false);
 		}
 	}
 

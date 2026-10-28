@@ -3,11 +3,11 @@ package dev.kultivator.client.sekte.kepribadian;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.kultivator.Kultivator;
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.EffectQuality;
 import dev.kultivator.client.epic.ShaderCompat;
 import dev.kultivator.sekte.kepribadian.KepribadianPayloads;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.minecraft.client.Minecraft;
@@ -65,7 +65,7 @@ final class GelembungPikiran {
 		registered = true;
 		LevelRenderEvents.COLLECT_SUBMITS.register(GelembungPikiran::render);
 		ClientTickEvents.END_CLIENT_TICK.register(client -> tick());
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> clear()));
+		ClientDisconnect.register((handler, client) -> client.execute(() -> clear()));
 	}
 
 	static void clear() {

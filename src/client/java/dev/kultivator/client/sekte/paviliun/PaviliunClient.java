@@ -1,5 +1,6 @@
 package dev.kultivator.client.sekte.paviliun;
 
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.EffectQuality;
 import dev.kultivator.client.epic.SekteScenes;
 import dev.kultivator.client.epic.sky.SkyDirector;
@@ -13,7 +14,6 @@ import dev.kultivator.epic.EpicIds;
 import dev.kultivator.sekte.SekteIds;
 import dev.kultivator.sekte.paviliun.PaviliunPayloads;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.minecraft.client.Minecraft;
@@ -56,7 +56,7 @@ public final class PaviliunClient {
 		ClientPlayNetworking.registerGlobalReceiver(PaviliunPayloads.View.TYPE, (p, context) -> onView(p));
 		ClientPlayNetworking.registerGlobalReceiver(PaviliunPayloads.Places.TYPE, (p, context) -> PaviliunWorld.set(p.data()));
 		ClientTickEvents.END_CLIENT_TICK.register(PaviliunClient::tick);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
+		ClientDisconnect.register((handler, client) -> client.execute(() -> {
 			DATA[0] = new CompoundTag();
 			DATA[1] = new CompoundTag();
 			PaviliunWorld.clear();

@@ -1,6 +1,7 @@
 package dev.kultivator.client.pusakalangit.world;
 
 import dev.kultivator.Kultivator;
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.dampak.world.DampakWorld;
 import dev.kultivator.client.dampak.world.DampakWorldBudget;
 import dev.kultivator.client.dampak.world.SigilRenderer;
@@ -13,7 +14,6 @@ import dev.kultivator.technique.spec.dsl.Dampak;
 import dev.kultivator.technique.spec.dsl.Phase;
 import dev.kultivator.technique.spec.dsl.SigilPattern;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.entity.EntityRenderers;
@@ -171,7 +171,7 @@ public final class TitahWorld {
 				warn("tick", exception);
 			}
 		});
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> clear()));
+		ClientDisconnect.register((handler, client) -> client.execute(() -> clear()));
 	}
 
 	/** True for the four Titah decree specs. */

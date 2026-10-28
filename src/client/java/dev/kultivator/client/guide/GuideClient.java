@@ -1,6 +1,7 @@
 package dev.kultivator.client.guide;
 
 import dev.kultivator.client.ClientCultivation;
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.Keys;
 import dev.kultivator.client.hub.HubNav;
 import dev.kultivator.client.hub.HubPages;
@@ -8,7 +9,6 @@ import dev.kultivator.client.hub.Tujuan;
 import dev.kultivator.client.hub.Urutan;
 import dev.kultivator.network.Payloads;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -55,7 +55,7 @@ public final class GuideClient {
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.GuideSync.TYPE, (payload, context) -> onSync(payload));
 		HubPages.daftar(HubNav.PANDUAN, Urutan.ID_KITAB, Urutan.KITAB, GuideScreen::new);
 		ClientTickEvents.END_CLIENT_TICK.register(GuideClient::tick);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> clear()));
+		ClientDisconnect.register((handler, client) -> client.execute(() -> clear()));
 	}
 
 	private static void clear() {

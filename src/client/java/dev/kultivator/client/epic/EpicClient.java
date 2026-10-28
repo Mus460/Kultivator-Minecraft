@@ -1,6 +1,7 @@
 package dev.kultivator.client.epic;
 
 import dev.kultivator.Kultivator;
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.epic.camera.CinematicDirector;
 import dev.kultivator.client.epic.camera.SkipKey;
 import dev.kultivator.client.epic.render.EpicRenderer;
@@ -11,7 +12,6 @@ import dev.kultivator.network.Payloads;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
@@ -50,7 +50,7 @@ public final class EpicClient {
 		LevelRenderEvents.BEFORE_BLOCK_OUTLINE.register((context, outline) -> !CinematicDirector.active());
 		ClientLifecycleEvents.CLIENT_STARTED.register(client -> registerHud());
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, buildContext) -> EpicClientCommands.register(dispatcher));
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> EpicDirector.clearAll()));
+		ClientDisconnect.register((handler, client) -> client.execute(() -> EpicDirector.clearAll()));
 	}
 
 	private static void registerHud() {

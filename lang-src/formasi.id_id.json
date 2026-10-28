@@ -76,6 +76,7 @@
   "kultivator.formasi.kas_full": "%1$s sudah penuh dan Kas Daya Formasi juga tidak muat lagi.",
   "kultivator.formasi.upgraded": "Mata formasi bangkit kembali: %1$s menjadi %2$s (inti, Daya, dan penjaga tetap).",
   "kultivator.formasi.upgrade_refused": "%1$s sudah lengkap di sekitar mata ini, tetapi tidak bisa menggantikan inti: %2$s",
+  "kultivator.formasi.refuse.amethyst_full": "Kas ametis hampir penuh, jadi bagian Daya ametis inti ini tidak muat dikembalikan.",
   "kultivator.formasi.refuse.node_spacing": "Simpul perpindahan sekte harus berjarak minimal %s blok.",
   "kultivator.formasi.broken": "Formasi %1$s rusak: %2$s blok hilang (posisi ditandai).",
   "kultivator.formasi.removed": "%1$s kehilangan matanya dan lenyap; %2$s Dayanya kembali ke Kas Daya Formasi.",

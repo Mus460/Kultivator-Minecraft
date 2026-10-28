@@ -1,11 +1,11 @@
 package dev.kultivator.client.anim;
 
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.anim.form.FormLayer;
 import dev.kultivator.client.anim.model.FireUltimates;
 import dev.kultivator.client.anim.model.ModelFx;
 import dev.kultivator.network.Payloads;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityRenderLayerRegistrationCallback;
 import net.minecraft.client.Minecraft;
@@ -44,7 +44,7 @@ public final class AnimClient {
 			}
 		});
 		ClientTickEvents.END_CLIENT_TICK.register(AnimClient::tick);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(AnimClient::clearAll));
+		ClientDisconnect.register((handler, client) -> client.execute(AnimClient::clearAll));
 	}
 
 	/** Client ticks since start (the clock of forms, binds and props). */

@@ -1,9 +1,9 @@
 package dev.kultivator.client.disciple.path;
 
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.disciple.DiscipleLook;
 import dev.kultivator.disciple.DiscipleEntity;
 import dev.kultivator.disciple.path.DisciplePaths;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.network.chat.Component;
 
 /**
@@ -17,7 +17,7 @@ public final class PathClient {
 	private static final int RED_SEAL = 0xC21F1F;
 
 	public static void init() {
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> PathFx.clear()));
+		ClientDisconnect.register((handler, client) -> client.execute(() -> PathFx.clear()));
 		DiscipleLook.addNameDecorator((disciple, tag) -> disciple.syncedRole() == DiscipleEntity.Role.DISCIPLE
 				&& (disciple.syncedPower() & DisciplePaths.BIT_RELEASED) != 0
 				? Component.translatable("kultivator.dpath.tag.released").withColor(RED_SEAL).append(tag) : tag);

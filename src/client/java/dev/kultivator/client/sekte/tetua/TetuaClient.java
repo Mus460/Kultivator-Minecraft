@@ -1,5 +1,6 @@
 package dev.kultivator.client.sekte.tetua;
 
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.EffectQuality;
 import dev.kultivator.client.epic.SekteScenes;
 import dev.kultivator.client.epic.sky.SkyDirector;
@@ -16,7 +17,6 @@ import dev.kultivator.sekte.SekteIds;
 import dev.kultivator.sekte.tetua.Tetua;
 import dev.kultivator.sekte.tetua.TetuaPayloads;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -53,7 +53,7 @@ public final class TetuaClient {
 		ClientPlayNetworking.registerGlobalReceiver(TetuaPayloads.Report.TYPE, (p, context) -> LaporanCard.show(p.report()));
 		ClientPlayNetworking.registerGlobalReceiver(TetuaPayloads.Ceremony.TYPE, (p, context) -> TetuaPoses.onCeremony(p));
 		ClientTickEvents.END_CLIENT_TICK.register(client -> tick(client));
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
+		ClientDisconnect.register((handler, client) -> client.execute(() -> {
 			LaporanCard.clear();
 			TetuaPoses.clear();
 			view = new CompoundTag();

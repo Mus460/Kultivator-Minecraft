@@ -1,7 +1,7 @@
 package dev.kultivator.client.musuh;
 
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.musuh.RogueCultivators;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.nbt.CompoundTag;
 
@@ -18,7 +18,7 @@ public final class MusuhClient {
 	public static void init() {
 		RogueMaskLayer.register();
 		EntityRenderers.register(RogueCultivators.TYPE, RogueRenderer::new);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
+		ClientDisconnect.register((handler, client) -> client.execute(() -> {
 			data = new CompoundTag();
 			MusuhFx.clear();
 		}));

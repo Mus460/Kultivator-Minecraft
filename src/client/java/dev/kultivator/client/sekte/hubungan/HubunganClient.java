@@ -1,5 +1,6 @@
 package dev.kultivator.client.sekte.hubungan;
 
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.epic.SekteScenes;
 import dev.kultivator.client.epic.sky.SkyDirector;
 import dev.kultivator.client.epic.sound.MusicCue;
@@ -11,7 +12,6 @@ import dev.kultivator.epic.EpicIds;
 import dev.kultivator.sekte.SekteIds;
 import dev.kultivator.sekte.hubungan.HubunganPayloads;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.minecraft.client.model.geom.ModelPart;
@@ -47,7 +47,7 @@ public final class HubunganClient {
 		ClientPlayNetworking.registerGlobalReceiver(HubunganPayloads.Jaring.TYPE, (payload, context) -> JaringScreen.receive(payload.data()));
 		ClientTickEvents.END_CLIENT_TICK.register(GelembungIkatan::tick);
 		LevelRenderEvents.COLLECT_SUBMITS.register(GelembungIkatan::render);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
+		ClientDisconnect.register((handler, client) -> client.execute(() -> {
 			GelembungIkatan.clear();
 			JaringScreen.bersih();
 		}));

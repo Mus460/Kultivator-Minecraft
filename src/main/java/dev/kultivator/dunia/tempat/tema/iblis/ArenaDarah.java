@@ -25,7 +25,9 @@ import dev.kultivator.util.DeathGuard;
 import dev.kultivator.util.Msg;
 import dev.kultivator.util.Sibuk;
 import dev.kultivator.voice.Voice;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
@@ -139,6 +141,23 @@ public final class ArenaDarah {
 			return true;
 		});
 		Sibuk.register("tema.arena", player -> LAGA.containsKey(player.getUUID()));
+		// the beast is persistent: one a stopped server saved must not come back to an empty pit
+		ServerEntityEvents.ALLOW_LOAD.register((entity, level, reason, flag) -> reason != EntitySpawnReason.LOAD
+				|| !entity.entityTags().contains("kultivator.iblis_arena"));
+		ServerLifecycleEvents.SERVER_STOPPING.register(ArenaDarah::hentikan);
+	}
+
+	/** A stopping server ends every bout: the foe goes and the paid entry fee is given back from the till. */
+	private static void hentikan(MinecraftServer server) {
+		for (Laga laga : LAGA.values()) {
+			ServerPlayer p = server.getPlayerList().getPlayer(laga.player);
+			if (p != null && laga.biaya > 0L) {
+				NilaiBatu.give(p, laga.biaya);
+				IblisData.ambilKas(server, laga.situs, laga.biaya);
+			}
+			buangLawan(laga);
+		}
+		LAGA.clear();
 	}
 
 	static void clear() {

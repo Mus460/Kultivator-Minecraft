@@ -1,13 +1,13 @@
 package dev.kultivator.client.duel.fx;
 
 import dev.kultivator.Kultivator;
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.duel.DuelBus;
 import dev.kultivator.client.epic.EpicDirector;
 import dev.kultivator.client.epic.camera.ShotGuard;
 import dev.kultivator.duel.net.DuelPayloads;
 import dev.kultivator.fx.DuelParticles;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleProviderRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -213,7 +213,7 @@ public final class DuelFx {
 		registerProviders();
 		DuelBus.register(new Listener());
 		ClientTickEvents.END_CLIENT_TICK.register(DuelFx::tick);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(DuelFx::clearAll));
+		ClientDisconnect.register((handler, client) -> client.execute(DuelFx::clearAll));
 		DuelTrailRenderer.init();
 		DuelCamera.init();
 		// the 7b shot guard never counts a fighter of a live duel as the hostile that blocks the intro or the finisher

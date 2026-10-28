@@ -1,13 +1,13 @@
 package dev.kultivator.client.dunia.tempat.tema.fx;
 
 import dev.kultivator.Kultivator;
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.epic.EpicBudget;
 import dev.kultivator.client.epic.ShaderCompat;
 import dev.kultivator.client.epic.kosmik.Kosmik3D;
 import dev.kultivator.client.epic.kosmik.KosmikTypes;
 import dev.kultivator.dunia.tempat.tema.TemaNet;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext;
@@ -65,7 +65,7 @@ public final class TemaFx {
 		LevelRenderEvents.COLLECT_SUBMITS.register(TemaFx::collect);
 		ClientTickEvents.END_CLIENT_TICK.register(TemaFx::tick);
 		HudElementRegistry.attachElementAfter(VanillaHudElements.MISC_OVERLAYS, Kultivator.id("tema_fx_hud"), new TemaHud());
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> bersihkan()));
+		ClientDisconnect.register((handler, client) -> client.execute(() -> bersihkan()));
 		TemaFxPerintah.init();
 	}
 

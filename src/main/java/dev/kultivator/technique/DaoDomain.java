@@ -96,6 +96,11 @@ final class DaoDomain {
 			}
 			return;
 		}
+		if (player.level() != active.ctx.level()) {
+			// a portal ended the cast; its pulses would search the old dimension
+			end(player, false);
+			return;
+		}
 		long now = player.level().getGameTime();
 		if (now >= active.end || active.ctx.ended() && active.ctx.copy()) {
 			end(player, true);

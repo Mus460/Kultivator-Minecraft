@@ -3,6 +3,7 @@ package dev.kultivator.client.tempat.ui;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.kultivator.Kultivator;
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.EffectQuality;
 import dev.kultivator.client.epic.ShaderCompat;
 import dev.kultivator.client.screen.ui.Palette;
@@ -16,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -121,7 +121,7 @@ public final class TeksDunia {
 		}
 		siap = true;
 		LevelRenderEvents.START_MAIN.register(context -> mulaiFrame());
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> bersihkan()));
+		ClientDisconnect.register((handler, client) -> client.execute(() -> bersihkan()));
 		// the 38MD board model with the sheet texts of this class (a later register of the same type would win)
 		EntityRenderers.register(PapanHidup.TYPE, PapanHidupTeksRenderer::new);
 	}

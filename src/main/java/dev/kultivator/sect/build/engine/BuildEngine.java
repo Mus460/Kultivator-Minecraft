@@ -244,6 +244,7 @@ public final class BuildEngine implements EngineApi {
 		restoreRetry.clear();
 		anchorJobs.clear();
 		PlanAudit.clear();
+		BreakRefund.clear();
 		CellIndex.forget();
 		server = null;
 	}

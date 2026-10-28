@@ -1,12 +1,12 @@
 package dev.kultivator.client.sekte.mandiri;
 
 import dev.kultivator.Kultivator;
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.hub.HubNav;
 import dev.kultivator.client.hub.HubPages;
 import dev.kultivator.client.hub.Tujuan;
 import dev.kultivator.client.hub.Urutan;
 import dev.kultivator.sekte.mandiri.cerita.MandiriPayloads;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
@@ -61,7 +61,7 @@ public final class MandiriClient {
 		});
 		ClientPlayNetworking.registerGlobalReceiver(MandiriPayloads.Pikir.TYPE, (payload, context) -> GelembungMandiri.terima(payload));
 		ClientPlayNetworking.registerGlobalReceiver(MandiriPayloads.Toast.TYPE, (payload, context) -> ToastMandiri.terima(payload));
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> bersih()));
+		ClientDisconnect.register((handler, client) -> client.execute(() -> bersih()));
 
 		// 43: Murid › Daftar is a page of the Gulungan; the Jalan Hidup sub of Murid › Murid is mounted by the Murid page (M03).
 		HubPages.daftar(HubNav.MURID, Urutan.ID_DAFTAR, Urutan.DAFTAR, MandiriBoardScreen::new);

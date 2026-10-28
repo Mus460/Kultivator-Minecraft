@@ -1,9 +1,9 @@
 package dev.kultivator.client.dunia;
 
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.dunia.DuniaAnchors;
 import dev.kultivator.dunia.DuniaGhostPayload;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.client.renderer.entity.NoopRenderer;
@@ -25,7 +25,7 @@ public final class DuniaSpineClient {
 		EntityRenderers.register(DuniaAnchors.TYPE, NoopRenderer::new);
 		ClientPlayNetworking.registerGlobalReceiver(DuniaGhostPayload.TYPE, (payload, context) -> DuniaGhost.onPayload(payload));
 		ClientTickEvents.END_CLIENT_TICK.register(client -> DuniaGhost.tick());
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
+		ClientDisconnect.register((handler, client) -> client.execute(() -> {
 			DuniaGhost.clear();
 			DuniaScenes.reset();
 		}));

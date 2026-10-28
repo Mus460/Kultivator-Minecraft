@@ -55,6 +55,8 @@ public final class Seteru {
 		SekteConfig.onReload(() -> SeteruConfig.load());
 		MandiriApi.addPertemuanProvider(Pertemuan.PENYEDIA);
 		PelaksanaSeteru.daftar();
+		Patroli.daftar();
+		DuelSeteru.daftarTetua();
 		SeteruPayloads.daftarPenerima();
 		SeteruCommands.init();
 		Insiden.init();

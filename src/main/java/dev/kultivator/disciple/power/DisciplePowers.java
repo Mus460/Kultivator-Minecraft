@@ -183,6 +183,7 @@ public final class DisciplePowers {
 		ServerLifecycleEvents.SERVER_STARTING.register(server -> SoulFlight.registerLate());
 		ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
 			PowerPulses.clear();
+			SevenFairies.clear();
 			LIVE.clear();
 		});
 	}

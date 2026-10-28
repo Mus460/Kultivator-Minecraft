@@ -1,12 +1,12 @@
 package dev.kultivator.client.sekte.langit;
 
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.disciple.DiscipleRenderer;
 import dev.kultivator.client.hub.HubNav;
 import dev.kultivator.client.hub.Tujuan;
 import dev.kultivator.client.hub.Urutan;
 import dev.kultivator.sekte.langit.api.LangitPayloads;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityRenderLayerRegistrationCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
@@ -38,7 +38,7 @@ public final class LangitClient {
 		ClientPlayNetworking.registerGlobalReceiver(LangitPayloads.Fx.TYPE, (payload, context) -> LangitFxClient.onFx(payload));
 		LevelRenderEvents.COLLECT_SUBMITS.register(LangitVisuals::collect);
 		ClientTickEvents.END_CLIENT_TICK.register(LangitVisuals::tick);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> LangitVisuals.clear()));
+		ClientDisconnect.register((handler, client) -> client.execute(() -> LangitVisuals.clear()));
 		LivingEntityRenderLayerRegistrationCallback.EVENT.register((entityType, renderer, helper, context) -> {
 			if (renderer instanceof DiscipleRenderer disciple) {
 				// the disciple model is a PlayerModel (an EntityModel of AvatarRenderState), which the helper's generic bound

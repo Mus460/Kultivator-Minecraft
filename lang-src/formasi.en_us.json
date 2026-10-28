@@ -76,6 +76,7 @@
   "kultivator.formasi.kas_full": "%1$s is full and nothing more fits in the Formation Kas.",
   "kultivator.formasi.upgraded": "The eye awakens anew: %1$s becomes %2$s (same core, Daya and keepers).",
   "kultivator.formasi.upgrade_refused": "%1$s is complete around this eye, but it cannot replace the core: %2$s",
+  "kultivator.formasi.refuse.amethyst_full": "the amethyst Kas is nearly full, so this core's amethyst Daya share cannot be returned to it.",
   "kultivator.formasi.refuse.node_spacing": "Sect transfer nodes must stand at least %s blocks apart.",
   "kultivator.formasi.broken": "Formation %1$s is broken: %2$s blocks missing (spots marked).",
   "kultivator.formasi.removed": "%1$s lost its eye and is gone; its %2$s Daya went back to the Formation Kas.",

@@ -1,8 +1,8 @@
 package dev.kultivator.client.elite;
 
 import dev.kultivator.Kultivator;
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.fx.FxDispatcher;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 
@@ -16,7 +16,7 @@ public final class EliteClient {
 	public static void init() {
 		HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, Kultivator.id("elite_plate"), new ElitePlate());
 		// One disconnect hook for the whole client/fx layer (see FxDispatcher.forgetLevel).
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(FxDispatcher::forgetLevel));
+		ClientDisconnect.register((handler, client) -> client.execute(FxDispatcher::forgetLevel));
 	}
 
 	private EliteClient() {

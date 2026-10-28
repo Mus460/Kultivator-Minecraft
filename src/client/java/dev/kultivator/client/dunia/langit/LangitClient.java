@@ -1,13 +1,13 @@
 package dev.kultivator.client.dunia.langit;
 
 import dev.kultivator.Kultivator;
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.dunia.langit.LangitCuacaPayload;
 import dev.kultivator.dunia.langit.LangitFxPayload;
 import dev.kultivator.dunia.langit.LangitHartaPayload;
 import dev.kultivator.dunia.langit.LangitItems;
 import dev.kultivator.dunia.langit.LangitSkyPayload;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
@@ -38,7 +38,7 @@ public final class LangitClient {
 		LevelRenderEvents.COLLECT_SUBMITS.register(LangitRenderer::collect);
 		HudElementRegistry.attachElementAfter(VanillaHudElements.MISC_OVERLAYS, Kultivator.id("langit_hud"), new LangitHud());
 		ClientTickEvents.END_CLIENT_TICK.register(LangitState::tick);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> LangitState.clear()));
+		ClientDisconnect.register((handler, client) -> client.execute(() -> LangitState.clear()));
 	}
 
 	private LangitClient() {

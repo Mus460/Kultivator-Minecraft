@@ -3,6 +3,7 @@ package dev.kultivator.client.fx.spec;
 import dev.kultivator.Kultivator;
 import dev.kultivator.KultivatorConfig;
 import dev.kultivator.client.ClientCultivation;
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.EffectQuality;
 import dev.kultivator.client.fx.quad.QuadFx;
 import dev.kultivator.data.TechniqueRegistry;
@@ -11,7 +12,6 @@ import dev.kultivator.network.Payloads;
 import dev.kultivator.technique.spec.dsl.FxLayer;
 import dev.kultivator.technique.spec.dsl.Phase;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityRenderLayerRegistrationCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
@@ -76,7 +76,7 @@ public final class SpecFx {
 			}
 		});
 		QuadFx.init();
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> clearAll()));
+		ClientDisconnect.register((handler, client) -> client.execute(() -> clearAll()));
 	}
 
 	/** Draws one technique event (called on the client thread by the payload receiver). */

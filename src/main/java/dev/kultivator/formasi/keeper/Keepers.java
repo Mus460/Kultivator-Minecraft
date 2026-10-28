@@ -316,6 +316,7 @@ public final class Keepers {
 	 * modifiers of every record (24.2.8), then assigns disciples ordered to STAY beside a running eye.
 	 */
 	public static void refresh(MinecraftServer server) {
+		freeOrphans(server);
 		Map<UUID, Map<UUID, DiscipleEntity>> byOwner = new HashMap<>();
 		for (CoreStore store : CoreTicker.stores()) {
 			ServerLevel level = store.dim() == null ? null : server.getLevel(store.dim());
@@ -417,6 +418,23 @@ public final class Keepers {
 			upkeep = 1.0D; // zero cost is handled by the record flag
 		}
 		return new double[]{upkeep, k, Affinity.matches(spec, dao, rootMask, sectRank) ? 1.0D : 0.0D};
+	}
+
+	/**
+	 * Frees a loaded keeper that no core lists any more: released from the tablet while it was unloaded, or its eye removed
+	 * meanwhile. Its saved activity brought it back to a post of nothing.
+	 */
+	private static void freeOrphans(MinecraftServer server) {
+		for (ServerPlayer master : server.getPlayerList().getPlayers()) {
+			for (DiscipleEntity disciple : Disciples.loaded(master.getUUID())) {
+				if (disciple.activity() == DiscipleEntity.ACTIVITY_FORMATION_KEEPER) {
+					CoreRecord record = coreOf(disciple);
+					if (record == null || record.keeper(disciple.soulId()) == null) {
+						release(disciple);
+					}
+				}
+			}
+		}
 	}
 
 	private static Map<UUID, DiscipleEntity> loadedBySoul(UUID owner) {

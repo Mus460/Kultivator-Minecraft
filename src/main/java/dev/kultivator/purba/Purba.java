@@ -74,8 +74,10 @@ public final class Purba {
 			EnvoyAi.clear();
 		});
 		ServerTickEvents.END_SERVER_TICK.register(Purba::tick);
+		ServerLifecycleEvents.SERVER_STOPPING.register(stopping -> PrimordialEvents.abandonOmen(null));
 		ServerPlayerEvents.JOIN.register(StarCalamity::initFor);
 		ServerPlayerEvents.LEAVE.register(player -> {
+			PrimordialEvents.abandonOmen(player.getUUID());
 			StarCalamity.abandon(player);
 			HeavenlyWrath.abandon(player);
 		});

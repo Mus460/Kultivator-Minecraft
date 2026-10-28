@@ -1,7 +1,7 @@
 package dev.kultivator.client.dunia.tempat.jalan;
 
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.dunia.tempat.jalan.JalanNet;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 /**
@@ -25,7 +25,7 @@ public final class JalanClient {
 		JalanPapan.init();
 		ClientPlayNetworking.registerGlobalReceiver(JalanNet.Peta.TYPE, (payload, context) -> JalanPeta.terima(payload));
 		ClientPlayNetworking.registerGlobalReceiver(JalanNet.Papan.TYPE, (payload, context) -> JalanPapan.terima(payload));
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
+		ClientDisconnect.register((handler, client) -> client.execute(() -> {
 			JalanPeta.lupakan();
 			JalanPapan.lupakan();
 		}));

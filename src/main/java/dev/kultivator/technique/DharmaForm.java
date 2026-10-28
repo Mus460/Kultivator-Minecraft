@@ -143,6 +143,9 @@ final class DharmaForm {
 			end(player, "kultivator.techniques.dharma_form.end");
 		} else if ((active.end() - now) % 20 == 0 && !roomNow(player)) {
 			end(player, "kultivator.techniques.dharma_form.ceiling");
+		} else if ((active.end() - now) % 40 == 0) {
+			// late viewers, a new level and lost packets: the armour look is resent every 2 s (VisualSync contract)
+			dev.kultivator.technique.spec.run.VisualSync.form(player, "dharma", (int) (active.end() - now), 0);
 		}
 	}
 

@@ -1,5 +1,6 @@
 package dev.kultivator.client.hall;
 
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.Keys;
 import dev.kultivator.client.hub.HubNav;
 import dev.kultivator.client.hub.HubPages;
@@ -10,7 +11,6 @@ import dev.kultivator.network.Actions;
 import dev.kultivator.network.Payloads;
 import dev.kultivator.sect.hall.Halls;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -53,7 +53,7 @@ public final class HallClient {
 	private static long papanVersi;
 
 	public static void init() {
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> clear()));
+		ClientDisconnect.register((handler, client) -> client.execute(() -> clear()));
 		ClientTickEvents.END_CLIENT_TICK.register(HallFx::tick);
 		ClientTickEvents.END_CLIENT_TICK.register(HallClient::tick);
 		HubPages.daftar(HubNav.SEKTE, Urutan.ID_IKHTISAR, Urutan.IKHTISAR, IkhtisarPage::new);

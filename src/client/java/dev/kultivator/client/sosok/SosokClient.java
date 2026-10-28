@@ -1,8 +1,8 @@
 package dev.kultivator.client.sosok;
 
+import dev.kultivator.client.ClientDisconnect;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 
 /**
  * Client entry of Sosok (DESIGN 40.7.3 C40.K3, module 40R): 40K's model layers (before the entity models are baked), 40G's
@@ -24,7 +24,7 @@ public final class SosokClient {
 				SosokRender.rapikan();
 			}
 		});
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(SosokClient::lepas));
+		ClientDisconnect.register((handler, client) -> client.execute(SosokClient::lepas));
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, buildContext) -> SosokKlienPerintah.register(dispatcher));
 	}
 

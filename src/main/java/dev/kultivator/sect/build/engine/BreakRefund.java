@@ -42,6 +42,10 @@ public final class BreakRefund {
 	private static final long LOG_TICKS = 1200L;
 	private static final Map<UUID, Long> LAST_LOG = new HashMap<>();
 
+	static void clear() {
+		LAST_LOG.clear();
+	}
+
 	static void init() {
 		PlayerBlockBreakEvents.BEFORE.register(BreakRefund::beforeBreak);
 	}

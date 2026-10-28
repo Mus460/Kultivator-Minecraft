@@ -1,13 +1,13 @@
 package dev.kultivator.client.sekte.turnamen;
 
 import dev.kultivator.Kultivator;
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.epic.SekteScenes;
 import dev.kultivator.client.epic.sky.SkyDirector;
 import dev.kultivator.client.epic.sound.MusicCue;
 import dev.kultivator.sekte.turnamen.Turnamen;
 import dev.kultivator.sekte.turnamen.TurnamenEntities;
 import dev.kultivator.sekte.turnamen.TurnamenPayloads;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
@@ -41,7 +41,7 @@ public final class TurnamenClient {
 		ClientPlayNetworking.registerGlobalReceiver(TurnamenPayloads.Lingkar.TYPE, (payload, context) -> LeiTaiRenderer.onLingkar(payload));
 		ClientPlayNetworking.registerGlobalReceiver(TurnamenPayloads.Papan.TYPE, (payload, context) -> data = payload.data() == null ? null
 				: payload.data().copy());
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
+		ClientDisconnect.register((handler, client) -> client.execute(() -> {
 			LeiTaiRenderer.clear();
 			data = null;
 		}));

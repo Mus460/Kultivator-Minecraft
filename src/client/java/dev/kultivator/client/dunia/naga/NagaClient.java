@@ -1,11 +1,11 @@
 package dev.kultivator.client.dunia.naga;
 
 import dev.kultivator.Kultivator;
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.dunia.DuniaScenes;
 import dev.kultivator.dunia.naga.NagaEntities;
 import dev.kultivator.dunia.naga.NagaPayloads;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
@@ -46,7 +46,7 @@ public final class NagaClient {
 			NagaHud.tick(minecraft);
 			BeastTierLayers.tick(minecraft);
 		});
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
+		ClientDisconnect.register((handler, client) -> client.execute(() -> {
 			NagaVisuals.clear();
 			NagaFar.clear();
 			NagaStrikes.clear();

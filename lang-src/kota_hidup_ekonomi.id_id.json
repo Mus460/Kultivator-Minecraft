@@ -148,6 +148,7 @@
   "kultivator.kota42.toko.gagal.tanpa_murid": "Tidak ada muridmu yang mengikutimu di dekat sini.",
   "kultivator.kota42.toko.gagal.tanpa_pegawai": "Toko ini tidak punya pegawai.",
   "kultivator.kota42.toko.gagal.rak_terisi": "Rak itu berisi barang lain.",
+  "kultivator.kota42.toko.gagal.rak_milik": "Rak dagangan itu milik orang lain.",
   "kultivator.kota42.toko.gagal.tak_laku": "Barang itu tidak bisa dijual di toko.",
   "kultivator.kota42.toko.gagal.tutup": "Toko ini sedang tutup.",
   "kultivator.kota42.toko.gagal.tanpa_toko": "Kamu tidak berdiri di tokomu (atau punya lebih dari satu toko).",

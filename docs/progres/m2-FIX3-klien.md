@@ -1,0 +1,5 @@
+# m2-FIX3 klien (fixer "klien")
+
+- [x] audit3-regresi 1: DISCONNECT clears dropped by Minecraft.dropAllTasks. New `client/ClientDisconnect` is the one Fabric DISCONNECT hook; the 75 per-module handlers now `ClientDisconnect.register(...)` (same lambda shape, nothing else changed). After the listeners it queues a marker task; if the marker has not run two client ticks later (END_CLIENT_TICK, not inside a task, so `client.execute` runs at once) the clears were dropped and every listener is replayed on the client thread. No JOIN replay on purpose: JOIN runs inside a task, so the clears would queue behind the new world's first payloads and wipe them.
+- [x] audit3-klien 1: Sosok atlas thrash. `KulitCache` never evicts an atlas asked for this frame (frame stamp per entry, `SosokDetail.nomorFrame()`), so the cache may exceed atlasMaks while more looks are in view and no longer cycles. A body whose ready atlas left the cache goes back through the `bolehSusun` budget (`SosokJembatan.atlasAda`).
+- [skip] audit3-klien 2 (DharmaForm resend): server file, outside this slice (needs below).

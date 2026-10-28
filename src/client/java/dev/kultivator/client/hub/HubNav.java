@@ -1,5 +1,6 @@
 package dev.kultivator.client.hub;
 
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.Keys;
 import dev.kultivator.client.epic.camera.CinematicDirector;
 import dev.kultivator.client.screen.CultivationScreen;
@@ -7,7 +8,6 @@ import dev.kultivator.network.Actions;
 import dev.kultivator.network.Payloads;
 import dev.kultivator.sect.hall.Halls;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents;
 import net.minecraft.client.KeyMapping;
@@ -65,7 +65,7 @@ public final class HubNav {
 	public static void init() {
 		ScreenEvents.AFTER_INIT.register((minecraft, screen, width, height) -> afterInit(screen));
 		ClientTickEvents.END_CLIENT_TICK.register(HubNav::tick);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(HubNav::reset));
+		ClientDisconnect.register((handler, client) -> client.execute(HubNav::reset));
 	}
 
 	// ================================================================== Gulungan Utama (DESIGN 43.4.3)

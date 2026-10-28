@@ -1,12 +1,12 @@
 package dev.kultivator.client.dunia.kota42.cakap;
 
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.dunia.kota42.KotaHidupClient;
 import dev.kultivator.client.voice.VoiceSettings;
 import dev.kultivator.dunia.kota.KultivatorNpc;
 import dev.kultivator.sosok.Sosok;
 import dev.kultivator.voice.VoiceEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -48,7 +48,7 @@ public final class UjaranClient {
 		initialised = true;
 		LevelRenderEvents.COLLECT_SUBMITS.register(GelembungUjaran::render);
 		ClientTickEvents.END_CLIENT_TICK.register(UjaranClient::tick);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
+		ClientDisconnect.register((handler, client) -> client.execute(() -> {
 			BERBUNYI.clear();
 			GelembungUjaran.bersih();
 		}));

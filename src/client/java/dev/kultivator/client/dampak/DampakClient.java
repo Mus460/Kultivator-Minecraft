@@ -7,6 +7,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import dev.kultivator.Kultivator;
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.EffectQuality;
 import dev.kultivator.client.dampak.cinema.SilentImpact;
 import dev.kultivator.client.dampak.cinema.SkyRide;
@@ -29,7 +30,6 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommands;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
@@ -86,7 +86,7 @@ public final class DampakClient {
 		});
 		ClientTickEvents.END_CLIENT_TICK.register(DampakClient::tick);
 		ClientLifecycleEvents.CLIENT_STARTED.register(client -> registerHud());
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> clearAll()));
+		ClientDisconnect.register((handler, client) -> client.execute(() -> clearAll()));
 		// the photosensitivity warning is a seal on Pengaturan › Kamera & Film (43.10.1), hooked by SettingsPage.daftar
 		try {
 			DampakWorld.init();

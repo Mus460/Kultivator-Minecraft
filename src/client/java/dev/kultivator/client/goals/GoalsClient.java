@@ -2,13 +2,13 @@ package dev.kultivator.client.goals;
 
 import dev.kultivator.Kultivator;
 import dev.kultivator.client.ClientCultivation;
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.Keys;
 import dev.kultivator.client.QiHud;
 import dev.kultivator.goals.Guide;
 import dev.kultivator.network.Actions;
 import dev.kultivator.network.Payloads;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.minecraft.client.Minecraft;
@@ -26,7 +26,7 @@ public final class GoalsClient {
 		HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, Kultivator.id("tribulation_hud"), new TribulationHud());
 		HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, Kultivator.id("meditation_alert"), new MeditationAlert());
 		ClientTickEvents.END_CLIENT_TICK.register(GoalsClient::tick);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> reset()));
+		ClientDisconnect.register((handler, client) -> client.execute(() -> reset()));
 	}
 
 	private static void tick(Minecraft minecraft) {

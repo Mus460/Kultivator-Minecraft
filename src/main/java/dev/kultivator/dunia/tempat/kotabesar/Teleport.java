@@ -87,8 +87,9 @@ public final class Teleport {
 	public static final long DERMAGA_TUTUP = 11000L;
 	private static final double CAKRAM_JARAK = 3.5D;
 
+	/** {@code total} is charged on arrival ({@link #pindah}), so a broken channel, a logout or a stop costs nothing. */
 	private record Kanal(ServerLevel level, Vec3 dari, long siteId, BlockPos tiba, ResourceKey<Level> dimensi, long selesai, boolean awan,
-			List<UUID> murid) {
+			List<UUID> murid, long total, long town, boolean gratis) {
 	}
 
 	private static final Map<UUID, Kanal> KANAL_AKTIF = new HashMap<>();
@@ -332,20 +333,12 @@ public final class Teleport {
 		List<DiscipleEntity> follow = pengikut(p);
 		int free = awan ? 0 : gratis(p, town);
 		long total = (free > 0 ? 0L : dest.harga()) + dest.harga() * follow.size();
-		if (!EkonomiApi.bayar(p, total, awan ? "kotabesar.dermaga" : "kotabesar.teleport")) {
-			balas(p, npcId, layar, awan, Component.translatable("kultivator.kota_besar.hukum.kurang", Barang.nb(total)), false);
-			return;
-		}
-		if (free > 0) {
-			KotaBesarData data = KotaBesarData.get(server);
-			data.pemain(p.getUUID()).putLong("gratis", Kota.day(server));
-			data.setDirty();
-		}
-		if (Hukum.ibuKota(server, town)) {
-			dev.kultivator.dunia.tempat.ekonomi.KasKota.tambah(server, town, Math.max(0L, total / 10L));
-		}
 		ServerLevel to = server.getLevel(dest.site().dim());
 		if (to == null) {
+			return;
+		}
+		if (dev.kultivator.dunia.kota.NilaiBatu.total(p) < total) {
+			balas(p, npcId, layar, awan, Component.translatable("kultivator.kota_besar.hukum.kurang", Barang.nb(total)), false);
 			return;
 		}
 		DuniaTickets.touch(to, ChunkPos.containing(arrive), 1);
@@ -355,7 +348,7 @@ public final class Teleport {
 		}
 		long now = p.level().getGameTime();
 		KANAL_AKTIF.put(p.getUUID(), new Kanal(p.level(), p.position(), dest.site().id(), arrive, to.dimension(),
-				now + (awan ? AWAN : KANAL), awan, ids));
+				now + (awan ? AWAN : KANAL), awan, ids, total, town, free > 0));
 		TempatLayar.tutup(p);
 		CompoundTag pillar = new CompoundTag();
 		pillar.putDouble("x", p.getX());
@@ -434,6 +427,18 @@ public final class Teleport {
 		ServerLevel to = server.getLevel(k.dimensi());
 		if (to == null) {
 			return;
+		}
+		if (!EkonomiApi.bayar(p, k.total(), k.awan() ? "kotabesar.dermaga" : "kotabesar.teleport")) {
+			Msg.actionBar(p, Component.translatable("kultivator.kota_besar.hukum.kurang", Barang.nb(k.total())).withStyle(ChatFormatting.RED));
+			return;
+		}
+		if (k.gratis()) {
+			KotaBesarData data = KotaBesarData.get(server);
+			data.pemain(p.getUUID()).putLong("gratis", Kota.day(server));
+			data.setDirty();
+		}
+		if (Hukum.ibuKota(server, k.town())) {
+			dev.kultivator.dunia.tempat.ekonomi.KasKota.tambah(server, k.town(), Math.max(0L, k.total() / 10L));
 		}
 		BlockPos at = k.tiba();
 		JamMalam.abaikan(p, 200L);
@@ -564,7 +569,7 @@ public final class Teleport {
 		if (to == null) {
 			return false;
 		}
-		pindah(p.level().getServer(), p, new Kanal(p.level(), p.position(), site.id(), at, to.dimension(), 0L, false, List.of()));
+		pindah(p.level().getServer(), p, new Kanal(p.level(), p.position(), site.id(), at, to.dimension(), 0L, false, List.of(), 0L, 0L, false));
 		return true;
 	}
 

@@ -1,5 +1,6 @@
 package dev.kultivator.client.sekte.kebun;
 
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.EffectQuality;
 import dev.kultivator.client.epic.SekteScenes;
 import dev.kultivator.client.epic.sky.SkyDirector;
@@ -15,7 +16,6 @@ import dev.kultivator.sekte.SekteIds;
 import dev.kultivator.sekte.kebun.Kebun;
 import dev.kultivator.sekte.kebun.KebunPayloads;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -56,7 +56,7 @@ public final class KebunClient {
 		ClientPlayNetworking.registerGlobalReceiver(KebunPayloads.World.TYPE, (p, context) -> TanamanRenderer.onWorld(p.data()));
 		ClientPlayNetworking.registerGlobalReceiver(KebunPayloads.Fx.TYPE, (p, context) -> KebunFx.on(p));
 		ClientTickEvents.END_CLIENT_TICK.register(KebunClient::tick);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> TanamanRenderer.clear()));
+		ClientDisconnect.register((handler, client) -> client.execute(() -> TanamanRenderer.clear()));
 		TanamanRenderer.init();
 		KebunPoses.init();
 		scenes();

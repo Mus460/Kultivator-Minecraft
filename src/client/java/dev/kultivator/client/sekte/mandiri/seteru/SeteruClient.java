@@ -1,12 +1,12 @@
 package dev.kultivator.client.sekte.mandiri.seteru;
 
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.hub.HubNav;
 import dev.kultivator.client.hub.Tujuan;
 import dev.kultivator.client.hub.Urutan;
 import dev.kultivator.client.sekte.diplomasi.LuarPage;
 import dev.kultivator.sekte.mandiri.seteru.SeteruIds;
 import dev.kultivator.sekte.mandiri.seteru.SeteruPayloads;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
@@ -42,7 +42,7 @@ public final class SeteruClient {
 		initialised = true;
 		ClientPlayNetworking.registerGlobalReceiver(SeteruPayloads.Layar.TYPE, (payload, context) -> lembar(payload));
 		ClientPlayNetworking.registerGlobalReceiver(SeteruPayloads.Judul.TYPE, (payload, context) -> KartuJudul.tampil(payload));
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
+		ClientDisconnect.register((handler, client) -> client.execute(() -> {
 			terakhir = null;
 			versi++;
 			rosterDiminta = "";

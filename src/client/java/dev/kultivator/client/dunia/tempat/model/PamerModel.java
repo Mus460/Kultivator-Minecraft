@@ -3,12 +3,12 @@ package dev.kultivator.client.dunia.tempat.model;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import dev.kultivator.Kultivator;
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.epic.EpicBudget;
 import dev.kultivator.client.epic.ShaderCompat;
 import dev.kultivator.client.epic.kosmik.Kosmik3D;
 import dev.kultivator.client.sosok.gerak.PropKatalog;
 import dev.kultivator.sosok.PropId;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.minecraft.client.Minecraft;
@@ -122,7 +122,7 @@ final class PamerModel {
 		}
 		initialised = true;
 		LevelRenderEvents.COLLECT_SUBMITS.register(PamerModel::collect);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> hapus()));
+		ClientDisconnect.register((handler, client) -> client.execute(() -> hapus()));
 	}
 
 	/** The creature and mechanism arc, 30 s. */

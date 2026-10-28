@@ -23,12 +23,15 @@ import dev.kultivator.dunia.tempat.ekonomi.LapakSekte;
 import dev.kultivator.dunia.tempat.ekonomi.RumahUang;
 import dev.kultivator.dunia.tempat.hidup.HidupApi;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
+import dev.kultivator.sect.Sect;
+import dev.kultivator.sect.SectData;
 import dev.kultivator.sect.hall.Halls;
 import dev.kultivator.sosok.GerakId;
 import dev.kultivator.sosok.PropId;
 import dev.kultivator.sosok.SosokApi;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
+import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.UUIDUtil;
@@ -40,6 +43,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.permissions.Permissions;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
@@ -118,6 +122,19 @@ public final class TokoPemain {
 		}
 		initialised = true;
 		Halls.addReturnHandler(MURID_ALASAN, (level, owner, stored, info) -> null);
+		// breaking a rack drops its whole stock at the breaker's feet: only the shop owner, a sect mate, an op or a creative player may
+		PlayerBlockBreakEvents.BEFORE.register((level, player, pos, state, blockEntity) -> {
+			if (!(blockEntity instanceof RakDagangBlockEntity rak) || !(player instanceof ServerPlayer sp) || rak.pemilik() == null
+					|| sp.isCreative() || rak.pemilik().equals(sp.getUUID()) || sp.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER)) {
+				return true;
+			}
+			Sect sect = SectData.get(sp.level().getServer()).sectOf(rak.pemilik());
+			if (sect != null && sect.isMember(sp.getUUID())) {
+				return true;
+			}
+			gagal(sp, "rak_milik");
+			return false;
+		});
 	}
 
 	static void lupakan() {

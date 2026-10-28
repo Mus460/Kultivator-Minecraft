@@ -6,6 +6,7 @@ import dev.kultivator.disciple.DiscipleEntity;
 import dev.kultivator.dunia.kota.NilaiBatu;
 import dev.kultivator.fx.Fx;
 import dev.kultivator.harta.SpiritStones;
+import dev.kultivator.sect.hall.Halls;
 import dev.kultivator.sekte.SekteSuara;
 import dev.kultivator.sekte.mandiri.MandiriKegiatan;
 import dev.kultivator.sekte.mandiri.api.EntriHarian;
@@ -125,7 +126,11 @@ public final class SerapBatu {
 			}
 			long change = NilaiBatu.VALUE[grade] - cost;
 			if (change > 0L) {
-				MandiriApi.ubahDompet(data, change, "kembalian_batu");
+				// what does not fit under the purse cap goes to the hall pool (2 NB a point), as in Dompet.terima
+				long rest = change - MandiriApi.ubahDompet(data, change, "kembalian_batu");
+				if (rest >= 2L && entity.ownerId() != null) {
+					Halls.addPool(entity.ownerId(), (int) Math.min(Integer.MAX_VALUE, rest / 2L));
+				}
 			}
 		}
 		CompoundTag record = DataTumbuh.sub(data, KEY);

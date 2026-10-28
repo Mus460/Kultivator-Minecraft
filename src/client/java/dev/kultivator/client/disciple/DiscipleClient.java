@@ -1,5 +1,6 @@
 package dev.kultivator.client.disciple;
 
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.fx.DiscipleFx;
 import dev.kultivator.client.hub.HubNav;
 import dev.kultivator.client.hub.HubPages;
@@ -7,7 +8,6 @@ import dev.kultivator.client.hub.Urutan;
 import dev.kultivator.disciple.DiscipleEntities;
 import dev.kultivator.network.Payloads;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.Nullable;
@@ -33,7 +33,7 @@ public final class DiscipleClient {
 				DiscipleFx.tick(minecraft);
 			}
 		});
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> clear()));
+		ClientDisconnect.register((handler, client) -> client.execute(() -> clear()));
 		HubPages.daftar(HubNav.MURID, Urutan.ID_MURID, Urutan.MURID, MuridPage::new);
 	}
 

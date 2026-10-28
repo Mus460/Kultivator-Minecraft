@@ -3,6 +3,7 @@ package dev.kultivator.client.sectbuild;
 import dev.kultivator.Kultivator;
 import dev.kultivator.KultivatorConfig;
 import com.mojang.blaze3d.platform.InputConstants;
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.Keys;
 import dev.kultivator.client.hub.HubNav;
 import dev.kultivator.client.hud.Kabar;
@@ -13,7 +14,6 @@ import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.network.Actions;
 import dev.kultivator.network.Payloads;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.minecraft.client.Minecraft;
@@ -60,7 +60,7 @@ public final class BuildClient {
 
 	/** Called once from {@code KultivatorClient}. */
 	public static void init() {
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> clear()));
+		ClientDisconnect.register((handler, client) -> client.execute(() -> clear()));
 		HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, Kultivator.id("sect_build_hud"), new BuildHud());
 		ClientTickEvents.END_CLIENT_TICK.register(BuildClient::tick);
 		// Sekte › Bangun of the Gulungan Utama (DESIGN 43.5, 43.12.2).

@@ -1,7 +1,7 @@
 package dev.kultivator.client.duel.anim;
 
+import dev.kultivator.client.ClientDisconnect;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -29,7 +29,7 @@ public final class DuelAnim {
 		LevelRenderEvents.START_MAIN.register(context -> BladeTracker.beginFrame());
 		LevelRenderEvents.COLLECT_SUBMITS.register(BladeDebug::collect);
 		ClientTickEvents.END_CLIENT_TICK.register(DuelAnim::tick);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(DuelAnim::clear));
+		ClientDisconnect.register((handler, client) -> client.execute(DuelAnim::clear));
 	}
 
 	private static void tick(Minecraft minecraft) {

@@ -57,6 +57,8 @@ public final class HidupApi {
 	public static final int TONTON_MAKS = 8;
 
 	private static final Map<Long, Timpaan> TIMPAAN = new HashMap<>();
+	/** Crowd size of the active {@code tonton:} override per place (absent = {@link #TONTON_MAKS}). */
+	private static final Map<Long, Integer> TONTON_UKURAN = new HashMap<>();
 	private static final ArrayDeque<Bahaya> BAHAYA = new ArrayDeque<>();
 
 	/** A schedule override of one place until game time {@code sampai}. */
@@ -191,6 +193,11 @@ public final class HidupApi {
 	 * it ends; guards keep their posts). Returns the place's site id, or 0 when {@code pusat} lies in no inhabited place.
 	 */
 	public static long kerumunan(ServerLevel level, BlockPos pusat, int detik) {
+		return kerumunan(level, pusat, detik, TONTON_MAKS);
+	}
+
+	/** As {@link #kerumunan(ServerLevel, BlockPos, int)}, with at most {@code maks} watchers (0..{@value #TONTON_MAKS}). */
+	public static long kerumunan(ServerLevel level, BlockPos pusat, int detik, int maks) {
 		TempatHuni huni = Saksi.tempat(level, pusat);
 		long situs = huni != null ? huni.situsId : 0L;
 		if (situs == 0L) {
@@ -200,6 +207,7 @@ public final class HidupApi {
 		if (situs == 0L || detik <= 0) {
 			return 0L;
 		}
+		TONTON_UKURAN.put(situs, Math.max(0, Math.min(TONTON_MAKS, maks)));
 		timpaJadwal(situs, "tonton:" + pusat.getX() + "," + pusat.getZ(), level.getGameTime() + detik * 20L);
 		if (huni != null) {
 			for (KultivatorNpc body : huni.tubuh.values()) {
@@ -209,11 +217,17 @@ public final class HidupApi {
 		return situs;
 	}
 
+	/** The watcher cap of the crowd at {@code situsId}. */
+	static int tontonUkuran(long situsId) {
+		return TONTON_UKURAN.getOrDefault(situsId, TONTON_MAKS);
+	}
+
 	/** Ends the crowd of {@link #kerumunan} at place {@code situsId} (the scene is over). */
 	public static void bubarkan(ServerLevel level, long situsId) {
 		String now = timpaan(situsId, level.getGameTime());
 		if (now != null && now.startsWith("tonton:")) {
 			timpaJadwal(situsId, "", 0L);
+			TONTON_UKURAN.remove(situsId);
 			TempatHuni huni = Pemanggil.huni(situsId);
 			if (huni != null) {
 				for (KultivatorNpc body : huni.tubuh.values()) {
@@ -309,6 +323,7 @@ public final class HidupApi {
 	/** Forgets every override and danger zone (server stop; {@link Hidup#init()} registers it). */
 	static void lupakan() {
 		TIMPAAN.clear();
+		TONTON_UKURAN.clear();
 		BAHAYA.clear();
 	}
 }

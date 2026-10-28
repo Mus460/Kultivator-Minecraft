@@ -212,7 +212,7 @@ public final class Founding {
 			Msg.chat(player, Component.translatable("kultivator.sectbuild.preview.refused").withStyle(ChatFormatting.YELLOW));
 			return false;
 		}
-		PENDING.put(owner, new Pending(owner, ticket, template, rotation, chosen, mode, tick(), 0, force, null, dimOf(player)));
+		PENDING.put(owner, new Pending(owner, ticket, template, rotation, chosen, mode, tick(), 0, force, null, hallDimOf(player)));
 		Msg.actionBar(player, Component.translatable("kultivator.sectbuild.preview.compiling", SectTemplates.name(template)).withStyle(ChatFormatting.AQUA));
 		return true;
 	}
@@ -237,7 +237,7 @@ public final class Founding {
 			Msg.chat(player, Component.translatable("kultivator.sectbuild.preview.refused").withStyle(ChatFormatting.YELLOW));
 			return false;
 		}
-		Pending pending = new Pending(owner, ticket, sky, rotation, Glaze.TINTA, mode, tick(), 0, test, null, dimOf(player));
+		Pending pending = new Pending(owner, ticket, sky, rotation, Glaze.TINTA, mode, tick(), 0, test, null, hallDimOf(player));
 		pending.sky = true;
 		PENDING.put(owner, pending);
 		Msg.actionBar(player, Component.translatable("kultivator.sectbuild.preview.compiling", SectTemplates.name(sky)).withStyle(ChatFormatting.AQUA));
@@ -510,6 +510,12 @@ public final class Founding {
 
 	private static String dimOf(ServerPlayer player) {
 		return player.level().dimension().identifier().toString();
+	}
+
+	/** FOUND, TEST, UPGRADE and sky previews stand at the hall's stele (the engine's job dimension), wherever the player is. */
+	private static String hallDimOf(ServerPlayer player) {
+		Halls.HallView hall = Halls.hallOf(player.getUUID());
+		return hall == null ? dimOf(player) : hall.dim().identifier().toString();
 	}
 
 	/** The {@code BuildPreview} with the flow's keys added: ticket, stele, mode, the ticks left and the confirm state. */

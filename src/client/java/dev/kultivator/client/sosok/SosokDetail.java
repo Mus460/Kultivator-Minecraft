@@ -127,6 +127,7 @@ public final class SosokDetail {
 
 	// ---- per-frame bookkeeping (render thread == client thread)
 	private static long frameKey = Long.MIN_VALUE;
+	private static long frameNo;
 	private static float[] jarak = new float[256];
 	private static int jarakN;
 	/** Squared-distance thresholds of this frame (from the previous frame's distances). */
@@ -287,6 +288,11 @@ public final class SosokDetail {
 
 	// ================================================================ per-frame budgets
 
+	/** Number of the frame being rendered (the atlas cache never evicts what this frame asked for). */
+	public static long nomorFrame() {
+		return frameNo;
+	}
+
 	/** Starts a frame's counting once per rendered frame (the first body extracted in a frame does it). */
 	static void mulaiFrame() {
 		long key = Minecraft.getInstance().getFrameTimeNs();
@@ -294,6 +300,7 @@ public final class SosokDetail {
 			return;
 		}
 		frameKey = key;
+		frameNo++;
 		Tingkat t = tingkat();
 		ambangGerakSq = ambang(t.gerakPenuhMaks);
 		ambangPegasSq = ambang(t.pegasMaks);

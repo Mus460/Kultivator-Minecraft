@@ -289,10 +289,23 @@ public final class TransportNetwork {
 			CoreView core = ctx.core();
 			double owed = core.ext().getDoubleOr(DEBT, 0.0D);
 			if (owed > 0.0D) {
-				CompoundTag ext = core.ext().copy();
-				ext.remove(DEBT);
-				Cores.setExt(core.dim(), core.id(), ext);
-				ctx.spend(owed);
+				// a trip is never free: what the core cannot pay now stays owed (spend takes all or nothing)
+				double left = owed;
+				double have = core.dayaCenti() / 100.0D;
+				if (ctx.spend(owed)) {
+					left = 0.0D;
+				} else if (have > 0.0D && ctx.spend(have)) {
+					left = owed - have;
+				}
+				if (left != owed) {
+					CompoundTag ext = core.ext().copy();
+					if (left > 1.0E-6D) {
+						ext.putDouble(DEBT, left);
+					} else {
+						ext.remove(DEBT);
+					}
+					Cores.setExt(core.dim(), core.id(), ext);
+				}
 			}
 		}
 

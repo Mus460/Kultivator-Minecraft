@@ -405,6 +405,12 @@ public final class Formasi {
 			Msg.chat(player, Component.translatable("kultivator.formasi.upgrade_refused", next.name(), refusal).withStyle(ChatFormatting.YELLOW));
 			return null;
 		}
+		if (next.has(Flag.STONE_ONLY) && record.amethystPart() > Kas.AMETHYST_CAP * 100L - Kas.amethyst(record.owner)) {
+			// the amethyst share has nowhere to go: refuse, never delete it
+			Msg.chat(player, Component.translatable("kultivator.formasi.upgrade_refused", next.name(),
+					Component.translatable("kultivator.formasi.refuse.amethyst_full")).withStyle(ChatFormatting.YELLOW));
+			return null;
+		}
 		record.spec = next.id();
 		record.rot = match.rot();
 		Verifier.apply(record, match);

@@ -1,6 +1,7 @@
 package dev.kultivator.client.duel;
 
 import dev.kultivator.Kultivator;
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.duel.compat.BetterCombatBridge;
 import dev.kultivator.client.duel.sound.DuelCrowd;
 import dev.kultivator.client.duel.sound.DuelSoundPlayer;
@@ -117,7 +118,7 @@ public final class DuelClient {
 			lastPrefsSent = -1;
 			client.execute(DuelClient::sendPrefs);
 		});
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(DuelClient::clearAll));
+		ClientDisconnect.register((handler, client) -> client.execute(DuelClient::clearAll));
 		HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, Kultivator.id("duel_hud"), new DuelHud());
 		DuelSettings.onPrefsChanged(DuelClient::sendPrefs);
 		DuelSoundPlayer.init();

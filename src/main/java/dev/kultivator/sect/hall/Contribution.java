@@ -428,11 +428,12 @@ final class Contribution {
 			Msg.chat(player, Component.translatable("kultivator.hall.shop.envoy_ready").withStyle(ChatFormatting.YELLOW));
 			return;
 		}
-		if (ware == Ware.INVITE && !Candidates.invite(owner)) {
-			Msg.chat(player, Component.translatable("kultivator.hall.shop.invite_failed").withStyle(ChatFormatting.YELLOW));
+		if (!Halls.spendPool(owner, cost)) {
 			return;
 		}
-		if (!Halls.spendPool(owner, cost)) {
+		if (ware == Ware.INVITE && !Candidates.invite(owner)) {
+			Halls.addPool(owner, cost);
+			Msg.chat(player, Component.translatable("kultivator.hall.shop.invite_failed").withStyle(ChatFormatting.YELLOW));
 			return;
 		}
 		switch (ware) {

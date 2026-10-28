@@ -1,6 +1,7 @@
 package dev.kultivator.sect.hall;
 
 import dev.kultivator.kehancuran.ProtectedZones;
+import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -106,6 +107,12 @@ public class HallBlock extends Block {
 			}
 			return InteractionResult.SUCCESS;
 		});
+	}
+
+	/** Nobody else mines an active hall's stele (it would put the hall to sleep and wipe its candidates). */
+	static void initBreakGuard() {
+		PlayerBlockBreakEvents.BEFORE.register((level, player, pos, state, blockEntity) ->
+				!(level instanceof ServerLevel serverLevel) || !state.is(HallItems.SECT_HALL_STELE) || Halls.mayBreakStele(player, serverLevel, pos));
 	}
 
 	@Override

@@ -27,7 +27,17 @@ import java.util.Map;
  */
 public final class KulitCache {
 
-	private record Entri(Identifier id, DynamicTexture tekstur) {
+	/** {@code frame}: the last frame that asked for it (an atlas named by a render state of this frame must stay alive). */
+	private static final class Entri {
+		final Identifier id;
+		final DynamicTexture tekstur;
+		long frame;
+
+		Entri(Identifier id, DynamicTexture tekstur, long frame) {
+			this.id = id;
+			this.tekstur = tekstur;
+			this.frame = frame;
+		}
 	}
 
 	private static final LinkedHashMap<Long, Entri> CACHE = new LinkedHashMap<>(128, 0.75F, true);
@@ -43,7 +53,8 @@ public final class KulitCache {
 	public static @Nullable Identifier atlas(SosokRupa rupa) {
 		Entri e = CACHE.get(rupa.kunci());
 		if (e != null) {
-			return e.id();
+			e.frame = SosokDetail.nomorFrame();
+			return e.id;
 		}
 		if (rusak) {
 			return null;
@@ -60,7 +71,7 @@ public final class KulitCache {
 		Identifier id = Kultivator.id("sosok/" + String.format(Locale.ROOT, "%016x", rupa.kunci()));
 		DynamicTexture tex = new DynamicTexture(() -> "kultivator sosok " + id.getPath(), img);
 		Minecraft.getInstance().getTextureManager().register(id, tex);
-		CACHE.put(rupa.kunci(), new Entri(id, tex));
+		CACHE.put(rupa.kunci(), new Entri(id, tex, SosokDetail.nomorFrame()));
 		long dt = System.nanoTime() - t0;
 		susunJumlah++;
 		susunNanoTotal += dt;
@@ -74,13 +85,20 @@ public final class KulitCache {
 		return CACHE.containsKey(rupa.kunci());
 	}
 
-	/** Releases the least recently used atlases above {@code maks}. */
+	/**
+	 * Releases the least recently used atlases above {@code maks}, never one used this frame (the cache may run over
+	 * {@code maks} while more looks than that are in view; the access order puts those last, so the walk stops there).
+	 */
 	private static void buang(int maks) {
+		long frame = SosokDetail.nomorFrame();
 		Iterator<Map.Entry<Long, Entri>> it = CACHE.entrySet().iterator();
 		while (CACHE.size() > maks && it.hasNext()) {
 			Entri e = it.next().getValue();
+			if (e.frame == frame) {
+				break;
+			}
 			it.remove();
-			Minecraft.getInstance().getTextureManager().release(e.id());
+			Minecraft.getInstance().getTextureManager().release(e.id);
 		}
 	}
 
@@ -88,7 +106,7 @@ public final class KulitCache {
 	public static void lepasSemua() {
 		Minecraft mc = Minecraft.getInstance();
 		for (Entri e : CACHE.values()) {
-			mc.getTextureManager().release(e.id());
+			mc.getTextureManager().release(e.id);
 		}
 		CACHE.clear();
 		rusak = false;

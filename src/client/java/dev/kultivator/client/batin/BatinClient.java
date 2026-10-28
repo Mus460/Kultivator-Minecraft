@@ -2,8 +2,8 @@ package dev.kultivator.client.batin;
 
 import dev.kultivator.batin.BatinItems;
 import dev.kultivator.batin.CiptaanArts;
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.codex.CodexNames;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -22,7 +22,7 @@ public final class BatinClient {
 	/** Called once from {@code KultivatorClient}. */
 	public static void init() {
 		CodexNames.register(BatinClient::ownName);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> data = new CompoundTag()));
+		ClientDisconnect.register((handler, client) -> client.execute(() -> data = new CompoundTag()));
 	}
 
 	/** Called once from {@code KultivatorClient} after {@link #init()}: the module's entity renderers. */

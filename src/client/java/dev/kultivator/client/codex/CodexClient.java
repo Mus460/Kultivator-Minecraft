@@ -2,6 +2,7 @@ package dev.kultivator.client.codex;
 
 import dev.kultivator.Kultivator;
 import dev.kultivator.client.ClientCultivation;
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.EffectQuality;
 import dev.kultivator.client.Keys;
 import dev.kultivator.client.hub.QuickWheel;
@@ -10,7 +11,6 @@ import dev.kultivator.data.TechniqueSpec;
 import dev.kultivator.network.Actions;
 import dev.kultivator.network.Payloads;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.minecraft.client.KeyMapping;
@@ -42,7 +42,7 @@ public final class CodexClient {
 		ClientTickEvents.START_CLIENT_TICK.register(CodexClient::startTick);
 		ClientTickEvents.END_CLIENT_TICK.register(CodexClient::endTick);
 		HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, Kultivator.id("codex_hud"), new CodexHud());
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
+		ClientDisconnect.register((handler, client) -> client.execute(() -> {
 			SealWheel.close(false);
 			castHeld = false;
 			CodexHud.reset();

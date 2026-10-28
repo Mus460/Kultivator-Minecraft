@@ -2,6 +2,7 @@ package dev.kultivator.sekte.mandiri.seteru;
 
 import dev.kultivator.disciple.DiscipleEntity;
 import dev.kultivator.duel.DuelIds;
+import dev.kultivator.duel.api.DuelEndListeners;
 import dev.kultivator.duel.session.DuelChallenges;
 import dev.kultivator.duel.session.DuelRuleSet;
 import dev.kultivator.duel.session.DuelSession;
@@ -24,6 +25,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -255,7 +257,35 @@ final class Patroli {
 		Msg.chat(master, line);
 	}
 
-	private record Usir(String seteru, UUID owner, UUID master, DiscipleEntity pemimpin, long mulai) {
+	private static final class Usir {
+		final String seteru;
+		final UUID owner;
+		final UUID master;
+		final DiscipleEntity pemimpin;
+		final long mulai;
+		/** The master won the duel (set by the end listener; a cancelled, drawn or missing result stays false). */
+		boolean menang;
+
+		Usir(String seteru, UUID owner, UUID master, DiscipleEntity pemimpin, long mulai) {
+			this.seteru = seteru;
+			this.owner = owner;
+			this.master = master;
+			this.pemimpin = pemimpin;
+			this.mulai = mulai;
+		}
+	}
+
+	/** Registered once from {@code Seteru.init}: reads who won the master's duel with the patrol leader. */
+	static void daftar() {
+		DuelEndListeners.add(Patroli::duelUsai);
+	}
+
+	private static void duelUsai(DuelSession session, @Nullable LivingEntity winner, @Nullable LivingEntity loser) {
+		for (Usir u : USIR) {
+			if (session.involves(u.pemimpin)) {
+				u.menang = winner != null && winner.getUUID().equals(u.master);
+			}
+		}
 	}
 
 	private static final List<Usir> USIR = new ArrayList<>();
@@ -303,8 +333,6 @@ final class Patroli {
 			}
 			USIR.remove(u);
 			ServerPlayer master = server.getPlayerList().getPlayer(u.master);
-			float mine = master == null || !master.isAlive() ? 0.0F : master.getHealth() / Math.max(1.0F, master.getMaxHealth());
-			float theirs = u.pemimpin.isRemoved() ? 0.0F : u.pemimpin.getHealth() / Math.max(1.0F, u.pemimpin.getMaxHealth());
 			SeteruData data = SeteruData.get(server);
 			SeteruData.Aula aula = data.aula(u.owner);
 			Perseteruan f = aula.byId(u.seteru);
@@ -312,7 +340,7 @@ final class Patroli {
 				continue;
 			}
 			long today = Ingatan.today(server);
-			if (mine >= theirs) {
+			if (u.menang) {
 				if (f.id.equals(aula.patroli.getStringOr("seteru", ""))) {
 					aula.patroli.putLong("usir", today + USIR_HARI);
 				}

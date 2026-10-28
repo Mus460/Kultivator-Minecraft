@@ -7,6 +7,7 @@ import dev.kultivator.fx.Fx;
 import dev.kultivator.fx.FxType;
 import dev.kultivator.util.Msg;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.ChatFormatting;
@@ -109,7 +110,23 @@ public final class BeastTribulation {
 			fail(session, true);
 			return false;
 		});
+		// the owner leaves (or the server stops): half the offering comes back while the player is still here
+		ServerPlayerEvents.LEAVE.register(player -> abandon(player.getUUID()));
+		ServerLifecycleEvents.SERVER_STOPPING.register(server -> abandon(null));
 		ServerLifecycleEvents.SERVER_STOPPED.register(server -> SESSIONS.clear());
+	}
+
+	private static void abandon(@Nullable UUID owner) {
+		for (Session session : new ArrayList<>(SESSIONS.values())) {
+			if (session.phase >= KesengsaraanEntity.PHASE_SUCCESS || owner != null && !owner.equals(session.owner)) {
+				continue;
+			}
+			ServerPlayer player = session.beast.level() instanceof ServerLevel level ? level.getServer().getPlayerList().getPlayer(session.owner) : null;
+			if (player != null) {
+				refundHalf(player, session);
+			}
+			end(session);
+		}
 	}
 
 	static boolean running(LivingEntity beast) {

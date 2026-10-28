@@ -1,11 +1,11 @@
 package dev.kultivator.client.dunia.tempat.model;
 
 import dev.kultivator.Kultivator;
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.epic.EpicBudget;
 import dev.kultivator.client.epic.ShaderCompat;
 import dev.kultivator.client.epic.kosmik.Kosmik3D;
 import dev.kultivator.client.epic.kosmik.KosmikTypes;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.minecraft.client.Minecraft;
@@ -164,7 +164,7 @@ public final class HiasanDunia {
 		}
 		initialised = true;
 		LevelRenderEvents.COLLECT_SUBMITS.register(HiasanDunia::collect);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> bersihkan()));
+		ClientDisconnect.register((handler, client) -> client.execute(() -> bersihkan()));
 	}
 
 	// ================================================================ client API

@@ -216,7 +216,8 @@ public final class SosokRender {
 			}
 			if (k.rupa != null) {
 				if (k.atlasSiap) {
-					atlas = SosokJembatan.atlas(k.rupa);
+					// an atlas that left the cache goes back through the budget below instead of composing unmetered
+					atlas = SosokJembatan.atlasAda(k.rupa) ? SosokJembatan.atlas(k.rupa) : null;
 					k.atlasSiap = atlas != null;
 				}
 				if (atlas == null) {

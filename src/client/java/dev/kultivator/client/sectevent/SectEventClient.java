@@ -1,10 +1,10 @@
 package dev.kultivator.client.sectevent;
 
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.hall.HallClient;
 import dev.kultivator.sect.event.SectEventPayload;
 import dev.kultivator.sect.event.Storehouse;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
@@ -40,7 +40,7 @@ public final class SectEventClient {
 				SectEventFx.tick(minecraft);
 			}
 		});
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
+		ClientDisconnect.register((handler, client) -> client.execute(() -> {
 			data = new CompoundTag();
 			version++;
 			seenHallVersion = -1L;

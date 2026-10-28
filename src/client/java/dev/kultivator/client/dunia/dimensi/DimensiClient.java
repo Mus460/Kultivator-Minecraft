@@ -1,6 +1,7 @@
 package dev.kultivator.client.dunia.dimensi;
 
 import dev.kultivator.Kultivator;
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.dunia.dimensi.render.ArwahRenderer;
 import dev.kultivator.client.dunia.dimensi.render.Headwear;
 import dev.kultivator.client.dunia.dimensi.render.KepitingRenderer;
@@ -12,7 +13,6 @@ import dev.kultivator.client.dunia.dimensi.render.YakshaRenderer;
 import dev.kultivator.dunia.dimensi.DimensiEntities;
 import dev.kultivator.dunia.dimensi.DimensiNet;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
@@ -56,7 +56,7 @@ public final class DimensiClient {
 		// the soul's view
 		HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, Kultivator.id("dimensi_jiwa"), new DimensiHud());
 		ClientTickEvents.END_CLIENT_TICK.register(DimensiClient::tick);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
+		ClientDisconnect.register((handler, client) -> client.execute(() -> {
 			DimensiState.clear();
 			DimensiJembatan.reset();
 			DimensiFx.clear();

@@ -1,6 +1,7 @@
 package dev.kultivator.client.epic.kosmik;
 
 import dev.kultivator.Kultivator;
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.epic.EpicBudget;
 import dev.kultivator.client.epic.EpicSettings;
 import dev.kultivator.client.epic.ShaderCompat;
@@ -8,7 +9,6 @@ import dev.kultivator.client.epic.camera.CinematicDirector;
 import dev.kultivator.client.epic.kosmik.orbit.OrbitStage;
 import dev.kultivator.client.epic.kosmik.surga.SurgaStage;
 import dev.kultivator.client.epic.render.EpicRenderer;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.phys.Vec3;
@@ -170,7 +170,7 @@ public final class Kosmik3D {
 			return;
 		}
 		registered = true;
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> release()));
+		ClientDisconnect.register((handler, client) -> client.execute(() -> release()));
 	}
 
 	/** One boolean while idle (from {@code EpicRenderer.collect}). */

@@ -1,8 +1,8 @@
 package dev.kultivator.client.dunia.tempat.perbaikan;
 
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.dunia.tempat.perbaikan.PerancahNet;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.minecraft.core.BlockPos;
@@ -28,7 +28,7 @@ public final class PerbaikanClient {
 		ClientPlayNetworking.registerGlobalReceiver(PerancahNet.Payload.TYPE, (payload, context) -> Perancah.onPayload(payload.data()));
 		ClientTickEvents.END_CLIENT_TICK.register(Perancah::tick);
 		LevelRenderEvents.COLLECT_SUBMITS.register(Perancah::render);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> Perancah.clear()));
+		ClientDisconnect.register((handler, client) -> client.execute(() -> Perancah.clear()));
 	}
 
 	/** A plot of Kota yang Hidup under construction: the box to put the scaffold round and the building progress 0..1. */

@@ -2,6 +2,7 @@ package dev.kultivator.sekte.mandiri.seteru;
 
 import dev.kultivator.disciple.DiscipleEntity;
 import dev.kultivator.duel.DuelIds;
+import dev.kultivator.duel.api.DuelEndListeners;
 import dev.kultivator.duel.session.DuelChallenges;
 import dev.kultivator.duel.session.DuelRuleSet;
 import dev.kultivator.duel.session.DuelSession;
@@ -21,6 +22,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -180,7 +182,7 @@ final class DuelSeteru {
 		SeteruPayloads.judul(p.level(), p.pos(), f, kita.getName(), mereka.getName());
 		long situs = 0L;
 		try {
-			situs = HidupApi.kerumunan(p.level(), p.pos(), 150);
+			situs = HidupApi.kerumunan(p.level(), p.pos(), 150, SeteruConfig.get().kerumunanMaks);
 		} catch (RuntimeException exception) {
 			situs = 0L;
 		}
@@ -273,6 +275,7 @@ final class DuelSeteru {
 	static void bersihkan() {
 		TONTON.clear();
 		MULAI.clear();
+		TETUA.clear();
 	}
 
 	/** The duel between the master and their Young Elder or Eldest Senior (39.F.4 "Tantang tetua mereka"). */
@@ -305,7 +308,35 @@ final class DuelSeteru {
 		return null;
 	}
 
-	private record TantanganGuru(String seteru, UUID owner, UUID master, DiscipleEntity tetua, long mulai) {
+	private static final class TantanganGuru {
+		final String seteru;
+		final UUID owner;
+		final UUID master;
+		final DiscipleEntity tetua;
+		final long mulai;
+		/** The master won the duel (set by the end listener; a cancelled, drawn or missing result stays false). */
+		boolean menang;
+
+		TantanganGuru(String seteru, UUID owner, UUID master, DiscipleEntity tetua, long mulai) {
+			this.seteru = seteru;
+			this.owner = owner;
+			this.master = master;
+			this.tetua = tetua;
+			this.mulai = mulai;
+		}
+	}
+
+	/** Registered once from {@code Seteru.init}: reads who won the master's duel with their elder. */
+	static void daftarTetua() {
+		DuelEndListeners.add(DuelSeteru::duelTetuaUsai);
+	}
+
+	private static void duelTetuaUsai(DuelSession session, @Nullable LivingEntity winner, @Nullable LivingEntity loser) {
+		for (TantanganGuru t : TETUA) {
+			if (session.involves(t.tetua)) {
+				t.menang = winner != null && winner.getUUID().equals(t.master);
+			}
+		}
 	}
 
 	private static final List<TantanganGuru> TETUA = new ArrayList<>();
@@ -325,10 +356,8 @@ final class DuelSeteru {
 				continue;
 			}
 			TETUA.remove(t);
-			ServerPlayer master = server.getPlayerList().getPlayer(t.master);
 			Perseteruan f = SeteruData.get(server).aula(t.owner).byId(t.seteru);
-			boolean win = master != null && master.isAlive()
-					&& master.getHealth() / Math.max(1.0F, master.getMaxHealth()) >= kesehatan(t.tetua);
+			boolean win = t.menang;
 			Adegan.nanti(server, 80, () -> TubuhSeteru.hilang(t.tetua));
 			if (f != null) {
 				CampurTangan.hasilTantangTetua(server, f, win);

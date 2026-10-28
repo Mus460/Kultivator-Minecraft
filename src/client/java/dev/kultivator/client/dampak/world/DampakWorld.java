@@ -1,6 +1,7 @@
 package dev.kultivator.client.dampak.world;
 
 import dev.kultivator.Kultivator;
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.anim.model.ModelFx;
 import dev.kultivator.client.epic.EpicClock;
 import dev.kultivator.client.fx.spec.CameraShake;
@@ -14,7 +15,6 @@ import dev.kultivator.technique.spec.dsl.Dampak;
 import dev.kultivator.technique.spec.dsl.Phase;
 import dev.kultivator.technique.spec.dsl.SigilPattern;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -117,7 +117,7 @@ public final class DampakWorld {
 			}
 		});
 		LevelRenderEvents.COLLECT_SUBMITS.register(SigilRenderer::collect);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> clear()));
+		ClientDisconnect.register((handler, client) -> client.execute(() -> clear()));
 	}
 
 	/**

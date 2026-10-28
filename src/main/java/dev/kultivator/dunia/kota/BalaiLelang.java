@@ -80,6 +80,9 @@ public final class BalaiLelang {
 		int state;
 		@Nullable UUID player;
 		int bidder = -1;
+		/** The last NPC bid (price and bidder, 0 / -1 for none): what a defaulted player bid falls back to. */
+		long npcPrice;
+		int npcBidder = -1;
 		long openAt;
 		long lastRaise = -1L;
 		/** A player's consigned piece (38.M.2.3): the seller and the consignment id, or null / 0 for a house lot. */
@@ -330,6 +333,8 @@ public final class BalaiLelang {
 				int who = willing.get(session.random.nextInt(willing.size()));
 				lot.price = nextPrice(lot, 5 + session.random.nextInt(11));
 				lot.bidder = who;
+				lot.npcPrice = lot.price;
+				lot.npcBidder = who;
 				lot.player = null;
 				lot.lastRaise = now;
 				lot.bids.add(new Object[] {session.bidders.get(who).name, lot.price, null, now});
@@ -398,13 +403,14 @@ public final class BalaiLelang {
 					KotaVoice.say(session.auctioneer, KotaVoice.AUCTION_SOLD, session.auctioneer.voiceKey("victory"), "kultivator.kota.lelang.suara.terjual");
 				}
 			} else {
-				// the winner could not pay (or left): the last NPC bidder takes it, the town remembers
+				// the winner could not pay (or left): the last NPC bidder takes it at his own (capped) bid, the town remembers
 				if (winner != null) {
 					KotaData.get(server).addReputation(session.town, winner.getUUID(), -5);
 					Msg.chat(winner, Component.translatable("kultivator.kota.lelang.gagal_bayar").withStyle(ChatFormatting.RED));
 				}
 				lot.player = null;
-				lot.bidder = session.bidders.isEmpty() ? -1 : 0;
+				lot.bidder = lot.npcBidder;
+				lot.price = lot.npcPrice;
 				lot.state = lot.bidder >= 0 ? 2 : 3;
 			}
 		} else {
@@ -483,7 +489,7 @@ public final class BalaiLelang {
 			Msg.actionBar(player, Component.translatable("kultivator.kota.lelang.usang").withStyle(ChatFormatting.RED));
 			return true;
 		}
-		if (player.getUUID().equals(lot.player)) {
+		if (player.getUUID().equals(lot.player) || lot.seller != null && lot.seller.equals(player.getUUID())) {
 			return true;
 		}
 		long offer = nextPrice(lot, step);

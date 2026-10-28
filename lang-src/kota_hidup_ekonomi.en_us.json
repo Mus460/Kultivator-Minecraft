@@ -148,6 +148,7 @@
   "kultivator.kota42.toko.gagal.tanpa_murid": "None of your disciples is following you nearby.",
   "kultivator.kota42.toko.gagal.tanpa_pegawai": "This shop has no clerk.",
   "kultivator.kota42.toko.gagal.rak_terisi": "That shelf holds other goods.",
+  "kultivator.kota42.toko.gagal.rak_milik": "That shop rack belongs to someone else.",
   "kultivator.kota42.toko.gagal.tak_laku": "That item cannot be sold in a shop.",
   "kultivator.kota42.toko.gagal.tutup": "This shop is closed.",
   "kultivator.kota42.toko.gagal.tanpa_toko": "You are not standing in your shop (or you have more than one).",

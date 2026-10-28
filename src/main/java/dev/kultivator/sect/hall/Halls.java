@@ -45,12 +45,14 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.permissions.Permissions;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
@@ -236,6 +238,7 @@ public final class Halls {
 		HallItems.init();
 		SectRanks.init();
 		HallBlock.initSneakUse();
+		HallBlock.initBreakGuard();
 		ServerLifecycleEvents.SERVER_STARTED.register(started -> server = started);
 		ServerLifecycleEvents.SERVER_STOPPED.register(stopped -> {
 			server = null;
@@ -646,6 +649,19 @@ public final class Halls {
 		CompoundTag core = coreOf(owner);
 		Msg.actionBar(player, Component.translatable("kultivator.hall.belongs", core == null ? "?" : hallName(core),
 				core == null ? "?" : core.getStringOr("owner_name", "?")).withStyle(ChatFormatting.GRAY));
+	}
+
+	/** {@code PlayerBlockBreakEvents.BEFORE} on a stele: an active hall's stele breaks only for its owner, a sect mate, an op or a creative player. */
+	static boolean mayBreakStele(Player player, ServerLevel level, BlockPos pos) {
+		UUID owner = ownerAt(level, pos);
+		if (owner == null || !(player instanceof ServerPlayer serverPlayer) || player.isCreative() || owner.equals(player.getUUID())
+				|| sectMate(serverPlayer, owner) || serverPlayer.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER)) {
+			return true;
+		}
+		CompoundTag core = coreOf(owner);
+		Msg.actionBar(serverPlayer, Component.translatable("kultivator.hall.belongs", core == null ? "?" : hallName(core),
+				core == null ? "?" : core.getStringOr("owner_name", "?")).withStyle(ChatFormatting.GRAY));
+		return false;
 	}
 
 	private static boolean sectMate(ServerPlayer player, UUID owner) {

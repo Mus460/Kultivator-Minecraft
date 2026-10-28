@@ -53,7 +53,6 @@ public final class Camps {
 	}
 
 	private static final Map<Integer, Camp> CAMPS = new LinkedHashMap<>();
-	private static int nextId = 1;
 
 	static void init() {
 		ServerLifecycleEvents.SERVER_STOPPED.register(server -> CAMPS.clear());
@@ -64,7 +63,11 @@ public final class Camps {
 	 * beaten. Returns the camp id (for {@link #close}).
 	 */
 	public static int open(ServerLevel level, BlockPos pos, UUID owner, Consumer<Boolean> onCleared) {
-		int id = nextId++;
+		// random, not a counter: missions save the id, and a restart must not hand a saved id to someone else's camp
+		int id;
+		do {
+			id = java.util.concurrent.ThreadLocalRandom.current().nextInt(1, Integer.MAX_VALUE);
+		} while (CAMPS.containsKey(id));
 		CAMPS.put(id, new Camp(id, level.dimension(), pos.immutable(), owner, onCleared == null ? cleared -> {
 		} : onCleared));
 		return id;

@@ -1,10 +1,10 @@
 package dev.kultivator.client.dunia.tempat.tema;
 
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.dunia.tempat.tema.fx.TemaFx;
 import dev.kultivator.client.dunia.tempat.tema.model.TemaModelClient;
 import dev.kultivator.client.tempat.ui.tema.TemaUiClient;
 import dev.kultivator.dunia.tempat.tema.TemaNet;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.Nullable;
@@ -38,7 +38,7 @@ public final class TemaClient {
 		}
 		ready = true;
 		ClientPlayNetworking.registerGlobalReceiver(TemaNet.TemaFxPayload.TYPE, (payload, context) -> terima(payload));
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> TERAKHIR.clear()));
+		ClientDisconnect.register((handler, client) -> client.execute(() -> TERAKHIR.clear()));
 		TemaFx.init();
 		TemaModelClient.init();
 		TemaUiClient.init();

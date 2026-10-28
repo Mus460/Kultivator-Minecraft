@@ -1,11 +1,11 @@
 package dev.kultivator.client.sekte.seragam;
 
 import dev.kultivator.Kultivator;
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.sekte.SekteContent;
 import dev.kultivator.sekte.SekteIds;
 import dev.kultivator.sekte.seragam.SeragamPayloads;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.minecraft.ChatFormatting;
@@ -60,7 +60,7 @@ public final class SeragamClient {
 			}
 		});
 		LevelRenderEvents.COLLECT_SUBMITS.register(BenderaRenderer::collect);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> clearAll()));
+		ClientDisconnect.register((handler, client) -> client.execute(() -> clearAll()));
 	}
 
 	/**

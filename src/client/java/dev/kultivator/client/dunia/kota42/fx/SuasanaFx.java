@@ -2,12 +2,12 @@ package dev.kultivator.client.dunia.kota42.fx;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.kultivator.Kultivator;
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.epic.EpicBudget;
 import dev.kultivator.client.epic.ShaderCompat;
 import dev.kultivator.client.screen.SettingsRows;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.minecraft.client.Minecraft;
@@ -40,7 +40,7 @@ public final class SuasanaFx {
 		ClientTickEvents.END_CLIENT_TICK.register(SuasanaFx::tik);
 		LevelRenderEvents.COLLECT_SUBMITS.register(SuasanaFx::kumpul);
 		ClientEntityEvents.ENTITY_UNLOAD.register((entity, level) -> Jelaga.hilang(entity));
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(SuasanaFx::bersihkan));
+		ClientDisconnect.register((handler, client) -> client.execute(SuasanaFx::bersihkan));
 	}
 
 	/**

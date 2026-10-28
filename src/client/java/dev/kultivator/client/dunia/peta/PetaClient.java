@@ -1,6 +1,7 @@
 package dev.kultivator.client.dunia.peta;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.Keys;
 import dev.kultivator.client.hub.HubNav;
 import dev.kultivator.client.hub.HubPages;
@@ -9,7 +10,6 @@ import dev.kultivator.client.hub.Urutan;
 import dev.kultivator.dunia.peta.PetaNet;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -31,7 +31,7 @@ public final class PetaClient {
 	public static void init() {
 		ClientPlayNetworking.registerGlobalReceiver(PetaNet.Region.TYPE, (payload, context) -> PetaCache.onRegion(payload));
 		ClientPlayNetworking.registerGlobalReceiver(PetaNet.Info.TYPE, (payload, context) -> onSheet(payload));
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+		ClientDisconnect.register((handler, client) -> {
 			PetaCache.clear();
 			// DISCONNECT can fire on the netty thread; GL textures must be freed on the render thread
 			client.execute(() -> {

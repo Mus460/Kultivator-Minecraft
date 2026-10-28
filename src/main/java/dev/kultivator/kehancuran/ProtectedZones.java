@@ -127,7 +127,13 @@ public final class ProtectedZones {
 	private static final List<ClaimProvider> CLAIM_PROVIDERS = new java.util.concurrent.CopyOnWriteArrayList<>();
 	/** Halls of this server cached for {@link #claimed} (rebuilt at most every 200 ticks; halls rarely move). */
 	private static volatile List<GlobalPos> claimHalls = List.of();
-	private static volatile long claimHallsAt = Long.MIN_VALUE;
+	private static volatile long claimHallsAt = Long.MIN_VALUE / 2;
+
+	/** Forgets the hall cache (SERVER_STOPPED): the tick count restarts and the next world has other halls. */
+	static void clearClaimCache() {
+		claimHalls = List.of();
+		claimHallsAt = Long.MIN_VALUE / 2;
+	}
 
 	/** Adds a player-claim provider (DESIGN 38.R.3 rule 2). */
 	public static void addClaimProvider(ClaimProvider provider) {

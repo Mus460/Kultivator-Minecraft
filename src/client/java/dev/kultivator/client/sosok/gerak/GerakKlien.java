@@ -1,5 +1,6 @@
 package dev.kultivator.client.sosok.gerak;
 
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.EffectQuality;
 import dev.kultivator.client.disciple.DiscipleRenderState;
 import dev.kultivator.fx.QiParticleOptions;
@@ -68,7 +69,7 @@ public final class GerakKlien {
 			}
 		});
 		ClientPlayConnectionEvents.JOIN.register((handler, sender, mc) -> muatUlang());
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, mc) -> mc.execute(GerakKlien::muatUlang));
+		ClientDisconnect.register((handler, mc) -> mc.execute(GerakKlien::muatUlang));
 	}
 
 	/** Forgets every body's state and the prop caches (world change, {@code /sosok muat_ulang}). */

@@ -1,7 +1,7 @@
 package dev.kultivator.client.beast;
 
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.fx.BeastFx;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 
 /**
  * Client setup for spirit beasts. The auras and the evolution cinematic are drawn by {@link BeastFx} from the synced
@@ -11,7 +11,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 public final class BeastClient {
 
 	public static void init() {
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> BeastFx.clear()));
+		ClientDisconnect.register((handler, client) -> client.execute(() -> BeastFx.clear()));
 	}
 
 	private BeastClient() {

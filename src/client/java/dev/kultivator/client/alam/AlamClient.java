@@ -1,12 +1,12 @@
 package dev.kultivator.client.alam;
 
 import dev.kultivator.alam.AlamEntities;
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.hub.HubNav;
 import dev.kultivator.client.hub.HubPages;
 import dev.kultivator.client.hub.Urutan;
 import dev.kultivator.client.musuh.MusuhPage;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.minecraft.nbt.CompoundTag;
@@ -26,7 +26,7 @@ public final class AlamClient {
 	public static void init() {
 		EntityRenderers.register(AlamEntities.REALM_RELIC, NoopRenderer::new);
 		ClientTickEvents.END_CLIENT_TICK.register(TreasureScreen::tick);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
+		ClientDisconnect.register((handler, client) -> client.execute(() -> {
 			data = new CompoundTag();
 			TreasureScreen.reset();
 			dev.kultivator.client.dunia.kota.SainganScreen.reset();

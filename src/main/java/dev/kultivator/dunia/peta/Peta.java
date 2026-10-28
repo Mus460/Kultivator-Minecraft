@@ -88,6 +88,11 @@ public final class Peta {
 	private static final Map<String, LongLinkedOpenHashSet> QUEUE = new HashMap<>();
 	private static final Map<UUID, CompoundTag> LAST_SURFACE = new HashMap<>();
 	private static final Map<Long, Long> EXCHANGES = new HashMap<>();
+	/** Per player {second, requests in it}: the map screen asks about twice a second, so this is generous. */
+	private static final Map<UUID, long[]> RATE = new HashMap<>();
+	private static final int REQUESTS_PER_SECOND = 20;
+	/** Most regions one watch may keep registered for pushes (a modified client cannot grow the set without end). */
+	private static final int WATCH_REGIONS_MAX = 4096;
 	private static int sampled;
 
 	public static void init() {
@@ -110,6 +115,7 @@ public final class Peta {
 			QUEUE.clear();
 			LAST_SURFACE.clear();
 			EXCHANGES.clear();
+			RATE.clear();
 		});
 		DuniaConfig.onReload(() -> {
 			MinecraftServer server = currentServer;
@@ -186,6 +192,15 @@ public final class Peta {
 			return;
 		}
 		MinecraftServer server = player.level().getServer();
+		long[] rate = RATE.computeIfAbsent(player.getUUID(), id -> new long[] {-1L, 0L});
+		long second = server.getTickCount() / 20L;
+		if (rate[0] != second) {
+			rate[0] = second;
+			rate[1] = 0L;
+		}
+		if (++rate[1] > REQUESTS_PER_SECOND && request.op() != PetaNet.OP_CLOSE) {
+			return;
+		}
 		PetaData data = PetaData.get(server);
 		String dim = dimId(player.level());
 		switch (request.op()) {
@@ -204,7 +219,9 @@ public final class Peta {
 				Watch watch = WATCH.computeIfAbsent(player.getUUID(), id -> new Watch(dim));
 				watch.dim = dim;
 				for (long key : request.keys()) {
-					watch.regions.add(key);
+					if (watch.regions.size() < WATCH_REGIONS_MAX) {
+						watch.regions.add(key);
+					}
 					sendRegion(player, data, dim, key);
 				}
 			}

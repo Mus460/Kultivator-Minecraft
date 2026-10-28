@@ -2,6 +2,7 @@ package dev.kultivator.client.hub;
 
 import dev.kultivator.Kultivator;
 import dev.kultivator.client.ClientCultivation;
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.Keys;
 import dev.kultivator.client.codex.SealWheel;
 import dev.kultivator.client.epic.camera.CinematicDirector;
@@ -13,7 +14,6 @@ import dev.kultivator.data.CultivationData;
 import dev.kultivator.network.Actions;
 import dev.kultivator.network.Payloads;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
@@ -72,7 +72,7 @@ public final class QuickWheel implements HudElement {
 		ClientTickEvents.START_CLIENT_TICK.register(QuickWheel::startTick);
 		ClientTickEvents.END_CLIENT_TICK.register(QuickWheel::endTick);
 		HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, Kultivator.id("quick_wheel"), new QuickWheel());
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
+		ClientDisconnect.register((handler, client) -> client.execute(() -> {
 			open = false;
 			held = false;
 			hovered = -1;

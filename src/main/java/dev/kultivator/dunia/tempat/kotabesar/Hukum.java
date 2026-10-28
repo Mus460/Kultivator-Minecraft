@@ -390,6 +390,16 @@ public final class Hukum {
 		}
 		ServerLevel overworld = server.overworld();
 		long now = overworld.getGameTime();
+		// a prisoner who respawned (or was taken) out of the capital is no longer "in a cell"; the sentence stays, the next visit judges it
+		for (UUID id : List.copyOf(PINTU.keySet())) {
+			ServerPlayer prisoner = server.getPlayerList().getPlayer(id);
+			if (prisoner != null && (prisoner.level() != overworld || KotaBesarKota.di(overworld, prisoner.blockPosition()) == null)) {
+				GerbangKotaEntity door = PINTU.remove(id);
+				if (door != null && !door.isRemoved()) {
+					door.discard();
+				}
+			}
+		}
 		for (ServerPlayer p : overworld.players()) {
 			if (p.isSpectator()) {
 				continue;

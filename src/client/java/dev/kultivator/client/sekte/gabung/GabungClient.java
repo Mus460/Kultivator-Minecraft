@@ -1,11 +1,11 @@
 package dev.kultivator.client.sekte.gabung;
 
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.sekte.gabung.fx.GabungFxClient;
 import dev.kultivator.client.sekte.gabung.gerak.GabungPoses;
 import dev.kultivator.client.sekte.gabung.model.GabungModelClient;
 import dev.kultivator.client.sekte.gabung.ui.GabungUiClient;
 import dev.kultivator.sekte.gabung.GabungPayloads;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.Nullable;
@@ -74,7 +74,7 @@ public final class GabungClient {
 				KLIP.put(payload.pemain(), payload);
 			}
 		});
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> hapus()));
+		ClientDisconnect.register((handler, client) -> client.execute(() -> hapus()));
 		// 41U Layar:
 		GabungUiClient.init();
 		// 41V Visual (class visuals, illusion stair, test effects):

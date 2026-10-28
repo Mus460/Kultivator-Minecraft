@@ -672,6 +672,18 @@ public final class Meditation {
 		UUID id = player.getUUID();
 		long now = player.level().getGameTime();
 		Fuel fuel = FUEL.get(id);
+		CompoundTag saved = data.extra();
+		if (fuel == null && saved.contains("fuel_left")) {
+			// the rest of a stone's period, kept when the player left (onLeave)
+			long left = saved.getLongOr("fuel_left", 0L);
+			int savedGrade = saved.getIntOr("fuel_grade", -1);
+			saved.remove("fuel_left");
+			saved.remove("fuel_grade");
+			if (left > 0L && savedGrade >= 0 && savedGrade < FUEL_SECONDS.length) {
+				fuel = new Fuel(savedGrade, now + left);
+				FUEL.put(id, fuel);
+			}
+		}
 		if (fuel != null && fuel.end() > now) {
 			putInt(player, data, "fuel", fuel.grade());
 			putLong(player, data, "fuel_end", fuel.end());
@@ -849,11 +861,16 @@ public final class Meditation {
 
 	public static void onLeave(ServerPlayer player) {
 		SESSIONS.remove(player.getUUID());
-		FUEL.remove(player.getUUID());
+		Fuel fuel = FUEL.remove(player.getUUID());
 		BREAKS.remove(player.getUUID());
 		Enlightenment.forgetAll(player);
 		SpiritSites.forget(player);
 		CultivationData data = Cultivators.get(player);
+		if (fuel != null && fuel.end() > player.level().getGameTime()) {
+			// the stone is spent: the rest of its period waits in the saved extra until the next meditation
+			data.extra().putInt("fuel_grade", fuel.grade());
+			data.extra().putLong("fuel_left", fuel.end() - player.level().getGameTime());
+		}
 		data.setMeditating(false);
 		resetSessionValues(data);
 	}

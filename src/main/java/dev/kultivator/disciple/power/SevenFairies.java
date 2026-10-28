@@ -26,6 +26,10 @@ final class SevenFairies {
 	/** Per master: the link stays up until this tick; a new link (edge) shows the seven-colour ribbon once. */
 	private static final Map<UUID, Long> LINKED = new HashMap<>();
 
+	static void clear() {
+		LINKED.clear();
+	}
+
 	static void register() {
 		DiscipleHooks.addDamageFactor((entity, target, technique) -> PowerCore.powered(entity)
 				&& DisciplePowers.live(entity).fairiesUntil > PowerCore.now(entity) ? DAMAGE : 1.0D);

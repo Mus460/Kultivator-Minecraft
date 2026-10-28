@@ -1,5 +1,6 @@
 package dev.kultivator.client.sekte.diplomasi;
 
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.epic.SekteScenes;
 import dev.kultivator.client.epic.sky.SkyDirector;
 import dev.kultivator.client.epic.sound.MusicCue;
@@ -10,7 +11,6 @@ import dev.kultivator.client.hub.Urutan;
 import dev.kultivator.client.screen.ui.Kronik;
 import dev.kultivator.epic.EpicIds;
 import dev.kultivator.sekte.diplomasi.DiplomasiPayloads;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
@@ -44,7 +44,7 @@ public final class DiplomasiClient {
 
 	public static void init() {
 		ClientPlayNetworking.registerGlobalReceiver(DiplomasiPayloads.Sheet.TYPE, (payload, context) -> onSheet(payload));
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
+		ClientDisconnect.register((handler, client) -> client.execute(() -> {
 			last = null;
 			versi++;
 		}));

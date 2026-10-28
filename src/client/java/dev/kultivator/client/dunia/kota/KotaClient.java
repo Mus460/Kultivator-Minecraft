@@ -1,9 +1,9 @@
 package dev.kultivator.client.dunia.kota;
 
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.dunia.kota.KotaEntities;
 import dev.kultivator.dunia.kota.KotaNet;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.nbt.CompoundTag;
@@ -33,7 +33,7 @@ public final class KotaClient {
 		KotaFx.init();
 		KotaLelang.init();
 		ClientTickEvents.END_CLIENT_TICK.register(KotaFx::tick);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
+		ClientDisconnect.register((handler, client) -> client.execute(() -> {
 			data = new CompoundTag();
 			npcId = -1;
 			screenKind = -1;

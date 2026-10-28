@@ -1,6 +1,7 @@
 package dev.kultivator.client.abadi;
 
 import dev.kultivator.client.ClientCultivation;
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.dunia.DuniaClient;
 import dev.kultivator.client.hub.HubNav;
 import dev.kultivator.client.hub.HubPages;
@@ -8,7 +9,6 @@ import dev.kultivator.client.hub.Urutan;
 import dev.kultivator.client.screen.ui.GulirTeks;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.data.Rank;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
@@ -30,7 +30,7 @@ public final class AbadiClient {
 
 	/** Called once from {@code KultivatorClient}. */
 	public static void init() {
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
+		ClientDisconnect.register((handler, client) -> client.execute(() -> {
 			data = new CompoundTag();
 			AbadiFx.clear();
 			LelangJembatan.reset();

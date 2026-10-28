@@ -1,13 +1,13 @@
 package dev.kultivator.client.dunia.reruntuhan;
 
 import dev.kultivator.Kultivator;
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.dunia.DuniaScenes;
 import dev.kultivator.dunia.reruntuhan.REntities;
 import dev.kultivator.dunia.reruntuhan.RNet;
 import dev.kultivator.dunia.reruntuhan.penjara.RajaIblisEntity;
 import dev.kultivator.dunia.reruntuhan.menara.PenjagaLantaiEntity;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.minecraft.ChatFormatting;
@@ -55,7 +55,7 @@ public final class ReruntuhanClient {
 			TowerSights.render(context);
 		});
 		ClientTickEvents.END_CLIENT_TICK.register(ReruntuhanClient::tick);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
+		ClientDisconnect.register((handler, client) -> client.execute(() -> {
 			RFxClient.clear();
 			TowerScenery.reset();
 			TowerSights.clear();

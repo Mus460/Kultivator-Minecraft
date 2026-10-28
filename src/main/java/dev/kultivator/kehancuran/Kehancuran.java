@@ -118,6 +118,7 @@ public final class Kehancuran {
 			ORDERS.clear();
 			DEFERRED.clear();
 			NOTED.clear();
+			ProtectedZones.clearClaimCache();
 		});
 		ServerPlayerEvents.LEAVE.register(player -> {
 			Order order = ORDERS.get(player.getUUID());

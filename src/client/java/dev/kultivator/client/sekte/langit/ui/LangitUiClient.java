@@ -1,5 +1,6 @@
 package dev.kultivator.client.sekte.langit.ui;
 
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.epic.SekteScenes;
 import dev.kultivator.client.epic.sky.SkyDirector;
 import dev.kultivator.client.epic.sound.MusicCue;
@@ -13,7 +14,6 @@ import dev.kultivator.sekte.langit.main.LangitBajak;
 import dev.kultivator.sekte.langit.main.LangitPeristiwa;
 import dev.kultivator.sekte.langit.main.LangitUiPayloads;
 import dev.kultivator.sekte.langit.main.LangitUtusan;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -56,7 +56,7 @@ public final class LangitUiClient {
 				HubNav.buka(Tujuan.of(HubNav.SEKTE, Urutan.ID_WILAYAH).sub(WilayahPage.SUB_LANGIT));
 			}
 		});
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
+		ClientDisconnect.register((handler, client) -> client.execute(() -> {
 			data = null;
 			versi++;
 		}));

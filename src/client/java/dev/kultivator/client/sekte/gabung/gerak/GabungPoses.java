@@ -3,6 +3,7 @@ package dev.kultivator.client.sekte.gabung.gerak;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import dev.kultivator.Kultivator;
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.EffectQuality;
 import dev.kultivator.client.anim.PoseRenderData;
 import dev.kultivator.client.epic.ShaderCompat;
@@ -20,7 +21,6 @@ import dev.kultivator.fx.QiParticles;
 import dev.kultivator.sekte.gabung.GabungPayloads;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityRenderLayerRegistrationCallback;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.player.PlayerModel;
@@ -225,7 +225,7 @@ public final class GabungPoses {
 			}
 		});
 		ClientTickEvents.END_CLIENT_TICK.register(GabungPoses::tick);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
+		ClientDisconnect.register((handler, client) -> client.execute(() -> {
 			JEJAK.clear();
 			PER_ID.clear();
 		}));

@@ -1,8 +1,8 @@
 package dev.kultivator.client.voice;
 
 import dev.kultivator.Kultivator;
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.voice.VoicePayload;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
@@ -33,7 +33,7 @@ public final class VoiceClient {
 	public static void init() {
 		ClientPlayNetworking.registerGlobalReceiver(VoicePayload.TYPE, (payload, context) -> onPayload(payload));
 		HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, Kultivator.id("voice_captions"), new VoiceCaptions());
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(VoiceCaptions::clear));
+		ClientDisconnect.register((handler, client) -> client.execute(VoiceCaptions::clear));
 	}
 
 	static void onPayload(VoicePayload p) {

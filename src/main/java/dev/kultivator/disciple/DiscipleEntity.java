@@ -290,6 +290,7 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity, Soso
 	private int nearOwnerTick = -10000;
 	private int releaseTicks;
 	private @Nullable BlockPos lastSafePos;
+	private boolean voidHeld;
 
 	// ---- phase 6 (DESIGN 20.2.5)
 	private Role role = Role.DISCIPLE;
@@ -1369,14 +1370,18 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity, Soso
 			// It cannot die, so the void must not hold it: back up onto the ground above (or the world spawn).
 			BlockPos top = this.level().getHeightmapPos(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, this.blockPosition());
 			this.setDeltaMovement(Vec3.ZERO);
+			this.resetFallDistance();
 			if (top.getY() <= this.level().getMinY() && this.level() instanceof ServerLevel level) {
-				// a void column: the last safe ground or the post first; the (overworld) spawn only in its own dimension
-				if ((lastSafePos != null && returnTo(lastSafePos)) || (post != null && returnTo(post))) {
+				// a void column: the last safe ground, the post or the master first; the (overworld) spawn only in its own dimension
+				if (rescueFromVoid()) {
 					return;
 				}
 				net.minecraft.core.GlobalPos spawn = level.getRespawnData().globalPos();
 				if (spawn.dimension().equals(level.dimension())) {
 					top = spawn.pos();
+				} else {
+					// nowhere to stand: hold it above the void (no gravity) until a safe spot loads, instead of dropping it again and again
+					voidHeld = true;
 				}
 			}
 			this.teleportTo(top.getX() + 0.5D, top.getY() + 1.0D, top.getZ() + 0.5D);
@@ -1385,12 +1390,29 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity, Soso
 		super.onBelowWorld();
 	}
 
+	/** A safe spot to stand on again: its last ground, its post, or its master (same or another dimension). */
+	private boolean rescueFromVoid() {
+		ServerPlayer owner = owner();
+		return (lastSafePos != null && returnTo(lastSafePos)) || (post != null && returnTo(post))
+				|| owner != null && (owner.level() == this.level() ? teleportNear(owner) : followAcross(owner) != null);
+	}
+
+	/** Held above a void it cannot stand on ({@link #onBelowWorld}); not saved, so a reload lets it fall and be caught again. */
+	@Override
+	public boolean isNoGravity() {
+		return voidHeld || super.isNoGravity();
+	}
+
 	// ================================================================== ticking
 
 	@Override
 	public void tick() {
 		super.tick();
 		if (this.level().isClientSide() || this.isRemoved() || !this.isAlive()) {
+			return;
+		}
+		if (voidHeld && this.tickCount % 20 == 0 && rescueFromVoid()) {
+			voidHeld = false;
 			return;
 		}
 		// Blocks do not act on it (isAffectedByBlocks), so water, rain and lava are handled here, on the entity only.

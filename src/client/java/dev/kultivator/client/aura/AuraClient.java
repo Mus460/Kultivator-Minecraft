@@ -2,6 +2,7 @@ package dev.kultivator.client.aura;
 
 import dev.kultivator.Kultivator;
 import dev.kultivator.aura.AuraPreviewPayload;
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.aura.high.AuraHigh;
 import dev.kultivator.client.aura.realm.FoundationAura;
 import dev.kultivator.client.aura.realm.GoldenCoreAura;
@@ -9,7 +10,6 @@ import dev.kultivator.client.aura.realm.MortalAura;
 import dev.kultivator.client.aura.realm.NascentSoulAura;
 import dev.kultivator.client.aura.realm.QiRefiningAura;
 import dev.kultivator.data.Realm;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
@@ -37,7 +37,7 @@ public final class AuraClient {
 		ClientPlayNetworking.registerGlobalReceiver(AuraPreviewPayload.TYPE, (payload, context) -> AuraPreviewClient.onPayload(payload));
 		LevelRenderEvents.COLLECT_SUBMITS.register(AuraEngine::render);
 		HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, Kultivator.id("aura_edge"), new AuraHud());
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
+		ClientDisconnect.register((handler, client) -> client.execute(() -> {
 			clear();
 			lastLevel = null;
 		}));

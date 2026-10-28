@@ -74,7 +74,7 @@ public final class MandiriConfig {
 		public int[] hidangan = {2, 6, 12, 25};
 		public int dupa = 3;
 		public int dupaJalan = 1;
-		/** Teleport station: ceil(teleportDasar + d / teleportPer), at most teleportMaks. */
+		/** Teleport station: ceil(teleportDasar + d / teleportPer), at most teleportMaks. Reserved: no teleport journey mode exists yet, these three are read nowhere. */
 		public int teleportDasar = 2;
 		public int teleportPer = 250;
 		public int teleportMaks = 120;

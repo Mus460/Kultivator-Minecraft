@@ -16,6 +16,7 @@ import dev.kultivator.util.Msg;
 import dev.kultivator.util.Targeting;
 import dev.kultivator.voice.Voice;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -69,6 +70,7 @@ public final class PapanMisi {
 	static final String COUNT = "bounties";
 
 	static void init() {
+		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> reopenCamp(handler.getPlayer()));
 		ServerLivingEntityEvents.AFTER_DEATH.register((victim, source) -> {
 			if (!(victim.level() instanceof ServerLevel level)) {
 				return;
@@ -99,6 +101,30 @@ public final class PapanMisi {
 				Msg.chat(player, Component.translatable("kultivator.kota.misi.buru_selesai").withStyle(ChatFormatting.GREEN));
 			}
 		});
+	}
+
+	private static int openCamp(ServerLevel level, ServerPlayer player, BlockPos at) {
+		return Camps.open(level, at, player.getUUID(), cleared -> {
+			if (cleared) {
+				CompoundTag current = active(player);
+				if (current.getIntOr("type", -1) == CAMP) {
+					current.putBoolean("done", true);
+					KotaData.get(level.getServer()).touch();
+					Msg.chat(player, Component.translatable("kultivator.kota.misi.kemah_selesai").withStyle(ChatFormatting.GREEN));
+				}
+			}
+		});
+	}
+
+	/** Camps live in memory only: a running camp quest is reopened at its saved spot when its owner joins after a restart. */
+	private static void reopenCamp(ServerPlayer player) {
+		CompoundTag misi = active(player);
+		if (misi.getIntOr("type", -1) != CAMP || misi.getBooleanOr("done", false) || !misi.contains("camp_at")
+				|| Camps.exists(misi.getIntOr("camp", -1))) {
+			return;
+		}
+		misi.putInt("camp", openCamp((ServerLevel) player.level(), player, BlockPos.of(misi.getLongOr("camp_at", 0L))));
+		KotaData.get(player.level().getServer()).touch();
 	}
 
 	/** The player's active bounty (empty when none). */
@@ -221,17 +247,8 @@ public final class PapanMisi {
 			}
 			case CAMP -> {
 				BlockPos at = campSpot(level, centre);
-				int id = Camps.open(level, at, player.getUUID(), cleared -> {
-					if (cleared) {
-						CompoundTag current = active(player);
-						if (current.getIntOr("type", -1) == CAMP) {
-							current.putBoolean("done", true);
-							KotaData.get(level.getServer()).touch();
-							Msg.chat(player, Component.translatable("kultivator.kota.misi.kemah_selesai").withStyle(ChatFormatting.GREEN));
-						}
-					}
-				});
-				misi.putInt("camp", id);
+				misi.putInt("camp", openCamp(level, player, at));
+				misi.putLong("camp_at", at.asLong());
 				Msg.chat(player, Component.translatable("kultivator.kota.misi.kemah_mulai", KedaiTeh.direction(player.blockPosition(), at), at.getX(), at.getZ())
 						.withStyle(ChatFormatting.GOLD));
 			}

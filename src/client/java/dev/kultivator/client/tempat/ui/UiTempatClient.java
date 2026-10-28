@@ -1,6 +1,7 @@
 package dev.kultivator.client.tempat.ui;
 
 import dev.kultivator.Kultivator;
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.hub.DiSini;
 import dev.kultivator.client.hub.HubNav;
 import dev.kultivator.client.hub.HubPages;
@@ -17,7 +18,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
@@ -98,7 +98,7 @@ public final class UiTempatClient {
 		}
 		siap = true;
 		ClientPlayNetworking.registerGlobalReceiver(TempatLayarPayload.TYPE, (payload, context) -> terima(payload));
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
+		ClientDisconnect.register((handler, client) -> client.execute(() -> {
 			LIHAT.clear();
 			TANPA_PEMBUAT.clear();
 			sesiLayar = null;

@@ -1,6 +1,7 @@
 package dev.kultivator.client.sekte.tangga;
 
 import dev.kultivator.Kultivator;
+import dev.kultivator.client.ClientDisconnect;
 import dev.kultivator.client.disciple.DiscipleRenderState;
 import dev.kultivator.client.epic.SekteScenes;
 import dev.kultivator.client.epic.sky.SkyDirector;
@@ -10,7 +11,6 @@ import dev.kultivator.sekte.SekteIds;
 import dev.kultivator.sekte.tangga.Tangga;
 import dev.kultivator.sekte.tangga.TanggaPayloads;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
@@ -42,7 +42,7 @@ public final class TanggaClient {
 		initialised = true;
 		ClientPlayNetworking.registerGlobalReceiver(TanggaPayloads.State.TYPE, (payload, context) -> TanggaIlusi.onState(payload));
 		ClientTickEvents.END_CLIENT_TICK.register(minecraft -> TanggaIlusi.tick());
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
+		ClientDisconnect.register((handler, client) -> client.execute(() -> {
 			TanggaIlusi.clear();
 			TanggaCatatanScreen.bersih();
 		}));

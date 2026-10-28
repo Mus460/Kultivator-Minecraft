@@ -64,7 +64,7 @@ public final class SeteruConfig {
 	public boolean patroli = true;
 	/** Rival bodies of 39F at once on the server (patrols included). */
 	public int tubuhMaks = 4;
-	/** Townsfolk gathering around a duel (38); 4 without 38. */
+	/** Townsfolk gathering around a duel (38); 4 without 38. Caps the watchers of a feud duel ({@code HidupApi.kerumunan}). */
 	public int kerumunanMaks = 8;
 	/** The most standing a sect may lose through feuds in one week. */
 	public int standingMingguMaks = 20;

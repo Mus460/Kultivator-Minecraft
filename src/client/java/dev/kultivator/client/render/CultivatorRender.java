@@ -1,6 +1,6 @@
 package dev.kultivator.client.render;
 
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import dev.kultivator.client.ClientDisconnect;
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityRenderLayerRegistrationCallback;
 import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 
@@ -25,7 +25,7 @@ public final class CultivatorRender {
 				helper.register(new DharmaGlowLayer(avatar, context));
 			}
 		});
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> CultivatorLook.clear()));
+		ClientDisconnect.register((handler, client) -> client.execute(() -> CultivatorLook.clear()));
 	}
 
 	private CultivatorRender() {
