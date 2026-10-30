@@ -140,7 +140,7 @@
 	"kultivator.formasiui.slip.front.tip": "Shows the pattern on the block you look at, or 4 blocks ahead, facing away from you.",
 	"kultivator.formasiui.slip.anchor": "At a Formation Point…",
 	"kultivator.formasiui.slip.anchor_n": "Formation Point %s/%s",
-	"kultivator.formasiui.slip.anchor.tip": "Shows the pattern at one of the hall blueprint's Formation Points. Click again for the next one.",
+	"kultivator.formasiui.slip.anchor.tip": "Shows the pattern at the selected Formation Spot of your hall. Pick another spot with the button below.",
 	"kultivator.formasiui.slip.target": "Aim this pattern at the eye I look at",
 	"kultivator.formasiui.slip.target.tip": "Sets the looked-at Formation Eye's target pattern, so its hologram and checks follow this formation.",
 
@@ -165,5 +165,23 @@
 	"kultivator.formasiui.holo.reading": "Reading the blocks...",
 
 	"kultivator.screen.help.formasi_pola.title": "Formation patterns and the hologram",
-	"kultivator.screen.help.formasi_pola": "Every formation is a pattern of ordinary blocks around a Formation Eye. The Codex on the Formasi tablet shows each pattern as layer slices with its bill of materials. Show Pattern (or /cultivate formasi pola <id> [utara|timur|selatan|barat] [minutes]) puts a hologram in the world: the current layer is strong, upper layers are faint, finished layers are green. Gold cubes are missing blocks, red crosses are wrong blocks, grey means the chunk is not loaded; the six nearest missing blocks show their name. Sneaking while looking at an eye shows its pattern for a moment. The hologram only reads blocks and never places any; it ends after its minutes, beyond 64 blocks, on a dimension change or with /cultivate formasi pola mati. Patterns marked 'faces true north' cannot be rotated. Killing arrays hurt only hostile mobs, within kill caps, and transport never crosses dimensions. Hidden nametags from concealment are cosmetic: the tab list and the locator bar still show players. Sources: A Record of a Mortal's Journey to Immortality (RMJ), Investiture of the Gods ch. 44-50 and 82, Desolate Era Book 8."
+	"kultivator.screen.help.formasi_pola": "Every formation is a pattern of ordinary blocks around a Formation Eye. The Codex on the Formasi tablet shows each pattern as layer slices with its bill of materials. Show Pattern (or /cultivate formasi pola <id> [utara|timur|selatan|barat] [minutes]) puts a hologram in the world: the current layer is strong, upper layers are faint, finished layers are green. Gold cubes are missing blocks, red crosses are wrong blocks, grey means the chunk is not loaded; the six nearest missing blocks show their name. Sneaking while looking at an eye shows its pattern for a moment. The hologram only reads blocks and never places any; it ends after its minutes, beyond 64 blocks, on a dimension change or with /cultivate formasi pola mati. Patterns marked 'faces true north' cannot be rotated. Killing arrays hurt only hostile mobs, within kill caps, and transport never crosses dimensions. Hidden nametags from concealment are cosmetic: the tab list and the locator bar still show players. Sources: A Record of a Mortal's Journey to Immortality (RMJ), Investiture of the Gods ch. 44-50 and 82, Desolate Era Book 8.",
+	"kultivator.formasiui.slip.anchor_next": "Next spot",
+	"kultivator.formasiui.slip.anchor_next.tip": "Selects the next Formation Spot for the hologram and the build.",
+	"kultivator.formasiui.slip.build": "Build on Spot %s",
+	"kultivator.formasiui.slip.build.tip": "Builds this pattern on the selected spot through Sect Construction: materials come from the sect store, facing the way you face. The Formation Eye and any costly heart are left empty, and the pattern is placed inactive.",
+	"kultivator.formasiui.slip.build.why.owner": "Only the hall owner can build patterns.",
+	"kultivator.formasiui.slip.build.why.lock": "This pattern is still locked at your hall level.",
+	"kultivator.formasiui.slip.build.why.fit": "This pattern is too big for the selected spot.",
+	"kultivator.formasiui.slip.build.why.started": "The pattern on this spot is already built or being built.",
+	"kultivator.formasiui.slip.spot": "Spot %1$s · radius %2$s · tier %3$s · %4$s",
+	"kultivator.formasiui.slip.spot.empty": "empty",
+	"kultivator.formasiui.slip.spot.pola": "%1$s (%2$s)",
+	"kultivator.formasiui.slip.spot.state.0": "waiting for its tier",
+	"kultivator.formasiui.slip.spot.state.1": "queued",
+	"kultivator.formasiui.slip.spot.state.2": "building",
+	"kultivator.formasiui.slip.spot.state.3": "built, inactive",
+	"kultivator.formasiui.slip.spot.state.4": "blocked",
+	"kultivator.formasiui.slip.spot.state.5": "skipped",
+	"kultivator.formasiui.slip.spot.state.6": "waiting for chunks"
 }

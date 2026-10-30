@@ -113,8 +113,10 @@ public final class LayarKartu extends LayarGabungDasar {
 		int top = kolom.mulai(l, x0, y0, x1 - 5, y1);
 		int bx1 = x1 - 8;
 		int cy = top;
-		kartu(l, x0, cy, bx1, cy + KARTU_H);
-		cy += KARTU_H + 6;
+		// one more line while the week of the rules read at the gate runs
+		int kh = KARTU_H + (lembar.sub(Kartu.KARTU).i(Kartu.ATURAN, 0) > 0 ? BARIS : 0);
+		kartu(l, x0, cy, bx1, cy + kh);
+		cy += kh + 6;
 		shifuY = cy - top;
 		cy += subjudul(l, t("tab.shifu"), x0, cy, bx1);
 		cy = shifu(l, x0, cy + 2, bx1);
@@ -198,6 +200,13 @@ public final class LayarKartu extends LayarGabungDasar {
 		batang(l, lx + pelW + 4, y + 2, Math.min(60, lw - pelW - 4), pel / 100.0F,
 				pel >= 35 ? Palette.BAHAYA : pel >= 10 ? Palette.PERINGATAN : Palette.OK, -1.0F);
 		y += BARIS;
+		int paham = c.i(Kartu.ATURAN, 0);
+		if (paham > 0) {
+			// the week of the member who read the rules at the gate: offences count half
+			IkonGabung.gambar(l.g, IkonGabung.HUKUM, lx, y - 1, 9);
+			l.teks(t("kartu.paham", paham), lx + 12, y, lw - 12, 0xFF2E7A4E);
+			y += BARIS;
+		}
 		int tugas = c.i(Kartu.TUGAS, 0);
 		int tugasMaks = c.i(Kartu.TUGAS_MAKS, 3);
 		boolean jatah = c.b(Kartu.JATAH);

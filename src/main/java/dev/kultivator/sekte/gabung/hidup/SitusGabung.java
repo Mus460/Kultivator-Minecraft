@@ -73,6 +73,7 @@ public final class SitusGabung {
 		}
 		initialised = true;
 		Kediaman.init();
+		MuridTitipan.init();
 		TurnamenMurid.init();
 		// F41-1: the 39F named roster fights in the Disciple Tournament (elders and the wounded stay out)
 		TurnamenMurid.setSumberRoster(new TurnamenMurid.SumberRoster() {

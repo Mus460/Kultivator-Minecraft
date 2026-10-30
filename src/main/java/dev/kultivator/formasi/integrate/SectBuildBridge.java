@@ -12,8 +12,9 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Phase 6b links (DESIGN 24.6.2): the owner's Titik Formasi anchors from {@code EngineApi.formasiAnchors} (empty until
- * P6b-cetak fills it) and the optional pattern component request, refused for specs that do not fit the anchor.
+ * Phase 6b links (DESIGN 24.6.2): the owner's finished Titik Formasi anchors from {@code EngineApi.formasiAnchors} (plots of
+ * templates 5-9, see {@code FormasiTitik}) and the pattern component request, refused for specs that do not fit the anchor.
+ * The Kitab slip reaches {@link #request} through the {@code pola:<anchorId>:<specId>:<rot>} action of {@code HallBridge}.
  */
 public final class SectBuildBridge {
 

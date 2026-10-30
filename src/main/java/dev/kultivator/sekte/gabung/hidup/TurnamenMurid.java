@@ -435,12 +435,17 @@ public final class TurnamenMurid {
 		TempatInfo info = TempatApi.tempatDi(level, arena);
 		Laga laga = new Laga(sekte, arena.immutable(), info == null ? 0L : info.situsId());
 		List<Slot> entrants = new ArrayList<>();
+		List<Slot> titipan = new ArrayList<>();
 		GabungData data = GabungData.get(server);
 		for (UUID uuid : data.anggotaSekte(sekte)) {
 			ServerPlayer p = server.getPlayerList().getPlayer(uuid);
 			Keanggotaan k = data.peek(uuid);
 			if (p == null || k == null || !dekat(p, laga.arena)) {
 				continue;
+			}
+			// 41.8.7: the wards of a member at the lei tai may enter whatever the member's own rank (a sect body fights for each)
+			for (Peserta w : MuridTitipan.peserta(p, k)) {
+				titipan.add(new Slot(false, w.id(), w.nama(), w.perempuan(), w.langkah(), w.peran(), w.sifat()));
 			}
 			Pangkat pk = k.pangkat;
 			if (pk != Pangkat.LUAR && pk != Pangkat.DALAM && pk != Pangkat.INTI) {
@@ -451,6 +456,13 @@ public final class TurnamenMurid {
 		entrants.sort(Comparator.comparingDouble(Slot::kekuatan).reversed());
 		while (entrants.size() > BRACKET) {
 			entrants.removeLast();
+		}
+		titipan.sort(Comparator.comparingDouble(Slot::kekuatan).reversed());
+		for (Slot w : titipan) {
+			if (entrants.size() >= BRACKET) {
+				break;
+			}
+			entrants.add(w);
 		}
 		List<Peserta> roster = new ArrayList<>(roster(server, sekte));
 		roster.removeIf(p -> p.peran() > PERAN_KAKAK);
@@ -849,12 +861,7 @@ public final class TurnamenMurid {
 			if (p == null) {
 				continue;
 			}
-			int base = switch (tempat[i]) {
-				case JUARA -> PK_JUARA;
-				case FINALIS -> PK_FINAL;
-				case SEMIFINALIS -> PK_SEMIFINAL;
-				default -> PK_IKUT;
-			};
+			int base = pkTempat(tempat[i]);
 			GabungApi.tambahPk(p, (int) Math.round(base * kf), "gabung.turnamen");
 			if (tempat[i] <= SEMIFINALIS && k.pangkat == Pangkat.DALAM) {
 				dev.kultivator.sekte.gabung.Promosi.lulus(p, Pangkat.INTI); // 41.7: top 3 of the Disciple Tournament opens Inti
@@ -869,12 +876,20 @@ public final class TurnamenMurid {
 						Kediaman.nama(laga.sekte)), 10, 70, 20);
 			}
 		}
+		for (int i = 0; i < BRACKET; i++) {
+			Slot s = laga.slot[i];
+			if (s != null && !s.pemain() && MuridTitipan.titipan(s.id())) {
+				// a ward: half the placement's PK to its master, when online
+				MuridTitipan.hadiah(server, s.id(), s.nama(), tempat[i], Math.max(1, (int) Math.round(pkTempat(tempat[i]) * kf / 2.0D)));
+			}
+		}
 		GabungData.DataSekteGabung d = data.sekte(laga.sekte);
 		CompoundTag bagian = d.bagian(BAGIAN);
 		bagian.putBoolean("selesai", true);
 		Slot champion = juara >= 0 ? laga.slot[juara] : null;
 		if (champion != null) {
-			bagian.putString("juara", champion.id());
+			// a ward's win is its master's (the monthly quota of the last champion goes to him)
+			bagian.putString("juara", !champion.pemain() && MuridTitipan.titipan(champion.id()) ? MuridTitipan.tuan(champion.id()) : champion.id());
 			Tag namaTag = komponen(server, champion.nama());
 			if (namaTag != null) {
 				bagian.put("juaraNama", namaTag);
@@ -909,6 +924,16 @@ public final class TurnamenMurid {
 			HidupApi.bubarkan(level, laga.situs);
 		}
 		level.playSound(null, laga.arena, SoundEvents.BELL_RESONATE, SoundSource.AMBIENT, 1.4F, 1.1F);
+	}
+
+	/** Base PK of a placement ({@link #JUARA} .. {@link #PESERTA}), before the class factor. */
+	private static int pkTempat(int tempat) {
+		return switch (tempat) {
+			case JUARA -> PK_JUARA;
+			case FINALIS -> PK_FINAL;
+			case SEMIFINALIS -> PK_SEMIFINAL;
+			default -> PK_IKUT;
+		};
 	}
 
 	/** The final standing as one line: champion, finalist, the two semi-finalists who lost. */

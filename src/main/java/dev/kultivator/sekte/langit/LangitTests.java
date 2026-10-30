@@ -45,7 +45,7 @@ public final class LangitTests {
 	public static final List<String> CHIPS = List.of("langit_sekte info", "langit_sekte pratinjau <1-9> [tinggi <y>] [putar <0-3>]",
 			"langit_sekte pamer <1-9> tingkat <0-9> [tinggi <y>]", "langit_sekte bangun <0-9> [instan|cepat]", "langit_sekte naik [paksa]",
 			"langit_sekte tp <tahta|kaki|puncak|feri>", "langit_sekte tp dermaga <i>", "langit_sekte jatuh [tinggi] [terjun]",
-			"langit_sekte jatuh murid", "langit_sekte feri", "langit_sekte formasi", "langit_sekte patroli", "langit_sekte tangga", "langit_sekte bajak [1-3]", "langit_sekte longbo",
+			"langit_sekte jatuh murid", "langit_sekte feri", "langit_sekte feri_misi", "langit_sekte formasi", "langit_sekte patroli", "langit_sekte tangga", "langit_sekte bajak [1-3]", "langit_sekte longbo",
 			"langit_sekte utusan", "langit_sekte tamu", "langit_sekte sengsara", "langit_sekte halo", "langit_sekte pesta",
 			"langit_sekte npc daftar", "langit_sekte npc cari", "langit_sekte npc tp <i>", "langit_sekte audit [1-9]", "langit_sekte reset");
 
@@ -89,6 +89,7 @@ public final class LangitTests {
 		// 37M movement tests (GerakUji): a sword patrol now, the First Climb of the nearest disciple.
 		root.then(Commands.literal("patroli").executes(ctx -> say(self(ctx), dev.kultivator.sekte.langit.gerak.GerakUji.patroli(self(ctx)))));
 		root.then(Commands.literal("tangga").executes(ctx -> say(self(ctx), dev.kultivator.sekte.langit.gerak.GerakUji.tangga(self(ctx)))));
+		root.then(Commands.literal("feri_misi").executes(ctx -> say(self(ctx), dev.kultivator.sekte.langit.gerak.GerakUji.feriMisi(self(ctx)))));
 		root.then(Commands.literal("bajak").executes(ctx -> report(self(ctx), LangitTestHooks.bajak(self(ctx), 0, false)))
 				.then(Commands.argument("n", IntegerArgumentType.integer(1, 3))
 						.executes(ctx -> report(self(ctx), LangitTestHooks.bajak(self(ctx), IntegerArgumentType.getInteger(ctx, "n"), false)))));

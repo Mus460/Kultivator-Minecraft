@@ -3,8 +3,11 @@ package dev.kultivator.sect.build.engine;
 import dev.kultivator.sect.build.api.Bahan;
 import dev.kultivator.sect.build.api.Bill;
 import dev.kultivator.sect.build.api.SiteView;
+import dev.kultivator.sect.build.blueprint.Component;
 import dev.kultivator.sect.build.blueprint.Emission;
+import dev.kultivator.sect.build.blueprint.FormasiTitik;
 import dev.kultivator.sect.build.blueprint.Glaze;
+import dev.kultivator.sect.build.blueprint.PolaPart;
 import dev.kultivator.sect.build.blueprint.TemplateSpec;
 import dev.kultivator.sect.build.blueprint.Templates;
 import net.minecraft.core.BlockPos;
@@ -79,6 +82,14 @@ final class Site {
 		}
 	}
 
+	/**
+	 * A pattern requested on a Titik Formasi plot (the {@code FORMASI_PATTERN} component of DESIGN 24.6.2 B): its component
+	 * id, the anchor ({@code formasi_<n>}), the formation spec id and the template-local rotation (world rotation minus the
+	 * site rotation). The component itself is rebuilt from this record, so a restart resumes it like any template component.
+	 */
+	record Pola(String id, String anchor, String spec, int rot) {
+	}
+
 	/** The site key: the owner, a showcase id, or a relocation orphan's own id. */
 	UUID owner;
 	/** A relocation orphan credits its refunds to the player who moved away (DESIGN 21.18); null otherwise. */
@@ -131,6 +142,9 @@ final class Site {
 	/** Where each waiting or suspended component stopped, with its unspent reservation. */
 	final Map<String, Parked> parked = new LinkedHashMap<>();
 	final Map<String, BlockPos> anchors = new LinkedHashMap<>();
+	/** 6b pattern requests on Titik Formasi plots (DESIGN 24.6.2 B), by component id; saved under {@code pola}. */
+	final Map<String, Pola> pola = new LinkedHashMap<>();
+	private final Map<String, Component> polaParts = new HashMap<>();
 	long bank;
 	boolean removePlayerBlocks;
 	boolean emptyContainers;
@@ -264,6 +278,61 @@ final class Site {
 		return Templates.get(template);
 	}
 
+	/** A component of the template, or a pattern requested on one of its Titik Formasi plots; null when there is none. */
+	@Nullable Component component(String id) {
+		Component own = spec().component(id);
+		return own != null ? own : polaComponent(id);
+	}
+
+	/** Every component the engine builds: the template's, then the requested patterns (always built as "Tambahan"). */
+	List<Component> components() {
+		List<Component> list = new ArrayList<>(spec().components());
+		list.addAll(polaComponents());
+		return list;
+	}
+
+	/** The requested pattern components (their plot's tier), empty on most sites. */
+	List<Component> polaComponents() {
+		List<Component> list = new ArrayList<>();
+		for (Map.Entry<String, Pola> entry : pola.entrySet()) {
+			FormasiTitik.Plot plot = FormasiTitik.plot(template, entry.getValue().anchor());
+			Component component = plot != null && done.contains(plot.componentId()) ? polaComponent(entry.getKey()) : null;
+			if (component != null) {
+				list.add(component);
+			}
+		}
+		return list;
+	}
+
+	private @Nullable Component polaComponent(String id) {
+		Pola request = pola.get(id);
+		if (request == null) {
+			return null;
+		}
+		Component cached = polaParts.get(id);
+		if (cached == null) {
+			FormasiTitik.Plot plot = FormasiTitik.plot(template, request.anchor());
+			if (plot == null) {
+				return null;
+			}
+			cached = Component.of(id, plot.tier()).kind("formasi_pola").name("formasi_pola").group(Component.Group.ORNAMENT)
+					.add(new PolaPart(plot, request.spec(), request.rot())).build();
+			polaParts.put(id, cached);
+		}
+		return cached;
+	}
+
+	/** Drops the cached component of a pattern request (the request changed). */
+	void polaClear(String id) {
+		polaParts.remove(id);
+	}
+
+	/** Forgets a pattern request (taken down with its component). */
+	void dropPola(String id) {
+		pola.remove(id);
+		polaParts.remove(id);
+	}
+
 	/** The compiled plan (built lazily from the saved snapshot and levels). */
 	SitePlan plan() {
 		if (plan == null) {
@@ -357,6 +426,17 @@ final class Site {
 		CompoundTag anchorTag = new CompoundTag();
 		anchors.forEach((id, pos) -> anchorTag.putIntArray(id, new int[]{pos.getX(), pos.getY(), pos.getZ()}));
 		tag.put("anchors", anchorTag);
+		if (!pola.isEmpty()) {
+			CompoundTag polaTag = new CompoundTag();
+			pola.forEach((id, request) -> {
+				CompoundTag each = new CompoundTag();
+				each.putString("anchor", request.anchor());
+				each.putString("spec", request.spec());
+				each.putInt("rot", request.rot());
+				polaTag.put(id, each);
+			});
+			tag.put("pola", polaTag);
+		}
 		tag.putLong("bank", bank);
 		tag.putBoolean("remove_player", removePlayerBlocks);
 		tag.putBoolean("empty_containers", emptyContainers);
@@ -489,6 +569,11 @@ final class Site {
 			if (pos.length == 3) {
 				site.anchors.put(id, new BlockPos(pos[0], pos[1], pos[2]));
 			}
+		}
+		CompoundTag polaTag = tag.getCompoundOrEmpty("pola");
+		for (String id : polaTag.keySet()) {
+			CompoundTag each = polaTag.getCompoundOrEmpty(id);
+			site.pola.put(id, new Pola(id, each.getStringOr("anchor", ""), each.getStringOr("spec", ""), each.getIntOr("rot", 0)));
 		}
 		site.bank = tag.getLongOr("bank", 0L);
 		site.removePlayerBlocks = tag.getBooleanOr("remove_player", false);

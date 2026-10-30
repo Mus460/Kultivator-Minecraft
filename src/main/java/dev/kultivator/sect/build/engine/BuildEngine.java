@@ -1,6 +1,10 @@
 package dev.kultivator.sect.build.engine;
 
 import dev.kultivator.Kultivator;
+import dev.kultivator.formasi.FormationRegistry;
+import dev.kultivator.formasi.SectFormationSlots;
+import dev.kultivator.formasi.spec.Flag;
+import dev.kultivator.formasi.spec.FormationSpec;
 import dev.kultivator.KultivatorConfig;
 import dev.kultivator.fx.Fx;
 import dev.kultivator.fx.FxType;
@@ -16,6 +20,7 @@ import dev.kultivator.sect.build.api.BuildFxIds;
 import dev.kultivator.sect.build.api.BuildListener;
 import dev.kultivator.sect.build.api.ComponentView;
 import dev.kultivator.sect.build.api.EngineApi;
+import dev.kultivator.sect.build.api.FormasiAnchor;
 import dev.kultivator.sect.build.api.MaterialLedger;
 import dev.kultivator.sect.build.api.PlanStats;
 import dev.kultivator.sect.build.api.SectTemplates;
@@ -23,6 +28,7 @@ import dev.kultivator.sect.build.api.SiteView;
 import dev.kultivator.sect.build.blueprint.Component;
 import dev.kultivator.sect.build.blueprint.Costs;
 import dev.kultivator.sect.build.blueprint.Emission;
+import dev.kultivator.sect.build.blueprint.FormasiTitik;
 import dev.kultivator.sect.build.blueprint.Glaze;
 import dev.kultivator.sect.build.blueprint.Phase;
 import dev.kultivator.sect.build.blueprint.TemplateSpec;
@@ -484,7 +490,7 @@ public final class BuildEngine implements EngineApi {
 			return;
 		}
 		// Async results.
-		if (site.survey == null && site.bills.isEmpty() && !site.spec().isPlaceholder()) {
+		if (site.survey == null && site.bills.size() < site.spec().components().size() + site.pola.size() && !site.spec().isPlaceholder()) {
 			survey(site);
 		}
 		if (site.survey != null && site.survey.isDone()) {
@@ -560,7 +566,7 @@ public final class BuildEngine implements EngineApi {
 
 	/** A saved open component after a restart: re-emitted and resumed at its saved cursor (emission is deterministic). */
 	private void resumeOpen(Site site) {
-		Component component = site.openMode == Site.MODE_REPAIR ? null : site.spec().component(site.openId);
+		Component component = site.openMode == Site.MODE_REPAIR ? null : site.component(site.openId);
 		if (component != null) {
 			site.pendingId = site.openId;
 			site.pending = site.plan().emitAsync(component);
@@ -686,7 +692,7 @@ public final class BuildEngine implements EngineApi {
 	/** Emits every component once in the background for the bills and op counts the UI shows (only those are kept). */
 	private void survey(Site site) {
 		SitePlan plan = site.plan();
-		List<Component> components = new ArrayList<>(plan.spec().components());
+		List<Component> components = site.components();
 		site.survey = CompletableFuture.supplyAsync(() -> {
 			Map<String, Bill> bills = new HashMap<>();
 			Map<String, Integer> ops = new HashMap<>();
@@ -717,7 +723,7 @@ public final class BuildEngine implements EngineApi {
 
 	/** Reopens a parked (waiting or suspended) component: only its parked cells and the ops after its cursor run again. */
 	private void reopen(Site site, String id) {
-		Component component = site.spec().component(id);
+		Component component = site.component(id);
 		if (component == null) {
 			Site.Parked parked = site.parked.remove(id);
 			if (parked != null) {
@@ -889,7 +895,7 @@ public final class BuildEngine implements EngineApi {
 			site.legacyQueue = legacyColumns(site, emission);
 			site.legacyCursor = 0;
 		}
-		Component component = site.spec().component(id);
+		Component component = site.component(id);
 		if (component != null && mode == Site.MODE_FULL && fresh && !instant(site)) {
 			BoundingBox box = site.plan().worldBox(emission.bounds);
 			sendBox(level, box, box.minY(), BuildFxIds.COMPONENT_OPEN, component.tier(), 0.0F);
@@ -1333,7 +1339,7 @@ public final class BuildEngine implements EngineApi {
 		}
 		release(site, site.refund);
 		site.refund = Bill.EMPTY;
-		Component component = site.spec().component(id);
+		Component component = site.component(id);
 		if (site.openMode == Site.MODE_REPAIR) {
 			closeOpen(site, true);
 			return;
@@ -1482,7 +1488,7 @@ public final class BuildEngine implements EngineApi {
 	// ================================================================== dismantling (deconstruction, lower test tiers)
 
 	private void nextDismantle(Site site) {
-		List<Component> components = new ArrayList<>(site.spec().components());
+		List<Component> components = site.components();
 		java.util.Collections.reverse(components);
 		for (Component component : components) {
 			if (component.tier() > site.dismantleTarget && site.done.contains(component.id())) {
@@ -1559,6 +1565,7 @@ public final class BuildEngine implements EngineApi {
 				return Math.max(1, spent);
 			}
 			site.done.remove(site.openId);
+			site.dropPola(site.openId);
 			site.anchors.entrySet().removeIf(entry -> emission.anchors.containsKey(entry.getKey()));
 			site.openId = null;
 			site.emission = null;
@@ -1589,7 +1596,7 @@ public final class BuildEngine implements EngineApi {
 		// A lower test tier: replay the kept tiers instantly so shared cells are whole again.
 		site.testTarget = site.dismantleTarget;
 		site.done.removeIf(id -> {
-			Component component = site.spec().component(id);
+			Component component = site.component(id);
 			return component != null && component.tier() <= site.dismantleTarget;
 		});
 		site.tier = 0;
@@ -1647,7 +1654,18 @@ public final class BuildEngine implements EngineApi {
 		int blocked = site.waiting.containsKey(component.id()) ? site.waiting.get(component.id()).size() : open ? site.blockedOps.size() : 0;
 		Site.Parked parked = site.parked.get(component.id());
 		Bill bill = open ? site.reserve : parked != null ? parked.held : site.bills.getOrDefault(component.id(), Bill.EMPTY);
-		return new ComponentView(component.id(), component.kind(), component.tier(), component.name(), box, box.minY(), state, placed, total, blocked, bill);
+		return new ComponentView(component.id(), component.kind(), component.tier(), nameOf(site, component), box, box.minY(), state, placed, total, blocked, bill);
+	}
+
+	/** A pattern component is named after its formation ("Pola: Formasi Pedang"), a template component by its key. */
+	private static net.minecraft.network.chat.Component nameOf(Site site, Component component) {
+		Site.Pola request = site.pola.get(component.id());
+		if (request == null) {
+			return component.name();
+		}
+		FormationSpec spec = FormationRegistry.byId(request.spec());
+		return net.minecraft.network.chat.Component.translatable(component.nameKey(),
+				spec == null ? net.minecraft.network.chat.Component.literal(request.spec()) : spec.name());
 	}
 
 	private int stateOf(Site site, Component component, int nextTier) {
@@ -1932,7 +1950,7 @@ public final class BuildEngine implements EngineApi {
 		Component next = Scheduler.next(site);
 		int nextTier = next == null ? site.tier + 1 : Math.max(site.tier + 1, next.tier());
 		List<ComponentView> list = new ArrayList<>();
-		for (Component component : site.spec().components()) {
+		for (Component component : site.components()) {
 			list.add(view(site, component, stateOf(site, component, nextTier)));
 		}
 		return list;
@@ -1945,7 +1963,7 @@ public final class BuildEngine implements EngineApi {
 			return Bill.EMPTY;
 		}
 		Bill.Builder bill = Bill.builder();
-		for (Component component : site.spec().components()) {
+		for (Component component : site.components()) {
 			String id = component.id();
 			if (site.finished(id) || id.equals(site.openId) || site.waiting.containsKey(id) || site.suspended.contains(id)) {
 				continue;
@@ -2006,6 +2024,93 @@ public final class BuildEngine implements EngineApi {
 		return site == null ? null : site.anchors.get(id);
 	}
 
+	// ================================================================== EngineApi: Titik Formasi (DESIGN 24.6.2)
+
+	@Override
+	public List<FormasiAnchor> formasiAnchors(UUID owner) {
+		Site site = sites.get(owner);
+		if (site == null || site.showcase || site.foot || site.sky) {
+			return List.of();
+		}
+		List<FormasiAnchor> list = new ArrayList<>();
+		for (FormasiTitik.Plot plot : FormasiTitik.plots(site.template)) {
+			BlockPos centre = site.anchors.get(plot.id());
+			if (centre == null || !site.done.contains(plot.componentId())) {
+				continue;
+			}
+			Site.Pola request = site.pola.get(plot.polaId());
+			Component component = request == null ? null : site.component(plot.polaId());
+			list.add(new FormasiAnchor(plot.id(), centre, plot.radius(), plot.tier(), request == null ? "" : request.spec(),
+					component == null ? -1 : stateOf(site, component, site.tier + 1)));
+		}
+		return list;
+	}
+
+	/**
+	 * The 6b pattern component (DESIGN 24.6.2 B): the cells of {@code spec.pattern().emit(rot)} around the anchor, built as a
+	 * Tambahan through the normal funding, placing and repair of the engine. Refused when the plot is not built, the spec does
+	 * not fit it, the pattern was already started, or the owner's store cannot pay the bill right now (nothing is taken up
+	 * front: the bill is reserved only when the component opens, and handed back whole if it is skipped or taken down). A
+	 * request that is still queued or skipped is replaced by a new one. {@code rot} is the world rotation (clockwise quarter
+	 * turns, as the hologram shows it); a fixed-orientation spec always faces north.
+	 */
+	@Override
+	public @Nullable net.minecraft.network.chat.Component requestPattern(UUID owner, String anchorId, String specId, int rot) {
+		Site site = sites.get(owner);
+		if (site == null || site.showcase || site.foot || site.sky || site.restoring || site.dismantling) {
+			return err("pola_no_site");
+		}
+		FormasiTitik.Plot plot = FormasiTitik.plot(site.template, anchorId);
+		if (plot == null || !site.anchors.containsKey(anchorId) || !site.done.contains(plot.componentId())) {
+			return err("pola_no_anchor");
+		}
+		FormationSpec spec = FormationRegistry.byId(specId);
+		if (spec == null || !SectFormationSlots.fits(spec, plot.radius())) {
+			return net.minecraft.network.chat.Component.translatable("kultivator.formasi.anchor.no_fit", spec == null ? specId : spec.name(), plot.radius());
+		}
+		String id = plot.polaId();
+		if (site.pola.containsKey(id)) {
+			boolean started = site.done.contains(id) || id.equals(site.openId) || id.equals(site.fundId) || site.waiting.containsKey(id)
+					|| site.suspended.contains(id) || id.equals(site.pendingId);
+			if (started) {
+				return err("pola_busy");
+			}
+		}
+		int worldRot = spec.has(Flag.FIXED_ORIENTATION) ? 0 : rot;
+		Site.Pola request = new Site.Pola(id, anchorId, specId, Math.floorMod(worldRot - site.rotation, 4));
+		Site.Pola before = site.pola.put(id, request);
+		site.polaClear(id);
+		Component component = site.component(id);
+		Emission emission = component == null ? null : site.plan().emit(component);
+		if (emission == null || emission.size() == 0) {
+			restorePola(site, id, before);
+			return err("pola_empty");
+		}
+		Bill bill = Costs.bill(emission);
+		if (site.paid()) {
+			MaterialLedger ledger = MaterialLedger.get();
+			if (!ledger.reserve(site.ledgerOwner(), bill)) {
+				restorePola(site, id, before);
+				return err("pola_poor");
+			}
+			ledger.release(site.ledgerOwner(), bill);
+		}
+		site.bills.put(id, bill);
+		site.opCounts.put(id, emission.size());
+		site.skipped.remove(id);
+		site.dirty = true;
+		save(site);
+		return null;
+	}
+
+	private static void restorePola(Site site, String id, Site.@Nullable Pola before) {
+		site.polaClear(id);
+		site.pola.remove(id);
+		if (before != null) {
+			site.pola.put(id, before);
+		}
+	}
+
 	@Override
 	public @Nullable BlockPos workSpot(UUID owner) {
 		Site site = sites.get(owner);
@@ -2064,7 +2169,7 @@ public final class BuildEngine implements EngineApi {
 	@Override
 	public boolean prioritize(UUID owner, String componentId) {
 		Site site = sites.get(owner);
-		if (site == null || site.spec().component(componentId) == null || site.done.contains(componentId)) {
+		if (site == null || site.component(componentId) == null || site.done.contains(componentId)) {
 			return false;
 		}
 		boolean requeued = site.skipped.remove(componentId);
@@ -2092,7 +2197,7 @@ public final class BuildEngine implements EngineApi {
 	@Override
 	public boolean skip(UUID owner, String componentId) {
 		Site site = sites.get(owner);
-		if (site == null || site.spec().component(componentId) == null || site.finished(componentId)) {
+		if (site == null || site.component(componentId) == null || site.finished(componentId)) {
 			return false;
 		}
 		if (!skippable(site, componentId)) {
@@ -2160,7 +2265,7 @@ public final class BuildEngine implements EngineApi {
 		site.dirty = true;
 		if (server != null) {
 			ServerLevel level = server.getLevel(site.dim);
-			Component component = site.spec().component(componentId);
+			Component component = site.component(componentId);
 			if (level != null && component != null) {
 				// Its anchors still count: emitted off the server thread, applied when they arrive.
 				anchorJobs.add(new AnchorJob(site, site.plan().emitAsync(component)));
@@ -2229,7 +2334,7 @@ public final class BuildEngine implements EngineApi {
 		}
 		SitePlan plan = site.plan();
 		List<Component> done = new ArrayList<>();
-		for (Component component : site.spec().components()) {
+		for (Component component : site.components()) {
 			if (site.done.contains(component.id())) {
 				done.add(component);
 			}

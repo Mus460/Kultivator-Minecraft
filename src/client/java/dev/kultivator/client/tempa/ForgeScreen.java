@@ -71,6 +71,7 @@ public class ForgeScreen extends AbstractContainerScreen<ForgeMenu> {
 	}
 
 	private final Fokus fokus = new Fokus(this::pesan);
+	private final TempaGeser geser = new TempaGeser(this::tataUlang);
 	private final TabBar rail = new TabBar();
 	private final DaftarGulir kartu = new DaftarGulir();
 	private final KeyHints.HelpSeal seal = new KeyHints.HelpSeal(0.0F, 0.0F, 13, () -> TOPICS[tab()]);
@@ -99,8 +100,16 @@ public class ForgeScreen extends AbstractContainerScreen<ForgeMenu> {
 	@Override
 	protected void init() {
 		super.init();
+		tataUlang();
+	}
+
+	/**
+	 * The panel's place: centred, or (a window shorter than the panel, e.g. GUI scale 4 on 1366x768) panned by {@link TempaGeser};
+	 * the slots follow {@code topPos}, the widgets are moved here.
+	 */
+	private void tataUlang() {
 		this.leftPos = (this.width - this.imageWidth + RAIL_W) / 2;
-		this.topPos = (this.height - this.imageHeight) / 2;
+		this.topPos = geser.atas(this.height, this.imageHeight);
 		natal.x = leftPos + COL_L;
 		natal.y = topPos + ROW_B;
 		bentuk.x = leftPos + COL_L;
@@ -161,7 +170,8 @@ public class ForgeScreen extends AbstractContainerScreen<ForgeMenu> {
 		int y0 = topPos;
 		int x1 = leftPos + imageWidth;
 		int y1 = topPos + imageHeight;
-		Lukis l = fokus.mulai(g, font, mouseX, mouseY, 1.0F, Palette.Gaya.KERTAS, x0, y0, x1, y1);
+		// the box is the visible part of the panel: the confirm centres in it, the pan seals sit at its edges
+		Lukis l = fokus.mulai(g, font, mouseX, mouseY, 1.0F, Palette.Gaya.KERTAS, x0, Math.max(0, y0), x1, Math.min(height, y1));
 		frame = l;
 		drawRail(l);
 		ScrollFrame.paper(g, x0, x1, y0, y1, y0, y1);
@@ -175,6 +185,7 @@ public class ForgeScreen extends AbstractContainerScreen<ForgeMenu> {
 			Brush.fitCentered(g, font, heading, (x0 + x1) / 2.0F, y0 + 6.0F, imageWidth - 44.0F, Palette.INK, 1.5F, 1.0F, false);
 		}
 		l.widget("bantuan", seal);
+		geser.gambar(l, Math.max(2, leftPos - RAIL_W - 20));
 		Brush.text(g, font, Component.translatable("kultivator.tempa.forge.materials"), x0 + ForgeMenu.GRID_X, y0 + ForgeMenu.GRID_Y - 10.0F,
 				Palette.SEAL_DARK, 1.0F, false);
 		for (Slot slot : menu.slots) {
@@ -409,6 +420,7 @@ public class ForgeScreen extends AbstractContainerScreen<ForgeMenu> {
 		// The confirm lies over the slots and items; the kit's tooltip only where no item tooltip shows.
 		g.nextStratum();
 		fokus.selesai(l, mouseX, mouseY);
+		geser.ikuti(fokus.kunci(), fokus.zonaFokus(), height);
 		if (fokus.segel().terbuka() || menu.getCarried().isEmpty() && (hoveredSlot == null || !hoveredSlot.hasItem())) {
 			g.nextStratum();
 			SlipTooltip.gambarAntrean(g, font, mouseX, mouseY, width, height);
@@ -449,13 +461,17 @@ public class ForgeScreen extends AbstractContainerScreen<ForgeMenu> {
 		if (fokus.gulir(x, y, scrollY)) {
 			return true;
 		}
-		return super.mouseScrolled(x, y, scrollX, scrollY);
+		// a hovered bundle takes the wheel first; what is left pans the panel
+		return super.mouseScrolled(x, y, scrollX, scrollY) || geser.roda(scrollY);
 	}
 
 	@Override
 	public boolean keyPressed(KeyEvent event) {
 		// The confirm takes every key (Esc cancels it); Tab / Enter / arrows walk the talismans and the rail.
 		if (fokus.tombol(event)) {
+			return true;
+		}
+		if (geser.tombol(event)) {
 			return true;
 		}
 		return super.keyPressed(event);

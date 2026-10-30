@@ -3592,6 +3592,7 @@ ke **log undo**, jadi `reset` dan `pamer hapus` memulihkan tanah persis seperti 
 | `reset` | Menghapus blok rencana tapak uji dan memulihkan tanah asli dari log undo (512 sel per tick), lalu mengosongkan templat |
 | `misi` / `misi selesai` | Mengacak ulang tawaran hari ini / semua regu pengumpul langsung pulang |
 | `pekerja` | Semua murid milikmu yang termuat dan bebas menjadi pekerja (paling banyak 4) |
+| `titik` / `titik <id> <pola>` | Daftar Titik Formasi tapakmu / memesan sebuah pola di titik itu (tapak uji membangunnya gratis, arah = hadapmu) |
 
 **Contoh sesi uji cepat:** pasang Prasasti di tanah datar → `/kultivasi uji sekte templat 3` → klik [Konfirmasi] dan
 [Ya, mulai bangun] → `/kultivasi uji sekte tingkat 9 instan` → jalan-jalan dan `/kultivasi uji sekte kamera 1` →
@@ -4127,6 +4128,9 @@ f . . . . . f
   Jaga → Perkuat → Waspada, *Tugaskan* dan *Lepas*, serta koin *Nyala/Mati*, *Tarik dari Kas*, dan talisman *Isi 12 jam*,
   *Lihat Pola*, *Lihat yang kurang*, *Tandai*. Di mode Kitab: *Hologram di depanku*, *Di Titik Formasi…* (disembunyikan selama templat sektemu belum punya Titik
   Formasi), *Tuju pola ini*.
+  **Titik Formasi** (Templat 5-9, petak berlantai batu dengan ubin tengah berukir): pilih titik dengan *Titik berikutnya*, lalu talisman
+  *Bangun di Titik k* (hanya pemilik aula; alasan muncul di tooltip bila mati) memesan polanya sebagai "Tambahan" lewat Gudang. Pola dibangun tak aktif:
+  Mata Formasi, hati beacon/berlian/netherite, air dan blok terlarang kamu pasang sendiri. Periksa & Perbaiki ikut memulihkan pola ini.
   Teman sekte melihat semuanya tanpa bisa mengubah, kecuali *Setor*.
 * **Peta simpul:** piringan giok, utara di atas. Simpul wilayah ditempatkan menurut posisinya, pos luar di tepi beserta
   jaraknya; tiap simpul menulis biaya dan Dayanya; segel merah berarti rusak, mati, atau belum termuat.
@@ -10061,6 +10065,14 @@ Tidak ada lagi dua layar berbeda untuk fungsi yang sama.
   `docs/rancangan/43-satu-gui.md`; daftar uji `docs/uji/FASE-43.md`.
 * **Uji skala GUI** (op, untuk penguji): `/kultivasi gabung skala <0|2|3|4> [layar]` menata layar Gabung Sekte seolah skala GUI
   itu (0 = mati); coba skala 2, 3 dan 4 pada tiap halaman.
+  `/kultivasi uji ui skala <n> [id]` menata seluruh Gulungan seperti skala GUI n (mouse ikut diskalakan); keluar dari lembar uji = ukuran normal.
+* **Tempa dan Cincin di layar pendek** (mis. 1366x768 skala 4): seluruh panel bisa digeser dengan roda mouse, PgUp/PgDn, dua segel panah di tepi kiri, atau Tab ke kontrol yang di luar layar.
+* **Murid Titipan** (anggota Luar ke atas): murid titipan yang bersemadi dalam 3,5 blok dari kolam/gua kediaman gurunya mendapat XP semadi x1,15; dipukul anggota sekte di dalam wilayah dihitung pelanggaran A1, dan serangan makhluk dikurangi separuh. Murid titipan ikut turnamen sebagai tubuh sekte (guru dapat separuh PK) dan perjalanannya ke sekte gurunya tak pernah gagal.
+* **Kenaikan pangkat sekte:** Luar -> Dalam -> Inti -> Tetua lewat Ujian Pangkat + upacara 10 detik (dicek ulang di akhir; gagal = PK dikembalikan); Tetua Sekte NPC juga menerima permohonan lewat dialog. Mengurung di Gua Renungan menahan ujian; keluar dari sekte menghapus tanda ujian.
+* **Paham aturan:** bila kamu membaca aturan sebelum sumpah, selama 7 hari dunia sejak bergabung setiap pelanggaran dihitung separuh poinnya (minimal 1; A2 tidak dihalving); kartu anggota menulis sisa harinya.
+* **Papan Misi kota** memberi Poin Kontribusi sekte bagi anggota (tampil di rincian misi).
+* **Feri Awan misi & teleport:** regu misi sekte langit tampil berangkat di feri (tampilan saja), dan pemimpin MALAS/SOMBONG memakai stasiun teleport untuk perjalanan jauh (`/kultivasi uji langit_sekte feri_misi` menguji tampilan).
+* **Milik pemilik:** Mata Formasi terdaftar, monumen Batu/Urat Pusaka, plakat desa, papan nama/kasir toko pemain tak bisa dihancurkan orang lain (kecuali pemilik, teman sekte, op, kreatif).
 
 ## 75. Gabung Sekte: Menjadi Murid Sekte NPC
 

@@ -171,5 +171,12 @@
   "kultivator.blueprint.audit.summary": "Audit: %s emisi, %s pelanggaran",
   "kultivator.blueprint.audit.template": "%s: di luar %s · tak dikenal atau terlarang %s · bentuk tangga %s · tak bertumpu %s · air terbuka %s · jangkar dan biaya %s",
   "kultivator.blueprint.audit.colour": "Anggaran warna: netral %s · merah %s · hijau giok %s · emas %s",
-  "kultivator.blueprint.audit.anchor": "%s: jangkar %s di luar jangkauan pada %s %s %s"
+  "kultivator.blueprint.audit.anchor": "%s: jangkar %s di luar jangkauan pada %s %s %s",
+  "kultivator.blueprint.comp.formasi_titik": "Titik Formasi",
+  "kultivator.blueprint.comp.formasi_pola": "Pola Formasi: %s",
+  "kultivator.blueprint.error.pola_no_site": "Pola formasi hanya bisa dibangun di tapak sektemu yang sedang berdiri.",
+  "kultivator.blueprint.error.pola_no_anchor": "Titik Formasi itu belum selesai dibangun di tapak sektemu.",
+  "kultivator.blueprint.error.pola_busy": "Pola di titik itu sudah mulai dibangun. Lewati bagian itu dulu, atau bongkar bangunan sekte.",
+  "kultivator.blueprint.error.pola_poor": "Bahan di gudang sektemu belum cukup untuk pola itu. Setor bahan dulu (daftar kebutuhan ada di tablet Bangun).",
+  "kultivator.blueprint.error.pola_empty": "Pola itu tidak menghasilkan blok yang bisa dibangun di titik ini."
 }

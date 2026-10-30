@@ -38,6 +38,7 @@ public class RingScreen extends AbstractContainerScreen<RingMenu> {
 	private static final int ERASE_W = 80;
 
 	private final Fokus fokus = new Fokus(this::pesan);
+	private final TempaGeser geser = new TempaGeser(this::tataUlang);
 	private final KeyHints.HelpSeal seal = new KeyHints.HelpSeal(0.0F, 0.0F, 13, () -> "cincin");
 	private @Nullable Lukis frame;
 	private @Nullable Component pesan;
@@ -54,6 +55,13 @@ public class RingScreen extends AbstractContainerScreen<RingMenu> {
 	@Override
 	protected void init() {
 		super.init();
+		tataUlang();
+	}
+
+	/** The panel's place: centred, or (a window shorter than the panel: 5 or more rows at GUI scale 4 on 1366x768) panned by {@link TempaGeser}. */
+	private void tataUlang() {
+		this.leftPos = (this.width - this.imageWidth) / 2;
+		this.topPos = geser.atas(this.height, this.imageHeight);
 		seal.moveTo(leftPos + imageWidth - 11.0F, topPos + 12.0F);
 	}
 
@@ -83,7 +91,8 @@ public class RingScreen extends AbstractContainerScreen<RingMenu> {
 		int y0 = topPos;
 		int x1 = leftPos + imageWidth;
 		int y1 = topPos + imageHeight;
-		Lukis l = fokus.mulai(g, font, mouseX, mouseY, 1.0F, Palette.Gaya.KERTAS, x0, y0, x1, y1);
+		// the box is the visible part of the panel: the confirm centres in it, the pan seals sit at its edges
+		Lukis l = fokus.mulai(g, font, mouseX, mouseY, 1.0F, Palette.Gaya.KERTAS, x0, Math.max(0, y0), x1, Math.min(height, y1));
 		frame = l;
 		ScrollFrame.paper(g, x0, x1, y0, y1, y0, y1);
 		ScrollFrame.rod(g, x0, x1, y0);
@@ -106,6 +115,7 @@ public class RingScreen extends AbstractContainerScreen<RingMenu> {
 			Brush.fit(g, font, Brush.bold(title), x0 + RingMenu.LEFT, y0 + 7.0F, titleW, Palette.INK, 1.0F, 1.0F, false);
 		}
 		l.widget("bantuan", seal);
+		geser.gambar(l, Math.max(2, leftPos - 20));
 		if (menu.tier >= 1) {
 			Component label = Component.translatable("kultivator.tempa.ring.erase");
 			int ex = x1 - RingMenu.LEFT - ERASE_W;
@@ -138,6 +148,7 @@ public class RingScreen extends AbstractContainerScreen<RingMenu> {
 		// The confirm lies over the slots and items; the kit's tooltip only where no item tooltip shows.
 		g.nextStratum();
 		fokus.selesai(l, mouseX, mouseY);
+		geser.ikuti(fokus.kunci(), fokus.zonaFokus(), height);
 		if (fokus.segel().terbuka() || menu.getCarried().isEmpty() && (hoveredSlot == null || !hoveredSlot.hasItem())) {
 			g.nextStratum();
 			SlipTooltip.gambarAntrean(g, font, mouseX, mouseY, width, height);
@@ -169,6 +180,15 @@ public class RingScreen extends AbstractContainerScreen<RingMenu> {
 		if (fokus.tombol(event)) {
 			return true;
 		}
+		if (geser.tombol(event)) {
+			return true;
+		}
 		return super.keyPressed(event);
+	}
+
+	@Override
+	public boolean mouseScrolled(double x, double y, double scrollX, double scrollY) {
+		// a hovered bundle takes the wheel first; what is left pans the panel
+		return fokus.gulir(x, y, scrollY) || super.mouseScrolled(x, y, scrollX, scrollY) || geser.roda(scrollY);
 	}
 }

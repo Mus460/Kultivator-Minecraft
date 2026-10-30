@@ -430,5 +430,7 @@
   "advancement.kultivator.first_gathering.title": "First Gathering Trip",
   "advancement.kultivator.first_gathering.description": "See a gathering party come home",
   "advancement.kultivator.sect_donor.title": "Sect Donor",
-  "advancement.kultivator.sect_donor.description": "Deposit materials into another player's sect"
+  "advancement.kultivator.sect_donor.description": "Deposit materials into another player's sect",
+  "kultivator.sectbuild.test.titik_none": "No Formation Spot is finished on your site yet.",
+  "kultivator.sectbuild.test.titik_row": "%1$s at %2$s %3$s %4$s · radius %5$s · tier %6$s · pattern: %7$s"
 }

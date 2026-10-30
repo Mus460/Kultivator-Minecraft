@@ -9,11 +9,15 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 import dev.kultivator.Kultivator;
 import dev.kultivator.disciple.DiscipleEntity;
 import dev.kultivator.disciple.Disciples;
+import dev.kultivator.formasi.FormationRegistry;
+import dev.kultivator.formasi.integrate.SectBuildBridge;
+import dev.kultivator.formasi.spec.FormationSpec;
 import dev.kultivator.sect.build.api.AuditReport;
 import dev.kultivator.sect.build.api.Bahan;
 import dev.kultivator.sect.build.api.Bill;
 import dev.kultivator.sect.build.api.ComponentView;
 import dev.kultivator.sect.build.api.EngineApi;
+import dev.kultivator.sect.build.api.FormasiAnchor;
 import dev.kultivator.sect.build.api.PlanStats;
 import dev.kultivator.sect.build.api.SectTemplates;
 import dev.kultivator.sect.build.api.SiteView;
@@ -63,6 +67,8 @@ public final class BuildCommands {
 
 	public static final String[] DIRECTIONS = {"utara", "timur", "selatan", "barat"};
 	private static final SuggestionProvider<CommandSourceStack> DIRECTION = (ctx, builder) -> SharedSuggestionProvider.suggest(DIRECTIONS, builder);
+	private static final SuggestionProvider<CommandSourceStack> SPECS = (ctx, builder) ->
+			SharedSuggestionProvider.suggest(FormationRegistry.all().stream().map(FormationSpec::id), builder);
 	private static final SuggestionProvider<CommandSourceStack> GLAZE = (ctx, builder) ->
 			SharedSuggestionProvider.suggest(Stream.of(Glaze.values()).map(Glaze::id), builder);
 	private static final SuggestionProvider<CommandSourceStack> COMPONENTS = (ctx, builder) -> {
@@ -256,6 +262,10 @@ public final class BuildCommands {
 			EngineApi.get().camera(self(ctx), IntegerArgumentType.getInteger(ctx, "view"));
 			return done(ctx);
 		})));
+		// 6b Titik Formasi (DESIGN 24.6.2): lists the built anchors, or queues a pattern on one (a test site builds it free).
+		sekte.then(Commands.literal("titik").executes(ctx -> titikList(self(ctx)))
+				.then(Commands.argument("titik", StringArgumentType.word()).then(Commands.argument("pola", StringArgumentType.word()).suggests(SPECS)
+						.executes(ctx -> titikBuild(self(ctx), StringArgumentType.getString(ctx, "titik"), StringArgumentType.getString(ctx, "pola"))))));
 		sekte.then(Commands.literal("upacara").executes(ctx -> ceremony(self(ctx), -1))
 				.then(Commands.argument("n", IntegerArgumentType.integer(1, SectTemplates.TIERS))
 						.executes(ctx -> ceremony(self(ctx), IntegerArgumentType.getInteger(ctx, "n")))));
@@ -571,6 +581,45 @@ public final class BuildCommands {
 		player.sendSystemMessage(Component.translatable("kultivator.sectbuild.test.coupling", dev.kultivator.sect.build.SectBuild.buildingCap(owner), FlowData.frozenScanCap(owner),
 				FlowData.guaranteeTier(owner)).withStyle(ChatFormatting.GRAY));
 		return result;
+	}
+
+	/** {@code uji sekte titik}: the finished Titik Formasi anchors of the player's site and what stands on each. */
+	private static int titikList(ServerPlayer player) {
+		List<FormasiAnchor> anchors = SectBuildBridge.anchors(player.getUUID());
+		if (anchors.isEmpty()) {
+			Msg.chat(player, Component.translatable("kultivator.sectbuild.test.titik_none").withStyle(ChatFormatting.YELLOW));
+			return 0;
+		}
+		for (FormasiAnchor anchor : anchors) {
+			player.sendSystemMessage(Component.translatable("kultivator.sectbuild.test.titik_row", anchor.id(), anchor.centre().getX(), anchor.centre().getY(),
+					anchor.centre().getZ(), anchor.radius(), anchor.tier(), anchor.pola().isEmpty() ? "-" : anchor.pola() + "/" + anchor.state()).withStyle(ChatFormatting.GRAY));
+		}
+		return anchors.size();
+	}
+
+	/** {@code uji sekte titik <id> <pola>}: asks the engine for the pattern on an anchor (rotation: the way the player faces). */
+	private static int titikBuild(ServerPlayer player, String anchorId, String specId) {
+		FormasiAnchor anchor = null;
+		for (FormasiAnchor each : SectBuildBridge.anchors(player.getUUID())) {
+			if (each.id().equals(anchorId)) {
+				anchor = each;
+			}
+		}
+		FormationSpec spec = FormationRegistry.byId(specId);
+		if (anchor == null || spec == null) {
+			Msg.chat(player, Component.translatable("kultivator.formasi.pola.bad").withStyle(ChatFormatting.RED));
+			return 0;
+		}
+		int rot = switch (player.getDirection()) {
+			case EAST -> 1;
+			case SOUTH -> 2;
+			case WEST -> 3;
+			default -> 0;
+		};
+		Component why = SectBuildBridge.request(player.getUUID(), anchor, spec, rot);
+		Msg.chat(player, why != null ? why.copy().withStyle(ChatFormatting.YELLOW)
+				: Component.translatable("kultivator.formasi.pola.queued", spec.name(), anchor.id()).withStyle(ChatFormatting.GREEN));
+		return why == null ? 1 : 0;
 	}
 
 	/** {@code uji sekte info <t>}: the real plan numbers. */

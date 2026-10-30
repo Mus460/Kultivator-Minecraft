@@ -1090,5 +1090,19 @@
   "kultivator.sekte.mandiri.jalan.kisah.berkelana.2.ok.2": "Di ujung perjalanan, %1$s menemukan kuil kecil tanpa nama dan menyapunya sebelum pergi.",
   "kultivator.sekte.mandiri.jalan.kisah.berkelana.2.gagal.0": "%1$s pulang lebih cepat; kakinya lelah dan rindu pada sekte.",
   "kultivator.sekte.mandiri.jalan.kisah.berkelana.2.gagal.1": "%1$s berbalik di tengah jalan; hatinya lebih ingin pulang daripada melihat ujung dunia.",
-  "kultivator.sekte.mandiri.jalan.kisah.berkelana.2.gagal.2": "Bekal habis lebih cepat dari rencana; %1$s pulang dengan perut keroncongan."
+  "kultivator.sekte.mandiri.jalan.kisah.berkelana.2.gagal.2": "Bekal habis lebih cepat dari rencana; %1$s pulang dengan perut keroncongan.",
+  "kultivator.sekte.mandiri.jalan.moda.teleport": "Stasiun Teleport",
+  "kultivator.sekte.mandiri.jalan.kisah.berangkat.kota.teleport": "%1$s berjalan ke stasiun teleport terdekat dan membayar ongkos ke Kota %2$s %3$s; sekejap kemudian ia sudah di sana.",
+  "kultivator.sekte.mandiri.jalan.kisah.berangkat.kota.teleport.0": "%1$s berjalan ke cakram teleport terdekat untuk menuju Kota %2$s %3$s; ongkos pergi-pulang dibayar di muka.",
+  "kultivator.sekte.mandiri.jalan.kisah.berangkat.kota.teleport.1": "Dengan dua kantong ongkos terselip di lengan baju, %1$s menuju stasiun teleport dan Kota %2$s %3$s.",
+  "kultivator.sekte.mandiri.jalan.kisah.berangkat.kota.teleport.2": "%1$s tidak sudi berjalan sejauh itu: stasiun teleport dulu, baru Kota %2$s %3$s.",
+  "kultivator.sekte.mandiri.jalan.harian.berangkat.kota.teleport": "Jalan ke Kota %2$s %3$s terlalu jauh untukku. Aku ke stasiun teleport dan membayar ongkos pergi-pulang; dompetku menipis, kakiku selamat.",
+  "kultivator.sekte.mandiri.jalan.harian.berangkat.kota.teleport.0": "Jalan ke Kota %2$s %3$s terlalu jauh untukku. Aku ke stasiun teleport dan membayar ongkos pergi-pulang; dompetku menipis, kakiku selamat.",
+  "kultivator.sekte.mandiri.jalan.harian.berangkat.kota.teleport.1": "Pagi ini aku pamit ke stasiun teleport. Kota %2$s %3$s hanya sepenyeduh teh jauhnya, asal ongkosnya cukup.",
+  "kultivator.sekte.mandiri.jalan.harian.berangkat.kota.teleport.2": "Orang bilang berjalan itu menempa diri. Mungkin, tapi hari ini aku menempa dompetku saja: teleport ke Kota %2$s %3$s.",
+  "kultivator.sekte.mandiri.jalan.harian.berangkat.kota.teleport.3": "Aku berjalan sebentar ke cakram teleport. Dari sana Kota %2$s %3$s tinggal satu kedipan.",
+  "kultivator.sekte.mandiri.jalan.kisah.teleport.pergi": "%1$s menyerahkan %4$s NB pada Juru Formasi, berdiri di atas cakram, dan lenyap dalam kilau giok; tahu-tahu sudah di Kota %2$s %3$s.",
+  "kultivator.sekte.mandiri.jalan.kisah.teleport.pulang": "%1$s membayar ongkos pulang, menyegel tangan di atas cakram, dan muncul dari kilau giok di Kota %2$s %3$s.",
+  "kultivator.sekte.mandiri.jalan.harian.teleport.pergi": "Cakram teleport berdengung di bawah kakiku. Enam segel tangan, kilau giok, lalu aku berdiri di Kota %2$s %3$s. Ongkosnya %4$s NB per orang.",
+  "kultivator.sekte.mandiri.jalan.harian.teleport.pulang": "Pulang lewat cakram teleport ke Kota %2$s %3$s. Perutku masih terasa dilempar-lempar, tapi kakiku utuh."
 }

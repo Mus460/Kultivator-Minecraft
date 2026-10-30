@@ -5,6 +5,7 @@ import dev.kultivator.sekte.diplomasi.DiplomasiGabung;
 import dev.kultivator.sekte.gabung.api.GabungApi;
 import dev.kultivator.sekte.gabung.api.Pangkat;
 import dev.kultivator.sekte.gabung.masuk.UjianCorak;
+import dev.kultivator.sekte.gabung.dunia.TokohSekte;
 import dev.kultivator.sekte.gabung.politik.Kursi;
 import dev.kultivator.sekte.mandiri.seteru.Roster;
 import dev.kultivator.util.Msg;
@@ -18,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * The two promotion trials that had no runner (D-41AD, 41.6.1): Murid Dalam and Tetua.
@@ -27,6 +29,9 @@ import java.util.List;
  *       is down to half: passed.</li>
  *   <li><b>Ujian Tetua</b>: the sect's corak test again ({@link UjianCorak}) with the elder's bar of
  *       {@link #AMBANG_TETUA} instead of the 0.5 of the Luar re-test.</li>
+ *   <li><b>Dukungan Tetua</b> (Wakil, 41.8.5 step 2): the sect's elder characters are counted at once; at least half of them
+ *       must stand at attitude {@link #AMBANG_DUKUNG} or more toward the player (raised through lessons, missions and
+ *       gifts). Elders that are players have no vote here: the master appoints them ({@code Politik.tunjuk}).</li>
  * </ul>
  * Both end in {@link Promosi#lulus}; [Ajukan Kenaikan] in the own grounds starts them while the trial is the only missing
  * requirement. No block changes, nobody dies.
@@ -35,15 +40,20 @@ final class UjianPangkat {
 
 	static final int DUEL_TICKS = 20 * 180;
 	static final double AMBANG_TETUA = 0.85D;
+	/** Elder attitude (-100..100) that counts as support for a Wakil (41.8.5). */
+	static final int AMBANG_DUKUNG = 50;
 	private static final String KEY = "kultivator.gabung.naik.";
 
 	/** True when this class runs the trial of {@code tujuan}. */
 	static boolean punya(Pangkat tujuan) {
-		return tujuan == Pangkat.DALAM || tujuan == Pangkat.TETUA;
+		return tujuan == Pangkat.DALAM || tujuan == Pangkat.TETUA || tujuan == Pangkat.WAKIL;
 	}
 
 	/** Starts the trial; false (with a chat line) when it cannot start now. */
 	static boolean mulai(ServerPlayer player, String sekte, Pangkat tujuan) {
+		if (tujuan == Pangkat.WAKIL) {
+			return dukungan(player);
+		}
 		String sibuk = Sibuk.why(player);
 		if (sibuk != null) {
 			Msg.chat(player, Sibuk.text(sibuk).copy().withStyle(ChatFormatting.GRAY));
@@ -88,6 +98,29 @@ final class UjianPangkat {
 		} else {
 			Msg.chat(player, Component.translatable(KEY + "ujian_dalam.gagal").withStyle(ChatFormatting.RED));
 		}
+	}
+
+	/** Counts the elders' support; marks the Wakil trial passed when at least half of them stand with the player. */
+	private static boolean dukungan(ServerPlayer player) {
+		MinecraftServer server = player.level().getServer();
+		UUID me = player.getUUID();
+		String sekte = GabungApi.anggota(player).sekte;
+		int total = 0;
+		int dukung = 0;
+		for (TokohSekte.Tokoh elder : TokohSekte.tetua(server, sekte)) {
+			total++;
+			if (TokohSekte.sikap(server, elder.id(), me) >= AMBANG_DUKUNG) {
+				dukung++;
+			}
+		}
+		int perlu = (total + 1) / 2;
+		if (dukung < perlu) {
+			Msg.chat(player, Component.translatable(KEY + "ujian_wakil.kurang", dukung, perlu, total, AMBANG_DUKUNG).withStyle(ChatFormatting.RED));
+			return false;
+		}
+		Msg.chat(player, Component.translatable(KEY + "ujian_wakil.cukup", dukung, total).withStyle(ChatFormatting.GREEN));
+		Promosi.lulus(player, Pangkat.WAKIL);
+		return true;
 	}
 
 	private static boolean ujianTetua(ServerPlayer player, String sekte) {

@@ -148,6 +148,7 @@ public final class LembarKartu {
 			c.put(Kartu.SAINGAN, s);
 		}
 		c.putInt(Kartu.PELANGGARAN, k.pelanggaran);
+		c.putInt(Kartu.ATURAN, dev.kultivator.sekte.gabung.PahamAturan.sisaHari(k, hari));
 		c.putInt(Kartu.TUGAS, k.tugasHari == hari ? k.tugasJumlah : 0);
 		c.putInt(Kartu.TUGAS_MAKS, TUGAS_MAKS);
 		c.putBoolean(Kartu.JATAH, k.jatahHari < 0L || hari - k.jatahHari >= 7L);
@@ -498,6 +499,7 @@ public final class LembarKartu {
 			return;
 		}
 		k.muridTitipan.add(soul);
+		dev.kultivator.sekte.gabung.hidup.MuridTitipan.didaftar(player, sekte);
 		k.catat(hari, "kultivator.gabung.ui.riwayat.daftar_murid", nama.getString());
 		GabungData.get(server).setDirty();
 		GabungLayar.pesan(player, Component.translatable("kultivator.gabung.ui.kartu.murid.didaftar", nama, GabungLayar.namaSekte(sekte)),

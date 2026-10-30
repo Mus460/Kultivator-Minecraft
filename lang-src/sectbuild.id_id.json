@@ -430,5 +430,7 @@
   "advancement.kultivator.first_gathering.title": "Ekspedisi Bahan Pertama",
   "advancement.kultivator.first_gathering.description": "Sambut regu pengumpul yang pulang pertama kali",
   "advancement.kultivator.sect_donor.title": "Penyumbang Sekte",
-  "advancement.kultivator.sect_donor.description": "Setor bahan ke sekte milik pemain lain"
+  "advancement.kultivator.sect_donor.description": "Setor bahan ke sekte milik pemain lain",
+  "kultivator.sectbuild.test.titik_none": "Belum ada Titik Formasi yang selesai di tapakmu.",
+  "kultivator.sectbuild.test.titik_row": "%1$s di %2$s %3$s %4$s · jari-jari %5$s · tahap %6$s · pola: %7$s"
 }

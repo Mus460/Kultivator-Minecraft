@@ -171,5 +171,12 @@
   "kultivator.blueprint.audit.summary": "Audit: %s emissions, %s violations",
   "kultivator.blueprint.audit.template": "%s: outside %s · unknown or banned %s · stair shapes %s · unsupported %s · open water %s · anchors and costs %s",
   "kultivator.blueprint.audit.colour": "Colour budget: neutral %s · red %s · teal and jade %s · gold %s",
-  "kultivator.blueprint.audit.anchor": "%s: anchor %s out of reach at %s %s %s"
+  "kultivator.blueprint.audit.anchor": "%s: anchor %s out of reach at %s %s %s",
+  "kultivator.blueprint.comp.formasi_titik": "Formation Spot",
+  "kultivator.blueprint.comp.formasi_pola": "Formation Pattern: %s",
+  "kultivator.blueprint.error.pola_no_site": "A formation pattern can only be built on your standing sect site.",
+  "kultivator.blueprint.error.pola_no_anchor": "That Formation Spot is not finished on your sect site yet.",
+  "kultivator.blueprint.error.pola_busy": "The pattern on that spot has already begun. Skip that part first, or deconstruct the sect.",
+  "kultivator.blueprint.error.pola_poor": "Your sect store lacks the materials for that pattern. Deposit materials first (the needs list is on the Build tablet).",
+  "kultivator.blueprint.error.pola_empty": "That pattern yields no buildable blocks on this spot."
 }

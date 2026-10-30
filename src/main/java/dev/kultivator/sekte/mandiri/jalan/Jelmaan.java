@@ -111,6 +111,7 @@ public final class Jelmaan {
 			lepasTubuh(p, false);
 		}
 		PANGGUNG.clear();
+		TIANG.clear();
 		for (Tubuh t : PER_JIWA.values()) {
 			if (!t.body.isRemoved()) {
 				t.body.discard();
@@ -154,6 +155,7 @@ public final class Jelmaan {
 		MandiriConfig cfg = MandiriConfig.get();
 		long now = server.overworld().getGameTime();
 		try {
+			tampilkanTeleport(server, now);
 			perbaruiPanggung(server, cfg, now);
 		} catch (RuntimeException exception) {
 			Kultivator.LOGGER.warn("Jelmaan: stage bodies failed to update", exception);
@@ -229,6 +231,11 @@ public final class Jelmaan {
 			PER_ENTITAS.put(body.getId(), t);
 			total++;
 			mulaiTahap(level, r, t, i, stage);
+			if (jenis == Jenis.KOTA && Rencana.TELEPORT.equals(r.moda()) && Tahap.TIBA_KOTA.equals(kind)) {
+				// 39.6.2: a party that rode the station steps out of the flash, tidying its robe
+				Fx.ring(level, body.position().add(0.0D, 0.1D, 0.0D), 0xBFFFEA, 2.0F);
+				SosokApi.gerak(body, GerakId.MENGUAP_PEREGANGAN, GerakId.V_MENGUAP_RAPIKAN, 50);
+			}
 		}
 		for (Tubuh t : PER_JIWA.values()) {
 			Rencana r = Perjalanan.rencana(server, t.soul);
@@ -741,6 +748,70 @@ public final class Jelmaan {
 			}
 			t.body.discard();
 		}
+	}
+
+	/** Station rides whose formation pillar was already raised ({@code tel:<journey>:<direction>}). */
+	private static final java.util.Set<String> TIANG = new java.util.HashSet<>();
+
+	/**
+	 * The station rides in progress (39.6.2, stage {@code teleport}): when a player is within 128 blocks of the station the party
+	 * stands round the disc, first paying the keeper (the money pouch changes hands), then making hand seals while the formation
+	 * pillar rises for the last three seconds; the flash and the departure of the bodies come when the stage resolves
+	 * ({@code Tahap}). Every body is a {@link #tunjukkan} stage, so the budget, the 160 block rule and the arrival of the real
+	 * disciple all apply.
+	 */
+	private static void tampilkanTeleport(MinecraftServer server, long now) {
+		if (TIANG.size() > 64) {
+			TIANG.clear();
+		}
+		for (UUID lead : JalanData.get(server).jiwaAktif()) {
+			Rencana r = Perjalanan.rencana(server, lead);
+			if (r == null || !lead.equals(r.soul()) || !Rencana.TELEPORT.equals(r.moda())) {
+				continue;
+			}
+			int i = r.tahapPada(now);
+			CompoundTag stage = i < 0 ? null : r.tahap(i);
+			ServerLevel level = Tahap.level(server, r);
+			if (stage == null || level == null || !Tahap.TELEPORT.equals(stage.getStringOr("jenis", ""))) {
+				continue;
+			}
+			BlockPos at = BlockPos.of(stage.getLongOr("pos", 0L));
+			if (!level.isLoaded(at) || !dekatPemain(level, at, 128.0D)) {
+				continue;
+			}
+			long mulai = stage.getLongOr("mulai", now);
+			long sampai = stage.getLongOr("sampai", now);
+			Adegan adegan = (now - mulai < (sampai - mulai) / 2L ? Adegan.diam(GerakId.TAWAR, 0, PropId.KANTONG_UANG)
+					: Adegan.diam(GerakId.SEGEL_TANGAN, 0, PropId.TIDAK_ADA)).berulang(100);
+			int n = 0;
+			for (UUID soul : r.rombongan()) {
+				tunjukkan(level, "tel:" + r.id() + ":" + soul, r.owner(), soul, null, sekitar(level, at, n++), at, adegan, 100);
+			}
+			if (sampai - now <= 60L && TIANG.add("tel:" + r.id() + ":" + stage.getIntOr("arah", 0))) {
+				KontrakKota.kilat(level, at, false, 3, -1);
+			}
+		}
+	}
+
+	/** Removes the stage body of {@code kunci} now (its stage resolved), with a puff. */
+	static void akhiriPentas(String kunci) {
+		Panggung p = PANGGUNG.remove(kunci);
+		if (p != null) {
+			lepasTubuh(p, true);
+		}
+	}
+
+	/**
+	 * A look-alike of the away disciple {@code soul} of {@code owner} (from its away record), unowned, unsaved and unlisted, for
+	 * another module's own scene (the sky ferry of 37G): it is not tracked here, the caller places it and discards it. Null
+	 * when the disciple has no away record or the NPC budget is full.
+	 */
+	public static @Nullable DiscipleEntity pinjam(ServerLevel level, UUID owner, UUID soul, BlockPos at) {
+		CompoundTag stored = tabletAway(owner, soul);
+		if (stored == null || !DuniaBudget.mayAdd(level, DuniaBudget.NPC, Vec3.atBottomCenterOf(at))) {
+			return null;
+		}
+		return badan(level, stored, at);
 	}
 
 	/** The real disciple {@code soul} arrived ({@code Disciples.arrive}): its stage bodies go at once. */

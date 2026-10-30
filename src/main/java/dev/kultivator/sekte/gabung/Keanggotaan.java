@@ -228,6 +228,9 @@ public final class Keanggotaan {
 		pintu = Pintu.GERBANG;
 		hariUjian = -1L;
 		calonSampai = -1L;
+		// the rank trials passed, the chore PK and the knowing-the-rules week belong to the membership that ended
+		bagian.remove("pangkat");
+		bagian.getCompoundOrEmpty("aturan").remove("pahamSampai");
 	}
 
 	// ================================================================== save / load

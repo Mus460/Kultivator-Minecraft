@@ -316,6 +316,34 @@ final class PlanAudit {
 				}
 			}
 		}
+		// 6b (DESIGN 24.6.2 B): every formation that fits a Titik Formasi of this template, in every rotation, plans only cells inside the
+		// footprint, prices every block, and plans every slot it can place (a pattern is complete); counted like any other op.
+		Ctx polaCtx = Ctx.dry(spec, run.glaze());
+		for (dev.kultivator.sect.build.blueprint.FormasiTitik.Plot plot : dev.kultivator.sect.build.blueprint.FormasiTitik.plots(spec.template())) {
+			for (dev.kultivator.formasi.spec.FormationSpec fs : dev.kultivator.formasi.FormationRegistry.all()) {
+				if (!dev.kultivator.formasi.SectFormationSlots.fits(fs, plot.radius())) {
+					continue;
+				}
+				for (int rot = 0; rot < fs.pattern().distinctRotations(); rot++) {
+					Sink sink = Sink.of(plot.polaId(), spec);
+					new dev.kultivator.sect.build.blueprint.PolaPart(plot, fs.id(), rot).emit(polaCtx, sink);
+					Emission emission = sink.finish();
+					outside += emission.outside;
+					for (int i = 0; i < emission.size(); i++) {
+						BlockState state = emission.states[i];
+						if (!state.isAir() && !Costs.known(state.getBlock())) {
+							unknown++;
+							log(name, plot.polaId(), fs.id() + " unknown block " + BuiltInRegistries.BLOCK.getKey(state.getBlock()), emission.pos[i]);
+						}
+					}
+					int want = dev.kultivator.sect.build.blueprint.PolaPart.placeable(fs, rot);
+					if (emission.size() != want) {
+						invariant++;
+						log(name, plot.polaId(), fs.id() + " rot " + rot + " plans " + emission.size() + " of " + want + " cells", 0L);
+					}
+				}
+			}
+		}
 		violations = outside + unknown + banned + stairs + unsupported + water + anchors + invariant;
 		long total = Math.max(1L, colour[0] + colour[1] + colour[2] + colour[3]);
 		lines.add(net.minecraft.network.chat.Component.translatable("kultivator.blueprint.audit.template", SectTemplates.name(spec.template()), outside, unknown + banned,

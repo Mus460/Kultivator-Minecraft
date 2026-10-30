@@ -89,6 +89,8 @@ public final class Promosi {
 		});
 		ServerTickEvents.END_SERVER_TICK.register(Promosi::tick);
 		ServerPlayerEvents.LEAVE.register(player -> batalkan(player, true));
+		// leaving the sect during the ceremony ends it (the PK went with the membership)
+		GabungBus.KELUAR.register((player, sekte, status) -> batalkan(player, false));
 		ServerLifecycleEvents.SERVER_STOPPED.register(s -> UPACARA.clear());
 		// The rank tree's [Ajukan Kenaikan]: the ceremony, the own-grounds check and the trials start here, not the 41U default.
 		GabungLayar.daftarAksi(GabungLembar.PohonPangkat.LAYAR, GabungLembar.PohonPangkat.OP_AJUKAN,
@@ -116,12 +118,38 @@ public final class Promosi {
 		Msg.chat(player, Component.translatable("kultivator.gabung.naik.lulus_ujian", tujuan.nama()).withStyle(ChatFormatting.GREEN));
 	}
 
+	/** PK earned from chores so far (the Tercatat alternative to the realm, 41.6.1). */
+	public static int pkTugas(Keanggotaan k) {
+		return k.bagian("pangkat").getIntOr("pkTugas", 0);
+	}
+
+	/**
+	 * True when the member could start the promotion now: the next rank's requirements all pass, or the trial is the only line
+	 * missing (the hall elder's dialog offers [Ajukan Kenaikan] then). {@code jalurTetua} asks about the elder branch of Inti.
+	 */
+	public static boolean siap(ServerPlayer player, boolean jalurTetua) {
+		Keanggotaan k = GabungApi.anggota(player);
+		if (!k.status.anggota() || UPACARA.containsKey(player.getUUID()) || jalurTetua && k.pangkat != Pangkat.INTI) {
+			return false;
+		}
+		Pangkat tujuan = berikut(k, jalurTetua);
+		if (tujuan == null) {
+			return false;
+		}
+		List<SyaratMasuk.Baris> syarat = syarat(player, tujuan);
+		boolean ok = true;
+		for (SyaratMasuk.Baris b : syarat) {
+			ok &= b.ok();
+		}
+		return ok || hanyaUjian(syarat) && mulaiUjian(tujuan);
+	}
+
 	/** True when the trial of {@code tujuan} was passed (or the rank has none). */
 	public static boolean sudahLulus(Keanggotaan k, Pangkat tujuan) {
 		return ujian(tujuan) == null || k.bagian("pangkat").getBooleanOr("lulus." + tujuan.id(), false);
 	}
 
-	/** True when {@link #ajukan} itself starts the trial of {@code tujuan} (the Luar re-test, the Dalam duel, the Tetua trial). */
+	/** True when {@link #ajukan} itself starts the trial of {@code tujuan} (the Luar re-test, the Dalam duel, the Tetua trial, the elders' count for Wakil). */
 	public static boolean mulaiUjian(Pangkat tujuan) {
 		return tujuan == Pangkat.LUAR || UjianPangkat.punya(tujuan);
 	}
@@ -156,7 +184,7 @@ public final class Promosi {
 		Realm perlu = tujuan.syaratRanah(kelas, tier);
 		Realm punya = Cultivators.get(player).realm();
 		if (tujuan == Pangkat.TERCATAT) {
-			int pkTugas = k.bagian("pangkat").getIntOr("pkTugas", 0);
+			int pkTugas = pkTugas(k);
 			out.add(new SyaratMasuk.Baris(punya.atLeast(perlu) || pkTugas >= PK_TUGAS_TERCATAT, "naik.ranah_atau_tugas",
 					new Object[]{perlu.displayName(), pkTugas, PK_TUGAS_TERCATAT}));
 		} else {
@@ -177,6 +205,10 @@ public final class Promosi {
 		if (kursi > 0) {
 			int dipakai = Kursi.pemegang(server, k.sekte, tujuan).size();
 			out.add(new SyaratMasuk.Baris(dipakai < kursi, "naik.kursi", new Object[]{dipakai, kursi}));
+		}
+		// not confined in the Gua Renungan
+		if (k.kurunganSampai > player.level().getGameTime()) {
+			out.add(new SyaratMasuk.Baris(false, "naik.kurungan", new Object[0]));
 		}
 		// trial
 		String ujian = ujian(tujuan);
@@ -303,11 +335,28 @@ public final class Promosi {
 				if (!k.status.anggota()) {
 					continue;
 				}
+				if (!masihSah(player, k, u.tujuan())) {
+					// the rank, the seat or the place changed during the ceremony: nothing is lost
+					k.pk += u.biaya();
+					GabungData.get(server).setDirty();
+					Msg.chat(player, Component.translatable("kultivator.gabung.naik.batal").withStyle(ChatFormatting.RED));
+					continue;
+				}
 				k.bagian("pangkat").remove("lulus." + u.tujuan().id());
 				GabungApi.setPangkat(player, u.tujuan(), "gabung.naik");
 				Msg.title(player, u.tujuan().nama(), Component.translatable("kultivator.gabung.naik.selesai", Pemeriksa.nama(k.sekte)), 10, 60, 20);
 			}
 		}
+	}
+
+	/** The ceremony may still crown {@code tujuan}: it is the next rank, a seat is free, the member is in the own grounds and not confined. */
+	private static boolean masihSah(ServerPlayer player, Keanggotaan k, Pangkat tujuan) {
+		if (k.pangkat.berikut(false) != tujuan && k.pangkat.berikut(true) != tujuan || !Pemeriksa.diWilayahSendiri(player)
+				|| k.kurunganSampai > player.level().getGameTime()) {
+			return false;
+		}
+		int kursi = tujuan.kursi(GabungApi.kelasSekte(k.sekte));
+		return kursi <= 0 || Kursi.pemegang(player.level().getServer(), k.sekte, tujuan).size() < kursi;
 	}
 
 	/** Stops a running ceremony (logout, leaving); {@code kembalikan} refunds its PK. */

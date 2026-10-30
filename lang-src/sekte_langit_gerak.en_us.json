@@ -51,5 +51,9 @@
 	"kultivator.sekte_langit.gerak.uji.simpul": "Cloud node %s at %s %s %s: %s, within reach of the stele: %s",
 	"kultivator.sekte_langit.gerak.uji.tautan": "  %s -> %s linked: %s",
 	"kultivator.sekte_langit.gerak.uji.tanpa_simpul": "No Cloud Transfer node yet.",
-	"kultivator.sekte_langit.gerak.uji.patroli": "Sword patrol sent: %s disciples."
+	"kultivator.sekte_langit.gerak.uji.patroli": "Sword patrol sent: %s disciples.",
+	"kultivator.sekte_langit.feri.misi": "The Cloud Ferry is seeing off disciples leaving on a mission.",
+	"kultivator.sekte_langit.gerak.uji.feri_misi": "The Cloud Ferry carries the disciples off on a mission (display only).",
+	"kultivator.sekte_langit.gerak.uji.feri_misi.gagal": "The ferry show cannot start: feri and feriMisi must be on, the tier 7 stops complete, a route found, a player within 128 blocks and no other ferry running.",
+	"kultivator.sekte_langit.gerak.uji.feri_misi.tanpa_murid": "None of your disciples is away (mission or journey)."
 }

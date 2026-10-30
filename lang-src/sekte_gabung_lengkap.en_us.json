@@ -1,0 +1,18 @@
+{
+  "kultivator.cerita.gabung_kenaikan.mulai": "Disciple, I have heard of you. Your record is clean and your days are in; the next rank waits only for your petition in the hall. Shall it go in now?",
+  "kultivator.cerita.gabung_kenaikan.mulai.1": "Petition for promotion.",
+  "kultivator.cerita.gabung_kenaikan.mulai.2": "Petition for the Elder path.",
+  "kultivator.cerita.gabung_kenaikan.mulai.3": "Show me the Rank Tree first.",
+  "kultivator.cerita.gabung_kenaikan.mulai.4": "Later.",
+  "kultivator.gabung.naik.batal": "The promotion ceremony is called off: your rank, the seat or your place changed during it. The PK is returned.",
+  "kultivator.gabung.syarat.naik.kurungan": "Not confined in the Reflection Cave",
+  "kultivator.gabung.naik.ujian_wakil.kurang": "Only %s of the %s elders needed stand with you (of %s elders; attitude %s or more). Raise their attitude through lessons, missions or gifts, then ask again.",
+  "kultivator.gabung.naik.ujian_wakil.cukup": "%s of %s elders stand with you. The elders' support is met; petition for your promotion in the hall.",
+  "kultivator.gabung.aturan.paham.mulai": "You had the sect rules read to you before the oath. For %s world days your offences count half.",
+  "kultivator.gabung.ui.kartu.paham": "Knows the rules: offences count half (%s days left)",
+  "kultivator.gabung.turnamen.titipan_nama": "%s (disciple of %s)",
+  "kultivator.gabung.turnamen.titipan_hadiah.1": "Your ward %s won the Disciple Tournament! +%s PK for you.",
+  "kultivator.gabung.turnamen.titipan_hadiah.2": "Your ward %s reached the final of the Disciple Tournament. +%s PK for you.",
+  "kultivator.gabung.turnamen.titipan_hadiah.3": "Your ward %s reached the semi-final of the Disciple Tournament. +%s PK for you.",
+  "kultivator.gabung.turnamen.titipan_hadiah.4": "Your ward %s took part in the Disciple Tournament. +%s PK for you."
+}

@@ -500,6 +500,25 @@ public final class TitahMonuments extends SavedData {
 		data.setDirty();
 	}
 
+	/**
+	 * The owner of the standing block monument that has a cell at {@code pos} (a live, unrevoked record), or null for a free block.
+	 * shortcut: a linear scan of the records' cells, only run when a Batu/Urat Pusaka is mined; index them if records grow into the thousands.
+	 */
+	static @Nullable UUID ownerAt(ServerLevel level, BlockPos pos) {
+		long cell = pos.asLong();
+		for (Planted record : get(level.getServer()).records.values()) {
+			if (record.revoked || !record.dimension.equals(level.dimension())) {
+				continue;
+			}
+			for (long block : record.blocks) {
+				if (block == cell) {
+					return record.owner;
+				}
+			}
+		}
+		return null;
+	}
+
 	private void queueClear(Planted record) {
 		if (record.blocks.length == 0) {
 			return;

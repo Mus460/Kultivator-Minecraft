@@ -5,6 +5,8 @@ import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.data.Realm;
 import dev.kultivator.disciple.DiscipleEntity;
 import dev.kultivator.formasi.FormasiItems;
+import dev.kultivator.formasi.FormationRegistry;
+import dev.kultivator.formasi.SectFormationSlots;
 import dev.kultivator.formasi.keeper.KeeperOrder;
 import dev.kultivator.formasi.spec.Family;
 import dev.kultivator.formasi.spec.Flag;
@@ -341,12 +343,16 @@ final class FormationSlip {
 				Component anchorLabel = Component.translatable("kultivator.formasiui.slip.anchor_n", anchorIndex % anchors.size() + 1, anchors.size());
 				page.talisman(g, cx + half + 3.0F, cursor, half, 14.0F, anchorLabel, true, () -> {
 					CompoundTag anchor = anchors.getCompoundOrEmpty(anchorIndex % anchors.size());
-					anchorIndex++;
-					hologram(spec, new BlockPos(anchor.getIntOr("x", 0), anchor.getIntOr("y", 0), anchor.getIntOr("z", 0)), -1);
+					// The anchor is the carved centre tile; the Mata Formasi (and the pattern's origin) stands one block above it.
+					hologram(spec, new BlockPos(anchor.getIntOr("x", 0), anchor.getIntOr("y", 0) + 1, anchor.getIntOr("z", 0)), -1);
 				}, mouseX, mouseY, List.of(Component.translatable("kultivator.formasiui.slip.anchor.tip")));
 			}
 		}
 		cursor += 17.0F;
+		ListTag anchors = page.f().getListOrEmpty("anchors");
+		if (!anchors.isEmpty() && player != null) {
+			cursor = anchorRow(page, g, font, spec, anchors, lock == null, cx, cursor, cw, top, bottom, mouseX, mouseY);
+		}
 		BlockPos looked = lookedEye();
 		if (looked != null && page.canEdit()) {
 			if (visible(cursor, 14.0F, top, bottom)) {
@@ -412,6 +418,45 @@ final class FormationSlip {
 			line.append(Component.translatable("kultivator.formasiui.slip.live.targets", spec.params().getInt("targets", 0)));
 		}
 		return line;
+	}
+
+	/**
+	 * The Titik Formasi row (DESIGN 24.6.2): picks the spot the hologram and the build act on, queues this pattern on it
+	 * through Pembangunan Sekte (the server checks the owner, the fit and the materials) and says what stands there.
+	 */
+	private static float anchorRow(FormasiPage page, GuiGraphicsExtractor g, Font font, FormationSpec spec, ListTag anchors, boolean unlocked, float cx,
+			float cursor, float cw, float top, float bottom, int mouseX, int mouseY) {
+		float half = (cw - 3.0F) / 2.0F;
+		int shown = anchorIndex % anchors.size();
+		CompoundTag anchor = anchors.getCompoundOrEmpty(shown);
+		int radius = anchor.getIntOr("r", 0);
+		int state = anchor.getIntOr("state", -1);
+		String pola = anchor.getStringOr("pola", "");
+		boolean fits = SectFormationSlots.fits(spec, radius);
+		// Nothing started yet: no request, or one that still waits in the queue or was skipped (the server replaces it).
+		boolean open = state < 0 || state == 0 || state == 1 || state == 5;
+		String why = !page.canEdit() ? "owner" : !unlocked ? "lock" : !fits ? "fit" : !open ? "started" : null;
+		if (visible(cursor, 14.0F, top, bottom)) {
+			page.talisman(g, cx, cursor, half, 14.0F, Component.translatable("kultivator.formasiui.slip.anchor_next"), anchors.size() > 1,
+					() -> anchorIndex = (anchorIndex + 1) % anchors.size(), mouseX, mouseY,
+					List.of(Component.translatable("kultivator.formasiui.slip.anchor_next.tip")));
+			List<Component> tip = new ArrayList<>();
+			tip.add(Component.translatable("kultivator.formasiui.slip.build.tip"));
+			if (why != null) {
+				tip.add(Component.translatable("kultivator.formasiui.slip.build.why." + why));
+			}
+			LocalPlayer player = Minecraft.getInstance().player;
+			page.talisman(g, cx + half + 3.0F, cursor, half, 14.0F, Component.translatable("kultivator.formasiui.slip.build", shown + 1), why == null,
+					() -> page.send("pola:" + anchor.getStringOr("id", "") + ":" + spec.id() + ":" + (player == null ? 0 : PatternHologram.facingRotation(player))),
+					mouseX, mouseY, tip);
+		}
+		cursor += 17.0F;
+		FormationSpec built = pola.isEmpty() ? null : FormationRegistry.byId(pola);
+		Component stands = built == null ? Component.translatable("kultivator.formasiui.slip.spot.empty")
+				: Component.translatable("kultivator.formasiui.slip.spot.pola", built.name(), Component.translatable("kultivator.formasiui.slip.spot.state." + state));
+		Component status = Component.translatable("kultivator.formasiui.slip.spot", shown + 1, radius, anchor.getIntOr("tier", 0), stands);
+		cursor += drawWrap(g, font, status, cx, cursor, cw, fits ? Palette.INK_SOFT : Palette.DANGER, 0.5F, top, bottom) + 3.0F;
+		return cursor;
 	}
 
 	/** Shows the hologram and closes the Gulungan so it can be seen (on purpose, 43.13 R32; the action bar says why). */

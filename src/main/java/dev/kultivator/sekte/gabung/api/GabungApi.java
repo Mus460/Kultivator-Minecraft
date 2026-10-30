@@ -213,8 +213,10 @@ public final class GabungApi {
 			return;
 		}
 		int sebelum = k.pelanggaran;
-		k.pelanggaran = Math.min(Aturan.MAKS, k.pelanggaran + aturan.poin());
-		k.catat(Kota.day(server), "kultivator.gabung.riwayat.langgar", aturan.id(), Integer.toString(aturan.poin()));
+		// the week of the member who read the rules at the gate (PahamAturan): half the points
+		int poin = dev.kultivator.sekte.gabung.PahamAturan.poin(k, Kota.day(server), aturan == Aturan.A2, aturan.poin());
+		k.pelanggaran = Math.min(Aturan.MAKS, k.pelanggaran + poin);
+		k.catat(Kota.day(server), "kultivator.gabung.riwayat.langgar", aturan.id(), Integer.toString(poin));
 		data.setDirty();
 		for (Penegak p : PENEGAK) {
 			try {
@@ -276,6 +278,7 @@ public final class GabungApi {
 			Advancements.grant(player, "sekte/gabung_kembali");
 		}
 		advPangkat(player, pangkat);
+		dev.kultivator.sekte.gabung.PahamAturan.saatMasuk(player, k);
 		GabungPayloads.siarkanLencana(player);
 		GabungBus.DITERIMA.invoker().onDiterima(player, sekte, pangkat);
 	}

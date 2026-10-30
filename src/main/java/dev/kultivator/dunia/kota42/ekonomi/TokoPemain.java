@@ -9,6 +9,7 @@ import dev.kultivator.dunia.kota42.KotaConfig;
 import dev.kultivator.dunia.kota42.KotaHidup;
 import dev.kultivator.dunia.kota42.api.Kategori;
 import dev.kultivator.dunia.kota42.api.WargaApi;
+import dev.kultivator.dunia.kota42.sekte.PapanCabangBlock;
 import dev.kultivator.dunia.kota42.warga.Warga;
 import dev.kultivator.dunia.tempat.TempatApi;
 import dev.kultivator.dunia.tempat.TempatInfo;
@@ -23,15 +24,13 @@ import dev.kultivator.dunia.tempat.ekonomi.LapakSekte;
 import dev.kultivator.dunia.tempat.ekonomi.RumahUang;
 import dev.kultivator.dunia.tempat.hidup.HidupApi;
 import dev.kultivator.dunia.tempat.ui.LembarKunci;
-import dev.kultivator.sect.Sect;
-import dev.kultivator.sect.SectData;
 import dev.kultivator.sect.hall.Halls;
 import dev.kultivator.sosok.GerakId;
 import dev.kultivator.sosok.PropId;
 import dev.kultivator.sosok.SosokApi;
 import dev.kultivator.util.Advancements;
+import dev.kultivator.util.Kepemilikan;
 import dev.kultivator.util.Msg;
-import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.UUIDUtil;
@@ -43,7 +42,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.permissions.Permissions;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
@@ -123,18 +121,22 @@ public final class TokoPemain {
 		initialised = true;
 		Halls.addReturnHandler(MURID_ALASAN, (level, owner, stored, info) -> null);
 		// breaking a rack drops its whole stock at the breaker's feet: only the shop owner, a sect mate, an op or a creative player may
-		PlayerBlockBreakEvents.BEFORE.register((level, player, pos, state, blockEntity) -> {
-			if (!(blockEntity instanceof RakDagangBlockEntity rak) || !(player instanceof ServerPlayer sp) || rak.pemilik() == null
-					|| sp.isCreative() || rak.pemilik().equals(sp.getUUID()) || sp.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER)) {
-				return true;
+		Kepemilikan.jaga(KotaEkonomiBlocks.RAK_DAGANG, (level, pos, entity) -> entity instanceof RakDagangBlockEntity rak ? rak.pemilik() : null,
+				"kultivator.kota42.toko.gagal.rak_milik");
+		// the shop sign, the cashier counter (owned by the shop whose house or stall holds it) and the branch sign are owned the same way
+		// a sign inside a shop answers to the shop's owner (a stranger's sign in it can be pulled down), else to whoever put it up
+		Kepemilikan.jaga(KotaEkonomiBlocks.PAPAN_NAMA_TOKO, (level, pos, entity) -> {
+			Toko toko = di(level, pos);
+			if (toko == null) {
+				toko = di(level, pos.below());
 			}
-			Sect sect = SectData.get(sp.level().getServer()).sectOf(rak.pemilik());
-			if (sect != null && sect.isMember(sp.getUUID())) {
-				return true;
-			}
-			gagal(sp, "rak_milik");
-			return false;
-		});
+			return toko != null ? toko.pemilik() : entity instanceof PapanNamaTokoBlock.Isi isi ? isi.pemilik() : null;
+		}, null);
+		Kepemilikan.jaga(KotaEkonomiBlocks.MEJA_KASIR, (level, pos, entity) -> {
+			Toko toko = di(level, pos);
+			return toko == null ? null : toko.pemilik();
+		}, null);
+		Kepemilikan.jaga(KotaEkonomiBlocks.PAPAN_CABANG, (level, pos, entity) -> entity instanceof PapanCabangBlock.Isi isi ? isi.pemilik() : null, null);
 	}
 
 	static void lupakan() {

@@ -30,6 +30,10 @@ public final class PusakaLangit {
 
 	public static void init() {
 		TitahItems.init();
+		// the stones of a planted weapon's block monument break only for the one who planted it (or a sect mate, an op, a creative player)
+		dev.kultivator.util.Kepemilikan.Pemilik cells = (level, pos, entity) -> TitahMonuments.ownerAt(level, pos);
+		dev.kultivator.util.Kepemilikan.jaga(TitahItems.BATU_PUSAKA, cells, "kultivator.kepemilikan.pusaka_titah");
+		dev.kultivator.util.Kepemilikan.jaga(TitahItems.URAT_PUSAKA, cells, "kultivator.kepemilikan.pusaka_titah");
 		ServerTickEvents.END_SERVER_TICK.register(server -> {
 			try {
 				TitahMonuments.tick(server);

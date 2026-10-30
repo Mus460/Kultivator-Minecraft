@@ -4,6 +4,7 @@ import dev.kultivator.disciple.DiscipleEntity;
 import dev.kultivator.disciple.Disciples;
 import dev.kultivator.formasi.core.CoreView;
 import dev.kultivator.formasi.effect.b.TransportNetwork;
+import dev.kultivator.sect.hall.Halls;
 import dev.kultivator.sekte.langit.api.SkyHallView;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -16,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * The movement half of {@code /kultivasi uji langit_sekte ...} (DESIGN 37.7.9; the command tree itself is 37G's
@@ -95,6 +97,25 @@ public final class GerakUji {
 	public static Component feri(ServerPlayer player) {
 		Component why = FeriPanggil.callNear(player);
 		return why != null ? why : Component.translatable("kultivator.sekte_langit.gerak.uji.feri");
+	}
+
+	/** {@code feri_misi}: the mission show now, with up to four of the hall's disciples that are away (any reason). */
+	public static Component feriMisi(ServerPlayer player) {
+		SkyHallView hall = hallOf(player);
+		if (hall == null) {
+			return Component.translatable("kultivator.sekte_langit.feri.bukan_langit");
+		}
+		List<UUID> souls = new ArrayList<>();
+		for (Halls.AwayView away : Halls.away(hall.owner())) {
+			if (souls.size() < FeriAwanEntity.SEATS) {
+				souls.add(away.soul());
+			}
+		}
+		if (souls.isEmpty()) {
+			return Component.translatable("kultivator.sekte_langit.gerak.uji.feri_misi.tanpa_murid");
+		}
+		return Component.translatable(FeriAwanEntity.misi(player.level(), hall.owner(), souls) ? "kultivator.sekte_langit.gerak.uji.feri_misi"
+				: "kultivator.sekte_langit.gerak.uji.feri_misi.gagal");
 	}
 
 	/** {@code formasi}: the tester's Cloud Transfer nodes and whether each pair links. */

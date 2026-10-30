@@ -89,7 +89,7 @@ public final class SiteDiagram {
 		if (k.contains("wall") || k.contains("boundary")) {
 			return WALL;
 		}
-		if (k.contains("disc") || k.contains("formation")) {
+		if (k.contains("disc") || k.contains("formation") || k.contains("formasi")) {
 			return DISC;
 		}
 		if (k.contains("peak") || k.contains("hill") || k.contains("rock")) {

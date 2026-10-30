@@ -140,7 +140,7 @@
 	"kultivator.formasiui.slip.front.tip": "Menampilkan pola di blok yang kamu lihat, atau 4 blok di depan, menghadap menjauhimu.",
 	"kultivator.formasiui.slip.anchor": "Di Titik Formasi…",
 	"kultivator.formasiui.slip.anchor_n": "Titik Formasi %s/%s",
-	"kultivator.formasiui.slip.anchor.tip": "Menampilkan pola di salah satu Titik Formasi cetak biru aula. Klik lagi untuk titik berikutnya.",
+	"kultivator.formasiui.slip.anchor.tip": "Menampilkan pola di Titik Formasi terpilih milik aulamu. Pilih titik lain dengan tombol di bawah.",
 	"kultivator.formasiui.slip.target": "Tuju pola ini di mata formasi yang kulihat",
 	"kultivator.formasiui.slip.target.tip": "Menetapkan pola sasaran Mata Formasi yang sedang kamu lihat, sehingga hologram dan pemeriksaannya mengikuti formasi ini.",
 
@@ -165,5 +165,23 @@
 	"kultivator.formasiui.holo.reading": "Membaca blok...",
 
 	"kultivator.screen.help.formasi_pola.title": "Pola formasi dan hologram",
-	"kultivator.screen.help.formasi_pola": "Setiap formasi adalah pola dari blok biasa di sekeliling Mata Formasi. Kitab di tablet Formasi menampilkan setiap pola sebagai irisan per lapis beserta daftar bahannya. Lihat Pola (atau /kultivasi formasi pola <id> [utara|timur|selatan|barat] [menit]) memunculkan hologram di dunia: lapis yang sedang dibangun tampak tegas, lapis di atasnya samar, lapis yang selesai berwarna hijau. Kubus emas adalah blok yang kurang, silang merah adalah blok yang salah, abu-abu berarti chunk belum termuat; enam blok kurang yang terdekat menampilkan namanya. Jongkok sambil melihat mata formasi menampilkan polanya sebentar. Hologram hanya membaca blok dan tidak pernah memasang apa pun; ia berakhir setelah menitnya habis, lebih jauh dari 64 blok, saat berganti dimensi, atau dengan /kultivasi formasi pola mati. Pola bertanda 'menghadap utara sejati' tidak bisa diputar. Formasi pembunuh hanya melukai monster yang bermusuhan, dalam batas pembunuhan, dan perpindahan tidak pernah lintas dimensi. Papan nama yang disembunyikan formasi penyembunyi hanyalah tampilan: daftar pemain dan locator bar tetap menampilkan pemain. Sumber: A Record of a Mortal's Journey to Immortality (RMJ), Investiture of the Gods bab 44-50 dan 82, Desolate Era Buku 8."
+	"kultivator.screen.help.formasi_pola": "Setiap formasi adalah pola dari blok biasa di sekeliling Mata Formasi. Kitab di tablet Formasi menampilkan setiap pola sebagai irisan per lapis beserta daftar bahannya. Lihat Pola (atau /kultivasi formasi pola <id> [utara|timur|selatan|barat] [menit]) memunculkan hologram di dunia: lapis yang sedang dibangun tampak tegas, lapis di atasnya samar, lapis yang selesai berwarna hijau. Kubus emas adalah blok yang kurang, silang merah adalah blok yang salah, abu-abu berarti chunk belum termuat; enam blok kurang yang terdekat menampilkan namanya. Jongkok sambil melihat mata formasi menampilkan polanya sebentar. Hologram hanya membaca blok dan tidak pernah memasang apa pun; ia berakhir setelah menitnya habis, lebih jauh dari 64 blok, saat berganti dimensi, atau dengan /kultivasi formasi pola mati. Pola bertanda 'menghadap utara sejati' tidak bisa diputar. Formasi pembunuh hanya melukai monster yang bermusuhan, dalam batas pembunuhan, dan perpindahan tidak pernah lintas dimensi. Papan nama yang disembunyikan formasi penyembunyi hanyalah tampilan: daftar pemain dan locator bar tetap menampilkan pemain. Sumber: A Record of a Mortal's Journey to Immortality (RMJ), Investiture of the Gods bab 44-50 dan 82, Desolate Era Buku 8.",
+	"kultivator.formasiui.slip.anchor_next": "Titik berikutnya",
+	"kultivator.formasiui.slip.anchor_next.tip": "Memilih Titik Formasi berikutnya untuk hologram dan pembangunan.",
+	"kultivator.formasiui.slip.build": "Bangun di Titik %s",
+	"kultivator.formasiui.slip.build.tip": "Membangun pola ini di titik terpilih lewat Pembangunan Sekte: bahan diambil dari gudang sekte, menghadap arah yang kamu hadapi. Mata formasi dan hati yang mahal dibiarkan kosong, dan pola dipasang tidak menyala.",
+	"kultivator.formasiui.slip.build.why.owner": "Hanya pemilik aula yang bisa membangun pola.",
+	"kultivator.formasiui.slip.build.why.lock": "Pola ini masih terkunci di tingkat aulamu.",
+	"kultivator.formasiui.slip.build.why.fit": "Pola ini terlalu besar untuk titik terpilih.",
+	"kultivator.formasiui.slip.build.why.started": "Pola di titik ini sudah dibangun atau sedang dibangun.",
+	"kultivator.formasiui.slip.spot": "Titik %1$s · jari-jari %2$s · tahap %3$s · %4$s",
+	"kultivator.formasiui.slip.spot.empty": "kosong",
+	"kultivator.formasiui.slip.spot.pola": "%1$s (%2$s)",
+	"kultivator.formasiui.slip.spot.state.0": "menunggu tahap",
+	"kultivator.formasiui.slip.spot.state.1": "dalam antrean",
+	"kultivator.formasiui.slip.spot.state.2": "sedang dibangun",
+	"kultivator.formasiui.slip.spot.state.3": "selesai, belum menyala",
+	"kultivator.formasiui.slip.spot.state.4": "terhalang",
+	"kultivator.formasiui.slip.spot.state.5": "dilewati",
+	"kultivator.formasiui.slip.spot.state.6": "menunggu chunk"
 }

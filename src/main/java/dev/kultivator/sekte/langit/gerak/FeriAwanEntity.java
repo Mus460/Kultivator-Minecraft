@@ -3,9 +3,13 @@ package dev.kultivator.sekte.langit.gerak;
 import dev.kultivator.disciple.DiscipleEntity;
 import dev.kultivator.disciple.Disciples;
 import dev.kultivator.dunia.DuniaTickets;
+import dev.kultivator.fx.Fx;
 import dev.kultivator.sekte.langit.api.LangitConfig;
 import dev.kultivator.sekte.langit.api.LangitIds;
 import dev.kultivator.sekte.langit.api.SkyHallView;
+import dev.kultivator.sekte.mandiri.jalan.Jelmaan;
+import dev.kultivator.sosok.GerakId;
+import dev.kultivator.sosok.SosokApi;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
 import dev.kultivator.util.Sibuk;
@@ -61,6 +65,11 @@ import java.util.concurrent.ConcurrentHashMap;
  * dissolves.</li>
  * </ul>
  * Busy players ({@code Sibuk.why}) are refused at boarding. No block is touched.
+ * <p>
+ * <b>Mission show</b> (37G, {@code langit.feriMisi}, {@link #misi}): a team the hall sends on an outside mission is already in
+ * {@code AwayStore}, so a ferry appears at the sky stop with their stage bodies ({@code Jelmaan.pinjam}) on its deck, they bow, sit
+ * and ride down to the ground stop, step off, bow again and vanish in a puff. Disciples cannot ride entities, so the bodies are
+ * placed on their seats every tick (no real passenger), never saved, never real. Only while a player is within 128 blocks.
  */
 public class FeriAwanEntity extends Entity {
 
@@ -100,6 +109,11 @@ public class FeriAwanEntity extends Entity {
 	private long boardedAt = -1L;
 	private int fade;
 	private final Set<UUID> riders = new HashSet<>();
+	/** Mission show: the stage bodies on the deck (empty on a real ferry). */
+	private final List<DiscipleEntity> tamu = new ArrayList<>();
+	private boolean misi;
+	/** Mission show: {@code tickCount} at which the guests walk off after arriving, or -1. */
+	private int tamuPergi = -1;
 
 	public FeriAwanEntity(EntityType<? extends FeriAwanEntity> type, Level level) {
 		super(type, level);
@@ -195,8 +209,114 @@ public class FeriAwanEntity extends Entity {
 		return null;
 	}
 
+	/**
+	 * 37G: the team {@code team} of {@code owner}'s hall was just sent on a mission (its members are in {@code AwayStore}): a ferry
+	 * shows them leaving, from the sky stop down to the ground stop. A show only: false (nothing happens) when the feature is off,
+	 * the hall has no ferry or no route, a real ferry of the hall is out, the stop is not loaded or no player is within 128 blocks.
+	 */
+	public static boolean misi(ServerLevel level, UUID owner, List<UUID> team) {
+		LangitConfig cfg = LangitConfig.get();
+		if (!LangitConfig.on() || !cfg.feri || !cfg.feriMisi || team.isEmpty()) {
+			return false;
+		}
+		SkyHallView hall = LangitGerak.hallIn(level, owner);
+		BlockPos topStop = LangitGerak.anchor(owner, FeriPanggil.TOP);
+		BlockPos bottomStop = FeriPanggil.bottomStop(owner);
+		if (hall == null || hall.tethered() || hall.tier() < FeriPanggil.MIN_TIER || topStop == null || bottomStop == null
+				|| LangitGerak.busy(level.getServer())) {
+			return false;
+		}
+		FeriAwanEntity live = LIVE.get(owner);
+		if (live != null && !live.isRemoved() && live.level() == level) {
+			return false;
+		}
+		FeriRute rute = FeriRute.plan(hall, bottomStop, topStop, level.getMaxY());
+		if (rute == null) {
+			return false;
+		}
+		Vec3 stop = rute.end();
+		BlockPos at = BlockPos.containing(stop);
+		boolean watched = false;
+		for (ServerPlayer player : level.players()) {
+			watched |= !player.isSpectator() && player.distanceToSqr(stop) <= 128.0D * 128.0D;
+		}
+		if (!watched || !level.isLoaded(at)) {
+			return false;
+		}
+		FeriAwanEntity ferry = new FeriAwanEntity(LangitGerakEntities.FERI, level);
+		ferry.owner = owner;
+		ferry.route = rute;
+		ferry.top = true;
+		ferry.misi = true;
+		ferry.waitLeft = WAIT_TICKS;
+		ferry.setPos(stop.x, stop.y, stop.z);
+		float yaw = rute.yawAt(rute.length());
+		ferry.setYRot(Float.isNaN(yaw) ? 0.0F : yaw);
+		for (UUID soul : team) {
+			if (ferry.tamu.size() >= SEATS) {
+				break;
+			}
+			DiscipleEntity body = Jelmaan.pinjam(level, owner, soul, at);
+			if (body == null) {
+				continue;
+			}
+			body.setNoAi(true);
+			body.setNoGravity(true);
+			ferry.tamu.add(body);
+		}
+		if (ferry.tamu.isEmpty() || !level.addFreshEntity(ferry)) {
+			ferry.lepasTamu(false);
+			return false;
+		}
+		LIVE.put(owner, ferry);
+		ferry.boardedAt = level.getGameTime();
+		ferry.seatTamu(true);
+		for (DiscipleEntity body : ferry.tamu) {
+			SosokApi.gerak(body, GerakId.HORMAT, GerakId.V_HORMAT_BAOQUAN, 60);
+		}
+		LangitGerak.fx(level, LangitIds.FX_FERI, at, at);
+		level.playSound(null, stop.x, stop.y, stop.z, SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.NEUTRAL, 1.0F, 0.9F);
+		return true;
+	}
+
+	/** Mission show: the guests on their seats ({@code deck}) or standing on the stop's floor, turned the ferry's way. */
+	private void seatTamu(boolean deck) {
+		double yaw = Math.toRadians(getYRot());
+		for (int i = 0; i < tamu.size() && i < SEAT.length; i++) {
+			DiscipleEntity body = tamu.get(i);
+			if (body.isRemoved()) {
+				continue;
+			}
+			double x = SEAT[i][0] * Math.cos(yaw) - SEAT[i][1] * Math.sin(yaw);
+			double z = SEAT[i][0] * Math.sin(yaw) + SEAT[i][1] * Math.cos(yaw);
+			body.setPos(getX() + x, deck ? getY() + SEAT_Y : getY() - FeriRute.HOVER + 0.02D, getZ() + z);
+			body.setDeltaMovement(Vec3.ZERO);
+			body.fallDistance = 0.0D;
+			body.setYRot(getYRot());
+			body.setYBodyRot(getYRot());
+			body.setYHeadRot(getYRot());
+		}
+	}
+
+	/** Mission show: the guests are gone (they walked off, or the ferry was removed), with a puff. */
+	private void lepasTamu(boolean puff) {
+		for (DiscipleEntity body : tamu) {
+			if (!body.isRemoved()) {
+				if (puff && body.level() instanceof ServerLevel level) {
+					Fx.burst(level, body.position().add(0.0D, 1.0D, 0.0D), 0xD8C8A8, 10, 0.6F);
+				}
+				body.discard();
+			}
+		}
+		tamu.clear();
+		tamuPergi = -1;
+	}
+
 	/** The hall's ferry was called again: wait longer where it is, or come over empty. */
 	private @Nullable Component recall(FeriRute rute, boolean wantTop) {
+		if (misi) {
+			return Component.translatable("kultivator.sekte_langit.feri.misi");
+		}
 		this.route = rute;
 		if (phase() == PHASE_TRAVEL) {
 			return Component.translatable("kultivator.sekte_langit.feri.jalan");
@@ -387,6 +507,10 @@ public class FeriAwanEntity extends Entity {
 			setPos(stop.x, stop.y, stop.z);
 		}
 		setSpeed(0.0F);
+		if (!tamu.isEmpty()) {
+			tickTamu(level);
+			return;
+		}
 		if (!getPassengers().isEmpty()) {
 			if (boardedAt >= 0L && level.getGameTime() - boardedAt >= DEPART_AFTER_BOARD && !LangitGerak.busy(level.getServer())) {
 				boardFollowers(level);
@@ -398,6 +522,25 @@ public class FeriAwanEntity extends Entity {
 		if (--waitLeft <= 0) {
 			setPhase(PHASE_FADE);
 			fade = 0;
+		}
+	}
+
+	/** Mission show at a stop: the guests bow, then the ferry leaves; after arriving they bow again and walk off. */
+	private void tickTamu(ServerLevel level) {
+		if (tamuPergi >= 0) {
+			seatTamu(false);
+			if (tickCount >= tamuPergi) {
+				lepasTamu(true);
+				waitLeft = 40;
+			}
+			return;
+		}
+		seatTamu(true);
+		if (boardedAt >= 0L && level.getGameTime() - boardedAt >= DEPART_AFTER_BOARD && !LangitGerak.busy(level.getServer())) {
+			for (DiscipleEntity body : tamu) {
+				SosokApi.gerak(body, GerakId.DUDUK_LANTAI, 0, 0);
+			}
+			depart();
 		}
 	}
 
@@ -462,6 +605,9 @@ public class FeriAwanEntity extends Entity {
 		travelled = next;
 		setPos(target.x, target.y, target.z);
 		setSpeed((float) SPEED);
+		if (!tamu.isEmpty()) {
+			seatTamu(true);
+		}
 		keepRiders(level);
 		if (travelled >= length - 1.0E-6D) {
 			arrive(level);
@@ -489,9 +635,17 @@ public class FeriAwanEntity extends Entity {
 		top = !top;
 		setSpeed(0.0F);
 		setPhase(PHASE_WAIT);
-		waitLeft = EMPTY_TICKS;
+		waitLeft = misi ? 100 : EMPTY_TICKS;
 		boardedAt = -1L;
 		riders.clear();
+		if (!tamu.isEmpty()) {
+			// the show's guests step down to the floor, bow and leave 2.5 s later
+			tamuPergi = tickCount + 50;
+			seatTamu(false);
+			for (DiscipleEntity body : tamu) {
+				SosokApi.gerak(body, GerakId.HORMAT, GerakId.V_HORMAT_BAOQUAN, 40);
+			}
+		}
 		BlockPos at = blockPosition();
 		LangitGerak.fx(level, LangitIds.FX_FERI, at, at);
 		level.playSound(null, getX(), getY(), getZ(), SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.NEUTRAL, 1.0F, 0.9F);
@@ -529,6 +683,7 @@ public class FeriAwanEntity extends Entity {
 
 	@Override
 	public void onRemoval(Entity.RemovalReason reason) {
+		lepasTamu(true);
 		if (owner != null && LIVE.get(owner) == this) {
 			LIVE.remove(owner);
 		}

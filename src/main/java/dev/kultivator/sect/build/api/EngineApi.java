@@ -257,18 +257,18 @@ public interface EngineApi {
 	// ================================================================== phase 7c Titik Formasi (DESIGN 24.6.2, 24.13 item 8)
 
 	/**
-	 * The owner's built Titik Formasi anchors ({@code formasi_<n>}), empty until P6b-cetak fills this (slip allowed). No
-	 * sect template emits a {@code formasi_<n>} anchor yet (only the legacy {@code formation} disc), so nothing can be read
-	 * here without the engine; the Kitab slip hides its "Di Titik Formasi" talisman while this list is empty.
+	 * The owner's finished Titik Formasi anchors ({@code formasi_<n>}, the plots of {@code FormasiTitik} that the site has
+	 * built), with the pattern requested on each; empty without a site or while none is built (templates 1-4 have none). The
+	 * Kitab slip hides its "Di Titik Formasi" talisman while this list is empty.
 	 */
 	default List<FormasiAnchor> formasiAnchors(UUID owner) {
 		return List.of();
 	}
 
 	/**
-	 * Optional: asks the engine to build {@code specId}'s pattern ({@code Pattern.emit(rot)}) at anchor {@code anchorId} as
-	 * a {@code FORMASI_PATTERN} component, inside the confirmed footprint only and placed inactive. Null when queued, else
-	 * why not (the default: unavailable).
+	 * Asks the engine to build {@code specId}'s pattern at anchor {@code anchorId} (world rotation {@code rot}, clockwise
+	 * quarter turns) as a {@code FORMASI_PATTERN} component, inside the confirmed footprint only and placed inactive (the eye
+	 * and any costly heart stay empty sockets). Null when queued, else why not (the default: unavailable).
 	 */
 	default @Nullable Component requestPattern(UUID owner, String anchorId, String specId, int rot) {
 		return Component.translatable(UNAVAILABLE_KEY);

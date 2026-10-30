@@ -51,5 +51,9 @@
 	"kultivator.sekte_langit.gerak.uji.simpul": "Simpul awan %s di %s %s %s: %s, dalam jangkauan prasasti: %s",
 	"kultivator.sekte_langit.gerak.uji.tautan": "  %s -> %s tertaut: %s",
 	"kultivator.sekte_langit.gerak.uji.tanpa_simpul": "Belum ada simpul Formasi Pindah Awan.",
-	"kultivator.sekte_langit.gerak.uji.patroli": "Patroli pedang dikirim: %s murid."
+	"kultivator.sekte_langit.gerak.uji.patroli": "Patroli pedang dikirim: %s murid.",
+	"kultivator.sekte_langit.feri.misi": "Feri Awan sedang mengantar murid yang berangkat misi.",
+	"kultivator.sekte_langit.gerak.uji.feri_misi": "Feri Awan mengantar murid berangkat misi (hanya tampilan).",
+	"kultivator.sekte_langit.gerak.uji.feri_misi.gagal": "Tampilan feri tidak bisa dimulai: feri dan feriMisi harus aktif, halte tingkat 7 lengkap, rute ada, pemain dalam 128 blok dan tidak ada feri lain yang berjalan.",
+	"kultivator.sekte_langit.gerak.uji.feri_misi.tanpa_murid": "Tak ada muridmu yang sedang pergi (misi atau perjalanan)."
 }

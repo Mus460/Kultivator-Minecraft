@@ -235,6 +235,8 @@ public final class GabungLembar {
 		public static final String KAKAK = "kakak";
 		public static final String SAINGAN = "saingan";
 		public static final String PELANGGARAN = "pelanggaran";
+		/** World days left of the week after joining in which the rules read at the gate halve the offence points (0 = none). */
+		public static final String ATURAN = "aturan";
 		public static final String TUGAS = "tugas";
 		public static final String TUGAS_MAKS = "tugas_maks";
 		public static final String JATAH = "jatah";

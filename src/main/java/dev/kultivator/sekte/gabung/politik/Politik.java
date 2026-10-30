@@ -427,6 +427,7 @@ public final class Politik {
 			return Component.translatable(KEY + "titipan.pk", biaya);
 		}
 		k.muridTitipan.add(murid.soulId());
+		dev.kultivator.sekte.gabung.hidup.MuridTitipan.didaftar(player, sekte);
 		GabungData.get(player.level().getServer()).setDirty();
 		player.sendSystemMessage(Component.translatable(KEY + "titipan.terdaftar", murid.getName(), DiplomasiGabung.nama(player.level().getServer(), sekte))
 				.withStyle(ChatFormatting.GREEN));

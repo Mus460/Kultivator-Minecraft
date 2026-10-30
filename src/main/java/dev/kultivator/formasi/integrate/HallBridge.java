@@ -173,6 +173,33 @@ public final class HallBridge {
 			Formasi.setTarget(player, level, pos, parts[4]);
 			refresh(player);
 		});
+		// 6b Titik Formasi (DESIGN 24.6.2 B): "pola:<anchorId>:<specId>:<rot>" lays the pattern on an anchor through the build engine.
+		Formasi.addActionHandler("pola", (player, text) -> {
+			String[] parts = text.split(":");
+			UUID owner = Halls.viewedOwner(player);
+			if (parts.length < 4) {
+				return;
+			}
+			if (!owner.equals(player.getUUID())) {
+				Msg.chat(player, Component.translatable("kultivator.formasi.not_owner").withStyle(ChatFormatting.RED));
+				return;
+			}
+			FormationSpec spec = FormationRegistry.byId(parts[2]);
+			FormasiAnchor anchor = null;
+			for (FormasiAnchor each : SectBuildBridge.anchors(owner)) {
+				if (each.id().equals(parts[1])) {
+					anchor = each;
+				}
+			}
+			if (spec == null || anchor == null) {
+				Msg.chat(player, Component.translatable("kultivator.formasi.pola.bad").withStyle(ChatFormatting.RED));
+				return;
+			}
+			Component why = SectBuildBridge.request(owner, anchor, spec, parseInt(parts[3]));
+			Msg.chat(player, why != null ? why.copy().withStyle(ChatFormatting.YELLOW)
+					: Component.translatable("kultivator.formasi.pola.queued", spec.name(), anchor.id()).withStyle(ChatFormatting.GREEN));
+			refresh(player);
+		});
 		ProtectiveFormations.addDrainExemption(HallBridge::shieldRunning);
 	}
 
@@ -336,6 +363,8 @@ public final class HallBridge {
 			tag.putInt("z", anchor.centre().getZ());
 			tag.putInt("r", anchor.radius());
 			tag.putInt("tier", anchor.tier());
+			tag.putString("pola", anchor.pola());
+			tag.putInt("state", anchor.state());
 			anchors.add(tag);
 		}
 		out.put("anchors", anchors);

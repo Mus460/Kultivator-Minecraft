@@ -1090,5 +1090,19 @@
   "kultivator.sekte.mandiri.jalan.kisah.berkelana.2.ok.2": "At the journey's end, %1$s found a small nameless shrine and swept it before leaving.",
   "kultivator.sekte.mandiri.jalan.kisah.berkelana.2.gagal.0": "%1$s headed home early; its feet were tired and it missed the sect.",
   "kultivator.sekte.mandiri.jalan.kisah.berkelana.2.gagal.1": "%1$s turned back halfway; its heart wanted home more than the edge of the world.",
-  "kultivator.sekte.mandiri.jalan.kisah.berkelana.2.gagal.2": "The provisions ran out sooner than planned; %1$s headed home with a growling stomach."
+  "kultivator.sekte.mandiri.jalan.kisah.berkelana.2.gagal.2": "The provisions ran out sooner than planned; %1$s headed home with a growling stomach.",
+  "kultivator.sekte.mandiri.jalan.moda.teleport": "Teleport Station",
+  "kultivator.sekte.mandiri.jalan.kisah.berangkat.kota.teleport": "%1$s walks to the nearest teleport station and pays the fare to %3$s %2$s Town; a moment later it is already there.",
+  "kultivator.sekte.mandiri.jalan.kisah.berangkat.kota.teleport.0": "%1$s walks to the nearest teleport disc to reach %3$s %2$s Town; the fare for both ways is paid up front.",
+  "kultivator.sekte.mandiri.jalan.kisah.berangkat.kota.teleport.1": "With two pouches of fare tucked in a sleeve, %1$s heads for the teleport station and %3$s %2$s Town.",
+  "kultivator.sekte.mandiri.jalan.kisah.berangkat.kota.teleport.2": "%1$s will not walk that far: the teleport station first, then %3$s %2$s Town.",
+  "kultivator.sekte.mandiri.jalan.harian.berangkat.kota.teleport": "The road to %3$s %2$s Town is too long for me. I take the teleport station and pay the fare both ways; my purse is thinner, my feet are saved.",
+  "kultivator.sekte.mandiri.jalan.harian.berangkat.kota.teleport.0": "The road to %3$s %2$s Town is too long for me. I take the teleport station and pay the fare both ways; my purse is thinner, my feet are saved.",
+  "kultivator.sekte.mandiri.jalan.harian.berangkat.kota.teleport.1": "This morning I took my leave for the teleport station. %3$s %2$s Town is only a cup of tea away, if the fare is enough.",
+  "kultivator.sekte.mandiri.jalan.harian.berangkat.kota.teleport.2": "They say walking tempers a person. Maybe, but today I temper only my purse: teleport to %3$s %2$s Town.",
+  "kultivator.sekte.mandiri.jalan.harian.berangkat.kota.teleport.3": "I walked a little to the teleport disc. From there %3$s %2$s Town is one blink away.",
+  "kultivator.sekte.mandiri.jalan.kisah.teleport.pergi": "%1$s hands %4$s NB to the Formation Keeper, stands on the disc and vanishes in a jade glow; the next moment it is in %3$s %2$s Town.",
+  "kultivator.sekte.mandiri.jalan.kisah.teleport.pulang": "%1$s pays the fare home, seals its hands over the disc and steps out of the jade glow in %3$s %2$s Town.",
+  "kultivator.sekte.mandiri.jalan.harian.teleport.pergi": "The teleport disc hums under my feet. Six hand seals, a jade glow, and I stand in %3$s %2$s Town. The fare was %4$s NB a head.",
+  "kultivator.sekte.mandiri.jalan.harian.teleport.pulang": "Home by the teleport disc to %3$s %2$s Town. My stomach still feels tossed about, but my legs are whole."
 }

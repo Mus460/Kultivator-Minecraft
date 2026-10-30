@@ -157,6 +157,12 @@ public class CultivationScreen extends Screen {
 	private float animFromX1;
 	private long animAt;
 
+	// uji ui skala (38.U.2, 43.0.5): while a test sheet with {@code uji_skala} N is drawn, the whole Gulungan is laid out as GUI scale N
+	// would lay it out on this window and drawn scaled to the real box (mouse divided by the same factor)
+	private static int ujiTampak;
+	private int ujiN;
+	private float ujiK = 1.0F;
+
 	private CultivationScreen(Tujuan tujuan) {
 		super(Component.translatable("kultivator.screen.title"));
 		this.section = Math.max(0, Math.min(HubNav.DI_SINI, tujuan.bagian()));
@@ -541,6 +547,9 @@ public class CultivationScreen extends Screen {
 
 	@Override
 	protected void init() {
+		if (ujiN > 0) {
+			ukur();
+		}
 		boolean first = !opened;
 		if (first) {
 			opened = true;
@@ -577,6 +586,34 @@ public class CultivationScreen extends Screen {
 			helpSeal = new KeyHints.HelpSeal(0.0F, 0.0F, SEAL, this::helpTopic);
 		}
 		seenVersion = ClientCultivation.version();
+	}
+
+	/** A page drawn this frame asks for the uji ui skala size {@code n} ({@link Page#render}); the next frame lays the Gulungan out for it. */
+	static void ujiLihat(int n) {
+		ujiTampak = n;
+	}
+
+	/** The layout size: the real GUI size, or (uji ui skala N) what GUI scale N would give with the factor that scales it back. */
+	private void ukur() {
+		var window = minecraft.getWindow();
+		int rw = window.getGuiScaledWidth();
+		int rh = window.getGuiScaledHeight();
+		int gs = window.getGuiScale();
+		if (ujiN <= 0 || gs <= 0) {
+			ujiK = 1.0F;
+			width = rw;
+			height = rh;
+			return;
+		}
+		// never smaller than 160 x 120 layout units; rounded up so the scaled backdrop covers the window
+		ujiK = Math.min(ujiN / (float) gs, Math.min(rw / 160.0F, rh / 120.0F));
+		width = (int) Math.ceil(rw / ujiK);
+		height = (int) Math.ceil(rh / ujiK);
+	}
+
+	/** A mouse event of the real window in layout coordinates. */
+	private MouseButtonEvent peta(MouseButtonEvent event) {
+		return ujiK == 1.0F ? event : new MouseButtonEvent(event.x() / ujiK, event.y() / ujiK, event.buttonInfo());
 	}
 
 	/** The paper and content box for the shown page (wide paper, sub bar), and its layout when the box changed. */
@@ -648,6 +685,19 @@ public class CultivationScreen extends Screen {
 
 	@Override
 	public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float a) {
+		if (ujiK == 1.0F) {
+			latar(g);
+		} else {
+			g.pose().pushMatrix();
+			g.pose().scale(ujiK, ujiK);
+			latar(g);
+			g.pose().popMatrix();
+		}
+		minecraft.gui.hud.extractDeferredSubtitles();
+	}
+
+	/** The ink night, the mountains and the moon over {@code width x height} (layout units). */
+	private void latar(GuiGraphicsExtractor g) {
 		long now = Util.getMillis();
 		float fade = backdrop.to(1.0F, Math.min(0.1F, (now - lastFrame) / 1000.0F), 0.0F);
 		int tint = warnaLangit();
@@ -674,7 +724,6 @@ public class CultivationScreen extends Screen {
 		// A pale moon behind the scroll.
 		Brush.halo(g, width * 0.82F, height * 0.18F, 9.0F, 8.0F, 0xE8EEF5, 0.35F * fade);
 		Brush.disc(g, width * 0.82F, height * 0.18F, 9.0F, Palette.argb(Math.round(0x90 * fade), 0xE8EEF5));
-		minecraft.gui.hud.extractDeferredSubtitles();
 	}
 
 	/**
@@ -693,6 +742,13 @@ public class CultivationScreen extends Screen {
 
 	/** Once per frame: registry or context changes refresh the coins; sub bar / wide paper changes relayout; new data reaches the page. */
 	private void segarkan() {
+		int mau = ujiTampak;
+		ujiTampak = 0;
+		if (mau != ujiN) {
+			ujiN = mau;
+			ukur();
+			init();
+		}
 		if (konteks == null && section == HubNav.DI_SINI) {
 			shown = null;
 			tampilkan(HubNav.lastSection(), "", "", null);
@@ -727,6 +783,17 @@ public class CultivationScreen extends Screen {
 
 	@Override
 	public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float a) {
+		if (ujiK == 1.0F) {
+			gambar(g, mouseX, mouseY, a);
+			return;
+		}
+		g.pose().pushMatrix();
+		g.pose().scale(ujiK, ujiK);
+		gambar(g, Math.round(mouseX / ujiK), Math.round(mouseY / ujiK), a);
+		g.pose().popMatrix();
+	}
+
+	private void gambar(GuiGraphicsExtractor g, int mouseX, int mouseY, float a) {
 		SlipTooltip.mulaiBingkai();
 		super.extractRenderState(g, mouseX, mouseY, a);
 		long now = Util.getMillis();
@@ -937,6 +1004,7 @@ public class CultivationScreen extends Screen {
 
 	@Override
 	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+		event = peta(event);
 		if (modal()) {
 			return shown.mouseClicked(event, doubleClick);
 		}
@@ -954,6 +1022,7 @@ public class CultivationScreen extends Screen {
 
 	@Override
 	public boolean mouseReleased(MouseButtonEvent event) {
+		event = peta(event);
 		if (!modal() && krom.lepas(event.x(), event.y())) {
 			return true;
 		}
@@ -965,6 +1034,9 @@ public class CultivationScreen extends Screen {
 
 	@Override
 	public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
+		event = peta(event);
+		dx /= ujiK;
+		dy /= ujiK;
 		if (!modal() && krom.seret(event.x(), event.y(), dx)) {
 			return true;
 		}
@@ -976,6 +1048,8 @@ public class CultivationScreen extends Screen {
 
 	@Override
 	public boolean mouseScrolled(double x, double y, double scrollX, double scrollY) {
+		x /= ujiK;
+		y /= ujiK;
 		if (shown != null && (modal() || inContent(x, y)) && shown.mouseScrolled(x, y, scrollX, scrollY)) {
 			return true;
 		}
@@ -1110,6 +1184,7 @@ public class CultivationScreen extends Screen {
 
 	@Override
 	public void removed() {
+		ujiTampak = 0;
 		UiSound.close();
 		if (shown != null && shown != konteks) {
 			shown.onHide();

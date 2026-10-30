@@ -112,6 +112,11 @@ public final class Desa {
 				|| !entity.entityTags().contains(Requests.QUEST_TAG) || Requests.wanted(entity));
 		ServerPlayerEvents.LEAVE.register(player -> VillageGuards.onLeave(player.getUUID()));
 		ServerPlayerEvents.JOIN.register(player -> dirty(player.getUUID()));
+		// pulling a plaque ends its pledge (DESIGN 25.6.2): only the sect that holds it, a sect mate, an op or a creative player may
+		dev.kultivator.util.Kepemilikan.jaga(DesaItems.SECT_PATRON_PLAQUE, (level, pos, entity) -> {
+			Map.Entry<UUID, Village> found = Vassals.byPlaque(pos);
+			return found == null ? null : found.getKey();
+		}, "kultivator.kepemilikan.plakat_desa");
 		ProtectedZones.addZoneProvider(Desa::protects);
 		// DESIGN 38.R.3 rule 2: the patron plaque of a pledged village is the master's claim (repair crews keep off it)
 		ProtectedZones.addClaimProvider(Desa::claimsPlaque);
@@ -220,6 +225,15 @@ public final class Desa {
 			}
 			if (schedule) {
 				schedule(server, owner, entry, player, day, scan);
+			}
+		}
+		// an offline owner's stored guards still stand at their plaques as stage bodies for players who pass by
+		for (UUID owner : Vassals.owners()) {
+			Vassals.Owner entry = server.getPlayerList().getPlayer(owner) == null ? Vassals.peek(owner) : null;
+			if (entry != null) {
+				for (Village village : List.copyOf(entry.villages)) {
+					VillageGuards.tick(server, owner, village, null);
+				}
 			}
 		}
 		flushDirty(server);

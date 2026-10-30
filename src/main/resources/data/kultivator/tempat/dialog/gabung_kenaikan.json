@@ -1,0 +1,40 @@
+{
+  "pembicara": [
+    "peran:tetua_sekte"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "gabung.naik_siap"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "310",
+      "pilihan": [
+        {
+          "syarat": [
+            "gabung.naik_siap murid"
+          ],
+          "akibat": [
+            "gabung.naik murid"
+          ]
+        },
+        {
+          "syarat": [
+            "gabung.naik_siap tetua"
+          ],
+          "akibat": [
+            "gabung.naik tetua"
+          ]
+        },
+        {
+          "akibat": [
+            "gabung.pohon"
+          ]
+        },
+        {}
+      ]
+    }
+  ]
+}

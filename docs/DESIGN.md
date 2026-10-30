@@ -25053,7 +25053,8 @@ Kode adalah kebenaran; butir di bawah mencatat tempat implementasi menyimpang da
 * Adegan cerita memakai beat 193-199 (190-192 dibiarkan kosong). Kartu hub masuk sub-tab SEKTE (tidak ada kartu ke-18).
 * Kitab Panduan bab 17 memakai slot tampilan cadangan setelah indeks simpan 8 (`GuideChapters.DISPLAY_ORDER`), 11
   langkah; langkah jaring dan sembilan langit opsional.
-* Belum dibuat: feri untuk murid misi (`feriMisi`), sapaan tamu langit oleh Tetua Urusan Luar (36; tercatat di
+* Sudah dibuat: feri untuk murid misi (`feriMisi`, tampilan keberangkatan saja; progres `m2-LENGKAP-langit-mandiri-misi`).
+* Belum dibuat: sapaan tamu langit oleh Tetua Urusan Luar (36; tercatat di
   `SekteLog` saja), dan kait jalur `TanggaService` (36 G) ke `LangitTangga.path(UUID)`.
 * Suara: 7 baris Jepang baru diminta (`heaven.langit_naik` + 6 `sekte_langit.*`), daftar di
   `docs/progres/langit-voices.md`; sampai klipnya ada, kode memakai baris lama atau lonceng.

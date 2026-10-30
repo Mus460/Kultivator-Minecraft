@@ -135,6 +135,14 @@ public abstract class Page {
 	public void batasTab(java.util.Set<String> ids) {
 	}
 
+	/**
+	 * The {@code uji ui skala} size N of a test sheet (38.U.2, 43.0.5), 0 for every other page: while such a page is drawn the
+	 * Gulungan lays itself out as GUI scale N would and draws scaled to the real window.
+	 */
+	public int ujiSkala() {
+		return 0;
+	}
+
 	/** Marks this page a read-only hub view (a sheet's write buttons are drawn disabled with the reason); default ignores it. */
 	public void lihatSaja(boolean baca) {
 	}
@@ -236,6 +244,10 @@ public abstract class Page {
 	 * the widgets (each in the Tab ring), the pictures above, then the confirm seal and the tooltip queue.
 	 */
 	public final void render(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
+		int uji = ujiSkala();
+		if (uji > 0) {
+			CultivationScreen.ujiLihat(uji);
+		}
 		Lukis l = fokusRing.mulai(g, font, mouseX, mouseY, 1.0F, gaya(), x, y, x + w, y + h);
 		drawBehind(g, mouseX, mouseY, seconds);
 		lukis(l);

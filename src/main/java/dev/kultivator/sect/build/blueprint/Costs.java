@@ -107,6 +107,19 @@ public final class Costs {
 			return Cost.item(exact);
 		}
 		String path = BuiltInRegistries.BLOCK.getKey(block).getPath();
+		// The few blocks only the 6b formation patterns place (DESIGN 24.6.2 B): an iron block is its deposit value, nine units.
+		if (block == Blocks.IRON_BLOCK) {
+			return Cost.of(Bahan.LOGAM, 900L);
+		}
+		if (block == Blocks.MAGMA_BLOCK) {
+			return Cost.of(Bahan.BATU, FULL);
+		}
+		if (path.startsWith("purpur")) {
+			return shaped(Bahan.KAPUR, path);
+		}
+		if (path.contains("nether_brick")) {
+			return shaped(Bahan.GENTENG, path);
+		}
 		// Gold and jade (Emas & Giok).
 		if (block == Blocks.GOLD_BLOCK || block == Blocks.RAW_GOLD_BLOCK) {
 			return Cost.of(Bahan.PERMATA, 900L);

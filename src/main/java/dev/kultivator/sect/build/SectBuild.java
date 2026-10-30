@@ -74,6 +74,8 @@ public final class SectBuild {
 
 	/** Called once from {@code Kultivator.onInitialize}. */
 	public static void init() {
+		// Titik Formasi plots join templates 3-9 through TemplateExtensions: before the first Templates.get (DESIGN 24.6.2).
+		dev.kultivator.sect.build.blueprint.FormasiTitik.register();
 		MaterialLedger.register(Ledger.INSTANCE);
 		BuildListener.add(Ceremonies.INSTANCE);
 		HallBridge.register();

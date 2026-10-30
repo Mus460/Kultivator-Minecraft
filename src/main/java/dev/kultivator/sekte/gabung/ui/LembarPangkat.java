@@ -158,9 +158,10 @@ public final class LembarPangkat {
 		// realm (Tercatat: Qi Refining or 50 PK earned with chores)
 		Realm butuh = tujuan.syaratRanah(kelas, tier);
 		if (tujuan == Pangkat.TERCATAT) {
-			boolean ok = ranah.ordinal() >= Realm.QI_REFINING.ordinal() || k.pkTotal >= 50L;
+			// the same count the promotion itself reads: PK earned with chores only
+			boolean ok = ranah.ordinal() >= Realm.QI_REFINING.ordinal() || Promosi.pkTugas(k) >= Promosi.PK_TUGAS_TERCATAT;
 			out.add(GabungLayar.syarat(ok, Component.translatable("kultivator.gabung.ui.syarat.tercatat", Realm.QI_REFINING.displayName()),
-					Component.translatable("kultivator.gabung.ui.punya.ranah_pk", cd.rank().displayName(), k.pkTotal), null));
+					Component.translatable("kultivator.gabung.ui.punya.ranah_pk", cd.rank().displayName(), Promosi.pkTugas(k)), null));
 		} else {
 			out.add(GabungLayar.syarat(ranah.ordinal() >= butuh.ordinal(), Component.translatable("kultivator.gabung.ui.syarat.ranah", butuh.displayName()),
 					cd.rank().displayName(), null));

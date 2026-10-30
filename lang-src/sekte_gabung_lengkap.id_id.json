@@ -1,0 +1,18 @@
+{
+  "kultivator.cerita.gabung_kenaikan.mulai": "Murid, aku sudah mendengar kabarmu. Catatanmu bersih dan jatahmu cukup; pangkat berikutnya tinggal menunggu pengajuanmu di aula. Mau diajukan sekarang?",
+  "kultivator.cerita.gabung_kenaikan.mulai.1": "Ajukan kenaikan.",
+  "kultivator.cerita.gabung_kenaikan.mulai.2": "Ajukan jalur Tetua.",
+  "kultivator.cerita.gabung_kenaikan.mulai.3": "Perlihatkan Pohon Pangkat dulu.",
+  "kultivator.cerita.gabung_kenaikan.mulai.4": "Nanti saja.",
+  "kultivator.gabung.naik.batal": "Upacara kenaikan batal: pangkat, kursi, atau tempatmu berubah selama upacara. PK dikembalikan.",
+  "kultivator.gabung.syarat.naik.kurungan": "Tidak sedang dikurung di Gua Renungan",
+  "kultivator.gabung.naik.ujian_wakil.kurang": "Baru %s dari %s tetua yang berpihak padamu (dari %s tetua; sikap minimal %s). Naikkan sikap mereka lewat pelajaran, misi, atau hadiah, lalu ajukan lagi.",
+  "kultivator.gabung.naik.ujian_wakil.cukup": "%s dari %s tetua berpihak padamu. Dukungan tetua terpenuhi; ajukan kenaikanmu di aula.",
+  "kultivator.gabung.aturan.paham.mulai": "Kau sudah membacakan aturan sekte sebelum bersumpah. Selama %s hari dunia pelanggaran pertamamu dihitung separuh.",
+  "kultivator.gabung.ui.kartu.paham": "Paham aturan: pelanggaran dihitung separuh (%s hari lagi)",
+  "kultivator.gabung.turnamen.titipan_nama": "%s (murid %s)",
+  "kultivator.gabung.turnamen.titipan_hadiah.1": "Murid titipanmu %s menjuarai Turnamen Murid! +%s PK untukmu.",
+  "kultivator.gabung.turnamen.titipan_hadiah.2": "Murid titipanmu %s sampai ke final Turnamen Murid. +%s PK untukmu.",
+  "kultivator.gabung.turnamen.titipan_hadiah.3": "Murid titipanmu %s mencapai semifinal Turnamen Murid. +%s PK untukmu.",
+  "kultivator.gabung.turnamen.titipan_hadiah.4": "Murid titipanmu %s ikut Turnamen Murid. +%s PK untukmu."
+}

@@ -3,8 +3,13 @@ package dev.kultivator.desa;
 import dev.kultivator.disciple.DiscipleEntity;
 import dev.kultivator.disciple.Disciples;
 import dev.kultivator.disciple.DuelRules;
+import dev.kultivator.sekte.mandiri.jalan.Jelmaan;
+import dev.kultivator.sosok.GerakId;
+import dev.kultivator.sosok.Gaya;
+import dev.kultivator.sosok.PropId;
 import dev.kultivator.util.Msg;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -154,9 +159,9 @@ public final class VillageGuards {
 				|| player.position().distanceToSqr(Vec3.atCenterOf(village.plaque)) > LEAVE_RANGE * LEAVE_RANGE;
 		if (!village.guardTag.isEmpty()) {
 			Long rest = RESTING.get(village.guard);
-			if (near && village.pledged && (rest == null || level.getGameTime() >= rest) && level.isPositionEntityTicking(village.plaque)) {
-				DiscipleEntity body = Disciples.arrive(level, Vec3.atBottomCenterOf(village.plaque.relative(village.plaque.getX() % 2 == 0
-						? net.minecraft.core.Direction.EAST : net.minecraft.core.Direction.WEST, 2)), village.guardTag, owner);
+			boolean resting = rest != null && level.getGameTime() < rest;
+			if (near && village.pledged && !resting && level.isPositionEntityTicking(village.plaque)) {
+				DiscipleEntity body = Disciples.arrive(level, Vec3.atBottomCenterOf(post(village)), village.guardTag, owner);
 				if (body != null) {
 					RESTING.remove(village.guard);
 					village.guardTag = new CompoundTag();
@@ -168,6 +173,9 @@ public final class VillageGuards {
 					clearFields(village);
 					Vassals.changed();
 				}
+			}
+			if (!village.guardTag.isEmpty() && village.pledged) {
+				showFar(level, owner, village, resting);
 			}
 			return;
 		}
@@ -186,6 +194,25 @@ public final class VillageGuards {
 				body.setActivityFocus(player.blockPosition());
 			}
 		}
+	}
+
+	/** Where the guard stands at its plaque (also where the stage body of a stored guard is shown). */
+	private static net.minecraft.core.BlockPos post(Village village) {
+		return village.plaque.relative(village.plaque.getX() % 2 == 0 ? Direction.EAST : Direction.WEST, 2);
+	}
+
+	/**
+	 * A stored guard (data only) shows as a far stage body at its post for any player within 128 blocks of the plaque, whether the
+	 * owner is away, offline or about to be near (DESIGN 39.6.6 stages): spear at the ready, or sitting wounded while it rests. The
+	 * real body replaces it the moment it arrives ({@code Jelmaan} drops the stage then). Renewed every second or so.
+	 */
+	private static void showFar(ServerLevel level, UUID owner, Village village, boolean resting) {
+		if (!level.isLoaded(village.plaque)) {
+			return;
+		}
+		Jelmaan.Adegan scene = resting ? Jelmaan.Adegan.diam(GerakId.DUDUK_LANTAI, 0, 0).terluka(Gaya.LUKA_PARAH)
+				: Jelmaan.Adegan.diam(GerakId.BERDIRI_JAGA, 0, PropId.TOMBAK);
+		Jelmaan.tunjukkan(level, "desa:" + owner + ":" + village.id, owner, village.guard, village.guardTag, post(village), village.plaque, scene, 100);
 	}
 
 	/** The owner logs out: every guard body standing at a plaque goes back into data. */

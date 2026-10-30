@@ -32,6 +32,7 @@ public final class LangitConfig {
 	public int tangkapJarak = 24;
 	public boolean terjunAwan = true;
 	public boolean feri = true;
+	/** A team sent on an outside mission leaves on the Cloud Ferry as a show (FeriAwanEntity#misi; needs {@link #feri}). */
 	public boolean feriMisi = true;
 	public boolean patroliPedang = true;
 	public int patroliMaks = 2;

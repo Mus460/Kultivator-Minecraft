@@ -2,11 +2,13 @@ package dev.kultivator.sekte.mandiri.jalan;
 
 import dev.kultivator.Kultivator;
 import dev.kultivator.disciple.DiscipleEntity;
+import dev.kultivator.dunia.kota.Towns;
 import dev.kultivator.sect.event.Expeditions;
 import dev.kultivator.sect.hall.Halls;
 import dev.kultivator.sekte.api.SekteApi;
 import dev.kultivator.sekte.api.Sifat;
 import dev.kultivator.sekte.api.Sikap;
+import dev.kultivator.sekte.mandiri.MandiriConfig;
 import dev.kultivator.sekte.mandiri.api.EntriHarian;
 import dev.kultivator.sekte.mandiri.api.GildaMurid;
 import dev.kultivator.sekte.mandiri.api.JalanHidup;
@@ -63,6 +65,10 @@ final class Tahap {
 	static final String GERBANG = "gerbang";
 	/** Held captive at a place (39.5.9) until the master comes or three days pass. */
 	static final String TAWANAN = "tawanan";
+	/** The ride of the town teleport station (38.B.4.3): pay, hand seals, the flash; {@code arah} 0 out, 1 home. */
+	static final String TELEPORT = "teleport";
+	/** Length of one station ride stage: the fare at the keeper, then the hand seals of the channel. */
+	static final long TELEPORT_TICK = 200L;
 
 	/** Longest road segment (blocks). */
 	static final int SEGMEN = 500;
@@ -174,7 +180,23 @@ final class Tahap {
 		long awan = (long) Math.ceil(dev.kultivator.sekte.mandiri.MandiriConfig.get().harga.awanDasar
 				+ d / Math.max(1, dev.kultivator.sekte.mandiri.MandiriConfig.get().harga.awanPer));
 		boolean manja = Watak.punya(sifat, Sifat.MALAS) || Watak.punya(sifat, Sifat.SOMBONG);
-		if (manja && !Watak.punya(sifat, Sifat.LICIK) && tujuan.town() != 0L
+		boolean licik = Watak.punya(sifat, Sifat.LICIK);
+		// 39.6.2: the lazy and the proud take the town teleport station when both ends have one and every purse can pay both rides
+		Stasiun stasiun = manja && !licik && tujuan.town() != 0L && !MandiriApi.kebijakan(leader).dilarang("teleport")
+				? cariStasiun(level, r, from, tujuan) : null;
+		if (stasiun != null) {
+			moda = Rencana.TELEPORT;
+			laju = LAJU_KAKI;
+			CompoundTag tel = new CompoundTag();
+			tel.putLong("tarif", stasiun.tarif());
+			tel.putLong("asal", stasiun.pos().asLong());
+			tel.putLong("kotaAsal", stasiun.kota());
+			tel.putBoolean("pulang", true);
+			tag.put(Rencana.TEL, tel);
+			for (UUID member : r.rombongan()) {
+				r.ubahUang(member, -2L * stasiun.tarif());
+			}
+		} else if (manja && !licik && tujuan.town() != 0L
 				&& dev.kultivator.dunia.kota.Towns.isKotaBesar(level.getServer(), tujuan.town()) && r.sisaUang(soul) >= awan * 2L) {
 			moda = Rencana.AWAN;
 			r.ubahUang(soul, -awan);
@@ -190,7 +212,14 @@ final class Tahap {
 		ListTag stages = r.tahap();
 		long t = now;
 		// out
-		t = jalan(level, stages, JALAN, from, to, d, laju, moda, t);
+		double dAsal = stasiun == null ? 0.0D : Math.max(32.0D, Tujuan.jarak(from, stasiun.pos()));
+		if (stasiun != null) {
+			t = jalan(level, stages, JALAN, from, stasiun.pos(), dAsal, laju, Rencana.KAKI, t);
+			stages.add(teleportTahap(t, stasiun.pos(), 0, stasiun.kota(), tujuan.town(), stasiun.tarif()));
+			t += TELEPORT_TICK;
+		} else {
+			t = jalan(level, stages, JALAN, from, to, d, laju, moda, t);
+		}
 		// destination
 		boolean kota = tujuan.town() != 0L || jenis == JenisJalan.BELANJA || jenis == JenisJalan.JUAL;
 		if (kota) {
@@ -214,12 +243,75 @@ final class Tahap {
 			t = tujuanStages(stages, jenis, to, t, rnd);
 		}
 		// home
-		t = jalan(level, stages, PULANG, to, from, d, laju, moda, t);
+		if (stasiun != null) {
+			stages.add(teleportTahap(t, KontrakKota.stasiun(level, tujuan.town()), 1, tujuan.town(), stasiun.kota(), stasiun.tarif()));
+			t += TELEPORT_TICK;
+			t = jalan(level, stages, PULANG, stasiun.pos(), from, dAsal, laju, Rencana.KAKI, t);
+		} else {
+			t = jalan(level, stages, PULANG, to, from, d, laju, moda, t);
+		}
 		stages.add(stage(GERBANG, t, t + 40L, from, 0));
 		t += 40L;
 		r.setPulang(t);
 		r.setBerikut(0);
 		return r;
+	}
+
+	/** The station ride {@code arah} (0 out, 1 home) at {@code pos}: it leaves the station of town {@code dari} for town {@code ke}. */
+	private static CompoundTag teleportTahap(long t, BlockPos pos, int arah, long dari, long ke, long tarif) {
+		CompoundTag s = stage(TELEPORT, t, t + TELEPORT_TICK, pos, 0);
+		s.putInt("arah", arah);
+		s.putLong("kotaDari", dari);
+		s.putLong("kotaKe", ke);
+		s.putLong("tarif", tarif);
+		return s;
+	}
+
+	/** The station a party boards (39.6.2): where, the town it belongs to, the fare per head and way. */
+	private record Stasiun(BlockPos pos, long kota, long tarif) {
+	}
+
+	/**
+	 * The origin station of a teleport journey to {@code tujuan}: the nearest station town within {@code teleportAsal} blocks of
+	 * the hall, when the destination town has a station too, the ride saves a real walk (the road would be over 900 blocks plus
+	 * twice the walk to the station) and every member can pay both rides. Null when any of that fails.
+	 */
+	private static @Nullable Stasiun cariStasiun(ServerLevel level, Rencana r, BlockPos from, TujuanProvider.Tujuan tujuan) {
+		MandiriConfig cfg = MandiriConfig.get();
+		MinecraftServer server = level.getServer();
+		if (cfg.teleportAsal <= 0 || cfg.harga.teleportMaks <= 0 || !KontrakKota.punyaStasiun(server, tujuan.town())) {
+			return null;
+		}
+		BlockPos dest = Towns.centre(server, tujuan.town());
+		ResourceKey<Level> destDim = Towns.dimension(server, tujuan.town());
+		if (dest == null || !level.dimension().equals(destDim)) {
+			return null;
+		}
+		long bestTown = 0L;
+		BlockPos best = null;
+		double bestD = cfg.teleportAsal;
+		for (long town : Towns.known(server)) {
+			if (town == tujuan.town() || !level.dimension().equals(Towns.dimension(server, town)) || !KontrakKota.punyaStasiun(server, town)) {
+				continue;
+			}
+			BlockPos centre = Towns.centre(server, town);
+			if (centre != null && Tujuan.jarak(from, centre) < bestD) {
+				bestD = Tujuan.jarak(from, centre);
+				best = centre;
+				bestTown = town;
+			}
+		}
+		if (best == null || Tujuan.jarak(from, dest) < 900.0D + 2.0D * bestD) {
+			return null;
+		}
+		long tarif = Math.min(cfg.harga.teleportMaks, (long) Math.ceil(cfg.harga.teleportDasar
+				+ Tujuan.jarak(best, dest) / Math.max(1, cfg.harga.teleportPer)));
+		for (UUID soul : r.rombongan()) {
+			if (r.sisaUang(soul) < 2L * tarif) {
+				return null;
+			}
+		}
+		return new Stasiun(KontrakKota.stasiun(level, bestTown), bestTown, tarif);
 	}
 
 	/** Appends the road home from {@code from} starting at {@code t} (after captivity, a ransom, a talisman) and the gate. */
@@ -385,6 +477,7 @@ final class Tahap {
 					tujuan(k);
 				}
 			}
+			case TELEPORT -> teleport(k);
 			case TAWANAN -> Tawanan.lolos(k);
 			case GERBANG -> r.kisah(JalanIds.k("kisah.gerbang." + (r.sukses() ? "baik" : "lelah") + "." + k.rnd().nextInt(3)),
 					List.of(k.namaPemimpin()));
@@ -392,6 +485,29 @@ final class Tahap {
 			}
 		}
 		simpanCermin(server, r);
+	}
+
+	/**
+	 * The station ride resolved: its story line and diary page (the fare was taken at the gate), the flash where the party
+	 * lands, and the departure bodies leave. No road events: the formation is safe.
+	 */
+	private static void teleport(Konteks k) {
+		Rencana r = k.r();
+		boolean pulang = k.t().getIntOr("arah", 0) == 1;
+		long ke = k.t().getLongOr("kotaKe", 0L);
+		List<String> args = new ArrayList<>();
+		args.add(k.namaPemimpin());
+		args.addAll(JalanIds.kota(ke));
+		args.add(String.valueOf(k.t().getLongOr("tarif", 0L)));
+		r.kisah(JalanIds.k(pulang ? "kisah.teleport.pulang" : "kisah.teleport.pergi"), args);
+		catat(k, r.soul(), "jalan", JalanIds.k(pulang ? "harian.teleport.pulang" : "harian.teleport.pergi"), args, EntriHarian.Suasana.SENANG, false);
+		if (pulang) {
+			r.tel().putBoolean("pulang", false);
+		}
+		for (UUID soul : r.rombongan()) {
+			Jelmaan.akhiriPentas("tel:" + r.id() + ":" + soul);
+		}
+		KontrakKota.kilat(k.level(), pulang ? BlockPos.of(r.tel().getLongOr("asal", 0L)) : KontrakKota.stasiun(k.level(), ke), true, 1, -1);
 	}
 
 	private static boolean luka(Rencana r) {
@@ -563,7 +679,8 @@ final class Tahap {
 				if (sect != null) {
 					if (akhir) {
 						r.hasil().putString("sekte", sect);
-						r.hasil().putBoolean("sekteSekutu", SekteApi.diplomasi().stance(r.owner(), sect) == Sikap.SEKUTU);
+						r.hasil().putBoolean("sekteSekutu", SekteApi.diplomasi().stance(r.owner(), sect) == Sikap.SEKUTU
+								|| sect.equals(dev.kultivator.sekte.gabung.politik.Politik.titipan(k.server(), r.owner(), r.soul())));
 					}
 				}
 				if (ok) {

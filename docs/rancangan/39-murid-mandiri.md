@@ -698,7 +698,9 @@ deterministik), sehingga tubuh tampilan bisa muncul di tahap mana pun dengan kea
 Kecepatan (blok per detik waktu dunia, sudah termasuk istirahat): jalan kaki 3,0 (Fana-Fondasi); pedang terbang 10 (Inti
 Emas+, bila tidak dilarang); jalan Kekaisaran 38 ×1,15; stasiun teleport 38 (ongkos `ceil(2 + d/250)` NB, maks 120) bila
 kedua ujung punya stasiun; Perjalanan Awan 38 (`ceil(6 + d/150)` NB). Moda = termurah yang cukup cepat; MALAS dan SOMBONG
-memilih teleport bila mampu; LICIK selalu berjalan/terbang (hemat). Contoh: kota 1500 blok jalan kaki = 500 s = 10.000 tick
+memilih teleport bila mampu; LICIK selalu berjalan/terbang (hemat). **Sudah dibuat:** moda `TELEPORT` (pemimpin MALAS/SOMBONG,
+kebijakan mengizinkan `teleport`, kota tujuan punya stasiun, aula dalam 600 blok dari satu stasiun lain `mandiri.teleportAsal`,
+jalan > 900 blok + 2x jarak ke stasiun asal; ongkos per kepala dari dompet perjalanan, mengalahkan Perjalanan Awan). Contoh: kota 1500 blok jalan kaki = 500 s = 10.000 tick
 ≈ 0,42 hari sekali jalan; dengan pedang ≈ 0,13 hari.
 
 **Tahap baku perjalanan BELANJA:**

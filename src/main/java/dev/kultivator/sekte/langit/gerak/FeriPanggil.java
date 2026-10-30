@@ -1,6 +1,7 @@
 package dev.kultivator.sekte.langit.gerak;
 
 import dev.kultivator.sekte.langit.api.LangitConfig;
+import dev.kultivator.sekte.api.SekteBus;
 import dev.kultivator.sekte.langit.api.SkyHallView;
 import dev.kultivator.util.Msg;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
@@ -22,7 +23,8 @@ import java.util.UUID;
  * Calling the Cloud Ferry (DESIGN 37.5.5): ringing a bell within 3 blocks of a stop of a sky hall one belongs to
  * ({@code feri_atas} on the island, {@code feri_bawah} on the ground, or the stair foot {@code tangga_kaki}) calls the
  * hall's ferry to that stop; the bell still rings as usual (the callback passes). {@link #callNear} is the command's
- * entry ({@code /kultivasi langit feri}, 37G). One call per player every 2 s. No block changes.
+ * entry ({@code /kultivasi langit feri}, 37G). One call per player every 2 s. It also listens to
+ * {@code SekteBus.MISSION_SENT}: a mission team leaves on the ferry as a show ({@link FeriAwanEntity#misi}). No block changes.
  */
 public final class FeriPanggil {
 
@@ -48,6 +50,14 @@ public final class FeriPanggil {
 			}
 			bell(serverLevel, serverPlayer, pos);
 			return InteractionResult.PASS;
+		});
+		// 37.5.5 (37G): a team sent on an outside mission leaves on the ferry as a show (langit.feriMisi)
+		SekteBus.MISSION_SENT.register((server, owner, missionId, team) -> {
+			SkyHallView hall = LangitConfig.on() && LangitConfig.get().feri && LangitConfig.get().feriMisi ? LangitGerak.api().skyHall(owner) : null;
+			ServerLevel level = hall == null ? null : server.getLevel(hall.dim());
+			if (level != null) {
+				FeriAwanEntity.misi(level, owner, team);
+			}
 		});
 		ServerPlayerEvents.LEAVE.register(player -> LAST.remove(player.getUUID()));
 		ServerLifecycleEvents.SERVER_STOPPED.register(server -> {

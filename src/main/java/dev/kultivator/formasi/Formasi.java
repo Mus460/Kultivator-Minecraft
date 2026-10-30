@@ -56,6 +56,7 @@ import dev.kultivator.fx.Fx;
 import dev.kultivator.fx.FxType;
 import dev.kultivator.sect.hall.Halls;
 import dev.kultivator.util.Advancements;
+import dev.kultivator.util.Kepemilikan;
 import dev.kultivator.util.Msg;
 import dev.kultivator.util.Targeting;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
@@ -147,6 +148,11 @@ public final class Formasi {
 		CoreTicker.init();
 		UseBlockCallback.EVENT.register(Formasi::onUseBlock);
 		PlayerBlockBreakEvents.AFTER.register(Formasi::onBreak);
+		// a registered eye breaks only for its owner, a sect mate, an op or a creative player (breaking it ends the whole formation)
+		Kepemilikan.jaga(FormasiItems.FORMATION_EYE, (level, pos, entity) -> {
+			CoreRecord record = CoreTicker.store(level).atEye(pos);
+			return record == null ? null : record.owner;
+		}, "kultivator.kepemilikan.mata_formasi");
 		MeditationBridge.init();
 		DiscipleBridge.init();
 		TribulationBridge.init();

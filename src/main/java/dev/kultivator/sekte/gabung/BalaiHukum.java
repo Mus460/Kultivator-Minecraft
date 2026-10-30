@@ -207,7 +207,7 @@ public final class BalaiHukum {
 		}
 		int aliran = SekteApi.diplomasi().aliran(k.sekte);
 		Msg.chat(player, Component.translatable("kultivator.gabung.hukum.tercatat", aturan.id().toUpperCase(java.util.Locale.ROOT),
-				aturan.teks(aliran), aturan.poin(), sesudah).withStyle(ChatFormatting.RED));
+				aturan.teks(aliran), sesudah - sebelum, sesudah).withStyle(ChatFormatting.RED));
 		player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.PLAYERS, 0.8F, 0.6F);
 		if (aturan == Aturan.A2) {
 			h.putLong("a2Batas", hari + BATAS_A2_HARI);

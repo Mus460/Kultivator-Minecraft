@@ -24,6 +24,7 @@ import dev.kultivator.network.Payloads;
 import dev.kultivator.sect.Sect;
 import dev.kultivator.sect.SectData;
 import dev.kultivator.util.Advancements;
+import dev.kultivator.util.Kepemilikan;
 import dev.kultivator.util.Msg;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
@@ -45,7 +46,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.permissions.Permissions;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
@@ -654,8 +654,7 @@ public final class Halls {
 	/** {@code PlayerBlockBreakEvents.BEFORE} on a stele: an active hall's stele breaks only for its owner, a sect mate, an op or a creative player. */
 	static boolean mayBreakStele(Player player, ServerLevel level, BlockPos pos) {
 		UUID owner = ownerAt(level, pos);
-		if (owner == null || !(player instanceof ServerPlayer serverPlayer) || player.isCreative() || owner.equals(player.getUUID())
-				|| sectMate(serverPlayer, owner) || serverPlayer.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER)) {
+		if (Kepemilikan.boleh(player, owner) || !(player instanceof ServerPlayer serverPlayer)) {
 			return true;
 		}
 		CompoundTag core = coreOf(owner);

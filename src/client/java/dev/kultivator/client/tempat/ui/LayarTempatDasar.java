@@ -41,7 +41,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public abstract class LayarTempatDasar extends Page implements UiTempatClient.LayarTempat {
 
-	/** Key of the {@code uji ui skala} test (the server still sends it; the single kit lays out in the real box). */
+	/** Key of the {@code uji ui skala} test: the Gulungan lays itself out as GUI scale N would while the sheet is drawn ({@link #ujiSkala}). */
 	public static final String UJI_SKALA = "uji_skala";
 	/** Key marking a test sheet (a ribbon "UJI" in the strip). */
 	public static final String UJI = "uji";
@@ -184,6 +184,12 @@ public abstract class LayarTempatDasar extends Page implements UiTempatClient.La
 
 	public boolean lihatSaja() {
 		return lihatSaja;
+	}
+
+	/** {@code uji ui skala} N of a test sheet (0 = none): read by the Gulungan, which relays itself out for it (38.U.2, 43.0.5). */
+	@Override
+	public int ujiSkala() {
+		return lembar == null ? 0 : lembar.i(UJI_SKALA, 0);
 	}
 
 	/** The tab shown now (after the first sheet is applied). */

@@ -11,6 +11,10 @@ import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import dev.kultivator.elite.EliteMonsters;
 import dev.kultivator.harta.SpiritHerbs;
 import dev.kultivator.musuh.Camps;
+import dev.kultivator.sekte.gabung.Gabung;
+import dev.kultivator.sekte.gabung.GabungConfig;
+import dev.kultivator.sekte.gabung.api.GabungApi;
+import dev.kultivator.sekte.gabung.hidup.JenisMisiGabung;
 import dev.kultivator.util.KillCredit;
 import dev.kultivator.util.Msg;
 import dev.kultivator.util.Targeting;
@@ -56,6 +60,10 @@ import java.util.UUID;
  * DESIGN 38.M.3 (one board system): every town bounty also has a guild rank by the band it was taken at ({@link #pangkat}:
  * E up to Mortal, D at Qi Refining, C from Foundation on) and pays the guild points of that rank to the Lencana Bintang of
  * the Gilda Kultivator, so the town board counts toward the badge exactly like the graded guild board.
+ * <p>
+ * DESIGN 41.6.2: a member of a sect ({@code GabungApi.sekte}) is also paid personal contribution points (PK) for a finished
+ * bounty, {@code dasarPK(band) x rank factor x the sect's class factor} (half the NB base of the same bounty), through the one
+ * PK door {@code GabungApi.tambahPk} (reason {@code gabung.misi_kota}); the board's bounties per day cap bounds it.
  */
 public final class PapanMisi {
 
@@ -358,6 +366,7 @@ public final class PapanMisi {
 		Lencana.tambah(player, points);
 		Msg.chat(player, Component.translatable("kultivator.tempat_ekonomi.misi.poin_kota", JenisMisi.HURUF.charAt(rank), points)
 				.withStyle(ChatFormatting.AQUA));
+		payPk(player, rank, misi.getIntOr("band", 1), misi.getIntOr("index", 0));
 		if (dev.kultivator.sect.hall.Halls.hallOf(player.getUUID()) != null) {
 			BukuKas.catat(player.level().getServer(), player.getUUID(), LembarKunci.BukuKas.SUMBER_MISI, 0, stones,
 					"kultivator.tempat_ekonomi.kas.catatan.misi", String.valueOf(JenisMisi.HURUF.charAt(rank)), IDS[Math.max(0, Math.min(IDS.length - 1,
@@ -370,6 +379,31 @@ public final class PapanMisi {
 			}
 		}
 		player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 0.5F, 1.4F);
+	}
+
+	/**
+	 * The PK of bounty slot {@code index} for {@code player} (41.6.2: the sect board's base for the band, the rank factor and the
+	 * sect's class factor), seeded by the player and the slot so the board's preview and the payout agree; 0 when the player is
+	 * in no sect or the sect module is off.
+	 */
+	public static int pkOf(ServerPlayer player, int rank, int band, int index) {
+		String sekte = Gabung.aktif() ? GabungApi.sekte(player.getUUID()) : null;
+		if (sekte == null) {
+			return 0;
+		}
+		RandomSource random = RandomSource.create(player.getUUID().getLeastSignificantBits() ^ index * 0x9E3779B97F4A7C15L);
+		double pk = JenisMisiGabung.dasarPk(band, random) * MisiGilda.PENGALI[Mth.clamp(rank, 0, 5)] * GabungApi.kelasSekte(sekte).kf();
+		return Math.max(1, (int) Math.round(pk));
+	}
+
+	private static void payPk(ServerPlayer player, int rank, int band, int index) {
+		int n = pkOf(player, rank, band, index);
+		if (n <= 0) {
+			return;
+		}
+		GabungApi.tambahPk(player, n, "gabung.misi_kota");
+		Msg.chat(player, Component.translatable("kultivator.kota.misi.hadiah_pk", Math.max(1, (int) Math.round(n * GabungConfig.get().skalaPk)))
+				.withStyle(ChatFormatting.AQUA));
 	}
 
 	private static boolean takeHerb(ServerPlayer player) {
@@ -535,6 +569,7 @@ public final class PapanMisi {
 			entry.putBoolean("taken", taken.getBooleanOr(player.getUUID() + "." + day + "." + i, false));
 			entry.putLong("reward", rewardOf(npc.town(), day, i, band));
 			entry.putString("pangkat", String.valueOf(JenisMisi.HURUF.charAt(pangkat(Mth.clamp(Cultivators.get(player).realm().ordinal(), 0, 8)))));
+			entry.putInt("pk", pkOf(player, pangkat(Mth.clamp(Cultivators.get(player).realm().ordinal(), 0, 8)), band, i));
 			list.add(entry);
 		}
 		tag.put("board", list);

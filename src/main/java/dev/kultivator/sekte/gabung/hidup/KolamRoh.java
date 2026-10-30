@@ -144,6 +144,23 @@ public final class KolamRoh {
 		return Math.max(0L, k.bagian(Kediaman.BAGIAN).getLongOr(SAMPAI, 0L) - player.level().getGameTime());
 	}
 
+	/** True when {@code pos} lies within {@code radius} blocks of a meditation seat of the compound it stands in (a ward at the pool, 41.8.7). */
+	public static boolean dekatKolam(ServerLevel level, BlockPos pos, double radius) {
+		if (level.dimension() != Level.OVERWORLD) {
+			return false;
+		}
+		TempatInfo info = TempatApi.tempatDi(level, pos);
+		if (info == null) {
+			return false;
+		}
+		for (BlockPos seat : seats(level, info.situsId())) {
+			if (seat.distSqr(pos) <= radius * radius) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	/** True while the session runs and the player sits at its seat (the {@code gabung_kolam} factor of {@link SitusGabung}). */
 	public static boolean aktifDi(ServerPlayer player) {
 		BlockPos seat = sesi(player);

@@ -34,6 +34,12 @@ final class Scheduler {
 				return component;
 			}
 		}
+		// Patterns requested on Titik Formasi plots (6b, DESIGN 24.6.2 B) are always Tambahan: their plot already stands.
+		for (Component component : site.polaComponents()) {
+			if (component.tier() <= limit && available(site, component)) {
+				return component;
+			}
+		}
 		for (int tier = site.tier + 1; tier <= limit; tier++) {
 			List<Component> list = spec.components(tier);
 			Component first = null;
@@ -116,7 +122,7 @@ final class Scheduler {
 
 	/** True when every component of every tier is finished. */
 	static boolean complete(Site site) {
-		for (Component component : site.spec().components()) {
+		for (Component component : site.components()) {
 			if (!site.finished(component.id())) {
 				return false;
 			}

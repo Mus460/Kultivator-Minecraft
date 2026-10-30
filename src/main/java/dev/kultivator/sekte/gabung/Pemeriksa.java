@@ -16,6 +16,7 @@ import dev.kultivator.sect.Sparring;
 import dev.kultivator.sekte.api.SekteApi;
 import dev.kultivator.sekte.gabung.api.GabungApi;
 import dev.kultivator.sekte.gabung.dunia.TokohSekte;
+import dev.kultivator.sekte.gabung.hidup.MuridTitipan;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -181,6 +182,9 @@ public final class Pemeriksa {
 			} else if (tubuhSekte(npc, sekte)) {
 				aturan = Aturan.A1;
 			}
+		} else if (victim instanceof DiscipleEntity murid && !murid.isOwnedBy(attacker) && sekte.equals(MuridTitipan.sekteDari(murid))) {
+			// 41.8.7: a ward of the sect is not struck in its grounds, no more than a member
+			aturan = Aturan.A1;
 		}
 		if (aturan == null || !jeda(attacker, victim.getUUID(), level.getGameTime())) {
 			return;

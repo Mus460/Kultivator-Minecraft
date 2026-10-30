@@ -49,11 +49,14 @@ public final class Rencana {
 	static final String TIBA_POS = "tibaPos";
 	static final String PERTEMUAN = "pertemuan";
 	static final String TAMBAHAN = "tambahan";
+	static final String TEL = "tel";
 
 	/** Ways to travel (39.6.2). */
 	public static final String KAKI = "kaki";
 	public static final String PEDANG = "pedang";
 	public static final String AWAN = "awan";
+	/** By the town teleport station: afoot to the nearest station, the ride, afoot again (and the same way home). */
+	public static final String TELEPORT = "teleport";
 
 	private final CompoundTag tag;
 
@@ -270,6 +273,35 @@ public final class Rencana {
 		ListTag list = tahap();
 		while (list.size() > index + 1) {
 			list.remove(list.size() - 1);
+		}
+		kembalikanTarifPulang();
+	}
+
+	/** The teleport plan {@code {tarif, asal (station block), kotaAsal, pulang (the return ride is paid and still ahead)}}, or empty. */
+	public CompoundTag tel() {
+		return tag.getCompoundOrEmpty(TEL);
+	}
+
+	/**
+	 * A plan cut short (recall, captivity) that no longer holds its return ride gives that fare back to every member's purse,
+	 * once: the fare of both rides was taken at the gate.
+	 */
+	private void kembalikanTarifPulang() {
+		CompoundTag t = tel();
+		if (!t.getBooleanOr("pulang", false)) {
+			return;
+		}
+		ListTag list = tahap();
+		for (int i = 0; i < list.size(); i++) {
+			CompoundTag s = list.getCompoundOrEmpty(i);
+			if (Tahap.TELEPORT.equals(s.getStringOr("jenis", "")) && s.getIntOr("arah", 0) == 1) {
+				return;
+			}
+		}
+		t.putBoolean("pulang", false);
+		long fare = t.getLongOr("tarif", 0L);
+		for (UUID soul : rombongan()) {
+			ubahUang(soul, fare);
 		}
 	}
 

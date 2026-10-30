@@ -54,6 +54,8 @@ public final class MandiriConfig {
 	public boolean bolehGugur = false;
 	/** The temptation layer (39.3.3). */
 	public boolean jalanIblis = true;
+	/** Farthest a hall may lie from a teleport station for a party to take the station ride (blocks; 0 = never). */
+	public int teleportAsal = 600;
 	/** Town bodies walking on roads near players. */
 	public boolean tampilJalan = true;
 	/** Town bodies ({@code Role.JELMAAN}) per town / per server. */
@@ -74,7 +76,7 @@ public final class MandiriConfig {
 		public int[] hidangan = {2, 6, 12, 25};
 		public int dupa = 3;
 		public int dupaJalan = 1;
-		/** Teleport station: ceil(teleportDasar + d / teleportPer), at most teleportMaks. Reserved: no teleport journey mode exists yet, these three are read nowhere. */
+		/** Teleport station ride, per head and way: ceil(teleportDasar + d / teleportPer), at most teleportMaks (0 turns the teleport journey mode off). */
 		public int teleportDasar = 2;
 		public int teleportPer = 250;
 		public int teleportMaks = 120;
@@ -140,6 +142,7 @@ public final class MandiriConfig {
 		c.stokMuridHari = clamp(c.stokMuridHari, 0, 64);
 		c.rampasanMinggu = clamp(c.rampasanMinggu, 0, 200);
 		c.pergiMaksPersen = sized(c.pergiMaksPersen, new int[]{25, 40}, 0, 100);
+		c.teleportAsal = clamp(c.teleportAsal, 0, 2000);
 		c.jelmaanPerKota = clamp(c.jelmaanPerKota, 0, 12);
 		c.jelmaanServer = clamp(c.jelmaanServer, 0, 32);
 		if (c.bobot == null) {

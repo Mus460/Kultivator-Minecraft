@@ -396,9 +396,14 @@ final class TownPages {
 				}
 				String id = jenis(entry);
 				Component kunci = entry.getBooleanOr("taken", false) ? Component.translatable("kultivator.kota.misi.sudah_diambil") : null;
+				List<Component> lain = new ArrayList<>();
+				lain.add(Component.translatable(M + "misi.nama_baik"));
+				if (entry.getIntOr("pk", 0) > 0) {
+					lain.add(Component.translatable("kultivator.kota.misi.hadiah_pk", entry.getIntOr("pk", 0)));
+				}
 				papan.add(new PapanMisi.Misi(String.valueOf(i), "", Component.translatable("kultivator.kota.misi.jenis." + id), null,
 						Component.translatable("kultivator.kota.misi.isi." + id), entry.getLongOr("reward", 0L),
-						List.of(Component.translatable(M + "misi.nama_baik")), null, null, kunci, false, 0L, 0L, 0L));
+						lain, null, null, kunci, false, 0L, 0L, 0L));
 			}
 			Component alasanTerima = !keeper ? Component.translatable("kultivator.kota.misi.di_papan")
 					: !active.isEmpty() ? Component.translatable("kultivator.kota.misi.sudah_ada")

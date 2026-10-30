@@ -11,12 +11,16 @@ import dev.kultivator.dunia.tempat.cerita.CeritaApi;
 import dev.kultivator.dunia.tempat.hidup.HidupApi;
 import dev.kultivator.dunia.tempat.jalan.RencanaJalan;
 import dev.kultivator.dunia.tempat.jalan.SimpulJalan;
+import dev.kultivator.dunia.tempat.kotabesar.KotaBesarAnchors;
 import dev.kultivator.dunia.tempat.kotabesar.KotaBesarApi;
+import dev.kultivator.dunia.tempat.kotabesar.KotaBesarPayload;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -72,6 +76,56 @@ public final class KontrakKota {
 			}
 		}
 		return tanah(level, centre.getX() + 6, centre.getZ() + 6, centre.getY());
+	}
+
+	/** True when the town has a Teleportation Formation Station (38.B.4.3): a capital or a themed city. */
+	public static boolean punyaStasiun(MinecraftServer server, long town) {
+		String jenis = Towns.jenis(server, town);
+		return Towns.JENIS_KOTA_BESAR.equals(jenis) || Towns.JENIS_KOTA_TEMA.equals(jenis);
+	}
+
+	/**
+	 * Where a rider stands at the station of {@code town}: the nearest loaded disc of the capital to its arrival point, else the
+	 * arrival point itself (the disc stands on the square, and a plan is made while its chunks may sleep).
+	 */
+	public static BlockPos stasiun(ServerLevel level, long town) {
+		BlockPos arrival = tiba(level, town);
+		try {
+			KotaBesarAnchors.KotaHidup live = KotaBesarAnchors.kota(town);
+			if (live != null) {
+				BlockPos best = null;
+				double bestD = Double.MAX_VALUE;
+				for (net.minecraft.world.entity.Entity disc : live.cakram) {
+					if (!disc.isRemoved() && disc.level() == level && disc.blockPosition().distSqr(arrival) < bestD) {
+						bestD = disc.blockPosition().distSqr(arrival);
+						best = disc.blockPosition();
+					}
+				}
+				if (best != null) {
+					return best;
+				}
+			}
+		} catch (RuntimeException exception) {
+			Kultivator.LOGGER.debug("Mandiri: station lookup failed", exception);
+		}
+		return arrival;
+	}
+
+	/** The formation pillar (channel, {@code seconds} s) or the arrival flash of 38's station at {@code at}, for players near it. */
+	public static void kilat(ServerLevel level, BlockPos at, boolean tiba, int seconds, int entityId) {
+		try {
+			CompoundTag data = new CompoundTag();
+			data.putDouble("x", at.getX() + 0.5D);
+			data.putDouble("y", at.getY());
+			data.putDouble("z", at.getZ() + 0.5D);
+			data.putInt("detik", Math.max(1, seconds));
+			data.putString("jenis", "cakram");
+			data.putBoolean("tiba", tiba);
+			data.putInt("pemain", entityId);
+			KotaBesarPayload.sekitar(level, Vec3.atCenterOf(at), "teleport", data);
+		} catch (RuntimeException exception) {
+			Kultivator.LOGGER.debug("Mandiri: station flash failed", exception);
+		}
 	}
 
 	/** A standing spot at column (x, z): 38's ground rule when it knows the place, else the surface (loaded chunks only). */

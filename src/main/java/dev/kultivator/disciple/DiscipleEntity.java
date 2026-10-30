@@ -1994,7 +1994,8 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity, Soso
 
 	@Override
 	public boolean startRiding(Entity entity, boolean force, boolean sendEventAndTriggers) {
-		return false;
+		// only the Cloud Ferry carries a disciple; boats, carts and mounts stay refused
+		return entity instanceof dev.kultivator.sekte.langit.gerak.FeriAwanEntity && super.startRiding(entity, force, sendEventAndTriggers);
 	}
 
 	@Override

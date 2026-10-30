@@ -6,9 +6,12 @@ import dev.kultivator.dunia.tempat.cerita.Syarat;
 import dev.kultivator.dunia.tempat.cerita.TempatDialog;
 import dev.kultivator.sekte.api.SekteApi;
 import dev.kultivator.sekte.gabung.Keanggotaan;
+import dev.kultivator.sekte.gabung.Promosi;
 import dev.kultivator.sekte.gabung.api.GabungApi;
 import dev.kultivator.sekte.gabung.api.Pintu;
 import dev.kultivator.sekte.gabung.api.StatusAnggota;
+import dev.kultivator.sekte.gabung.ui.GabungLayar;
+import dev.kultivator.sekte.gabung.ui.GabungLembar;
 import dev.kultivator.util.Msg;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -26,7 +29,11 @@ import java.util.List;
  * {@code gabung.lulus_sini}, {@code gabung.ujian_jalan}, {@code gabung.tamu_jalan};</li>
  * <li>effects {@code gabung.mulai_ujian}, {@code gabung.sumpah}, {@code gabung.jawab <kesan> [sifat]},
  * {@code gabung.wawancara}, {@code gabung.tamu duel|karya}, {@code gabung.undangan <sekte|terdekat>},
- * {@code gabung.kenal <sekte|terdekat>}, {@code gabung.dengar <sekte|terdekat>}.</li>
+ * {@code gabung.kenal <sekte|terdekat>}, {@code gabung.dengar <sekte|terdekat>};</li>
+ * <li>the promotion door of the sect's elders ({@code gabung_kenaikan}): condition {@code gabung.naik_siap [tetua]} (a member of
+ * the sect the body serves whose next rank asks for nothing but its trial or is all met; argument {@code murid} or {@code tetua}
+ * picks the branch, none means either), effects {@code gabung.naik [tetua]}
+ * ({@code Promosi.ajukan}: starts the trial or the ceremony) and {@code gabung.pohon} (opens the rank tree).</li>
  * </ul>
  * "Sini" means the sect the speaking body serves ({@link Perekrut#sekteDari}). {@code gabung.beri_token} is 41W's
  * ({@code CeritaGabung}); {@link TokenNaik#beriToken} is the full form it may call.
@@ -52,6 +59,23 @@ final class MasukCerita {
 			Keanggotaan k = GabungApi.anggota(p);
 			return sekte != null && k.status == StatusAnggota.CALON && sekte.equals(k.sekte) && !Putusan.lulus(k, sekte)
 					&& !tanpaHari(k) && !HariUjian.bukaSekarang(p.level().getServer(), sekte);
+		});
+		Syarat.daftar("gabung.naik_siap", (p, a) -> {
+			String sekte = sini(p);
+			if (sekte == null || !sekte.equals(GabungApi.sekte(p.getUUID()))) {
+				return false;
+			}
+			String jalan = a.isEmpty() ? "" : a.getFirst();
+			return "tetua".equals(jalan) ? Promosi.siap(p, true) : "murid".equals(jalan) ? Promosi.siap(p, false)
+					: Promosi.siap(p, false) || Promosi.siap(p, true);
+		});
+		Akibat.daftar("gabung.naik", (p, a) -> {
+			TempatDialog.akhiri(p);
+			Promosi.ajukan(p, !a.isEmpty() && "tetua".equals(a.getFirst()));
+		});
+		Akibat.daftar("gabung.pohon", (p, a) -> {
+			TempatDialog.akhiri(p);
+			GabungLayar.bukaLayar(p, GabungLembar.PohonPangkat.LAYAR, -1, null);
 		});
 		Syarat.daftar("gabung.lulus_sini", (p, a) -> {
 			String sekte = sini(p);
